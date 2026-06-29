@@ -75,12 +75,37 @@ function MainAppContent() {
           
           try {
             setIsSigning(true);
-            const message = new TextEncoder().encode(`Welcome to Void Covenant!\n\nPlease sign this message to authenticate your wallet.\n\nTimestamp: ${Date.now()}`);
-            await signMessage(message);
+            const timestamp = Date.now();
+            const messageString = `Welcome to Void Covenant!\n\nPlease sign this message to authenticate your wallet.\n\nTimestamp: ${timestamp}`;
+            const message = new TextEncoder().encode(messageString);
+            
+            const signatureBytes = await signMessage(message);
+            
+            const bs58 = (await import('bs58')).default;
+            const signature = bs58.encode(signatureBytes);
+            const publicKeyStr = publicKey.toBase58();
+
+            const response = await fetch('/api/auth', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                publicKey: publicKeyStr,
+                signature,
+                message: messageString
+              })
+            });
+
+            if (!response.ok) {
+              throw new Error('Backend authentication failed');
+            }
+
+            const data = await response.json();
+            localStorage.setItem('void_covenant_token', data.token);
+
             setIsVerified(true);
           } catch (error) {
             console.error("Signature rejected or failed:", error);
-            // Disconnect if they refuse to sign
+            // Disconnect if they refuse to sign or auth fails
             disconnect().catch(() => {});
           } finally {
             setIsSigning(false);

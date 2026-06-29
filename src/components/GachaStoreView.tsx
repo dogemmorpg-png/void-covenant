@@ -10,7 +10,7 @@ import { getRandomEquipmentByTier, generateEquipmentInstance } from '../data/equ
 import { Gem, Coins, Sparkles, Box, Trash2, Shield, Flame, Skull, Sword } from 'lucide-react';
 
 export const GachaStoreView: React.FC = () => {
-  const { profile, spendGold, spendShards, addCardToCollection, addEquipment } = useGame();
+  const { profile, spendGold, spendShards, addCardToCollection, addEquipment, setProfile } = useGame();
   const toast = useToast();
   
   const [activeTab, setActiveTab] = useState<'cards' | 'equipment'>('cards');
@@ -22,98 +22,51 @@ export const GachaStoreView: React.FC = () => {
   const [isRevealed, setIsRevealed] = useState(false);
 
   // Buy Bronze Pack (costs 300 Gold)
-  const buyBronzePack = () => {
-    if (spendGold(300)) {
-      triggerOpeningAnimation('bronze', 3);
-    } else {
-      toast('Not enough gold! Complete Campaign missions or exchange shards.', 'warning');
-    }
-  };
-
   // Buy Obsidian Pack (costs 30 Shards)
-  const buyObsidianPack = () => {
-    if (spendShards(30)) {
-      triggerOpeningAnimation('obsidian', 3);
-    } else {
-      toast('Not enough Dark Shards! Connect Solana wallet, complete airdrop tasks, or buy shards.', 'warning');
-    }
-  };
+  const buyObsidianPack = () => buyPackBackend('obsidian');
 
   // Buy Abyssal Pack (costs 70 Shards)
-  const buyAbyssalPack = () => {
-    if (spendShards(70)) {
-      triggerOpeningAnimation('abyssal', 3);
-    } else {
-      toast('Not enough Dark Shards! Top up Solana balance and make a purchase.', 'warning');
-    }
-  };
+  const buyBronzePack = () => buyPackBackend('bronze');
 
   // Run pack animation
-  const triggerOpeningAnimation = (packType: 'bronze' | 'obsidian' | 'abyssal', numCards: number) => {
+  const triggerOpeningAnimationBackend = (packType: string, newCards: any[]) => {
     audioSystem.playMagic();
-    setOpeningPack(packType);
-    setRevealedCards([]);
+    setOpeningPack(packType as any);
+    setRevealedCards(newCards);
     setIsRevealed(false);
+    setTimeout(() => setIsRevealed(true), 1500);
+  };
 
-    // Pick random cards based on pool
-    const pool = CARD_TEMPLATES;
-    let selectedTemplates: any[] = [];
-
-    for (let i = 0; i < numCards; i++) {
-      let rand = Math.random() * 100;
-      let cardTemplate;
-
-      if (packType === 'bronze') {
-        // 95% Bronze, 5% Silver
-        if (rand < 95) {
-          const bronzePool = pool.filter(c => c.tier === 'bronze');
-          cardTemplate = bronzePool[Math.floor(Math.random() * bronzePool.length)];
-        } else {
-          const silverPool = pool.filter(c => c.tier === 'silver');
-          cardTemplate = silverPool[Math.floor(Math.random() * silverPool.length)];
-        }
-      } else if (packType === 'obsidian') {
-        // 40% Bronze (L2-3), 50% Silver, 10% Gold
-        if (rand < 40) {
-          const bronzePool = pool.filter(c => c.tier === 'bronze');
-          cardTemplate = bronzePool[Math.floor(Math.random() * bronzePool.length)];
-        } else if (rand < 90) {
-          const silverPool = pool.filter(c => c.tier === 'silver');
-          cardTemplate = silverPool[Math.floor(Math.random() * silverPool.length)];
-        } else {
-          const goldPool = pool.filter(c => c.tier === 'gold');
-          cardTemplate = goldPool[Math.floor(Math.random() * goldPool.length)];
-        }
-      } else {
-        // Abyssal: 40% Silver, 45% Gold, 15% Legendary
-        if (rand < 40) {
-          const silverPool = pool.filter(c => c.tier === 'silver');
-          cardTemplate = silverPool[Math.floor(Math.random() * silverPool.length)];
-        } else if (rand < 85) {
-          const goldPool = pool.filter(c => c.tier === 'gold');
-          cardTemplate = goldPool[Math.floor(Math.random() * goldPool.length)];
-        } else {
-          const legendaryPool = pool.filter(c => c.tier === 'legendary');
-          cardTemplate = legendaryPool[Math.floor(Math.random() * legendaryPool.length)];
-        }
+  const buyPackBackend = async (packType: 'bronze' | 'obsidian' | 'abyssal') => {
+    try {
+      const token = localStorage.getItem('void_covenant_token');
+      if (!token) {
+        toast('Please connect and authenticate your wallet first.', 'warning');
+        return;
       }
-
-      // Roll level (bronze pack has level 1, obsidian/abyssal can roll level 1 to 2)
-      let rollLevel = 1;
-      if (packType === 'obsidian' && Math.random() < 0.3) rollLevel = 2;
-      if (packType === 'abyssal' && Math.random() < 0.4) rollLevel = 2;
-
-      // Add to collection in context and save in state
-      const newCardInstance = addCardToCollection(cardTemplate, rollLevel);
-      selectedTemplates.push(newCardInstance);
+      
+      const res = await fetch('/api/gacha', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ packType, numCards: 3 })
+      });
+      
+      const data = await res.json();
+      if (!res.ok) {
+        toast(data.error || 'Failed to purchase pack', 'error');
+        return;
+      }
+      
+      setProfile(data.profile);
+      triggerOpeningAnimationBackend(packType, data.newCards);
+      
+    } catch (e) {
+      console.error(e);
+      toast('Network error while purchasing pack', 'error');
     }
-
-    setRevealedCards(selectedTemplates);
-
-    // Delay visual reveal steps
-    setTimeout(() => {
-      setIsRevealed(true);
-    }, 1500);
   };
 
   // Equipment Packs
