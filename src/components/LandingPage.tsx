@@ -27,7 +27,7 @@ const features = [
     desc: 'Deploy dark creatures, unleash devastating skills, and crush your enemies in tactical turn-based battles.',
   },
   {
-    icon: '<img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />',
+    icon: <img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />,
     title: 'Dark Summoning Altar',
     desc: 'Open booster packs to summon powerful entities from Bronze to Legendary tier.',
   },
@@ -37,7 +37,7 @@ const features = [
     desc: 'Challenge other players in ranked matches. Climb the leagues from Recruit to Abyss Master.',
   },
   {
-    icon: '<img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />',
+    icon: <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />,
     title: 'Blockchain Airdrop',
     desc: 'Connect your Solana wallet, complete quests, and earn $VOID tokens before the listing.',
   },

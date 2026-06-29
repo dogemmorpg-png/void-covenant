@@ -82,11 +82,11 @@ const getSkillBadgeStyle = (type: string) => {
 
 const getSkillIcon = (type: string) => {
   switch (type?.toLowerCase()) {
-    case 'sacrifice': return '💀';
-    case 'vampirism': return '🩸';
-    case 'hex': return '<img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />';
-    case 'plague': return '🤢';
-    default: return '✨';
+    case 'sacrifice': return <Skull className="w-5 h-5 inline-block" />;
+    case 'vampirism': return <Flame className="w-5 h-5 inline-block" />;
+    case 'hex': return <img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-5 h-5 inline-block align-text-bottom mx-1" />;
+    case 'plague': return <Activity className="w-5 h-5 inline-block" />;
+    default: return <Star className="w-5 h-5 inline-block" />;
   }
 };
 
@@ -1192,12 +1192,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 else if (log.includes('VICTORY') || log.includes('healed')) colorClass = 'text-emerald-400 font-bold';
                 else if (log.includes('DEFEAT') || log.includes('fell') || log.includes('Death')) colorClass = 'text-red-500 font-bold';
                 else if (log.includes('Sacrifice') || log.includes('💀')) colorClass = 'text-yellow-500';
-                else if (log.includes('Hex') || log.includes('<img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />')) colorClass = 'text-purple-400';
+                else if (log.includes('Hex')) colorClass = 'text-purple-400';
                 else if (log.includes('Enemy') || log.includes('😈')) colorClass = 'text-rose-300';
 
                 return (
-                  <div key={index} className={`border-b border-gray-900/20 pb-0.5 leading-relaxed ${colorClass}`}>
-                    {log}
+                  <div key={index} className={`border-b border-gray-900/20 pb-0.5 leading-relaxed ${colorClass}`} dangerouslySetInnerHTML={{ __html: log }}>
                   </div>
                 );
               })}
