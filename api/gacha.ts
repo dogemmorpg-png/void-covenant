@@ -4,11 +4,17 @@ import { createClient } from '@supabase/supabase-js';
 import { CARD_TEMPLATES, createCardInstance } from '../src/data/cards';
 
 // Setup Supabase Service Client (bypasses RLS to safely update DB)
-const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
+
+// Helper to get supabase instance
+function getSupabase() {
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error('Supabase URL or Service Role Key is missing in environment variables.');
+  }
+  return createClient(supabaseUrl, supabaseServiceKey);
+}
 
 function generateRandomCards(packType: string, numCards: number) {
   const pool = CARD_TEMPLATES;
@@ -93,6 +99,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const walletAddress = decoded.wallet;
     const { packType, numCards = 3 } = req.body;
 
+    const supabase = getSupabase();
+
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('data')
@@ -144,8 +152,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({ success: true, profile, newCards });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Gacha error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }
