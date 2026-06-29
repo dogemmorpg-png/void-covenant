@@ -9,7 +9,7 @@
       "DOM",
       "DOM.Iterable"
     ],
-    "skipLibCheck": true,
+    "skipLibCheck": true, "esModuleInterop": true,
     "moduleResolution": "bundler",
     "isolatedModules": true,
     "moduleDetection": "force",
