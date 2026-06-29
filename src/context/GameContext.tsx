@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { Card, PlayerProfile, CampaignStage, BattlePassTier, CardTemplate, CardTier, Equipment, EquipmentSlot } from '../types';
 import { getStarterDeck, CARD_TEMPLATES, createCardInstance, BATTLE_PASS_TIERS, AIRDROP_TASKS } from '../data/cards';
 import { supabase } from '../utils/supabaseClient';
@@ -353,7 +353,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Connect Solana Wallet
-  const connectSolanaWallet = async (address: string) => {
+  const connectSolanaWallet = useCallback(async (address: string) => {
     setIsLoadingProfile(true);
     const specificKey = `${LOCAL_STORAGE_KEY}_${address}`;
     let loadedProfile = createDefaultProfile();
@@ -419,12 +419,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setProfile(loadedProfile);
     setIsLoadingProfile(false);
-  };
+  }, []);
 
   // Disconnect Solana Wallet
-  const disconnectSolanaWallet = () => {
+  const disconnectSolanaWallet = useCallback(() => {
     setProfile(createDefaultProfile());
-  };
+  }, []);
 
   const registerPlayer = (username: string, avatarUrl: string) => {
     setProfile(current => {
