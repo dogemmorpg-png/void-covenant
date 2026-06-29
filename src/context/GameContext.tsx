@@ -43,12 +43,14 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = 'void_covenant_profile_v1';
 
-const createDefaultProfile = (): PlayerProfile => ({
+const createDefaultProfile = (): PlayerProfile => {
+  const starterDeck = getStarterDeck();
+  return {
   gold: 500,
   dust: 100,
   darkShards: 0,
-  collection: getStarterDeck(),
-  deck: getStarterDeck().slice(0, 5).map(c => c.id),
+  collection: starterDeck,
+  deck: starterDeck.slice(0, 5).map(c => c.id),
   pveEnergy: 10,
   pveEnergyMax: 10,
   pvpEnergy: 5,
@@ -73,7 +75,8 @@ const createDefaultProfile = (): PlayerProfile => ({
   isPremiumBP: false,
   username: '',
   isRegistered: false
-});
+  };
+};
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [soundOn, setSoundOn] = useState(false);
@@ -100,7 +103,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         data: newProfile,
         updated_at: new Date().toISOString()
       }).then(({ error }) => {
-        if (error) console.error('Error saving to Supabase', error);
+        if (error) {
+          console.error('Error saving to Supabase', error);
+          // Optional: alert('Supabase Save Error: ' + JSON.stringify(error));
+        }
       });
     }
   };
@@ -373,6 +379,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const levelUps = (parsed.level || 1) - 1;
           parsed.heroMaxHealth = 30 + (levelUps * 2);
         }
+        
+        // Sanitize deck to remove ghost cards
+        if (parsed.deck && parsed.collection) {
+          parsed.deck = parsed.deck.filter(id => parsed.collection.some(c => c.id === id));
+        }
+
         loadedProfile = { ...loadedProfile, ...parsed, solanaAddress: address, solBalance: 12.5 };
         setProfile(loadedProfile);
         setIsLoadingProfile(false);
@@ -390,6 +402,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const levelUps = (parsed.level || 1) - 1;
           parsed.heroMaxHealth = 30 + (levelUps * 2);
         }
+        
+        // Sanitize deck to remove ghost cards
+        if (parsed.deck && parsed.collection) {
+          parsed.deck = parsed.deck.filter(id => parsed.collection.some(c => c.id === id));
+        }
+        
         loadedProfile = { ...loadedProfile, ...parsed, solanaAddress: address, solBalance: 12.5 };
       } catch (e) {
         console.error('Failed to parse specific wallet profile', e);
@@ -405,6 +423,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
               const levelUps = (parsed.level || 1) - 1;
               parsed.heroMaxHealth = 30 + (levelUps * 2);
             }
+            
+            // Sanitize deck to remove ghost cards
+            if (parsed.deck && parsed.collection) {
+              parsed.deck = parsed.deck.filter(id => parsed.collection.some(c => c.id === id));
+            }
+            
             loadedProfile = { ...loadedProfile, ...parsed, solanaAddress: address, solBalance: 12.5 };
             
             // Save the migrated profile immediately and remove the legacy one to prevent copying it to other wallets
