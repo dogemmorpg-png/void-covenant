@@ -20,7 +20,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 
 function MainAppContent() {
-  const { profile, connectSolanaWallet, registerPlayer, disconnectSolanaWallet } = useGame();
+  const { profile, isLoadingProfile, connectSolanaWallet, registerPlayer, disconnectSolanaWallet } = useGame();
   const { connected, publicKey, signMessage, disconnect } = useWallet();
   const { setVisible } = useWalletModal();
   
@@ -106,13 +106,13 @@ function MainAppContent() {
   }
 
   // Prevent UI flickering while profile state syncs with wallet connection state
-  if (connected && publicKey && (!isVerified || profile.solanaAddress !== publicKey.toBase58())) {
+  if (connected && publicKey && (!isVerified || profile.solanaAddress !== publicKey.toBase58() || isLoadingProfile)) {
     return (
       <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 rounded-full border-t-2 border-r-2 border-t-[#dd2c40] border-r-transparent animate-spin" />
           <p className="text-[#dd2c40] font-mono text-xs tracking-[0.3em] animate-pulse">
-            {isSigning ? 'AWAITING SIGNATURE...' : 'SYNCING...'}
+            {isSigning ? 'AWAITING SIGNATURE...' : isLoadingProfile ? 'LOADING PROFILE...' : 'SYNCING...'}
           </p>
         </div>
       </div>

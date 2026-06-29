@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { Card, PlayerProfile, CampaignStage, BattlePassTier, CardTemplate, CardTier, Equipment, EquipmentSlot } from '../types';
 import { getStarterDeck, CARD_TEMPLATES, createCardInstance, BATTLE_PASS_TIERS, AIRDROP_TASKS } from '../data/cards';
+import { supabase } from '../utils/supabaseClient';
 
 interface GameContextType {
   profile: PlayerProfile;
@@ -17,7 +18,8 @@ interface GameContextType {
   usePveEnergy: (amount: number) => boolean;
   usePvpEnergy: (amount: number) => boolean;
   buyDarkShardsWithSOL: (solAmount: number) => boolean;
-  connectSolanaWallet: (address: string) => void;
+  isLoadingProfile: boolean;
+  connectSolanaWallet: (address: string) => Promise<void>;
   disconnectSolanaWallet: () => void;
   fuseCards: (cardId1: string, cardId2: string) => { success: boolean; message: string; newCard?: Card };
   addCardToCollection: (cardTemplate: CardTemplate, level?: number) => Card;
@@ -81,15 +83,25 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const [profile, setProfile] = useState<PlayerProfile>(createDefaultProfile);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
 
   // Ref to track latest profile for synchronous reads in spend functions
   const profileRef = useRef(profile);
   useEffect(() => { profileRef.current = profile; }, [profile]);
 
-  // Automatically save profile changes to localStorage
+  // Automatically save profile changes to localStorage and Supabase
   const saveProfile = (newProfile: PlayerProfile) => {
     if (newProfile.solanaAddress) {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_${newProfile.solanaAddress}`, JSON.stringify(newProfile));
+      
+      supabase.from('profiles').upsert({
+        wallet_address: newProfile.solanaAddress,
+        username: newProfile.username || null,
+        level: newProfile.level || 1,
+        pvp_rating: newProfile.pvpRating || 100,
+        data: newProfile,
+        updated_at: new Date().toISOString()
+      }).catch(err => console.error('Error saving to Supabase', err));
     }
   };
 
@@ -341,11 +353,34 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Connect Solana Wallet
-  const connectSolanaWallet = (address: string) => {
+  const connectSolanaWallet = async (address: string) => {
+    setIsLoadingProfile(true);
     const specificKey = `${LOCAL_STORAGE_KEY}_${address}`;
     let loadedProfile = createDefaultProfile();
     loadedProfile.solanaAddress = address;
     loadedProfile.solBalance = 12.5;
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('data')
+        .eq('wallet_address', address)
+        .single();
+        
+      if (data && data.data) {
+        const parsed = data.data as PlayerProfile;
+        if (parsed.heroMaxHealth && parsed.heroMaxHealth >= 100) {
+          const levelUps = (parsed.level || 1) - 1;
+          parsed.heroMaxHealth = 30 + (levelUps * 2);
+        }
+        loadedProfile = { ...loadedProfile, ...parsed, solanaAddress: address, solBalance: 12.5 };
+        setProfile(loadedProfile);
+        setIsLoadingProfile(false);
+        return;
+      }
+    } catch (e) {
+      console.warn('Profile not found in Supabase or network error, falling back to local storage', e);
+    }
 
     const specificSaved = localStorage.getItem(specificKey);
     if (specificSaved) {
@@ -383,6 +418,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     setProfile(loadedProfile);
+    setIsLoadingProfile(false);
   };
 
   // Disconnect Solana Wallet
@@ -798,6 +834,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <GameContext.Provider
       value={{
         profile,
+        isLoadingProfile,
         setProfile,
         saveProfile,
         addGold,
