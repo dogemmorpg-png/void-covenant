@@ -642,33 +642,35 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let message = '';
     
     setProfile(current => {
-      const isCurrentlyInDeck = current.deck.includes(cardId);
+      // Self-heal ghost cards
+      const validDeck = current.deck.filter(id => current.collection.some(c => c.id === id));
+      const isCurrentlyInDeck = validDeck.includes(cardId);
       
       if (isCurrentlyInDeck) {
         // Remove from deck. Ensure they have at least 1 card in deck!
-        if (current.deck.length <= 1) {
+        if (validDeck.length <= 1) {
           message = 'Deck cannot be empty. Select at least 1 card.';
-          return current;
+          return { ...current, deck: validDeck };
         }
         success = true;
         message = 'Card removed from battle deck.';
         const updated = {
           ...current,
-          deck: current.deck.filter(id => id !== cardId)
+          deck: validDeck.filter(id => id !== cardId)
         };
         saveProfile(updated);
         return updated;
       } else {
         // Add to deck. Check max 5 limit.
-        if (current.deck.length >= 5) {
+        if (validDeck.length >= 5) {
           message = 'Maximum 5 cards in deck. Remove a card first.';
-          return current;
+          return { ...current, deck: validDeck };
         }
         success = true;
         message = 'Card added to battle deck!';
         const updated = {
           ...current,
-          deck: [...current.deck, cardId]
+          deck: [...validDeck, cardId]
         };
         saveProfile(updated);
         return updated;
