@@ -1405,7 +1405,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     </div>
 
                     <div className="p-2.5 rounded-lg bg-purple-950/30 border border-purple-900/35">
-                      <span className="font-bold text-purple-300"><img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> Hex [X]:</span>
+                      <span className="font-bold text-purple-300"><Zap className="w-4 h-4 inline-block text-purple-400 mx-1 align-text-bottom" /> Hex [X]:</span>
                       <p className="text-gray-400 mt-0.5">
                         Before dealing damage, hexes the opposite creature, increasing next incoming damage by +X.
                       </p>

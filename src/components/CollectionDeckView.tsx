@@ -327,16 +327,16 @@ export const CollectionDeckView: React.FC = () => {
                       <div
                         key={card.id}
                         onClick={() => selectFuseCard2(card.id)}
-                        className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer border ${getCardTierStyles(card.tier, isSelected, true)}`}
+                        className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer border overflow-hidden group ${getCardTierStyles(card.tier, isSelected, true)}`}
                       >
-                        <div className="absolute top-1 right-1 bg-black/70 border border-purple-500/30 rounded-full w-4 h-4 flex items-center justify-center text-[8px] font-mono font-bold text-purple-400">
-                          L{card.level}
-                        </div>
-                        {card.image.startsWith('/') ? (
-                          <img src={card.image} className="absolute inset-0 w-full h-full object-cover rounded-xl opacity-40 z-[-1]" />
+                        {card.image.startsWith('/cards/') ? (
+                          <>
+                            <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 group-hover:scale-110 transition-transform duration-500" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20 z-0 pointer-events-none" />
+                          </>
                         ) : (
-                          <div className="absolute inset-0 flex items-center justify-center opacity-30 z-[-1]">
-                            {renderCardIcon(card.image, `w-8 h-8 ${getCardIconColor(card.color)}`)}
+                          <div className="absolute inset-0 flex items-center justify-center opacity-40 z-0">
+                            {renderCardIcon(card.image, `w-12 h-12 ${getCardIconColor(card.color)}`)}
                           </div>
                         )}
                         <div className="text-center mt-2 relative z-10 drop-shadow-md">

@@ -7,6 +7,7 @@ import { Award, Lock, CheckCircle2, ChevronRight, Gem, AlertCircle } from 'lucid
 export const BattlePassView: React.FC = () => {
   const { profile, setProfile, claimBattlePassReward, saveProfile, addBattlePassPoints } = useGame();
   const toast = useToast();
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   
   // local premium check (we can simulate or save in profile)
   // Let's store premium battle pass status in player profile by extending/simulating it.
@@ -28,16 +29,19 @@ export const BattlePassView: React.FC = () => {
       return;
     }
 
-    if (window.confirm('Do you really want to purchase Premium Battle Pass: Dark Pass for 40 <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />? You will instantly unlock legendary rewards in the right column!')) {
-      const updated = {
-        ...profile,
-        darkShards: profile.darkShards - 40,
-        isPremiumBP: true
-      };
-      setProfile(updated as any);
-      saveProfile(updated as any);
-      toast('Dark Pass successfully activated! The Blood Moon welcomes you.', 'reward');
-    }
+    setShowConfirmModal(true);
+  };
+
+  const confirmPurchase = () => {
+    const updated = {
+      ...profile,
+      darkShards: profile.darkShards - 40,
+      isPremiumBP: true
+    };
+    setProfile(updated as any);
+    saveProfile(updated as any);
+    setShowConfirmModal(false);
+    toast('Dark Pass successfully activated! The Blood Moon welcomes you.', 'reward');
   };
 
   const handleClaimReward = (tierIndex: number, isPremium: boolean) => {
@@ -226,6 +230,34 @@ export const BattlePassView: React.FC = () => {
         })}
 
       </div>
+
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-[#151a21] border border-purple-500/50 rounded-2xl max-w-md w-full shadow-2xl overflow-hidden relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-900 via-red-900 to-purple-900" />
+            
+            <div className="p-6">
+              <div className="text-center relative z-10">
+                <Gem className="w-12 h-12 text-purple-400 mx-auto mb-4 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
+                <h2 className="text-xl font-display font-black text-white uppercase tracking-widest mb-2 text-shadow-gold">Unlock Dark Pass</h2>
+                
+                <p className="text-gray-300 font-sans text-sm mb-6 leading-relaxed">
+                  Do you really want to purchase Premium Battle Pass: Dark Pass for 40 <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-5 h-5 inline-block align-text-bottom mx-1" />? You will instantly unlock legendary rewards!
+                </p>
+
+                <div className="flex gap-3">
+                  <button onClick={() => setShowConfirmModal(false)} className="flex-1 bg-[#0b0c10] hover:bg-gray-800 border border-gray-700/50 text-gray-400 font-mono text-xs py-3 rounded-xl transition-all">
+                    CANCEL
+                  </button>
+                  <button onClick={confirmPurchase} className="flex-1 bg-gradient-to-r from-purple-900 to-[#4e0707] hover:from-purple-600 hover:to-red-700 border border-purple-500/50 text-white font-display font-black tracking-widest py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                    CONFIRM
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -9,6 +9,7 @@ export const AirdropHubView: React.FC = () => {
   const { profile, connectSolanaWallet, completeAirdropTask, addReferral, buyDarkShardsWithSOL } = useGame();
   const toast = useToast();
   const { setVisible } = useWalletModal();
+  const [showConfirmShardsModal, setShowConfirmShardsModal] = useState<number | null>(null);
   
   // Simulated countdown for token listing
   const [timeLeft, setTimeLeft] = useState({
@@ -67,11 +68,14 @@ export const AirdropHubView: React.FC = () => {
       return;
     }
 
-    if (window.confirm(`Do you confirm the smart contract transaction in your wallet to buy Dark Shards for ${solCost} SOL?`)) {
-      if (buyDarkShardsWithSOL(solCost)) {
-        toast(`Solana blockchain transaction confirmed! Added +${solCost * 50} Dark Shards`, 'reward');
-      }
+    setShowConfirmShardsModal(solCost);
+  };
+
+  const confirmBuyShards = () => {
+    if (showConfirmShardsModal && buyDarkShardsWithSOL(showConfirmShardsModal)) {
+      toast(`Solana blockchain transaction confirmed! Added +${showConfirmShardsModal * 50} Dark Shards`, 'reward');
     }
+    setShowConfirmShardsModal(null);
   };
 
   return (
@@ -277,6 +281,34 @@ export const AirdropHubView: React.FC = () => {
           })}
         </div>
       </div>
+
+      {showConfirmShardsModal !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-[#151a21] border border-[#66fcf1]/50 rounded-2xl max-w-md w-full shadow-2xl overflow-hidden relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-900 via-[#66fcf1] to-teal-900" />
+            
+            <div className="p-6">
+              <div className="text-center relative z-10">
+                <Coins className="w-12 h-12 text-[#66fcf1] mx-auto mb-4 drop-shadow-[0_0_10px_rgba(102,252,241,0.5)]" />
+                <h2 className="text-xl font-display font-black text-white uppercase tracking-widest mb-2">Buy Dark Shards</h2>
+                
+                <p className="text-gray-300 font-sans text-sm mb-6 leading-relaxed">
+                  Do you confirm the smart contract transaction in your wallet to buy {showConfirmShardsModal * 50} <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-5 h-5 inline-block align-text-bottom mx-1" /> Dark Shards for <span className="text-[#66fcf1] font-bold">{showConfirmShardsModal} SOL</span>?
+                </p>
+
+                <div className="flex gap-3">
+                  <button onClick={() => setShowConfirmShardsModal(null)} className="flex-1 bg-[#0b0c10] hover:bg-gray-800 border border-gray-700/50 text-gray-400 font-mono text-xs py-3 rounded-xl transition-all">
+                    CANCEL
+                  </button>
+                  <button onClick={confirmBuyShards} className="flex-1 bg-gradient-to-r from-teal-900 to-[#1f2833] hover:from-teal-600 hover:to-indigo-900 border border-[#66fcf1]/50 text-[#66fcf1] font-display font-black tracking-widest py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(102,252,241,0.4)]">
+                    CONFIRM
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
