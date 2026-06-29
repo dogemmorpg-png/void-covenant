@@ -1,0 +1,13 @@
+src/components/BattleFieldView.tsx : 📥 Выберите свободный Slot на поле боя
+src/components/BattleFieldView.tsx : <span className="font-bold text-white block">Жертва</span>
+src/components/BattleFieldView.tsx : <div className="text-amber-500 font-bold text-sm">+20 🪙 Золота</div>
+src/components/BattleFieldView.tsx : <span className="font-bold text-rose-300">🩸 Vampirism [X] (Вампиризм):</span>
+src/components/BattleFieldView.tsx : <span className="font-bold text-purple-300">🔮 Hex [X] (Проклятие):</span>
+src/components/BattleFieldView.tsx : <span className="font-bold text-emerald-300">🤢 Plague [X] (Чума):</span>
+src/components/PvpArenaView.tsx : Стоимость входа: 1 PvP Energy. При поражении вы потеряете -15 MMR.
+src/components/PvpArenaView.tsx : Ratingи лучших призывателей Void Covenant. Побеждайте в PvP, чтобы подняться выше в рейтинге!
+src/components/SplashScreen.tsx : Тёмная Карточная RPG
+src/components/SplashScreen.tsx : «Из тьмы бездны восстанет тот, кто заключит ковенант...»
+src/components/SplashScreen.tsx : <span className="relative z-10">ВОЙТИ В БЕЗДНУ</span>
+src/components/Toast.tsx : aria-label="Закрыть"
+src/context/GameContext.tsx : // We add duplicates of Skeleton and Rat so they can level them up and immediately experience Fusing (Слияние)!

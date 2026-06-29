@@ -1,0 +1,6 @@
+{
+  "name": "Void Covenant",
+  "description": "A browser-based dark fantasy 1v1 tactical card RPG inspired by Spellstone with card fusing, PvE campaigns, PvP arena, and simulated Web3 economy.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
