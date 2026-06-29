@@ -1,7 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
-import { CARD_TEMPLATES, createCardInstance } from '../src/data/cards';
+import { CARD_TEMPLATES, createCardInstance } from '../src/data/cards.js';
 
 // Setup Supabase Service Client (bypasses RLS to safely update DB)
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
