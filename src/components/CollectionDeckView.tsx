@@ -694,7 +694,7 @@ export const CollectionDeckView: React.FC = () => {
                       selectedCard.skills.map((skill, idx) => (
                         <div key={idx} className="bg-black/30 border border-white/10/40 p-2.5 rounded-lg text-xs">
                           <span className="font-display font-semibold text-[#ebd09b] block uppercase">
-                            {skill.type === 'hex' && <><img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> Hex</>}
+                            {skill.type === 'hex' && <><Zap className="w-4 h-4 inline-block text-purple-400" /> Hex</>}
                             {skill.type === 'vampirism' && '🩸 Vampirism'}
                             {skill.type === 'plague' && '🤢 Plague'}
                             {skill.type === 'sacrifice' && '💀 Sacrifice'}

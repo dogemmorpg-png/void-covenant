@@ -84,7 +84,7 @@ const getSkillIcon = (type: string) => {
   switch (type?.toLowerCase()) {
     case 'sacrifice': return <Skull className="w-5 h-5 inline-block" />;
     case 'vampirism': return <Flame className="w-5 h-5 inline-block" />;
-    case 'hex': return <img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-5 h-5 inline-block align-text-bottom mx-1" />;
+    case 'hex': return <Zap className="w-4 h-4 inline-block text-purple-400 mx-0.5" />;
     case 'plague': return <Activity className="w-5 h-5 inline-block" />;
     default: return <Star className="w-5 h-5 inline-block" />;
   }
