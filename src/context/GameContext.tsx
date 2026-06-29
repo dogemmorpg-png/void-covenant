@@ -53,6 +53,7 @@ const createDefaultProfile = (): PlayerProfile => ({
   pveEnergyMax: 10,
   pvpEnergy: 5,
   pvpEnergyMax: 5,
+  lastEnergyRefill: Date.now(),
   lastPveEnergyRefill: Date.now(),
   lastPvpEnergyRefill: Date.now(),
   pveProgress: 1,
@@ -101,7 +102,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         pvp_rating: newProfile.pvpRating || 100,
         data: newProfile,
         updated_at: new Date().toISOString()
-      }).catch(err => console.error('Error saving to Supabase', err));
+      }).then(({ error }) => {
+        if (error) console.error('Error saving to Supabase', error);
+      });
     }
   };
 
