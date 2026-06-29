@@ -97,9 +97,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       supabase.from('profiles').upsert({
         wallet_address: newProfile.solanaAddress,
-        username: newProfile.username || null,
-        level: newProfile.level || 1,
-        pvp_rating: newProfile.pvpRating || 100,
         data: newProfile,
         updated_at: new Date().toISOString()
       }).then(({ error }) => {
