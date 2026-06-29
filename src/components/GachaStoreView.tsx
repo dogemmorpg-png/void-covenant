@@ -22,11 +22,13 @@ export const GachaStoreView: React.FC = () => {
   const [isRevealed, setIsRevealed] = useState(false);
 
   // Buy Bronze Pack (costs 300 Gold)
+  const buyBronzePack = () => buyPackBackend('bronze');
+
   // Buy Obsidian Pack (costs 30 Shards)
   const buyObsidianPack = () => buyPackBackend('obsidian');
 
   // Buy Abyssal Pack (costs 70 Shards)
-  const buyBronzePack = () => buyPackBackend('bronze');
+  const buyAbyssalPack = () => buyPackBackend('abyssal');
 
   // Run pack animation
   const triggerOpeningAnimationBackend = (packType: string, newCards: any[]) => {
