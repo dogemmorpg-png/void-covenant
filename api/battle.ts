@@ -2,8 +2,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
 import { PlayerProfile, CardTemplate } from '../src/types.js';
-import { CAMPAIGN_STAGES } from '../src/data/cards.js';
-import { createCardInstance } from '../src/data/cards.js';
+import { generateCampaignStage, createCardInstance } from '../src/data/cards.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
@@ -90,7 +89,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (battleType === 'campaign' && result === 'win') {
-      const stage = CAMPAIGN_STAGES.find((s: any) => s.id === stageId);
+      const floorNum = parseInt(stageId);
+      if (isNaN(floorNum)) return res.status(400).json({ error: 'Invalid campaign stage' });
+
+      const stage = generateCampaignStage(floorNum);
       if (!stage) return res.status(400).json({ error: 'Invalid campaign stage' });
 
       goldReward = Math.floor(stage.goldReward * goldMultiplier);
@@ -105,9 +107,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       
       // Update campaign progress
-      const stageIndex = CAMPAIGN_STAGES.findIndex((s: any) => s.id === stageId);
-      if (stageIndex >= profile.pveProgress) {
-        profile.pveProgress = stageIndex + 1;
+      if (floorNum >= profile.pveProgress) {
+        profile.pveProgress = floorNum + 1;
       }
       
       // Update campaign stars
