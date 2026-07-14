@@ -31,14 +31,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
 
-  const walletAddress = decoded.walletAddress;
+  const walletAddress = decoded.walletAddress || decoded.wallet;
   if (!walletAddress) {
     return res.status(400).json({ error: 'Token missing wallet address' });
-  }
-
-  const { safeProfileData } = req.body;
-  if (!safeProfileData) {
-    return res.status(400).json({ error: 'Missing profile data' });
   }
 
   try {
@@ -54,23 +49,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
-    const currentProfile = profileRow.data;
-
-    // ONLY merge fields that are safe for the user to change locally:
-    // deck, equipped, soundOn, isRegistered, username, avatarUrl
-    if (safeProfileData.deck) currentProfile.deck = safeProfileData.deck;
-    if (safeProfileData.equipped) currentProfile.equipped = safeProfileData.equipped;
-    if (safeProfileData.soundOn !== undefined) currentProfile.soundOn = safeProfileData.soundOn;
-    if (safeProfileData.isRegistered !== undefined) currentProfile.isRegistered = safeProfileData.isRegistered;
-    if (safeProfileData.username) currentProfile.username = safeProfileData.username;
-    if (safeProfileData.avatarUrl) currentProfile.avatarUrl = safeProfileData.avatarUrl;
-
-    const oldVersion = currentProfile.version;
-    currentProfile.version = (oldVersion || 0) + 1;
+    const profile = profileRow.data;
+    const oldVersion = profile.version;
+    
+    profile.lastBattleTimestamp = Date.now();
+    profile.version = (oldVersion || 0) + 1;
 
     let updateQuery = supabase
       .from('profiles')
-      .update({ data: currentProfile, updated_at: new Date().toISOString() })
+      .update({ data: profile, updated_at: new Date().toISOString() })
       .eq('wallet_address', walletAddress);
 
     if (oldVersion === undefined) {
@@ -85,9 +72,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(409).json({ error: 'Concurrent modification detected. Please try again.' });
     }
 
-    return res.status(200).json({ success: true, profile: currentProfile });
+    return res.status(200).json({ success: true, message: 'Battle session started' });
+
   } catch (error: any) {
-    console.error('Sync API error:', error);
+    console.error('Battle Start API error:', error);
     return res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }

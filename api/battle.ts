@@ -59,6 +59,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const profile: PlayerProfile = profileRow.data;
 
+    // Bot Prevention: Check lastBattleTimestamp
+    if (!profile.lastBattleTimestamp) {
+      return res.status(400).json({ error: 'Battle session not started. Suspicious activity detected.' });
+    }
+    const elapsedSeconds = (Date.now() - profile.lastBattleTimestamp) / 1000;
+    if (elapsedSeconds < 8) {
+      // Clears timestamp to prevent immediate retry with same session
+      profile.lastBattleTimestamp = undefined;
+      return res.status(400).json({ error: 'Battle completed too quickly. Suspicious activity detected.' });
+    }
+    profile.lastBattleTimestamp = undefined;
+
     let goldReward = 0;
     let dustReward = 0;
     let expReward = 0;
@@ -133,13 +145,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       profile.pveEnergy = profile.maxEnergy; // Refill energy on level up
     }
 
-    const { error: updateError } = await supabase
+    const oldVersion = profile.version;
+    profile.version = (oldVersion || 0) + 1;
+
+    let updateQuery = supabase
       .from('profiles')
       .update({ data: profile, updated_at: new Date().toISOString() })
       .eq('wallet_address', walletAddress);
 
-    if (updateError) {
-      return res.status(500).json({ error: 'Failed to save battle rewards.' });
+    if (oldVersion === undefined) {
+      updateQuery = updateQuery.is('data->>version', null);
+    } else {
+      updateQuery = updateQuery.eq('data->>version', oldVersion.toString());
+    }
+
+    const { data: updateData, error: updateError } = await updateQuery.select('wallet_address');
+
+    if (updateError || !updateData || updateData.length === 0) {
+      return res.status(409).json({ error: 'Concurrent modification detected. Please try again.' });
     }
 
     return res.status(200).json({

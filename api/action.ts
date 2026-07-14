@@ -128,13 +128,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Unknown action' });
     }
 
-    const { error: updateError } = await supabase
+    const oldVersion = profile.version;
+    profile.version = (oldVersion || 0) + 1;
+
+    let updateQuery = supabase
       .from('profiles')
       .update({ data: profile, updated_at: new Date().toISOString() })
       .eq('wallet_address', walletAddress);
 
-    if (updateError) {
-      return res.status(500).json({ error: 'Failed to save action result.' });
+    if (oldVersion === undefined) {
+      updateQuery = updateQuery.is('data->>version', null);
+    } else {
+      updateQuery = updateQuery.eq('data->>version', oldVersion.toString());
+    }
+
+    const { data: updateData, error: updateError } = await updateQuery.select('wallet_address');
+
+    if (updateError || !updateData || updateData.length === 0) {
+      return res.status(409).json({ error: 'Concurrent modification detected. Please try again.' });
     }
 
     return res.status(200).json({

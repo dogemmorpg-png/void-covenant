@@ -148,6 +148,23 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [activeLogStepText, setActiveLogStepText] = useState<string>('');
   
+  useEffect(() => {
+    // Notify server that battle started
+    const startBattle = async () => {
+      const token = localStorage.getItem('void_covenant_token');
+      if (!token) return;
+      try {
+        await fetch('/api/battle-start', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      } catch (e) {
+        console.error('Failed to start battle session', e);
+      }
+    };
+    startBattle();
+  }, []);
+
   // Active animation targets for cards movement and effects
   const [animatingSlot, setAnimatingSlot] = useState<{
     side: 'player' | 'enemy';
