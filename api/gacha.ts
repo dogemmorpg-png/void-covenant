@@ -2,11 +2,11 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
 import { CARD_TEMPLATES, createCardInstance } from '../src/data/cards.js';
+import { getRandomEquipmentByTier, generateEquipmentInstance } from '../src/data/equipment.js';
+import { PlayerProfile, CardTier } from '../src/types.js';
 
-// Setup Supabase Service Client (bypasses RLS to safely update DB)
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
-// Helper to get supabase instance
 function getSupabase() {
   const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
@@ -67,13 +67,32 @@ function generateRandomCards(packType: string, numCards: number) {
   return selectedTemplates;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // CORS setup
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+function generateRandomEquipment(packType: string, numEquips: number) {
+  let selectedEquips: any[] = [];
+  for (let i = 0; i < numEquips; i++) {
+    let tier: CardTier = 'bronze';
+    const rand = Math.random() * 100;
+    
+    if (packType === 'eq_basic') {
+      tier = rand < 80 ? 'bronze' : 'silver';
+    } else if (packType === 'eq_rare') {
+      if (rand < 40) tier = 'bronze';
+      else if (rand < 90) tier = 'silver';
+      else tier = 'gold';
+    } else {
+      if (rand < 40) tier = 'silver';
+      else if (rand < 85) tier = 'gold';
+      else tier = 'legendary';
+    }
 
+    const template = getRandomEquipmentByTier(tier);
+    const instance = generateEquipmentInstance(template);
+    selectedEquips.push(instance);
+  }
+  return selectedEquips;
+}
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
@@ -96,7 +115,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
 
-    const walletAddress = decoded.wallet;
+    const walletAddress = decoded.walletAddress || decoded.wallet;
     const { packType, numCards = 3 } = req.body;
 
     const supabase = getSupabase();
@@ -111,38 +130,43 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
-    const profile = profileData.data;
+    const profile: PlayerProfile = profileData.data;
 
     let goldCost = 0;
     let shardCost = 0;
+    let isEquipment = false;
 
     if (packType === 'bronze') goldCost = 300;
     else if (packType === 'obsidian') shardCost = 30;
     else if (packType === 'abyssal') shardCost = 100;
+    else if (packType === 'eq_basic') { goldCost = 500; isEquipment = true; }
+    else if (packType === 'eq_rare') { shardCost = 30; isEquipment = true; }
+    else if (packType === 'eq_premium') { shardCost = 70; isEquipment = true; }
     else return res.status(400).json({ error: 'Invalid pack type' });
 
-    if (profile.gold < goldCost) {
+    if (goldCost > 0 && profile.gold < goldCost) {
       return res.status(400).json({ error: 'Not enough gold' });
     }
     
-    // Check shards or dust depending on how it's stored
-    const currentShards = profile.shards !== undefined ? profile.shards : (profile.dust || 0);
-    if (currentShards < shardCost) {
-      return res.status(400).json({ error: 'Not enough shards' });
+    if (shardCost > 0 && profile.darkShards < shardCost) {
+      return res.status(400).json({ error: 'Not enough Dark Shards' });
     }
 
     if (goldCost > 0) profile.gold -= goldCost;
-    if (shardCost > 0) {
-      if (profile.shards !== undefined) profile.shards -= shardCost;
-      else profile.dust -= shardCost;
-    }
+    if (shardCost > 0) profile.darkShards -= shardCost;
 
-    const newCards = generateRandomCards(packType, numCards);
-    profile.collection = [...(profile.collection || []), ...newCards];
+    let newItems: any[] = [];
+    if (isEquipment) {
+      newItems = generateRandomEquipment(packType, 1);
+      profile.equipment = [...(profile.equipment || []), ...newItems];
+    } else {
+      newItems = generateRandomCards(packType, numCards);
+      profile.collection = [...(profile.collection || []), ...newItems];
+    }
 
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({ data: profile })
+      .update({ data: profile, updated_at: new Date().toISOString() })
       .eq('wallet_address', walletAddress);
 
     if (updateError) {
@@ -150,7 +174,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: 'Failed to update database' });
     }
 
-    return res.status(200).json({ success: true, profile, newCards });
+    return res.status(200).json({ success: true, profile, newItems });
 
   } catch (error: any) {
     console.error('Gacha error:', error);

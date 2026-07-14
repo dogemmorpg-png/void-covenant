@@ -5,7 +5,7 @@ import { BATTLE_PASS_TIERS } from '../data/cards';
 import { Award, Lock, CheckCircle2, ChevronRight, Gem, AlertCircle } from 'lucide-react';
 
 export const BattlePassView: React.FC = () => {
-  const { profile, setProfile, claimBattlePassReward, saveProfile, addBattlePassPoints } = useGame();
+  const { profile, setProfile, claimBattlePassReward, saveProfile, addBattlePassPoints, submitAction } = useGame();
   const toast = useToast();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   
@@ -32,22 +32,20 @@ export const BattlePassView: React.FC = () => {
     setShowConfirmModal(true);
   };
 
-  const confirmPurchase = () => {
-    const updated = {
-      ...profile,
-      darkShards: profile.darkShards - 40,
-      isPremiumBP: true
-    };
-    setProfile(updated as any);
-    saveProfile(updated as any);
+  const confirmPurchase = async () => {
+    const res = await submitAction('buy_premium_bp', {});
+    if (res.success) {
+      toast('Dark Pass successfully activated! The Blood Moon welcomes you.', 'reward');
+    } else {
+      toast(res.message, 'error');
+    }
     setShowConfirmModal(false);
-    toast('Dark Pass successfully activated! The Blood Moon welcomes you.', 'reward');
   };
 
-  const handleClaimReward = (tierIndex: number, isPremium: boolean) => {
-    const res = claimBattlePassReward(tierIndex, isPremium);
+  const handleClaimReward = async (tierIndex: number, isPremium: boolean) => {
+    const res = await claimBattlePassReward(tierIndex, isPremium);
     if (res.success) {
-      // update list
+      toast(res.message || 'Reward claimed!', 'reward');
     } else {
       toast(res.message, 'warning');
     }

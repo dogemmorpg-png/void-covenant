@@ -131,9 +131,9 @@ export const CollectionDeckView: React.FC = () => {
     setFusionConfirmData({ card1, card2 });
   };
 
-  const confirmFusionRitual = () => {
+  const confirmFusionRitual = async () => {
     if (!fusionConfirmData) return;
-    const res = fuseCards(fusionConfirmData.card1.id, fusionConfirmData.card2.id);
+    const res = await fuseCards(fusionConfirmData.card1.id, fusionConfirmData.card2.id);
     if (res.success) {
       audioSystem.playMagic();
       setIsFusingMode(false);

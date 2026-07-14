@@ -17,15 +17,17 @@ interface GameContextType {
   toggleSound: () => void;
   usePveEnergy: (amount: number) => boolean;
   usePvpEnergy: (amount: number) => boolean;
-  buyDarkShardsWithSOL: (solAmount: number) => boolean;
+  buyDarkShardsWithSOL: (solAmount: number) => Promise<boolean>;
   isLoadingProfile: boolean;
   connectSolanaWallet: (address: string) => Promise<void>;
   disconnectSolanaWallet: () => void;
-  fuseCards: (cardId1: string, cardId2: string) => { success: boolean; message: string; newCard?: Card };
+  fuseCards: (cardId1: string, cardId2: string) => Promise<{ success: boolean; message: string; newCard?: Card }>;
+  submitBattleResult: (battleType: 'campaign' | 'pvp', stageId: string, result: 'win' | 'loss', stars?: number) => Promise<{ success: boolean; message: string; rewards?: any }>;
+  submitAction: (action: string, payload: any) => Promise<{ success: boolean; message: string; data?: any }>;
   addCardToCollection: (cardTemplate: CardTemplate, level?: number) => Card;
   toggleDeckCard: (cardId: string) => { success: boolean; message: string };
-  claimBattlePassReward: (tierIndex: number, isPremium: boolean) => { success: boolean; message: string };
-  completeAirdropTask: (taskId: string) => { success: boolean; message: string };
+  claimBattlePassReward: (tierIndex: number, isPremium: boolean) => Promise<{ success: boolean; message: string }>;
+  completeAirdropTask: (taskId: string) => Promise<{ success: boolean; message: string }>;
   addBattlePassPoints: (amount: number) => void;
   claimBattlePassTier: (index: number) => void;
   addExp: (amount: number) => void;
@@ -98,16 +100,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (newProfile.solanaAddress) {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_${newProfile.solanaAddress}`, JSON.stringify(newProfile));
       
-      supabase.from('profiles').upsert({
-        wallet_address: newProfile.solanaAddress,
-        data: newProfile,
-        updated_at: new Date().toISOString()
-      }).then(({ error }) => {
-        if (error) {
-          console.error('Error saving to Supabase', error);
-          // Optional: alert('Supabase Save Error: ' + JSON.stringify(error));
-        }
-      });
+      const token = localStorage.getItem('void_covenant_token');
+      if (token) {
+        fetch('/api/sync', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ safeProfileData: newProfile })
+        }).catch(err => console.error('Failed to sync profile', err));
+      }
     }
   };
 
@@ -341,21 +344,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Buy Shards using SOL
-  const buyDarkShardsWithSOL = (solAmount: number): boolean => {
-    const ref = profileRef.current;
-    if (!ref.solanaAddress || !ref.solBalance || ref.solBalance < solAmount) return false;
-    setProfile(current => {
-      if (!current.solanaAddress || !current.solBalance || current.solBalance < solAmount) return current;
-      const shardsBought = Math.round(solAmount * 50); // 1 SOL = 50 Shards
-      const updated = {
-        ...current,
-        solBalance: Number((current.solBalance - solAmount).toFixed(4)),
-        darkShards: current.darkShards + shardsBought
-      };
-      saveProfile(updated);
-      return updated;
-    });
-    return true;
+  const buyDarkShardsWithSOL = async (solAmount: number): Promise<boolean> => {
+    const res = await submitAction('buy_shards', { solAmount });
+    return res.success;
   };
 
   // Connect Solana Wallet
@@ -481,159 +472,87 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return newCard;
   };
 
-  // Fusing: Combine two identical cards of same level & tier
-  const fuseCards = (cardId1: string, cardId2: string): { success: boolean; message: string; newCard?: Card } => {
-    let success = false;
-    let message = '';
-    let resultCard: Card | undefined;
-    
-    setProfile(current => {
-      const card1 = current.collection.find(c => c.id === cardId1);
-      const card2 = current.collection.find(c => c.id === cardId2);
-      
-      if (!card1 || !card2 || cardId1 === cardId2) {
-        message = 'You must select two different cards.';
-        return current;
-      }
-      
-      if (card1.baseId !== card2.baseId) {
-        message = 'Cards must have the same base creature.';
-        return current;
-      }
-      
-      if (card1.level !== card2.level) {
-        message = 'Cards must be the same level.';
-        return current;
-      }
-      
-      if (card1.tier !== card2.tier) {
-        message = 'Cards must be the same tier.';
-        return current;
+  const fuseCards = async (cardId1: string, cardId2: string): Promise<{ success: boolean; message: string; newCard?: Card }> => {
+    const token = localStorage.getItem('void_covenant_token');
+    if (!token) return { success: false, message: 'Please authenticate first.' };
+
+    try {
+      const res = await fetch('/api/fusion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ cardId1, cardId2 })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, message: data.error || 'Fusion failed.' };
       }
 
-      const isLevelUpgrade = card1.level < 5;
-      
-      // Fusing costs gold and dust dynamically
-      const goldCost = isLevelUpgrade ? card1.level * 150 : 500;
-      const dustCost = isLevelUpgrade ? card1.level * 20 : 100;
-      
-      if (current.gold < goldCost) {
-        message = `Not enough gold for fusion. Required: ${goldCost} 🪙`;
-        return current;
-      }
-      if (current.dust < dustCost) {
-        message = `Not enough Dark Dust. Required: ${dustCost} 🔮`;
-        return current;
-      }
-      
-      let fusedCard: Card;
+      setProfile(data.profile);
 
-      if (isLevelUpgrade) {
-        // LEVEL UP (e.g. 1 -> 2, 2 -> 3, 3 -> 4, 4 -> 5)
-        const nextLevel = card1.level + 1;
-        fusedCard = {
-          ...card1,
-          id: card1.id, // Retain ID of the first card to keep favorite status & deck slot
-          level: nextLevel,
-          attack: Math.round(card1.attack * 1.15),
-          health: Math.round(card1.health * 1.15),
-          maxHealth: Math.round(card1.health * 1.15)
-        };
-
-        // Scale skill values slightly with level
-        const template = CARD_TEMPLATES.find(t => t.baseId === card1.baseId);
-        if (template) {
-          fusedCard.skills = card1.skills.map(skill => {
-            const skillTemplate = template.skills.find(s => s.type === skill.type);
-            const baseValue = skillTemplate ? skillTemplate.value : skill.value;
-            const scaleFactor = 1 + Math.floor((nextLevel - 1) / 2) * 0.5; // +50% power every 2 levels
-            const newValue = Math.round(baseValue * scaleFactor);
-            return {
-              ...skill,
-              value: newValue,
-              description: skill.description.replace(/\d+/, String(newValue))
-            };
-          });
-        }
-        
-        success = true;
-        message = `Fusion successful! ${card1.name} leveled up to L${nextLevel}!`;
-      } else {
-        // TIER UPGRADE (Level 5 -> Next Tier, Reset to Level 1)
-        if (card1.tier === 'legendary') {
-          message = 'Card is already at the highest tier (Legendary) and cannot be fused.';
-          return current;
-        }
-
-        // Calculate next tier
-        let nextTier: CardTier = 'bronze';
-        if (card1.tier === 'bronze') nextTier = 'silver';
-        else if (card1.tier === 'silver') nextTier = 'gold';
-        else if (card1.tier === 'gold') nextTier = 'legendary';
-        
-        let template = CARD_TEMPLATES.find(t => t.baseId === card1.baseId);
-        if (!template) {
-          message = 'Card template not found.';
-          return current;
-        }
-        
-        success = true;
-        message = `Fusion successful! Upgraded to higher tier: ${card1.name} [${nextTier.toUpperCase()}]`;
-        
-        // Instantiate new card of next tier, level 1
-        fusedCard = createCardInstance(template, 1);
-        fusedCard.id = card1.id; // Retain ID to preserve favorite status & deck slot
-        fusedCard.tier = nextTier;
-        
-        // Boost fused card stats specifically
-        fusedCard.attack = Math.round(card1.attack * 1.15); // +15% from max previous
-        fusedCard.health = Math.round(card1.health * 1.15);
-        fusedCard.maxHealth = fusedCard.health;
-        
-        // Enhance delay (reduction)
-        fusedCard.delay = Math.max(1, card1.delay - 1); // Reduced delay is the ultimate reward!
-        
-        // Add a skill bonus for fusing
-        if (nextTier === 'silver' && fusedCard.skills.length === 1) {
-          fusedCard.skills.push({
-            type: 'vampirism',
-            value: 2,
-            description: 'Vampirism: restores +2 HP on fusion.'
-          });
-        } else if (nextTier === 'gold') {
-          fusedCard.skills.forEach(s => s.value += 2);
-        } else if (nextTier === 'legendary') {
-          fusedCard.skills.push({
-            type: 'hex',
-            value: 3,
-            description: 'Legendary Hex: +3 to enemy incoming damage.'
-          });
-        }
-      }
-      
-      // Remove both cards (but note that fusedCard keeps cardId1 so we will append fusedCard)
-      const newCollection = current.collection.filter(c => c.id !== cardId1 && c.id !== cardId2);
-      newCollection.push(fusedCard);
-      
-      // Clean up combat deck
-      // Card 2 is consumed, so it must be removed.
-      // Card 1 is upgraded and keeps its ID, so it can stay.
-      const newDeck = current.deck.filter(id => id !== cardId2);
-      
-      resultCard = fusedCard;
-      
-      const updated = {
-        ...current,
-        gold: current.gold - goldCost,
-        dust: current.dust - dustCost,
-        collection: newCollection,
-        deck: newDeck
+      return {
+        success: true,
+        message: 'Fusion successful!',
+        newCard: data.newCard
       };
-      saveProfile(updated);
-      return updated;
-    });
+    } catch (err: any) {
+      console.error('Fusion error:', err);
+      return { success: false, message: 'Network error during fusion.' };
+    }
+  };
+
+  const submitBattleResult = async (battleType: 'campaign' | 'pvp', stageId: string, result: 'win' | 'loss', stars?: number) => {
+    const token = localStorage.getItem('void_covenant_token');
+    if (!token) return { success: false, message: 'Not authenticated' };
+
+    try {
+      const res = await fetch('/api/battle', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ battleType, stageId, result, stars })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, message: data.error || 'Battle rewards failed.' };
+      }
+
+      setProfile(data.profile);
+      return { success: true, message: 'Rewards claimed successfully', rewards: data.rewards };
+    } catch (err: any) {
+      console.error('Battle API error:', err);
+      return { success: false, message: 'Network error during battle reward claim.' };
+    }
+  };
+
+  const submitAction = async (action: string, payload: any) => {
+    const token = localStorage.getItem('void_covenant_token');
+    if (!token) return { success: false, message: 'Not authenticated' };
     
-    return { success, message, newCard: resultCard };
+    try {
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action, payload })
+      });
+      const data = await res.json();
+      if (!res.ok) return { success: false, message: data.error || 'Action failed.' };
+      
+      setProfile(data.profile);
+      return { success: true, message: data.message, data };
+    } catch (err: any) {
+      console.error('Action API error:', err);
+      return { success: false, message: 'Network error.' };
+    }
   };
 
   // Add / Remove card in the battle deck (max 5 cards in deck)
@@ -681,65 +600,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Claim Battle Pass Tier reward
-  const claimBattlePassReward = (tierIndex: number, isPremium: boolean): { success: boolean; message: string } => {
-    let success = false;
-    let message = '';
-    const tier = BATTLE_PASS_TIERS[tierIndex];
-    
-    setProfile(current => {
-      if (current.battlePassPoints < tier.pointsRequired) {
-        message = 'Not enough Battle Pass points.';
-        return current;
-      }
-      
-      const claimId = tierIndex * 2 + (isPremium ? 1 : 0);
-      if (current.battlePassClaimed.includes(claimId)) {
-        message = 'Reward already claimed.';
-        return current;
-      }
-      
-      success = true;
-      const rewardType = isPremium ? tier.premiumRewardType : tier.freeRewardType;
-      const rewardAmount = isPremium ? tier.premiumRewardAmount : tier.freeRewardAmount;
-      
-      let updatedGold = current.gold;
-      let updatedDust = current.dust;
-      let updatedShards = current.darkShards;
-      let updatedCollection = [...current.collection];
-      let pveEnergy = current.pveEnergy;
-      
-      if (rewardType === 'gold') {
-        updatedGold += rewardAmount;
-        message = `Received ${rewardAmount} 🪙 Gold!`;
-      } else if (rewardType === 'dust') {
-        updatedDust += rewardAmount;
-        message = `Received ${rewardAmount} 🔮 Dark Dust!`;
-      } else if (rewardType === 'shards') {
-        updatedShards += rewardAmount;
-        message = `Received ${rewardAmount} 💎 Dark Shards!`;
-      } else if (rewardType === 'card' || rewardType === 'legendary_pack') {
-        // Instantiate a rare card template
-        const rareTemplates = CARD_TEMPLATES.filter(t => t.tier === 'silver' || t.tier === 'gold');
-        const randomTemplate = rareTemplates[Math.floor(Math.random() * rareTemplates.length)];
-        const newCard = createCardInstance(randomTemplate, 1);
-        updatedCollection.push(newCard);
-        message = `Received a unique card: ${newCard.name} [${newCard.tier.toUpperCase()}]!`;
-      }
-      
-      const updated = {
-        ...current,
-        gold: updatedGold,
-        dust: updatedDust,
-        darkShards: updatedShards,
-        pveEnergy,
-        collection: updatedCollection,
-        battlePassClaimed: [...current.battlePassClaimed, claimId]
-      };
-      saveProfile(updated);
-      return updated;
-    });
-    
-    return { success, message };
+  const claimBattlePassReward = async (tierIndex: number, isPremium: boolean): Promise<{ success: boolean; message: string }> => {
+    return submitAction('claim_battlepass', { tierIndex, isPremium });
   };
 
   const claimBattlePassTier = (index: number) => {
@@ -747,60 +609,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Complete Airdrop / social tasks
-  const completeAirdropTask = (taskId: string): { success: boolean; message: string } => {
-    let success = false;
-    let message = '';
-    
-    setProfile(current => {
-      if (current.completedTasks.includes(taskId)) {
-        message = 'Task already completed.';
-        return current;
-      }
-      
-      const task = AIRDROP_TASKS.find(t => t.id === taskId);
-      if (!task) {
-        message = 'Task not found.';
-        return current;
-      }
-      
-      success = true;
-      let updatedGold = current.gold;
-      let updatedDust = current.dust;
-      let updatedShards = current.darkShards;
-      
-      if (task.rewardType === 'gold') {
-        updatedGold += task.rewardAmount;
-        message = `Task completed! Reward: +${task.rewardAmount} 🪙 Gold.`;
-      } else if (task.rewardType === 'dust') {
-        updatedDust += task.rewardAmount;
-        message = `Task completed! Reward: +${task.rewardAmount} 🔮 Dark Dust.`;
-      } else if (task.rewardType === 'shards') {
-        updatedShards += task.rewardAmount;
-        message = `Task completed! Reward: +${task.rewardAmount} 💎 Dark Shards.`;
-      }
-      
-      // If wallet connection task
-      let walletAddress = current.solanaAddress;
-      let walletBalance = current.solBalance;
-      if (taskId === 'wallet_connect' && !walletAddress) {
-        // Wallet connection handled externally via WalletContext
-        // Just mark the task as completed
-      }
-      
-      const updated = {
-        ...current,
-        gold: updatedGold,
-        dust: updatedDust,
-        darkShards: updatedShards,
-        solanaAddress: walletAddress,
-        solBalance: walletBalance,
-        completedTasks: [...current.completedTasks, taskId]
-      };
-      saveProfile(updated);
-      return updated;
-    });
-    
-    return { success, message };
+  const completeAirdropTask = async (taskId: string): Promise<{ success: boolean; message: string }> => {
+    return submitAction('airdrop_task', { taskId });
   };
 
   // Battle pass points progression helper
@@ -877,6 +687,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         connectSolanaWallet,
         disconnectSolanaWallet,
         fuseCards,
+        submitBattleResult,
+        submitAction,
         addCardToCollection,
         toggleDeckCard,
         claimBattlePassReward,

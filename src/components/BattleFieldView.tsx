@@ -111,7 +111,7 @@ const getSkillDescEnglish = (type: string, value: number) => {
 };
 
 export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitBattle, battleType = 'campaign' }) => {
-  const { profile, setProfile, saveProfile, addGold, addDust, addShards, addBattlePassPoints, addCardToCollection, soundOn, toggleSound, addExp, addCampaignStars } = useGame();
+  const { profile, setProfile, saveProfile, addGold, addDust, addShards, addBattlePassPoints, addCardToCollection, soundOn, toggleSound, addExp, addCampaignStars, submitBattleResult } = useGame();
   
   // Calculate total bonuses from equipped items by type
   const getEquipmentBonus = (bonusType: string) => {
@@ -469,83 +469,44 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   };
 
   // Rewards distribution
-  const handleBattleWon = () => {
+  const handleBattleWon = async () => {
     audioSystem.playMagic();
-    const goldBonus = getEquipmentBonus('goldBonus');
-    const goldMultiplier = 1 + (goldBonus / 100);
-    const finalGoldReward = Math.floor(stage.goldReward * goldMultiplier);
     
-    addGold(finalGoldReward);
-    addDust(stage.dustReward);
-    addExp(50); // Base EXP reward
-    if (stage.shardsReward > 0) {
-      addShards(stage.shardsReward);
-    }
-    addBattlePassPoints(50);
-    
-    // Calculate Campaign Stars
+    let stars = 1;
     if (battleType === 'campaign') {
       const hpPercentage = battle.playerHeroHealth / battle.playerHeroMaxHealth;
-      let stars = 1;
       if (hpPercentage === 1) stars = 3;
       else if (hpPercentage >= 0.5) stars = 2;
-      
-      addCampaignStars(stage.id.toString(), stars);
-    }
-    
-    // Check for card reward
-    if (battleType === 'campaign' && stage.cardReward) {
-      // Create and add the card instance using the template
-      addCardToCollection(stage.cardReward as any, 1);
     }
 
     if (battleType === 'pvp') {
-      handlePvpWon();
+      await handlePvpWon();
     } else {
-      if (stage.id === profile.pveProgress) {
-        setProfile(current => {
-          const updated = {
-            ...current,
-            pveProgress: current.pveProgress + 1
-          };
-          saveProfile(updated);
-          return updated;
-        });
+      const res = await submitBattleResult(battleType, stage.id.toString(), 'win', stars);
+      if (!res.success) {
+        console.error('Failed to save battle result:', res.message);
+      } else {
+        addBattlePassPoints(50);
       }
     }
   };
 
   // PVP Specific endings
-  const handlePvpWon = () => {
+  const handlePvpWon = async () => {
     audioSystem.playMagic();
-    const goldBonus = getEquipmentBonus('goldBonus');
-    const goldMultiplier = 1 + (goldBonus / 100);
-    const finalGoldReward = Math.floor(20 * goldMultiplier);
-
-    addGold(finalGoldReward);
-    addExp(80);
-    setProfile(current => {
-      const updated = {
-        ...current,
-        pvpRating: current.pvpRating + 25
-      };
-      saveProfile(updated);
-      return updated;
-    });
+    const res = await submitBattleResult('pvp', 'pvp', 'win');
+    if (!res.success) {
+      console.error('Failed to save PVP result:', res.message);
+    } else {
+      addBattlePassPoints(50);
+    }
   };
 
-  const handleBattleLost = () => {
+  const handleBattleLost = async () => {
     audioSystem.playError();
-    addGold(20);
-    if (battleType === 'pvp') {
-      setProfile(current => {
-        const updated = {
-          ...current,
-          pvpRating: Math.max(100, current.pvpRating - 15)
-        };
-        saveProfile(updated);
-        return updated;
-      });
+    const res = await submitBattleResult(battleType, stage.id.toString(), 'loss');
+    if (!res.success) {
+      console.error('Failed to save loss result:', res.message);
     }
   };
 

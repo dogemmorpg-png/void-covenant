@@ -42,7 +42,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Signature is valid. Issue JWT token.
-    const token = jwt.sign({ wallet: publicKey }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ walletAddress: publicKey, wallet: publicKey }, JWT_SECRET, { expiresIn: '7d' });
 
     res.status(200).json({ token });
   } catch (error) {

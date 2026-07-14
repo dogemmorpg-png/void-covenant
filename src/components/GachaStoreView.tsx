@@ -31,15 +31,16 @@ export const GachaStoreView: React.FC = () => {
   const buyAbyssalPack = () => buyPackBackend('abyssal');
 
   // Run pack animation
-  const triggerOpeningAnimationBackend = (packType: string, newCards: any[]) => {
+  const triggerOpeningAnimationBackend = (packType: string, newCards: any[], newEquipment: any[]) => {
     audioSystem.playMagic();
     setOpeningPack(packType as any);
     setRevealedCards(newCards);
+    setRevealedEquipment(newEquipment);
     setIsRevealed(false);
     setTimeout(() => setIsRevealed(true), 1500);
   };
 
-  const buyPackBackend = async (packType: 'bronze' | 'obsidian' | 'abyssal') => {
+  const buyPackBackend = async (packType: string, isEquipment: boolean = false) => {
     try {
       const token = localStorage.getItem('void_covenant_token');
       if (!token) {
@@ -63,73 +64,24 @@ export const GachaStoreView: React.FC = () => {
       }
       
       setProfile(data.profile);
-      triggerOpeningAnimationBackend(packType, data.newCards);
+      if (isEquipment) {
+        triggerOpeningAnimationBackend(packType, [], data.newItems);
+      } else {
+        triggerOpeningAnimationBackend(packType, data.newItems, []);
+      }
       
-    } catch (e) {
-      console.error(e);
-      toast('Network error while purchasing pack', 'error');
+    } catch (err: any) {
+      console.error(err);
+      toast('Network error during pack purchase.', 'error');
     }
   };
 
   // Equipment Packs
-  const buyBasicEquipmentPack = () => {
-    if (spendGold(500)) {
-      triggerEquipmentOpening('eq_basic');
-    } else {
-      toast('Not enough gold for a Basic Equipment Chest.', 'warning');
-    }
-  };
+  const buyBasicEquipmentPack = () => buyPackBackend('eq_basic', true);
+  const buyRareEquipmentPack = () => buyPackBackend('eq_rare', true);
+  const buyPremiumEquipmentPack = () => buyPackBackend('eq_premium', true);
 
-  const buyRareEquipmentPack = () => {
-    if (spendShards(30)) {
-      triggerEquipmentOpening('eq_rare');
-    } else {
-      toast('Not enough Dark Shards for a Rare Equipment Chest.', 'warning');
-    }
-  };
 
-  const buyPremiumEquipmentPack = () => {
-    if (spendShards(70)) {
-      triggerEquipmentOpening('eq_premium');
-    } else {
-      toast('Not enough Dark Shards for a Premium Equipment Chest.', 'warning');
-    }
-  };
-
-  const triggerEquipmentOpening = (packType: 'eq_basic' | 'eq_rare' | 'eq_premium') => {
-    audioSystem.playMagic();
-    setOpeningPack(packType);
-    setRevealedCards([]);
-    setRevealedEquipment([]);
-    setIsRevealed(false);
-
-    let tier: CardTier = 'bronze';
-    const rand = Math.random() * 100;
-    
-    if (packType === 'eq_basic') {
-      // 80% Bronze, 20% Silver
-      tier = rand < 80 ? 'bronze' : 'silver';
-    } else if (packType === 'eq_rare') {
-      // 40% Bronze, 50% Silver, 10% Gold
-      if (rand < 40) tier = 'bronze';
-      else if (rand < 90) tier = 'silver';
-      else tier = 'gold';
-    } else {
-      // Premium: 40% Silver, 45% Gold, 15% Legendary
-      if (rand < 40) tier = 'silver';
-      else if (rand < 85) tier = 'gold';
-      else tier = 'legendary';
-    }
-
-    const template = getRandomEquipmentByTier(tier);
-    const instance = generateEquipmentInstance(template);
-    addEquipment(instance);
-    setRevealedEquipment([instance]);
-
-    setTimeout(() => {
-      setIsRevealed(true);
-    }, 1500);
-  };
 
   // Close reveal dialog
   const closeReveal = () => {

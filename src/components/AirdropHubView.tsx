@@ -48,13 +48,18 @@ export const AirdropHubView: React.FC = () => {
     const task = AIRDROP_TASKS.find(t => t.id === taskId);
     if (task?.actionUrl) {
       window.open(task.actionUrl, '_blank');
+      setIsCompletingTask(taskId);
     }
 
-    setTimeout(() => {
-      const res = completeAirdropTask(taskId);
+    // Simulate network delay for effect
+    setTimeout(async () => {
+      const res = await completeAirdropTask(taskId);
       if (res.success) {
         toast(res.message, 'success');
+      } else {
+        toast(res.message, 'error');
       }
+      setIsCompletingTask(null);
     }, 1000);
   };
 
@@ -71,9 +76,14 @@ export const AirdropHubView: React.FC = () => {
     setShowConfirmShardsModal(solCost);
   };
 
-  const confirmBuyShards = () => {
-    if (showConfirmShardsModal && buyDarkShardsWithSOL(showConfirmShardsModal)) {
-      toast(`Solana blockchain transaction confirmed! Added +${showConfirmShardsModal * 50} Dark Shards`, 'reward');
+  const confirmBuyShards = async () => {
+    if (showConfirmShardsModal) {
+      const success = await buyDarkShardsWithSOL(showConfirmShardsModal);
+      if (success) {
+        toast(`Solana blockchain transaction confirmed! Added +${showConfirmShardsModal * 50} Dark Shards`, 'reward');
+      } else {
+        toast('Failed to buy Dark Shards.', 'error');
+      }
     }
     setShowConfirmShardsModal(null);
   };
