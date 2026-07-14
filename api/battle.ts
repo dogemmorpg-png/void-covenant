@@ -64,7 +64,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Battle session not started. Suspicious activity detected.' });
     }
     const elapsedSeconds = (Date.now() - profile.lastBattleTimestamp) / 1000;
-    if (elapsedSeconds < 8) {
+    if (elapsedSeconds < 2) {
       // Clears timestamp to prevent immediate retry with same session
       profile.lastBattleTimestamp = undefined;
       return res.status(400).json({ error: 'Battle completed too quickly. Suspicious activity detected.' });
