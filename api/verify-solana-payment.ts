@@ -244,6 +244,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       profile.hasPremiumBp = true;
     }
 
+    // Always force profile to be registered so payments never drop the player back to nickname selection
+    profile.isRegistered = true;
+    if (!profile.username) {
+      profile.username = `Lord_${walletAddress.slice(0, 4)}`;
+    }
+
     // Record processed signature to prevent replay attacks
     profile.processedTransactions = [...processedTxList, signature];
 
