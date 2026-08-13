@@ -361,6 +361,32 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadedProfile.solanaAddress = address;
     loadedProfile.solBalance = 12.5;
 
+    // 1. Read local storage first for instant offline/offline purchase preservation
+    let localParsed: any = null;
+    const specificSaved = localStorage.getItem(specificKey);
+    if (specificSaved) {
+      try {
+        localParsed = JSON.parse(specificSaved);
+      } catch (e) {
+        console.error('Failed to parse specific wallet profile', e);
+      }
+    } else {
+      const legacySaved = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (legacySaved) {
+        try {
+          const parsed = JSON.parse(legacySaved);
+          if (!parsed.solanaAddress || parsed.solanaAddress === address) {
+            localParsed = parsed;
+          }
+        } catch (e) {}
+      }
+    }
+
+    if (localParsed) {
+      loadedProfile = { ...loadedProfile, ...localParsed, solanaAddress: address, solBalance: 12.5 };
+    }
+
+    // 2. Fetch Supabase profile and merge (keeping highest resources & progress)
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -370,72 +396,31 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
       if (data && data.data) {
         const parsed = data.data as PlayerProfile;
-        if (parsed.heroMaxHealth && parsed.heroMaxHealth >= 100) {
-          const levelUps = (parsed.level || 1) - 1;
-          parsed.heroMaxHealth = 30 + (levelUps * 2);
-        }
         
-        // Sanitize deck to remove ghost cards
-        if (parsed.deck && parsed.collection) {
-          parsed.deck = parsed.deck.filter(id => parsed.collection.some(c => c.id === id));
+        loadedProfile.darkShards = Math.max(loadedProfile.darkShards || 0, parsed.darkShards || 0);
+        loadedProfile.gold = Math.max(loadedProfile.gold || 0, parsed.gold || 0);
+        loadedProfile.dust = Math.max(loadedProfile.dust || 0, parsed.dust || 0);
+        loadedProfile.pveProgress = Math.max(loadedProfile.pveProgress || 1, parsed.pveProgress || 1);
+        if (parsed.username) loadedProfile.username = parsed.username;
+        if (parsed.avatarUrl) loadedProfile.avatarUrl = parsed.avatarUrl;
+        if (parsed.collection && parsed.collection.length > (loadedProfile.collection || []).length) {
+          loadedProfile.collection = parsed.collection;
         }
-
-        loadedProfile = calculateEnergy({ ...loadedProfile, ...parsed, solanaAddress: address, solBalance: 12.5 });
-        setProfile(loadedProfile);
-        setIsLoadingProfile(false);
-        return;
+        if (parsed.hasPremiumBp) loadedProfile.hasPremiumBp = true;
       }
     } catch (e) {
-      console.warn('Profile not found in Supabase or network error, falling back to local storage', e);
+      console.warn('Supabase read skipped or offline', e);
     }
 
-    const specificSaved = localStorage.getItem(specificKey);
-    if (specificSaved) {
-      try {
-        const parsed = JSON.parse(specificSaved);
-        if (parsed.heroMaxHealth && parsed.heroMaxHealth >= 100) {
-          const levelUps = (parsed.level || 1) - 1;
-          parsed.heroMaxHealth = 30 + (levelUps * 2);
-        }
-        
-        // Sanitize deck to remove ghost cards
-        if (parsed.deck && parsed.collection) {
-          parsed.deck = parsed.deck.filter(id => parsed.collection.some(c => c.id === id));
-        }
-        
-        loadedProfile = { ...loadedProfile, ...parsed, solanaAddress: address, solBalance: 12.5 };
-      } catch (e) {
-        console.error('Failed to parse specific wallet profile', e);
-      }
-    } else {
-      // Try to migrate legacy profile if it matches this address or has no address
-      const legacySaved = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (legacySaved) {
-        try {
-          const parsed = JSON.parse(legacySaved);
-          if (!parsed.solanaAddress || parsed.solanaAddress === address) {
-            if (parsed.heroMaxHealth && parsed.heroMaxHealth >= 100) {
-              const levelUps = (parsed.level || 1) - 1;
-              parsed.heroMaxHealth = 30 + (levelUps * 2);
-            }
-            
-            // Sanitize deck to remove ghost cards
-            if (parsed.deck && parsed.collection) {
-              parsed.deck = parsed.deck.filter(id => parsed.collection.some(c => c.id === id));
-            }
-            
-            loadedProfile = { ...loadedProfile, ...parsed, solanaAddress: address, solBalance: 12.5 };
-            
-            // Save the migrated profile immediately and remove the legacy one to prevent copying it to other wallets
-            localStorage.setItem(specificKey, JSON.stringify(loadedProfile));
-            localStorage.removeItem(LOCAL_STORAGE_KEY);
-          }
-        } catch(e) {
-          console.error('Failed to parse legacy profile', e);
-        }
-      }
+    // Sanitize deck
+    if (loadedProfile.deck && loadedProfile.collection) {
+      loadedProfile.deck = loadedProfile.deck.filter(id => loadedProfile.collection.some(c => c.id === id));
+    }
+    if (!loadedProfile.deck || loadedProfile.deck.length === 0) {
+      loadedProfile.deck = loadedProfile.collection.slice(0, 5).map(c => c.id);
     }
 
+    // Always force registered and valid username for connected wallet
     if (!loadedProfile.username) {
       loadedProfile.username = `Lord_${address.slice(0, 4)}`;
     }

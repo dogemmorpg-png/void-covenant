@@ -52,9 +52,13 @@ function MainAppContent() {
     !(task.id === 'wallet_connect' && profile.TONWalletAddress)
   );
 
+  const wasConnectedRef = React.useRef(false);
+
   React.useEffect(() => {
-    // Reset verification if disconnected
-    if (!connected) {
+    if (connected && publicKey) {
+      wasConnectedRef.current = true;
+    } else if (!connected && wasConnectedRef.current) {
+      wasConnectedRef.current = false;
       setIsVerified(false);
       setIsSigning(false);
       if (profile.solanaAddress) {
