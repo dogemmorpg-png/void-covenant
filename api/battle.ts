@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
 import { PlayerProfile, CardTemplate } from '../src/types.js';
 import { generateCampaignStage, createCardInstance } from '../src/data/cards.js';
+import { calculateEnergy, processExpGain } from '../src/utils/energyHelper.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
@@ -56,19 +57,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
-    const profile: PlayerProfile = profileRow.data;
+    let profile: PlayerProfile = profileRow.data;
 
-    // Bot Prevention: Check lastBattleTimestamp
-    if (!profile.lastBattleTimestamp) {
-      return res.status(400).json({ error: 'Battle session not started. Suspicious activity detected.' });
-    }
-    const elapsedSeconds = (Date.now() - profile.lastBattleTimestamp) / 1000;
-    if (elapsedSeconds < 2) {
-      // Clears timestamp to prevent immediate retry with same session
-      profile.lastBattleTimestamp = undefined;
-      return res.status(400).json({ error: 'Battle completed too quickly. Suspicious activity detected.' });
-    }
-    profile.lastBattleTimestamp = undefined;
+    // Recalculate energy based on time passed
+    profile = calculateEnergy(profile);
 
     let goldReward = 0;
     let dustReward = 0;
@@ -76,8 +68,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let shardsReward = 0;
     let cardRewardStr = '';
     
-    // Add logic to calculate equipment bonuses (we'll just use a fixed 1x for simplicity on backend, or read from profile)
-    // Actually, we can check the profile's equipment!
     let goldMultiplier = 1;
     let expMultiplier = 1;
     if (profile.equipped && profile.equipment) {
@@ -88,82 +78,85 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    if (battleType === 'campaign' && result === 'win') {
+    if (battleType === 'campaign') {
       const floorNum = parseInt(stageId);
       if (isNaN(floorNum)) return res.status(400).json({ error: 'Invalid campaign stage' });
 
       const stage = generateCampaignStage(floorNum);
       if (!stage) return res.status(400).json({ error: 'Invalid campaign stage' });
 
-      goldReward = Math.floor(stage.goldReward * goldMultiplier);
-      dustReward = stage.dustReward;
-      shardsReward = stage.shardsReward || 0;
-      expReward = Math.floor(50 * expMultiplier);
+      // Energy check & deduction
+      if ((profile.pveEnergy || 0) < stage.energyCost) {
+        return res.status(400).json({ error: 'Not enough PvE energy' });
+      }
+      profile.pveEnergy -= stage.energyCost;
 
-      if (stage.cardReward) {
-        const newCard = createCardInstance(stage.cardReward as CardTemplate, 1);
-        profile.collection.push(newCard);
-        cardRewardStr = newCard.name;
-      }
-      
-      // Update campaign progress
-      if (floorNum >= profile.pveProgress) {
-        profile.pveProgress = floorNum + 1;
-      }
-      
-      // Update campaign stars
-      if (stars && stars > 0) {
-        if (!profile.campaignStars) profile.campaignStars = {};
-        const currentStars = profile.campaignStars[stageId.toString()] || 0;
-        if (stars > currentStars) {
-          profile.campaignStars[stageId.toString()] = stars;
+      if (result === 'win') {
+        goldReward = Math.floor(stage.goldReward * goldMultiplier);
+        dustReward = stage.dustReward;
+        shardsReward = stage.shardsReward || 0;
+        expReward = Math.floor(50 * expMultiplier);
+
+        if (stage.cardReward) {
+          const newCard = createCardInstance(stage.cardReward as CardTemplate, 1);
+          profile.collection = profile.collection || [];
+          profile.collection.push(newCard);
+          cardRewardStr = newCard.name;
         }
+        
+        // Advance campaign progress
+        if (floorNum >= (profile.pveProgress || 1)) {
+          profile.pveProgress = floorNum + 1;
+        }
+        
+        // Update campaign stars
+        if (stars && stars > 0) {
+          profile.campaignStars = profile.campaignStars || {};
+          const currentStars = profile.campaignStars[stageId.toString()] || 0;
+          if (stars > currentStars) {
+            profile.campaignStars[stageId.toString()] = stars;
+          }
+        }
+
+        profile.battlePassPoints = (profile.battlePassPoints || 0) + 50;
+      } else {
+        goldReward = Math.floor(20 * goldMultiplier);
       }
-    } else if (battleType === 'campaign' && result === 'loss') {
-      goldReward = Math.floor(20 * goldMultiplier);
     } else if (battleType === 'pvp') {
+      // Energy check & deduction
+      if ((profile.pvpEnergy || 0) < 1) {
+        return res.status(400).json({ error: 'Not enough PvP energy' });
+      }
+      profile.pvpEnergy -= 1;
+
       if (result === 'win') {
         goldReward = Math.floor(20 * goldMultiplier);
         expReward = Math.floor(80 * expMultiplier);
         profile.pvpRating = (profile.pvpRating || 1000) + 15;
+        profile.battlePassPoints = (profile.battlePassPoints || 0) + 50;
       } else {
         goldReward = Math.floor(20 * goldMultiplier);
         profile.pvpRating = Math.max(0, (profile.pvpRating || 1000) - 10);
       }
     }
 
-    profile.gold += goldReward;
-    profile.dust += dustReward;
-    profile.darkShards += shardsReward;
+    profile.gold = (profile.gold || 0) + goldReward;
+    profile.dust = (profile.dust || 0) + dustReward;
+    profile.darkShards = (profile.darkShards || 0) + shardsReward;
     
-    // Process EXP
-    profile.exp += expReward;
-    if (profile.exp >= profile.maxExp) {
-      profile.level += 1;
-      profile.exp = profile.exp - profile.maxExp;
-      profile.maxExp = Math.floor(profile.maxExp * 1.25);
-      profile.heroMaxHealth += 2;
-      profile.pveEnergy = profile.maxEnergy; // Refill energy on level up
+    // Process EXP and Level Ups cleanly
+    if (expReward > 0) {
+      processExpGain(profile, expReward);
     }
 
-    const oldVersion = profile.version;
-    profile.version = (oldVersion || 0) + 1;
-
-    let updateQuery = supabase
+    const { error: updateError } = await supabase
       .from('profiles')
       .update({ data: profile, updated_at: new Date().toISOString() })
       .eq('wallet_address', walletAddress);
 
-    if (oldVersion === undefined) {
-      updateQuery = updateQuery.is('data->>version', null);
-    } else {
-      updateQuery = updateQuery.eq('data->>version', oldVersion.toString());
-    }
-
-    const { data: updateData, error: updateError } = await updateQuery.select('wallet_address');
-
-    if (updateError || !updateData || updateData.length === 0) {
-      return res.status(409).json({ error: 'Concurrent modification detected. Please try again.' });
+    if (updateError) {
+      console.error('Update profile error in battle.ts:', updateError);
+      return res.status(500).json({ error: 'Failed to save battle rewards.' });
     }
 
     return res.status(200).json({

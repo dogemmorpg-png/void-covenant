@@ -1,6 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
+import { calculateEnergy } from '../src/utils/energyHelper.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
@@ -54,7 +55,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
-    const currentProfile = profileRow.data;
+    let currentProfile = profileRow.data;
+    currentProfile = calculateEnergy(currentProfile);
 
     // ONLY merge fields that are safe for the user to change locally:
     // deck, equipped, soundOn, isRegistered, username, avatarUrl
@@ -65,24 +67,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (safeProfileData.username) currentProfile.username = safeProfileData.username;
     if (safeProfileData.avatarUrl) currentProfile.avatarUrl = safeProfileData.avatarUrl;
 
-    const oldVersion = currentProfile.version;
-    currentProfile.version = (oldVersion || 0) + 1;
-
-    let updateQuery = supabase
+    const { error: updateError } = await supabase
       .from('profiles')
       .update({ data: currentProfile, updated_at: new Date().toISOString() })
       .eq('wallet_address', walletAddress);
 
-    if (oldVersion === undefined) {
-      updateQuery = updateQuery.is('data->>version', null);
-    } else {
-      updateQuery = updateQuery.eq('data->>version', oldVersion.toString());
-    }
-
-    const { data: updateData, error: updateError } = await updateQuery.select('wallet_address');
-
-    if (updateError || !updateData || updateData.length === 0) {
-      return res.status(409).json({ error: 'Concurrent modification detected. Please try again.' });
+    if (updateError) {
+      console.error('Sync API save error:', updateError);
+      return res.status(500).json({ error: 'Failed to sync profile.' });
     }
 
     return res.status(200).json({ success: true, profile: currentProfile });

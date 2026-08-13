@@ -11,8 +11,9 @@ interface CampaignViewProps {
 }
 
 export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => {
-  const { profile, usePveEnergy, addGold, addDust, addShards, addExp } = useGame();
+  const { profile, submitAction } = useGame();
   const toast = useToast();
+  const [isSweeping, setIsSweeping] = useState(false);
   
   const maxFloor = profile.pveProgress || 1;
   const [viewingFloor, setViewingFloor] = useState<number>(maxFloor);
@@ -29,27 +30,29 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
   const stageStars = profile.campaignStars?.[selectedStage.id.toString()] || 0;
 
   const handleStart = () => {
-    if (profile.pveEnergy < selectedStage.energyCost) {
+    if ((profile.pveEnergy || 0) < selectedStage.energyCost) {
       toast('Not enough PvE energy! Wait for recovery.', 'warning');
       return;
     }
-    
-    if (usePveEnergy(selectedStage.energyCost)) {
-      onStartBattle(selectedStage);
-    }
+    onStartBattle(selectedStage);
   };
 
-  const handleSweep = () => {
-    if (profile.pveEnergy < selectedStage.energyCost) {
+  const handleSweep = async () => {
+    if (isSweeping) return;
+    if ((profile.pveEnergy || 0) < selectedStage.energyCost) {
       toast('Not enough PvE energy for a sweep!', 'warning');
       return;
     }
-    if (usePveEnergy(selectedStage.energyCost)) {
-      addGold(selectedStage.goldReward);
-      addDust(selectedStage.dustReward);
-      addExp(50);
-      if (selectedStage.shardsReward > 0) addShards(selectedStage.shardsReward);
-      toast(`Sweep Success! +${selectedStage.goldReward} Gold, +${selectedStage.dustReward} Dust, +50 EXP`, 'success');
+    setIsSweeping(true);
+    try {
+      const res = await submitAction('sweep_stage', { floorNum: viewingFloor });
+      if (!res.success) {
+        toast(res.message, 'error');
+      } else {
+        toast(res.message, 'success');
+      }
+    } finally {
+      setIsSweeping(false);
     }
   };
 

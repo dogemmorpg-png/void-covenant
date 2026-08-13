@@ -135,9 +135,6 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
   };
 
   const launchPvpBattle = () => {
-    // Consume 1 energy
-    if (!usePvpEnergy(1)) return;
-
     // Names for simulated PvP enemies
     const enemyNames = [
       'Lilith_Gloom', 'Warlock_Eldritch', 'Covenant_Slayer', 'Spectre_X',

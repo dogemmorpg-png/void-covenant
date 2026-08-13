@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import { Card, PlayerProfile, CampaignStage, BattlePassTier, CardTemplate, CardTier, Equipment, EquipmentSlot } from '../types';
 import { getStarterDeck, CARD_TEMPLATES, createCardInstance, BATTLE_PASS_TIERS, AIRDROP_TASKS } from '../data/cards';
 import { supabase } from '../utils/supabaseClient';
+import { calculateEnergy } from '../utils/energyHelper';
 
 interface GameContextType {
   profile: PlayerProfile;
@@ -114,58 +115,21 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Passive Energy Regeneration over time
+  // Passive Energy Regeneration over time (UI updates only, no server spam)
   useEffect(() => {
     const interval = setInterval(() => {
       setProfile(current => {
-        const now = Date.now();
-        
-        const lastPve = current.lastPveEnergyRefill ?? current.lastEnergyRefill;
-        const lastPvp = current.lastPvpEnergyRefill ?? current.lastEnergyRefill;
-        
-        const timePassedPve = now - lastPve;
-        const timePassedPvp = now - lastPvp;
-        
-        let pveGained = 0;
-        let pvpGained = 0;
-        
-        // 20 minutes per PvE energy (1,200,000 ms)
-        const pveRegenTime = 1200000;
-        // 15 minutes per PvP energy (900,000 ms)
-        const pvpRegenTime = 900000;
-        
-        let newLastPve = lastPve;
-        let newLastPvp = lastPvp;
-        
-        if (current.pveEnergy >= current.pveEnergyMax) {
-          newLastPve = now;
-        } else if (timePassedPve >= pveRegenTime) {
-          pveGained = Math.floor(timePassedPve / pveRegenTime);
-          newLastPve = now - (timePassedPve % pveRegenTime);
+        const updated = calculateEnergy({ ...current });
+        if (
+          updated.pveEnergy !== current.pveEnergy || 
+          updated.pvpEnergy !== current.pvpEnergy ||
+          updated.lastPveEnergyRefill !== current.lastPveEnergyRefill
+        ) {
+          return updated;
         }
-        
-        if (current.pvpEnergy >= current.pvpEnergyMax) {
-          newLastPvp = now;
-        } else if (timePassedPvp >= pvpRegenTime) {
-          pvpGained = Math.floor(timePassedPvp / pvpRegenTime);
-          newLastPvp = now - (timePassedPvp % pvpRegenTime);
-        }
-        
-        if (pveGained > 0 || pvpGained > 0 || newLastPve !== lastPve || newLastPvp !== lastPvp) {
-          const updatedProfile = {
-            ...current,
-            pveEnergy: Math.min(current.pveEnergyMax, current.pveEnergy + pveGained),
-            pvpEnergy: Math.min(current.pvpEnergyMax, current.pvpEnergy + pvpGained),
-            lastPveEnergyRefill: newLastPve,
-            lastPvpEnergyRefill: newLastPvp
-          };
-          saveProfile(updatedProfile);
-          return updatedProfile;
-        }
-        
         return current;
       });
-    }, 15000); // Check every 15 seconds
+    }, 5000); // Check every 5 seconds
 
     return () => clearInterval(interval);
   }, []);
@@ -376,7 +340,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           parsed.deck = parsed.deck.filter(id => parsed.collection.some(c => c.id === id));
         }
 
-        loadedProfile = { ...loadedProfile, ...parsed, solanaAddress: address, solBalance: 12.5 };
+        loadedProfile = calculateEnergy({ ...loadedProfile, ...parsed, solanaAddress: address, solBalance: 12.5 });
         setProfile(loadedProfile);
         setIsLoadingProfile(false);
         return;
@@ -432,6 +396,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
+    loadedProfile = calculateEnergy(loadedProfile);
     setProfile(loadedProfile);
     setIsLoadingProfile(false);
   }, []);

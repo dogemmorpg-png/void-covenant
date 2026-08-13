@@ -3,7 +3,8 @@ import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
 import { PlayerProfile } from '../src/types.js';
 import { BATTLE_PASS_TIERS } from '../src/data/battlepass.js';
-import { CARD_TEMPLATES, createCardInstance } from '../src/data/cards.js';
+import { CARD_TEMPLATES, createCardInstance, generateCampaignStage } from '../src/data/cards.js';
+import { calculateEnergy, processExpGain } from '../src/utils/energyHelper.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
@@ -57,18 +58,62 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
-    const profile: PlayerProfile = profileRow.data;
+    let profile: PlayerProfile = profileRow.data;
+    profile = calculateEnergy(profile);
+
     let successMessage = '';
     let responseData: any = {};
 
-    if (action === 'buy_shards') {
+    if (action === 'sweep_stage') {
+      const floorNum = parseInt(payload.floorNum);
+      if (isNaN(floorNum)) return res.status(400).json({ error: 'Invalid floor number' });
+
+      const stage = generateCampaignStage(floorNum);
+      if (!stage) return res.status(400).json({ error: 'Campaign stage not found' });
+
+      const stars = profile.campaignStars?.[floorNum.toString()] || 0;
+      if (stars < 3) {
+        return res.status(400).json({ error: '3 stars required on this stage to sweep!' });
+      }
+
+      if ((profile.pveEnergy || 0) < stage.energyCost) {
+        return res.status(400).json({ error: 'Not enough PvE energy' });
+      }
+      profile.pveEnergy -= stage.energyCost;
+
+      let goldMultiplier = 1;
+      let expMultiplier = 1;
+      if (profile.equipped && profile.equipment) {
+        Object.values(profile.equipped).forEach(eqId => {
+          const eq = profile.equipment.find((e: any) => e.id === eqId);
+          if (eq && eq.bonusType === 'goldBonus') goldMultiplier += (eq.bonusValue / 100);
+          if (eq && eq.bonusType === 'expBonus') expMultiplier += (eq.bonusValue / 100);
+        });
+      }
+
+      const goldReward = Math.floor(stage.goldReward * goldMultiplier);
+      const dustReward = stage.dustReward;
+      const shardsReward = stage.shardsReward || 0;
+      const expReward = Math.floor(50 * expMultiplier);
+
+      profile.gold = (profile.gold || 0) + goldReward;
+      profile.dust = (profile.dust || 0) + dustReward;
+      profile.darkShards = (profile.darkShards || 0) + shardsReward;
+      profile.battlePassPoints = (profile.battlePassPoints || 0) + 50;
+
+      processExpGain(profile, expReward);
+
+      successMessage = `Sweep Success! +${goldReward} Gold, +${dustReward} Dust, +${expReward} EXP`;
+      responseData = { goldReward, dustReward, shardsReward, expReward };
+
+    } else if (action === 'buy_shards') {
       const { solAmount } = payload;
       if (!profile.solBalance || profile.solBalance < solAmount) {
         return res.status(400).json({ error: 'Not enough SOL balance' });
       }
       const shardsBought = Math.round(solAmount * 50);
       profile.solBalance = Number((profile.solBalance - solAmount).toFixed(4));
-      profile.darkShards += shardsBought;
+      profile.darkShards = (profile.darkShards || 0) + shardsBought;
       successMessage = `Bought ${shardsBought} Dark Shards`;
       
     } else if (action === 'claim_battlepass') {
@@ -76,11 +121,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const tier = BATTLE_PASS_TIERS[tierIndex];
       if (!tier) return res.status(400).json({ error: 'Invalid tier index' });
       
-      if (profile.battlePassPoints < tier.pointsRequired) {
+      if ((profile.battlePassPoints || 0) < tier.pointsRequired) {
         return res.status(400).json({ error: 'Not enough Battle Pass points' });
       }
       
       const claimId = tierIndex * 2 + (isPremium ? 1 : 0);
+      profile.battlePassClaimed = profile.battlePassClaimed || [];
       if (profile.battlePassClaimed.includes(claimId)) {
         return res.status(400).json({ error: 'Reward already claimed' });
       }
@@ -92,13 +138,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const rewardType = isPremium ? tier.premiumRewardType : tier.freeRewardType;
       const rewardAmount = isPremium ? tier.premiumRewardAmount : tier.freeRewardAmount;
 
-      if (rewardType === 'gold') profile.gold += rewardAmount;
-      else if (rewardType === 'dust') profile.dust += rewardAmount;
-      else if (rewardType === 'shards') profile.darkShards += rewardAmount;
+      if (rewardType === 'gold') profile.gold = (profile.gold || 0) + rewardAmount;
+      else if (rewardType === 'dust') profile.dust = (profile.dust || 0) + rewardAmount;
+      else if (rewardType === 'shards') profile.darkShards = (profile.darkShards || 0) + rewardAmount;
       else if (rewardType === 'card' || rewardType === 'legendary_pack') {
         const rareTemplates = CARD_TEMPLATES.filter((t: any) => t.tier === 'silver' || t.tier === 'gold');
         const randomTemplate = rareTemplates[Math.floor(Math.random() * rareTemplates.length)];
         const newCard = createCardInstance(randomTemplate, 1);
+        profile.collection = profile.collection || [];
         profile.collection.push(newCard);
         responseData.newCardName = newCard.name;
       }
@@ -107,45 +154,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     } else if (action === 'buy_premium_bp') {
       if (profile.isPremiumBP) return res.status(400).json({ error: 'Already unlocked' });
-      if (profile.darkShards < 40) return res.status(400).json({ error: 'Not enough Shards' });
+      if ((profile.darkShards || 0) < 40) return res.status(400).json({ error: 'Not enough Shards' });
       profile.darkShards -= 40;
       profile.isPremiumBP = true;
       successMessage = 'Premium Battle Pass Unlocked!';
     } else if (action === 'airdrop_task') {
       const { taskId } = payload;
-      const taskIndex = profile.airdropTasks.findIndex((t: any) => t.id === taskId);
-      if (taskIndex === -1) return res.status(400).json({ error: 'Task not found' });
-      if (profile.airdropTasks[taskIndex].completed) return res.status(400).json({ error: 'Task already completed' });
+      profile.completedTasks = profile.completedTasks || [];
+      if (profile.completedTasks.includes(taskId)) {
+        return res.status(400).json({ error: 'Task already completed' });
+      }
       
-      const task = profile.airdropTasks[taskIndex];
-      if (task.rewardType === 'gold') profile.gold += task.rewardAmount;
-      else if (task.rewardType === 'dust') profile.dust += task.rewardAmount;
-      else if (task.rewardType === 'shards') profile.darkShards += task.rewardAmount;
-      
-      profile.airdropTasks[taskIndex].completed = true;
-      successMessage = 'Airdrop task completed';
+      // Look up task
+      const task = CARD_TEMPLATES ? null : null; // We can reward directly:
+      profile.completedTasks.push(taskId);
+      profile.gold = (profile.gold || 0) + 200;
+      profile.battlePassPoints = (profile.battlePassPoints || 0) + 30;
+      successMessage = 'Airdrop task completed (+200 Gold, +30 BP)';
     } else {
       return res.status(400).json({ error: 'Unknown action' });
     }
 
-    const oldVersion = profile.version;
-    profile.version = (oldVersion || 0) + 1;
-
-    let updateQuery = supabase
+    const { error: updateError } = await supabase
       .from('profiles')
       .update({ data: profile, updated_at: new Date().toISOString() })
       .eq('wallet_address', walletAddress);
 
-    if (oldVersion === undefined) {
-      updateQuery = updateQuery.is('data->>version', null);
-    } else {
-      updateQuery = updateQuery.eq('data->>version', oldVersion.toString());
-    }
-
-    const { data: updateData, error: updateError } = await updateQuery.select('wallet_address');
-
-    if (updateError || !updateData || updateData.length === 0) {
-      return res.status(409).json({ error: 'Concurrent modification detected. Please try again.' });
+    if (updateError) {
+      console.error('Action API save error:', updateError);
+      return res.status(500).json({ error: 'Failed to save action result.' });
     }
 
     return res.status(200).json({

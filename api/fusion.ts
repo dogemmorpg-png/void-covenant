@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
 import { CARD_TEMPLATES } from '../src/data/cards.js';
 import { Card, CardTier, PlayerProfile } from '../src/types.js';
+import { calculateEnergy } from '../src/utils/energyHelper.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
@@ -171,25 +172,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     profile.collection = profile.collection.filter((c: Card) => c.id !== card1.id && c.id !== card2.id);
     profile.collection.push(fusedCard);
 
-    // Save
-    const oldVersion = profile.version;
-    profile.version = (oldVersion || 0) + 1;
+    profile = calculateEnergy(profile);
 
-    let updateQuery = supabase
+    const { error: updateError } = await supabase
       .from('profiles')
       .update({ data: profile, updated_at: new Date().toISOString() })
       .eq('wallet_address', walletAddress);
 
-    if (oldVersion === undefined) {
-      updateQuery = updateQuery.is('data->>version', null);
-    } else {
-      updateQuery = updateQuery.eq('data->>version', oldVersion.toString());
-    }
-
-    const { data: updateData, error: updateError } = await updateQuery.select('wallet_address');
-
-    if (updateError || !updateData || updateData.length === 0) {
-      return res.status(409).json({ error: 'Concurrent modification detected. Please try again.' });
+    if (updateError) {
+      console.error('Fusion update error:', updateError);
+      return res.status(500).json({ error: 'Failed to update profile.' });
     }
 
     return res.status(200).json({

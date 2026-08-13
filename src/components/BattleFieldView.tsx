@@ -112,9 +112,8 @@ const getSkillDescEnglish = (type: string, value: number) => {
 };
 
 export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitBattle, battleType = 'campaign' }) => {
-  const { profile, setProfile, saveProfile, addGold, addDust, addShards, addBattlePassPoints, addCardToCollection, soundOn, toggleSound, addExp, addCampaignStars, submitBattleResult } = useGame();
+  const { profile, setProfile, soundOn, toggleSound, submitBattleResult } = useGame();
   const toast = useToast();
-  const [isStarting, setIsStarting] = useState(true);
   
   // Calculate total bonuses from equipped items by type
   const getEquipmentBonus = (bonusType: string) => {
@@ -150,28 +149,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const [speedMultiplier, setSpeedMultiplier] = useState<number>(1);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [activeLogStepText, setActiveLogStepText] = useState<string>('');
-  
-  useEffect(() => {
-    // Notify server that battle started
-    const startBattle = async () => {
-      const token = localStorage.getItem('void_covenant_token');
-      if (!token) {
-        setIsStarting(false);
-        return;
-      }
-      try {
-        await fetch('/api/battle-start', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-      } catch (e) {
-        console.error('Failed to start battle session', e);
-      } finally {
-        setIsStarting(false);
-      }
-    };
-    startBattle();
-  }, []);
 
   // Active animation targets for cards movement and effects
   const [animatingSlot, setAnimatingSlot] = useState<{
@@ -497,19 +474,20 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const handleBattleWon = async () => {
     audioSystem.playMagic();
     
-    let stars = 1;
-    if (battleType === 'campaign') {
-      const hpPercentage = battle.playerHeroHealth / battle.playerHeroMaxHealth;
-      if (hpPercentage === 1) stars = 3;
-      else if (hpPercentage >= 0.5) stars = 2;
+    if (battleType === 'pvp') {
+      await handlePvpWon();
+      return;
     }
+
+    let stars = 1;
+    const hpPercentage = battle.playerHeroHealth / battle.playerHeroMaxHealth;
+    if (hpPercentage === 1) stars = 3;
+    else if (hpPercentage >= 0.5) stars = 2;
 
     const res = await submitBattleResult(battleType, stage.id.toString(), 'win', stars);
     if (!res.success) {
       console.error('Failed to save battle result:', res.message);
       toast(res.message, 'error');
-    } else {
-      addBattlePassPoints(50);
     }
   };
 
@@ -520,8 +498,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     if (!res.success) {
       console.error('Failed to save PVP result:', res.message);
       toast(res.message, 'error');
-    } else {
-      addBattlePassPoints(50);
     }
   };
 
@@ -563,14 +539,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       ));
   };
 
-  if (isStarting) {
-    return (
-      <div className="fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-50">
-        <div className="w-16 h-16 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
-        <p className="text-purple-400 font-serif mt-6 text-xl tracking-widest uppercase">Initializing Battle...</p>
-      </div>
-    );
-  }
+
 
   return (
     <div className="min-h-screen bg-[#06070a] text-gray-200 p-3 md:p-4 font-sans flex flex-col justify-between">
