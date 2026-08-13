@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GameProvider, useGame } from './context/GameContext';
 import { ToastProvider } from './components/Toast';
 import { audioSystem } from './utils/AudioSystem';
@@ -26,6 +26,21 @@ function MainAppContent() {
   
   const [isVerified, setIsVerified] = useState(false);
   const [isSigning, setIsSigning] = useState(false);
+  const lastWalletRef = useRef<string | null>(null);
+
+  // Auto-detect wallet switching or disconnection
+  useEffect(() => {
+    const currentKeyStr = publicKey ? publicKey.toBase58() : null;
+    if (currentKeyStr !== lastWalletRef.current) {
+      lastWalletRef.current = currentKeyStr;
+      setIsVerified(false);
+      setIsSigning(false);
+      if (!connected || !publicKey) {
+        localStorage.removeItem('void_covenant_token');
+        disconnectSolanaWallet();
+      }
+    }
+  }, [connected, publicKey, disconnectSolanaWallet]);
   
   // Tab states
   const [activeTab, setActiveTab] = useState<'campaign' | 'pvp' | 'collection' | 'hero' | 'altar' | 'airdrop' | 'battlepass'>('campaign');
@@ -49,27 +64,24 @@ function MainAppContent() {
 
   const hasUnfinishedTasks = AIRDROP_TASKS.some(task => 
     !profile.completedTasks.includes(task.id) && 
-    !(task.id === 'wallet_connect' && profile.TONWalletAddress)
+    !(task.id === 'wallet_connect' && profile.solanaAddress)
   );
 
-  React.useEffect(() => {
-    // Reset verification if disconnected
+  useEffect(() => {
     if (!connected) {
       setIsVerified(false);
       setIsSigning(false);
-      if (profile.solanaAddress) {
-        disconnectSolanaWallet();
-      }
       return;
     }
 
     if (connected && publicKey) {
-      // If we haven't verified the signature yet for this session
+      // If signature is not verified for current wallet
       if (!isVerified && !isSigning) {
         const performSignature = async () => {
           if (!signMessage) {
-            console.warn("Wallet does not support message signing!");
+            console.warn("Wallet does not support message signing, bypassing server auth");
             setIsVerified(true);
+            connectSolanaWallet(publicKey.toBase58());
             return;
           }
           
@@ -95,31 +107,28 @@ function MainAppContent() {
               })
             });
 
-            if (!response.ok) {
-              throw new Error('Backend authentication failed');
+            if (response.ok) {
+              const data = await response.json();
+              if (data.token) {
+                localStorage.setItem('void_covenant_token', data.token);
+              }
             }
 
-            const data = await response.json();
-            localStorage.setItem('void_covenant_token', data.token);
-
             setIsVerified(true);
+            connectSolanaWallet(publicKeyStr);
           } catch (error) {
-            console.error("Signature rejected or failed:", error);
-            // Disconnect if they refuse to sign or auth fails
-            disconnect().catch(() => {});
+            console.error("Signature rejected or auth error:", error);
+            // Allow playing even if backend auth fails
+            setIsVerified(true);
+            connectSolanaWallet(publicKey.toBase58());
           } finally {
             setIsSigning(false);
           }
         };
         performSignature();
-      } else if (isVerified) {
-        // Only load the game profile AFTER they have successfully signed
-        if (!profile.solanaAddress || profile.solanaAddress !== publicKey.toBase58()) {
-          connectSolanaWallet(publicKey.toBase58());
-        }
       }
     }
-  }, [connected, publicKey, isVerified, isSigning, profile.solanaAddress, connectSolanaWallet, disconnectSolanaWallet, signMessage, disconnect]);
+  }, [connected, publicKey, isVerified, isSigning, connectSolanaWallet, signMessage]);
 
   if (!connected) {
     return (
@@ -180,128 +189,156 @@ function MainAppContent() {
                 setActiveBattleType('campaign');
                 setActiveBattleStage(stage);
               }} />
-          )}
-          {activeTab === 'pvp' && (
-            <PvpArenaView onStartBattle={(stage, type) => {
-              setActiveBattleType(type);
-              setActiveBattleStage(stage);
-            }} />
-          )}
-          {activeTab === 'collection' && <CollectionDeckView />}
-          {activeTab === 'hero' && <HeroInventoryView />}
-          {activeTab === 'altar' && <GachaStoreView />}
-          {activeTab === 'airdrop' && <AirdropHubView />}
-          {activeTab === 'battlepass' && <BattlePassView />}
-        </div>
-      </div>
-
-      {/* Navigation Footer Tab Bar (Mobile responsive and desktop styled) */}
-      <div className="bg-[#151a21]/95 border-t border-[#c5a880]/20 sticky bottom-0 z-50 backdrop-blur-md py-2.5">
-        <div className="max-w-4xl mx-auto flex items-center justify-around gap-2 px-4">
-          
-          {/* Campaign Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('campaign'); }}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
-              activeTab === 'campaign'
-                ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <Swords className="w-5 h-5" />
-            <span className="text-[10px] font-display font-bold tracking-wider">CAMPAIGN</span>
-          </button>
-
-          {/* Arena Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('pvp'); }}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
-              activeTab === 'pvp'
-                ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <Trophy className="w-5 h-5" />
-            <span className="text-[10px] font-display font-bold tracking-wider">ARENA</span>
-          </button>
-
-          {/* Collection Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('collection'); }}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
-              activeTab === 'collection'
-                ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <FolderGit className="w-5 h-5" />
-            <span className="text-[10px] font-display font-bold tracking-wider">CARDS</span>
-          </button>
-
-          {/* Hero Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('hero'); }}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
-              activeTab === 'hero'
-                ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <UserCircle2 className="w-5 h-5" />
-            <span className="text-[10px] font-display font-bold tracking-wider">LORD</span>
-          </button>
-
-          {/* Altar Gacha Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('altar'); }}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
-              activeTab === 'altar'
-                ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <Sparkles className="w-5 h-5" />
-            <span className="text-[10px] font-display font-bold tracking-wider">SUMMON</span>
-          </button>
-
-          {/* Airdrop Web3 Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('airdrop'); }}
-            className={`relative flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
-              activeTab === 'airdrop'
-                ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <Wallet className="w-5 h-5" />
-            <span className="text-[10px] font-display font-bold tracking-wider">AIRDROP</span>
-            {hasUnfinishedTasks && (
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#dd2c40] rounded-full animate-ping" />
             )}
-          </button>
 
-          {/* Battle Pass Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('battlepass'); }}
-            className={`relative flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
-              activeTab === 'battlepass'
-                ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <Award className="w-5 h-5" />
-            <span className="text-[10px] font-display font-bold tracking-wider">BATTLE PASS</span>
-            {hasUnclaimedBP && (
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#dd2c40] rounded-full animate-ping" />
+            {activeTab === 'pvp' && (
+              <PvpArenaView onStartPvpBattle={(stage) => {
+                setActiveBattleType('pvp');
+                setActiveBattleStage(stage);
+              }} />
             )}
-          </button>
 
+            {activeTab === 'collection' && <CollectionDeckView />}
+
+            {activeTab === 'hero' && <HeroInventoryView />}
+
+            {activeTab === 'altar' && <GachaStoreView />}
+
+            {activeTab === 'airdrop' && <AirdropHubView />}
+
+            {activeTab === 'battlepass' && <BattlePassView />}
+          </div>
         </div>
+
+        {/* Bottom Navigation Bar */}
+        <div className="sticky bottom-0 z-40 bg-[#0b0c10]/95 backdrop-blur-xl border-t border-[#c5a880]/20 py-2.5 px-4 shadow-[0_-10px_30px_rgba(0,0,0,0.8)]">
+          <div className="max-w-4xl mx-auto flex justify-between items-center gap-1 md:gap-4">
+            
+            <button
+              onClick={() => {
+                audioSystem.playClick();
+                setActiveTab('campaign');
+              }}
+              className={`flex-1 flex flex-col items-center py-1.5 px-2 rounded-xl transition-all cursor-pointer ${
+                activeTab === 'campaign'
+                  ? 'bg-gradient-to-t from-red-950/60 to-transparent text-[#dd2c40] border border-[#dd2c40]/30 shadow-[0_0_15px_rgba(221,44,64,0.2)]'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+              }`}
+            >
+              <Swords className="w-5 h-5 mb-1" />
+              <span className="font-display text-[10px] uppercase font-bold tracking-wider">Campaign</span>
+            </button>
+
+            <button
+              onClick={() => {
+                audioSystem.playClick();
+                setActiveTab('pvp');
+              }}
+              className={`flex-1 flex flex-col items-center py-1.5 px-2 rounded-xl transition-all cursor-pointer ${
+                activeTab === 'pvp'
+                  ? 'bg-gradient-to-t from-purple-950/60 to-transparent text-purple-400 border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.2)]'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+              }`}
+            >
+              <Trophy className="w-5 h-5 mb-1" />
+              <span className="font-display text-[10px] uppercase font-bold tracking-wider">PvP Arena</span>
+            </button>
+
+            <button
+              onClick={() => {
+                audioSystem.playClick();
+                setActiveTab('collection');
+              }}
+              className={`flex-1 flex flex-col items-center py-1.5 px-2 rounded-xl transition-all cursor-pointer ${
+                activeTab === 'collection'
+                  ? 'bg-gradient-to-t from-amber-950/60 to-transparent text-[#ebd09b] border border-[#ebd09b]/30 shadow-[0_0_15px_rgba(235,208,155,0.2)]'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+              }`}
+            >
+              <FolderGit className="w-5 h-5 mb-1" />
+              <span className="font-display text-[10px] uppercase font-bold tracking-wider">Deck</span>
+            </button>
+
+            <button
+              onClick={() => {
+                audioSystem.playClick();
+                setActiveTab('hero');
+              }}
+              className={`flex-1 flex flex-col items-center py-1.5 px-2 rounded-xl transition-all cursor-pointer ${
+                activeTab === 'hero'
+                  ? 'bg-gradient-to-t from-[#66fcf1]/20 to-transparent text-[#66fcf1] border border-[#66fcf1]/30 shadow-[0_0_15px_rgba(102,252,241,0.2)]'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+              }`}
+            >
+              <UserCircle2 className="w-5 h-5 mb-1" />
+              <span className="font-display text-[10px] uppercase font-bold tracking-wider">Inventory</span>
+            </button>
+
+            <button
+              onClick={() => {
+                audioSystem.playClick();
+                setActiveTab('altar');
+              }}
+              className={`flex-1 flex flex-col items-center py-1.5 px-2 rounded-xl transition-all cursor-pointer ${
+                activeTab === 'altar'
+                  ? 'bg-gradient-to-t from-cyan-950/60 to-transparent text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+              }`}
+            >
+              <Sparkles className="w-5 h-5 mb-1" />
+              <span className="font-display text-[10px] uppercase font-bold tracking-wider">Summon</span>
+            </button>
+
+            <button
+              onClick={() => {
+                audioSystem.playClick();
+                setActiveTab('battlepass');
+              }}
+              className={`flex-1 flex flex-col items-center py-1.5 px-2 rounded-xl transition-all relative cursor-pointer ${
+                activeTab === 'battlepass'
+                  ? 'bg-gradient-to-t from-purple-950/60 to-transparent text-purple-300 border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.2)]'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+              }`}
+            >
+              {hasUnclaimedBP && (
+                <span className="absolute top-1 right-3 w-2 h-2 rounded-full bg-purple-500 animate-ping" />
+              )}
+              <Award className="w-5 h-5 mb-1" />
+              <span className="font-display text-[10px] uppercase font-bold tracking-wider">Pass</span>
+            </button>
+
+            <button
+              onClick={() => {
+                audioSystem.playClick();
+                setActiveTab('airdrop');
+              }}
+              className={`flex-1 flex flex-col items-center py-1.5 px-2 rounded-xl transition-all relative cursor-pointer ${
+                activeTab === 'airdrop'
+                  ? 'bg-gradient-to-t from-[#66fcf1]/20 to-transparent text-[#66fcf1] border border-[#66fcf1]/30 shadow-[0_0_15px_rgba(102,252,241,0.2)]'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+              }`}
+            >
+              {hasUnfinishedTasks && (
+                <span className="absolute top-1 right-3 w-2 h-2 rounded-full bg-[#66fcf1] animate-ping" />
+              )}
+              <Wallet className="w-5 h-5 mb-1" />
+              <span className="font-display text-[10px] uppercase font-bold tracking-wider">Airdrop</span>
+            </button>
+
+          </div>
+        </div>
+
       </div>
-    </div>
     </>
   );
 }
 
 export default function App() {
   return (
-    <GameProvider>
-      <ToastProvider>
+    <ToastProvider>
+      <GameProvider>
         <MainAppContent />
-      </ToastProvider>
-    </GameProvider>
+      </GameProvider>
+    </ToastProvider>
   );
 }

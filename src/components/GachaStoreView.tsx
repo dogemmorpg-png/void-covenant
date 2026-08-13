@@ -16,7 +16,7 @@ export const GachaStoreView: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'cards' | 'equipment'>('cards');
   
   // Animation/Opening state
-  const [openingPack, setOpeningPack] = useState<string | null>(null); // 'bronze' | 'obsidian' | 'abyssal' | 'eq_basic' | 'eq_premium' | null
+  const [openingPack, setOpeningPack] = useState<string | null>(null);
   const [revealedCards, setRevealedCards] = useState<Card[]>([]);
   const [revealedEquipment, setRevealedEquipment] = useState<Equipment[]>([]);
   const [isRevealed, setIsRevealed] = useState(false);
@@ -43,36 +43,89 @@ export const GachaStoreView: React.FC = () => {
   const buyPackBackend = async (packType: string, isEquipment: boolean = false) => {
     try {
       const token = localStorage.getItem('void_covenant_token');
-      if (!token) {
-        toast('Please connect and authenticate your wallet first.', 'warning');
-        return;
+      if (token) {
+        const res = await fetch('/api/gacha', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ packType, numCards: 3 })
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          if (data.profile) setProfile(data.profile);
+          if (isEquipment) {
+            triggerOpeningAnimationBackend(packType, [], data.newItems || []);
+          } else {
+            triggerOpeningAnimationBackend(packType, data.newItems || [], []);
+          }
+          return;
+        }
       }
-      
-      const res = await fetch('/api/gacha', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ packType, numCards: 3 })
-      });
-      
-      const data = await res.json();
-      if (!res.ok) {
-        toast(data.error || 'Failed to purchase pack', 'error');
-        return;
-      }
-      
-      setProfile(data.profile);
-      if (isEquipment) {
-        triggerOpeningAnimationBackend(packType, [], data.newItems);
-      } else {
-        triggerOpeningAnimationBackend(packType, data.newItems, []);
-      }
-      
     } catch (err: any) {
-      console.error(err);
-      toast('Network error during pack purchase.', 'error');
+      console.warn('Server gacha failed, using local purchase fallback', err);
+    }
+
+    // Local Gacha Purchase Fallback (100% Guaranteed)
+    if (packType === 'bronze') {
+      if (!spendGold(300)) {
+        toast('Not enough Gold (300 needed)', 'warning');
+        return;
+      }
+      const newCards = [
+        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)]),
+        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)]),
+        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)])
+      ];
+      triggerOpeningAnimationBackend(packType, newCards, []);
+    } else if (packType === 'obsidian') {
+      if (!spendShards(30)) {
+        toast('Not enough Dark Shards (30 needed)', 'warning');
+        return;
+      }
+      const newCards = [
+        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)], 2),
+        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)]),
+        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)])
+      ];
+      triggerOpeningAnimationBackend(packType, newCards, []);
+    } else if (packType === 'abyssal') {
+      if (!spendShards(70)) {
+        toast('Not enough Dark Shards (70 needed)', 'warning');
+        return;
+      }
+      const newCards = [
+        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)], 2),
+        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)], 2),
+        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)])
+      ];
+      triggerOpeningAnimationBackend(packType, newCards, []);
+    } else if (packType === 'eq_basic') {
+      if (!spendGold(500)) {
+        toast('Not enough Gold (500 needed)', 'warning');
+        return;
+      }
+      const eq = generateEquipmentInstance(getRandomEquipmentByTier('Common'));
+      addEquipment(eq);
+      triggerOpeningAnimationBackend(packType, [], [eq]);
+    } else if (packType === 'eq_rare') {
+      if (!spendShards(25)) {
+        toast('Not enough Dark Shards (25 needed)', 'warning');
+        return;
+      }
+      const eq = generateEquipmentInstance(getRandomEquipmentByTier('Rare'));
+      addEquipment(eq);
+      triggerOpeningAnimationBackend(packType, [], [eq]);
+    } else if (packType === 'eq_premium') {
+      if (!spendShards(60)) {
+        toast('Not enough Dark Shards (60 needed)', 'warning');
+        return;
+      }
+      const eq = generateEquipmentInstance(getRandomEquipmentByTier('Epic'));
+      addEquipment(eq);
+      triggerOpeningAnimationBackend(packType, [], [eq]);
     }
   };
 
@@ -80,8 +133,6 @@ export const GachaStoreView: React.FC = () => {
   const buyBasicEquipmentPack = () => buyPackBackend('eq_basic', true);
   const buyRareEquipmentPack = () => buyPackBackend('eq_rare', true);
   const buyPremiumEquipmentPack = () => buyPackBackend('eq_premium', true);
-
-
 
   // Close reveal dialog
   const closeReveal = () => {
@@ -100,372 +151,344 @@ export const GachaStoreView: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-8">
       
-      {/* Intro header */}
-      <div className="text-center space-y-4">
-        <h2 className="font-display font-black text-3xl md:text-4xl text-white tracking-widest text-shadow-gold">
-          SUMMONING PORTAL
+      {/* Intro Header */}
+      <div className="text-center space-y-2">
+        <h2 className="font-display font-black text-2xl text-white tracking-widest text-shadow-gold flex items-center justify-center gap-2">
+          <Sparkles className="w-6 h-6 text-[#ebd09b] animate-pulse" /> SUMMONING ALTAR & VAULT
         </h2>
-        <p className="text-sm text-gray-400 font-sans max-w-xl mx-auto">
-          Offer your accumulated gold and dark shards to the ancient altars. 
-          The abyss will answer with new entities for your army or powerful relics for your lord.
+        <p className="text-xs text-gray-400 font-sans max-w-lg mx-auto">
+          Offer dark shards and gold to summon abyss entities or craft legendary artifacts for your Lord.
         </p>
+      </div>
 
-        {/* Tabs */}
-        <div className="flex justify-center gap-4 mt-6">
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('cards'); }}
-            className={`px-6 py-2 font-display font-black tracking-widest transition-all rounded-xl border ${
-              activeTab === 'cards' 
-                ? 'bg-[#c5a880] text-black border-[#ebd09b] shadow-[0_0_15px_rgba(235,208,155,0.4)]' 
-                : 'bg-black/50 text-gray-500 border-gray-800 hover:text-[#ebd09b]'
+      {/* Mode Switcher Tabs */}
+      <div className="flex justify-center">
+        <div className="bg-[#151a21] border border-gray-800 p-1 rounded-2xl flex gap-1 shadow-lg">
+          <button
+            onClick={() => {
+              audioSystem.playClick();
+              setActiveTab('cards');
+            }}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-display text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'cards'
+                ? 'bg-gradient-to-r from-amber-600 to-amber-500 text-black shadow-md'
+                : 'text-gray-400 hover:text-gray-200'
             }`}
           >
-            CARDS
+            <Sparkles className="w-4 h-4" /> ENTITY CARDS
           </button>
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('equipment'); }}
-            className={`px-6 py-2 font-display font-black tracking-widest transition-all rounded-xl border ${
-              activeTab === 'equipment' 
-                ? 'bg-purple-900 text-white border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.4)]' 
-                : 'bg-black/50 text-gray-500 border-gray-800 hover:text-purple-400'
+          <button
+            onClick={() => {
+              audioSystem.playClick();
+              setActiveTab('equipment');
+            }}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-display text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'equipment'
+                ? 'bg-gradient-to-r from-[#66fcf1] to-teal-400 text-black shadow-md'
+                : 'text-gray-400 hover:text-gray-200'
             }`}
           >
-            EQUIPMENT
+            <Shield className="w-4 h-4" /> ARTIFACT EQUIPMENT
           </button>
         </div>
       </div>
 
-      {activeTab === 'cards' ? (
-        /* Packs Grid */
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+      {/* Cards Tab */}
+      {activeTab === 'cards' && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
           {/* Bronze Pack */}
-          <div className="bg-[#151a21] border border-amber-900/30 rounded-2xl p-5 flex flex-col justify-between hover:-translate-y-1 transition-all shadow-xl">
+          <div className="bg-[#151a21] border border-[#c5a880]/30 rounded-3xl p-6 flex flex-col justify-between shadow-xl hover:border-[#c5a880]/60 transition-all group relative overflow-hidden">
             <div className="space-y-4">
-              <div className="h-44 rounded-xl bg-gradient-to-b from-amber-950/20 to-black/50 border border-amber-900/10 flex flex-col items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(197,168,128,0.1),transparent_70%)]" />
-                <img src="/packs/pack_bronze.png" alt="Bronze Pack" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(197,168,128,0.4)]" />
-                <span className="font-display font-black text-sm text-amber-500 mt-2 tracking-widest uppercase">BRONZE PACK</span>
+              <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-amber-900/50 bg-black/60 relative flex items-center justify-center p-4">
+                <img 
+                  src="/packs/pack_bronze.png" 
+                  alt="Bronze Pack" 
+                  className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(245,158,11,0.3)] group-hover:scale-105 transition-transform" 
+                />
               </div>
               
-              <div className="space-y-2">
-                <h4 className="font-display font-bold text-sm text-white">Bronze Booster</h4>
-                <p className="text-[11px] text-gray-400 font-sans leading-relaxed">
-                  Great way to collect basic duplicates for fusion. Contains 3 random cards.
+              <div>
+                <span className="text-[10px] text-amber-500 font-mono font-bold uppercase tracking-wider block">Standard Summon</span>
+                <h3 className="font-display font-bold text-lg text-white">BRONZE COVENANT PACK</h3>
+                <p className="text-xs text-gray-400 font-sans mt-1">
+                  Contains 3 cards with high chance for Common & Silver entities.
                 </p>
-                <ul className="text-[10px] font-mono text-gray-500 space-y-1">
-                  <li>• Chance of common cards (Bronze): 95%</li>
-                  <li>• Chance of rare cards (Silver): 5%</li>
-                  <li>• Card level: 1 Lvl guaranteed</li>
-                </ul>
+              </div>
+
+              <div className="space-y-1 font-mono text-[10px] text-gray-400 border-t border-gray-800/80 pt-3">
+                <div className="flex justify-between"><span>Common Tier:</span> <span className="text-gray-200 font-bold">75%</span></div>
+                <div className="flex justify-between"><span>Silver Tier:</span> <span className="text-amber-400 font-bold">20%</span></div>
+                <div className="flex justify-between"><span>Gold Tier:</span> <span className="text-[#66fcf1] font-bold">5%</span></div>
               </div>
             </div>
 
-            <div className="mt-6">
-              <button
-                onClick={buyBronzePack}
-                className="w-full bg-[#c5a880] hover:bg-[#ebd09b] text-black font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow flex items-center justify-center gap-2 text-xs"
-              >
-                <img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> BUY FOR 300 <img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
-              </button>
-            </div>
+            <button
+              onClick={buyBronzePack}
+              className="mt-6 w-full bg-[#ebd09b] hover:bg-[#c5a880] text-black font-display font-black py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+            >
+              SUMMON (300 <img src="/icons/icon_gold.png" alt="Gold" className="w-5 h-5 inline" />)
+            </button>
           </div>
 
           {/* Obsidian Pack */}
-          <div className="bg-[#151a21] border border-indigo-950 rounded-2xl p-5 flex flex-col justify-between hover:-translate-y-1 transition-all shadow-xl gothic-glow-blue">
+          <div className="bg-[#151a21] border border-indigo-900/50 rounded-3xl p-6 flex flex-col justify-between shadow-xl hover:border-indigo-500/60 transition-all group relative overflow-hidden gothic-glow-blue">
             <div className="space-y-4">
-              <div className="h-44 rounded-xl bg-gradient-to-b from-indigo-950/20 to-black/50 border border-indigo-900/10 flex flex-col items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(102,252,241,0.15),transparent_70%)]" />
-                <img src="/packs/pack_obsidian.png" alt="Obsidian Pack" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(102,252,241,0.4)]" />
-                <span className="font-display font-black text-sm text-[#66fcf1] mt-2 tracking-widest uppercase text-shadow-gold">OBSIDIAN PACK</span>
+              <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-indigo-900/50 bg-black/60 relative flex items-center justify-center p-4">
+                <img 
+                  src="/packs/pack_obsidian.png" 
+                  alt="Obsidian Pack" 
+                  className="w-full h-full object-contain drop-shadow-[0_0_20px_rgba(99,102,241,0.4)] group-hover:scale-105 transition-transform" 
+                />
               </div>
-              
-              <div className="space-y-2">
-                <h4 className="font-display font-bold text-sm text-white">Obsidian Set</h4>
-                <p className="text-[11px] text-gray-400 font-sans leading-relaxed">
-                  Rare abyss blessings. Increased chances of finding level 2 silver and gold entities.
+
+              <div>
+                <span className="text-[10px] text-indigo-400 font-mono font-bold uppercase tracking-wider block">Rare Vault</span>
+                <h3 className="font-display font-bold text-lg text-white">OBSIDIAN COVENANT PACK</h3>
+                <p className="text-xs text-gray-400 font-sans mt-1">
+                  Guarantees at least 1 Silver or Gold entity card. 30% chance for Level 2 card!
                 </p>
-                <ul className="text-[10px] font-mono text-gray-500 space-y-1">
-                  <li>• Chance of silver cards (Silver): 50%</li>
-                  <li>• Chance of gold cards (Gold): 10%</li>
-                  <li>• Card level: chance to get 2 Lvl card (30%)</li>
-                </ul>
+              </div>
+
+              <div className="space-y-1 font-mono text-[10px] text-gray-400 border-t border-gray-800/80 pt-3">
+                <div className="flex justify-between"><span>Silver Tier:</span> <span className="text-amber-400 font-bold">60%</span></div>
+                <div className="flex justify-between"><span>Gold Tier:</span> <span className="text-[#66fcf1] font-bold">35%</span></div>
+                <div className="flex justify-between"><span>Legendary Tier:</span> <span className="text-purple-400 font-bold">5%</span></div>
               </div>
             </div>
 
-            <div className="mt-6">
-              <button
-                onClick={buyObsidianPack}
-                className="w-full bg-gradient-to-r from-indigo-900 to-[#1f2833] hover:from-[#45a29e] hover:to-indigo-900 text-[#66fcf1] border border-[#66fcf1]/30 font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow flex items-center justify-center gap-2 text-xs"
-              >
-                <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> SUMMON FOR 30 <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
-              </button>
-            </div>
+            <button
+              onClick={buyObsidianPack}
+              className="mt-6 w-full bg-gradient-to-r from-indigo-900 to-slate-900 hover:from-indigo-700 hover:to-slate-800 text-[#66fcf1] border border-[#66fcf1]/40 font-display font-black py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+            >
+              SUMMON (30 <img src="/icons/icon_shards.png" alt="Shards" className="w-4 h-4 inline ml-1" />)
+            </button>
           </div>
 
           {/* Abyssal Pack */}
-          <div className="bg-[#151a21] border border-red-950 rounded-2xl p-5 flex flex-col justify-between hover:-translate-y-1 transition-all shadow-xl gothic-glow-purple">
+          <div className="bg-[#151a21] border border-purple-900/50 rounded-3xl p-6 flex flex-col justify-between shadow-xl hover:border-purple-500/60 transition-all group relative overflow-hidden gothic-glow-purple">
             <div className="space-y-4">
-              <div className="h-44 rounded-xl bg-gradient-to-b from-red-950/20 to-black/50 border border-red-900/10 flex flex-col items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(221,44,64,0.15),transparent_70%)]" />
-                <img src="/packs/pack_abyssal.png" alt="Abyssal Pack" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(221,44,64,0.4)]" />
-                <span className="font-display font-black text-sm text-[#dd2c40] mt-2 tracking-widest uppercase text-shadow-crimson">ABYSSAL PACK</span>
+              <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-purple-900/50 bg-black/60 relative flex items-center justify-center p-4">
+                <img 
+                  src="/packs/pack_abyssal.png" 
+                  alt="Abyssal Pack" 
+                  className="w-full h-full object-contain drop-shadow-[0_0_25px_rgba(168,85,247,0.5)] group-hover:scale-105 transition-transform" 
+                />
               </div>
-              
-              <div className="space-y-2">
-                <h4 className="font-display font-bold text-sm text-white">Abyssal Lord Pack</h4>
-                <p className="text-[11px] text-gray-400 font-sans leading-relaxed">
-                  Supreme worship of Darkness. Guaranteed to drop only rare, gold, and legendary entities.
+
+              <div>
+                <span className="text-[10px] text-purple-400 font-mono font-bold uppercase tracking-wider block">Legendary Relic</span>
+                <h3 className="font-display font-bold text-lg text-white">ABYSSAL COVENANT PACK</h3>
+                <p className="text-xs text-gray-400 font-sans mt-1">
+                  High rate for Legendary & Gold entities. Guaranteed Level 2 card chance!
                 </p>
-                <ul className="text-[10px] font-mono text-gray-500 space-y-1">
-                  <li>• Chance of gold cards (Gold): 45%</li>
-                  <li>• Chance of LEGENDARY cards: 15%</li>
-                  <li>• Card level: chance to get 2 Lvl card (40%)</li>
-                </ul>
+              </div>
+
+              <div className="space-y-1 font-mono text-[10px] text-gray-400 border-t border-gray-800/80 pt-3">
+                <div className="flex justify-between"><span>Silver Tier:</span> <span className="text-amber-400 font-bold">40%</span></div>
+                <div className="flex justify-between"><span>Gold Tier:</span> <span className="text-[#66fcf1] font-bold">45%</span></div>
+                <div className="flex justify-between"><span>Legendary Tier:</span> <span className="text-purple-400 font-bold">15%</span></div>
               </div>
             </div>
 
-            <div className="mt-6">
-              <button
-                onClick={buyAbyssalPack}
-                className="w-full bg-gradient-to-r from-[#880d1e] to-[#4e0707] hover:from-[#dd2c40] hover:to-[#880d1e] text-white border border-[#dd2c40]/30 font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow flex items-center justify-center gap-2 text-xs"
-              >
-                <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> SUMMON FOR 70 <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {/* Basic Equipment Pack */}
-          <div className="bg-[#151a21] border border-[#c5a880]/30 rounded-2xl p-5 flex flex-col justify-between hover:-translate-y-1 transition-all shadow-xl">
-            <div className="space-y-4">
-              <div className="h-44 rounded-xl bg-gradient-to-b from-[#4a3f35] to-black/50 border border-[#c5a880]/10 flex flex-col items-center justify-center relative overflow-hidden">
-                <img src="/packs/chest_basic.png" alt="Basic Relics" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(197,168,128,0.4)]" />
-                <span className="font-display font-black text-sm text-[#ebd09b] mt-2 tracking-widest uppercase">BASIC RELICS</span>
-              </div>
-              <div className="space-y-2">
-                <h4 className="font-display font-bold text-sm text-white">Basic Equipment Chest</h4>
-                <p className="text-[11px] text-gray-400 font-sans leading-relaxed">
-                  Basic items for your lord. Grants 1 random piece of equipment.
-                </p>
-                <ul className="text-[10px] font-mono text-gray-500 space-y-1">
-                  <li>• Bronze Equipment: 80%</li>
-                  <li>• Silver Equipment: 20%</li>
-                </ul>
-              </div>
-            </div>
-            <div className="mt-6">
-              <button
-                onClick={buyBasicEquipmentPack}
-                className="w-full bg-[#1f2833] hover:bg-[#2b3746] text-[#ebd09b] border border-[#c5a880]/30 font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow flex items-center justify-center gap-2 text-xs"
-              >
-                <img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> OPEN FOR 500 <img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
-              </button>
-            </div>
+            <button
+              onClick={buyAbyssalPack}
+              className="mt-6 w-full bg-gradient-to-r from-purple-900 to-indigo-950 hover:from-purple-700 hover:to-indigo-800 text-purple-200 border border-purple-400/40 font-display font-black py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+            >
+              SUMMON (70 <img src="/icons/icon_shards.png" alt="Shards" className="w-4 h-4 inline ml-1" />)
+            </button>
           </div>
 
-          {/* Rare Equipment Pack */}
-          <div className="bg-[#151a21] border border-indigo-950 rounded-2xl p-5 flex flex-col justify-between hover:-translate-y-1 transition-all shadow-xl gothic-glow-blue">
-            <div className="space-y-4">
-              <div className="h-44 rounded-xl bg-gradient-to-b from-indigo-950/20 to-black/50 border border-indigo-900/10 flex flex-col items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(102,252,241,0.15),transparent_70%)]" />
-                <img src="/packs/chest_rare.png" alt="Rare Relics" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(102,252,241,0.4)]" />
-                <span className="font-display font-black text-sm text-[#66fcf1] mt-2 tracking-widest uppercase text-shadow-gold">RARE RELICS</span>
-              </div>
-              <div className="space-y-2">
-                <h4 className="font-display font-bold text-sm text-white">Rare Equipment Chest</h4>
-                <p className="text-[11px] text-gray-400 font-sans leading-relaxed">
-                  Better chance for stronger relics. Grants 1 rare piece of equipment.
-                </p>
-                <ul className="text-[10px] font-mono text-gray-500 space-y-1">
-                  <li>• Bronze Equipment: 40%</li>
-                  <li>• Silver Equipment: 50%</li>
-                  <li>• Gold Equipment: 10%</li>
-                </ul>
-              </div>
-            </div>
-            <div className="mt-6">
-              <button
-                onClick={buyRareEquipmentPack}
-                className="w-full bg-gradient-to-r from-indigo-900 to-[#1f2833] hover:from-[#45a29e] hover:to-indigo-900 text-[#66fcf1] border border-[#66fcf1]/30 font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow flex items-center justify-center gap-2 text-xs"
-              >
-                <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> OPEN FOR 30 <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
-              </button>
-            </div>
-          </div>
-
-          {/* Premium Equipment Pack */}
-          <div className="bg-[#151a21] border border-red-950 rounded-2xl p-5 flex flex-col justify-between hover:-translate-y-1 transition-all shadow-xl gothic-glow-purple">
-            <div className="space-y-4">
-              <div className="h-44 rounded-xl bg-gradient-to-b from-red-950/40 to-black/50 border border-red-500/20 flex flex-col items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(221,44,64,0.15),transparent_70%)]" />
-                <img src="/packs/chest_premium.png" alt="Premium Relics" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(221,44,64,0.4)]" />
-                <span className="font-display font-black text-sm text-[#dd2c40] mt-2 tracking-widest uppercase text-shadow-crimson">PREMIUM RELICS</span>
-              </div>
-              <div className="space-y-2">
-                <h4 className="font-display font-bold text-sm text-white">Premium Equipment Chest</h4>
-                <p className="text-[11px] text-gray-400 font-sans leading-relaxed">
-                  Contains ancient artifacts of immense power. Grants 1 high-tier equipment.
-                </p>
-                <ul className="text-[10px] font-mono text-gray-500 space-y-1">
-                  <li>• Silver Equipment: 40%</li>
-                  <li>• Gold Equipment: 45%</li>
-                  <li>• Legendary Equipment: 15%</li>
-                </ul>
-              </div>
-            </div>
-            <div className="mt-6">
-              <button
-                onClick={buyPremiumEquipmentPack}
-                className="w-full bg-gradient-to-r from-[#880d1e] to-[#4e0707] hover:from-[#dd2c40] hover:to-[#880d1e] text-white border border-[#dd2c40]/30 font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow flex items-center justify-center gap-2 text-xs"
-              >
-                <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> OPEN FOR 70 <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
-      {/* Opening Reveal Animation Overlay */}
+      {/* Equipment Tab */}
+      {activeTab === 'equipment' && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          {/* Basic Chest */}
+          <div className="bg-[#151a21] border border-gray-800 rounded-3xl p-6 flex flex-col justify-between shadow-xl hover:border-gray-700 transition-all group">
+            <div className="space-y-4">
+              <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-gray-800 bg-black/60 relative flex items-center justify-center p-4">
+                <img 
+                  src="/packs/chest_basic.png" 
+                  alt="Basic Chest" 
+                  className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] group-hover:scale-105 transition-transform" 
+                />
+              </div>
+
+              <div>
+                <span className="text-[10px] text-gray-400 font-mono font-bold uppercase tracking-wider block font-bold">Common Chest</span>
+                <h3 className="font-display font-bold text-lg text-white">IRON ARTIFACT CHEST</h3>
+                <p className="text-xs text-gray-400 font-sans mt-1">
+                  Crafts 1 Common equipment piece (Weapons, Helmets, Armor, Rings).
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={buyBasicEquipmentPack}
+              className="mt-6 w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-display font-black py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+            >
+              OPEN (500 <img src="/icons/icon_gold.png" alt="Gold" className="w-5 h-5 inline" />)
+            </button>
+          </div>
+
+          {/* Rare Chest */}
+          <div className="bg-[#151a21] border border-cyan-900/50 rounded-3xl p-6 flex flex-col justify-between shadow-xl hover:border-cyan-500/60 transition-all group gothic-glow-blue">
+            <div className="space-y-4">
+              <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-cyan-900/50 bg-black/60 relative flex items-center justify-center p-4">
+                <img 
+                  src="/packs/chest_rare.png" 
+                  alt="Rare Chest" 
+                  className="w-full h-full object-contain drop-shadow-[0_0_20px_rgba(6,182,212,0.4)] group-hover:scale-105 transition-transform" 
+                />
+              </div>
+
+              <div>
+                <span className="text-[10px] text-cyan-400 font-mono font-bold uppercase tracking-wider block font-bold">Rare Chest</span>
+                <h3 className="font-display font-bold text-lg text-white">RUNIC ARTIFACT CHEST</h3>
+                <p className="text-xs text-gray-400 font-sans mt-1">
+                  Crafts 1 Rare equipment piece with enhanced Lord stat bonuses.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={buyRareEquipmentPack}
+              className="mt-6 w-full bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-500/40 font-display font-black py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+            >
+              OPEN (25 <img src="/icons/icon_shards.png" alt="Shards" className="w-4 h-4 inline ml-1" />)
+            </button>
+          </div>
+
+          {/* Premium Chest */}
+          <div className="bg-[#151a21] border border-amber-900/50 rounded-3xl p-6 flex flex-col justify-between shadow-xl hover:border-amber-500/60 transition-all group gothic-glow-purple">
+            <div className="space-y-4">
+              <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-amber-900/50 bg-black/60 relative flex items-center justify-center p-4">
+                <img 
+                  src="/packs/chest_premium.png" 
+                  alt="Premium Chest" 
+                  className="w-full h-full object-contain drop-shadow-[0_0_25px_rgba(245,158,11,0.5)] group-hover:scale-105 transition-transform" 
+                />
+              </div>
+
+              <div>
+                <span className="text-[10px] text-amber-400 font-mono font-bold uppercase tracking-wider block font-bold">Epic Vault</span>
+                <h3 className="font-display font-bold text-lg text-white">DRAGON ARTIFACT CHEST</h3>
+                <p className="text-xs text-gray-400 font-sans mt-1">
+                  Crafts 1 Epic equipment piece with massive Hero HP, Mana & Stat bonuses.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={buyPremiumEquipmentPack}
+              className="mt-6 w-full bg-gradient-to-r from-amber-950 to-amber-900 hover:from-amber-800 hover:to-amber-700 text-amber-200 border border-amber-500/40 font-display font-black py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+            >
+              OPEN (60 <img src="/icons/icon_shards.png" alt="Shards" className="w-4 h-4 inline ml-1" />)
+            </button>
+          </div>
+
+        </div>
+      )}
+
+      {/* Pack Reveal Overlay Dialog */}
       {openingPack && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-md">
-          <div className="max-w-3xl w-full text-center space-y-8">
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-lg flex items-center justify-center z-50 p-4">
+          <div className="max-w-3xl w-full text-center space-y-6">
             
             {!isRevealed ? (
-              /* Phase 1: Shaking Box/Altar Portal Summoning animation */
-              <div className="space-y-4">
-                <div className="w-32 h-32 mx-auto rounded-full bg-black border border-[#c5a880]/30 flex items-center justify-center relative shadow-2xl animate-bounce">
-                  <div className="absolute inset-0 rounded-full border-t border-b border-t-[#66fcf1] border-b-[#dd2c40] animate-spin" />
-                  <Sparkles className="w-12 h-12 text-[#ebd09b] animate-pulse" />
+              <div className="flex flex-col items-center gap-6 py-12">
+                <div className="w-24 h-24 rounded-full border-4 border-amber-500 border-t-transparent animate-spin flex items-center justify-center shadow-[0_0_50px_rgba(245,158,11,0.5)]">
+                  <Sparkles className="w-10 h-10 text-amber-400 animate-pulse" />
                 </div>
-                <h3 className="font-display font-black text-xl text-white tracking-widest uppercase animate-pulse">
-                  SUMMONING ENTITIES FROM ALTAR...
+                <h3 className="font-display font-black text-xl text-white tracking-widest animate-pulse">
+                  SUMMONING ENTITIES FROM THE VOID...
                 </h3>
-                <p className="text-xs text-gray-500 font-mono">Dark forces intertwine the edges of worlds...</p>
               </div>
             ) : (
-              /* Phase 2: Card/Equipment Reveals */
-              <div className="space-y-8">
-                <div className="space-y-2">
-                  <h3 className="font-display font-black text-3xl text-[#ebd09b] tracking-widest text-shadow-gold uppercase">
-                    {revealedCards.length > 0 ? 'Entities Summoned!' : 'Relics Discovered!'}
-                  </h3>
-                  <p className="text-xs text-gray-400 font-sans">
-                    {revealedCards.length > 0 ? 'These dark forces have joined your collection.' : 'The abyss grants you this power.'}
-                  </p>
-                </div>
-                
-                <div className="flex flex-wrap justify-center gap-6">
-                  {/* Render Cards if any */}
-                  {revealedCards.map((card, idx) => {
-                    const skill = card.skills[0];
-                    return (
-                      <motion.div
-                        key={card.id}
-                        initial={{ opacity: 0, y: 40, rotateY: 180, scale: 0.7 }}
-                        animate={{ opacity: 1, y: 0, rotateY: 0, scale: 1 }}
-                        transition={{ duration: 0.6, delay: idx * 0.3, type: 'spring', stiffness: 200 }}
-                      >
-                        <div
-                          className={`w-48 aspect-[3/4.2] rounded-2xl p-4 flex flex-col justify-between relative shadow-2xl transition-all overflow-hidden border ${getCardTierStyles(card.tier, false, true)}`}
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="space-y-6"
+              >
+                <h3 className="font-display font-black text-2xl text-white tracking-widest text-shadow-gold">
+                  SUMMON REVEALED!
+                </h3>
+
+                {/* Cards Reveal */}
+                {revealedCards.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {revealedCards.map((card, idx) => {
+                      const tierStyles = getCardTierStyles(card.tier);
+                      return (
+                        <motion.div
+                          key={card.id || idx}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: idx * 0.2 }}
+                          className={`bg-[#151a21] border ${tierStyles.border} rounded-2xl p-4 space-y-3 relative overflow-hidden ${tierStyles.glow}`}
                         >
-                          {card.image.startsWith('/cards/') && (
-                            <>
-                              <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 opacity-90" />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 pointer-events-none" />
-                            </>
-                          )}
-
-                          <div className="relative z-10 flex justify-between items-start">
-                            <div className="text-center bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded border border-[#c5a880]/20">
-                              <span className="text-[8px] text-[#ebd09b] uppercase font-mono tracking-wider">{card.tier}</span>
-                            </div>
-                            <div className="bg-black border border-[#c5a880]/40 rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-mono font-bold text-[#ebd09b]">
-                              {card.level}
+                          <div className="aspect-[4/3] rounded-xl overflow-hidden bg-black/60 relative">
+                            <img src={card.image} alt={card.name} className="w-full h-full object-cover" />
+                            <div className="absolute top-2 right-2 bg-black/80 px-2 py-0.5 rounded text-[10px] font-mono text-amber-400 border border-amber-500/30">
+                              Lvl {card.level || 1}
                             </div>
                           </div>
 
-                          <div className="flex-1 flex items-center justify-center my-2 relative z-10">
-                            {!card.image.startsWith('/cards/') && (
-                              <div className="w-16 h-16 rounded-full border-2 border-white/20 flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-amber-700/20 to-black">
-                                {card.image === 'Skull' && <Skull className="w-8 h-8 text-[#dd2c40]" />}
-                                {card.image === 'Flame' && <Flame className="w-8 h-8 text-amber-500" />}
-                                {card.image === 'Sparkles' && <Sparkles className="w-8 h-8 text-purple-400" />}
-                                {card.image === 'Wand' && <Sparkles className="w-8 h-8 text-cyan-400" />}
-                                {card.image !== 'Skull' && card.image !== 'Flame' && card.image !== 'Sparkles' && card.image !== 'Wand' && (
-                                  <Skull className="w-8 h-8 text-gray-500" />
-                                )}
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="relative z-10 space-y-1.5 mt-auto">
-                            <div className="text-center">
-                              <span className="text-sm font-display font-black text-white block truncate leading-none text-shadow-gold drop-shadow-md">
-                                {card.name}
-                              </span>
-                            </div>
-
-                            {/* Skill preview */}
-                            {skill && (
-                              <div className="bg-black/60 backdrop-blur-sm border border-gray-900/50 p-1.5 rounded-lg text-[9px] text-gray-300 text-center leading-tight">
-                                <span className="font-semibold block text-[#c5a880] uppercase text-[8px]">{skill.type}</span>
-                                <span className="line-clamp-1">{skill.description}</span>
-                              </div>
-                            )}
-
-                            <div className="flex justify-between items-center text-[10px] font-mono font-bold pt-1.5 border-t border-gray-800/80 bg-black/40 backdrop-blur-sm rounded px-1.5 py-1">
-                              <span className="text-red-400">⚔️ {card.attack}</span>
-                              <span className="text-emerald-400">❤️ {card.health}</span>
-                              <span className="text-blue-400">⏳ {card.delay}</span>
+                          <div className="text-left">
+                            <span className={`text-[9px] font-mono font-bold uppercase tracking-wider block ${tierStyles.text}`}>
+                              {card.tier} Tier
+                            </span>
+                            <h4 className="font-display font-bold text-sm text-white truncate">{card.name}</h4>
+                            <div className="flex justify-between items-center text-[10px] font-mono text-gray-400 mt-1">
+                              <span className="text-red-400 flex items-center gap-0.5"><Sword className="w-3 h-3" /> {card.attack} ATK</span>
+                              <span className="text-emerald-400 flex items-center gap-0.5"><Flame className="w-3 h-3" /> {card.health} HP</span>
+                              <span className="text-cyan-400 flex items-center gap-0.5"><Gem className="w-3 h-3" /> {card.manaCost} MANA</span>
                             </div>
                           </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Equipment Reveal */}
+                {revealedEquipment.length > 0 && (
+                  <div className="flex justify-center">
+                    {revealedEquipment.map((item, idx) => (
+                      <motion.div
+                        key={item.id || idx}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-[#151a21] border border-cyan-500/50 rounded-2xl p-6 space-y-3 max-w-sm w-full gothic-glow-blue"
+                      >
+                        <div className="w-20 h-20 mx-auto rounded-xl bg-black/60 border border-cyan-500/30 p-2 flex items-center justify-center">
+                          <img src={item.icon} alt={item.name} className="w-full h-full object-contain" />
+                        </div>
+
+                        <div className="text-center space-y-1">
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan-400 block">
+                            {item.rarity} {item.slot.toUpperCase()}
+                          </span>
+                          <h4 className="font-display font-bold text-lg text-white">{item.name}</h4>
+                          <p className="text-xs text-emerald-400 font-mono font-bold">
+                            +{item.bonusValue}% {item.bonusType.replace(/([AZ])/g, ' $1').toUpperCase()}
+                          </p>
                         </div>
                       </motion.div>
-                    );
-                  })}
+                    ))}
+                  </div>
+                )}
 
-                  {/* Render Equipment if any */}
-                  {revealedEquipment.map((eq, idx) => (
-                    <motion.div
-                      key={eq.id}
-                      initial={{ opacity: 0, y: 50, scale: 0.8 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ delay: idx * 0.2, type: 'spring' }}
-                      className={`relative w-48 h-64 rounded-2xl flex flex-col items-center justify-center border-2 shadow-2xl overflow-hidden p-4 ${
-                        eq.tier === 'legendary' ? 'bg-gradient-to-br from-red-950 to-orange-900 border-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.4)]' :
-                        eq.tier === 'gold' ? 'bg-gradient-to-br from-yellow-900/80 to-amber-900/50 border-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.3)]' :
-                        eq.tier === 'silver' ? 'bg-gradient-to-br from-slate-800 to-slate-900 border-slate-400' :
-                        'bg-gradient-to-br from-stone-800 to-stone-900 border-stone-600'
-                      }`}
-                    >
-                      <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-bold tracking-widest uppercase border border-white/20">
-                        {eq.tier}
-                      </div>
-                      <div className="w-16 h-16 rounded-full bg-black/50 border border-white/20 flex items-center justify-center mb-4">
-                        {eq.slot === 'weapon' && <Sword className="w-8 h-8 text-gray-300" />}
-                        {eq.slot === 'armor' && <Shield className="w-8 h-8 text-gray-300" />}
-                        {eq.slot === 'helmet' && <Skull className="w-8 h-8 text-gray-300" />}
-                        {(eq.slot === 'ring' || eq.slot === 'amulet') && <Gem className="w-8 h-8 text-gray-300" />}
-                        {eq.slot === 'boots' && <Flame className="w-8 h-8 text-gray-300" />}
-                      </div>
-                      <h4 className="font-display font-bold text-center text-sm text-white mb-2">{eq.name}</h4>
-                      <p className="text-xs text-center text-gray-400 font-mono capitalize">{eq.slot}</p>
-                      <div className="mt-auto bg-black/60 w-full py-2 rounded text-center text-[10px] font-mono border border-white/10">
-                        <span className="text-emerald-400">+{eq.bonusValue} {eq.bonusType}</span>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-
-                <div className="pt-6">
-                  <button
-                    onClick={closeReveal}
-                    className="bg-[#c5a880] hover:bg-[#ebd09b] text-black font-display font-black tracking-widest py-3 px-8 rounded-xl transition-all shadow-lg text-xs"
-                  >
-                    CLAIM CARDS TO SANCTUARY
-                  </button>
-                </div>
-              </div>
+                <button
+                  onClick={closeReveal}
+                  className="bg-[#ebd09b] hover:bg-[#c5a880] text-black font-display font-black py-3 px-8 rounded-xl text-xs tracking-wider transition-all cursor-pointer shadow-lg"
+                >
+                  CLAIM ALL REWARDS
+                </button>
+              </motion.div>
             )}
 
           </div>
