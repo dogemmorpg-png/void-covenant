@@ -11,12 +11,9 @@ const HELIUS_KEY = 'a53833dc-25c4-42e3-bdef-26901e8e84e9';
 const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_KEY}`;
 
 function getSupabase() {
-  const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-  if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error('Supabase URL or Service Role Key is missing in environment variables.');
-  }
-  return createClient(supabaseUrl, supabaseServiceKey);
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://yetzjqqnmllwufmzopor.supabase.co';
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlldHpqcXFubWxsd3VmbXpvcG9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NTkwMzgsImV4cCI6MjA5ODMzNTAzOH0.Ra2mdK9QS4Aq5WZsUmULvqfdaJkdLJBcEzPch9EpwB4';
+  return createClient(supabaseUrl, supabaseKey);
 }
 
 const PACKAGES: Record<string, { solCost: number; shards: number; dust: number; isBp?: boolean }> = {

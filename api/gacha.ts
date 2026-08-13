@@ -9,12 +9,9 @@ import { calculateEnergy } from '../src/utils/energyHelper';
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
 function getSupabase() {
-  const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-  if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error('Supabase URL or Service Role Key is missing in environment variables.');
-  }
-  return createClient(supabaseUrl, supabaseServiceKey);
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://yetzjqqnmllwufmzopor.supabase.co';
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlldHpqcXFubWxsd3VmbXpvcG9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NTkwMzgsImV4cCI6MjA5ODMzNTAzOH0.Ra2mdK9QS4Aq5WZsUmULvqfdaJkdLJBcEzPch9EpwB4';
+  return createClient(supabaseUrl, supabaseKey);
 }
 
 function generateRandomCards(packType: string, numCards: number) {
