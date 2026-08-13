@@ -176,14 +176,12 @@ export const AirdropHubView: React.FC = () => {
       }
 
       if (!verifyRes || !verifyRes.success) {
-        // Fallback info if RPC indexer is delayed
-        toast('Transaction submitted! Shards will be credited automatically as soon as Solana indexing completes.', 'info');
         setPaymentState(prev => ({
           ...prev,
-          status: 'success',
-          message: `Transaction submitted! If RPC indexing is delayed, your +${pkg.shardsReward} Dark Shards will appear automatically within 1-2 minutes.`
+          status: 'error',
+          message: verifyRes?.message || 'Transaction landed on Solana, but server indexing is still pending. Click "RETRY VERIFICATION" below to claim.'
         }));
-        refreshBalance();
+        toast('Verification pending. Click "Retry Verification" to claim your shards.', 'warning');
         return;
       }
 
@@ -205,6 +203,37 @@ export const AirdropHubView: React.FC = () => {
         message: isUserReject ? 'Transaction was cancelled by user.' : (err.message || 'Payment failed.')
       }));
       toast(isUserReject ? 'Transaction cancelled' : (err.message || 'Payment failed'), isUserReject ? 'info' : 'error');
+    }
+  };
+
+  const handleRetryVerification = async () => {
+    if (!paymentState.txSignature || !paymentState.selectedPkg) return;
+    try {
+      setPaymentState(prev => ({
+        ...prev,
+        status: 'verifying',
+        message: 'Re-verifying transaction on Solana blockchain...'
+      }));
+
+      const res = await verifySolanaPayment(paymentState.txSignature, paymentState.selectedPkg.id);
+      if (res.success) {
+        setPaymentState(prev => ({
+          ...prev,
+          status: 'success',
+          message: res.message
+        }));
+        refreshBalance();
+        toast('Transaction verified! Shards credited!', 'success');
+      } else {
+        setPaymentState(prev => ({
+          ...prev,
+          status: 'error',
+          message: res.message || 'Verification failed. Please try again in a few seconds.'
+        }));
+        toast(res.message || 'Verification failed', 'error');
+      }
+    } catch (e: any) {
+      toast(e.message || 'Error re-verifying transaction', 'error');
     }
   };
 
@@ -523,7 +552,15 @@ export const AirdropHubView: React.FC = () => {
             )}
 
             {(paymentState.status === 'success' || paymentState.status === 'error') && (
-              <div className="pt-2">
+              <div className="pt-2 space-y-2">
+                {paymentState.status === 'error' && paymentState.txSignature && (
+                  <button
+                    onClick={handleRetryVerification}
+                    className="w-full bg-[#66fcf1] hover:bg-[#45a29e] text-black font-display font-black py-3 px-6 rounded-xl text-xs tracking-wider transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2"
+                  >
+                    <RefreshCw className="w-4 h-4" /> RETRY VERIFICATION
+                  </button>
+                )}
                 <button
                   onClick={() => setPaymentState({ status: 'idle', message: '' })}
                   className="w-full bg-[#ebd09b] hover:bg-[#c5a880] text-black font-display font-black py-3 px-6 rounded-xl text-xs tracking-wider transition-all cursor-pointer shadow-lg"

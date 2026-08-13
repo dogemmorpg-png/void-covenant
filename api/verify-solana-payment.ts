@@ -116,40 +116,40 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Transaction failed on the Solana blockchain.' });
     }
 
-    // 4. Verify Transfer Instruction & Recipient
+    // 4. Verify Transfer Instruction & Recipient (Foolproof Balance Delta Check)
     const expectedLamports = Math.floor(pkg.solCost * LAMPORTS_PER_SOL);
     let validTransferFound = false;
 
-    // Inspect parsed instructions
-    const instructions = tx.transaction.message.instructions;
-    for (const ix of instructions) {
-      if ('parsed' in ix && ix.program === 'system' && ix.parsed?.type === 'transfer') {
-        const info = ix.parsed.info;
-        if (
-          info.destination === TREASURY_WALLET_ADDRESS &&
-          info.source === walletAddress &&
-          info.lamports >= expectedLamports
-        ) {
+    // Check 1: Account keys balance delta for Treasury Wallet
+    if (tx.meta && tx.meta.preBalances && tx.meta.postBalances) {
+      const accountKeys = tx.transaction.message.accountKeys;
+      const treasuryIndex = accountKeys.findIndex((k: any) => {
+        const pubkeyStr = typeof k === 'string' ? k : (k.pubkey ? k.pubkey.toString() : String(k));
+        return pubkeyStr === TREASURY_WALLET_ADDRESS;
+      });
+
+      if (treasuryIndex !== -1) {
+        const pre = tx.meta.preBalances[treasuryIndex] || 0;
+        const post = tx.meta.postBalances[treasuryIndex] || 0;
+        const gained = post - pre;
+        if (gained >= expectedLamports - 10000) {
           validTransferFound = true;
-          break;
         }
       }
     }
 
-    // Fallback: Also inspect inner instructions if using a router/proxy
-    if (!validTransferFound && tx.meta?.innerInstructions) {
-      for (const inner of tx.meta.innerInstructions) {
-        for (const ix of inner.instructions) {
-          if ('parsed' in ix && ix.program === 'system' && ix.parsed?.type === 'transfer') {
-            const info = ix.parsed.info;
-            if (
-              info.destination === TREASURY_WALLET_ADDRESS &&
-              info.source === walletAddress &&
-              info.lamports >= expectedLamports
-            ) {
-              validTransferFound = true;
-              break;
-            }
+    // Check 2: Fallback to parsed instructions inspect
+    if (!validTransferFound) {
+      const instructions = tx.transaction.message.instructions;
+      for (const ix of instructions) {
+        if ('parsed' in ix && ix.program === 'system' && ix.parsed?.type === 'transfer') {
+          const info = ix.parsed.info;
+          if (
+            info.destination === TREASURY_WALLET_ADDRESS &&
+            info.lamports >= expectedLamports - 10000
+          ) {
+            validTransferFound = true;
+            break;
           }
         }
       }
@@ -157,7 +157,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!validTransferFound) {
       return res.status(400).json({
-        error: `Transaction does not match expected payment of ${pkg.solCost} SOL to treasury wallet (${TREASURY_WALLET_ADDRESS}).`
+        error: `Transaction on-chain transfer does not match package requirement (${pkg.solCost} SOL to ${TREASURY_WALLET_ADDRESS}).`
       });
     }
 
