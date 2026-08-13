@@ -377,10 +377,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             let serverProfile = calculateEnergy(data.profile);
             
             // Fallback for missing username
-            if (!serverProfile.username) {
+            // Only force username/registered if they are actually registered, or let the UI handle it
+            if (!serverProfile.username && serverProfile.isRegistered) {
               serverProfile.username = `Lord_${address.slice(0, 4)}`;
             }
-            serverProfile.isRegistered = true;
             serverProfile.solBalance = 12.5;
 
             setProfile(serverProfile);
@@ -394,14 +394,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
-    // If server fails or no token, create a clean default, don't use local storage
+    // If server fails or no token, create a clean default but do NOT set as active online profile
+    // This allows the user to see the landing page or retry
     let loadedProfile = createDefaultProfile();
-    loadedProfile.solanaAddress = address;
-    loadedProfile.solBalance = 12.5;
-    loadedProfile.username = `Lord_${address.slice(0, 4)}`;
-    loadedProfile.isRegistered = true;
-
-    loadedProfile = calculateEnergy(loadedProfile);
     setProfile(loadedProfile);
     setIsLoadingProfile(false);
   }, []);

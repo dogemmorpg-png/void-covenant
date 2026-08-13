@@ -94,7 +94,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Prevent creating duplicates by checking again or using insert
       const { data: existingCheck } = await supabase.from('profiles').select('id').eq('wallet_address', walletAddress).limit(1);
       if (!existingCheck || existingCheck.length === 0) {
-        await supabase.from('profiles').insert({ wallet_address: walletAddress, data: currentProfile });
+        const { error: insertError } = await supabase.from('profiles').insert({ wallet_address: walletAddress, data: currentProfile });
+        if (insertError) {
+          console.error('Failed to insert new profile:', insertError);
+          return res.status(500).json({ error: 'Failed to create profile in database.', details: insertError });
+        }
       }
     } else {
       currentProfile = profileRow.data;
