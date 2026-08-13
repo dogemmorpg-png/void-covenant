@@ -145,8 +145,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     profile.darkShards = (profile.darkShards || 0) + shardsReward;
     
     // Process EXP and Level Ups cleanly
+    let levelUpInfo = { leveledUp: false, newLevel: profile.level };
     if (expReward > 0) {
-      processExpGain(profile, expReward);
+      const res = processExpGain(profile, expReward);
+      levelUpInfo = { leveledUp: res.leveledUp, newLevel: profile.level };
     }
 
     const { error: updateError } = await supabase
@@ -167,7 +169,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         dust: dustReward,
         shards: shardsReward,
         exp: expReward,
-        cardName: cardRewardStr
+        cardName: cardRewardStr,
+        ...levelUpInfo
       }
     });
 
