@@ -136,6 +136,34 @@ function MainAppContent() {
 
   // Prevent UI flickering while profile state syncs with wallet connection state
   if (connected && publicKey && (!isVerified || profile.solanaAddress !== publicKey.toBase58() || isLoadingProfile)) {
+    // If we're not loading and not signing, but we're stuck here, it means the server fetch failed.
+    if (!isLoadingProfile && !isSigning && isVerified) {
+      return (
+        <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center relative overflow-hidden">
+          <div className="bg-noise mix-blend-overlay absolute inset-0 z-0 opacity-20" />
+          <div className="relative z-10 flex flex-col items-center gap-6 max-w-md text-center p-8 border border-[#dd2c40]/30 bg-black/60 rounded-lg backdrop-blur-sm">
+            <div className="w-16 h-16 rounded-full border-2 border-[#dd2c40] flex items-center justify-center mb-2">
+              <span className="text-[#dd2c40] font-bold text-2xl">!</span>
+            </div>
+            <h2 className="text-[#ebd09b] font-display text-2xl tracking-widest uppercase">Connection Failed</h2>
+            <p className="text-gray-400 font-body text-sm">
+              We could not synchronize your profile with the game server. This might be due to a network issue, server maintenance, or an invalid session.
+            </p>
+            <button
+              onClick={() => {
+                disconnect().catch(() => {});
+                localStorage.removeItem('void_covenant_token');
+                window.location.reload();
+              }}
+              className="mt-4 px-8 py-3 bg-[#dd2c40] hover:bg-[#ff334b] text-white font-display font-bold tracking-widest rounded transition-all"
+            >
+              DISCONNECT & RETRY
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
