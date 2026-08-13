@@ -1,7 +1,7 @@
 // @ts-nocheck
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
-
+import { VercelRequest, VercelResponse } from '@vercel/node';
+import jwt from 'jsonwebtoken';
+import { createClient } from '@supabase/supabase-js';
 import { CARD_TEMPLATES, createCardInstance } from './shared/cards';
 import { getRandomEquipmentByTier, generateEquipmentInstance } from './shared/equipment';
 import { PlayerProfile, CardTier } from './shared/types';
@@ -101,9 +101,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-      const jwt = require('jsonwebtoken');
-  const { createClient } = require('@supabase/supabase-js');
-  const authHeader = req.headers.authorization;
+    const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Missing or invalid token' });
     }
@@ -223,4 +221,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }
+
 

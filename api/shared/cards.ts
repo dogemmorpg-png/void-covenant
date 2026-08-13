@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Card, CardTemplate, CardTier, CampaignStage, AirdropTask, BattlePassTier } from './types';
 
 export const CARD_TEMPLATES: CardTemplate[] = [

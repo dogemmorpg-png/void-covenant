@@ -1,7 +1,7 @@
 // @ts-nocheck
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
-
+import { VercelRequest, VercelResponse } from '@vercel/node';
+import jwt from 'jsonwebtoken';
+import { createClient } from '@supabase/supabase-js';
 import { CARD_TEMPLATES } from './shared/cards';
 import { Card, CardTier, PlayerProfile } from './shared/types';
 import { calculateEnergy } from './shared/energyHelper';
@@ -19,8 +19,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-    const jwt = require('jsonwebtoken');
-  const { createClient } = require('@supabase/supabase-js');
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Missing or invalid authorization header' });
@@ -249,4 +247,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }
+
 
