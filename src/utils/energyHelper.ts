@@ -64,10 +64,6 @@ export function processExpGain(profile: PlayerProfile, expGained: number): { pro
     profile.exp -= required;
     level += 1;
     heroMaxHealth += 2;
-    profile.pveEnergy = profile.pveEnergyMax || 10;
-    profile.pvpEnergy = profile.pvpEnergyMax || 5;
-    profile.lastPveEnergyRefill = Date.now();
-    profile.lastPvpEnergyRefill = Date.now();
     leveledUp = true;
     required = getRequiredExpForLevel(level);
   }

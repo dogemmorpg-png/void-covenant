@@ -68,10 +68,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'One or both cards not found in collection.' });
     }
 
-    // Validate they are not in the active deck
-    if (profile.deck.includes(cardId1) || profile.deck.includes(cardId2)) {
-      return res.status(400).json({ error: 'Cannot fuse cards that are currently in your active deck.' });
-    }
+
 
     if (card1.baseId !== card2.baseId) {
       return res.status(400).json({ error: 'Cards must have the same base creature.' });
@@ -171,6 +168,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     profile.dust -= dustCost;
     profile.collection = profile.collection.filter((c: Card) => c.id !== card1.id && c.id !== card2.id);
     profile.collection.push(fusedCard);
+
+    // Keep active deck updated seamlessly
+    if (profile.deck) {
+      if (profile.deck.includes(card2.id) && !profile.deck.includes(card1.id)) {
+        profile.deck = profile.deck.map((id: string) => id === card2.id ? card1.id : id);
+      } else if (profile.deck.includes(card2.id) && profile.deck.includes(card1.id)) {
+        profile.deck = profile.deck.filter((id: string) => id !== card2.id);
+      }
+    }
 
     profile = calculateEnergy(profile);
 

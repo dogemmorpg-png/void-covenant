@@ -103,7 +103,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { leveledUp } = processExpGain(profile, expReward);
 
       successMessage = leveledUp 
-        ? `🔥 LEVEL UP! Reached Level ${profile.level}! (Energy Refilled!) +${goldReward} Gold, +${dustReward} Dust, +${expReward} EXP`
+        ? `🔥 LEVEL UP! Reached Level ${profile.level}! (+2 Max HP) +${goldReward} Gold, +${dustReward} Dust, +${expReward} EXP`
         : `Sweep Success! +${goldReward} Gold, +${dustReward} Dust, +${expReward} EXP`;
       responseData = { goldReward, dustReward, shardsReward, expReward, leveledUp, level: profile.level };
 
