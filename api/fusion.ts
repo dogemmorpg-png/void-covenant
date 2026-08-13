@@ -51,9 +51,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .eq('wallet_address', walletAddress)
       .single();
 
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      return res.status(500).json({ error: 'Database error fetching profile', details: fetchError });
+    }
+
     let profile: PlayerProfile;
 
-    if (fetchError || !profileRow) {
+    if (!profileRow) {
       profile = {
         gold: 1000,
         dust: 250,
@@ -91,7 +95,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         username: '',
         isRegistered: false
       } as any;
-      await supabase.from('profiles').upsert({ wallet_address: walletAddress, data: profile });
+      // Prevent creating duplicates by checking again or using insert
+      const { data: existingCheck } = await supabase.from('profiles').select('id').eq('wallet_address', walletAddress).limit(1);
+      if (!existingCheck || existingCheck.length === 0) {
+        await supabase.from('profiles').insert({ wallet_address: walletAddress, data: profile });
+      }
     } else {
       profile = profileRow.data;
     }
