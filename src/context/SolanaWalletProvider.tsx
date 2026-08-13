@@ -6,19 +6,18 @@ import {
     SolflareWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
-import { clusterApiUrl } from '@solana/web3.js';
+import { HELIUS_RPC_URL } from '../data/solanaConfig';
 
 // Default styles that can be overridden by your app
 import '@solana/wallet-adapter-react-ui/styles.css';
 
 export const SolanaWalletProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    // The network is set to Mainnet-Beta for real SOL transactions
     const network = WalletAdapterNetwork.Mainnet;
 
-    // You can provide a custom RPC endpoint via VITE_SOLANA_RPC_URL or fallback to clusterApiUrl
+    // Use Helius Dedicated Mainnet RPC for maximum speed and 0 dropped transactions
     const endpoint = useMemo(() => {
-        return (import.meta as any).env?.VITE_SOLANA_RPC_URL || clusterApiUrl(network);
-    }, [network]);
+        return (import.meta as any).env?.VITE_SOLANA_RPC_URL || HELIUS_RPC_URL;
+    }, []);
 
     const wallets = useMemo(
         () => [

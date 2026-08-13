@@ -3,6 +3,9 @@ export const TREASURY_WALLET_ADDRESS =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_TREASURY_WALLET_ADDRESS) ||
   'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr';
 
+export const HELIUS_API_KEY = 'd5c11508-c979-443a-abf2-e6436747e764';
+export const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
+
 export const SOLANA_NETWORK = 'mainnet-beta';
 
 export interface SolanaPackage {
