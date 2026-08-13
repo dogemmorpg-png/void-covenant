@@ -99,6 +99,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Automatically save profile changes to localStorage and Supabase
   const saveProfile = (newProfile: PlayerProfile) => {
+    setProfile(newProfile);
     if (newProfile.solanaAddress) {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_${newProfile.solanaAddress}`, JSON.stringify(newProfile));
       
