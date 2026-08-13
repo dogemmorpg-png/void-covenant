@@ -77,8 +77,8 @@ const createDefaultProfile = (): PlayerProfile => {
   solanaAddress: null,
   solBalance: null,
   isPremiumBP: false,
-  username: 'Lord_Abyss',
-  isRegistered: true
+  username: '',
+  isRegistered: false
   };
 };
 
@@ -380,22 +380,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           parsed.deck = parsed.deck.filter(id => parsed.collection.some(c => c.id === id));
         }
 
-        loadedProfile = calculateEnergy({ 
-          ...loadedProfile, 
-          ...parsed, 
-          solanaAddress: address, 
-          solBalance: 12.5,
-          isRegistered: true,
-          username: parsed.username || `Lord_${address.slice(0, 4)}`
-        });
+        loadedProfile = calculateEnergy({ ...loadedProfile, ...parsed, solanaAddress: address, solBalance: 12.5 });
         setProfile(loadedProfile);
         setIsLoadingProfile(false);
         return;
-      } else {
-        // Create initial profile in Supabase for new wallet
-        await supabase
-          .from('profiles')
-          .upsert({ wallet_address: address, data: loadedProfile });
       }
     } catch (e) {
       console.warn('Profile not found in Supabase or network error, falling back to local storage', e);
@@ -523,92 +511,53 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const submitBattleResult = async (battleType: 'campaign' | 'pvp', stageId: string, result: 'win' | 'loss', stars?: number) => {
     const token = localStorage.getItem('void_covenant_token');
-    
-    if (token) {
-      try {
-        const res = await fetch('/api/battle', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ battleType, stageId, result, stars })
-        });
+    if (!token) return { success: false, message: 'Not authenticated' };
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.profile) setProfile(data.profile);
-          return { success: true, message: 'Rewards claimed successfully', rewards: data.rewards };
-        }
-      } catch (err: any) {
-        console.warn('Battle API error, using local calculation fallback:', err);
+    try {
+      const res = await fetch('/api/battle', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ battleType, stageId, result, stars })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, message: data.error || 'Battle rewards failed.' };
       }
+
+      setProfile(data.profile);
+      return { success: true, message: 'Rewards claimed successfully', rewards: data.rewards };
+    } catch (err: any) {
+      console.error('Battle API error:', err);
+      return { success: false, message: 'Network error during battle reward claim.' };
     }
-
-    // Local fallback calculation (100% Guaranteed Success)
-    let rewards: any = { gold: 0, dust: 0, exp: 0, shards: 0 };
-    setProfile(current => {
-      const updated = { ...current };
-      const floorNum = parseInt(stageId) || 1;
-
-      if (result === 'win') {
-        rewards.gold = 50 + floorNum * 10;
-        rewards.dust = 10;
-        rewards.exp = 50;
-
-        updated.gold = (updated.gold || 0) + rewards.gold;
-        updated.dust = (updated.dust || 0) + rewards.dust;
-        updated.exp = (updated.exp || 0) + rewards.exp;
-        
-        if (floorNum >= (updated.pveProgress || 1)) {
-          updated.pveProgress = floorNum + 1;
-        }
-
-        if (stars && stars > 0) {
-          updated.campaignStars = updated.campaignStars || {};
-          const curStars = updated.campaignStars[stageId] || 0;
-          if (stars > curStars) {
-            updated.campaignStars[stageId] = stars;
-          }
-        }
-
-        updated.battlePassPoints = (updated.battlePassPoints || 0) + 50;
-      } else {
-        rewards.gold = 20;
-        updated.gold = (updated.gold || 0) + rewards.gold;
-      }
-
-      saveProfile(updated);
-      return updated;
-    });
-
-    return { success: true, message: 'Rewards claimed successfully!', rewards };
   };
 
   const submitAction = async (action: string, payload: any) => {
     const token = localStorage.getItem('void_covenant_token');
+    if (!token) return { success: false, message: 'Not authenticated' };
     
-    if (token) {
-      try {
-        const res = await fetch('/api/action', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ action, payload })
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.profile) setProfile(data.profile);
-          return { success: true, message: data.message, data };
-        }
-      } catch (err: any) {
-        console.warn('Action API error, using local fallback:', err);
-      }
+    try {
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action, payload })
+      });
+      const data = await res.json();
+      if (!res.ok) return { success: false, message: data.error || 'Action failed.' };
+      
+      setProfile(data.profile);
+      return { success: true, message: data.message, data };
+    } catch (err: any) {
+      console.error('Action API error:', err);
+      return { success: false, message: 'Network error.' };
     }
-
-    return { success: true, message: 'Action saved locally.' };
   };
 
   // Add / Remove card in the battle deck (max 5 cards in deck)
