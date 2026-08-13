@@ -64,8 +64,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const profileRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles?wallet_address=eq.${walletAddress}&select=data`, {
       headers: {
         'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`
-      }
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Cache-Control': 'no-cache'
+      },
+      cache: 'no-store'
     });
 
     if (!profileRes.ok) {
@@ -118,9 +120,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           'apikey': SUPABASE_KEY,
           'Authorization': `Bearer ${SUPABASE_KEY}`,
           'Content-Type': 'application/json',
-          'Prefer': 'resolution=merge-duplicates'
+          'Prefer': 'resolution=merge-duplicates',
+          'Cache-Control': 'no-cache'
         },
-        body: JSON.stringify({ wallet_address: walletAddress, data: profile })
+        body: JSON.stringify({ wallet_address: walletAddress, data: profile }),
+        cache: 'no-store'
       });
     } else {
       profile = profileRows[0].data || {};
@@ -260,9 +264,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`,
         'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
+        'Prefer': 'return=minimal',
+        'Cache-Control': 'no-cache'
       },
-      body: JSON.stringify({ data: profile })
+      body: JSON.stringify({ data: profile }),
+      cache: 'no-store'
     });
 
     if (!updateRes.ok) {
