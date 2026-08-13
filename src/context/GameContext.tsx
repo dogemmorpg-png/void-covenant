@@ -77,8 +77,8 @@ const createDefaultProfile = (): PlayerProfile => {
   solanaAddress: null,
   solBalance: null,
   isPremiumBP: false,
-  username: '',
-  isRegistered: false
+  username: 'Lord_Abyss',
+  isRegistered: true
   };
 };
 
@@ -380,7 +380,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           parsed.deck = parsed.deck.filter(id => parsed.collection.some(c => c.id === id));
         }
 
-        loadedProfile = calculateEnergy({ ...loadedProfile, ...parsed, solanaAddress: address, solBalance: 12.5 });
+        loadedProfile = calculateEnergy({ 
+          ...loadedProfile, 
+          ...parsed, 
+          solanaAddress: address, 
+          solBalance: 12.5,
+          isRegistered: true,
+          username: parsed.username || `Lord_${address.slice(0, 4)}`
+        });
         setProfile(loadedProfile);
         setIsLoadingProfile(false);
         return;
