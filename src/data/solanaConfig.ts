@@ -3,18 +3,19 @@ export const TREASURY_WALLET_ADDRESS =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_TREASURY_WALLET_ADDRESS) ||
   'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr';
 
-export const HELIUS_API_KEY = 'd5c11508-c979-443a-abf2-e6436747e764';
+export const HELIUS_API_KEY = 'a53833dc-25c4-42e3-bdef-26901e8e84e9';
+export const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
 
 // Primary & Fallback RPC endpoints for max reliability
 export const SOLANA_RPC_ENDPOINTS = [
+  HELIUS_RPC_URL,
   'https://solana-rpc.publicnode.com',
-  'https://api.mainnet-beta.solana.com',
-  `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`
+  'https://api.mainnet-beta.solana.com'
 ];
 
 export const DEFAULT_RPC_URL = 
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SOLANA_RPC_URL) ||
-  'https://solana-rpc.publicnode.com';
+  HELIUS_RPC_URL;
 
 export const SOLANA_NETWORK = 'mainnet-beta';
 

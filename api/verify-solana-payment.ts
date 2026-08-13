@@ -7,7 +7,7 @@ import { calculateEnergy } from '../src/utils/energyHelper.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 const TREASURY_WALLET_ADDRESS = process.env.TREASURY_WALLET_ADDRESS || 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr';
-const HELIUS_KEY = 'd5c11508-c979-443a-abf2-e6436747e764';
+const HELIUS_KEY = 'a53833dc-25c4-42e3-bdef-26901e8e84e9';
 const SOLANA_RPC_URL = process.env.SOLANA_RPC_URL || `https://mainnet.helius-rpc.com/?api-key=${HELIUS_KEY}`;
 
 function getSupabase() {
@@ -29,9 +29,9 @@ const PACKAGES: Record<string, { solCost: number; shards: number; dust: number; 
 
 async function getWorkingSolanaConnection(): Promise<Connection> {
   const endpoints = [
+    SOLANA_RPC_URL,
     'https://solana-rpc.publicnode.com',
-    'https://api.mainnet-beta.solana.com',
-    process.env.SOLANA_RPC_URL || ''
+    'https://api.mainnet-beta.solana.com'
   ].filter(Boolean);
 
   for (const ep of endpoints) {
