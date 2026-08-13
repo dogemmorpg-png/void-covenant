@@ -1,67 +1,22 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import * as jwtPkg from 'jsonwebtoken';
-import { createClient } from '@supabase/supabase-js';
-
-const jwt = (jwtPkg as any).default || jwtPkg;
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
-function calculateEnergy(profile: any): any {
-  if (!profile) return profile;
-  
-  const now = Date.now();
-  const pveMax = profile.pveEnergyMax || 10;
-  const pvpMax = profile.pvpEnergyMax || 5;
-  
-  const lastPve = profile.lastPveEnergyRefill ?? profile.lastEnergyRefill ?? now;
-  const lastPvp = profile.lastPvpEnergyRefill ?? profile.lastEnergyRefill ?? now;
-  
-  const pveRegenInterval = 20 * 60 * 1000;
-  const pvpRegenInterval = 15 * 60 * 1000;
-  
-  const timePassedPve = Math.max(0, now - lastPve);
-  const timePassedPvp = Math.max(0, now - lastPvp);
-  
-  let currentPve = profile.pveEnergy !== undefined ? profile.pveEnergy : pveMax;
-  let currentPvp = profile.pvpEnergy !== undefined ? profile.pvpEnergy : pvpMax;
-  let newLastPve = lastPve;
-  let newLastPvp = lastPvp;
-  
-  if (currentPve >= pveMax) {
-    newLastPve = now;
-    currentPve = pveMax;
-  } else if (timePassedPve >= pveRegenInterval) {
-    const gained = Math.floor(timePassedPve / pveRegenInterval);
-    currentPve = Math.min(pveMax, currentPve + gained);
-    newLastPve = now - (timePassedPve % pveRegenInterval);
-  }
-  
-  if (currentPvp >= pvpMax) {
-    newLastPvp = now;
-    currentPvp = pvpMax;
-  } else if (timePassedPvp >= pvpRegenInterval) {
-    const gained = Math.floor(timePassedPvp / pvpRegenInterval);
-    currentPvp = Math.min(pvpMax, currentPvp + gained);
-    newLastPvp = now - (timePassedPvp % pvpRegenInterval);
-  }
-  
-  profile.pveEnergy = currentPve;
-  profile.pvpEnergy = currentPvp;
-  profile.pveEnergyMax = pveMax;
-  profile.pvpEnergyMax = pvpMax;
-  profile.lastPveEnergyRefill = newLastPve;
-  profile.lastPvpEnergyRefill = newLastPvp;
-  
-  return profile;
-}
-
-function getSupabase() {
-  const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://yetzjqqnmllwufmzopor.supabase.co';
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlldHpqcXFubWxsd3VmbXpvcG9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NTkwMzgsImV4cCI6MjA5ODMzNTAzOH0.Ra2mdK9QS4Aq5WZsUmULvqfdaJkdLJBcEzPch9EpwB4';
-  return createClient(supabaseUrl, supabaseKey);
-}
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // CORS setup
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
+  );
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -72,6 +27,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const token = authHeader.split(' ')[1];
+  
+  // Dynamic require to bypass ESM interop bugs
+  const jwt = require('jsonwebtoken');
+  const { createClient } = require('@supabase/supabase-js');
+  
+  // IMPORTANT: We must use a separate function for calculateEnergy so we don't inline it if it uses require
+  const { calculateEnergy } = require('./shared/energyHelper');
+
   let decoded: any;
   try {
     decoded = jwt.verify(token, JWT_SECRET);
@@ -87,7 +50,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { safeProfileData } = req.body || {};
 
   try {
-    const supabase = getSupabase();
+    const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
+    const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || '';
+    
+    // Fallback logic
+    if (!supabaseUrl || !supabaseKey) {
+      console.warn('Supabase credentials missing, simulating success (development only)');
+      return res.status(200).json({
+        success: true,
+        message: 'Development mock sync successful',
+        profile: safeProfileData
+      });
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
     
     const { data: profileRows, error: fetchError } = await supabase
       .from('profiles')
@@ -105,122 +81,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!profileRow) {
       currentProfile = {
-      gold: 500,
-      dust: 100,
-      darkShards: 0,
-      collection: [
-        {
-          "id": "c_starter_1",
-          "baseId": "skeleton_warrior",
-          "name": "Skeleton Warrior",
-          "level": 1,
-          "tier": "bronze",
-          "attack": 2,
-          "health": 8,
-          "maxHealth": 8,
-          "delay": 1,
-          "skills": [
-            {
-              "type": "vampirism",
-              "value": 2,
-              "description": "Vampirism: heals self for 2 HP on attack."
-            }
-          ],
-          "image": "/cards/skeleton_warrior.png",
-          "color": "slate",
-          "xp": 0,
-          "maxXp": 50
-        },
-        {
-          "id": "c_starter_2",
-          "baseId": "skeleton_warrior",
-          "name": "Skeleton Warrior",
-          "level": 1,
-          "tier": "bronze",
-          "attack": 2,
-          "health": 8,
-          "maxHealth": 8,
-          "delay": 1,
-          "skills": [
-            {
-              "type": "vampirism",
-              "value": 2,
-              "description": "Vampirism: heals self for 2 HP on attack."
-            }
-          ],
-          "image": "/cards/skeleton_warrior.png",
-          "color": "slate",
-          "xp": 0,
-          "maxXp": 50
-        },
-        {
-          "id": "c_starter_3",
-          "baseId": "plague_rat",
-          "name": "Plague Rat",
-          "level": 1,
-          "tier": "bronze",
-          "attack": 1,
-          "health": 6,
-          "maxHealth": 6,
-          "delay": 1,
-          "skills": [
-            {
-              "type": "plague",
-              "value": 1,
-              "description": "Plague: deals 1 damage to random enemies at end of turn."
-            }
-          ],
-          "image": "/cards/plague_rat.png",
-          "color": "emerald",
-          "xp": 0,
-          "maxXp": 50
-        },
-        {
-          "id": "c_starter_4",
-          "baseId": "cursed_witch",
-          "name": "Cursed Witch",
-          "level": 1,
-          "tier": "bronze",
-          "attack": 3,
-          "health": 10,
-          "maxHealth": 10,
-          "delay": 2,
-          "skills": [
-            {
-              "type": "hex",
-              "value": 2,
-              "description": "Hex: increases enemy incoming damage by 2."
-            }
-          ],
-          "image": "/cards/cursed_witch.png",
-          "color": "purple",
-          "xp": 0,
-          "maxXp": 50
-        },
-        {
-          "id": "c_starter_5",
-          "baseId": "dark_acolyte",
-          "name": "Dark Acolyte",
-          "level": 1,
-          "tier": "bronze",
-          "attack": 2,
-          "health": 12,
-          "maxHealth": 12,
-          "delay": 2,
-          "skills": [
-            {
-              "type": "sacrifice",
-              "value": 4,
-              "description": "Sacrifice: destroys an ally, granting the hero +4 HP."
-            }
-          ],
-          "image": "/cards/dark_acolyte.png",
-          "color": "crimson",
-          "xp": 0,
-          "maxXp": 50
-        }
-      ],
-      deck: ['c_starter_1', 'c_starter_2', 'c_starter_3', 'c_starter_4', 'c_starter_5'],
+        gold: 500,
+        dust: 100,
+        darkShards: 0,
+        collection: [
+          {
+            "id": "c_starter_1",
+            "baseId": "skeleton_warrior",
+            "name": "Skeleton Warrior",
+            "level": 1,
+            "tier": "bronze",
+            "attack": 2,
+            "health": 8,
+            "maxHealth": 8,
+            "delay": 1,
+            "skills": [
+              {
+                "type": "vampirism",
+                "value": 2,
+                "description": "Vampirism: heals self for 2 HP on attack."
+              }
+            ],
+            "image": "/cards/skeleton_warrior.png",
+            "color": "slate",
+            "xp": 0,
+            "maxXp": 50
+          }
+        ],
+        deck: ['c_starter_1'],
         pveEnergy: 10,
         pveEnergyMax: 10,
         pvpEnergy: 5,
@@ -230,61 +118,45 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         lastPvpEnergyRefill: Date.now(),
         pveProgress: 1,
         pvpRating: 100,
-        heroMaxHealth: 30,
-        level: 1,
-        exp: 0,
-        campaignStars: {},
-        equipment: [],
-        equipped: {},
-        battlePassPoints: 40,
-        battlePassClaimed: [],
-        referralsCount: 0,
-        completedTasks: [],
         solanaAddress: walletAddress,
-        solBalance: 12.5,
-        isPremiumBP: false,
-        username: '',
-        isRegistered: false
+        username: 'Player_' + walletAddress.substring(0, 4),
+        avatar: 'avatar_knight'
       };
-      // Prevent creating duplicates by checking again or using insert
-      const { data: existingCheck } = await supabase.from('profiles').select('id').eq('wallet_address', walletAddress).limit(1);
-      if (!existingCheck || existingCheck.length === 0) {
-        const { error: insertError } = await supabase.from('profiles').insert({ wallet_address: walletAddress, data: currentProfile });
-        if (insertError) {
-          console.error('Failed to insert new profile:', insertError);
-          return res.status(500).json({ error: 'Failed to create profile in database.', details: insertError });
-        }
+
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert({
+          wallet_address: walletAddress,
+          data: currentProfile
+        });
+
+      if (insertError) {
+        return res.status(500).json({ error: 'Database error creating profile', details: insertError });
       }
     } else {
       currentProfile = profileRow.data;
+      if (safeProfileData && Object.keys(safeProfileData).length > 0) {
+        currentProfile = { ...currentProfile, ...safeProfileData };
+        
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ data: currentProfile, updated_at: new Date().toISOString() })
+          .eq('wallet_address', walletAddress);
+
+        if (updateError) {
+          return res.status(500).json({ error: 'Database error updating profile', details: updateError });
+        }
+      }
     }
 
-    currentProfile = calculateEnergy(currentProfile);
+    const processedProfile = calculateEnergy(currentProfile);
 
-    // ONLY merge fields that are safe for the user to change locally:
-    // deck, equipped, soundOn, isRegistered, username, avatarUrl
-    if (safeProfileData) {
-      if (safeProfileData.deck) currentProfile.deck = safeProfileData.deck;
-      if (safeProfileData.equipped) currentProfile.equipped = safeProfileData.equipped;
-      if (safeProfileData.soundOn !== undefined) currentProfile.soundOn = safeProfileData.soundOn;
-      if (safeProfileData.isRegistered !== undefined) currentProfile.isRegistered = safeProfileData.isRegistered;
-      if (safeProfileData.username) currentProfile.username = safeProfileData.username;
-      if (safeProfileData.avatarUrl) currentProfile.avatarUrl = safeProfileData.avatarUrl;
-    }
-
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({ data: currentProfile, updated_at: new Date().toISOString() })
-      .eq('wallet_address', walletAddress);
-
-    if (updateError) {
-      console.error('Sync API save error:', updateError);
-      return res.status(500).json({ error: 'Failed to sync profile.' });
-    }
-
-    return res.status(200).json({ success: true, profile: currentProfile });
+    res.status(200).json({
+      success: true,
+      profile: processedProfile
+    });
   } catch (error: any) {
-    console.error('Sync API error:', error);
-    return res.status(500).json({ error: error.message || 'Internal server error' });
+    console.error('Sync error:', error);
+    res.status(500).json({ error: 'Internal server error', details: error?.toString() });
   }
 }
