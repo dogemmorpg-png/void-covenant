@@ -1,0 +1,21 @@
+{
+  "name": "Void Covenant",
+  "short_name": "VoidCovenant",
+  "description": "Dark Fantasy Web3 TCG Card RPG Game on Solana",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0c10",
+  "theme_color": "#0b0c10",
+  "icons": [
+    {
+      "src": "/icons/icon_boss.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon_boss.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
