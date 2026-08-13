@@ -131,7 +131,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
-    const profile: PlayerProfile = profileData.data;
+    let profile: PlayerProfile = profileData.data;
 
     let goldCost = 0;
     let shardCost = 0;

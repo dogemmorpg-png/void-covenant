@@ -58,7 +58,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
-    const profile: PlayerProfile = profileRow.data;
+    let profile: PlayerProfile = profileRow.data;
 
     // Validate cards exist in collection
     const card1 = profile.collection.find((c: Card) => c.id === cardId1);

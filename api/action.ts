@@ -71,7 +71,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const stage = generateCampaignStage(floorNum);
       if (!stage) return res.status(400).json({ error: 'Campaign stage not found' });
 
-      const stars = profile.campaignStars?.[floorNum.toString()] || 0;
+      const stars = profile.campaignStars?.[floorNum.toString()] ?? profile.campaignStars?.[floorNum as any] ?? (floorNum < (profile.pveProgress || 1) ? 3 : 0);
       if (stars < 3) {
         return res.status(400).json({ error: '3 stars required on this stage to sweep!' });
       }
