@@ -1,7 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
-import { Connection, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { PlayerProfile } from '../src/types';
 import { calculateEnergy } from '../src/utils/energyHelper';
 
@@ -25,7 +24,7 @@ const PACKAGES: Record<string, { solCost: number; shards: number; dust: number; 
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // CORS Headers
+  // Always set CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -34,39 +33,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).end();
   }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Missing or invalid authorization header' });
-  }
-
-  const token = authHeader.split(' ')[1];
-  let decoded: any;
   try {
-    decoded = jwt.verify(token, JWT_SECRET);
-  } catch (err) {
-    return res.status(401).json({ error: 'Invalid or expired token' });
-  }
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
 
-  const walletAddress = decoded.walletAddress;
-  if (!walletAddress) {
-    return res.status(400).json({ error: 'Token missing wallet address' });
-  }
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing or invalid authorization header' });
+    }
 
-  const { signature, packageId } = req.body;
-  if (!signature || !packageId) {
-    return res.status(400).json({ error: 'Missing transaction signature or package ID.' });
-  }
+    const token = authHeader.split(' ')[1];
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (err) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
 
-  const pkg = PACKAGES[packageId];
-  if (!pkg) {
-    return res.status(400).json({ error: 'Invalid package ID.' });
-  }
+    const walletAddress = decoded.walletAddress;
+    if (!walletAddress) {
+      return res.status(400).json({ error: 'Token missing wallet address' });
+    }
 
-  try {
+    const { signature, packageId } = req.body || {};
+    if (!signature || !packageId) {
+      return res.status(400).json({ error: 'Missing transaction signature or package ID.' });
+    }
+
+    const pkg = PACKAGES[packageId];
+    if (!pkg) {
+      return res.status(400).json({ error: 'Invalid package ID.' });
+    }
+
     const supabase = getSupabase();
     
     // 1. Fetch Profile
@@ -85,52 +84,73 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // 2. Anti-Replay Attack Check
     const processedTxList: string[] = (profile as any).processedTransactions || [];
     if (processedTxList.includes(signature)) {
-      return res.status(400).json({ error: 'This transaction signature has already been claimed!' });
+      return res.status(200).json({ 
+        success: true, 
+        message: 'This transaction signature has already been claimed and credited to your account!',
+        profile 
+      });
     }
 
-    // 3. Fast Helius RPC Connection
-    const connection = new Connection(HELIUS_RPC_URL, 'confirmed');
+    // 3. Fast Native Direct JSON-RPC fetch to Helius
+    let tx: any = null;
 
-    // Quick status check
-    const status = await connection.getSignatureStatus(signature, { searchTransactionHistory: true });
-    if (status.value?.err) {
-      return res.status(400).json({ error: 'Transaction failed on Solana blockchain.' });
+    try {
+      const txRes = await fetch(HELIUS_RPC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'getTransaction',
+          params: [
+            signature,
+            { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0, commitment: 'confirmed' }
+          ]
+        })
+      });
+      const txJson: any = await txRes.json();
+      tx = txJson.result;
+    } catch (e) {
+      console.warn('Primary Helius RPC fetch error:', e);
     }
 
-    // Fetch parsed transaction from Helius
-    let tx = await connection.getParsedTransaction(signature, {
-      maxSupportedTransactionVersion: 0,
-      commitment: 'confirmed'
-    });
-
+    // Fallback to public node if Helius indexer is still indexing
     if (!tx) {
-      // If indexer is slightly behind, fallback to public node for instant fetch
       try {
-        const fallbackConn = new Connection('https://solana-rpc.publicnode.com', 'confirmed');
-        tx = await fallbackConn.getParsedTransaction(signature, {
-          maxSupportedTransactionVersion: 0,
-          commitment: 'confirmed'
+        const fallbackRes = await fetch('https://solana-rpc.publicnode.com', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'getTransaction',
+            params: [
+              signature,
+              { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0, commitment: 'confirmed' }
+            ]
+          })
         });
+        const fallbackJson: any = await fallbackRes.json();
+        tx = fallbackJson.result;
       } catch (e) {
-        console.warn('Fallback RPC fetch failed:', e);
+        console.warn('Fallback PublicNode RPC fetch error:', e);
       }
     }
 
     if (!tx) {
-      return res.status(400).json({ error: 'Transaction indexing in progress. Please click RETRY VERIFICATION in 2 seconds.' });
+      return res.status(400).json({ error: 'Transaction indexing in progress on Solana network. Please click RETRY VERIFICATION in 2 seconds.' });
     }
 
     if (tx.meta?.err) {
       return res.status(400).json({ error: 'Transaction failed on the Solana blockchain.' });
     }
 
-    // 4. Verify Transfer Recipient & Amount (Balance Delta Check)
-    const expectedLamports = Math.floor(pkg.solCost * LAMPORTS_PER_SOL);
+    // 4. Verify Transfer Recipient & Amount (Balance Delta Verification)
+    const expectedLamports = Math.floor(pkg.solCost * 1_000_000_000);
     let validTransferFound = false;
 
-    // Balance Delta Verification (Foolproof)
     if (tx.meta && tx.meta.preBalances && tx.meta.postBalances) {
-      const accountKeys = tx.transaction.message.accountKeys;
+      const accountKeys = tx.transaction?.message?.accountKeys || [];
       const treasuryIndex = accountKeys.findIndex((k: any) => {
         const pubkeyStr = typeof k === 'string' ? k : (k.pubkey ? k.pubkey.toString() : String(k));
         return pubkeyStr === TREASURY_WALLET_ADDRESS;
@@ -146,12 +166,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    // Parsed Instruction Fallback
+    // Fallback Parsed Instructions Check
     if (!validTransferFound) {
-      const instructions = tx.transaction.message.instructions;
+      const instructions = tx.transaction?.message?.instructions || [];
       for (const ix of instructions) {
-        if ('parsed' in ix && ix.program === 'system' && ix.parsed?.type === 'transfer') {
-          const info = ix.parsed.info;
+        if (ix.program === 'system' && ix.parsed?.type === 'transfer') {
+          const info = ix.parsed.info || {};
           if (
             info.destination === TREASURY_WALLET_ADDRESS &&
             info.lamports >= expectedLamports - 10000
@@ -199,12 +219,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({
       success: true,
-      message: `Payment successful! +${pkg.shardsReward} Dark Shards added!`,
+      message: `Payment verified! +${pkg.shards} Dark Shards added.`,
       profile
     });
 
-  } catch (err: any) {
-    console.error('Verify Solana Payment API Error:', err);
-    return res.status(500).json({ error: err.message || 'Internal server error' });
+  } catch (globalErr: any) {
+    console.error('Unhandled verify-solana-payment error:', globalErr);
+    return res.status(500).json({
+      error: globalErr.message || 'Server error verifying Solana payment.'
+    });
   }
 }
