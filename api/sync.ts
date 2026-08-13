@@ -1,9 +1,57 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
-import { calculateEnergy } from '../src/utils/energyHelper';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
+
+function calculateEnergy(profile: any): any {
+  if (!profile) return profile;
+  
+  const now = Date.now();
+  const pveMax = profile.pveEnergyMax || 10;
+  const pvpMax = profile.pvpEnergyMax || 5;
+  
+  const lastPve = profile.lastPveEnergyRefill ?? profile.lastEnergyRefill ?? now;
+  const lastPvp = profile.lastPvpEnergyRefill ?? profile.lastEnergyRefill ?? now;
+  
+  const pveRegenInterval = 20 * 60 * 1000;
+  const pvpRegenInterval = 15 * 60 * 1000;
+  
+  const timePassedPve = Math.max(0, now - lastPve);
+  const timePassedPvp = Math.max(0, now - lastPvp);
+  
+  let currentPve = profile.pveEnergy !== undefined ? profile.pveEnergy : pveMax;
+  let currentPvp = profile.pvpEnergy !== undefined ? profile.pvpEnergy : pvpMax;
+  let newLastPve = lastPve;
+  let newLastPvp = lastPvp;
+  
+  if (currentPve >= pveMax) {
+    newLastPve = now;
+    currentPve = pveMax;
+  } else if (timePassedPve >= pveRegenInterval) {
+    const gained = Math.floor(timePassedPve / pveRegenInterval);
+    currentPve = Math.min(pveMax, currentPve + gained);
+    newLastPve = now - (timePassedPve % pveRegenInterval);
+  }
+  
+  if (currentPvp >= pvpMax) {
+    newLastPvp = now;
+    currentPvp = pvpMax;
+  } else if (timePassedPvp >= pvpRegenInterval) {
+    const gained = Math.floor(timePassedPvp / pvpRegenInterval);
+    currentPvp = Math.min(pvpMax, currentPvp + gained);
+    newLastPvp = now - (timePassedPvp % pvpRegenInterval);
+  }
+  
+  profile.pveEnergy = currentPve;
+  profile.pvpEnergy = currentPvp;
+  profile.pveEnergyMax = pveMax;
+  profile.pvpEnergyMax = pvpMax;
+  profile.lastPveEnergyRefill = newLastPve;
+  profile.lastPvpEnergyRefill = newLastPvp;
+  
+  return profile;
+}
 
 function getSupabase() {
   const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://yetzjqqnmllwufmzopor.supabase.co';
