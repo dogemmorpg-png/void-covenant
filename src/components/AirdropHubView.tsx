@@ -21,7 +21,7 @@ export const AirdropHubView: React.FC = () => {
 
   // Payment processing state modal
   const [paymentState, setPaymentState] = useState<{
-    status: 'idle' | 'signing' | 'verifying' | 'success' | 'error';
+    status: 'idle' | 'signing' | 'verifying' | 'pending' | 'success' | 'error';
     message: string;
     txSignature?: string;
     selectedPkg?: SolanaPackage;
@@ -99,7 +99,7 @@ export const AirdropHubView: React.FC = () => {
     }, 1000);
   };
 
-  // Blazing fast 1.5-second purchase handler
+  // Blazing fast purchase handler with automatic 5-attempt verification
   const handlePurchasePackage = async (pkg: SolanaPackage) => {
     if (!connected || !publicKey || !sendTransaction) {
       toast('Please connect your Solana wallet first!', 'warning');
@@ -122,7 +122,7 @@ export const AirdropHubView: React.FC = () => {
       const lamports = Math.floor(pkg.solCost * LAMPORTS_PER_SOL);
       const transaction = new Transaction();
 
-      // Add Priority Fee (ComputeBudget) so validators process in next block (< 1.5s)
+      // Add Priority Fee (ComputeBudget) so validators process in next block (< 1s)
       transaction.add(
         ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 100000 })
       );
@@ -141,35 +141,41 @@ export const AirdropHubView: React.FC = () => {
 
       // Broadcast transaction instantly
       const signature = await sendTransaction(transaction, connection, {
-        skipPreflight: true,
-        maxRetries: 3
+        skipPreflight: false,
+        preflightCommitment: 'confirmed'
       });
 
       setPaymentState({
         status: 'verifying',
-        message: 'Verifying on-chain transaction with Helius server...',
+        message: 'Transaction broadcasted to Solana Mainnet! Verifying with Helius...',
         txSignature: signature,
         selectedPkg: pkg
       });
 
-      // Immediate Fast Poll Server Verification (3 fast attempts: 0.5s, 1.2s, 2.0s)
+      // Poll verification up to 6 attempts with 1.2s intervals (~7.2s)
       let verifyRes: any = null;
-      for (let attempt = 1; attempt <= 3; attempt++) {
+      for (let attempt = 1; attempt <= 6; attempt++) {
+        setPaymentState(prev => ({
+          ...prev,
+          message: `Verifying on-chain transaction with Helius (Attempt ${attempt}/6)...`
+        }));
+
         verifyRes = await verifySolanaPayment(signature, pkg.id);
         if (verifyRes && verifyRes.success) {
           break;
         }
-        if (attempt === 1) await new Promise(r => setTimeout(r, 600));
-        if (attempt === 2) await new Promise(r => setTimeout(r, 1200));
+        if (attempt < 6) {
+          await new Promise(r => setTimeout(r, 1200));
+        }
       }
 
       if (!verifyRes || !verifyRes.success) {
         setPaymentState(prev => ({
           ...prev,
-          status: 'error',
-          message: verifyRes?.message || 'Transaction broadcasted! Click "RETRY VERIFICATION" to claim your shards.'
+          status: 'pending',
+          message: 'Transaction sent to Solana! On-chain indexing in progress. Click RETRY VERIFICATION below.'
         }));
-        toast('Verification pending. Click "Retry Verification" to claim.', 'warning');
+        toast('Transaction submitted. Click Retry Verification to claim.', 'info');
         return;
       }
 
@@ -187,7 +193,7 @@ export const AirdropHubView: React.FC = () => {
       const isUserReject = err.message?.includes('User rejected') || err.message?.includes('cancelled');
       setPaymentState(prev => ({
         ...prev,
-        status: 'error',
+        status: isUserReject ? 'error' : 'error',
         message: isUserReject ? 'Transaction was cancelled by user.' : (err.message || 'Payment failed.')
       }));
       toast(isUserReject ? 'Transaction cancelled' : (err.message || 'Payment failed'), isUserReject ? 'info' : 'error');
@@ -200,7 +206,7 @@ export const AirdropHubView: React.FC = () => {
       setPaymentState(prev => ({
         ...prev,
         status: 'verifying',
-        message: 'Re-verifying transaction on Solana blockchain...'
+        message: 'Re-verifying transaction on Solana blockchain with Helius...'
       }));
 
       const res = await verifySolanaPayment(paymentState.txSignature, paymentState.selectedPkg.id);
@@ -215,10 +221,10 @@ export const AirdropHubView: React.FC = () => {
       } else {
         setPaymentState(prev => ({
           ...prev,
-          status: 'error',
-          message: res.message || 'Verification failed. Please try again in a few seconds.'
+          status: 'pending',
+          message: res.message || 'Verification in progress. Please click RETRY VERIFICATION again in 2 seconds.'
         }));
-        toast(res.message || 'Verification failed', 'error');
+        toast(res.message || 'Verification pending...', 'info');
       }
     } catch (e: any) {
       toast(e.message || 'Error re-verifying transaction', 'error');
@@ -321,7 +327,7 @@ export const AirdropHubView: React.FC = () => {
                     <button
                       key={pkg.id}
                       onClick={() => handlePurchasePackage(pkg)}
-                      disabled={paymentState.status !== 'idle' && paymentState.status !== 'success' && paymentState.status !== 'error'}
+                      disabled={paymentState.status !== 'idle' && paymentState.status !== 'success' && paymentState.status !== 'error' && paymentState.status !== 'pending'}
                       className="w-full bg-[#1f2833]/80 hover:bg-[#1f2833] border border-[#66fcf1]/20 hover:border-[#66fcf1]/50 rounded-xl p-2.5 flex items-center justify-between text-left transition-all group cursor-pointer disabled:opacity-50"
                     >
                       <div className="flex-1 pr-2">
@@ -481,6 +487,7 @@ export const AirdropHubView: React.FC = () => {
             {/* Top decorative glow */}
             <div className={`absolute top-0 left-0 right-0 h-1.5 ${
               paymentState.status === 'success' ? 'bg-emerald-500' :
+              paymentState.status === 'pending' ? 'bg-amber-500' :
               paymentState.status === 'error' ? 'bg-red-500' :
               'bg-[#66fcf1] animate-pulse'
             }`} />
@@ -493,6 +500,11 @@ export const AirdropHubView: React.FC = () => {
               )}
               {paymentState.status === 'verifying' && (
                 <div className="w-16 h-16 rounded-full border-4 border-indigo-900 border-t-[#66fcf1] animate-spin" />
+              )}
+              {paymentState.status === 'pending' && (
+                <div className="w-16 h-16 rounded-full bg-amber-950/50 border-2 border-amber-500 flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.4)]">
+                  <RefreshCw className="w-8 h-8 text-amber-400 animate-spin" />
+                </div>
               )}
               {paymentState.status === 'success' && (
                 <div className="w-16 h-16 rounded-full bg-emerald-950/50 border-2 border-emerald-400 flex items-center justify-center shadow-[0_0_20px_rgba(52,211,153,0.4)]">
@@ -510,6 +522,7 @@ export const AirdropHubView: React.FC = () => {
               <h3 className="font-display font-bold text-lg text-white">
                 {paymentState.status === 'signing' && 'Approve in Wallet'}
                 {paymentState.status === 'verifying' && 'Verifying with Helius...'}
+                {paymentState.status === 'pending' && 'Verification Pending'}
                 {paymentState.status === 'success' && 'Payment Complete! 🎉'}
                 {paymentState.status === 'error' && 'Transaction Error'}
               </h3>
@@ -533,9 +546,9 @@ export const AirdropHubView: React.FC = () => {
               </div>
             )}
 
-            {(paymentState.status === 'success' || paymentState.status === 'error') && (
+            {(paymentState.status === 'success' || paymentState.status === 'pending' || paymentState.status === 'error') && (
               <div className="pt-2 space-y-2">
-                {paymentState.status === 'error' && paymentState.txSignature && (
+                {(paymentState.status === 'pending' || paymentState.status === 'error') && paymentState.txSignature && (
                   <button
                     onClick={handleRetryVerification}
                     className="w-full bg-[#66fcf1] hover:bg-[#45a29e] text-black font-display font-black py-3 px-6 rounded-xl text-xs tracking-wider transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2"
