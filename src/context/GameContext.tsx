@@ -19,6 +19,7 @@ interface GameContextType {
   usePveEnergy: (amount: number) => boolean;
   usePvpEnergy: (amount: number) => boolean;
   buyDarkShardsWithSOL: (solAmount: number) => Promise<boolean>;
+  verifySolanaPayment: (signature: string, packageId: string) => Promise<{ success: boolean; message: string }>;
   isLoadingProfile: boolean;
   connectSolanaWallet: (address: string) => Promise<void>;
   disconnectSolanaWallet: () => void;
@@ -307,10 +308,38 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  // Buy Shards using SOL
+  // Buy Shards using SOL (Legacy alias)
   const buyDarkShardsWithSOL = async (solAmount: number): Promise<boolean> => {
     const res = await submitAction('buy_shards', { solAmount });
     return res.success;
+  };
+
+  // Verify real on-chain Solana payment
+  const verifySolanaPayment = async (signature: string, packageId: string): Promise<{ success: boolean; message: string }> => {
+    const token = localStorage.getItem('void_covenant_token');
+    if (!token) return { success: false, message: 'Authentication required.' };
+
+    try {
+      const res = await fetch('/api/verify-solana-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ signature, packageId })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, message: data.error || 'Payment verification failed.' };
+      }
+
+      setProfile(data.profile);
+      return { success: true, message: data.message };
+    } catch (err: any) {
+      console.error('Verify payment error:', err);
+      return { success: false, message: 'Network error during payment verification.' };
+    }
   };
 
   // Connect Solana Wallet
@@ -649,6 +678,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         usePveEnergy,
         usePvpEnergy,
         buyDarkShardsWithSOL,
+        verifySolanaPayment,
         connectSolanaWallet,
         disconnectSolanaWallet,
         fuseCards,

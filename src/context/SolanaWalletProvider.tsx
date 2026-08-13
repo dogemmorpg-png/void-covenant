@@ -12,11 +12,13 @@ import { clusterApiUrl } from '@solana/web3.js';
 import '@solana/wallet-adapter-react-ui/styles.css';
 
 export const SolanaWalletProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
-    const network = WalletAdapterNetwork.Devnet;
+    // The network is set to Mainnet-Beta for real SOL transactions
+    const network = WalletAdapterNetwork.Mainnet;
 
-    // You can also provide a custom RPC endpoint.
-    const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+    // You can provide a custom RPC endpoint via VITE_SOLANA_RPC_URL or fallback to clusterApiUrl
+    const endpoint = useMemo(() => {
+        return (import.meta as any).env?.VITE_SOLANA_RPC_URL || clusterApiUrl(network);
+    }, [network]);
 
     const wallets = useMemo(
         () => [
