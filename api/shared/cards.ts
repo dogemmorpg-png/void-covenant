@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { Card, CardTemplate, CardTier, CampaignStage, AirdropTask, BattlePassTier } from './types';
+import { Card, CardTemplate, CardTier, CampaignStage, AirdropTask, BattlePassTier } from './types.js';
 
 export const CARD_TEMPLATES: CardTemplate[] = [
   {
@@ -914,5 +914,6 @@ export const AIRDROP_TASKS: AirdropTask[] = [
     actionUrl: 'https://x.com/void_covenant'
   }
 ];
+
 
 

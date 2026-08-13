@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { Equipment, EquipmentSlot, CardTier } from './types';
+import { Equipment, EquipmentSlot, CardTier } from './types.js';
 
 export const EQUIPMENT_TEMPLATES: Omit<Equipment, 'id'>[] = [
   // BRONZE TIER
@@ -49,4 +49,5 @@ export const getRandomEquipmentByTier = (tier: CardTier | 'random'): Omit<Equipm
   }
   return pool[Math.floor(Math.random() * pool.length)];
 };
+
 

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { PlayerProfile } from './types';
+import { PlayerProfile } from './types.js';
 
 export function calculateEnergy(profile: PlayerProfile): PlayerProfile {
   if (!profile) return profile;
@@ -73,4 +73,5 @@ export function processExpGain(profile: PlayerProfile, expGained: number): { pro
   profile.heroMaxHealth = heroMaxHealth;
   return { profile, leveledUp };
 }
+
 

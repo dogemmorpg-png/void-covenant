@@ -3,9 +3,9 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
 const jwt = (jwtPkg as any).default || jwtPkg;
 import { createClient } from '@supabase/supabase-js';
-import { PlayerProfile, CardTemplate } from './shared/types';
-import { generateCampaignStage, createCardInstance } from './shared/cards';
-import { calculateEnergy, processExpGain } from './shared/energyHelper';
+import { PlayerProfile, CardTemplate } from './shared/types.js';
+import { generateCampaignStage, createCardInstance } from './shared/cards.js';
+import { calculateEnergy, processExpGain } from './shared/energyHelper.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
@@ -217,6 +217,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }
+
 
 
 
