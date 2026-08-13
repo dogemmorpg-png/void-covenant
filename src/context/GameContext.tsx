@@ -392,10 +392,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .from('profiles')
         .select('data')
         .eq('wallet_address', address)
-        .single();
+        .limit(1);
         
-      if (data && data.data) {
-        const parsed = data.data as PlayerProfile;
+      if (data && data.length > 0 && data[0].data) {
+        const parsed = data[0].data as PlayerProfile;
         
         // If no local storage exists, load currencies from Supabase. Otherwise, preserve local currency edits.
         if (!localParsed) {
