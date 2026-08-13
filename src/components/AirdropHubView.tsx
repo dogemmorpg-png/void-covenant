@@ -6,7 +6,7 @@ import { SOLANA_PACKAGES, SolanaPackage, TREASURY_WALLET_ADDRESS } from '../data
 import { Wallet, Share2, Gem, Coins, ExternalLink, CheckCircle, Clock, RefreshCw, Sparkles, Check, AlertCircle, ShieldCheck } from 'lucide-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Transaction, SystemProgram, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Transaction, SystemProgram, PublicKey, LAMPORTS_PER_SOL, ComputeBudgetProgram } from '@solana/web3.js';
 
 export const AirdropHubView: React.FC = () => {
   const { profile, completeAirdropTask, addReferral, verifySolanaPayment } = useGame();
@@ -119,7 +119,14 @@ export const AirdropHubView: React.FC = () => {
       });
 
       const lamports = Math.floor(pkg.solCost * LAMPORTS_PER_SOL);
-      const transaction = new Transaction().add(
+      const transaction = new Transaction();
+
+      // Add Priority Fee instruction so Solana Mainnet validators prioritize and process immediately (< 2s)
+      transaction.add(
+        ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 100000 })
+      );
+
+      transaction.add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: new PublicKey(TREASURY_WALLET_ADDRESS),
@@ -131,7 +138,10 @@ export const AirdropHubView: React.FC = () => {
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = publicKey;
 
-      const signature = await sendTransaction(transaction, connection);
+      const signature = await sendTransaction(transaction, connection, {
+        skipPreflight: false,
+        preflightCommitment: 'confirmed'
+      });
 
       setPaymentState({
         status: 'confirming',
@@ -140,17 +150,29 @@ export const AirdropHubView: React.FC = () => {
         selectedPkg: pkg
       });
 
-      await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+      // Attempt local websocket confirmation
+      try {
+        await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+      } catch (confirmErr) {
+        console.warn('Local websocket confirmation wait finished, proceeding to server verification...', confirmErr);
+      }
 
       setPaymentState(prev => ({
         ...prev,
         status: 'verifying',
-        message: 'Verifying on-chain transaction with game backend...'
+        message: 'Verifying on-chain transaction with game server...'
       }));
 
-      const res = await verifySolanaPayment(signature, pkg.id);
-      if (!res.success) {
-        throw new Error(res.message);
+      // Verify on server (retry loop to account for indexer propagation)
+      let verifyRes = await verifySolanaPayment(signature, pkg.id);
+      if (!verifyRes.success) {
+        // Wait 2.5 seconds and retry once more in case RPC was lagging behind
+        await new Promise(r => setTimeout(r, 2500));
+        verifyRes = await verifySolanaPayment(signature, pkg.id);
+      }
+
+      if (!verifyRes.success) {
+        throw new Error(verifyRes.message || 'Transaction could not be verified on-chain yet.');
       }
 
       setPaymentState(prev => ({
