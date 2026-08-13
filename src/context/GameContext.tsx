@@ -329,16 +329,26 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify({ signature, packageId })
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        return { success: false, message: data.error || 'Payment verification failed.' };
+      const text = await res.text();
+      let data: any = {};
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error('API response is not JSON:', text);
+        return { success: false, message: `Server error (${res.status}): ${text.slice(0, 100)}` };
       }
 
-      setProfile(data.profile);
-      return { success: true, message: data.message };
+      if (!res.ok) {
+        return { success: false, message: data.error || `Payment verification failed (HTTP ${res.status}).` };
+      }
+
+      if (data.profile) {
+        setProfile(data.profile);
+      }
+      return { success: true, message: data.message || 'Payment verified!' };
     } catch (err: any) {
       console.error('Verify payment error:', err);
-      return { success: false, message: 'Network error during payment verification.' };
+      return { success: false, message: err.message || 'Network error during payment verification.' };
     }
   };
 

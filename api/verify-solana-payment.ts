@@ -2,8 +2,8 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
 import { Connection, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { PlayerProfile } from '../src/types.js';
-import { calculateEnergy } from '../src/utils/energyHelper.js';
+import { PlayerProfile } from '../src/types';
+import { calculateEnergy } from '../src/utils/energyHelper';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 const TREASURY_WALLET_ADDRESS = process.env.TREASURY_WALLET_ADDRESS || 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr';
