@@ -512,14 +512,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return current;
       }
 
-      if (card1.templateId !== card2.templateId) {
-        errorMsg = 'Cards must be identical template type to fuse!';
+      if (card1.baseId !== card2.baseId) {
+        errorMsg = 'Cards must be identical base entity type to fuse!';
         return current;
       }
 
-      const template = CARD_TEMPLATES.find(t => t.id === card1.templateId);
+      const template = CARD_TEMPLATES.find(t => t.baseId === card1.baseId);
       if (!template) {
-        errorMsg = 'Card template definition not found.';
+        errorMsg = `Card template definition not found for ${card1.baseId}.`;
         return current;
       }
 
