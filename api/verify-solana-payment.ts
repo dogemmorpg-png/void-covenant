@@ -27,7 +27,7 @@ const PACKAGES: Record<string, { solCost: number; shards: number; dust: number; 
   premium_bp_sol: { solCost: 0.25, shards: 0, dust: 0, isBp: true }
 };
 
-async function getWorkingSolanaConnection(): Promise<Connection> {
+async function fetchParsedTransactionWithTimeout(signature: string): Promise<any> {
   const endpoints = [
     SOLANA_RPC_URL,
     'https://solana-rpc.publicnode.com',
@@ -37,13 +37,20 @@ async function getWorkingSolanaConnection(): Promise<Connection> {
   for (const ep of endpoints) {
     try {
       const conn = new Connection(ep, 'confirmed');
-      await conn.getLatestBlockhash();
-      return conn;
+      const txPromise = conn.getParsedTransaction(signature, {
+        maxSupportedTransactionVersion: 0,
+        commitment: 'confirmed'
+      });
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('RPC fetch timeout')), 5000)
+      );
+      const tx = await Promise.race([txPromise, timeoutPromise]);
+      if (tx) return tx;
     } catch (e) {
-      console.warn(`RPC endpoint failed: ${ep}`);
+      console.warn(`RPC fetch failed or timed out on ${ep}`);
     }
   }
-  return new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+  return null;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -101,22 +108,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'This transaction signature has already been claimed!' });
     }
 
-    // 3. Verify On-Chain Transaction with Solana RPC
-    const connection = await getWorkingSolanaConnection();
-    const tx = await connection.getParsedTransaction(signature, {
-      maxSupportedTransactionVersion: 0,
-      commitment: 'confirmed'
-    });
+    // 3. Verify On-Chain Transaction with Fast Timeout Fallback
+    const tx = await fetchParsedTransactionWithTimeout(signature);
 
     if (!tx) {
-      return res.status(400).json({ error: 'Transaction not found on Solana blockchain. Please wait a few seconds for network confirmation and try again.' });
+      return res.status(400).json({ error: 'Transaction not indexed on Solana blockchain yet. Please wait 3 seconds and click Retry Verification.' });
     }
 
     if (tx.meta?.err) {
       return res.status(400).json({ error: 'Transaction failed on the Solana blockchain.' });
     }
 
-    // 4. Verify Transfer Instruction & Recipient (Foolproof Balance Delta Check)
+    // 4. Verify Transfer Instruction & Recipient (Balance Delta Check)
     const expectedLamports = Math.floor(pkg.solCost * LAMPORTS_PER_SOL);
     let validTransferFound = false;
 
@@ -169,33 +172,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       profile.dust = (profile.dust || 0) + pkg.dust;
     }
     if (pkg.isBp) {
-      profile.isPremiumBP = true;
+      profile.hasPremiumBp = true;
     }
 
-    // Record signature to prevent replay
+    // Record processed signature
     (profile as any).processedTransactions = [...processedTxList, signature];
+
+    // Energy calculation update
     profile = calculateEnergy(profile);
 
-    // 6. Save Updated Profile to Supabase
+    // 6. Save updated profile to Supabase
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({ data: profile, updated_at: new Date().toISOString() })
+      .update({ data: profile })
       .eq('wallet_address', walletAddress);
 
     if (updateError) {
-      console.error('Failed to save profile after payment verification:', updateError);
-      return res.status(500).json({ error: 'Failed to credit purchase. Please contact support with your transaction hash.' });
+      console.error('Failed to save profile after payment:', updateError);
+      return res.status(500).json({ error: 'Failed to update player account in database.' });
     }
 
     return res.status(200).json({
       success: true,
-      profile,
-      message: `Payment verified on Solana! Credited +${pkg.shards} Dark Shards${pkg.dust ? ` & +${pkg.dust} Dust` : ''}!`,
-      signature
+      message: `Success! Payment verified. Added items to your account!`,
+      profile
     });
 
-  } catch (error: any) {
-    console.error('Solana payment verification error:', error);
-    return res.status(500).json({ error: error.message || 'Internal server error' });
+  } catch (err: any) {
+    console.error('Verify Solana Payment API Error:', err);
+    return res.status(500).json({ error: err.message || 'Internal server error' });
   }
 }
