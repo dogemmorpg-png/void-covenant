@@ -1,7 +1,7 @@
 {
   "name": "Void Covenant",
   "short_name": "VoidCovenant",
-  "description": "Dark Fantasy Web3 TCG Card RPG Game on Solana",
+  "description": "Dark Fantasy Card RPG Game on Solana",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0b0c10",

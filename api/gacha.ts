@@ -177,7 +177,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (packType === 'bronze') goldCost = 300;
     else if (packType === 'obsidian') shardCost = 30;
-    else if (packType === 'abyssal') shardCost = 100;
+    else if (packType === 'abyssal') shardCost = 70;
     else if (packType === 'eq_basic') { goldCost = 500; isEquipment = true; }
     else if (packType === 'eq_rare') { shardCost = 30; isEquipment = true; }
     else if (packType === 'eq_premium') { shardCost = 70; isEquipment = true; }

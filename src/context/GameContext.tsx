@@ -634,46 +634,35 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Add / Remove card in the battle deck (max 5 cards in deck)
   const toggleDeckCard = (cardId: string): { success: boolean; message: string } => {
-    let success = false;
-    let message = '';
+    // Self-heal ghost cards
+    const validDeck = profile.deck.filter(id => profile.collection.some(c => c.id === id));
+    const isCurrentlyInDeck = validDeck.includes(cardId);
     
-    setProfile(current => {
-      // Self-heal ghost cards
-      const validDeck = current.deck.filter(id => current.collection.some(c => c.id === id));
-      const isCurrentlyInDeck = validDeck.includes(cardId);
-      
-      if (isCurrentlyInDeck) {
-        // Remove from deck. Ensure they have at least 1 card in deck!
-        if (validDeck.length <= 1) {
-          message = 'Deck cannot be empty. Select at least 1 card.';
-          return { ...current, deck: validDeck };
-        }
-        success = true;
-        message = 'Card removed from battle deck.';
-        const updated = {
-          ...current,
-          deck: validDeck.filter(id => id !== cardId)
-        };
-        saveProfile(updated);
-        return updated;
-      } else {
-        // Add to deck. Check max 5 limit.
-        if (validDeck.length >= 5) {
-          message = 'Maximum 5 cards in deck. Remove a card first.';
-          return { ...current, deck: validDeck };
-        }
-        success = true;
-        message = 'Card added to battle deck!';
-        const updated = {
-          ...current,
-          deck: [...validDeck, cardId]
-        };
-        saveProfile(updated);
-        return updated;
+    if (isCurrentlyInDeck) {
+      // Remove from deck. Ensure they have at least 1 card in deck!
+      if (validDeck.length <= 1) {
+        return { success: false, message: 'Deck cannot be empty. Select at least 1 card.' };
       }
-    });
-    
-    return { success, message };
+      
+      const updated = {
+        ...profile,
+        deck: validDeck.filter(id => id !== cardId)
+      };
+      saveProfile(updated);
+      return { success: true, message: 'Card removed from battle deck.' };
+    } else {
+      // Add to deck. Check max 5 limit.
+      if (validDeck.length >= 5) {
+        return { success: false, message: 'Maximum 5 cards in deck. Remove a card first.' };
+      }
+      
+      const updated = {
+        ...profile,
+        deck: [...validDeck, cardId]
+      };
+      saveProfile(updated);
+      return { success: true, message: 'Card added to battle deck!' };
+    }
   };
 
   // Claim Battle Pass Tier reward
