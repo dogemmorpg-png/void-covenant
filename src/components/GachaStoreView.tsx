@@ -107,7 +107,7 @@ export const GachaStoreView: React.FC = () => {
         toast('Not enough Gold (500 needed)', 'warning');
         return;
       }
-      const eq = generateEquipmentInstance(getRandomEquipmentByTier('Common'));
+      const eq = generateEquipmentInstance(getRandomEquipmentByTier('bronze'));
       addEquipment(eq);
       triggerOpeningAnimationBackend(packType, [], [eq]);
     } else if (packType === 'eq_rare') {
@@ -115,7 +115,7 @@ export const GachaStoreView: React.FC = () => {
         toast('Not enough Dark Shards (25 needed)', 'warning');
         return;
       }
-      const eq = generateEquipmentInstance(getRandomEquipmentByTier('Rare'));
+      const eq = generateEquipmentInstance(getRandomEquipmentByTier('silver'));
       addEquipment(eq);
       triggerOpeningAnimationBackend(packType, [], [eq]);
     } else if (packType === 'eq_premium') {
@@ -123,7 +123,7 @@ export const GachaStoreView: React.FC = () => {
         toast('Not enough Dark Shards (60 needed)', 'warning');
         return;
       }
-      const eq = generateEquipmentInstance(getRandomEquipmentByTier('Epic'));
+      const eq = generateEquipmentInstance(getRandomEquipmentByTier('gold'));
       addEquipment(eq);
       triggerOpeningAnimationBackend(packType, [], [eq]);
     }
@@ -495,7 +495,7 @@ export const GachaStoreView: React.FC = () => {
                         {eq.tier}
                       </div>
                       <div className="w-16 h-16 rounded-full bg-black/50 border border-white/20 flex items-center justify-center mb-4">
-                        {eq.slot === 'weapon' && <Sword className="w-8 h-8 text-gray-300" />}
+                        {eq.slot === 'weapon' && <Swords className="w-8 h-8 text-gray-300" />}
                         {eq.slot === 'armor' && <Shield className="w-8 h-8 text-gray-300" />}
                         {eq.slot === 'helmet' && <Skull className="w-8 h-8 text-gray-300" />}
                         {(eq.slot === 'ring' || eq.slot === 'amulet') && <Gem className="w-8 h-8 text-gray-300" />}
