@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import jwt from 'jsonwebtoken';
+import * as jwtPkg from 'jsonwebtoken';
+const jwt = (jwtPkg as any).default || jwtPkg;
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 const TREASURY_WALLET_ADDRESS = process.env.TREASURY_WALLET_ADDRESS || 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr';
@@ -289,4 +290,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 }
+
 

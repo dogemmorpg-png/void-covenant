@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import jwt from 'jsonwebtoken';
+import * as jwtPkg from 'jsonwebtoken';
+const jwt = (jwtPkg as any).default || jwtPkg;
 import { createClient } from '@supabase/supabase-js';
 import { PlayerProfile, CardTemplate } from './shared/types';
 import { generateCampaignStage, createCardInstance } from './shared/cards';
@@ -216,5 +217,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }
+
 
 

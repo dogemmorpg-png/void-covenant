@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import jwt from 'jsonwebtoken';
+import * as jwtPkg from 'jsonwebtoken';
+const jwt = (jwtPkg as any).default || jwtPkg;
 import { createClient } from '@supabase/supabase-js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
@@ -80,4 +81,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }
+
 
