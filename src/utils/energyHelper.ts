@@ -1,4 +1,4 @@
-import { PlayerProfile } from '../types.js';
+import { PlayerProfile } from '../types';
 
 export function calculateEnergy(profile: PlayerProfile): PlayerProfile {
   if (!profile) return profile;
