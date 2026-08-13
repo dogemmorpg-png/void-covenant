@@ -2,8 +2,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
 import { PlayerProfile } from '../src/types.js';
-import { BATTLE_PASS_TIERS } from '../src/data/battlepass.js';
-import { CARD_TEMPLATES, createCardInstance, generateCampaignStage } from '../src/data/cards.js';
+import { CARD_TEMPLATES, createCardInstance, generateCampaignStage, BATTLE_PASS_TIERS } from '../src/data/cards.js';
 import { calculateEnergy, processExpGain } from '../src/utils/energyHelper.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';

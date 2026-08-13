@@ -11,7 +11,7 @@ interface CampaignViewProps {
 }
 
 export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => {
-  const { profile, submitAction } = useGame();
+  const { profile, submitAction, usePveEnergy } = useGame();
   const toast = useToast();
   const [isSweeping, setIsSweeping] = useState(false);
   
@@ -34,6 +34,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
       toast('Not enough PvE energy! Wait for recovery.', 'warning');
       return;
     }
+    usePveEnergy(selectedStage.energyCost);
     onStartBattle(selectedStage);
   };
 
