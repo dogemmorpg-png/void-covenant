@@ -368,7 +368,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          // No body required to just fetch the authoritative profile
+          body: JSON.stringify({})
         });
 
         if (res.ok) {
@@ -376,7 +376,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (data.profile) {
             let serverProfile = calculateEnergy(data.profile);
             
-            // Fallback for missing username
             // Only force username/registered if they are actually registered, or let the UI handle it
             if (!serverProfile.username && serverProfile.isRegistered) {
               serverProfile.username = `Lord_${address.slice(0, 4)}`;
@@ -387,18 +386,20 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setIsLoadingProfile(false);
             return;
           }
+        } else {
+          console.error(`Sync API returned ${res.status}: ${await res.text()}`);
         }
       } catch (err) {
         console.error('Failed to connect to authoritative server', err);
-        // Do not fallback to local storage - game must be online
       }
     }
 
-    // If server fails or no token, create a clean default but do NOT set as active online profile
-    // This allows the user to see the landing page or retry
-    let loadedProfile = createDefaultProfile();
-    setProfile(loadedProfile);
+    // If server fails or no token, disconnect to prevent infinite syncing loop
+    console.error('Disconnecting due to server sync failure.');
+    setProfile(createDefaultProfile());
     setIsLoadingProfile(false);
+    // Remove invalid token
+    localStorage.removeItem('void_covenant_token');
   }, []);
 
   // Disconnect Solana Wallet
