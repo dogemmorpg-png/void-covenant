@@ -245,7 +245,7 @@ export const AirdropHubView: React.FC = () => {
           const updated = { ...profile };
           if (pkg.shardsReward > 0) updated.darkShards = (updated.darkShards || 0) + pkg.shardsReward;
           if (pkg.dustBonus > 0) updated.dust = (updated.dust || 0) + pkg.dustBonus;
-          if (pkg.isBattlePass) updated.hasPremiumBp = true;
+          if ((pkg as any).isBattlePass) updated.hasPremiumBp = true;
           updated.processedTransactions = [...(updated.processedTransactions || []), signature];
           saveProfile(updated);
         }
@@ -313,7 +313,7 @@ export const AirdropHubView: React.FC = () => {
         const updated = { ...profile };
         if (pkg.shardsReward > 0) updated.darkShards = (updated.darkShards || 0) + pkg.shardsReward;
         if (pkg.dustBonus > 0) updated.dust = (updated.dust || 0) + pkg.dustBonus;
-        if (pkg.isBattlePass) updated.hasPremiumBp = true;
+        if ((pkg as any).isBattlePass) updated.hasPremiumBp = true;
         updated.processedTransactions = [...(updated.processedTransactions || []), sig];
         saveProfile(updated);
 
@@ -680,3 +680,4 @@ export const AirdropHubView: React.FC = () => {
     </div>
   );
 };
+

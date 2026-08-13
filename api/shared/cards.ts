@@ -770,7 +770,7 @@ export function getStarterDeck(): Card[] {
 }
 
 
-export const generateCampaignStage = (floor: number): import('../types').CampaignStage => {
+export const generateCampaignStage = (floor: number): import('./types').CampaignStage => {
   const isBoss = floor % 10 === 0;
   
   // Health scales by 5 per floor
@@ -913,3 +913,5 @@ export const AIRDROP_TASKS: AirdropTask[] = [
     actionUrl: 'https://x.com/void_covenant'
   }
 ];
+
+

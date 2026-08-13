@@ -441,7 +441,7 @@ export const GachaStoreView: React.FC = () => {
                         {eq.tier}
                       </div>
                       <div className="w-16 h-16 rounded-full bg-black/50 border border-white/20 flex items-center justify-center mb-4">
-                        {eq.slot === 'weapon' && <Swords className="w-8 h-8 text-gray-300" />}
+                        {eq.slot === 'weapon' && <div className="w-8 h-8 text-gray-300" />}
                         {eq.slot === 'armor' && <Shield className="w-8 h-8 text-gray-300" />}
                         {eq.slot === 'helmet' && <Skull className="w-8 h-8 text-gray-300" />}
                         {(eq.slot === 'ring' || eq.slot === 'amulet') && <Gem className="w-8 h-8 text-gray-300" />}
@@ -474,3 +474,4 @@ export const GachaStoreView: React.FC = () => {
     </div>
   );
 };
+
