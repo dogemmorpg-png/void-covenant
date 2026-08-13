@@ -27,6 +27,25 @@ const PACKAGES: Record<string, { solCost: number; shards: number; dust: number; 
   premium_bp_sol: { solCost: 0.25, shards: 0, dust: 0, isBp: true }
 };
 
+async function getWorkingSolanaConnection(): Promise<Connection> {
+  const endpoints = [
+    'https://solana-rpc.publicnode.com',
+    'https://api.mainnet-beta.solana.com',
+    process.env.SOLANA_RPC_URL || ''
+  ].filter(Boolean);
+
+  for (const ep of endpoints) {
+    try {
+      const conn = new Connection(ep, 'confirmed');
+      await conn.getLatestBlockhash();
+      return conn;
+    } catch (e) {
+      console.warn(`RPC endpoint failed: ${ep}`);
+    }
+  }
+  return new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -83,7 +102,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // 3. Verify On-Chain Transaction with Solana RPC
-    const connection = new Connection(SOLANA_RPC_URL, 'confirmed');
+    const connection = await getWorkingSolanaConnection();
     const tx = await connection.getParsedTransaction(signature, {
       maxSupportedTransactionVersion: 0,
       commitment: 'confirmed'
