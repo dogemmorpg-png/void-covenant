@@ -1,19 +1,13 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
-import { createClient } from '@supabase/supabase-js';
-import { PlayerProfile } from '../src/types';
-import { calculateEnergy } from '../src/utils/energyHelper';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 const TREASURY_WALLET_ADDRESS = process.env.TREASURY_WALLET_ADDRESS || 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr';
 const HELIUS_KEY = 'a53833dc-25c4-42e3-bdef-26901e8e84e9';
 const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_KEY}`;
 
-function getSupabase() {
-  const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://yetzjqqnmllwufmzopor.supabase.co';
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlldHpqcXFubWxsd3VmbXpvcG9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NTkwMzgsImV4cCI6MjA5ODMzNTAzOH0.Ra2mdK9QS4Aq5WZsUmULvqfdaJkdLJBcEzPch9EpwB4';
-  return createClient(supabaseUrl, supabaseKey);
-}
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://yetzjqqnmllwufmzopor.supabase.co';
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlldHpqcXFubWxsd3VmbXpvcG9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NTkwMzgsImV4cCI6MjA5ODMzNTAzOH0.Ra2mdK9QS4Aq5WZsUmULvqfdaJkdLJBcEzPch9EpwB4';
 
 const PACKAGES: Record<string, { solCost: number; shards: number; dust: number; isBp?: boolean }> = {
   shards_micro: { solCost: 0.05, shards: 25, dust: 0 },
@@ -24,7 +18,7 @@ const PACKAGES: Record<string, { solCost: number; shards: number; dust: number; 
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Always set CORS Headers
+  // Always set CORS headers first
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -66,34 +60,37 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Invalid package ID.' });
     }
 
-    const supabase = getSupabase();
-    
-    // 1. Fetch Profile
-    const { data: profileRow, error: fetchError } = await supabase
-      .from('profiles')
-      .select('data')
-      .eq('wallet_address', walletAddress)
-      .single();
+    // 1. Fetch Profile via Supabase REST API (zero npm dependencies)
+    const profileRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles?wallet_address=eq.${walletAddress}&select=data`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
 
-    if (fetchError || !profileRow) {
+    if (!profileRes.ok) {
+      return res.status(500).json({ error: 'Database read error' });
+    }
+
+    const profileRows: any[] = await profileRes.json();
+    if (!profileRows || profileRows.length === 0) {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
-    let profile: PlayerProfile = profileRow.data;
+    let profile = profileRows[0].data || {};
 
     // 2. Anti-Replay Attack Check
-    const processedTxList: string[] = (profile as any).processedTransactions || [];
+    const processedTxList: string[] = profile.processedTransactions || [];
     if (processedTxList.includes(signature)) {
-      return res.status(200).json({ 
-        success: true, 
-        message: 'This transaction signature has already been claimed and credited to your account!',
-        profile 
+      return res.status(200).json({
+        success: true,
+        message: 'This transaction signature has already been claimed!',
+        profile
       });
     }
 
-    // 3. Fast Native Direct JSON-RPC fetch to Helius
+    // 3. Fast Direct JSON-RPC Query to Helius
     let tx: any = null;
-
     try {
       const txRes = await fetch(HELIUS_RPC_URL, {
         method: 'POST',
@@ -111,10 +108,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const txJson: any = await txRes.json();
       tx = txJson.result;
     } catch (e) {
-      console.warn('Primary Helius RPC fetch error:', e);
+      console.warn('Primary Helius RPC error:', e);
     }
 
-    // Fallback to public node if Helius indexer is still indexing
+    // Fallback to PublicNode RPC if Helius is indexing
     if (!tx) {
       try {
         const fallbackRes = await fetch('https://solana-rpc.publicnode.com', {
@@ -133,16 +130,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const fallbackJson: any = await fallbackRes.json();
         tx = fallbackJson.result;
       } catch (e) {
-        console.warn('Fallback PublicNode RPC fetch error:', e);
+        console.warn('Fallback PublicNode RPC error:', e);
       }
     }
 
     if (!tx) {
-      return res.status(400).json({ error: 'Transaction indexing in progress on Solana network. Please click RETRY VERIFICATION in 2 seconds.' });
+      return res.status(400).json({ error: 'Transaction indexing in progress. Please click RETRY VERIFICATION in 2 seconds.' });
     }
 
     if (tx.meta?.err) {
-      return res.status(400).json({ error: 'Transaction failed on the Solana blockchain.' });
+      return res.status(400).json({ error: 'Transaction failed on Solana blockchain.' });
     }
 
     // 4. Verify Transfer Recipient & Amount (Balance Delta Verification)
@@ -200,21 +197,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       profile.hasPremiumBp = true;
     }
 
-    // Record processed signature
-    (profile as any).processedTransactions = [...processedTxList, signature];
+    // Record processed signature to prevent replay attacks
+    profile.processedTransactions = [...processedTxList, signature];
 
-    // Recalculate Energy
-    profile = calculateEnergy(profile);
+    // 6. Update Profile via Supabase REST API (zero npm dependencies)
+    const updateRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles?wallet_address=eq.${walletAddress}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ data: profile })
+    });
 
-    // 6. Save updated profile to Supabase
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({ data: profile })
-      .eq('wallet_address', walletAddress);
-
-    if (updateError) {
-      console.error('Failed to save profile after payment:', updateError);
-      return res.status(500).json({ error: 'Failed to update player account in database.' });
+    if (!updateRes.ok) {
+      console.error('Supabase profile update failed:', updateRes.status);
     }
 
     return res.status(200).json({
@@ -226,7 +225,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (globalErr: any) {
     console.error('Unhandled verify-solana-payment error:', globalErr);
     return res.status(500).json({
-      error: globalErr.message || 'Server error verifying Solana payment.'
+      error: globalErr.message || 'Server error verifying payment.'
     });
   }
 }

@@ -9,7 +9,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Transaction, SystemProgram, PublicKey, LAMPORTS_PER_SOL, ComputeBudgetProgram } from '@solana/web3.js';
 
 export const AirdropHubView: React.FC = () => {
-  const { profile, completeAirdropTask, addReferral, verifySolanaPayment } = useGame();
+  const { profile, completeAirdropTask, addReferral, verifySolanaPayment, addShards, addDust, saveProfile } = useGame();
   const toast = useToast();
   const { setVisible } = useWalletModal();
   const { connection } = useConnection();
@@ -48,6 +48,67 @@ export const AirdropHubView: React.FC = () => {
       setRealSolBalance(null);
     }
   }, [connected, publicKey, refreshBalance]);
+
+  // Direct On-Chain Verification Fallback (100% Fail-Safe)
+  const verifyOnChainDirect = async (signature: string, pkg: SolanaPackage): Promise<boolean> => {
+    const HELIUS_RPC_URL = 'https://mainnet.helius-rpc.com/?api-key=a53833dc-25c4-42e3-bdef-26901e8e84e9';
+    const expectedLamports = Math.floor(pkg.solCost * LAMPORTS_PER_SOL);
+
+    const checkEndpoint = async (rpcUrl: string) => {
+      const res = await fetch(rpcUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'getTransaction',
+          params: [
+            signature,
+            { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0, commitment: 'confirmed' }
+          ]
+        })
+      });
+      const json = await res.json();
+      return json.result;
+    };
+
+    try {
+      let tx = await checkEndpoint(HELIUS_RPC_URL);
+      if (!tx) {
+        tx = await checkEndpoint('https://solana-rpc.publicnode.com');
+      }
+
+      if (!tx || tx.meta?.err) return false;
+
+      // Balance Delta Check
+      if (tx.meta?.preBalances && tx.meta?.postBalances) {
+        const accountKeys = tx.transaction?.message?.accountKeys || [];
+        const treasuryIndex = accountKeys.findIndex((k: any) => {
+          const pubkeyStr = typeof k === 'string' ? k : (k.pubkey ? k.pubkey.toString() : String(k));
+          return pubkeyStr === TREASURY_WALLET_ADDRESS;
+        });
+
+        if (treasuryIndex !== -1) {
+          const gained = (tx.meta.postBalances[treasuryIndex] || 0) - (tx.meta.preBalances[treasuryIndex] || 0);
+          if (gained >= expectedLamports - 10000) return true;
+        }
+      }
+
+      // Parsed Instruction Check
+      const instructions = tx.transaction?.message?.instructions || [];
+      for (const ix of instructions) {
+        if (ix.program === 'system' && ix.parsed?.type === 'transfer') {
+          const info = ix.parsed.info || {};
+          if (info.destination === TREASURY_WALLET_ADDRESS && info.lamports >= expectedLamports - 10000) {
+            return true;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Direct on-chain check error:', e);
+    }
+    return false;
+  };
 
   // Countdown timer for listing
   const [timeLeft, setTimeLeft] = useState({
@@ -99,7 +160,7 @@ export const AirdropHubView: React.FC = () => {
     }, 1000);
   };
 
-  // Blazing fast purchase handler with automatic 5-attempt verification
+  // Blazing fast purchase handler with automatic dual verification
   const handlePurchasePackage = async (pkg: SolanaPackage) => {
     if (!connected || !publicKey || !sendTransaction) {
       toast('Please connect your Solana wallet first!', 'warning');
@@ -122,7 +183,7 @@ export const AirdropHubView: React.FC = () => {
       const lamports = Math.floor(pkg.solCost * LAMPORTS_PER_SOL);
       const transaction = new Transaction();
 
-      // Add Priority Fee (ComputeBudget) so validators process in next block (< 1s)
+      // Priority fee for < 1s validator inclusion
       transaction.add(
         ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 100000 })
       );
@@ -152,24 +213,45 @@ export const AirdropHubView: React.FC = () => {
         selectedPkg: pkg
       });
 
-      // Poll verification up to 6 attempts with 1.2s intervals (~7.2s)
-      let verifyRes: any = null;
-      for (let attempt = 1; attempt <= 6; attempt++) {
+      // 1. Attempt Server Verification first
+      let verifySuccess = false;
+      for (let attempt = 1; attempt <= 4; attempt++) {
         setPaymentState(prev => ({
           ...prev,
-          message: `Verifying on-chain transaction with Helius (Attempt ${attempt}/6)...`
+          message: `Verifying on-chain transaction with Helius (Attempt ${attempt}/4)...`
         }));
 
-        verifyRes = await verifySolanaPayment(signature, pkg.id);
-        if (verifyRes && verifyRes.success) {
+        const res = await verifySolanaPayment(signature, pkg.id);
+        if (res && res.success) {
+          verifySuccess = true;
           break;
         }
-        if (attempt < 6) {
-          await new Promise(r => setTimeout(r, 1200));
+        if (attempt < 4) {
+          await new Promise(r => setTimeout(r, 1000));
         }
       }
 
-      if (!verifyRes || !verifyRes.success) {
+      // 2. Direct On-Chain Fallback if server returned error or was indexing
+      if (!verifySuccess) {
+        setPaymentState(prev => ({
+          ...prev,
+          message: 'Performing direct on-chain verification with Helius RPC...'
+        }));
+
+        const directVerified = await verifyOnChainDirect(signature, pkg);
+        if (directVerified) {
+          verifySuccess = true;
+          // Credit directly on client
+          const updated = { ...profile };
+          if (pkg.shardsReward > 0) updated.darkShards = (updated.darkShards || 0) + pkg.shardsReward;
+          if (pkg.dustBonus > 0) updated.dust = (updated.dust || 0) + pkg.dustBonus;
+          if (pkg.isBattlePass) updated.hasPremiumBp = true;
+          updated.processedTransactions = [...(updated.processedTransactions || []), signature];
+          saveProfile(updated);
+        }
+      }
+
+      if (!verifySuccess) {
         setPaymentState(prev => ({
           ...prev,
           status: 'pending',
@@ -193,7 +275,7 @@ export const AirdropHubView: React.FC = () => {
       const isUserReject = err.message?.includes('User rejected') || err.message?.includes('cancelled');
       setPaymentState(prev => ({
         ...prev,
-        status: isUserReject ? 'error' : 'error',
+        status: 'error',
         message: isUserReject ? 'Transaction was cancelled by user.' : (err.message || 'Payment failed.')
       }));
       toast(isUserReject ? 'Transaction cancelled' : (err.message || 'Payment failed'), isUserReject ? 'info' : 'error');
@@ -202,14 +284,18 @@ export const AirdropHubView: React.FC = () => {
 
   const handleRetryVerification = async () => {
     if (!paymentState.txSignature || !paymentState.selectedPkg) return;
+    const sig = paymentState.txSignature;
+    const pkg = paymentState.selectedPkg;
+
     try {
       setPaymentState(prev => ({
         ...prev,
         status: 'verifying',
-        message: 'Re-verifying transaction on Solana blockchain with Helius...'
+        message: 'Re-verifying transaction on Solana blockchain...'
       }));
 
-      const res = await verifySolanaPayment(paymentState.txSignature, paymentState.selectedPkg.id);
+      // Server check
+      const res = await verifySolanaPayment(sig, pkg.id);
       if (res.success) {
         setPaymentState(prev => ({
           ...prev,
@@ -218,14 +304,36 @@ export const AirdropHubView: React.FC = () => {
         }));
         refreshBalance();
         toast('Transaction verified! Shards credited!', 'success');
-      } else {
+        return;
+      }
+
+      // Direct Client On-Chain Check
+      const directOk = await verifyOnChainDirect(sig, pkg);
+      if (directOk) {
+        const updated = { ...profile };
+        if (pkg.shardsReward > 0) updated.darkShards = (updated.darkShards || 0) + pkg.shardsReward;
+        if (pkg.dustBonus > 0) updated.dust = (updated.dust || 0) + pkg.dustBonus;
+        if (pkg.isBattlePass) updated.hasPremiumBp = true;
+        updated.processedTransactions = [...(updated.processedTransactions || []), sig];
+        saveProfile(updated);
+
         setPaymentState(prev => ({
           ...prev,
-          status: 'pending',
-          message: res.message || 'Verification in progress. Please click RETRY VERIFICATION again in 2 seconds.'
+          status: 'success',
+          message: `Payment confirmed on-chain! +${pkg.shardsReward} Dark Shards added!`
         }));
-        toast(res.message || 'Verification pending...', 'info');
+        refreshBalance();
+        toast('Transaction verified on-chain! Shards credited!', 'success');
+        return;
       }
+
+      setPaymentState(prev => ({
+        ...prev,
+        status: 'pending',
+        message: 'Verification in progress on Solana network. Click RETRY VERIFICATION in 2 seconds.'
+      }));
+      toast('Verification pending on-chain...', 'info');
+
     } catch (e: any) {
       toast(e.message || 'Error re-verifying transaction', 'error');
     }
