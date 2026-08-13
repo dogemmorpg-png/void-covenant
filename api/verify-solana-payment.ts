@@ -1,14 +1,14 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
-import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Connection, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { PlayerProfile } from '../src/types.js';
 import { calculateEnergy } from '../src/utils/energyHelper.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 const TREASURY_WALLET_ADDRESS = process.env.TREASURY_WALLET_ADDRESS || 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr';
 const HELIUS_KEY = 'a53833dc-25c4-42e3-bdef-26901e8e84e9';
-const SOLANA_RPC_URL = process.env.SOLANA_RPC_URL || `https://mainnet.helius-rpc.com/?api-key=${HELIUS_KEY}`;
+const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_KEY}`;
 
 function getSupabase() {
   const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
@@ -27,33 +27,16 @@ const PACKAGES: Record<string, { solCost: number; shards: number; dust: number; 
   premium_bp_sol: { solCost: 0.25, shards: 0, dust: 0, isBp: true }
 };
 
-async function fetchParsedTransactionWithTimeout(signature: string): Promise<any> {
-  const endpoints = [
-    SOLANA_RPC_URL,
-    'https://solana-rpc.publicnode.com',
-    'https://api.mainnet-beta.solana.com'
-  ].filter(Boolean);
-
-  for (const ep of endpoints) {
-    try {
-      const conn = new Connection(ep, 'confirmed');
-      const txPromise = conn.getParsedTransaction(signature, {
-        maxSupportedTransactionVersion: 0,
-        commitment: 'confirmed'
-      });
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('RPC fetch timeout')), 5000)
-      );
-      const tx = await Promise.race([txPromise, timeoutPromise]);
-      if (tx) return tx;
-    } catch (e) {
-      console.warn(`RPC fetch failed or timed out on ${ep}`);
-    }
-  }
-  return null;
-}
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // CORS Headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -108,22 +91,47 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'This transaction signature has already been claimed!' });
     }
 
-    // 3. Verify On-Chain Transaction with Fast Timeout Fallback
-    const tx = await fetchParsedTransactionWithTimeout(signature);
+    // 3. Fast Helius RPC Connection
+    const connection = new Connection(HELIUS_RPC_URL, 'confirmed');
+
+    // Quick status check
+    const status = await connection.getSignatureStatus(signature, { searchTransactionHistory: true });
+    if (status.value?.err) {
+      return res.status(400).json({ error: 'Transaction failed on Solana blockchain.' });
+    }
+
+    // Fetch parsed transaction from Helius
+    let tx = await connection.getParsedTransaction(signature, {
+      maxSupportedTransactionVersion: 0,
+      commitment: 'confirmed'
+    });
 
     if (!tx) {
-      return res.status(400).json({ error: 'Transaction not indexed on Solana blockchain yet. Please wait 3 seconds and click Retry Verification.' });
+      // If indexer is slightly behind, fallback to public node for instant fetch
+      try {
+        const fallbackConn = new Connection('https://solana-rpc.publicnode.com', 'confirmed');
+        tx = await fallbackConn.getParsedTransaction(signature, {
+          maxSupportedTransactionVersion: 0,
+          commitment: 'confirmed'
+        });
+      } catch (e) {
+        console.warn('Fallback RPC fetch failed:', e);
+      }
+    }
+
+    if (!tx) {
+      return res.status(400).json({ error: 'Transaction indexing in progress. Please click RETRY VERIFICATION in 2 seconds.' });
     }
 
     if (tx.meta?.err) {
       return res.status(400).json({ error: 'Transaction failed on the Solana blockchain.' });
     }
 
-    // 4. Verify Transfer Instruction & Recipient (Balance Delta Check)
+    // 4. Verify Transfer Recipient & Amount (Balance Delta Check)
     const expectedLamports = Math.floor(pkg.solCost * LAMPORTS_PER_SOL);
     let validTransferFound = false;
 
-    // Check 1: Account keys balance delta for Treasury Wallet
+    // Balance Delta Verification (Foolproof)
     if (tx.meta && tx.meta.preBalances && tx.meta.postBalances) {
       const accountKeys = tx.transaction.message.accountKeys;
       const treasuryIndex = accountKeys.findIndex((k: any) => {
@@ -141,7 +149,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    // Check 2: Fallback to parsed instructions inspect
+    // Parsed Instruction Fallback
     if (!validTransferFound) {
       const instructions = tx.transaction.message.instructions;
       for (const ix of instructions) {
@@ -160,7 +168,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!validTransferFound) {
       return res.status(400).json({
-        error: `Transaction on-chain transfer does not match package requirement (${pkg.solCost} SOL to ${TREASURY_WALLET_ADDRESS}).`
+        error: `Transaction payment does not match package cost (${pkg.solCost} SOL).`
       });
     }
 
@@ -178,7 +186,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Record processed signature
     (profile as any).processedTransactions = [...processedTxList, signature];
 
-    // Energy calculation update
+    // Recalculate Energy
     profile = calculateEnergy(profile);
 
     // 6. Save updated profile to Supabase
@@ -194,7 +202,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({
       success: true,
-      message: `Success! Payment verified. Added items to your account!`,
+      message: `Payment successful! +${pkg.shardsReward} Dark Shards added!`,
       profile
     });
 

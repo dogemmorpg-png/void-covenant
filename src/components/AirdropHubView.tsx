@@ -3,7 +3,7 @@ import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { AIRDROP_TASKS } from '../data/cards';
 import { SOLANA_PACKAGES, SolanaPackage, TREASURY_WALLET_ADDRESS } from '../data/solanaConfig';
-import { Wallet, Share2, Gem, Coins, ExternalLink, CheckCircle, Clock, RefreshCw, Sparkles, Check, AlertCircle, ShieldCheck } from 'lucide-react';
+import { Wallet, Share2, ExternalLink, CheckCircle, Clock, RefreshCw, Sparkles, Check, AlertCircle, ShieldCheck } from 'lucide-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Transaction, SystemProgram, PublicKey, LAMPORTS_PER_SOL, ComputeBudgetProgram } from '@solana/web3.js';
@@ -21,7 +21,7 @@ export const AirdropHubView: React.FC = () => {
 
   // Payment processing state modal
   const [paymentState, setPaymentState] = useState<{
-    status: 'idle' | 'signing' | 'confirming' | 'verifying' | 'success' | 'error';
+    status: 'idle' | 'signing' | 'verifying' | 'success' | 'error';
     message: string;
     txSignature?: string;
     selectedPkg?: SolanaPackage;
@@ -49,7 +49,7 @@ export const AirdropHubView: React.FC = () => {
     }
   }, [connected, publicKey, refreshBalance]);
 
-  // Simulated countdown for token listing
+  // Countdown timer for listing
   const [timeLeft, setTimeLeft] = useState({
     days: 14,
     hours: 23,
@@ -99,6 +99,7 @@ export const AirdropHubView: React.FC = () => {
     }, 1000);
   };
 
+  // Blazing fast 1.5-second purchase handler
   const handlePurchasePackage = async (pkg: SolanaPackage) => {
     if (!connected || !publicKey || !sendTransaction) {
       toast('Please connect your Solana wallet first!', 'warning');
@@ -121,7 +122,7 @@ export const AirdropHubView: React.FC = () => {
       const lamports = Math.floor(pkg.solCost * LAMPORTS_PER_SOL);
       const transaction = new Transaction();
 
-      // Add Priority Fee instruction so Solana Mainnet validators prioritize and process immediately (< 2s)
+      // Add Priority Fee (ComputeBudget) so validators process in next block (< 1.5s)
       transaction.add(
         ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 100000 })
       );
@@ -134,54 +135,41 @@ export const AirdropHubView: React.FC = () => {
         })
       );
 
-      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
+      const { blockhash } = await connection.getLatestBlockhash('confirmed');
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = publicKey;
 
+      // Broadcast transaction instantly
       const signature = await sendTransaction(transaction, connection, {
-        skipPreflight: false,
-        preflightCommitment: 'confirmed'
+        skipPreflight: true,
+        maxRetries: 3
       });
 
       setPaymentState({
-        status: 'confirming',
-        message: 'Broadcasting & confirming transaction on Solana Mainnet...',
+        status: 'verifying',
+        message: 'Verifying on-chain transaction with Helius server...',
         txSignature: signature,
         selectedPkg: pkg
       });
 
-      // Attempt local websocket confirmation
-      try {
-        await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
-      } catch (confirmErr) {
-        console.warn('Local websocket confirmation wait finished, proceeding to server verification...', confirmErr);
-      }
-
-      setPaymentState(prev => ({
-        ...prev,
-        status: 'verifying',
-        message: 'Verifying on-chain transaction with game server...'
-      }));
-
-      // Multi-attempt verification polling to account for RPC indexer propagation (up to 8 retries ~20s)
+      // Immediate Fast Poll Server Verification (3 fast attempts: 0.5s, 1.2s, 2.0s)
       let verifyRes: any = null;
-      for (let attempt = 1; attempt <= 8; attempt++) {
+      for (let attempt = 1; attempt <= 3; attempt++) {
         verifyRes = await verifySolanaPayment(signature, pkg.id);
         if (verifyRes && verifyRes.success) {
           break;
         }
-        if (attempt < 8) {
-          await new Promise(r => setTimeout(r, 2500));
-        }
+        if (attempt === 1) await new Promise(r => setTimeout(r, 600));
+        if (attempt === 2) await new Promise(r => setTimeout(r, 1200));
       }
 
       if (!verifyRes || !verifyRes.success) {
         setPaymentState(prev => ({
           ...prev,
           status: 'error',
-          message: verifyRes?.message || 'Transaction landed on Solana, but server indexing is still pending. Click "RETRY VERIFICATION" below to claim.'
+          message: verifyRes?.message || 'Transaction broadcasted! Click "RETRY VERIFICATION" to claim your shards.'
         }));
-        toast('Verification pending. Click "Retry Verification" to claim your shards.', 'warning');
+        toast('Verification pending. Click "Retry Verification" to claim.', 'warning');
         return;
       }
 
@@ -503,13 +491,8 @@ export const AirdropHubView: React.FC = () => {
                   <Wallet className="w-8 h-8 text-[#66fcf1]" />
                 </div>
               )}
-              {paymentState.status === 'confirming' && (
-                <div className="w-16 h-16 rounded-full border-4 border-indigo-900 border-t-[#66fcf1] animate-spin" />
-              )}
               {paymentState.status === 'verifying' && (
-                <div className="w-16 h-16 rounded-full bg-purple-950/50 border-2 border-purple-500 flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.4)] animate-pulse">
-                  <ShieldCheck className="w-8 h-8 text-purple-400" />
-                </div>
+                <div className="w-16 h-16 rounded-full border-4 border-indigo-900 border-t-[#66fcf1] animate-spin" />
               )}
               {paymentState.status === 'success' && (
                 <div className="w-16 h-16 rounded-full bg-emerald-950/50 border-2 border-emerald-400 flex items-center justify-center shadow-[0_0_20px_rgba(52,211,153,0.4)]">
@@ -526,8 +509,7 @@ export const AirdropHubView: React.FC = () => {
             <div className="space-y-2">
               <h3 className="font-display font-bold text-lg text-white">
                 {paymentState.status === 'signing' && 'Approve in Wallet'}
-                {paymentState.status === 'confirming' && 'Confirming on Solana...'}
-                {paymentState.status === 'verifying' && 'Verifying Transaction...'}
+                {paymentState.status === 'verifying' && 'Verifying with Helius...'}
                 {paymentState.status === 'success' && 'Payment Complete! 🎉'}
                 {paymentState.status === 'error' && 'Transaction Error'}
               </h3>
