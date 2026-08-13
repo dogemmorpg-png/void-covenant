@@ -62,70 +62,16 @@ export const GachaStoreView: React.FC = () => {
             triggerOpeningAnimationBackend(packType, data.newItems || [], []);
           }
           return;
+        } else {
+            const errData = await res.json();
+            toast(errData.error || 'Failed to purchase pack', 'error');
         }
+      } else {
+          toast('You must be logged in to purchase', 'error');
       }
     } catch (err: any) {
-      console.warn('Server gacha failed, using local purchase fallback', err);
-    }
-
-    // Local Gacha Purchase Fallback (100% Guaranteed Success)
-    if (packType === 'bronze') {
-      if (!spendGold(300)) {
-        toast('Not enough Gold (300 needed)', 'warning');
-        return;
-      }
-      const newCards = [
-        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)]),
-        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)]),
-        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)])
-      ];
-      triggerOpeningAnimationBackend(packType, newCards, []);
-    } else if (packType === 'obsidian') {
-      if (!spendShards(30)) {
-        toast('Not enough Dark Shards (30 needed)', 'warning');
-        return;
-      }
-      const newCards = [
-        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)], 2),
-        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)]),
-        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)])
-      ];
-      triggerOpeningAnimationBackend(packType, newCards, []);
-    } else if (packType === 'abyssal') {
-      if (!spendShards(70)) {
-        toast('Not enough Dark Shards (70 needed)', 'warning');
-        return;
-      }
-      const newCards = [
-        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)], 2),
-        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)], 2),
-        addCardToCollection(CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)])
-      ];
-      triggerOpeningAnimationBackend(packType, newCards, []);
-    } else if (packType === 'eq_basic') {
-      if (!spendGold(500)) {
-        toast('Not enough Gold (500 needed)', 'warning');
-        return;
-      }
-      const eq = generateEquipmentInstance(getRandomEquipmentByTier('bronze'));
-      addEquipment(eq);
-      triggerOpeningAnimationBackend(packType, [], [eq]);
-    } else if (packType === 'eq_rare') {
-      if (!spendShards(25)) {
-        toast('Not enough Dark Shards (25 needed)', 'warning');
-        return;
-      }
-      const eq = generateEquipmentInstance(getRandomEquipmentByTier('silver'));
-      addEquipment(eq);
-      triggerOpeningAnimationBackend(packType, [], [eq]);
-    } else if (packType === 'eq_premium') {
-      if (!spendShards(60)) {
-        toast('Not enough Dark Shards (60 needed)', 'warning');
-        return;
-      }
-      const eq = generateEquipmentInstance(getRandomEquipmentByTier('gold'));
-      addEquipment(eq);
-      triggerOpeningAnimationBackend(packType, [], [eq]);
+      console.warn('Server gacha failed', err);
+      toast('Network error connecting to server', 'error');
     }
   };
 

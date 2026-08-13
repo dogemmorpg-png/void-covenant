@@ -97,14 +97,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const profileRef = useRef(profile);
   useEffect(() => { profileRef.current = profile; }, [profile]);
 
-  // Automatically save profile changes to localStorage and Supabase
+  // Automatically save profile settings to Supabase
   const saveProfile = (newProfile: PlayerProfile) => {
     setProfile(newProfile);
     if (newProfile.solanaAddress) {
-      localStorage.setItem(`${LOCAL_STORAGE_KEY}_${newProfile.solanaAddress}`, JSON.stringify(newProfile));
-      
+      // Local storage is now ONLY used for token persistence, NOT for the profile itself
       const token = localStorage.getItem('void_covenant_token');
       if (token) {
+        // Send safe profile updates to the server (e.g. deck, equipped, sound)
         fetch('/api/sync', {
           method: 'POST',
           headers: {
@@ -112,7 +112,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({ safeProfileData: newProfile })
-        }).catch(err => console.error('Failed to sync profile', err));
+        }).catch(err => console.error('Failed to sync profile settings', err));
       }
     }
   };
@@ -353,85 +353,56 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Connect Solana Wallet
+  // Connect Solana Wallet (Strict Server-Authoritative)
   const connectSolanaWallet = useCallback(async (address: string) => {
     setIsLoadingProfile(true);
-    const specificKey = `${LOCAL_STORAGE_KEY}_${address}`;
+
+    const token = localStorage.getItem('void_covenant_token');
+    
+    if (token) {
+      try {
+        // Fetch strictly from the backend to ensure a unique DB profile is created/returned
+        const res = await fetch('/api/sync', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          // No body required to just fetch the authoritative profile
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.profile) {
+            let serverProfile = calculateEnergy(data.profile);
+            
+            // Fallback for missing username
+            if (!serverProfile.username) {
+              serverProfile.username = `Lord_${address.slice(0, 4)}`;
+            }
+            serverProfile.isRegistered = true;
+            serverProfile.solBalance = 12.5;
+
+            setProfile(serverProfile);
+            setIsLoadingProfile(false);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('Failed to connect to authoritative server', err);
+        // Do not fallback to local storage - game must be online
+      }
+    }
+
+    // If server fails or no token, create a clean default, don't use local storage
     let loadedProfile = createDefaultProfile();
     loadedProfile.solanaAddress = address;
     loadedProfile.solBalance = 12.5;
-
-    // 1. Read local storage first for instant offline/offline purchase preservation
-    let localParsed: any = null;
-    const specificSaved = localStorage.getItem(specificKey);
-    if (specificSaved) {
-      try {
-        localParsed = JSON.parse(specificSaved);
-      } catch (e) {
-        console.error('Failed to parse specific wallet profile', e);
-      }
-    } else {
-      const legacySaved = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (legacySaved) {
-        try {
-          const parsed = JSON.parse(legacySaved);
-          if (!parsed.solanaAddress || parsed.solanaAddress === address) {
-            localParsed = parsed;
-          }
-        } catch (e) {}
-      }
-    }
-
-    if (localParsed) {
-      loadedProfile = { ...loadedProfile, ...localParsed, solanaAddress: address, solBalance: 12.5 };
-    }
-
-    // 2. Fetch Supabase profile and merge (keeping highest resources & progress)
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('data')
-        .eq('wallet_address', address)
-        .limit(1);
-        
-      if (data && data.length > 0 && data[0].data) {
-        const parsed = data[0].data as PlayerProfile;
-        
-        // If no local storage exists, load currencies from Supabase. Otherwise, preserve local currency edits.
-        if (!localParsed) {
-          loadedProfile.darkShards = parsed.darkShards ?? loadedProfile.darkShards;
-          loadedProfile.gold = parsed.gold ?? loadedProfile.gold;
-          loadedProfile.dust = parsed.dust ?? loadedProfile.dust;
-        }
-        loadedProfile.pveProgress = Math.max(loadedProfile.pveProgress || 1, parsed.pveProgress || 1);
-        if (parsed.username) loadedProfile.username = parsed.username;
-        if (parsed.avatarUrl) loadedProfile.avatarUrl = parsed.avatarUrl;
-        if (parsed.collection && parsed.collection.length > (loadedProfile.collection || []).length) {
-          loadedProfile.collection = parsed.collection;
-        }
-        if (parsed.hasPremiumBp) loadedProfile.hasPremiumBp = true;
-      }
-    } catch (e) {
-      console.warn('Supabase read skipped or offline', e);
-    }
-
-    // Sanitize deck
-    if (loadedProfile.deck && loadedProfile.collection) {
-      loadedProfile.deck = loadedProfile.deck.filter(id => loadedProfile.collection.some(c => c.id === id));
-    }
-    if (!loadedProfile.deck || loadedProfile.deck.length === 0) {
-      loadedProfile.deck = loadedProfile.collection.slice(0, 5).map(c => c.id);
-    }
-
-    // Always force registered and valid username for connected wallet
-    if (!loadedProfile.username) {
-      loadedProfile.username = `Lord_${address.slice(0, 4)}`;
-    }
+    loadedProfile.username = `Lord_${address.slice(0, 4)}`;
     loadedProfile.isRegistered = true;
 
     loadedProfile = calculateEnergy(loadedProfile);
     setProfile(loadedProfile);
-    saveProfile(loadedProfile);
     setIsLoadingProfile(false);
   }, []);
 

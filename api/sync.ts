@@ -34,25 +34,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Token missing wallet address' });
   }
 
-  const { safeProfileData } = req.body;
-  if (!safeProfileData) {
-    return res.status(400).json({ error: 'Missing profile data' });
-  }
+  const { safeProfileData } = req.body || {};
 
   try {
     const supabase = getSupabase();
     
-    const { data: profileRow, error: fetchError } = await supabase
+    const { data: profileRows, error: fetchError } = await supabase
       .from('profiles')
       .select('data')
       .eq('wallet_address', walletAddress)
-      .single();
+      .limit(1);
 
-    let currentProfile: any;
+    const profileRow = profileRows && profileRows.length > 0 ? profileRows[0] : null;
 
-    if (fetchError && fetchError.code !== 'PGRST116') {
+    if (fetchError) {
       return res.status(500).json({ error: 'Database error fetching profile', details: fetchError });
     }
+
+    let currentProfile: any;
 
     if (!profileRow) {
       currentProfile = {
@@ -105,12 +104,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // ONLY merge fields that are safe for the user to change locally:
     // deck, equipped, soundOn, isRegistered, username, avatarUrl
-    if (safeProfileData.deck) currentProfile.deck = safeProfileData.deck;
-    if (safeProfileData.equipped) currentProfile.equipped = safeProfileData.equipped;
-    if (safeProfileData.soundOn !== undefined) currentProfile.soundOn = safeProfileData.soundOn;
-    if (safeProfileData.isRegistered !== undefined) currentProfile.isRegistered = safeProfileData.isRegistered;
-    if (safeProfileData.username) currentProfile.username = safeProfileData.username;
-    if (safeProfileData.avatarUrl) currentProfile.avatarUrl = safeProfileData.avatarUrl;
+    if (safeProfileData) {
+      if (safeProfileData.deck) currentProfile.deck = safeProfileData.deck;
+      if (safeProfileData.equipped) currentProfile.equipped = safeProfileData.equipped;
+      if (safeProfileData.soundOn !== undefined) currentProfile.soundOn = safeProfileData.soundOn;
+      if (safeProfileData.isRegistered !== undefined) currentProfile.isRegistered = safeProfileData.isRegistered;
+      if (safeProfileData.username) currentProfile.username = safeProfileData.username;
+      if (safeProfileData.avatarUrl) currentProfile.avatarUrl = safeProfileData.avatarUrl;
+    }
 
     const { error: updateError } = await supabase
       .from('profiles')
