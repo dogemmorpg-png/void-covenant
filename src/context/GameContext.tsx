@@ -384,6 +384,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile(loadedProfile);
         setIsLoadingProfile(false);
         return;
+      } else {
+        // Create initial profile in Supabase for new wallet
+        await supabase
+          .from('profiles')
+          .upsert({ wallet_address: address, data: loadedProfile });
       }
     } catch (e) {
       console.warn('Profile not found in Supabase or network error, falling back to local storage', e);

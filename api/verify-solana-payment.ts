@@ -72,12 +72,59 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: 'Database read error' });
     }
 
+    let profile: any;
     const profileRows: any[] = await profileRes.json();
     if (!profileRows || profileRows.length === 0) {
-      return res.status(404).json({ error: 'Profile not found' });
+      profile = {
+        gold: 1000,
+        dust: 250,
+        darkShards: 50,
+        collection: [
+          { id: 'c_starter_1', templateId: 's1_skeletal_warrior', name: 'Skeleton Warrior', tier: 'Common', attack: 4, health: 5, manaCost: 2, image: '/cards/skeleton_warrior.png', count: 1, level: 1 },
+          { id: 'c_starter_2', templateId: 's1_grave_ghoul', name: 'Grave Ghoul', tier: 'Common', attack: 3, health: 6, manaCost: 2, image: '/cards/grave_ghoul.png', count: 1, level: 1 },
+          { id: 'c_starter_3', templateId: 's1_bone_archer', name: 'Bone Archer', tier: 'Common', attack: 5, health: 3, manaCost: 2, image: '/cards/bone_archer.png', count: 1, level: 1 },
+          { id: 'c_starter_4', templateId: 's1_plague_rat', name: 'Plague Rat', tier: 'Common', attack: 2, health: 4, manaCost: 1, image: '/cards/plague_rat.png', count: 1, level: 1 },
+          { id: 'c_starter_5', templateId: 's1_dark_acolyte', name: 'Dark Acolyte', tier: 'Common', attack: 4, health: 4, manaCost: 2, image: '/cards/dark_acolyte.png', count: 1, level: 1 }
+        ],
+        deck: ['c_starter_1', 'c_starter_2', 'c_starter_3', 'c_starter_4', 'c_starter_5'],
+        pveEnergy: 10,
+        pveEnergyMax: 10,
+        pvpEnergy: 5,
+        pvpEnergyMax: 5,
+        lastEnergyRefill: Date.now(),
+        lastPveEnergyRefill: Date.now(),
+        lastPvpEnergyRefill: Date.now(),
+        pveProgress: 1,
+        pvpRating: 100,
+        heroMaxHealth: 30,
+        level: 1,
+        exp: 0,
+        campaignStars: {},
+        equipment: [],
+        equipped: {},
+        battlePassPoints: 40,
+        battlePassClaimed: [],
+        referralsCount: 0,
+        completedTasks: [],
+        solanaAddress: walletAddress,
+        solBalance: 12.5,
+        isPremiumBP: false,
+        username: '',
+        isRegistered: false
+      };
+      await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify({ wallet_address: walletAddress, data: profile })
+      });
+    } else {
+      profile = profileRows[0].data || {};
     }
-
-    let profile = profileRows[0].data || {};
 
     // 2. Anti-Replay Attack Check
     const processedTxList: string[] = profile.processedTransactions || [];
