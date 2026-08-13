@@ -62,12 +62,16 @@ export const CollectionDeckView: React.FC = () => {
   const selectedCard = profile.collection.find(c => c.id === selectedCardId) || null;
 
   // Filtered & sorted collection
+  const tierWeight = { legendary: 4, gold: 3, rare: 2, basic: 1 };
   const filteredCollection = profile.collection
     .filter(card => {
       if (tierFilter === 'all') return true;
       return card.tier === tierFilter;
     })
     .sort((a, b) => {
+      const tierDiff = (tierWeight[b.tier as keyof typeof tierWeight] || 0) - (tierWeight[a.tier as keyof typeof tierWeight] || 0);
+      if (tierDiff !== 0) return tierDiff;
+
       if (sortBy === 'level') return b.level - a.level;
       if (sortBy === 'attack') return b.attack - a.attack;
       if (sortBy === 'health') return b.health - a.health;
