@@ -55,9 +55,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!profileRow) {
       currentProfile = {
-        gold: 1000,
-        dust: 250,
-        darkShards: 50,
+        gold: 500,
+        dust: 100,
+        darkShards: 0,
         collection: [
           { id: 'c_starter_1', templateId: 's1_skeletal_warrior', name: 'Skeleton Warrior', tier: 'Common', attack: 4, health: 5, manaCost: 2, image: '/cards/skeleton_warrior.png', count: 1, level: 1 },
           { id: 'c_starter_2', templateId: 's1_grave_ghoul', name: 'Grave Ghoul', tier: 'Common', attack: 3, health: 6, manaCost: 2, image: '/cards/grave_ghoul.png', count: 1, level: 1 },
