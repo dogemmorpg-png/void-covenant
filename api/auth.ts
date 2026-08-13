@@ -1,7 +1,9 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import nacl from 'tweetnacl';
-import bs58 from 'bs58';
+import bs58Pkg from 'bs58';
 import jwt from 'jsonwebtoken';
+
+const bs58 = (bs58Pkg as any).default || bs58Pkg;
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 

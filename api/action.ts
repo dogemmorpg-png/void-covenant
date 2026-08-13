@@ -44,13 +44,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const supabase = getSupabase();
     
-    const { data: profileRow, error: fetchError } = await supabase
+    const { data: profileRows, error: fetchError } = await supabase
       .from('profiles')
       .select('data')
       .eq('wallet_address', walletAddress)
-      .single();
+      .limit(1);
 
-    if (fetchError && fetchError.code !== 'PGRST116') {
+    const profileRow = profileRows && profileRows.length > 0 ? profileRows[0] : null;
+
+    if (fetchError) {
       return res.status(500).json({ error: 'Database error fetching profile', details: fetchError });
     }
 
