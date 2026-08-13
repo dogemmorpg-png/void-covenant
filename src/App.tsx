@@ -18,6 +18,9 @@ import { LandingPage } from './components/LandingPage';
 import { RegistrationScreen } from './components/RegistrationScreen';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
+import bs58Pkg from 'bs58';
+
+const bs58 = (bs58Pkg as any).default || bs58Pkg;
 
 function MainAppContent() {
   const { profile, isLoadingProfile, connectSolanaWallet, registerPlayer, disconnectSolanaWallet } = useGame();
@@ -85,7 +88,6 @@ function MainAppContent() {
             
             const signatureBytes = await signMessage(message);
             
-            const bs58 = (await import('bs58')).default;
             const signature = bs58.encode(signatureBytes);
             const publicKeyStr = publicKey.toBase58();
 

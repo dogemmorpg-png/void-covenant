@@ -1,9 +1,9 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
-import { PlayerProfile, CardTemplate } from '../src/types';
-import { generateCampaignStage, createCardInstance } from '../src/data/cards';
-import { calculateEnergy, processExpGain } from '../src/utils/energyHelper';
+import { PlayerProfile, CardTemplate } from './shared/types';
+import { generateCampaignStage, createCardInstance } from './shared/cards';
+import { calculateEnergy, processExpGain } from './shared/energyHelper';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 

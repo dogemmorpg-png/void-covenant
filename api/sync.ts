@@ -1,6 +1,8 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import jwt from 'jsonwebtoken';
+import * as jwtPkg from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
+
+const jwt = (jwtPkg as any).default || jwtPkg;
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 

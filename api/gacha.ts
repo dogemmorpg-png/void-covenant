@@ -1,10 +1,10 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
-import { CARD_TEMPLATES, createCardInstance } from '../src/data/cards';
-import { getRandomEquipmentByTier, generateEquipmentInstance } from '../src/data/equipment';
-import { PlayerProfile, CardTier } from '../src/types';
-import { calculateEnergy } from '../src/utils/energyHelper';
+import { CARD_TEMPLATES, createCardInstance } from './shared/cards';
+import { getRandomEquipmentByTier, generateEquipmentInstance } from './shared/equipment';
+import { PlayerProfile, CardTier } from './shared/types';
+import { calculateEnergy } from './shared/energyHelper';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
