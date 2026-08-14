@@ -167,7 +167,7 @@ export const TalentsView: React.FC = () => {
       <div className="flex flex-col md:flex-row gap-6">
         {renderStanceColumn('void_strike', 'Void Strike', <Zap className="w-8 h-8 text-purple-400" />, 'text-purple-400')}
         {renderStanceColumn('blood_aura', 'Blood Aura', <Activity className="w-8 h-8 text-red-400" />, 'text-red-400')}
-        {renderStanceColumn('warlord_cry', 'Warlord\\'s Cry', <Flame className="w-8 h-8 text-amber-500" />, 'text-amber-500')}
+        {renderStanceColumn('warlord_cry', "Warlord's Cry", <Flame className="w-8 h-8 text-amber-500" />, 'text-amber-500')}
       </div>
     </div>
   );
