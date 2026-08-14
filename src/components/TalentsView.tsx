@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { TALENT_TREES, TalentStance, TalentNode } from '../data/talents';
-import { Zap, Activity, Flame, Shield, Star, Lock } from 'lucide-react';
+import { Zap, Activity, Flame, Shield, Star, Lock, Plus } from 'lucide-react';
 
 export const TalentsView: React.FC = () => {
   const { profile, updateProfile, submitAction } = useGame();
