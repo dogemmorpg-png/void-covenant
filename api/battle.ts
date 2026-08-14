@@ -54,6 +54,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .single();
 
     let profile: PlayerProfile;
+    let oldUpdatedAt = profileRow ? profileRow.updated_at : null;
 
     if (fetchError || !profileRow) {
       profile = {
