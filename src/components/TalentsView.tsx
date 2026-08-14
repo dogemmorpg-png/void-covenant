@@ -1,21 +1,36 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
-import { TALENT_TREES, TalentStance, TalentNode } from '../data/talents';
-import { Zap, Activity, Flame, Shield, Star, Lock, Plus } from 'lucide-react';
+import { TALENT_TREES, TalentStance } from '../data/talents';
+import { Zap, Activity, Flame, Lock, Plus, Star } from 'lucide-react';
+
+const STANCES: { id: TalentStance; name: string; icon: React.ReactNode; color: string; desc: string }[] = [
+  { id: 'void_strike', name: 'Void Strike', icon: <Zap className="w-6 h-6" />, color: 'text-purple-400', desc: '10% chance to deal 1 bonus damage.' },
+  { id: 'blood_aura', name: 'Blood Aura', icon: <Activity className="w-6 h-6" />, color: 'text-red-400', desc: '15% chance to heal an ally for 1 HP.' },
+  { id: 'warlord_cry', name: "Warlord's Cry", icon: <Flame className="w-6 h-6" />, color: 'text-amber-500', desc: '10% chance to buff an ally with +1 Atk.' },
+];
+
+const TREE_WIDTH = 800;
+const TREE_HEIGHT = 850;
+
+const getPos = (tier: number, col: number) => {
+  const x = 400 + col * 260;
+  const y = 80 + (tier - 1) * 160;
+  return { x, y };
+};
 
 export const TalentsView: React.FC = () => {
-  const { profile, updateProfile, submitAction } = useGame();
+  const { profile, updateProfile } = useGame();
   const toast = useToast();
-  
+  const [activeTab, setActiveTab] = useState<TalentStance>(profile?.activeStance || 'void_strike');
+
   if (!profile) return null;
 
   const totalPoints = Math.max(0, profile.level - 1);
   const spentPoints = Object.values(profile.talents || {}).reduce((sum, val) => sum + val, 0);
   const availablePoints = totalPoints - spentPoints;
-  const activeStance = profile.activeStance || 'void_strike';
 
-  const handlePurchase = async (nodeId: string) => {
+  const handlePurchase = (nodeId: string) => {
     if (availablePoints <= 0) {
       toast('Not enough skill points! Level up to get more.', 'warning');
       return;
@@ -30,27 +45,21 @@ export const TalentsView: React.FC = () => {
       return;
     }
 
-    // Check requirements
     if (node.requires && node.requires.length > 0) {
       const hasReq = node.requires.every(reqId => (profile.talents?.[reqId] || 0) > 0);
       if (!hasReq) {
-        toast('You must unlock the previous talent first.', 'error');
+        toast('You must unlock the required previous talents first.', 'error');
         return;
       }
     }
 
     const newTalents = { ...profile.talents, [nodeId]: currentLevel + 1 };
-    
-    // Optimistic update
     updateProfile({ talents: newTalents });
-    
-    // In a real app we'd sync this to backend immediately or queue it
-    // Wait, sync is automatic when we update context? Yes, GameContext syncs state automatically.
     toast('Talent upgraded!', 'success');
   };
 
-  const handleEquipStance = (stance: TalentStance) => {
-    updateProfile({ activeStance: stance });
+  const handleEquipStance = () => {
+    updateProfile({ activeStance: activeTab });
     toast('Combat Stance updated!', 'success');
   };
 
@@ -63,114 +72,229 @@ export const TalentsView: React.FC = () => {
       toast('You have not spent any points yet.', 'info');
       return;
     }
-
     const newProfile = { ...profile, gold: profile.gold - 500, talents: {} };
     updateProfile(newProfile);
     toast('Talents reset successfully.', 'success');
   };
 
-  const renderStanceColumn = (stance: TalentStance, title: string, icon: React.ReactNode, colorClass: string, description: string) => {
-    const stanceNodes = TALENT_TREES.filter(t => t.stance === stance);
-    const isEquipped = activeStance === stance;
-
-    return (
-      <div className={`flex flex-col gap-4 p-4 rounded-xl border ${isEquipped ? 'border-amber-500/50 bg-amber-950/10' : 'border-gray-800 bg-black/40'} flex-1`}>
-        <div className="flex flex-col items-center mb-4 text-center space-y-2">
-          <div className={`w-16 h-16 rounded-full flex items-center justify-center border-2 ${isEquipped ? 'border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.5)]' : 'border-gray-700'}`}>
-            {icon}
-          </div>
-          <h3 className={`font-display font-bold text-lg ${colorClass}`}>{title}</h3>
-          <p className="text-xs text-gray-400 leading-relaxed px-2 min-h-[48px] flex items-center justify-center">
-            {description}
-          </p>
-          <button 
-            onClick={() => handleEquipStance(stance)}
-            disabled={isEquipped}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${isEquipped ? 'bg-amber-600/20 text-amber-500 border border-amber-600/50' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
-          >
-            {isEquipped ? 'ACTIVE STANCE' : 'EQUIP STANCE'}
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-3 relative">
-          {stanceNodes.sort((a, b) => a.row - b.row).map(node => {
-            const currentLevel = profile.talents?.[node.id] || 0;
-            const isMaxed = currentLevel >= node.maxLevel;
-            
-            let isLocked = false;
-            if (node.requires) {
-               isLocked = !node.requires.every(req => (profile.talents?.[req] || 0) > 0);
-            }
-
-            return (
-              <div 
-                key={node.id} 
-                className={`relative p-3 rounded-lg border ${
-                  isLocked ? 'border-gray-900 bg-gray-900/50 opacity-50' : 
-                  currentLevel > 0 ? 'border-amber-700/50 bg-[#1a1423]' : 'border-gray-700 bg-black/60'
-                } flex gap-3 transition-colors`}
-              >
-                <div className="flex flex-col items-center justify-center gap-1">
-                  <button 
-                    onClick={() => handlePurchase(node.id)}
-                    disabled={isLocked || isMaxed || availablePoints <= 0}
-                    className={`w-10 h-10 rounded-md border flex items-center justify-center transition-all ${
-                      isLocked ? 'border-gray-800 bg-gray-800' :
-                      isMaxed ? 'border-amber-500 bg-amber-900/50 text-amber-400' :
-                      'border-gray-500 bg-gray-800 hover:border-amber-400'
-                    }`}
-                  >
-                    {isLocked ? <Lock className="w-4 h-4 text-gray-600" /> : <Plus className="w-5 h-5" />}
-                  </button>
-                  <span className="text-[10px] font-mono text-gray-400">
-                    {currentLevel}/{node.maxLevel}
-                  </span>
-                </div>
-                <div className="flex-1 flex flex-col justify-center">
-                  <span className={`text-sm font-bold ${currentLevel > 0 ? 'text-amber-100' : 'text-gray-300'}`}>{node.name}</span>
-                  <span className="text-xs text-gray-400 leading-tight mt-1">{node.description(Math.max(1, currentLevel))}</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
+  const activeNodes = TALENT_TREES.filter(t => t.stance === activeTab);
+  const isCurrentStanceEquipped = profile.activeStance === activeTab;
+  const currentStanceConfig = STANCES.find(s => s.id === activeTab);
 
   return (
-    <div className="max-w-7xl mx-auto p-4 space-y-8">
+    <div className="max-w-5xl mx-auto p-4 space-y-6">
       {/* Header */}
-      <div className="bg-[#151a21] border border-gray-800 rounded-2xl p-6 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="space-y-2">
+      <div className="bg-[#151a21] border border-gray-800 rounded-2xl p-6 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent"></div>
+        <div className="space-y-2 z-10">
           <h2 className="font-display font-black text-2xl text-white tracking-widest text-shadow-gold">
             COMMANDER TALENTS
           </h2>
           <p className="text-gray-400 text-sm max-w-xl">
-            Spend skill points earned from leveling up to enhance your Hero's combat stances. You can switch your active stance at any time.
+            Shape your Hero's combat style by unlocking powerful synergistic nodes.
           </p>
         </div>
         
-        <div className="flex gap-4 items-center">
-          <div className="bg-black/50 border border-gray-700 rounded-lg p-4 text-center min-w-[120px]">
-            <span className="block text-xs text-gray-400 font-mono mb-1">UNSPENT POINTS</span>
-            <span className="block text-3xl font-display font-bold text-amber-400">{availablePoints}</span>
+        <div className="flex gap-4 items-center z-10">
+          <div className="bg-black/60 border border-gray-700/50 rounded-lg p-3 text-center min-w-[120px] shadow-inner">
+            <span className="block text-[10px] text-gray-500 font-mono mb-1">UNSPENT POINTS</span>
+            <span className="block text-3xl font-display font-bold text-amber-400 text-shadow-gold">{availablePoints}</span>
           </div>
           <button 
             onClick={handleReset}
-            className="h-full px-4 py-3 bg-red-950/40 hover:bg-red-900/60 border border-red-900/50 rounded-lg text-red-300 text-sm font-bold transition-all flex flex-col items-center justify-center gap-1"
+            className="h-full px-4 py-3 bg-red-950/20 hover:bg-red-900/40 border border-red-900/30 rounded-lg text-red-400 text-sm font-bold transition-all flex flex-col items-center justify-center gap-1 group"
           >
-            <span>Reset Talents</span>
-            <span className="text-[10px] font-mono opacity-70">Cost: 500 Gold</span>
+            <span className="group-hover:text-red-300">Reset Talents</span>
+            <span className="text-[10px] font-mono opacity-60 group-hover:opacity-100">Cost: 500 Gold</span>
           </button>
         </div>
       </div>
 
-      {/* Talent Trees */}
-      <div className="flex flex-col md:flex-row gap-6">
-        {renderStanceColumn('void_strike', 'Void Strike', <Zap className="w-8 h-8 text-purple-400" />, 'text-purple-400', '10% chance on attack to strike with Void energy, dealing 1 bonus damage.')}
-        {renderStanceColumn('blood_aura', 'Blood Aura', <Activity className="w-8 h-8 text-red-400" />, 'text-red-400', '15% chance on attack to siphon life, healing a random damaged ally card for 1 HP.')}
-        {renderStanceColumn('warlord_cry', "Warlord's Cry", <Flame className="w-8 h-8 text-amber-500" />, 'text-amber-500', '10% chance on attack to roar, giving a random ally card +1 Attack for 1 turn.')}
+      {/* Main Content Area */}
+      <div className="bg-black/40 border border-gray-800 rounded-2xl overflow-hidden flex flex-col">
+        {/* Tabs */}
+        <div className="flex border-b border-gray-800 bg-[#0a0a0f]">
+          {STANCES.map(stance => (
+            <button
+              key={stance.id}
+              onClick={() => setActiveTab(stance.id)}
+              className={`flex-1 p-4 flex items-center justify-center gap-3 transition-all relative ${
+                activeTab === stance.id ? 'bg-gray-800/30' : 'hover:bg-gray-900/50 opacity-60 hover:opacity-100'
+              }`}
+            >
+              <div className={`${stance.color} ${activeTab === stance.id ? 'scale-110 drop-shadow-[0_0_8px_currentColor]' : ''} transition-transform`}>
+                {stance.icon}
+              </div>
+              <span className={`font-display font-bold tracking-wide ${activeTab === stance.id ? 'text-white' : 'text-gray-400'}`}>
+                {stance.name}
+              </span>
+              {activeTab === stance.id && (
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]"></div>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Tree Container */}
+        <div className="p-6 relative bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-900/50 via-[#050505] to-black min-h-[600px]">
+          
+          {/* Equip Stance Action Bar */}
+          <div className="flex flex-col items-center justify-center mb-6 space-y-3">
+             <p className="text-gray-400 text-sm max-w-lg text-center bg-black/40 px-4 py-2 rounded-full border border-gray-800/50">
+               Base Effect: <span className="text-gray-200">{currentStanceConfig?.desc}</span>
+             </p>
+             <button 
+              onClick={handleEquipStance}
+              disabled={isCurrentStanceEquipped}
+              className={`px-8 py-3 rounded-full text-sm font-bold tracking-widest transition-all shadow-lg z-10 ${
+                isCurrentStanceEquipped 
+                  ? 'bg-amber-900/20 text-amber-500/50 border border-amber-900/30 cursor-not-allowed' 
+                  : 'bg-amber-600 hover:bg-amber-500 text-white border border-amber-400 shadow-[0_0_20px_rgba(217,119,6,0.4)] hover:shadow-[0_0_30px_rgba(217,119,6,0.6)] hover:scale-105'
+              }`}
+            >
+              {isCurrentStanceEquipped ? 'STANCE ACTIVE' : 'EQUIP THIS STANCE'}
+            </button>
+          </div>
+
+          <div className="overflow-x-auto overflow-y-hidden w-full pb-8 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
+            <div 
+              className="relative mx-auto" 
+              style={{ width: TREE_WIDTH, height: TREE_HEIGHT }}
+            >
+              {/* SVG Lines */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+                <defs>
+                  <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                </defs>
+                {activeNodes.map(node => {
+                  if (!node.requires) return null;
+                  const targetPos = getPos(node.tier, node.col);
+                  
+                  return node.requires.map(reqId => {
+                    const reqNode = activeNodes.find(n => n.id === reqId);
+                    if (!reqNode) return null;
+                    const sourcePos = getPos(reqNode.tier, reqNode.col);
+
+                    const currentLevel = profile.talents?.[node.id] || 0;
+                    const reqLevel = profile.talents?.[reqNode.id] || 0;
+                    
+                    const isFullyUnlocked = currentLevel > 0;
+                    const isAvailable = reqLevel > 0; 
+
+                    let strokeColor = '#1f2937'; // gray-800
+                    let strokeWidth = 2;
+                    let opacity = 0.5;
+
+                    if (isFullyUnlocked) {
+                      strokeColor = '#d97706'; // amber-600
+                      strokeWidth = 4;
+                      opacity = 1;
+                    } else if (isAvailable) {
+                      strokeColor = '#4b5563'; // gray-600
+                      strokeWidth = 3;
+                      opacity = 0.8;
+                    }
+
+                    return (
+                      <line 
+                        key={`${sourcePos.x}-${sourcePos.y}-${targetPos.x}-${targetPos.y}`}
+                        x1={sourcePos.x} 
+                        y1={sourcePos.y + 55} // start from bottom center of source node 
+                        x2={targetPos.x} 
+                        y2={targetPos.y - 55} // end at top center of target node
+                        stroke={strokeColor} 
+                        strokeWidth={strokeWidth}
+                        opacity={opacity}
+                        filter={isFullyUnlocked ? 'url(#glow)' : ''}
+                        className="transition-all duration-500"
+                      />
+                    );
+                  });
+                })}
+              </svg>
+
+              {/* Nodes */}
+              {activeNodes.map(node => {
+                const pos = getPos(node.tier, node.col);
+                const currentLevel = profile.talents?.[node.id] || 0;
+                const isMaxed = currentLevel >= node.maxLevel;
+                
+                let isLocked = false;
+                if (node.requires) {
+                   isLocked = !node.requires.every(req => (profile.talents?.[req] || 0) > 0);
+                }
+
+                // Node size
+                const width = 240;
+                const height = 110;
+
+                const isMajor = node.tier === 3 || node.tier === 5;
+                const nodeColor = isMajor ? 'amber' : 'gray';
+
+                let bgClass = 'bg-[#111] border-gray-800';
+                let textClass = 'text-gray-500';
+
+                if (currentLevel > 0) {
+                  bgClass = isMaxed 
+                    ? `bg-${nodeColor}-950/40 border-${nodeColor}-500/80 shadow-[0_0_15px_rgba(245,158,11,0.3)]` 
+                    : `bg-[#1a1a24] border-${nodeColor}-700/60`;
+                  textClass = 'text-amber-100';
+                } else if (!isLocked) {
+                  bgClass = 'bg-[#15151e] border-gray-600 hover:border-amber-600/50';
+                  textClass = 'text-gray-300';
+                }
+
+                return (
+                  <div 
+                    key={node.id}
+                    className={`absolute z-10 p-4 rounded-xl border-2 flex flex-col justify-between transition-all duration-300 ${bgClass} ${isLocked ? 'opacity-40 grayscale' : 'hover:scale-105 hover:z-20'}`}
+                    style={{ 
+                      left: pos.x - width / 2, 
+                      top: pos.y - height / 2,
+                      width,
+                      height
+                    }}
+                  >
+                    <div className="flex justify-between items-start gap-2">
+                       <div className="flex-1">
+                          <h4 className={`text-sm font-bold leading-tight ${textClass}`}>{node.name}</h4>
+                          <p className="text-[11px] text-gray-400 mt-1.5 leading-tight line-clamp-3">
+                            {node.description(Math.max(1, currentLevel))}
+                          </p>
+                       </div>
+                       <button 
+                          onClick={() => handlePurchase(node.id)}
+                          disabled={isLocked || isMaxed || availablePoints <= 0}
+                          className={`shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center transition-colors ${
+                            isLocked ? 'border-gray-800 bg-gray-900 cursor-not-allowed' :
+                            isMaxed ? 'border-amber-500 bg-amber-600 text-black cursor-default shadow-[0_0_10px_rgba(245,158,11,0.5)]' :
+                            'border-gray-500 bg-gray-800 hover:bg-amber-600 hover:text-black hover:border-amber-400 text-gray-300'
+                          }`}
+                        >
+                          {isLocked ? <Lock className="w-3 h-3" /> : (isMaxed ? <Star className="w-3 h-3 fill-current" /> : <Plus className="w-4 h-4" />)}
+                        </button>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 mt-3">
+                       <div className="flex-1 h-1.5 bg-gray-900 rounded-full overflow-hidden border border-gray-800 shadow-inner">
+                          <div 
+                            className={`h-full ${isMaxed ? 'bg-amber-400' : 'bg-amber-600/70'} transition-all`} 
+                            style={{ width: `${(currentLevel / node.maxLevel) * 100}%` }}
+                          />
+                       </div>
+                       <span className={`text-[10px] font-mono font-bold ${isMaxed ? 'text-amber-400' : 'text-gray-500'}`}>
+                         {currentLevel}/{node.maxLevel}
+                       </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
