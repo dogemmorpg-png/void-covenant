@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { Equipment, EquipmentSlot } from '../types';
+import { TalentsView } from './TalentsView';
 import { Shield, Sword, Skull, Gem, Flame, UserCircle2 } from 'lucide-react';
 
 export const HeroInventoryView: React.FC = () => {
   const { profile, equipItem, unequipItem } = useGame();
   
   const [selectedSlot, setSelectedSlot] = useState<EquipmentSlot | null>(null);
+  const [subTab, setSubTab] = useState<'equipment' | 'talents'>('equipment');
 
   const getSlotIcon = (slot: EquipmentSlot) => {
     switch(slot) {

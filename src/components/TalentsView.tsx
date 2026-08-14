@@ -6,7 +6,7 @@ import { Zap, Activity, Flame, Shield, Star, Lock, Plus } from 'lucide-react';
 
 export const TalentsView: React.FC = () => {
   const { profile, updateProfile, submitAction } = useGame();
-  const { toast } = useToast();
+  const toast = useToast();
   
   if (!profile) return null;
 
