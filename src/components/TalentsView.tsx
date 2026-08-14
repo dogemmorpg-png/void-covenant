@@ -28,16 +28,7 @@ export const TalentsView: React.FC = () => {
   if (!profile) return null;
 
   const totalPoints = Math.max(0, profile.level - 1);
-  
-  // Calculate spent points ONLY for the currently active tab (stance)
-  const spentPoints = Object.entries(profile.talents || {}).reduce((sum, [nodeId, val]) => {
-    const node = TALENT_TREES.find(n => n.id === nodeId);
-    if (node && node.stance === activeTab) {
-      return sum + val;
-    }
-    return sum;
-  }, 0);
-  
+  const spentPoints = Object.values(profile.talents || {}).reduce((sum, val) => sum + val, 0);
   const availablePoints = totalPoints - spentPoints;
 
   const handlePurchase = (nodeId: string) => {
@@ -83,22 +74,12 @@ export const TalentsView: React.FC = () => {
       return;
     }
     if (spentPoints === 0) {
-      toast(`You have not spent any points in ${currentStanceConfig?.name} yet.`, 'info');
+      toast('You have not spent any points yet.', 'info');
       return;
     }
-    
-    // Only reset talents for the active tab
-    const newTalents = { ...profile.talents };
-    for (const key in newTalents) {
-      const node = TALENT_TREES.find(n => n.id === key);
-      if (node && node.stance === activeTab) {
-        delete newTalents[key];
-      }
-    }
-
-    const newProfile = { ...profile, gold: profile.gold - 500, talents: newTalents };
+    const newProfile = { ...profile, gold: profile.gold - 500, talents: {} };
     updateProfile(newProfile);
-    toast(`${currentStanceConfig?.name} talents reset successfully.`, 'success');
+    toast('Talents reset successfully.', 'success');
   };
 
   const activeNodes = TALENT_TREES.filter(t => t.stance === activeTab);
@@ -194,8 +175,31 @@ export const TalentsView: React.FC = () => {
         </div>
 
         {/* Tree Container */}
-        <div className="relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900/40 via-black to-black min-h-[700px] z-10">
+        <div className="relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900/40 via-black to-black min-h-[700px] z-10 flex flex-col items-center">
           
+          {/* Equip Stance Action Bar (in document flow) */}
+          <div className="flex flex-col items-center justify-center mt-6 mb-2 space-y-3 relative z-20">
+             <div className="bg-black/60 backdrop-blur-md px-6 py-3 rounded-full border border-gray-800/80 shadow-[0_0_20px_rgba(0,0,0,0.5)] flex items-center gap-4">
+                <div className={`${currentStanceConfig?.color}`}>
+                  {currentStanceConfig?.icon}
+                </div>
+                <p className="text-gray-400 text-sm max-w-lg text-center">
+                  Base Effect: <span className="text-gray-200 font-bold">{currentStanceConfig?.desc}</span>
+                </p>
+             </div>
+             <button 
+              onClick={handleEquipStance}
+              disabled={isCurrentStanceEquipped}
+              className={`px-10 py-3.5 rounded-full text-sm font-black tracking-widest uppercase transition-all shadow-lg ${
+                isCurrentStanceEquipped 
+                  ? 'bg-gray-900 text-gray-600 border border-gray-800 cursor-not-allowed' 
+                  : 'bg-white text-black hover:bg-amber-400 hover:scale-105 border border-white hover:border-amber-300 hover:shadow-[0_0_30px_rgba(251,191,36,0.6)] active:scale-95'
+              }`}
+            >
+              {isCurrentStanceEquipped ? 'STANCE ACTIVE' : 'EQUIP STANCE'}
+            </button>
+          </div>
+
           <div className="overflow-x-auto overflow-y-hidden w-full pt-10 pb-20 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
             <div 
               className="relative mx-auto" 
@@ -426,31 +430,6 @@ export const TalentsView: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Floating Action Bar at the Bottom */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center">
-         <div className="bg-black/80 backdrop-blur-xl border border-gray-700 p-2 pl-6 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex items-center gap-6 group/fab">
-            <div className="flex items-center gap-3">
-              {currentStanceConfig?.icon}
-              <div className="flex flex-col">
-                <span className="text-xs text-gray-400 font-bold uppercase tracking-widest">{currentStanceConfig?.name}</span>
-                <span className="text-[10px] text-gray-500 hidden md:block">{currentStanceConfig?.desc}</span>
-              </div>
-            </div>
-            
-            <button 
-              onClick={handleEquipStance}
-              disabled={isCurrentStanceEquipped}
-              className={`px-8 py-3 rounded-full text-sm font-black tracking-widest uppercase transition-all shadow-lg ${
-                isCurrentStanceEquipped 
-                  ? 'bg-gray-900 text-gray-600 border border-gray-800 cursor-not-allowed' 
-                  : 'bg-white text-black hover:bg-amber-400 hover:scale-105 border border-white hover:border-amber-300 hover:shadow-[0_0_30px_rgba(251,191,36,0.6)] active:scale-95'
-              }`}
-            >
-              {isCurrentStanceEquipped ? 'Active' : 'Equip Stance'}
-            </button>
-         </div>
       </div>
 
     </div>
