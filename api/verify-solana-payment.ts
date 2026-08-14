@@ -166,6 +166,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(400).json({ error: 'Transaction failed on Solana blockchain.' });
           }
 
+          const accountKeys = tx.transaction?.message?.accountKeys || [];
+          const senderPubkeyStr = typeof accountKeys[0] === 'string' ? accountKeys[0] : (accountKeys[0]?.pubkey ? accountKeys[0].pubkey.toString() : String(accountKeys[0]));
+          if (senderPubkeyStr !== walletAddress) {
+            return res.status(400).json({ error: 'Transaction sender mismatch. This transaction belongs to another wallet.' });
+          }
+
           const expectedLamports = Math.floor(pkg.solCost * 1_000_000_000);
           let validTransferFound = false;
 
