@@ -169,50 +169,74 @@ export const HeroInventoryView: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Equipment Panel */}
-        <div className="md:col-span-7 bg-[#151a21] border border-purple-900/30 rounded-3xl p-6 relative overflow-hidden gothic-glow-purple">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.05),transparent_70%)] pointer-events-none" />
-          
-          <h3 className="font-display font-black text-xl text-purple-300 tracking-widest mb-6 text-center border-b border-purple-900/50 pb-4">
-            EQUIPPED RELICS
-          </h3>
-
-          <div className="flex justify-center items-center h-64 relative">
-            {/* Center Avatar silhouette or logo */}
-            <div className="w-24 h-32 bg-black/40 border border-white/5 rounded-xl absolute flex items-center justify-center">
-              <UserCircle2 className="w-12 h-12 text-gray-700" />
-            </div>
-
-            {/* Equipment Grid Layout */}
-            <div className="grid grid-cols-2 gap-x-28 gap-y-4 absolute z-10">
-              <div className="flex flex-col gap-4">
-                {renderEquipmentBox(eqHelmet, 'helmet')}
-                {renderEquipmentBox(eqWeapon, 'weapon')}
-                {renderEquipmentBox(eqRing, 'ring')}
-              </div>
-              <div className="flex flex-col gap-4">
-                {renderEquipmentBox(eqAmulet, 'amulet')}
-                {renderEquipmentBox(eqArmor, 'armor')}
-                {renderEquipmentBox(eqBoots, 'boots')}
-              </div>
-            </div>
+        {/* Right Panel */}
+        <div className="md:col-span-7 flex flex-col gap-4">
+          {/* Sub-Tab Navigation */}
+          <div className="flex gap-2">
+            <button 
+              onClick={() => setSubTab('equipment')}
+              className={`flex-1 py-3 rounded-xl font-display font-bold tracking-widest text-sm transition-all ${subTab === 'equipment' ? 'bg-purple-900/40 text-purple-300 border border-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.2)]' : 'bg-black/40 text-gray-500 border border-transparent hover:bg-black/60'}`}
+            >
+              EQUIPMENT
+            </button>
+            <button 
+              onClick={() => setSubTab('talents')}
+              className={`flex-1 py-3 rounded-xl font-display font-bold tracking-widest text-sm transition-all ${subTab === 'talents' ? 'bg-amber-900/40 text-amber-400 border border-amber-500/50 shadow-[0_0_15px_rgba(251,191,36,0.2)]' : 'bg-black/40 text-gray-500 border border-transparent hover:bg-black/60'}`}
+            >
+              TALENTS
+            </button>
           </div>
 
-          {selectedSlot && profile.equipped[selectedSlot] && (
-            <div className="mt-8 flex justify-center">
-              <button 
-                onClick={() => unequipItem(selectedSlot)}
-                className="bg-red-900/40 hover:bg-red-900/80 text-red-400 border border-red-500/30 px-6 py-2 rounded-lg font-mono text-xs uppercase tracking-widest transition-all"
-              >
-                Unequip {selectedSlot}
-              </button>
+          {subTab === 'equipment' ? (
+            <div className="bg-[#151a21] border border-purple-900/30 rounded-3xl p-6 relative overflow-hidden gothic-glow-purple">
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.05),transparent_70%)] pointer-events-none" />
+              
+              <h3 className="font-display font-black text-xl text-purple-300 tracking-widest mb-6 text-center border-b border-purple-900/50 pb-4">
+                EQUIPPED RELICS
+              </h3>
+
+              <div className="flex justify-center items-center h-64 relative">
+                {/* Center Avatar silhouette or logo */}
+                <div className="w-24 h-32 bg-black/40 border border-white/5 rounded-xl absolute flex items-center justify-center">
+                  <UserCircle2 className="w-12 h-12 text-gray-700" />
+                </div>
+
+                {/* Equipment Grid Layout */}
+                <div className="grid grid-cols-2 gap-x-28 gap-y-4 absolute z-10">
+                  <div className="flex flex-col gap-4">
+                    {renderEquipmentBox(eqHelmet, 'helmet')}
+                    {renderEquipmentBox(eqWeapon, 'weapon')}
+                    {renderEquipmentBox(eqRing, 'ring')}
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    {renderEquipmentBox(eqAmulet, 'amulet')}
+                    {renderEquipmentBox(eqArmor, 'armor')}
+                    {renderEquipmentBox(eqBoots, 'boots')}
+                  </div>
+                </div>
+              </div>
+
+              {selectedSlot && profile.equipped[selectedSlot] && (
+                <div className="mt-8 flex justify-center relative z-20">
+                  <button 
+                    onClick={() => unequipItem(selectedSlot)}
+                    className="bg-red-900/40 hover:bg-red-900/80 text-red-400 border border-red-500/30 px-6 py-2 rounded-lg font-mono text-xs uppercase tracking-widest transition-all"
+                  >
+                    Unequip {selectedSlot}
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="bg-[#151a21] border border-amber-900/30 rounded-3xl p-6 relative overflow-hidden">
+               <TalentsView />
             </div>
           )}
         </div>
       </div>
 
       {/* Inventory Panel */}
-      {renderInventoryList()}
+      {subTab === 'equipment' && renderInventoryList()}
 
     </div>
   );
