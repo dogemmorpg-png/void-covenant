@@ -283,6 +283,18 @@ function MainAppContent() {
             <span className="text-[10px] font-display font-bold tracking-wider">LORD</span>
           </button>
 
+          {/* Talents Tab */}
+          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('talents'); }}
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
+              activeTab === 'talents'
+                ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <Sparkles className="w-5 h-5" />
+            <span className="text-[10px] font-display font-bold tracking-wider">TALENTS</span>
+          </button>
+
           {/* Altar Gacha Tab */}
           <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('altar'); }}
             className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
