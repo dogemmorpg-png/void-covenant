@@ -41,6 +41,7 @@ interface GameContextType {
   registerPlayer: (username: string, avatarUrl: string) => void;
   logoutPlayer: () => void;
   resetProfile: () => void;
+  updateProfile: (updates: Partial<PlayerProfile>) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -733,6 +734,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     window.location.reload();
   };
 
+  const updateProfile = (updates: Partial<PlayerProfile>) => {
+    setProfile(current => {
+      const updated = { ...current, ...updates };
+      saveProfile(updated);
+      return updated;
+    });
+  };
+
   return (
     <GameContext.Provider
       value={{
@@ -771,7 +780,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addReferral,
         registerPlayer,
         logoutPlayer,
-        resetProfile
+        resetProfile,
+        updateProfile
       }}
     >
       {children}

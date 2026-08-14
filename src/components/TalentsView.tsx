@@ -69,7 +69,7 @@ export const TalentsView: React.FC = () => {
     toast('Talents reset successfully.', 'success');
   };
 
-  const renderStanceColumn = (stance: TalentStance, title: string, icon: React.ReactNode, colorClass: string) => {
+  const renderStanceColumn = (stance: TalentStance, title: string, icon: React.ReactNode, colorClass: string, description: string) => {
     const stanceNodes = TALENT_TREES.filter(t => t.stance === stance);
     const isEquipped = activeStance === stance;
 
@@ -80,6 +80,9 @@ export const TalentsView: React.FC = () => {
             {icon}
           </div>
           <h3 className={`font-display font-bold text-lg ${colorClass}`}>{title}</h3>
+          <p className="text-xs text-gray-400 leading-relaxed px-2 min-h-[48px] flex items-center justify-center">
+            {description}
+          </p>
           <button 
             onClick={() => handleEquipStance(stance)}
             disabled={isEquipped}
@@ -165,9 +168,9 @@ export const TalentsView: React.FC = () => {
 
       {/* Talent Trees */}
       <div className="flex flex-col md:flex-row gap-6">
-        {renderStanceColumn('void_strike', 'Void Strike', <Zap className="w-8 h-8 text-purple-400" />, 'text-purple-400')}
-        {renderStanceColumn('blood_aura', 'Blood Aura', <Activity className="w-8 h-8 text-red-400" />, 'text-red-400')}
-        {renderStanceColumn('warlord_cry', "Warlord's Cry", <Flame className="w-8 h-8 text-amber-500" />, 'text-amber-500')}
+        {renderStanceColumn('void_strike', 'Void Strike', <Zap className="w-8 h-8 text-purple-400" />, 'text-purple-400', '10% chance on attack to strike with Void energy, dealing 1 bonus damage.')}
+        {renderStanceColumn('blood_aura', 'Blood Aura', <Activity className="w-8 h-8 text-red-400" />, 'text-red-400', '15% chance on attack to siphon life, healing a random damaged ally card for 1 HP.')}
+        {renderStanceColumn('warlord_cry', "Warlord's Cry", <Flame className="w-8 h-8 text-amber-500" />, 'text-amber-500', '10% chance on attack to roar, giving a random ally card +1 Attack for 1 turn.')}
       </div>
     </div>
   );
