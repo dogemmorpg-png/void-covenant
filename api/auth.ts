@@ -46,7 +46,21 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(401).json({ error: 'Invalid signature' });
     }
 
-    // Signature is valid. Issue JWT token.
+    // Parse timestamp from message to prevent replay attacks
+    const timestampMatch = message.match(/Timestamp:\s*(\d+)/);
+    if (!timestampMatch) {
+      return res.status(401).json({ error: 'Invalid message format (missing timestamp)' });
+    }
+    
+    const signedTimestamp = parseInt(timestampMatch[1], 10);
+    const now = Date.now();
+    const FIVE_MINUTES = 5 * 60 * 1000;
+    
+    if (now - signedTimestamp > FIVE_MINUTES || signedTimestamp - now > 60000) {
+      return res.status(401).json({ error: 'Signature expired (replay attack prevention)' });
+    }
+
+    // Signature is valid and recent. Issue JWT token.
     const token = jwt.sign({ walletAddress: publicKey, wallet: publicKey }, JWT_SECRET, { expiresIn: '7d' });
 
     res.status(200).json({ token });

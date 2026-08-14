@@ -116,19 +116,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const walletAddress = decoded.walletAddress || decoded.wallet;
-    const { packType, numCards = 3 } = req.body;
+    const { packType } = req.body;
+    let numCards = 3;
+    if (packType === 'obsidian') numCards = 5;
+    if (packType === 'abyssal') numCards = 5;
 
     const supabase = getSupabase();
 
-    const { data: profileData, error: profileError } = await supabase
+    const { data: profileRow, error: profileError } = await supabase
       .from('profiles')
-      .select('data')
+      .select('data, updated_at')
       .eq('wallet_address', walletAddress)
       .single();
 
     let profile: PlayerProfile;
+    let oldUpdatedAt = profileRow ? profileRow.updated_at : null;
 
-    if (profileError || !profileData) {
+    if (profileError || !profileRow) {
       profile = {
         gold: 1000,
         dust: 250,
@@ -168,7 +172,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       } as any;
       await supabase.from('profiles').upsert({ wallet_address: walletAddress, data: profile });
     } else {
-      profile = profileData.data;
+      profile = profileRow.data;
     }
 
     let goldCost = 0;
@@ -205,14 +209,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     profile = calculateEnergy(profile);
 
-    const { error: updateError } = await supabase
+    const newUpdatedAt = new Date().toISOString();
+    let updateQuery = supabase
       .from('profiles')
-      .update({ data: profile, updated_at: new Date().toISOString() })
+      .update({ data: profile, updated_at: newUpdatedAt })
       .eq('wallet_address', walletAddress);
+      
+    if (oldUpdatedAt) {
+      updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
+    }
 
-    if (updateError) {
-      console.error('Update error in gacha.ts:', updateError);
-      return res.status(500).json({ error: 'Failed to update database' });
+    const { data: updateResult, error: updateError } = await updateQuery.select('id');
+
+    if (updateError || !updateResult || updateResult.length === 0) {
+      console.error('Race condition or update error in gacha.ts:', updateError);
+      return res.status(409).json({ error: 'Conflict: Please try again' });
     }
 
     return res.status(200).json({ success: true, profile, newItems });
