@@ -219,7 +219,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
     }
 
-    const { data: updateResult, error: updateError } = await updateQuery.select('id');
+    const { data: updateResult, error: updateError } = await updateQuery.select('wallet_address');
 
     if (updateError || !updateResult || updateResult.length === 0) {
       console.error('Race condition or update error in gacha.ts:', updateError);

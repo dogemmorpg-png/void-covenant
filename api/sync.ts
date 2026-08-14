@@ -249,7 +249,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         isRegistered: false
       };
       // Prevent creating duplicates by checking again or using insert
-      const { data: existingCheck } = await supabase.from('profiles').select('id').eq('wallet_address', walletAddress).limit(1);
+      const { data: existingCheck } = await supabase.from('profiles').select('wallet_address').eq('wallet_address', walletAddress).limit(1);
       if (!existingCheck || existingCheck.length === 0) {
         const { error: insertError } = await supabase.from('profiles').insert({ wallet_address: walletAddress, data: currentProfile });
         if (insertError) {
@@ -282,7 +282,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (oldUpdatedAt) {
       updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
     }
-    const { data: updateResult, error: updateError } = await updateQuery.select('id');
+    const { data: updateResult, error: updateError } = await updateQuery.select('wallet_address');
     if (updateError || !updateResult || updateResult.length === 0) {
       console.error('Sync API OCC conflict');
       return res.status(409).json({ error: 'Conflict: Please try again' });
