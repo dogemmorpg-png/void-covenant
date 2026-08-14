@@ -46,9 +46,13 @@ export const TalentsView: React.FC = () => {
     }
 
     if (node.requires && node.requires.length > 0) {
-      const hasReq = node.requires.every(reqId => (profile.talents?.[reqId] || 0) > 0);
+      const hasReq = node.requires.every(reqId => {
+        const reqNode = TALENT_TREES.find(n => n.id === reqId);
+        const reqLvl = profile.talents?.[reqId] || 0;
+        return node.requireMax ? reqLvl >= (reqNode?.maxLevel || 1) : reqLvl > 0;
+      });
       if (!hasReq) {
-        toast('You must unlock the required previous talents first.', 'error');
+        toast(node.requireMax ? 'You must MAX OUT the required previous talents first.' : 'You must unlock the required previous talents first.', 'error');
         return;
       }
     }
@@ -182,7 +186,7 @@ export const TalentsView: React.FC = () => {
                     const reqLevel = profile.talents?.[reqNode.id] || 0;
                     
                     const isFullyUnlocked = currentLevel > 0;
-                    const isAvailable = reqLevel > 0; 
+                    const isAvailable = node.requireMax ? reqLevel >= reqNode.maxLevel : reqLevel > 0; 
 
                     let strokeColor = '#1f2937'; // gray-800
                     let strokeWidth = 2;
@@ -224,7 +228,11 @@ export const TalentsView: React.FC = () => {
                 
                 let isLocked = false;
                 if (node.requires) {
-                   isLocked = !node.requires.every(req => (profile.talents?.[req] || 0) > 0);
+                   isLocked = !node.requires.every(req => {
+                     const reqNode = activeNodes.find(n => n.id === req);
+                     const reqLevel = profile.talents?.[req] || 0;
+                     return node.requireMax ? reqLevel >= (reqNode?.maxLevel || 1) : reqLevel > 0;
+                   });
                 }
 
                 // Node size

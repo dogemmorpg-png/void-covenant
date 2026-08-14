@@ -10,7 +10,8 @@ export interface TalentNode {
   description: (level: number) => string;
   maxLevel: number;
   cost: number;
-  requires?: string[]; // IDs of nodes that must have at least 1 point to unlock
+  requires?: string[]; // IDs of nodes that must be unlocked to purchase
+  requireMax?: boolean; // If true, dependencies in 'requires' must be at max level
 }
 
 export const TALENT_TREES: TalentNode[] = [
@@ -20,26 +21,26 @@ export const TALENT_TREES: TalentNode[] = [
   {
     id: 'void_base', stance: 'void_strike', tier: 1, col: 0,
     name: 'Void Attunement',
-    description: (lvl) => `+${lvl * 1.5}% chance to trigger Void Strike (Base: 10%).`,
-    maxLevel: 5, cost: 1
+    description: (lvl) => `+${lvl * 1.5}% chance to trigger Void Strike (Base: 25%).`,
+    maxLevel: 20, cost: 1
   },
   {
     id: 'void_dmg', stance: 'void_strike', tier: 2, col: -1,
     name: 'Dark Matter',
     description: (lvl) => `Void Strike base damage increased by +${lvl}.`,
-    maxLevel: 3, cost: 2, requires: ['void_base']
+    maxLevel: 10, cost: 2, requires: ['void_base']
   },
   {
     id: 'void_chain', stance: 'void_strike', tier: 2, col: 1,
     name: 'Chain Lightning',
-    description: (lvl) => `${lvl * 8}% chance to hit a second random target.`,
-    maxLevel: 3, cost: 2, requires: ['void_base']
+    description: (lvl) => `${lvl * 3}% chance to hit a second random target.`,
+    maxLevel: 10, cost: 2, requires: ['void_base']
   },
   {
     id: 'void_pierce', stance: 'void_strike', tier: 3, col: 0,
     name: 'Armor Piercing',
     description: () => `Void Strike damage ignores enemy Ward and Armor entirely.`,
-    maxLevel: 1, cost: 4, requires: ['void_dmg', 'void_chain']
+    maxLevel: 1, cost: 4, requires: ['void_dmg', 'void_chain'], requireMax: true
   },
   {
     id: 'void_execute', stance: 'void_strike', tier: 4, col: -1,
@@ -159,9 +160,9 @@ export function getTalentStats(talents: Record<string, number> = {}, stance: Tal
   
   if (stance === 'void_strike') {
     return {
-      triggerChance: 10 + (getLvl('void_base') * 1.5),
+      triggerChance: 25 + (getLvl('void_base') * 1.5),
       baseDamage: 1 + getLvl('void_dmg'),
-      chainChance: getLvl('void_chain') * 8,
+      chainChance: getLvl('void_chain') * 3,
       pierce: getLvl('void_pierce') > 0,
       executeDamage: getLvl('void_execute') * 2,
       leechPercent: getLvl('void_leech') * 15,
