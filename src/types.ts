@@ -76,7 +76,9 @@ export interface PlayerProfile {
   exp: number;
   campaignStars: Record<string, number>; // stageId -> stars
   equipment: Equipment[];
-  equipped: Partial<Record<EquipmentSlot, string>>; // slot -> equipment id
+  equipped: Partial<Record<EquipmentSlot, string>>;
+  talents?: Record<string, number>;
+  activeStance?: string; // slot -> equipment id
   isPremiumBP?: boolean;
   username?: string;
   avatarUrl?: string;

@@ -272,6 +272,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (safeProfileData.isRegistered !== undefined) currentProfile.isRegistered = safeProfileData.isRegistered;
       if (safeProfileData.username) currentProfile.username = safeProfileData.username;
       if (safeProfileData.avatarUrl) currentProfile.avatarUrl = safeProfileData.avatarUrl;
+      if (safeProfileData.talents) currentProfile.talents = safeProfileData.talents;
+      if (safeProfileData.activeStance) currentProfile.activeStance = safeProfileData.activeStance;
     }
 
     const newUpdatedAt = new Date().toISOString();

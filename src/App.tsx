@@ -11,6 +11,7 @@ import { BattlePassView } from './components/BattlePassView';
 import { BattleFieldView } from './components/BattleFieldView';
 import { PvpArenaView } from './components/PvpArenaView';
 import { HeroInventoryView } from './components/HeroInventoryView';
+import { TalentsView } from './components/TalentsView';
 import { CampaignStage } from './types';
 import { Swords, FolderGit, Sparkles, Wallet, Award, Trophy, UserCircle2 } from 'lucide-react';
 import { BATTLE_PASS_TIERS, AIRDROP_TASKS } from './data/cards';
@@ -31,7 +32,7 @@ function MainAppContent() {
   const [isSigning, setIsSigning] = useState(false);
   
   // Tab states
-  const [activeTab, setActiveTab] = useState<'campaign' | 'pvp' | 'collection' | 'hero' | 'altar' | 'airdrop' | 'battlepass'>('campaign');
+  const [activeTab, setActiveTab] = useState<'campaign' | 'pvp' | 'collection' | 'hero' | 'talents' | 'altar' | 'airdrop' | 'battlepass'>('campaign');
   
   // Active Battle stage state
   const [activeBattleStage, setActiveBattleStage] = useState<CampaignStage | null>(null);
@@ -223,6 +224,7 @@ function MainAppContent() {
           )}
           {activeTab === 'collection' && <CollectionDeckView />}
           {activeTab === 'hero' && <HeroInventoryView />}
+          {activeTab === 'talents' && <TalentsView />}
           {activeTab === 'altar' && <GachaStoreView />}
           {activeTab === 'airdrop' && <AirdropHubView />}
           {activeTab === 'battlepass' && <BattlePassView />}

@@ -73,7 +73,34 @@ const getTierTextColor = (tier: string) => {
 
 const getSkillBadgeStyle = (type: string) => {
   switch (type?.toLowerCase()) {
-    case 'sacrifice': return 'bg-red-950/50 border-red-900/50 text-red-400';
+            case 'hero_skill': {
+          stepDescription = `Commander uses ${step.stance.replace('_', ' ').toUpperCase()}!`;
+          if (step.stance === 'void_strike') {
+            audioSystem.playAttack();
+            if (step.targetSlot !== undefined) {
+              const targetCard = copy.enemyBoard[step.targetSlot];
+              if (targetCard) targetCard.health -= step.damage;
+              setAnimatingSlot({ side: 'enemy', slot: step.targetSlot, type: 'damage' });
+            }
+          } else if (step.stance === 'blood_aura') {
+            audioSystem.playHeal();
+            if (step.targetSlot !== undefined) {
+              const targetCard = copy.playerBoard[step.targetSlot];
+              if (targetCard) targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + step.heal);
+              setAnimatingSlot({ side: 'player', slot: step.targetSlot, type: 'heal' });
+            }
+          } else if (step.stance === 'warlord_cry') {
+            audioSystem.playHeal(); // maybe buff sound
+            if (step.targetSlot !== undefined) {
+              const targetCard = copy.playerBoard[step.targetSlot];
+              if (targetCard) targetCard.attack += 1;
+              setAnimatingSlot({ side: 'player', slot: step.targetSlot, type: 'heal' });
+            }
+          }
+          break;
+        }
+
+        case 'sacrifice': return 'bg-red-950/50 border-red-900/50 text-red-400';
     case 'vampirism': return 'bg-rose-950/50 border-rose-900/50 text-rose-300';
     case 'hex': return 'bg-purple-950/50 border-purple-900/50 text-purple-300';
     case 'plague': return 'bg-emerald-950/50 border-emerald-900/50 text-emerald-300';
@@ -83,7 +110,34 @@ const getSkillBadgeStyle = (type: string) => {
 
 const getSkillIcon = (type: string) => {
   switch (type?.toLowerCase()) {
-    case 'sacrifice': return <Skull className="w-5 h-5 inline-block" />;
+            case 'hero_skill': {
+          stepDescription = `Commander uses ${step.stance.replace('_', ' ').toUpperCase()}!`;
+          if (step.stance === 'void_strike') {
+            audioSystem.playAttack();
+            if (step.targetSlot !== undefined) {
+              const targetCard = copy.enemyBoard[step.targetSlot];
+              if (targetCard) targetCard.health -= step.damage;
+              setAnimatingSlot({ side: 'enemy', slot: step.targetSlot, type: 'damage' });
+            }
+          } else if (step.stance === 'blood_aura') {
+            audioSystem.playHeal();
+            if (step.targetSlot !== undefined) {
+              const targetCard = copy.playerBoard[step.targetSlot];
+              if (targetCard) targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + step.heal);
+              setAnimatingSlot({ side: 'player', slot: step.targetSlot, type: 'heal' });
+            }
+          } else if (step.stance === 'warlord_cry') {
+            audioSystem.playHeal(); // maybe buff sound
+            if (step.targetSlot !== undefined) {
+              const targetCard = copy.playerBoard[step.targetSlot];
+              if (targetCard) targetCard.attack += 1;
+              setAnimatingSlot({ side: 'player', slot: step.targetSlot, type: 'heal' });
+            }
+          }
+          break;
+        }
+
+        case 'sacrifice': return <Skull className="w-5 h-5 inline-block" />;
     case 'vampirism': return <Flame className="w-5 h-5 inline-block" />;
     case 'hex': return <Zap className="w-4 h-4 inline-block text-purple-400 mx-0.5" />;
     case 'plague': return <Activity className="w-5 h-5 inline-block" />;
@@ -93,7 +147,34 @@ const getSkillIcon = (type: string) => {
 
 const getSkillNameEnglish = (type: string) => {
   switch (type?.toLowerCase()) {
-    case 'sacrifice': return 'Sacrifice';
+            case 'hero_skill': {
+          stepDescription = `Commander uses ${step.stance.replace('_', ' ').toUpperCase()}!`;
+          if (step.stance === 'void_strike') {
+            audioSystem.playAttack();
+            if (step.targetSlot !== undefined) {
+              const targetCard = copy.enemyBoard[step.targetSlot];
+              if (targetCard) targetCard.health -= step.damage;
+              setAnimatingSlot({ side: 'enemy', slot: step.targetSlot, type: 'damage' });
+            }
+          } else if (step.stance === 'blood_aura') {
+            audioSystem.playHeal();
+            if (step.targetSlot !== undefined) {
+              const targetCard = copy.playerBoard[step.targetSlot];
+              if (targetCard) targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + step.heal);
+              setAnimatingSlot({ side: 'player', slot: step.targetSlot, type: 'heal' });
+            }
+          } else if (step.stance === 'warlord_cry') {
+            audioSystem.playHeal(); // maybe buff sound
+            if (step.targetSlot !== undefined) {
+              const targetCard = copy.playerBoard[step.targetSlot];
+              if (targetCard) targetCard.attack += 1;
+              setAnimatingSlot({ side: 'player', slot: step.targetSlot, type: 'heal' });
+            }
+          }
+          break;
+        }
+
+        case 'sacrifice': return 'Sacrifice';
     case 'vampirism': return 'Vampirism';
     case 'hex': return 'Hex';
     case 'plague': return 'Plague';
@@ -103,7 +184,34 @@ const getSkillNameEnglish = (type: string) => {
 
 const getSkillDescEnglish = (type: string, value: number) => {
   switch (type?.toLowerCase()) {
-    case 'sacrifice': return `Ally sacrifice: destroys a random friendly creature on play, healing your Lord by +${value} HP and permanently buffing stats by +${Math.round(value/2)} ATK and +${value} HP.`;
+            case 'hero_skill': {
+          stepDescription = `Commander uses ${step.stance.replace('_', ' ').toUpperCase()}!`;
+          if (step.stance === 'void_strike') {
+            audioSystem.playAttack();
+            if (step.targetSlot !== undefined) {
+              const targetCard = copy.enemyBoard[step.targetSlot];
+              if (targetCard) targetCard.health -= step.damage;
+              setAnimatingSlot({ side: 'enemy', slot: step.targetSlot, type: 'damage' });
+            }
+          } else if (step.stance === 'blood_aura') {
+            audioSystem.playHeal();
+            if (step.targetSlot !== undefined) {
+              const targetCard = copy.playerBoard[step.targetSlot];
+              if (targetCard) targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + step.heal);
+              setAnimatingSlot({ side: 'player', slot: step.targetSlot, type: 'heal' });
+            }
+          } else if (step.stance === 'warlord_cry') {
+            audioSystem.playHeal(); // maybe buff sound
+            if (step.targetSlot !== undefined) {
+              const targetCard = copy.playerBoard[step.targetSlot];
+              if (targetCard) targetCard.attack += 1;
+              setAnimatingSlot({ side: 'player', slot: step.targetSlot, type: 'heal' });
+            }
+          }
+          break;
+        }
+
+        case 'sacrifice': return `Ally sacrifice: destroys a random friendly creature on play, healing your Lord by +${value} HP and permanently buffing stats by +${Math.round(value/2)} ATK and +${value} HP.`;
     case 'vampirism': return `Heals this card by +${value} HP every time it deals damage to the enemy opposite.`;
     case 'hex': return `Hexes the opposite card, increasing all next incoming damage by +${value}.`;
     case 'plague': return `Spreads plague at the end of each turn, dealing -${value} HP to a random living enemy card.`;
@@ -293,6 +401,33 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
       
       switch (step.type) {
+                case 'hero_skill': {
+          stepDescription = `Commander uses ${step.stance.replace('_', ' ').toUpperCase()}!`;
+          if (step.stance === 'void_strike') {
+            audioSystem.playAttack();
+            if (step.targetSlot !== undefined) {
+              const targetCard = copy.enemyBoard[step.targetSlot];
+              if (targetCard) targetCard.health -= step.damage;
+              setAnimatingSlot({ side: 'enemy', slot: step.targetSlot, type: 'damage' });
+            }
+          } else if (step.stance === 'blood_aura') {
+            audioSystem.playHeal();
+            if (step.targetSlot !== undefined) {
+              const targetCard = copy.playerBoard[step.targetSlot];
+              if (targetCard) targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + step.heal);
+              setAnimatingSlot({ side: 'player', slot: step.targetSlot, type: 'heal' });
+            }
+          } else if (step.stance === 'warlord_cry') {
+            audioSystem.playHeal(); // maybe buff sound
+            if (step.targetSlot !== undefined) {
+              const targetCard = copy.playerBoard[step.targetSlot];
+              if (targetCard) targetCard.attack += 1;
+              setAnimatingSlot({ side: 'player', slot: step.targetSlot, type: 'heal' });
+            }
+          }
+          break;
+        }
+
         case 'sacrifice': {
           const placingCard = copy.playerBoard[step.slot];
           const sacrCard = copy.playerBoard[step.targetSlot];
@@ -454,7 +589,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     if (battle.playerBoard[slotIndex] !== null) return; 
     
     setIsSimulating(true);
-    const { nextState, animateSequence: steps } = simulateCombatTurn(battle, selectedHandCardId, slotIndex);
+    const { nextState, animateSequence: steps } = simulateCombatTurn(battle, selectedHandCardId, slotIndex, profile);
     
     setFinalBattleState(nextState);
     setSelectedHandCardId(null);
@@ -464,7 +599,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   // Handle End Turn click
   const handleEndTurnWithoutCard = () => {
     setIsSimulating(true);
-    const { nextState, animateSequence: steps } = simulateCombatTurn(battle, null, null);
+    const { nextState, animateSequence: steps } = simulateCombatTurn(battle, null, null, profile);
     
     setFinalBattleState(nextState);
     setupPlaybackState(null, null, steps);
