@@ -49,7 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Fetch profile
     const { data: profileRows, error: fetchError } = await supabase
       .from('profiles')
-      .select('data')
+      .select('data, updated_at')
       .eq('wallet_address', walletAddress)
       .limit(1);
 
@@ -60,6 +60,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     let profile: PlayerProfile;
+    let oldUpdatedAt = profileRow ? profileRow.updated_at : null;
 
     if (!profileRow) {
       profile = {
@@ -228,10 +229,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     profile = calculateEnergy(profile);
 
-    const { error: updateError } = await supabase
+    const newUpdatedAt = new Date().toISOString();
+    let updateQuery = supabase
       .from('profiles')
-      .update({ data: profile, updated_at: new Date().toISOString() })
+      .update({ data: profile, updated_at: newUpdatedAt })
       .eq('wallet_address', walletAddress);
+
+    if (oldUpdatedAt) {
+      updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
+    }
+
+    const { data: updateResult, error: updateError } = await updateQuery.select('wallet_address');
+
+    if (updateError || !updateResult || updateResult.length === 0) {
+      console.error('Fusion OCC conflict');
+      return res.status(409).json({ error: 'Conflict: Please try again' });
+    }
 
     if (updateError) {
       console.error('Fusion update error:', updateError);

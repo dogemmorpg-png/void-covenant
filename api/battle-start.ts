@@ -43,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     const { data: profileRow, error: fetchError } = await supabase
       .from('profiles')
-      .select('data')
+      .select('data, updated_at')
       .eq('wallet_address', walletAddress)
       .single();
 
@@ -52,20 +52,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const profile = profileRow.data;
-    const oldVersion = profile.version;
+    const oldUpdatedAt = profileRow.updated_at;
     
     profile.lastBattleTimestamp = Date.now();
-    profile.version = (oldVersion || 0) + 1;
+    
 
     let updateQuery = supabase
       .from('profiles')
       .update({ data: profile, updated_at: new Date().toISOString() })
       .eq('wallet_address', walletAddress);
 
-    if (oldVersion === undefined) {
-      updateQuery = updateQuery.is('data->>version', null);
-    } else {
-      updateQuery = updateQuery.eq('data->>version', oldVersion.toString());
+    if (oldUpdatedAt) {
+      updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
     }
 
     const { data: updateData, error: updateError } = await updateQuery.select('wallet_address');
