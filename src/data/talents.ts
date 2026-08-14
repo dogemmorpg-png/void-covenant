@@ -108,49 +108,49 @@ export const TALENT_TREES: TalentNode[] = [
   },
 
   // ==============================
-  // --- WARLORD'S CRY (Utility) ---
+  // --- WARLORD'S CRY (AoE Buff) ---
   // ==============================
   {
     id: 'war_base', stance: 'warlord_cry', tier: 1, col: 0,
     name: 'Warlord Attunement',
-    description: (lvl) => `+${lvl * 1.5}% chance to trigger Warlord's Cry (Base: 10%).`,
-    maxLevel: 5, cost: 1
+    description: (lvl) => `+${lvl * 1.5}% chance to trigger Warlord's Cry (Base: 25%).`,
+    maxLevel: 20, cost: 1
   },
   {
     id: 'war_atk', stance: 'warlord_cry', tier: 2, col: -1,
     name: 'Battle Fervor',
-    description: (lvl) => `The Attack buff is increased by +${lvl} (Base is +1).`,
-    maxLevel: 3, cost: 2, requires: ['war_base']
+    description: (lvl) => `Grants ALL ally cards +${lvl} bonus Attack.`,
+    maxLevel: 10, cost: 2, requires: ['war_base']
   },
   {
-    id: 'war_momentum', stance: 'warlord_cry', tier: 2, col: 1,
-    name: 'Momentum',
-    description: (lvl) => `${lvl * 15}% chance to also reduce the target's Delay by 1.`,
-    maxLevel: 3, cost: 2, requires: ['war_base']
+    id: 'war_armor', stance: 'warlord_cry', tier: 2, col: 1,
+    name: 'Phalanx',
+    description: (lvl) => `Also grants ALL ally cards +${lvl} Armor.`,
+    maxLevel: 10, cost: 2, requires: ['war_base']
   },
   {
     id: 'war_duration', stance: 'warlord_cry', tier: 3, col: 0,
     name: 'Lasting Inspiration',
-    description: () => `The Attack buff lasts for 2 turns instead of 1.`,
-    maxLevel: 1, cost: 4, requires: ['war_atk', 'war_momentum']
+    description: () => `The Attack and Armor buffs last for 2 turns instead of 1.`,
+    maxLevel: 1, cost: 4, requires: ['war_atk', 'war_armor'], requireMax: true
   },
   {
-    id: 'war_priority', stance: 'warlord_cry', tier: 4, col: -1,
-    name: 'Tactical Priority',
-    description: () => `Always prioritizes targeting ally cards that have Delay 0.`,
-    maxLevel: 1, cost: 3, requires: ['war_duration']
+    id: 'war_momentum', stance: 'warlord_cry', tier: 4, col: -1,
+    name: 'Momentum',
+    description: (lvl) => `${lvl * 33}% chance to also reduce the Delay of all allies by 1.`,
+    maxLevel: 3, cost: 3, requires: ['war_duration']
   },
   {
-    id: 'war_rally', stance: 'warlord_cry', tier: 4, col: 1,
+    id: 'war_heal', stance: 'warlord_cry', tier: 4, col: 1,
     name: 'Rallying Cry',
-    description: (lvl) => `Also grants +${lvl} Armor to the target for the buff duration.`,
+    description: (lvl) => `Heals all ally cards for ${lvl} HP when triggered.`,
     maxLevel: 3, cost: 3, requires: ['war_duration']
   },
   {
     id: 'war_ultimate', stance: 'warlord_cry', tier: 5, col: 0,
     name: 'Unstoppable Force',
-    description: () => `The Warlord's Cry buffs become permanent for the rest of the battle.`,
-    maxLevel: 1, cost: 6, requires: ['war_priority', 'war_rally']
+    description: () => `The Attack and Armor buffs become permanent for the rest of the battle.`,
+    maxLevel: 1, cost: 6, requires: ['war_momentum', 'war_heal'], requireMax: true
   }
 ];
 
@@ -182,12 +182,12 @@ export function getTalentStats(talents: Record<string, number> = {}, stance: Tal
   }
   if (stance === 'warlord_cry') {
     return {
-      triggerChance: 10 + (getLvl('war_base') * 1.5),
+      triggerChance: 25 + (getLvl('war_base') * 1.5),
       bonusAtk: 1 + getLvl('war_atk'),
-      momentumChance: getLvl('war_momentum') * 15,
+      bonusArmor: getLvl('war_armor'),
       durationTurns: getLvl('war_duration') > 0 ? 2 : 1,
-      priorityReady: getLvl('war_priority') > 0,
-      bonusArmor: getLvl('war_rally'),
+      momentumChance: getLvl('war_momentum') * 33,
+      aoeHeal: getLvl('war_heal'),
       permanent: getLvl('war_ultimate') > 0,
     };
   }
