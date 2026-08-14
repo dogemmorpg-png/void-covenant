@@ -28,7 +28,16 @@ export const TalentsView: React.FC = () => {
   if (!profile) return null;
 
   const totalPoints = Math.max(0, profile.level - 1);
-  const spentPoints = Object.values(profile.talents || {}).reduce((sum, val) => sum + val, 0);
+  
+  // Calculate spent points ONLY for the currently active tab (stance)
+  const spentPoints = Object.entries(profile.talents || {}).reduce((sum, [nodeId, val]) => {
+    const node = TALENT_TREES.find(n => n.id === nodeId);
+    if (node && node.stance === activeTab) {
+      return sum + val;
+    }
+    return sum;
+  }, 0);
+  
   const availablePoints = totalPoints - spentPoints;
 
   const handlePurchase = (nodeId: string) => {
@@ -74,12 +83,22 @@ export const TalentsView: React.FC = () => {
       return;
     }
     if (spentPoints === 0) {
-      toast('You have not spent any points yet.', 'info');
+      toast(`You have not spent any points in ${currentStanceConfig?.name} yet.`, 'info');
       return;
     }
-    const newProfile = { ...profile, gold: profile.gold - 500, talents: {} };
+    
+    // Only reset talents for the active tab
+    const newTalents = { ...profile.talents };
+    for (const key in newTalents) {
+      const node = TALENT_TREES.find(n => n.id === key);
+      if (node && node.stance === activeTab) {
+        delete newTalents[key];
+      }
+    }
+
+    const newProfile = { ...profile, gold: profile.gold - 500, talents: newTalents };
     updateProfile(newProfile);
-    toast('Talents reset successfully.', 'success');
+    toast(`${currentStanceConfig?.name} talents reset successfully.`, 'success');
   };
 
   const activeNodes = TALENT_TREES.filter(t => t.stance === activeTab);
@@ -410,8 +429,8 @@ export const TalentsView: React.FC = () => {
       </div>
 
       {/* Floating Action Bar at the Bottom */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
-         <div className="pointer-events-auto bg-black/80 backdrop-blur-xl border border-gray-700 p-2 pl-6 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex items-center gap-6 group/fab">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center">
+         <div className="bg-black/80 backdrop-blur-xl border border-gray-700 p-2 pl-6 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex items-center gap-6 group/fab">
             <div className="flex items-center gap-3">
               {currentStanceConfig?.icon}
               <div className="flex flex-col">
