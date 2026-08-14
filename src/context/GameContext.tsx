@@ -617,6 +617,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const goldReward = 50 + floorNum * 10;
         const dustReward = 10;
         
+        updated.pveEnergy = Math.max(0, (updated.pveEnergy || 0) - (payload?.energyCost || 3));
         updated.gold = (updated.gold || 0) + goldReward;
         updated.dust = (updated.dust || 0) + dustReward;
         updated.battlePassPoints = (updated.battlePassPoints || 0) + 50;
@@ -721,10 +722,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (updated) {
-      const updatedProfile = { ...profile, collection: newCollection };
-      setProfile(updatedProfile);
-      saveProfile(updatedProfile);
-    }
+        const updatedProfile = { ...profile, collection: newCollection };
+        setProfile(updatedProfile);
+        // Do not call saveProfile here to avoid OCC conflicts right after gacha
+      }
   }, [profile.collection.length]); // Only run on mount or length change
 
   const resetProfile = () => {
