@@ -4,7 +4,7 @@ import * as jwtPkg from 'jsonwebtoken';
 const jwt = (jwtPkg as any).default || jwtPkg;
 import { createClient } from '@supabase/supabase-js';
 import { PlayerProfile } from './_shared/types.js';
-import { CARD_TEMPLATES, createCardInstance, generateCampaignStage, BATTLE_PASS_TIERS } from './_shared/cards.js';
+import { CARD_TEMPLATES, createCardInstance, generateCampaignStage, BATTLE_PASS_TIERS, AIRDROP_TASKS } from './_shared/cards.js';
 import { calculateEnergy, processExpGain } from './_shared/energyHelper.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
@@ -158,6 +158,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     } else if (action === 'buy_shards') {
       const { solAmount } = payload;
+      if (solAmount <= 0 || isNaN(solAmount)) return res.status(400).json({ error: 'Invalid amount' });
       if (!profile.solBalance || profile.solBalance < solAmount) {
         return res.status(400).json({ error: 'Not enough SOL balance' });
       }
