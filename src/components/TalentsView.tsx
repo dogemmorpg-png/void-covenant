@@ -5,8 +5,8 @@ import { TALENT_TREES, TalentStance } from '../data/talents';
 import { Zap, Activity, Flame, Lock, Plus, Star } from 'lucide-react';
 
 const STANCES: { id: TalentStance; name: string; icon: React.ReactNode; color: string; desc: string }[] = [
-  { id: 'void_strike', name: 'Void Strike', icon: <Zap className="w-6 h-6" />, color: 'text-purple-400', desc: '10% chance to deal 1 bonus damage.' },
-  { id: 'blood_aura', name: 'Blood Aura', icon: <Activity className="w-6 h-6" />, color: 'text-red-400', desc: '15% chance to heal an ally for 1 HP.' },
+  { id: 'void_strike', name: 'Void Strike', icon: <Zap className="w-6 h-6" />, color: 'text-purple-400', desc: '25% chance to deal 1 bonus damage.' },
+  { id: 'blood_aura', name: 'Blood Aura', icon: <Activity className="w-6 h-6" />, color: 'text-red-400', desc: '25% chance to heal an ally for 1 HP.' },
   { id: 'warlord_cry', name: "Warlord's Cry", icon: <Flame className="w-6 h-6" />, color: 'text-amber-500', desc: '10% chance to buff an ally with +1 Atk.' },
 ];
 

@@ -67,26 +67,26 @@ export const TALENT_TREES: TalentNode[] = [
   {
     id: 'blood_base', stance: 'blood_aura', tier: 1, col: 0,
     name: 'Blood Attunement',
-    description: (lvl) => `+${lvl * 2}% chance to trigger Blood Aura (Base: 15%).`,
-    maxLevel: 5, cost: 1
+    description: (lvl) => `+${lvl * 1.5}% chance to trigger Blood Aura (Base: 25%).`,
+    maxLevel: 20, cost: 1
   },
   {
     id: 'blood_heal', stance: 'blood_aura', tier: 2, col: -1,
     name: 'Vitality',
     description: (lvl) => `Base healing amount increased by +${lvl}.`,
-    maxLevel: 3, cost: 2, requires: ['blood_base']
+    maxLevel: 10, cost: 2, requires: ['blood_base']
   },
   {
     id: 'blood_cleanse', stance: 'blood_aura', tier: 2, col: 1,
     name: 'Purity',
-    description: (lvl) => `${lvl * 25}% chance to cleanse Poison/Hex from the target.`,
-    maxLevel: 3, cost: 2, requires: ['blood_base']
+    description: (lvl) => `${lvl * 3}% chance to cleanse Poison/Hex from the target.`,
+    maxLevel: 10, cost: 2, requires: ['blood_base']
   },
   {
     id: 'blood_ward', stance: 'blood_aura', tier: 3, col: 0,
     name: 'Blood Ward',
     description: () => `The healed target also gains Ward 1 (Shields against the next hit).`,
-    maxLevel: 1, cost: 4, requires: ['blood_heal', 'blood_cleanse']
+    maxLevel: 1, cost: 4, requires: ['blood_heal', 'blood_cleanse'], requireMax: true
   },
   {
     id: 'blood_overflow', stance: 'blood_aura', tier: 4, col: -1,
@@ -171,9 +171,9 @@ export function getTalentStats(talents: Record<string, number> = {}, stance: Tal
   }
   if (stance === 'blood_aura') {
     return {
-      triggerChance: 15 + (getLvl('blood_base') * 2),
+      triggerChance: 25 + (getLvl('blood_base') * 1.5),
       baseHealing: 1 + getLvl('blood_heal'),
-      cleanseChance: getLvl('blood_cleanse') * 25,
+      cleanseChance: getLvl('blood_cleanse') * 3,
       ward: getLvl('blood_ward') > 0,
       overflowPercent: getLvl('blood_overflow') * 33,
       bonusMaxHp: getLvl('blood_shield'),
