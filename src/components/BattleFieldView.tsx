@@ -175,6 +175,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
   const [showLogDrawer, setShowLogDrawer] = useState<boolean>(false);
   const [screenShake, setScreenShake] = useState<boolean>(false);
+  const [hoveredHandCardIndex, setHoveredHandCardIndex] = useState<number | null>(null);
 
   // Track the final target battle state once the calculation resolves
   const [finalBattleState, setFinalBattleState] = useState<BattleState | null>(null);
@@ -615,7 +616,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     <div className="h-screen max-h-screen overflow-hidden bg-[#06070a] text-gray-200 p-2 md:p-3 font-sans flex flex-col justify-between select-none relative">
       
       {/* Header Bar */}
-      <div className="bg-[#151a21]/90 border border-[#ebd09b]/10 rounded-lg p-1.5 px-3 flex justify-between items-center max-w-5xl mx-auto w-full mb-2 shadow-md h-[40px] shrink-0">
+      <div className="bg-[#151a21]/90 border border-[#ebd09b]/10 rounded-lg p-1.5 px-3 flex justify-between items-center max-w-7xl mx-auto w-full mb-2 shadow-md h-[40px] shrink-0">
         <button
           onClick={() => {
             if (window.confirm('Are you sure you want to escape? Energy will not be refunded.')) {
@@ -649,8 +650,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         </div>
       </div>
 
-      {/* Main Container */}
-      <div className={`max-w-5xl mx-auto w-full flex-1 flex flex-col justify-between relative min-h-0 pb-16 ${screenShake ? 'animate-shake' : ''}`}>
+      {/* Main Container - expanded to max-w-7xl */}
+      <div className={`max-w-7xl mx-auto w-full flex-1 flex flex-col justify-between relative min-h-0 pb-16 ${screenShake ? 'animate-shake' : ''}`}>
         
         {/* Battle Arena */}
         <div 
@@ -759,11 +760,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             )}
           </AnimatePresence>
 
-          {/* BOARD STAGE FIELD (LINEAR DUELS) */}
+          {/* BOARD STAGE FIELD (LINEAR DUELS) - cards and slots increased size */}
           <div className="flex-1 flex flex-col justify-around my-2 min-h-0 relative">
             
             {/* 1. ENEMY BOARD */}
-            <div className="grid grid-cols-5 gap-2 md:gap-3 relative">
+            <div className="grid grid-cols-5 gap-3 relative">
               <div className="absolute inset-x-0 -bottom-2 h-[1px] bg-red-950/25" />
               {visualState.enemyBoard.map((card, idx) => {
                 const isActing = animatingSlot?.side === 'enemy' && animatingSlot?.slot === idx && animatingSlot?.type === 'strike';
@@ -773,7 +774,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 const side = 'enemy';
 
                 return (
-                  <div key={idx} className="relative aspect-[3/4.1] max-h-[135px] max-w-[95px] mx-auto w-full shrink-0">
+                  <div key={idx} className="relative aspect-[3/4.1] max-h-[165px] max-w-[120px] mx-auto w-full shrink-0">
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       {renderFloatingTextsFor({ side: 'enemy', slot: idx })}
                     </div>
@@ -801,7 +802,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         }}
                         className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 text-center relative overflow-visible select-none transition-all bg-[#151a21] text-white cursor-help shadow-lg`}
                       >
-                        {/* Card Background & Artwork inside wrapper for rounded overflow-hidden */}
+                        {/* Card Background & Artwork */}
                         <div className="absolute inset-0 rounded-xl overflow-hidden z-0 pointer-events-none">
                           <div className={`absolute inset-0 opacity-[0.06] bg-gradient-to-br ${getTierBgGradient(card.tier)}`} />
                           {card.image.startsWith('/cards/') && (
@@ -839,7 +840,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         )}
 
                         <div className="mt-0.5 z-10 relative">
-                          <span className="text-[8.5px] font-display font-black tracking-tight text-white block truncate leading-none">
+                          <span className="text-[9.5px] font-display font-black tracking-tight text-white block truncate leading-none">
                             {card.name}
                           </span>
                         </div>
@@ -863,19 +864,18 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           />
                         </div>
 
-                        {/* Blank space for overlapping badges */}
                         <div className="h-2 z-10 relative" />
 
                         {/* Overlapping Badges on Corners */}
-                        <div className="absolute -bottom-2 -left-2 w-6.5 h-6.5 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border border-[#151a21] flex items-center justify-center shadow-md z-20">
-                          <span className="text-white text-[9px] font-black font-mono">⚔️{card.attack}</span>
+                        <div className="absolute -bottom-2 -left-2 w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-2 border-[#151a21] flex items-center justify-center shadow-md z-20">
+                          <span className="text-white text-[10px] font-black font-mono">⚔️{card.attack}</span>
                         </div>
-                        <div className="absolute -bottom-2 -right-2 w-6.5 h-6.5 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-red-700 border border-[#151a21] flex items-center justify-center shadow-md z-20">
-                          <span className="text-white text-[9px] font-black font-mono">❤️{card.health}</span>
+                        <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-red-700 border-2 border-[#151a21] flex items-center justify-center shadow-md z-20">
+                          <span className="text-white text-[10px] font-black font-mono">❤️{card.health}</span>
                         </div>
                       </motion.div>
                     ) : (
-                      // Empty Slot styled beautifully
+                      // Empty Slot
                       <div className="w-full h-full rounded-xl border border-white/5 bg-black/40 flex flex-col items-center justify-center relative shadow-inner group hover:border-[#ebd09b]/25 transition-all duration-300">
                         <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none" />
                         <Swords className="w-4 h-4 text-gray-800 group-hover:text-gray-700 transition-colors" />
@@ -948,7 +948,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             </div>
 
             {/* 2. PLAYER BOARD */}
-            <div className="grid grid-cols-5 gap-2 md:gap-3 relative">
+            <div className="grid grid-cols-5 gap-3 relative">
               <div className="absolute inset-x-0 -top-2 h-[1px] bg-cyan-950/25" />
               {visualState.playerBoard.map((card, idx) => {
                 const canPlace = selectedHandCardId && card === null && !isSimulating;
@@ -959,7 +959,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 const side = 'player';
 
                 return (
-                  <div key={idx} className="relative aspect-[3/4.1] max-h-[135px] max-w-[95px] mx-auto w-full shrink-0">
+                  <div key={idx} className="relative aspect-[3/4.1] max-h-[165px] max-w-[120px] mx-auto w-full shrink-0">
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       {renderFloatingTextsFor({ side: 'player', slot: idx })}
                     </div>
@@ -1015,17 +1015,17 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                         {/* Centered top status badge */}
                         {card.delay > 0 ? (
-                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-cyan-400 to-blue-600 border border-cyan-300 rounded-full px-1.5 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-bold text-white shadow-md z-20 animate-pulse">
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-cyan-400 to-blue-600 border border-cyan-300 rounded-full px-1.5 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-black text-white shadow-md z-20 animate-pulse">
                             ⏳{card.delay}
                           </div>
                         ) : (
-                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-emerald-500 to-green-700 border border-emerald-300 rounded-full w-4 h-4 flex items-center justify-center text-[7px] font-mono font-bold text-white shadow-md z-20 animate-bounce">
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-emerald-500 to-green-700 border border-emerald-300 rounded-full w-4 h-4 flex items-center justify-center text-[7px] font-mono font-black text-white shadow-md z-20 animate-bounce">
                             ⚔️
                           </div>
                         )}
 
                         <div className="mt-0.5 z-10 relative">
-                          <span className="text-[8.5px] font-display font-black tracking-tight text-white block truncate leading-none">
+                          <span className="text-[9.5px] font-display font-black tracking-tight text-white block truncate leading-none">
                             {card.name}
                           </span>
                         </div>
@@ -1049,19 +1049,18 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           />
                         </div>
 
-                        {/* Blank space for overlapping badges */}
                         <div className="h-2 z-10 relative" />
 
                         {/* Overlapping Badges on Corners */}
-                        <div className="absolute -bottom-2 -left-2 w-6.5 h-6.5 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border border-[#151a21] flex items-center justify-center shadow-md z-20">
-                          <span className="text-white text-[9px] font-black font-mono">⚔️{card.attack}</span>
+                        <div className="absolute -bottom-2 -left-2 w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-2 border-[#151a21] flex items-center justify-center shadow-md z-20">
+                          <span className="text-white text-[10px] font-black font-mono">⚔️{card.attack}</span>
                         </div>
-                        <div className="absolute -bottom-2 -right-2 w-6.5 h-6.5 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-red-700 border border-[#151a21] flex items-center justify-center shadow-md z-20">
-                          <span className="text-white text-[9px] font-black font-mono">❤️{card.health}</span>
+                        <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-red-700 border-2 border-[#151a21] flex items-center justify-center shadow-md z-20">
+                          <span className="text-white text-[10px] font-black font-mono">❤️{card.health}</span>
                         </div>
                       </motion.div>
                     ) : (
-                      // Empty Slot styled beautifully
+                      // Empty Slot
                       <div 
                         onClick={() => canPlace && handlePlayCard(idx)}
                         className={`w-full h-full rounded-xl border flex flex-col items-center justify-center relative shadow-inner group transition-all duration-300 ${
@@ -1375,49 +1374,66 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           )}
         </AnimatePresence>
 
-        {/* PLAYER HAND FAN ZONE (Raise cards bottom coordinate, expand cards width/height for premium visibility) */}
+        {/* PLAYER HAND FAN ZONE - animated interactively using state-driven slide-aside positioning */}
         <div className="absolute bottom-[-15px] left-1/2 -translate-x-1/2 flex justify-center items-end h-[140px] z-40 select-none pointer-events-none w-[520px]">
           <div className="flex justify-center items-end relative w-full h-full pointer-events-auto">
             {visualState.playerHand.map((card, idx) => {
               const isSelected = selectedHandCardId === card.id;
               
-              // Hearthstone/Spellstone fan spacing
+              // Spacing spread calculations
               const totalHand = visualState.playerHand.length;
               const middle = (totalHand - 1) / 2;
               const offset = idx - middle;
               const rotate = offset * 5; 
+              
+              let translateX = offset * 45;
               // Push cards slightly down when not hovered, but raise them so they are readable
-              const translateY = Math.abs(offset) * 5 + (isSelected ? -25 : 35);
-              const translateX = offset * 45;
+              let translateY = Math.abs(offset) * 5 + (isSelected ? -25 : 35);
+              let scale = 1.0;
+              let zIndex = 10 + idx;
+
+              // If a card is hovered, slide other cards aside (Hearthstone style)
+              if (hoveredHandCardIndex !== null) {
+                if (hoveredHandCardIndex === idx) {
+                  translateY = -55;
+                  scale = 1.45;
+                  zIndex = 100;
+                } else if (idx < hoveredHandCardIndex) {
+                  translateX -= 30; // Slide left
+                } else if (idx > hoveredHandCardIndex) {
+                  translateX += 30; // Slide right
+                }
+              }
 
               return (
                 <motion.div
                   key={card.id}
-                  style={{
-                    position: 'absolute',
-                    bottom: '0px',
-                    left: 'calc(50% - 48px)',
-                    width: '96px',
-                    height: '135px',
-                    transformOrigin: 'bottom center',
-                    transform: `translateX(${translateX}px) translateY(${translateY}px) rotate(${rotate}deg)`,
-                    zIndex: isSelected ? 45 : 10 + idx,
+                  animate={{
+                    x: translateX,
+                    y: translateY,
+                    scale: scale,
+                    rotate: hoveredHandCardIndex === idx ? 0 : rotate,
+                    zIndex: zIndex
                   }}
-                  whileHover={!isSimulating ? {
-                    y: -65,
-                    scale: 1.4,
-                    rotate: 0,
-                    zIndex: 100,
-                    transition: { duration: 0.18, ease: 'easeOut' }
-                  } : {}}
+                  transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 22
+                  }}
                   onClick={() => {
                     if (!isSimulating) {
                       setSelectedHandCardId(isSelected ? null : card.id);
                     }
                   }}
-                  onMouseEnter={() => setHoveredCard(card as any)}
-                  onMouseLeave={() => setHoveredCard(null)}
-                  className={`rounded-xl border flex flex-col justify-between p-1.5 text-center cursor-pointer transition-shadow bg-[#151a21] text-white select-none overflow-visible shadow-lg ${
+                  onMouseEnter={() => {
+                    setHoveredHandCardIndex(idx);
+                    setHoveredCard(card as any);
+                  }}
+                  onMouseLeave={() => {
+                    setHoveredHandCardIndex(null);
+                    setHoveredCard(null);
+                  }}
+                  className={`absolute bottom-[0px] left-[calc(50%-48px)] w-[96px] h-[135px] origin-bottom rounded-xl border flex flex-col justify-between p-1.5 text-center cursor-pointer transition-shadow bg-[#151a21] text-white select-none overflow-visible shadow-lg ${
                     isSelected 
                       ? 'border-[#66fcf1] shadow-[0_0_15px_rgba(102,252,241,0.6)]' 
                       : 'border-gray-800 hover:border-gray-600'
