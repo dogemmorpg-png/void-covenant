@@ -650,17 +650,20 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       </div>
 
       {/* Main Container */}
-      <div className={`max-w-5xl mx-auto w-full flex-1 flex flex-col justify-between relative min-h-0 pb-20 ${screenShake ? 'animate-shake' : ''}`}>
+      <div className={`max-w-5xl mx-auto w-full flex-1 flex flex-col justify-between relative min-h-0 pb-16 ${screenShake ? 'animate-shake' : ''}`}>
         
         {/* Battle Arena */}
-        <div className="flex-1 flex flex-col justify-between bg-gradient-to-b from-[#0b0c10] to-[#06070a] border border-[#c5a880]/15 rounded-2xl p-3 md:p-4 shadow-2xl relative min-h-0 overflow-hidden">
+        <div 
+          style={{ background: 'radial-gradient(circle at center, #161c2a 0%, #07090f 70%, #030406 100%)' }}
+          className="flex-1 flex flex-col justify-between border-2 border-[#ebd09b]/20 rounded-2xl p-3 md:p-4 shadow-[0_0_30px_rgba(0,0,0,0.8),_inset_0_0_40px_rgba(235,208,155,0.05)] relative min-h-0 overflow-hidden"
+        >
           
           {/* ENEMY HERO ZONE */}
-          <div className="flex justify-between items-center bg-black/35 border border-red-950/40 p-2 rounded-xl mb-2 relative overflow-hidden h-[44px] shrink-0">
+          <div className="flex justify-between items-center bg-black/30 border border-red-950/40 p-2 rounded-xl mb-2 relative overflow-hidden h-[44px] shrink-0">
             <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-red-900/10 to-transparent pointer-events-none" />
             
             <div className="flex items-center gap-2 relative z-10">
-              <div className="w-8 h-8 rounded-full bg-[#4e0707] border border-[#dd2c40]/40 flex items-center justify-center shadow-inner relative overflow-hidden shrink-0">
+              <div className="w-8 h-10 rounded-b-full rounded-t-xl bg-[#4e0707] border-2 border-[#dd2c40] flex items-center justify-center shadow-[0_0_12px_rgba(221,44,64,0.4)] relative overflow-hidden shrink-0">
                 {renderFloatingTextsFor('enemy-hero')}
                 {stage.enemyHeroImage?.startsWith('/') ? (
                   <img src={stage.enemyHeroImage} alt="Enemy Hero" className="w-full h-full object-cover" />
@@ -757,7 +760,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           </AnimatePresence>
 
           {/* BOARD STAGE FIELD (LINEAR DUELS) */}
-          <div className="flex-1 flex flex-col justify-around my-2 min-h-0">
+          <div className="flex-1 flex flex-col justify-around my-2 min-h-0 relative">
             
             {/* 1. ENEMY BOARD */}
             <div className="grid grid-cols-5 gap-2 md:gap-3 relative">
@@ -775,101 +778,110 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       {renderFloatingTextsFor({ side: 'enemy', slot: idx })}
                     </div>
                     
-                    <motion.div
-                      onMouseEnter={() => card && setHoveredCard(card)}
-                      onMouseLeave={() => setHoveredCard(null)}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{
-                        opacity: isDeath ? 0 : 1,
-                        scale: isActing ? 1.15 : isDeath ? 0.7 : isHeal ? 1.05 : 1,
-                        y: isActing ? 30 : 0,
-                        x: isHit ? [0, -6, 6, -4, 4, 0] : 0,
-                        boxShadow: card && card.delay === 0
-                          ? "0 0 10px rgba(220, 38, 64, 0.4)"
-                          : "0 2px 4px rgba(0, 0, 0, 0.15)",
-                        borderColor: isHit ? "#ef4444" : card ? getTierBorderColor(card.tier) : "#151a21"
-                      }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 280,
-                        damping: 14,
-                        x: { duration: 0.25 }
-                      }}
-                      className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 text-center relative overflow-hidden select-none transition-all ${
-                        card
-                          ? `${card.delay > 0 ? 'brightness-[0.4] saturate-[0.6]' : ''} bg-[#151a21] text-white cursor-help shadow-md`
-                          : 'bg-black/30 border-red-950/25 border-dashed flex items-center justify-center'
-                      }`}
-                    >
-                      {card ? (
-                        <>
+                    {card ? (
+                      <motion.div
+                        onMouseEnter={() => card && setHoveredCard(card)}
+                        onMouseLeave={() => setHoveredCard(null)}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{
+                          opacity: isDeath ? 0 : 1,
+                          scale: isActing ? 1.15 : isDeath ? 0.7 : isHeal ? 1.05 : 1,
+                          y: isActing ? 30 : 0,
+                          x: isHit ? [0, -6, 6, -4, 4, 0] : 0,
+                          boxShadow: card.delay === 0
+                            ? "0 0 15px rgba(220, 38, 64, 0.4)"
+                            : "0 4px 6px rgba(0, 0, 0, 0.3)",
+                          borderColor: isHit ? "#ef4444" : getTierBorderColor(card.tier)
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 280,
+                          damping: 14,
+                          x: { duration: 0.25 }
+                        }}
+                        className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 text-center relative overflow-visible select-none transition-all bg-[#151a21] text-white cursor-help shadow-lg`}
+                      >
+                        {/* Card Background & Artwork inside wrapper for rounded overflow-hidden */}
+                        <div className="absolute inset-0 rounded-xl overflow-hidden z-0 pointer-events-none">
                           <div className={`absolute inset-0 opacity-[0.06] bg-gradient-to-br ${getTierBgGradient(card.tier)}`} />
                           {card.image.startsWith('/cards/') && (
                             <>
-                              <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 rounded-xl opacity-85" />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10 z-0 rounded-xl pointer-events-none" />
+                              <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
                             </>
                           )}
-                          
-                          {card.delay > 0 && (
-                            <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] z-20 flex flex-col items-center justify-center gap-1 pointer-events-none rounded-xl">
-                              <div className="w-7 h-7 rounded-full bg-black/80 border border-red-500/40 flex items-center justify-center shadow-[0_0_8px_rgba(239,68,68,0.3)] animate-pulse">
-                                <span className="text-red-400 font-mono text-xs font-black tracking-tighter">⏳{card.delay}</span>
-                              </div>
-                            </div>
-                          )}
+                        </div>
 
-                          <div className="flex justify-between items-center text-[6px] font-mono font-bold text-gray-500 z-10 relative">
-                            <span className={`uppercase tracking-wider ${getTierTextColor(card.tier)}`}>
-                              {card.tier}
+                        {card.delay > 0 && (
+                          <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center gap-1 pointer-events-none rounded-xl">
+                            <div className="w-7 h-7 rounded-full bg-black/85 border border-red-500/40 flex items-center justify-center shadow-[0_0_8px_rgba(239,68,68,0.3)] animate-pulse">
+                              <span className="text-red-400 font-mono text-xs font-black tracking-tighter">⏳{card.delay}</span>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex justify-between items-center text-[6px] font-mono font-bold text-gray-500 z-10 relative">
+                          <span className={`uppercase tracking-wider ${getTierTextColor(card.tier)}`}>
+                            {card.tier}
+                          </span>
+                          <span>Lvl {card.level}</span>
+                        </div>
+
+                        {/* Centered top status badge */}
+                        {card.delay > 0 ? (
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-red-600 to-red-800 border border-red-500 rounded-full px-1.5 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-bold text-white shadow-md z-20 animate-pulse">
+                            ⏳{card.delay}
+                          </div>
+                        ) : (
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-red-600 to-rose-700 border border-white rounded-full w-4 h-4 flex items-center justify-center text-[7px] font-mono font-bold text-white shadow-md z-20 animate-bounce">
+                            ⚔️
+                          </div>
+                        )}
+
+                        <div className="mt-0.5 z-10 relative">
+                          <span className="text-[8.5px] font-display font-black tracking-tight text-white block truncate leading-none">
+                            {card.name}
+                          </span>
+                        </div>
+
+                        <div className="flex flex-wrap justify-center gap-0.5 my-0.5 z-10 relative max-h-[14px] overflow-hidden">
+                          {card.skills.map((s, sIdx) => (
+                            <span
+                              key={sIdx}
+                              className={`text-[5.5px] px-0.5 py-0.2 rounded border ${getSkillBadgeStyle(s.type)}`}
+                            >
+                              {getSkillIcon(s.type)}{s.value}
                             </span>
-                            <span>Lvl {card.level}</span>
-                          </div>
+                          ))}
+                        </div>
 
-                          {card.delay > 0 ? (
-                            <div className="absolute -top-1 -right-1 bg-[#4e0707] border border-[#dd2c40] rounded-full px-1 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-bold text-white shadow animate-pulse z-20">
-                              ⏳{card.delay}
-                            </div>
-                          ) : (
-                            <div className="absolute -top-1 -right-1 bg-red-600 border border-white rounded-full w-4 h-4 flex items-center justify-center text-[7px] font-mono font-bold text-white shadow z-20 animate-bounce">
-                              ⚔️
-                            </div>
-                          )}
+                        <div className="w-full bg-black/40 h-0.5 rounded-full overflow-hidden z-10 border border-black/30 relative">
+                          <motion.div
+                            className="bg-red-500 h-full rounded-full"
+                            animate={{ width: `${(card.health / card.maxHealth) * 100}%` }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        </div>
 
-                          <div className="mt-0.5 z-10 relative">
-                            <span className="text-[8.5px] font-display font-black tracking-tight text-white block truncate leading-none">
-                              {card.name}
-                            </span>
-                          </div>
+                        {/* Blank space for overlapping badges */}
+                        <div className="h-2 z-10 relative" />
 
-                          <div className="flex flex-wrap justify-center gap-0.5 my-0.5 z-10 relative max-h-[14px] overflow-hidden">
-                            {card.skills.map((s, sIdx) => (
-                              <span
-                                key={sIdx}
-                                className={`text-[5.5px] px-0.5 py-0.2 rounded border ${getSkillBadgeStyle(s.type)}`}
-                              >
-                                {getSkillIcon(s.type)}{s.value}
-                              </span>
-                            ))}
-                          </div>
-
-                          <div className="w-full bg-black/40 h-0.5 rounded-full overflow-hidden z-10 border border-black/30 relative">
-                            <motion.div
-                              className="bg-red-500 h-full rounded-full"
-                              animate={{ width: `${(card.health / card.maxHealth) * 100}%` }}
-                              transition={{ duration: 0.3 }}
-                            />
-                          </div>
-
-                          <div className="flex justify-between items-center text-[8px] font-mono font-black pt-0.5 border-t border-gray-800/80 mt-0.5 z-10 relative">
-                            <span className="text-red-400">⚔️ {card.attack}</span>
-                            <span className="text-emerald-400">❤️ {card.health}</span>
-                          </div>
-                        </>
-                      ) : (
-                        <span className="text-[7px] font-mono text-gray-700 uppercase tracking-widest">Slot {idx+1}</span>
-                      )}
-                    </motion.div>
+                        {/* Overlapping Badges on Corners */}
+                        <div className="absolute -bottom-2 -left-2 w-6.5 h-6.5 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border border-[#151a21] flex items-center justify-center shadow-md z-20">
+                          <span className="text-white text-[9px] font-black font-mono">⚔️{card.attack}</span>
+                        </div>
+                        <div className="absolute -bottom-2 -right-2 w-6.5 h-6.5 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-red-700 border border-[#151a21] flex items-center justify-center shadow-md z-20">
+                          <span className="text-white text-[9px] font-black font-mono">❤️{card.health}</span>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      // Empty Slot styled beautifully
+                      <div className="w-full h-full rounded-xl border border-white/5 bg-black/40 flex flex-col items-center justify-center relative shadow-inner group hover:border-[#ebd09b]/25 transition-all duration-300">
+                        <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none" />
+                        <Swords className="w-4 h-4 text-gray-800 group-hover:text-gray-700 transition-colors" />
+                        <span className="text-[7px] font-mono font-bold text-gray-700 uppercase tracking-widest mt-1">Empty Slot</span>
+                      </div>
+                    )}
 
                     {/* Skill Overlay Animations */}
                     <AnimatePresence>
@@ -952,108 +964,119 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       {renderFloatingTextsFor({ side: 'player', slot: idx })}
                     </div>
                     
-                    <motion.div
-                      onMouseEnter={() => card && setHoveredCard(card)}
-                      onMouseLeave={() => setHoveredCard(null)}
-                      onClick={() => canPlace && handlePlayCard(idx)}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{
-                        opacity: isDeath ? 0 : 1,
-                        scale: isActing ? 1.15 : isDeath ? 0.7 : isHeal ? 1.05 : canPlace ? 1.02 : 1,
-                        y: isActing ? -30 : 0,
-                        x: isHit ? [0, -6, 6, -4, 4, 0] : 0,
-                        boxShadow: card && card.delay === 0
-                          ? "0 0 10px rgba(102, 252, 241, 0.4)"
-                          : canPlace
-                            ? "0 0 8px rgba(16, 185, 129, 0.3)"
-                            : "0 2px 4px rgba(0, 0, 0, 0.15)",
-                        borderColor: isHit ? "#ef4444" : canPlace ? "#10b981" : card ? getTierBorderColor(card.tier) : "#151a21"
-                      }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 280,
-                        damping: 14,
-                        x: { duration: 0.25 }
-                      }}
-                      className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 text-center relative overflow-hidden select-none transition-all ${
-                        canPlace
-                          ? 'bg-emerald-950/20 border-emerald-500/50 cursor-pointer border-dashed animate-pulse'
-                          : card
-                            ? `${card.delay > 0 ? 'brightness-[0.4] saturate-[0.6]' : ''} bg-[#151a21] text-white cursor-help shadow-md`
-                            : 'bg-black/30 border-cyan-950/20 border-dashed flex items-center justify-center'
-                      }`}
-                    >
-                      {card ? (
-                        <>
+                    {card ? (
+                      <motion.div
+                        onMouseEnter={() => card && setHoveredCard(card)}
+                        onMouseLeave={() => setHoveredCard(null)}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{
+                          opacity: isDeath ? 0 : 1,
+                          scale: isActing ? 1.15 : isDeath ? 0.7 : isHeal ? 1.05 : 1,
+                          y: isActing ? -30 : 0,
+                          x: isHit ? [0, -6, 6, -4, 4, 0] : 0,
+                          boxShadow: card.delay === 0
+                            ? "0 0 15px rgba(102, 252, 241, 0.4)"
+                            : "0 4px 6px rgba(0, 0, 0, 0.3)",
+                          borderColor: isHit ? "#ef4444" : getTierBorderColor(card.tier)
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 280,
+                          damping: 14,
+                          x: { duration: 0.25 }
+                        }}
+                        className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 text-center relative overflow-visible select-none transition-all bg-[#151a21] text-white cursor-help shadow-lg`}
+                      >
+                        {/* Card Background & Artwork */}
+                        <div className="absolute inset-0 rounded-xl overflow-hidden z-0 pointer-events-none">
                           <div className={`absolute inset-0 opacity-[0.06] bg-gradient-to-br ${getTierBgGradient(card.tier)}`} />
                           {card.image.startsWith('/cards/') && (
                             <>
-                              <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 rounded-xl opacity-85" />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10 z-0 rounded-xl pointer-events-none" />
+                              <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
                             </>
                           )}
-                          
-                          {card.delay > 0 && (
-                            <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] z-20 flex flex-col items-center justify-center gap-1 pointer-events-none rounded-xl">
-                              <div className="w-7 h-7 rounded-full bg-black/80 border border-cyan-500/40 flex items-center justify-center shadow-[0_0_8px_rgba(6,182,212,0.3)] animate-pulse">
-                                <span className="text-cyan-400 font-mono text-xs font-black tracking-tighter">⏳{card.delay}</span>
-                              </div>
-                            </div>
-                          )}
+                        </div>
 
-                          <div className="flex justify-between items-center text-[6px] font-mono font-bold text-gray-500 z-10 relative">
-                            <span className={`uppercase tracking-wider ${getTierTextColor(card.tier)}`}>
-                              {card.tier}
+                        {card.delay > 0 && (
+                          <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center gap-1 pointer-events-none rounded-xl">
+                            <div className="w-7 h-7 rounded-full bg-black/85 border border-cyan-500/40 flex items-center justify-center shadow-[0_0_8px_rgba(6,182,212,0.3)] animate-pulse">
+                              <span className="text-cyan-400 font-mono text-xs font-black tracking-tighter">⏳{card.delay}</span>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex justify-between items-center text-[6px] font-mono font-bold text-gray-500 z-10 relative">
+                          <span className={`uppercase tracking-wider ${getTierTextColor(card.tier)}`}>
+                            {card.tier}
+                          </span>
+                          <span>Lvl {card.level}</span>
+                        </div>
+
+                        {/* Centered top status badge */}
+                        {card.delay > 0 ? (
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-cyan-400 to-blue-600 border border-cyan-300 rounded-full px-1.5 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-bold text-white shadow-md z-20 animate-pulse">
+                            ⏳{card.delay}
+                          </div>
+                        ) : (
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-emerald-500 to-green-700 border border-emerald-300 rounded-full w-4 h-4 flex items-center justify-center text-[7px] font-mono font-bold text-white shadow-md z-20 animate-bounce">
+                            ⚔️
+                          </div>
+                        )}
+
+                        <div className="mt-0.5 z-10 relative">
+                          <span className="text-[8.5px] font-display font-black tracking-tight text-white block truncate leading-none">
+                            {card.name}
+                          </span>
+                        </div>
+
+                        <div className="flex flex-wrap justify-center gap-0.5 my-0.5 z-10 relative max-h-[14px] overflow-hidden">
+                          {card.skills.map((s, sIdx) => (
+                            <span
+                              key={sIdx}
+                              className={`text-[5.5px] px-0.5 py-0.2 rounded border ${getSkillBadgeStyle(s.type)}`}
+                            >
+                              {getSkillIcon(s.type)}{s.value}
                             </span>
-                            <span>Lvl {card.level}</span>
-                          </div>
+                          ))}
+                        </div>
 
-                          {card.delay > 0 ? (
-                            <div className="absolute -top-1 -right-1 bg-[#091a2f] border border-cyan-500 rounded-full px-1 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-bold text-cyan-300 shadow z-20">
-                              ⏳{card.delay}
-                            </div>
-                          ) : (
-                            <div className="absolute -top-1 -right-1 bg-emerald-600 border border-white rounded-full w-4 h-4 flex items-center justify-center text-[7px] font-mono font-bold text-white shadow z-20 animate-bounce">
-                              ⚔️
-                            </div>
-                          )}
+                        <div className="w-full bg-black/40 h-0.5 rounded-full overflow-hidden z-10 border border-black/30 relative">
+                          <motion.div
+                            className="bg-emerald-500 h-full rounded-full"
+                            animate={{ width: `${(card.health / card.maxHealth) * 100}%` }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        </div>
 
-                          <div className="mt-0.5 z-10 relative">
-                            <span className="text-[8.5px] font-display font-black tracking-tight text-white block truncate leading-none">
-                              {card.name}
-                            </span>
-                          </div>
+                        {/* Blank space for overlapping badges */}
+                        <div className="h-2 z-10 relative" />
 
-                          <div className="flex flex-wrap justify-center gap-0.5 my-0.5 z-10 relative max-h-[14px] overflow-hidden">
-                            {card.skills.map((s, sIdx) => (
-                              <span
-                                key={sIdx}
-                                className={`text-[5.5px] px-0.5 py-0.2 rounded border ${getSkillBadgeStyle(s.type)}`}
-                              >
-                                {getSkillIcon(s.type)}{s.value}
-                              </span>
-                            ))}
-                          </div>
-
-                          <div className="w-full bg-black/40 h-0.5 rounded-full overflow-hidden z-10 border border-black/30 relative">
-                            <motion.div
-                              className="bg-emerald-500 h-full rounded-full"
-                              animate={{ width: `${(card.health / card.maxHealth) * 100}%` }}
-                              transition={{ duration: 0.3 }}
-                            />
-                          </div>
-
-                          <div className="flex justify-between items-center text-[8px] font-mono font-black pt-0.5 border-t border-gray-800/80 mt-0.5 z-10 relative">
-                            <span className="text-red-400">⚔️ {card.attack}</span>
-                            <span className="text-emerald-400">❤️ {card.health}</span>
-                          </div>
-                        </>
-                      ) : (
-                        <span className="text-[7px] font-mono text-gray-700 uppercase tracking-widest">
-                          {canPlace ? 'Place 📥' : `Slot ${idx+1}`}
+                        {/* Overlapping Badges on Corners */}
+                        <div className="absolute -bottom-2 -left-2 w-6.5 h-6.5 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border border-[#151a21] flex items-center justify-center shadow-md z-20">
+                          <span className="text-white text-[9px] font-black font-mono">⚔️{card.attack}</span>
+                        </div>
+                        <div className="absolute -bottom-2 -right-2 w-6.5 h-6.5 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-red-700 border border-[#151a21] flex items-center justify-center shadow-md z-20">
+                          <span className="text-white text-[9px] font-black font-mono">❤️{card.health}</span>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      // Empty Slot styled beautifully
+                      <div 
+                        onClick={() => canPlace && handlePlayCard(idx)}
+                        className={`w-full h-full rounded-xl border flex flex-col items-center justify-center relative shadow-inner group transition-all duration-300 ${
+                          canPlace
+                            ? 'bg-emerald-950/20 border-emerald-500/50 cursor-pointer border-dashed animate-pulse'
+                            : 'bg-black/30 border-cyan-950/20 border-dashed'
+                        }`}
+                      >
+                        <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none" />
+                        <Swords className={`w-4 h-4 transition-colors ${canPlace ? 'text-emerald-400' : 'text-gray-800 group-hover:text-gray-700'}`} />
+                        <span className={`text-[7px] font-mono font-bold uppercase tracking-widest mt-1 ${canPlace ? 'text-emerald-400' : 'text-gray-700'}`}>
+                          {canPlace ? 'Place Here' : 'Empty Slot'}
                         </span>
-                      )}
-                    </motion.div>
+                      </div>
+                    )}
 
                     {/* Skill Overlay Animations */}
                     <AnimatePresence>
@@ -1137,11 +1160,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           </div>
 
           {/* PLAYER HERO ZONE & CONTROLS */}
-          <div className="flex flex-col md:flex-row justify-between items-center bg-black/35 border border-cyan-950/40 p-2 px-3 rounded-xl mt-2 gap-2 h-[48px] shrink-0 relative z-30">
+          <div className="flex justify-between items-center bg-black/40 border border-cyan-950/40 p-2 px-4 rounded-xl mt-2 h-[48px] shrink-0 relative z-30">
             
-            {/* Player Profile Hero */}
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-[#151a21] border border-[#66fcf1]/40 flex items-center justify-center shadow-inner relative overflow-hidden shrink-0">
+            {/* Left: Player Profile Hero */}
+            <div className="flex items-center gap-2 w-1/3">
+              <div className="w-8 h-10 rounded-b-full rounded-t-xl bg-[#151a21] border-2 border-[#66fcf1] flex items-center justify-center shadow-[0_0_12px_rgba(102,252,241,0.4)] relative overflow-hidden shrink-0">
                 {renderFloatingTextsFor('player-hero')}
                 {profile.avatarUrl ? (
                   <img src={profile.avatarUrl} alt="Hero Avatar" className="w-full h-full object-cover" />
@@ -1155,50 +1178,67 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               </div>
             </div>
 
-            {/* End Turn / Skip buttons */}
-            <div className="flex items-center gap-2">
-              {!selectedHandCardId && (
-                <button
-                  disabled={isSimulating}
-                  onClick={handleEndTurnWithoutCard}
-                  className="bg-gradient-to-r from-teal-900 to-[#1f2833] hover:from-[#45a29e] hover:to-teal-900 border border-[#66fcf1]/40 text-[#66fcf1] text-[10px] font-display font-black py-1.5 px-4 rounded-lg shadow transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none cursor-pointer h-[32px] flex items-center justify-center"
-                >
-                  ⏳ PLAY TURN
-                </button>
-              )}
-
-              {selectedHandCardId && (
-                <div className="flex items-center gap-1.5">
-                  <p className="text-[10px] font-bold text-amber-200 bg-amber-900/40 border border-amber-500/50 rounded px-2 py-1 animate-pulse leading-none">
-                    📥 Select empty slot
-                  </p>
-                  <button
-                    onClick={() => setSelectedHandCardId(null)}
-                    className="bg-[#4e0707] hover:bg-[#880d1e] border border-[#dd2c40]/40 text-[#dd2c40] text-[9px] font-mono font-bold py-1 px-2.5 rounded transition-all cursor-pointer h-[28px]"
-                  >
-                    ✕ CANCEL
-                  </button>
-                </div>
-              )}
+            {/* Center: Empty to leave space for the fanned hand */}
+            <div className="w-1/3 flex justify-center">
             </div>
 
-            {/* Player HP bar */}
-            <div className="text-right space-y-0.5 font-mono w-40 md:w-56">
-              <div className="flex justify-between text-[10px] font-bold text-[#66fcf1] leading-none">
-                <span>Health:</span>
-                <span>{visualState.playerHeroHealth} / {visualState.playerHeroMaxHealth} HP</span>
+            {/* Right: HP Bar & Play Turn Button */}
+            <div className="flex items-center gap-3 w-1/3 justify-end">
+              <div className="text-right space-y-0.5 font-mono w-28 md:w-36 shrink-0">
+                <div className="flex justify-between text-[10px] font-bold text-[#66fcf1] leading-none">
+                  <span>Health:</span>
+                  <span>{visualState.playerHeroHealth} / {visualState.playerHeroMaxHealth} HP</span>
+                </div>
+                <div className="w-full bg-cyan-950/30 h-1.5 rounded-full border border-[#66fcf1]/20 overflow-hidden">
+                  <motion.div
+                    className="bg-[#66fcf1] h-full rounded-full"
+                    animate={{ width: `${Math.max(0, (visualState.playerHeroHealth / visualState.playerHeroMaxHealth) * 100)}%` }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </div>
               </div>
-              <div className="w-full bg-cyan-950/30 h-1.5 rounded-full border border-[#66fcf1]/20 overflow-hidden">
-                <motion.div
-                  className="bg-[#66fcf1] h-full rounded-full"
-                  animate={{ width: `${Math.max(0, (visualState.playerHeroHealth / visualState.playerHeroMaxHealth) * 100)}%` }}
-                  transition={{ duration: 0.3 }}
-                />
+
+              {/* Play Turn Button */}
+              <div className="shrink-0">
+                {!selectedHandCardId && (
+                  <button
+                    disabled={isSimulating}
+                    onClick={handleEndTurnWithoutCard}
+                    className="bg-gradient-to-r from-teal-900 to-[#1f2833] hover:from-[#4df030] hover:to-teal-900 border border-[#66fcf1]/40 hover:border-emerald-500/60 text-[#66fcf1] hover:text-white text-[9px] md:text-[10px] font-display font-black py-1 px-3 rounded-lg shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none cursor-pointer h-[32px] flex items-center justify-center"
+                  >
+                    ⏳ PLAY
+                  </button>
+                )}
+
+                {selectedHandCardId && (
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setSelectedHandCardId(null)}
+                      className="bg-[#4e0707] hover:bg-[#880d1e] border border-[#dd2c40]/40 text-[#dd2c40] text-[8px] font-mono font-bold py-1 px-2 rounded cursor-pointer h-[28px] flex items-center justify-center"
+                    >
+                      ✕ CANCEL
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
         </div>
+
+        {/* Selected Card Deploy Prompt Overlay */}
+        <AnimatePresence>
+          {selectedHandCardId && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              className="absolute bottom-[20%] left-1/2 -translate-x-1/2 bg-amber-950/90 border border-amber-500/50 rounded-xl px-4 py-2 text-xs font-bold text-amber-200 shadow-[0_0_20px_rgba(235,208,155,0.4)] z-30 animate-pulse pointer-events-none flex items-center gap-2"
+            >
+              <span>📥</span> Select an empty slot on the board to deploy card
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Collapsible log button */}
         <button
@@ -1335,39 +1375,40 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           )}
         </AnimatePresence>
 
-        {/* PLAYER HAND FAN ZONE */}
-        <div className="absolute bottom-[-10px] left-1/2 -translate-x-1/2 flex justify-center items-end h-[100px] z-40 select-none pointer-events-none w-[480px]">
+        {/* PLAYER HAND FAN ZONE (Raise cards bottom coordinate, expand cards width/height for premium visibility) */}
+        <div className="absolute bottom-[-15px] left-1/2 -translate-x-1/2 flex justify-center items-end h-[140px] z-40 select-none pointer-events-none w-[520px]">
           <div className="flex justify-center items-end relative w-full h-full pointer-events-auto">
             {visualState.playerHand.map((card, idx) => {
               const isSelected = selectedHandCardId === card.id;
               
-              // Spellstone fan style
+              // Hearthstone/Spellstone fan spacing
               const totalHand = visualState.playerHand.length;
               const middle = (totalHand - 1) / 2;
               const offset = idx - middle;
-              const rotate = offset * 6; // 6 degrees step
-              const translateY = Math.abs(offset) * 4 + (isSelected ? -25 : 0);
-              const translateX = offset * 32;
+              const rotate = offset * 5; 
+              // Push cards slightly down when not hovered, but raise them so they are readable
+              const translateY = Math.abs(offset) * 5 + (isSelected ? -25 : 35);
+              const translateX = offset * 45;
 
               return (
                 <motion.div
                   key={card.id}
                   style={{
                     position: 'absolute',
-                    bottom: '15px',
-                    left: 'calc(50% - 40px)',
-                    width: '80px',
-                    height: '110px',
+                    bottom: '0px',
+                    left: 'calc(50% - 48px)',
+                    width: '96px',
+                    height: '135px',
                     transformOrigin: 'bottom center',
                     transform: `translateX(${translateX}px) translateY(${translateY}px) rotate(${rotate}deg)`,
                     zIndex: isSelected ? 45 : 10 + idx,
                   }}
                   whileHover={!isSimulating ? {
-                    y: -40,
-                    scale: 1.3,
+                    y: -65,
+                    scale: 1.4,
                     rotate: 0,
-                    zIndex: 50,
-                    transition: { duration: 0.15, ease: 'easeOut' }
+                    zIndex: 100,
+                    transition: { duration: 0.18, ease: 'easeOut' }
                   } : {}}
                   onClick={() => {
                     if (!isSimulating) {
@@ -1376,25 +1417,39 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   }}
                   onMouseEnter={() => setHoveredCard(card as any)}
                   onMouseLeave={() => setHoveredCard(null)}
-                  className={`rounded-lg border flex flex-col justify-between p-1.5 text-center cursor-pointer transition-shadow bg-[#151a21] text-white select-none ${
+                  className={`rounded-xl border flex flex-col justify-between p-1.5 text-center cursor-pointer transition-shadow bg-[#151a21] text-white select-none overflow-visible shadow-lg ${
                     isSelected 
-                      ? 'border-[#66fcf1] shadow-[0_0_12px_rgba(102,252,241,0.5)]' 
-                      : 'border-gray-800 hover:border-gray-600 shadow-md'
+                      ? 'border-[#66fcf1] shadow-[0_0_15px_rgba(102,252,241,0.6)]' 
+                      : 'border-gray-800 hover:border-gray-600'
                   }`}
                 >
                   <>
-                    <div className={`absolute inset-0 opacity-[0.05] bg-gradient-to-br ${getTierBgGradient(card.tier)}`} />
-                    {card.image.startsWith('/cards/') && (
-                      <>
-                        <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 rounded-lg opacity-85" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10 z-0 rounded-lg pointer-events-none" />
-                      </>
-                    )}
+                    {/* Card background/image wrapper to prevent bleeding */}
+                    <div className="absolute inset-0 rounded-xl overflow-hidden z-0 pointer-events-none">
+                      <div className={`absolute inset-0 opacity-[0.05] bg-gradient-to-br ${getTierBgGradient(card.tier)}`} />
+                      {card.image.startsWith('/cards/') && (
+                        <>
+                          <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
+                        </>
+                      )}
+                    </div>
                     
                     <div className="flex justify-between items-center text-[6px] font-mono font-bold text-gray-500 z-10 relative">
                       <span className={`${getTierTextColor(card.tier)}`}>{card.tier}</span>
                       <span>Lvl {card.level}</span>
                     </div>
+
+                    {/* Delay top status badge */}
+                    {card.delay > 0 ? (
+                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-cyan-400 to-blue-600 border border-cyan-300 rounded-full px-1.5 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-black text-white shadow-md z-20 animate-pulse leading-none">
+                        ⏳{card.delay}
+                      </div>
+                    ) : (
+                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-emerald-500 to-green-700 border border-[#66fcf1] rounded-full px-1.5 py-0.2 flex items-center justify-center text-[7px] font-mono font-black text-white shadow-md z-20 animate-pulse leading-none">
+                        READY
+                      </div>
+                    )}
 
                     <div className="mt-0.5 z-10 relative">
                       <span className="text-[7.5px] font-display font-black tracking-tight text-white block truncate leading-none">
@@ -1402,19 +1457,26 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       </span>
                     </div>
 
-                    <div className="flex-1 flex items-center justify-center z-10 relative">
-                      {card.delay > 0 ? (
-                        <div className="bg-black/60 border border-cyan-500/40 rounded px-1 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-black text-cyan-400">
-                          ⏳{card.delay}
-                        </div>
-                      ) : (
-                        <span className="text-[7px] font-mono text-emerald-400 font-bold animate-pulse">READY ⚔️</span>
-                      )}
+                    <div className="flex flex-wrap justify-center gap-0.5 my-0.5 z-10 relative max-h-[14px] overflow-hidden">
+                      {card.skills.map((s, sIdx) => (
+                        <span
+                          key={sIdx}
+                          className={`text-[5.5px] px-0.5 py-0.2 rounded border ${getSkillBadgeStyle(s.type)}`}
+                        >
+                          {getSkillIcon(s.type)}{s.value}
+                        </span>
+                      ))}
                     </div>
 
-                    <div className="flex justify-between items-center text-[7.5px] font-mono font-black pt-0.5 border-t border-gray-800/80 z-10 relative">
-                      <span className="text-red-400">⚔️ {card.attack}</span>
-                      <span className="text-emerald-400">❤️ {card.health}</span>
+                    {/* blank space for badges */}
+                    <div className="h-2 z-10 relative" />
+
+                    {/* Corner badges overlapping card limits */}
+                    <div className="absolute -bottom-2 -left-2 w-6.5 h-6.5 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border border-[#151a21] flex items-center justify-center shadow-md z-20">
+                      <span className="text-white text-[9px] font-black font-mono">⚔️{card.attack}</span>
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 w-6.5 h-6.5 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-red-700 border border-[#151a21] flex items-center justify-center shadow-md z-20">
+                      <span className="text-white text-[9px] font-black font-mono">❤️{card.health}</span>
                     </div>
                   </>
                 </motion.div>
