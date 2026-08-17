@@ -658,8 +658,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           {/* Wooden Table Board Divider */}
           <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#ebd09b]/15 to-transparent -translate-y-1/2 pointer-events-none z-10" />
 
-          {/* 1. ENEMY HERO PORTRAIT (Centered top) */}
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 flex flex-col items-center z-30">
+          {/* 1. ENEMY HERO PORTRAIT (Top-Left corner) */}
+          <div className="absolute top-4 left-4 flex flex-col items-center z-30">
             <div className="relative">
               <div className="w-14 h-14 rounded-full border-4 border-red-700/80 bg-[#1c0808] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
                 {renderFloatingTextsFor('enemy-hero')}
@@ -679,8 +679,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             </span>
           </div>
 
-          {/* 2. PLAYER HERO PORTRAIT (Centered bottom - positioned to sit above hand cards) */}
-          <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center z-30">
+          {/* 2. PLAYER HERO PORTRAIT (Bottom-Left corner) */}
+          <div className="absolute bottom-4 left-4 flex flex-col items-center z-30">
             <div className="relative">
               <div className="w-14 h-14 rounded-full border-4 border-cyan-600/80 bg-[#0d161d] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
                 {renderFloatingTextsFor('player-hero')}
@@ -842,14 +842,15 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
                             </>
                           )}
+                          {card.delay > 0 && (
+                            <div className="absolute inset-0 bg-black/45 flex items-center justify-center z-15">
+                              <div className="w-9 h-9 rounded-full bg-gradient-to-b from-amber-500/90 to-amber-700/90 border-2 border-amber-300/80 flex flex-col items-center justify-center shadow-[0_0_12px_rgba(245,158,11,0.5)] animate-pulse">
+                                <span className="text-[10px] leading-none select-none">⏳</span>
+                                <span className="text-white text-[10px] font-black font-mono leading-none mt-0.5 select-none">{card.delay}</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
-
-                        {/* Prominent clock badge on top */}
-                        {card.delay > 0 && (
-                          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-b from-amber-400 to-amber-600 border-2 border-amber-200 rounded-full px-2 py-0.5 flex items-center gap-0.5 text-[9px] font-mono font-black text-white shadow-lg z-30 animate-pulse">
-                            ⏳ <span className="leading-none text-shadow-sm">{card.delay}</span>
-                          </div>
-                        )}
 
                         <div className="flex justify-between items-center text-[7px] md:text-[8px] font-mono font-black text-gray-400 z-10 relative px-1">
                           <span className={`uppercase tracking-wider ${getTierTextColor(card.tier)}`}>
@@ -1023,14 +1024,15 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
                             </>
                           )}
+                          {card.delay > 0 && (
+                            <div className="absolute inset-0 bg-black/45 flex items-center justify-center z-15">
+                              <div className="w-9 h-9 rounded-full bg-gradient-to-b from-amber-500/90 to-amber-700/90 border-2 border-amber-300/80 flex flex-col items-center justify-center shadow-[0_0_12px_rgba(245,158,11,0.5)] animate-pulse">
+                                <span className="text-[10px] leading-none select-none">⏳</span>
+                                <span className="text-white text-[10px] font-black font-mono leading-none mt-0.5 select-none">{card.delay}</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
-
-                        {/* Prominent clock badge on top */}
-                        {card.delay > 0 && (
-                          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-b from-cyan-400 to-blue-600 border-2 border-cyan-300 rounded-full px-2 py-0.5 flex items-center gap-0.5 text-[9px] font-mono font-black text-white shadow-lg z-30 animate-pulse">
-                            ⏳ <span className="leading-none text-shadow-sm">{card.delay}</span>
-                          </div>
-                        )}
 
                         <div className="flex justify-between items-center text-[7px] md:text-[8px] font-mono font-black text-gray-400 z-10 relative px-1">
                           <span className={`uppercase tracking-wider ${getTierTextColor(card.tier)}`}>
@@ -1291,13 +1293,15 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
                     </>
                   )}
+                  {hoveredCard.delay > 0 && (
+                    <div className="absolute inset-0 bg-black/45 flex items-center justify-center z-15">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-b from-amber-500/90 to-amber-700/90 border-2 border-amber-300/80 flex flex-col items-center justify-center shadow-md animate-pulse">
+                        <span className="text-[9px] leading-none">⏳</span>
+                        <span className="text-white text-[9px] font-black font-mono leading-none mt-0.5">{hoveredCard.delay}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-
-                {hoveredCard.delay > 0 && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-b from-amber-400 to-amber-600 border-2 border-amber-200 rounded-full px-2 py-0.5 flex items-center gap-0.5 text-[9px] font-mono font-black text-white shadow-lg z-30 animate-pulse">
-                    ⏳ <span className="leading-none">{hoveredCard.delay}</span>
-                  </div>
-                )}
 
                 <div className="flex justify-between items-center text-[7px] font-mono font-bold text-gray-500 z-10 relative">
                   <span className={`uppercase tracking-wider ${getTierTextColor(hoveredCard.tier)}`}>{hoveredCard.tier}</span>
@@ -1344,7 +1348,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     <span>Level {hoveredCard.level}</span>
                   </div>
                   
-                  <div className="space-y-2 overflow-y-auto max-h-[85px] pr-1">
+                  <div className="space-y-2 pr-1">
                     {hoveredCard.skills.map((s, sIdx) => (
                       <div key={sIdx} className="space-y-0.5">
                         <div className="font-mono font-black text-[10px] flex items-center gap-1 text-white">
@@ -1454,14 +1458,15 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
                         </>
                       )}
+                      {card.delay > 0 && (
+                        <div className="absolute inset-0 bg-black/45 flex items-center justify-center z-15">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-b from-amber-500/90 to-amber-700/90 border-2 border-amber-300/80 flex flex-col items-center justify-center shadow-[0_0_12px_rgba(245,158,11,0.5)] animate-pulse">
+                            <span className="text-[10px] leading-none select-none">⏳</span>
+                            <span className="text-white text-[10px] font-black font-mono leading-none mt-0.5 select-none">{card.delay}</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    
-                    {/* Prominent clock badge on top */}
-                    {card.delay > 0 && (
-                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-b from-cyan-400 to-blue-600 border-2 border-cyan-300 rounded-full px-2 py-0.5 flex items-center gap-0.5 text-[9px] font-mono font-black text-white shadow-lg z-30 animate-pulse">
-                        ⏳ <span className="leading-none text-shadow-sm">{card.delay}</span>
-                      </div>
-                    )}
 
                     <div className="flex justify-between items-center text-[7px] md:text-[8px] font-mono font-black text-gray-400 z-10 relative px-1">
                       <span className={`${getTierTextColor(card.tier)}`}>{card.tier}</span>
