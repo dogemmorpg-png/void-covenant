@@ -40,6 +40,7 @@ interface FloatingTextEffect {
   text: string;
   target: 'player-hero' | 'enemy-hero' | { side: 'player' | 'enemy'; slot: number };
   colorClass: string;
+  xOffset?: number;
 }
 
 // Card tier helper functions for pristine styling
@@ -200,7 +201,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     colorClass: string
   ) => {
     const id = `float_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    setFloatingTexts(prev => [...prev, { id, text, target, colorClass }]);
+    const xOffset = (Math.random() - 0.5) * 50; // Random horizontal bounce direction
+    setFloatingTexts(prev => [...prev, { id, text, target, colorClass, xOffset }]);
     setTimeout(() => {
       setFloatingTexts(prev => prev.filter(f => f.id !== id));
     }, 1000);
@@ -575,7 +577,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     }
   };
 
-  // Internal helper to retrieve floating texts for specific slot
+  // Internal helper to retrieve floating texts for specific slot (RPG fountain bounce)
   const renderFloatingTextsFor = (targetKey: string | { side: 'player' | 'enemy'; slot: number }) => {
     return floatingTexts
       .filter(f => {
@@ -590,18 +592,26 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           );
         }
       })
-      .map(f => (
-        <motion.div
-          key={f.id}
-          initial={{ opacity: 1, y: 15, scale: 0.8 }}
-          animate={{ opacity: 0, y: -45, scale: 1.25 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
-          className={`absolute z-50 pointer-events-none text-center font-mono font-black select-none text-shadow-glow ${f.colorClass}`}
-        >
-          {f.text}
-        </motion.div>
-      ));
+      .map(f => {
+        const xOffset = f.xOffset || 0;
+        return (
+          <motion.div
+            key={f.id}
+            initial={{ opacity: 1, y: 15, x: 0, scale: 0.7 }}
+            animate={{ 
+              opacity: [1, 1, 0], 
+              y: [15, -30, -55], 
+              x: [0, xOffset, xOffset * 1.3], 
+              scale: [0.7, 1.45, 1.1] 
+            }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.85, ease: "easeOut" }}
+            className={`absolute z-50 pointer-events-none text-center font-mono font-black select-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] ${f.colorClass}`}
+          >
+            {f.text}
+          </motion.div>
+        );
+      });
   };
 
 
@@ -611,7 +621,18 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     : null;
 
   return (
-    <div className="h-screen max-h-screen overflow-hidden bg-[#090705] text-gray-200 p-2 md:p-3 font-sans flex flex-col justify-between select-none relative">
+    <div className="h-screen max-h-screen overflow-hidden bg-[#090705]
+      [--dash-offset:16]
+      [&_line]:[stroke-dashoffset:var(--dash-offset)]
+     text-gray-200 p-2 md:p-3 font-sans flex flex-col justify-between select-none relative">
+      
+      <style>{`
+        @keyframes dash {
+          to {
+            stroke-dashoffset: -40;
+          }
+        }
+      `}</style>
       
       {/* Header Bar */}
       <div className="bg-[#120d0a]/95 border border-[#ebd09b]/15 rounded-lg p-1.5 px-3 flex justify-between items-center max-w-7xl mx-auto w-full mb-2 shadow-md h-[40px] shrink-0 z-20">
@@ -657,6 +678,63 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         >
           {/* Wooden Table Board Divider */}
           <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#ebd09b]/15 to-transparent -translate-y-1/2 pointer-events-none z-10" />
+
+          {/* Glowing Targeting Arrow Overlay during combat strikes */}
+          {isAnimating && currentStep && (currentStep.type === 'attack' || currentStep.type === 'direct_attack') && animatingSlot?.type === 'strike' && (
+            <svg className="absolute inset-0 w-full h-full pointer-events-none z-25">
+              <defs>
+                <linearGradient id="glowingArrowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ff4500" stopOpacity="0.85" />
+                  <stop offset="100%" stopColor="#a855f7" stopOpacity="0.25" />
+                </linearGradient>
+              </defs>
+              {(() => {
+                const side = currentStep.attacker;
+                const slot = currentStep.slot;
+                
+                // Attacker slot positions X/Y percentages
+                const startX = `${20 * slot + 10}%`;
+                const startY = side === 'player' ? '70%' : '30%';
+                
+                let endX = '50%';
+                let endY = '50%';
+                
+                if (currentStep.type === 'direct_attack') {
+                  // Targeted Hero Portrait in the left-hand panel
+                  endX = '55px'; 
+                  endY = side === 'player' ? '46px' : 'calc(100% - 46px)';
+                } else {
+                  endX = `${20 * currentStep.targetSlot + 10}%`;
+                  endY = side === 'player' ? '30%' : '70%';
+                }
+                
+                return (
+                  <>
+                    <line
+                      x1={startX}
+                      y1={startY}
+                      x2={endX}
+                      y2={endY}
+                      stroke="url(#glowingArrowGrad)"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeDasharray="4 4"
+                      className="animate-[dash_1.5s_linear_infinite]"
+                      style={{ filter: 'drop-shadow(0 0 5px rgba(255, 69, 0, 0.75))' }}
+                    />
+                    <circle
+                      cx={endX}
+                      cy={endY}
+                      r="4.5"
+                      fill="#ff4500"
+                      className="animate-ping"
+                      style={{ filter: 'drop-shadow(0 0 8px rgba(255, 69, 0, 1))' }}
+                    />
+                  </>
+                );
+              })()}
+            </svg>
+          )}
 
           {/* 1. ENEMY HERO PORTRAIT (Top-Left corner - large format) */}
           <div className="absolute top-4 left-4 flex items-center gap-3 z-30 bg-black/50 p-2 rounded-2xl border border-red-950/30 backdrop-blur-sm shadow-md">
@@ -793,6 +871,39 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             )}
           </AnimatePresence>
 
+          {/* Dynamic attack target coordinates for 3-phase Framer keyframes */}
+          {(() => {
+            // Calculated once per render for slot movements
+            window.activeStrikeX_player = 0;
+            window.activeStrikeY_player = -45;
+            window.activeStrikeX_enemy = 0;
+            window.activeStrikeY_enemy = 45;
+
+            if (isAnimating && currentStep) {
+              if (currentStep.type === 'attack') {
+                const diff = (currentStep.targetSlot - currentStep.slot) * 92;
+                if (currentStep.attacker === 'player') {
+                  window.activeStrikeX_player = diff;
+                  window.activeStrikeY_player = -50;
+                } else {
+                  window.activeStrikeX_enemy = diff;
+                  window.activeStrikeY_enemy = 50;
+                }
+              } else if (currentStep.type === 'direct_attack') {
+                // Heroes are absolute positioned at left:16px (X: ~40px). Slots start X: ~200px.
+                // So a direct attack moves the card far left and up/down.
+                const diffX = -130 - (currentStep.slot * 92);
+                if (currentStep.attacker === 'player') {
+                  window.activeStrikeX_player = diffX;
+                  window.activeStrikeY_player = -170;
+                } else {
+                  window.activeStrikeX_enemy = diffX;
+                  window.activeStrikeY_enemy = 170;
+                }
+              }
+            }
+          })()}
+
           {/* BOARD STAGE FIELD (LINEAR DUELS) - centered board */}
           <div className="flex-1 flex flex-col justify-center gap-8 md:gap-10 my-2 min-h-0 relative py-14">
             
@@ -819,20 +930,20 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{
                           opacity: isDeath ? 0 : 1,
-                          scale: isActing ? 1.15 : isDeath ? 0.2 : isHeal ? 1.05 : 1,
-                          y: isActing ? 35 : 0,
-                          rotate: isDeath ? 12 : 0,
-                          x: isHit ? [0, -6, 6, -4, 4, 0] : 0,
+                          scale: isActing ? [1, 1.05, 1.15, 1] : isDeath ? 0.2 : isHeal ? 1.05 : 1,
+                          y: isActing ? [0, -12, window.activeStrikeY_enemy || 45, 0] : 0,
+                          x: isActing ? [0, 0, window.activeStrikeX_enemy || 0, 0] : (isHit ? [0, -6, 6, -4, 4, 0] : 0),
+                          rotate: isActing ? [0, 2, -3, 0] : (isDeath ? 12 : 0),
                           boxShadow: card.delay === 0
                             ? "0 0 15px rgba(220, 38, 64, 0.45)"
                             : "0 4px 10px rgba(0, 0, 0, 0.4)",
                           borderColor: isHit ? "#ef4444" : getTierBorderColor(card.tier)
                         }}
                         transition={{
-                          type: "spring",
-                          stiffness: 350,
-                          damping: 12,
-                          x: { duration: 0.25 }
+                          y: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : { type: "spring", stiffness: 350, damping: 12 },
+                          x: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : (isHit ? { duration: 0.25 } : { type: "spring", stiffness: 350, damping: 12 }),
+                          scale: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : { duration: 0.2 },
+                          rotate: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : { duration: 0.2 }
                         }}
                         className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none transition-all bg-[#151a21] text-white cursor-help shadow-lg`}
                       >
@@ -950,13 +1061,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                        currentStep.targetSlot === idx && 
                        isHit && (
                         <motion.div
-                          initial={{ opacity: 0, scale: 0.7 }}
-                          animate={{ opacity: [0, 0.9, 0.9, 0], scale: [0.7, 1.15, 1.15, 1] }}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: [0, 0.85, 0.85, 0] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.6 }}
-                          className="absolute inset-0 bg-[#0e2c1e]/70 border-2 border-emerald-500/80 z-35 flex items-center justify-center rounded-xl pointer-events-none"
+                          transition={{ duration: 0.7 }}
+                          className="absolute inset-0 bg-[#0c1f15]/85 border-2 border-emerald-500 rounded-xl z-35 flex flex-col items-center justify-center rounded-xl pointer-events-none shadow-[0_0_15px_rgba(16,185,129,0.5)]"
                         >
-                          <span className="text-xl drop-shadow-[0_0_8px_rgba(77,240,48,0.8)]">🤢</span>
+                          <span className="text-[7.5px] font-mono font-black text-emerald-400 tracking-widest uppercase animate-pulse leading-none">PLAGUE INFECT</span>
+                          <span className="text-sm mt-1 drop-shadow-[0_0_6px_rgba(77,240,48,0.8)]">🤢</span>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -970,13 +1082,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                          : visualState.enemyBoard[currentStep.slot]?.skills?.some(s => s.type === 'hex')
                        ) && (
                         <motion.div
-                          initial={{ opacity: 0, rotate: -20 }}
-                          animate={{ opacity: [0, 0.8, 0.8, 0], rotate: [0, 15, 15, 0] }}
+                          initial={{ opacity: 0, scale: 0.85 }}
+                          animate={{ opacity: [0, 0.85, 0.85, 0], scale: [0.85, 1.05, 1.0] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.6 }}
-                          className="absolute inset-0 bg-purple-950/50 border border-purple-500/50 z-35 flex items-center justify-center rounded-xl pointer-events-none"
+                          transition={{ duration: 0.7 }}
+                          className="absolute inset-0 bg-purple-950/70 border-2 border-purple-500 rounded-xl z-35 flex flex-col items-center justify-center rounded-xl pointer-events-none shadow-[0_0_15px_rgba(168,85,247,0.5)]"
                         >
-                          <span className="text-xl drop-shadow-[0_0_8px_rgba(182,77,250,0.8)]">🔮</span>
+                          <span className="text-[8px] font-mono font-black text-purple-400 tracking-widest uppercase leading-none animate-pulse">HEX CURSED</span>
+                          <span className="text-sm mt-1 drop-shadow-[0_0_6px_rgba(182,77,250,0.8)]">🔮</span>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -1009,20 +1122,20 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{
                           opacity: isDeath ? 0 : 1,
-                          scale: isActing ? 1.15 : isDeath ? 0.2 : isHeal ? 1.05 : 1,
-                          y: isActing ? -35 : 0,
-                          rotate: isDeath ? 12 : 0,
-                          x: isHit ? [0, -6, 6, -4, 4, 0] : 0,
+                          scale: isActing ? [1, 1.05, 1.15, 1] : isDeath ? 0.2 : isHeal ? 1.05 : 1,
+                          y: isActing ? [0, 12, window.activeStrikeY_player || -45, 0] : 0,
+                          x: isActing ? [0, 0, window.activeStrikeX_player || 0, 0] : (isHit ? [0, -6, 6, -4, 4, 0] : 0),
+                          rotate: isActing ? [0, -2, 3, 0] : (isDeath ? 12 : 0),
                           boxShadow: card.delay === 0
                             ? "0 0 15px rgba(102, 252, 241, 0.45)"
                             : "0 4px 10px rgba(0, 0, 0, 0.4)",
                           borderColor: isHit ? "#ef4444" : getTierBorderColor(card.tier)
                         }}
                         transition={{
-                          type: "spring",
-                          stiffness: 350,
-                          damping: 12,
-                          x: { duration: 0.25 }
+                          y: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : { type: "spring", stiffness: 350, damping: 12 },
+                          x: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : (isHit ? { duration: 0.25 } : { type: "spring", stiffness: 350, damping: 12 }),
+                          scale: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : { duration: 0.2 },
+                          rotate: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : { duration: 0.2 }
                         }}
                         className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none transition-all bg-[#151a21] text-white cursor-help shadow-lg`}
                       >
@@ -1149,13 +1262,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                        currentStep.targetSlot === idx && 
                        isHit && (
                         <motion.div
-                          initial={{ opacity: 0, scale: 0.7 }}
-                          animate={{ opacity: [0, 0.9, 0.9, 0], scale: [0.7, 1.15, 1.15, 1] }}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: [0, 0.85, 0.85, 0] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.6 }}
-                          className="absolute inset-0 bg-[#0e2c1e]/70 border-2 border-emerald-500/80 z-35 flex items-center justify-center rounded-xl pointer-events-none"
+                          transition={{ duration: 0.7 }}
+                          className="absolute inset-0 bg-[#0c1f15]/85 border-2 border-emerald-500 rounded-xl z-35 flex flex-col items-center justify-center rounded-xl pointer-events-none shadow-[0_0_15px_rgba(16,185,129,0.5)]"
                         >
-                          <span className="text-xl drop-shadow-[0_0_8px_rgba(77,240,48,0.8)]">🤢</span>
+                          <span className="text-[7.5px] font-mono font-black text-emerald-400 tracking-widest uppercase animate-pulse leading-none">PLAGUE INFECT</span>
+                          <span className="text-sm mt-1 drop-shadow-[0_0_6px_rgba(77,240,48,0.8)]">🤢</span>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -1165,12 +1279,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                        currentStep.targetSlot === idx && (
                         <motion.div
                           initial={{ opacity: 1, scale: 1 }}
-                          animate={{ opacity: 0, scale: 1.5 }}
+                          animate={{ opacity: 0, scale: 1.35 }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.6 }}
-                          className="absolute inset-0 bg-[#3f1a66]/80 border-2 border-[#b64dfa]/80 z-35 flex items-center justify-center rounded-xl pointer-events-none"
+                          transition={{ duration: 0.7 }}
+                          className="absolute inset-0 bg-red-950/70 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center rounded-xl pointer-events-none shadow-[0_0_15px_rgba(239,68,68,0.6)]"
                         >
-                          <span className="text-2xl drop-shadow-[0_0_10px_rgba(182,77,250,0.8)]">💀</span>
+                          <span className="text-[8px] font-mono font-black text-red-500 tracking-widest uppercase leading-none">SACRIFICED</span>
+                          <span className="text-sm mt-1 drop-shadow-[0_0_8px_rgba(239,68,68,0.95)]">💀</span>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -1184,13 +1299,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                          : visualState.enemyBoard[currentStep.slot]?.skills?.some(s => s.type === 'hex')
                        ) && (
                         <motion.div
-                          initial={{ opacity: 0, rotate: -20 }}
-                          animate={{ opacity: [0, 0.8, 0.8, 0], rotate: [0, 15, 15, 0] }}
+                          initial={{ opacity: 0, scale: 0.85 }}
+                          animate={{ opacity: [0, 0.85, 0.85, 0], scale: [0.85, 1.05, 1.0] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.6 }}
-                          className="absolute inset-0 bg-purple-950/50 border border-purple-500/50 z-35 flex items-center justify-center rounded-xl pointer-events-none"
+                          transition={{ duration: 0.7 }}
+                          className="absolute inset-0 bg-purple-950/70 border-2 border-purple-500 rounded-xl z-35 flex flex-col items-center justify-center rounded-xl pointer-events-none shadow-[0_0_15px_rgba(168,85,247,0.5)]"
                         >
-                          <span className="text-xl drop-shadow-[0_0_8px_rgba(182,77,250,0.8)]">🔮</span>
+                          <span className="text-[8px] font-mono font-black text-purple-400 tracking-widest uppercase leading-none animate-pulse">HEX CURSED</span>
+                          <span className="text-sm mt-1 drop-shadow-[0_0_6px_rgba(182,77,250,0.8)]">🔮</span>
                         </motion.div>
                       )}
                     </AnimatePresence>
