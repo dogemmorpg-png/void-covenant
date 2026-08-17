@@ -1,3 +1,4 @@
+import { TALENT_TREES } from './_shared/talents.js';
 // @ts-nocheck
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
@@ -272,7 +273,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (safeProfileData.isRegistered !== undefined) currentProfile.isRegistered = safeProfileData.isRegistered;
       if (safeProfileData.username) currentProfile.username = safeProfileData.username;
       if (safeProfileData.avatarUrl) currentProfile.avatarUrl = safeProfileData.avatarUrl;
-      if (safeProfileData.talents) currentProfile.talents = safeProfileData.talents;
+      if (safeProfileData.talents) {
+        let totalSpent = 0;
+        const requestedTalents = safeProfileData.talents;
+        let valid = true;
+        
+        for (const [nodeId, level] of Object.entries(requestedTalents)) {
+           const node = TALENT_TREES.find((t: any) => t.id === nodeId);
+           if (!node) {
+             valid = false;
+             break;
+           }
+           const numLevel = Number(level) || 0;
+           if (numLevel < 0 || numLevel > node.maxLevel) {
+             valid = false;
+             break;
+           }
+           totalSpent += (numLevel * node.cost);
+        }
+        
+        const playerLevel = currentProfile.level || 1;
+        if (valid && totalSpent <= playerLevel) {
+          currentProfile.talents = requestedTalents;
+        } else {
+          console.warn(`Cheating detected for wallet ${walletAddress}: Spent ${totalSpent} points at Level ${playerLevel}`);
+        }
+      }
       if (safeProfileData.activeStance) currentProfile.activeStance = safeProfileData.activeStance;
     }
 
