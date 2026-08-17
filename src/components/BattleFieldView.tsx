@@ -611,85 +611,113 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     : null;
 
   return (
-    <div className="h-screen max-h-screen overflow-hidden bg-[#06070a] text-gray-200 p-2 md:p-3 font-sans flex flex-col justify-between select-none relative">
+    <div className="h-screen max-h-screen overflow-hidden bg-[#090705] text-gray-200 p-2 md:p-3 font-sans flex flex-col justify-between select-none relative">
       
       {/* Header Bar */}
-      <div className="bg-[#151a21]/90 border border-[#ebd09b]/10 rounded-lg p-1.5 px-3 flex justify-between items-center max-w-7xl mx-auto w-full mb-2 shadow-md h-[40px] shrink-0">
+      <div className="bg-[#120d0a]/95 border border-[#ebd09b]/15 rounded-lg p-1.5 px-3 flex justify-between items-center max-w-7xl mx-auto w-full mb-2 shadow-md h-[40px] shrink-0 z-20">
         <button
           onClick={() => {
             if (window.confirm('Are you sure you want to escape? Energy will not be refunded.')) {
               onExitBattle(false);
             }
           }}
-          className="flex items-center gap-1 text-[10px] font-mono font-bold text-gray-400 hover:text-white transition-all bg-black/40 py-1 px-2 border border-gray-800 rounded cursor-pointer"
+          className="flex items-center gap-1 text-[10px] font-mono font-bold text-amber-500 hover:text-white transition-all bg-black/60 py-1 px-2 border border-amber-950/40 rounded cursor-pointer"
         >
           <ArrowLeft className="w-3 h-3" /> ESCAPE
         </button>
 
         <div className="text-center font-display font-black text-sm tracking-widest text-shadow-gold text-white uppercase flex items-center gap-3">
           <span>{stage.name}</span>
-          <span className="text-gray-500">•</span>
-          <span className="text-cyan-400 font-mono text-xs font-bold">TURN {visualState.turn}</span>
+          <span className="text-amber-950">•</span>
+          <span className="text-amber-500 font-mono text-xs font-bold">TURN {visualState.turn}</span>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowHelpModal(true)}
-            className="text-[10px] font-mono text-[#ebd09b] hover:text-white bg-black/40 py-1 px-2 border border-[#ebd09b]/25 rounded cursor-pointer transition-all"
+            className="text-[10px] font-mono text-[#ebd09b] hover:text-white bg-black/60 py-1 px-2 border border-[#ebd09b]/25 rounded cursor-pointer transition-all"
           >
             RULES
           </button>
           <button
             onClick={toggleSound}
-            className="text-gray-500 hover:text-white transition-all bg-black/30 p-1 border border-gray-800 rounded cursor-pointer"
+            className="text-gray-500 hover:text-white transition-all bg-black/50 p-1 border border-amber-950/40 rounded cursor-pointer"
           >
             {soundOn ? <Volume2 className="w-3.5 h-3.5 text-[#ebd09b]" /> : <VolumeX className="w-3.5 h-3.5" />}
           </button>
         </div>
       </div>
 
-      {/* Main Container - expanded to max-w-7xl */}
+      {/* Main Container */}
       <div className={`max-w-7xl mx-auto w-full flex-1 flex flex-col justify-between relative min-h-0 pb-16 ${screenShake ? 'animate-shake' : ''}`}>
         
-        {/* Battle Arena */}
+        {/* Battle Arena - Medieval Fantasy Table */}
         <div 
-          style={{ background: 'radial-gradient(circle at center, #161c2a 0%, #07090f 70%, #030406 100%)' }}
-          className="flex-1 flex flex-col justify-between border-2 border-[#ebd09b]/20 rounded-2xl p-3 md:p-4 shadow-[0_0_30px_rgba(0,0,0,0.8),_inset_0_0_40px_rgba(235,208,155,0.05)] relative min-h-0 overflow-hidden"
+          className="flex-1 flex flex-col justify-center border-[6px] border-[#251a14] bg-[#120d0a] rounded-2xl p-4 shadow-[inset_0_0_60px_rgba(0,0,0,0.95),_0_10px_30px_rgba(0,0,0,0.85)] relative min-h-0 overflow-hidden"
         >
-          
-          {/* ENEMY HERO ZONE */}
-          <div className="flex justify-between items-center bg-black/30 border border-red-950/40 p-2 rounded-xl mb-2 relative overflow-hidden h-[44px] shrink-0">
-            <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-red-900/10 to-transparent pointer-events-none" />
-            
-            <div className="flex items-center gap-2 relative z-10">
-              <div className="w-8 h-10 rounded-b-full rounded-t-xl bg-[#4e0707] border-2 border-[#dd2c40] flex items-center justify-center shadow-[0_0_12px_rgba(221,44,64,0.4)] relative overflow-hidden shrink-0">
+          {/* Wooden Table Board Divider */}
+          <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#ebd09b]/15 to-transparent -translate-y-1/2 pointer-events-none z-10" />
+
+          {/* 1. ENEMY HERO PORTRAIT (Centered top) */}
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 flex flex-col items-center z-30">
+            <div className="relative">
+              <div className="w-14 h-14 rounded-full border-4 border-red-700/80 bg-[#1c0808] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
                 {renderFloatingTextsFor('enemy-hero')}
                 {stage.enemyHeroImage?.startsWith('/') ? (
                   <img src={stage.enemyHeroImage} alt="Enemy Hero" className="w-full h-full object-cover" />
                 ) : (
-                  <Skull className="w-4 h-4 text-[#dd2c40]" />
+                  <Skull className="w-6 h-6 text-[#dd2c40]" />
                 )}
               </div>
-              <div>
-                <span className="text-[8px] font-mono font-bold text-[#dd2c40] tracking-wider uppercase block leading-none">Enemy Lord</span>
-                <h4 className="font-display font-black text-sm text-white leading-none mt-0.5">{stage.enemyHeroName}</h4>
+              {/* Health Shield (Hearthstone style) */}
+              <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-red-600 to-red-800 border-2 border-red-300 flex items-center justify-center shadow-lg z-30">
+                <span className="text-white text-xs font-black font-mono leading-none select-none">{visualState.enemyHeroHealth}</span>
               </div>
             </div>
+            <span className="text-[9px] font-display font-black text-red-500/90 tracking-wider mt-1 uppercase text-shadow-sm leading-none">
+              {stage.enemyHeroName}
+            </span>
+          </div>
 
-            {/* Enemy HP Bar */}
-            <div className="text-right space-y-0.5 font-mono w-40 md:w-56 relative z-10">
-              <div className="flex justify-between text-xs font-black text-red-400 leading-none">
-                <span>Health:</span>
-                <span>{visualState.enemyHeroHealth} / {visualState.enemyHeroMaxHealth} HP</span>
+          {/* 2. PLAYER HERO PORTRAIT (Centered bottom - positioned to sit above hand cards) */}
+          <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center z-30">
+            <div className="relative">
+              <div className="w-14 h-14 rounded-full border-4 border-cyan-600/80 bg-[#0d161d] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
+                {renderFloatingTextsFor('player-hero')}
+                {profile.avatarUrl ? (
+                  <img src={profile.avatarUrl} alt="Hero Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <Shield className="w-6 h-6 text-[#66fcf1]" />
+                )}
               </div>
-              <div className="w-full bg-[#4e0707]/30 h-1.5 rounded-full border border-red-900/20 overflow-hidden">
-                <motion.div
-                  className="bg-[#dd2c40] h-full rounded-full"
-                  animate={{ width: `${Math.max(0, (visualState.enemyHeroHealth / visualState.enemyHeroMaxHealth) * 100)}%` }}
-                  transition={{ duration: 0.3 }}
-                />
+              {/* Health Shield */}
+              <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-red-600 to-red-800 border-2 border-red-300 flex items-center justify-center shadow-lg z-30">
+                <span className="text-white text-xs font-black font-mono leading-none select-none">{visualState.playerHeroHealth}</span>
               </div>
             </div>
+            <span className="text-[9px] font-display font-black text-cyan-400 tracking-wider mt-1 uppercase text-shadow-sm leading-none">
+              {profile.username || 'Summoner'}
+            </span>
+          </div>
+
+          {/* Hearthstone Style Flip End Turn Button (Right center) */}
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 z-35">
+            {!selectedHandCardId ? (
+              <button
+                disabled={isSimulating}
+                onClick={handleEndTurnWithoutCard}
+                className={`w-[86px] h-[36px] bg-gradient-to-b from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 disabled:from-gray-800 disabled:to-gray-900 border-2 border-[#ebd09b]/80 disabled:border-gray-800 text-black disabled:text-gray-600 font-display font-black text-[10px] uppercase tracking-wider rounded-md shadow-[0_4px_12px_rgba(0,0,0,0.6),_0_0_8px_rgba(235,208,155,0.15)] hover:shadow-[0_4px_15px_rgba(235,208,155,0.35),_0_0_12px_rgba(235,208,155,0.25)] transition-all active:scale-95 cursor-pointer flex items-center justify-center leading-none`}
+              >
+                {isSimulating ? 'PLAYING' : 'END TURN'}
+              </button>
+            ) : (
+              <button
+                onClick={() => setSelectedHandCardId(null)}
+                className="w-[86px] h-[36px] bg-gradient-to-b from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 border-2 border-red-500 text-white font-display font-black text-[9px] uppercase tracking-wider rounded-md shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center leading-none"
+              >
+                ✕ CANCEL
+              </button>
+            )}
           </div>
 
           {/* PLAYBACK ACTION BANNER / CONTROLLER */}
@@ -699,7 +727,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}
-                className="bg-[#151a21]/95 border border-[#66fcf1]/35 rounded-lg p-1.5 px-3 flex justify-between items-center mb-2 gap-2 shadow-md backdrop-blur-sm h-[38px] shrink-0"
+                className="absolute top-16 left-1/2 -translate-x-1/2 bg-[#120d0a]/95 border border-[#66fcf1]/35 rounded-lg p-1.5 px-3 flex justify-between items-center gap-2 shadow-md backdrop-blur-sm h-[38px] w-[500px] shrink-0 z-35"
               >
                 <div className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#66fcf1] animate-ping" />
@@ -758,12 +786,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             )}
           </AnimatePresence>
 
-          {/* BOARD STAGE FIELD (LINEAR DUELS) - cards and slots increased size and center-grouped with gap */}
-          <div className="flex-1 flex flex-col justify-center gap-6 md:gap-8 my-2 min-h-0 relative">
+          {/* BOARD STAGE FIELD (LINEAR DUELS) - centered board */}
+          <div className="flex-1 flex flex-col justify-center gap-8 md:gap-10 my-2 min-h-0 relative py-14">
             
             {/* 1. ENEMY BOARD */}
             <div className="grid grid-cols-5 gap-3 relative">
-              <div className="absolute inset-x-0 -bottom-3 h-[1px] bg-red-950/20" />
+              <div className="absolute inset-x-0 -bottom-4 h-[1px] bg-red-950/15" />
               {visualState.enemyBoard.map((card, idx) => {
                 const isActing = animatingSlot?.side === 'enemy' && animatingSlot?.slot === idx && animatingSlot?.type === 'strike';
                 const isHit = animatingSlot?.side === 'enemy' && animatingSlot?.slot === idx && animatingSlot?.type === 'hit';
@@ -869,11 +897,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         </div>
                       </motion.div>
                     ) : (
-                      // Empty Slot
-                      <div className="w-full h-full rounded-xl border border-white/5 bg-black/40 flex flex-col items-center justify-center relative shadow-inner group hover:border-[#ebd09b]/25 transition-all duration-300">
+                      // Empty Recessed Slot
+                      <div className="w-full h-full rounded-xl border border-amber-950/20 bg-black/45 flex flex-col items-center justify-center relative shadow-[inset_0_4px_10px_rgba(0,0,0,0.8)] group hover:border-[#ebd09b]/15 transition-all duration-300">
                         <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none" />
-                        <Swords className="w-4 h-4 text-gray-800 group-hover:text-gray-700 transition-colors" />
-                        <span className="text-[7px] font-mono font-bold text-gray-700 uppercase tracking-widest mt-1">Empty Slot</span>
+                        <Swords className="w-5 h-5 text-amber-950/30 group-hover:text-amber-950/50 transition-colors" />
+                        <span className="text-[7px] font-mono font-bold text-amber-950/25 uppercase tracking-widest mt-1">Empty Slot</span>
                       </div>
                     )}
 
@@ -943,7 +971,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
             {/* 2. PLAYER BOARD */}
             <div className="grid grid-cols-5 gap-3 relative">
-              <div className="absolute inset-x-0 -top-2 h-[1px] bg-cyan-950/25" />
+              <div className="absolute inset-x-0 -top-4 h-[1px] bg-cyan-950/15" />
               {visualState.playerBoard.map((card, idx) => {
                 const canPlace = selectedHandCardId && card === null && !isSimulating;
                 const isActing = animatingSlot?.side === 'player' && animatingSlot?.slot === idx && animatingSlot?.type === 'strike';
@@ -1050,18 +1078,18 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         </div>
                       </motion.div>
                     ) : (
-                      // Empty Slot
+                      // Empty Recessed Slot
                       <div 
                         onClick={() => canPlace && handlePlayCard(idx)}
-                        className={`w-full h-full rounded-xl border flex flex-col items-center justify-center relative shadow-inner group transition-all duration-300 ${
+                        className={`w-full h-full rounded-xl border flex flex-col items-center justify-center relative shadow-[inset_0_4px_10px_rgba(0,0,0,0.8)] group transition-all duration-300 ${
                           canPlace
                             ? 'bg-emerald-950/20 border-emerald-500/50 cursor-pointer border-dashed animate-pulse'
-                            : 'bg-black/30 border-cyan-950/20 border-dashed'
+                            : 'bg-black/30 border-amber-950/10 border-dashed'
                         }`}
                       >
                         <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none" />
-                        <Swords className={`w-4 h-4 transition-colors ${canPlace ? 'text-emerald-400' : 'text-gray-800 group-hover:text-gray-700'}`} />
-                        <span className={`text-[7px] font-mono font-bold uppercase tracking-widest mt-1 ${canPlace ? 'text-emerald-400' : 'text-gray-700'}`}>
+                        <Swords className={`w-5 h-5 transition-colors ${canPlace ? 'text-emerald-400' : 'text-amber-950/30 group-hover:text-amber-950/50'}`} />
+                        <span className={`text-[7px] font-mono font-bold uppercase tracking-widest mt-1 ${canPlace ? 'text-emerald-400' : 'text-amber-950/25'}`}>
                           {canPlace ? 'Place Here' : 'Empty Slot'}
                         </span>
                       </div>
@@ -1148,71 +1176,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
           </div>
 
-          {/* PLAYER HERO ZONE & CONTROLS */}
-          <div className="flex justify-between items-center bg-black/40 border border-cyan-950/40 p-2 px-4 rounded-xl mt-2 h-[48px] shrink-0 relative z-30">
-            
-            {/* Left: Player Profile Hero */}
-            <div className="flex items-center gap-2 w-1/3">
-              <div className="w-8 h-10 rounded-b-full rounded-t-xl bg-[#151a21] border-2 border-[#66fcf1] flex items-center justify-center shadow-[0_0_12px_rgba(102,252,241,0.4)] relative overflow-hidden shrink-0">
-                {renderFloatingTextsFor('player-hero')}
-                {profile.avatarUrl ? (
-                  <img src={profile.avatarUrl} alt="Hero Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  <Shield className="w-4 h-4 text-[#66fcf1]" />
-                )}
-              </div>
-              <div>
-                <span className="text-[8px] font-mono font-bold text-[#66fcf1] tracking-wider uppercase block leading-none">Your Hero</span>
-                <h4 className="font-display font-black text-sm text-white leading-none mt-0.5">{profile.username || 'Wind Summoner'}</h4>
-              </div>
-            </div>
-
-            {/* Center: Empty to leave space for the fanned hand */}
-            <div className="w-1/3 flex justify-center">
-            </div>
-
-            {/* Right: HP Bar & Play Turn Button */}
-            <div className="flex items-center gap-3 w-1/3 justify-end">
-              <div className="text-right space-y-0.5 font-mono w-28 md:w-36 shrink-0">
-                <div className="flex justify-between text-xs font-black text-[#66fcf1] leading-none">
-                  <span>Health:</span>
-                  <span>{visualState.playerHeroHealth} / {visualState.playerHeroMaxHealth} HP</span>
-                </div>
-                <div className="w-full bg-cyan-950/30 h-1.5 rounded-full border border-[#66fcf1]/20 overflow-hidden">
-                  <motion.div
-                    className="bg-[#66fcf1] h-full rounded-full"
-                    animate={{ width: `${Math.max(0, (visualState.playerHeroHealth / visualState.playerHeroMaxHealth) * 100)}%` }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </div>
-              </div>
-
-              {/* Play Turn Button */}
-              <div className="shrink-0">
-                {!selectedHandCardId && (
-                  <button
-                    disabled={isSimulating}
-                    onClick={handleEndTurnWithoutCard}
-                    className="bg-gradient-to-r from-teal-900 to-[#1f2833] hover:from-[#4df030] hover:to-teal-900 border border-[#66fcf1]/40 hover:border-emerald-500/60 text-[#66fcf1] hover:text-white text-[10px] font-display font-black py-1 px-4 rounded-lg shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none cursor-pointer h-[32px] flex items-center justify-center"
-                  >
-                    ⏳ PLAY
-                  </button>
-                )}
-
-                {selectedHandCardId && (
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => setSelectedHandCardId(null)}
-                      className="bg-[#4e0707] hover:bg-[#880d1e] border border-[#dd2c40]/40 text-[#dd2c40] text-[8px] font-mono font-bold py-1 px-2 rounded cursor-pointer h-[28px] flex items-center justify-center"
-                    >
-                      ✕ CANCEL
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
         </div>
 
         {/* Selected Card Deploy Prompt Overlay */}
@@ -1222,7 +1185,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              className="absolute bottom-[20%] left-1/2 -translate-x-1/2 bg-amber-950/90 border border-amber-500/50 rounded-xl px-4 py-2 text-xs font-bold text-amber-200 shadow-[0_0_20px_rgba(235,208,155,0.4)] z-30 animate-pulse pointer-events-none flex items-center gap-2"
+              className="absolute bottom-[24%] left-1/2 -translate-x-1/2 bg-amber-950/90 border border-amber-500/50 rounded-xl px-4 py-2 text-xs font-bold text-amber-200 shadow-[0_0_20px_rgba(235,208,155,0.4)] z-30 animate-pulse pointer-events-none flex items-center gap-2"
             >
               <span>📥</span> Select an empty slot on the board to deploy card
             </motion.div>
@@ -1232,12 +1195,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         {/* Collapsible log button */}
         <button
           onClick={() => setShowLogDrawer(true)}
-          className="absolute top-12 right-2 bg-[#151a21]/90 border border-red-900/40 text-red-400 hover:text-white p-2 rounded-full cursor-pointer shadow-lg hover:border-red-500 transition-all z-35 flex items-center justify-center group"
+          className="absolute top-14 right-4 bg-[#120d0a]/90 border border-amber-900/40 text-[#ebd09b] hover:text-white p-2.5 rounded-full cursor-pointer shadow-lg hover:border-amber-500 transition-all z-35 flex items-center justify-center group"
           title="Open Duel Log"
         >
-          <Scroll className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          <Scroll className="w-4.5 h-4.5 group-hover:scale-110 transition-transform" />
           {visualState.combatLog.length > 1 && (
-            <span className="absolute -top-1 -right-1 bg-red-600 text-white font-mono text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-black animate-pulse">
+            <span className="absolute -top-1 -right-1 bg-red-600 text-white font-mono text-[8px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border border-black animate-pulse">
               {visualState.combatLog.length - 1}
             </span>
           )}
@@ -1550,7 +1513,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         </div>
 
       </div>
-
 
             {/* WIN POPUP MODAL */}
       {battle.phase === 'player_won' && (
