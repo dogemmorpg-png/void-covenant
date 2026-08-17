@@ -108,7 +108,7 @@ export const TALENT_TREES: TalentNode[] = [
   },
 
   // ==============================
-  // --- WARLORD'S CRY (AoE Buff) ---
+  // --- WARLORD'S CRY (Single Buff) ---
   // ==============================
   {
     id: 'war_base', stance: 'warlord_cry', tier: 1, col: 0,
@@ -119,13 +119,13 @@ export const TALENT_TREES: TalentNode[] = [
   {
     id: 'war_atk', stance: 'warlord_cry', tier: 2, col: -1,
     name: 'Battle Fervor', icon: 'Axe',
-    description: (lvl) => `Grants ALL ally cards +${lvl} bonus Attack.`,
+    description: (lvl) => `The Attack buff is increased by +${lvl}.`,
     maxLevel: 10, cost: 2, requires: ['war_base']
   },
   {
     id: 'war_armor', stance: 'warlord_cry', tier: 2, col: 1,
     name: 'Phalanx', icon: 'Shield',
-    description: (lvl) => `Also grants ALL ally cards +${lvl} Armor.`,
+    description: (lvl) => `Also grants the target +${lvl} Armor.`,
     maxLevel: 10, cost: 2, requires: ['war_base']
   },
   {
@@ -137,13 +137,13 @@ export const TALENT_TREES: TalentNode[] = [
   {
     id: 'war_momentum', stance: 'warlord_cry', tier: 4, col: -1,
     name: 'Momentum', icon: 'Wind',
-    description: (lvl) => `${lvl * 33}% chance to also reduce the Delay of all allies by 1.`,
+    description: (lvl) => `${lvl * 33}% chance to also reduce the target's Delay by 1.`,
     maxLevel: 3, cost: 3, requires: ['war_duration']
   },
   {
     id: 'war_heal', stance: 'warlord_cry', tier: 4, col: 1,
     name: 'Rallying Cry', icon: 'Stethoscope',
-    description: (lvl) => `Heals all ally cards for ${lvl} HP when triggered.`,
+    description: (lvl) => `Heals the target for ${lvl} HP when triggered.`,
     maxLevel: 3, cost: 3, requires: ['war_duration']
   },
   {
