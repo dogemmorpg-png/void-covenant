@@ -1061,14 +1061,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                        currentStep.targetSlot === idx && 
                        isHit && (
                         <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: [0, 0.85, 0.85, 0] }}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.7 }}
-                          className="absolute inset-0 bg-[#0c1f15]/85 border-2 border-emerald-500 rounded-xl z-35 flex flex-col items-center justify-center rounded-xl pointer-events-none shadow-[0_0_15px_rgba(16,185,129,0.5)]"
+                          transition={{ duration: 0.85 }}
+                          className="absolute inset-0 bg-black/45 border-2 border-emerald-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(16,185,129,0.7)] overflow-hidden"
                         >
-                          <span className="text-[7.5px] font-mono font-black text-emerald-400 tracking-widest uppercase animate-pulse leading-none">PLAGUE INFECT</span>
-                          <span className="text-sm mt-1 drop-shadow-[0_0_6px_rgba(77,240,48,0.8)]">🤢</span>
+                          <img src="/icons/plague_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-80" />
+                          <span className="relative text-[8.5px] font-mono font-black text-emerald-400 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-emerald-500/30 z-10 animate-pulse">PLAGUE INFECT</span>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -1082,14 +1082,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                          : visualState.enemyBoard[currentStep.slot]?.skills?.some(s => s.type === 'hex')
                        ) && (
                         <motion.div
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          animate={{ opacity: [0, 0.85, 0.85, 0], scale: [0.85, 1.05, 1.0] }}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.7 }}
-                          className="absolute inset-0 bg-purple-950/70 border-2 border-purple-500 rounded-xl z-35 flex flex-col items-center justify-center rounded-xl pointer-events-none shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+                          transition={{ duration: 0.85 }}
+                          className="absolute inset-0 bg-black/45 border-2 border-purple-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(168,85,247,0.7)] overflow-hidden"
                         >
-                          <span className="text-[8px] font-mono font-black text-purple-400 tracking-widest uppercase leading-none animate-pulse">HEX CURSED</span>
-                          <span className="text-sm mt-1 drop-shadow-[0_0_6px_rgba(182,77,250,0.8)]">🔮</span>
+                          <img src="/icons/hex_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <span className="relative text-[9px] font-mono font-black text-purple-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-purple-500/30 z-10 animate-pulse">HEX CURSED</span>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -1262,14 +1262,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                        currentStep.targetSlot === idx && 
                        isHit && (
                         <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: [0, 0.85, 0.85, 0] }}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.7 }}
-                          className="absolute inset-0 bg-[#0c1f15]/85 border-2 border-emerald-500 rounded-xl z-35 flex flex-col items-center justify-center rounded-xl pointer-events-none shadow-[0_0_15px_rgba(16,185,129,0.5)]"
+                          transition={{ duration: 0.85 }}
+                          className="absolute inset-0 bg-black/45 border-2 border-emerald-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(16,185,129,0.7)] overflow-hidden"
                         >
-                          <span className="text-[7.5px] font-mono font-black text-emerald-400 tracking-widest uppercase animate-pulse leading-none">PLAGUE INFECT</span>
-                          <span className="text-sm mt-1 drop-shadow-[0_0_6px_rgba(77,240,48,0.8)]">🤢</span>
+                          <img src="/icons/plague_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-80" />
+                          <span className="relative text-[8.5px] font-mono font-black text-emerald-400 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-emerald-500/30 z-10 animate-pulse">PLAGUE INFECT</span>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -1281,11 +1281,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 1, scale: 1 }}
                           animate={{ opacity: 0, scale: 1.35 }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.7 }}
-                          className="absolute inset-0 bg-red-950/70 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center rounded-xl pointer-events-none shadow-[0_0_15px_rgba(239,68,68,0.6)]"
+                          transition={{ duration: 0.85 }}
+                          className="absolute inset-0 bg-black/45 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(239,68,68,0.7)] overflow-hidden"
                         >
-                          <span className="text-[8px] font-mono font-black text-red-500 tracking-widest uppercase leading-none">SACRIFICED</span>
-                          <span className="text-sm mt-1 drop-shadow-[0_0_8px_rgba(239,68,68,0.95)]">💀</span>
+                          <img src="/icons/sacrifice_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <span className="relative text-[8.5px] font-mono font-black text-red-500 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-red-500/30 z-10 animate-pulse">SACRIFICED</span>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -1299,14 +1299,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                          : visualState.enemyBoard[currentStep.slot]?.skills?.some(s => s.type === 'hex')
                        ) && (
                         <motion.div
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          animate={{ opacity: [0, 0.85, 0.85, 0], scale: [0.85, 1.05, 1.0] }}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.7 }}
-                          className="absolute inset-0 bg-purple-950/70 border-2 border-purple-500 rounded-xl z-35 flex flex-col items-center justify-center rounded-xl pointer-events-none shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+                          transition={{ duration: 0.85 }}
+                          className="absolute inset-0 bg-black/45 border-2 border-purple-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(168,85,247,0.7)] overflow-hidden"
                         >
-                          <span className="text-[8px] font-mono font-black text-purple-400 tracking-widest uppercase leading-none animate-pulse">HEX CURSED</span>
-                          <span className="text-sm mt-1 drop-shadow-[0_0_6px_rgba(182,77,250,0.8)]">🔮</span>
+                          <img src="/icons/hex_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <span className="relative text-[9px] font-mono font-black text-purple-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-purple-500/30 z-10 animate-pulse">HEX CURSED</span>
                         </motion.div>
                       )}
                     </AnimatePresence>
