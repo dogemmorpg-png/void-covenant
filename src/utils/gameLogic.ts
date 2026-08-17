@@ -145,6 +145,7 @@ export function simulateCombatTurn(
             const heal = Math.floor(totalLeech * (s.leechPercent / 100));
             if (heal > 0) {
               state.playerHeroHealth = Math.min(state.playerHeroMaxHealth, state.playerHeroHealth + heal);
+                animateSequence.push({ type: 'hero_heal', heal: heal });
               logs.push(`⚡ Void Strike leeches ${heal} HP to the Hero!`);
             }
           }
@@ -171,14 +172,17 @@ export function simulateCombatTurn(
             if (targetCard.health >= targetCard.maxHealth && s.overflowPercent > 0) {
               const lordHeal = Math.max(1, Math.floor(heal * (s.overflowPercent / 100)));
               state.playerHeroHealth = Math.min(state.playerHeroMaxHealth, state.playerHeroHealth + lordHeal);
+                animateSequence.push({ type: 'hero_heal', heal: lordHeal });
               logs.push(`🩸 Blood Aura healed Hero for ${lordHeal} HP (Overflow).`);
             } else {
               targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + heal);
               logs.push(`🩸 Blood Aura healed ${targetCard.name} for ${heal} HP.`);
               
-              if (s.cleanseChance > 0 && Math.random() * 100 < s.cleanseChance) {
+              let cleansed = false;
+                if (s.cleanseChance > 0 && Math.random() * 100 < s.cleanseChance) {
                 if (targetCard.hexedAmount > 0) {
                    targetCard.hexedAmount = 0;
+                     cleansed = true;
                    logs.push(`🩸 Blood Aura cleansed Hex from ${targetCard.name}!`);
                 }
               }
@@ -192,7 +196,7 @@ export function simulateCombatTurn(
               targetCard.health += s.bonusMaxHp; // also heal the amount it expanded
               logs.push(`🩸 Blood Aura expanded ${targetCard.name}'s max HP by ${s.bonusMaxHp}!`);
             }
-            animateSequence.push({ type: 'hero_skill', stance: 'blood_aura', targetSlot: targetSlot, heal: heal });
+            animateSequence.push({ type: 'hero_skill', stance: 'blood_aura', targetSlot: targetSlot, heal: heal, ward: s.ward, bonusMaxHp: s.bonusMaxHp, cleanse: cleansed });
           }
         }
       }
@@ -221,15 +225,17 @@ export function simulateCombatTurn(
             }
             logs.push(`🔥 Warlord's Cry grants ${targetCard.name} ${s.bonusArmor} Armor!`);
           }
-          if (s.momentumChance > 0 && Math.random() * 100 < s.momentumChance) {
+          let delayReduced = false;
+            if (s.momentumChance > 0 && Math.random() * 100 < s.momentumChance) {
              targetCard.delay = Math.max(0, targetCard.delay - 1);
+               delayReduced = true;
              logs.push(`🔥 Warlord's Cry reduced ${targetCard.name}'s Delay by 1!`);
           }
           if (s.aoeHeal > 0) {
             targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + s.aoeHeal);
             logs.push(`🔥 Warlord's Cry heals ${targetCard.name} for ${s.aoeHeal}!`);
           }
-          animateSequence.push({ type: 'hero_skill', stance: 'warlord_cry', targetSlot: targetSlot });
+          animateSequence.push({ type: 'hero_skill', stance: 'warlord_cry', targetSlot: targetSlot, bonusAtk: s.bonusAtk, bonusArmor: s.bonusArmor, aoeHeal: s.aoeHeal, delayReduced });
         }
       }
     }
