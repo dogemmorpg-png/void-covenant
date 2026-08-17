@@ -149,7 +149,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   // Hand selection and simulators
   const [selectedHandCardId, setSelectedHandCardId] = useState<string | null>(null);
   const [isSimulating, setIsSimulating] = useState(false);
-  const [showLog, setShowLog] = useState(false);
 
   // Sequencer Playback state
   const [isAnimating, setIsAnimating] = useState(false);
@@ -553,7 +552,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
 
   return (
-    <div className="h-screen overflow-hidden bg-[#06070a] text-gray-200 p-3 md:p-4 font-sans flex flex-col justify-between relative">
+    <div className="min-h-screen bg-[#06070a] text-gray-200 p-3 md:p-4 font-sans flex flex-col justify-between">
       
       {/* Header Bar */}
       <div className="bg-[#151a21] border border-[#ebd09b]/20 rounded-xl p-3 flex justify-between items-center max-w-7xl mx-auto w-full mb-4 shadow-lg">
@@ -1003,12 +1002,64 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
         </div>
 
-        
-        {/* Codex (Right 1 column) */}
-        <div className="flex flex-col gap-4 relative z-40 min-h-0">
+        {/* Combat Logs & Player Hand / Codex (Right 1 column) */}
+        <div className="flex flex-col gap-4">
           
+          {/* PLAYER HAND ZONE */}
+          <div className="bg-[#151a21] border border-[#c5a880]/15 rounded-2xl p-4 flex flex-col justify-between">
+            <h4 className="font-display font-bold text-xs text-[#ebd09b] tracking-wider uppercase border-b border-gray-800 pb-2 mb-3 flex justify-between items-center">
+              <span>🃏 YOUR HAND</span>
+              <span className="bg-black/30 text-[10px] font-mono px-2 py-0.5 rounded border border-gray-800 text-[#ebd09b]">
+                {visualState.playerHand.length}
+              </span>
+            </h4>
+
+            <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
+              {visualState.playerHand.map((card) => {
+                const isSelected = selectedHandCardId === card.id;
+                return (
+                  <div
+                    key={card.id}
+                    onClick={() => {
+                      if (!isSimulating) {
+                        setSelectedHandCardId(isSelected ? null : card.id);
+                      }
+                    }}
+                    onMouseEnter={() => setHoveredCard(card as any)}
+                    onMouseLeave={() => setHoveredCard(null)}
+                    className={`p-2 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                      isSelected 
+                        ? 'bg-black/90 border-[#66fcf1] scale-[1.02] shadow-[0_0_10px_rgba(102,252,241,0.25)]' 
+                        : 'bg-black/45 border-gray-800/80 hover:border-gray-700'
+                    }`}
+                  >
+                    <div>
+                      <span className="font-display font-bold text-xs text-white block leading-tight">{card.name}</span>
+                      <div className="flex items-center gap-2 mt-1 font-mono text-[9px] md:text-[10px]">
+                        <span className="text-red-400 font-bold">⚔️{card.attack}</span>
+                        <span className="text-emerald-400 font-bold">❤️{card.health}</span>
+                        <span className="text-blue-400 font-bold">⏳{card.delay}</span>
+                      </div>
+                    </div>
+                    {isSelected ? (
+                      <span className="text-[9px] text-emerald-400 font-mono font-bold uppercase tracking-wider">Selected</span>
+                    ) : (
+                      <span className="text-[8px] text-gray-500 font-mono uppercase tracking-wider bg-black/40 px-1.5 py-0.5 rounded border border-gray-900">Deploy</span>
+                    )}
+                  </div>
+                );
+              })}
+              
+              {visualState.playerHand.length === 0 && (
+                <div className="text-center text-[10px] text-gray-500 font-mono py-6 border border-dashed border-gray-800 rounded-xl">
+                  Deck is empty.
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* BATTLE CODEX & INTERACTIVE CARD ANALYST */}
-          <div className="bg-[#151a21] border border-[#c5a880]/15 rounded-2xl p-4 flex flex-col justify-between flex-1 overflow-y-auto min-h-0">
+          <div className="bg-[#151a21] border border-[#c5a880]/15 rounded-2xl p-4 flex flex-col justify-between min-h-[170px]">
             {hoveredCard ? (
               <motion.div
                 key={hoveredCard.id}
@@ -1088,7 +1139,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   <div className="bg-black/35 p-1 rounded border border-gray-900/50 flex items-start gap-1">
                     <span className="text-amber-500">💀</span>
                     <div>
-                      <span className="font-bold text-white block">Sacrifice</span>
+                          <span className="font-bold text-white block">Sacrifice</span>
                       <span className="text-gray-500">Destroys an ally.</span>
                     </div>
                   </div>
@@ -1097,122 +1148,39 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             )}
           </div>
 
-          {/* COMBAT CHRONICLES LOG (Collapsible) */}
-          <AnimatePresence>
-            {showLog && (
-              <motion.div
-                initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                animate={{ opacity: 1, height: 200, marginTop: 16 }}
-                exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                className="bg-[#151a21] border border-[#c5a880]/15 rounded-2xl flex flex-col overflow-hidden"
-              >
-                <div className="p-4 flex-1 flex flex-col h-full">
-                  <h4 className="font-display font-bold text-xs text-red-400 tracking-wider uppercase border-b border-gray-800 pb-2 mb-2 shrink-0">
-                    📜 BLOODY DUEL LOG
-                  </h4>
-                  <div className="flex-1 overflow-y-auto font-mono text-[9px] text-gray-400 space-y-1.5 pr-1 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
-                    {visualState.combatLog.map((log, index) => {
-                      let colorClass = 'text-gray-400';
-                      if (log.includes('TURN')) colorClass = 'text-cyan-400 font-bold border-t border-gray-800 pt-1.5 mt-1.5';
-                      else if (log.includes('VICTORY') || log.includes('healed')) colorClass = 'text-emerald-400 font-bold';
-                      else if (log.includes('DEFEAT') || log.includes('fell') || log.includes('Death')) colorClass = 'text-red-500 font-bold';
-                      else if (log.includes('Sacrifice') || log.includes('💀')) colorClass = 'text-yellow-500';
-                      else if (log.includes('Hex')) colorClass = 'text-purple-400';
-                      else if (log.includes('Enemy') || log.includes('😈')) colorClass = 'text-rose-300';
-                      return (
-                        <div key={index} className={`border-b border-gray-900/20 pb-0.5 leading-relaxed ${colorClass}`} dangerouslySetInnerHTML={{ __html: log }} />
-                      );
-                    })}
+          {/* COMBAT CHRONICLES LOG */}
+          <div className="bg-[#151a21] border border-[#c5a880]/15 rounded-2xl p-4 flex-1 flex flex-col justify-between min-h-[160px]">
+            <h4 className="font-display font-bold text-xs text-red-400 tracking-wider uppercase border-b border-gray-800 pb-2 mb-2">
+              📜 BLOODY DUEL LOG
+            </h4>
+
+            {/* Scrollable logs */}
+            <div
+              id="combat-log-scroll"
+              className="flex-1 max-h-[170px] overflow-y-auto font-mono text-[9px] text-gray-400 space-y-1.5 pr-1 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent"
+            >
+              {visualState.combatLog.map((log, index) => {
+                let colorClass = 'text-gray-400';
+                if (log.includes('TURN')) colorClass = 'text-cyan-400 font-bold border-t border-gray-800 pt-1.5 mt-1.5';
+                else if (log.includes('VICTORY') || log.includes('healed')) colorClass = 'text-emerald-400 font-bold';
+                else if (log.includes('DEFEAT') || log.includes('fell') || log.includes('Death')) colorClass = 'text-red-500 font-bold';
+                else if (log.includes('Sacrifice') || log.includes('💀')) colorClass = 'text-yellow-500';
+                else if (log.includes('Hex')) colorClass = 'text-purple-400';
+                else if (log.includes('Enemy') || log.includes('😈')) colorClass = 'text-rose-300';
+
+                return (
+                  <div key={index} className={`border-b border-gray-900/20 pb-0.5 leading-relaxed ${colorClass}`} dangerouslySetInnerHTML={{ __html: log }}>
                   </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                );
+              })}
+            </div>
+          </div>
+
         </div>
 
       </div>
 
-      {/* PLAYER HAND FAN */}
-      <div className="absolute bottom-0 inset-x-0 h-[22vh] flex justify-center items-end pointer-events-none z-50 pb-2">
-        {visualState.playerHand.map((card, idx) => {
-          const total = visualState.playerHand.length;
-          const isSelected = selectedHandCardId === card.id;
-          const offset = idx - (total - 1) / 2;
-          const rotate = offset * 5;
-          const translateY = Math.abs(offset) * 8;
-          
-          return (
-            <motion.div
-              key={card.id}
-              onClick={() => {
-                if (!isSimulating) {
-                  setSelectedHandCardId(isSelected ? null : card.id);
-                }
-              }}
-              onMouseEnter={() => setHoveredCard(card as any)}
-              onMouseLeave={() => setHoveredCard(null)}
-              initial={{ y: 150, opacity: 0 }}
-              animate={{
-                rotate: isSelected ? 0 : rotate,
-                y: isSelected ? -40 : translateY,
-                scale: isSelected ? 1.1 : 1,
-                zIndex: isSelected ? 110 : 100 + idx
-              }}
-              whileHover={{
-                y: -35,
-                rotate: 0,
-                scale: 1.1,
-                zIndex: 120
-              }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              className={`w-28 md:w-36 aspect-[3/4.2] rounded-xl border flex flex-col justify-between p-2 text-center relative overflow-hidden select-none cursor-pointer pointer-events-auto shadow-2xl bg-[#151a21] transition-colors -mx-2 md:-mx-4 ${
-                isSelected ? 'border-[#66fcf1] shadow-[0_0_20px_rgba(102,252,241,0.6)] bg-[#102028]' : 'border-gray-700 hover:border-[#ebd09b]'
-              }`}
-            >
-              <div className={`absolute inset-0 opacity-[0.15] bg-gradient-to-br ${getTierBgGradient(card.tier)}`} />
-              {card.image.startsWith('/cards/') && (
-                <>
-                  <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 rounded-xl opacity-90" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 rounded-xl pointer-events-none" />
-                </>
-              )}
-              
-              <div className="flex justify-between items-center text-[7px] md:text-[8px] font-mono font-bold text-gray-300 z-10 relative">
-                <span className={`uppercase tracking-wider ${getTierTextColor(card.tier)}`}>{card.tier}</span>
-                <span>Lvl {card.level}</span>
-              </div>
-              
-              <div className="mt-1 z-10 relative bg-black/70 backdrop-blur-sm rounded px-1 py-0.5 border border-white/10 shadow">
-                <span className="text-[9px] md:text-[10px] font-display font-black tracking-tight text-white block truncate leading-none">
-                  {card.name}
-                </span>
-              </div>
-              
-              <div className="flex-1" />
-
-              {card.skills.length > 0 && (
-                <div className="z-10 relative flex flex-col gap-0.5 max-h-[36px] overflow-hidden mb-1 justify-end">
-                   {card.skills.map((s, sIdx) => (
-                     <div key={sIdx} className="bg-black/80 rounded px-1 py-0.5 text-[7px] md:text-[8px] text-left text-gray-200 font-mono border border-gray-600/50 flex gap-1 items-center truncate shadow-sm">
-                        <span>{getSkillIcon(s.type)}</span>
-                        <span>{getSkillNameEnglish(s.type)} {s.value}</span>
-                     </div>
-                   ))}
-                </div>
-              )}
-
-              <div className="flex justify-between items-center text-[9px] md:text-[10px] font-mono font-black pt-1 border-t border-gray-600/80 mt-1 z-10 relative bg-black/80 rounded-b-lg px-1 shadow">
-                <span className="text-red-400">⚔️ {card.attack}</span>
-                <span className="text-blue-400">⏳ {card.delay}</span>
-                <span className="text-emerald-400">❤️ {card.health}</span>
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-
       {/* WIN POPUP MODAL */}
-
       {battle.phase === 'player_won' && (
         <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-md">
           <div className="bg-[#151a21] border border-[#ebd09b]/30 rounded-2xl p-8 max-w-md w-full text-center space-y-6 shadow-2xl gothic-glow-gold">
