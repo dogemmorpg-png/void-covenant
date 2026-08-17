@@ -87,13 +87,11 @@ const getSkillBadgeStyle = (type: string) => {
 
 const getSkillIcon = (type: string) => {
   switch (type?.toLowerCase()) {
-  
-
-        case 'sacrifice': return <Skull className="w-5 h-5 inline-block" />;
-    case 'vampirism': return <Flame className="w-5 h-5 inline-block" />;
-    case 'hex': return <Zap className="w-4 h-4 inline-block text-purple-400 mx-0.5" />;
-    case 'plague': return <Activity className="w-5 h-5 inline-block" />;
-    default: return <Star className="w-5 h-5 inline-block" />;
+    case 'sacrifice': return <Skull className="w-3.5 h-3.5 inline-block text-red-400" />;
+    case 'vampirism': return <Flame className="w-3.5 h-3.5 inline-block text-rose-400" />;
+    case 'hex': return <Zap className="w-3.5 h-3.5 inline-block text-purple-400" />;
+    case 'plague': return <Activity className="w-3.5 h-3.5 inline-block text-emerald-400" />;
+    default: return <Star className="w-3.5 h-3.5 inline-block text-yellow-400" />;
   }
 };
 
@@ -175,7 +173,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
   const [showLogDrawer, setShowLogDrawer] = useState<boolean>(false);
   const [screenShake, setScreenShake] = useState<boolean>(false);
-  const [hoveredHandCardIndex, setHoveredHandCardIndex] = useState<number | null>(null);
 
   // Track the final target battle state once the calculation resolves
   const [finalBattleState, setFinalBattleState] = useState<BattleState | null>(null);
@@ -628,10 +625,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           <ArrowLeft className="w-3 h-3" /> ESCAPE
         </button>
 
-        <div className="text-center font-display font-black text-xs tracking-widest text-shadow-gold text-white uppercase flex items-center gap-3">
+        <div className="text-center font-display font-black text-sm tracking-widest text-shadow-gold text-white uppercase flex items-center gap-3">
           <span>{stage.name}</span>
           <span className="text-gray-500">•</span>
-          <span className="text-cyan-400 font-mono text-[11px] font-bold">TURN {visualState.turn}</span>
+          <span className="text-cyan-400 font-mono text-xs font-bold">TURN {visualState.turn}</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -674,13 +671,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               </div>
               <div>
                 <span className="text-[8px] font-mono font-bold text-[#dd2c40] tracking-wider uppercase block leading-none">Enemy Lord</span>
-                <h4 className="font-display font-bold text-xs text-white leading-none mt-0.5">{stage.enemyHeroName}</h4>
+                <h4 className="font-display font-black text-sm text-white leading-none mt-0.5">{stage.enemyHeroName}</h4>
               </div>
             </div>
 
             {/* Enemy HP Bar */}
             <div className="text-right space-y-0.5 font-mono w-40 md:w-56 relative z-10">
-              <div className="flex justify-between text-[10px] font-bold text-red-400 leading-none">
+              <div className="flex justify-between text-xs font-black text-red-400 leading-none">
                 <span>Health:</span>
                 <span>{visualState.enemyHeroHealth} / {visualState.enemyHeroMaxHealth} HP</span>
               </div>
@@ -760,12 +757,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             )}
           </AnimatePresence>
 
-          {/* BOARD STAGE FIELD (LINEAR DUELS) - cards and slots increased size */}
-          <div className="flex-1 flex flex-col justify-around my-2 min-h-0 relative">
+          {/* BOARD STAGE FIELD (LINEAR DUELS) - cards and slots increased size and center-grouped with gap */}
+          <div className="flex-1 flex flex-col justify-center gap-6 md:gap-8 my-2 min-h-0 relative">
             
             {/* 1. ENEMY BOARD */}
             <div className="grid grid-cols-5 gap-3 relative">
-              <div className="absolute inset-x-0 -bottom-2 h-[1px] bg-red-950/25" />
+              <div className="absolute inset-x-0 -bottom-3 h-[1px] bg-red-950/20" />
               {visualState.enemyBoard.map((card, idx) => {
                 const isActing = animatingSlot?.side === 'enemy' && animatingSlot?.slot === idx && animatingSlot?.type === 'strike';
                 const isHit = animatingSlot?.side === 'enemy' && animatingSlot?.slot === idx && animatingSlot?.type === 'hit';
@@ -786,8 +783,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{
                           opacity: isDeath ? 0 : 1,
-                          scale: isActing ? 1.15 : isDeath ? 0.7 : isHeal ? 1.05 : 1,
-                          y: isActing ? 30 : 0,
+                          scale: isActing ? 1.15 : isDeath ? 0.2 : isHeal ? 1.05 : 1,
+                          y: isActing ? 35 : 0,
+                          rotate: isDeath ? 12 : 0,
                           x: isHit ? [0, -6, 6, -4, 4, 0] : 0,
                           boxShadow: card.delay === 0
                             ? "0 0 15px rgba(220, 38, 64, 0.4)"
@@ -796,13 +794,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         }}
                         transition={{
                           type: "spring",
-                          stiffness: 280,
-                          damping: 14,
+                          stiffness: 350,
+                          damping: 12,
                           x: { duration: 0.25 }
                         }}
                         className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 text-center relative overflow-visible select-none transition-all bg-[#151a21] text-white cursor-help shadow-lg`}
                       >
-                        {/* Card Background & Artwork */}
+                        {/* Card Background & Artwork inside wrapper for rounded overflow-hidden */}
                         <div className="absolute inset-0 rounded-xl overflow-hidden z-0 pointer-events-none">
                           <div className={`absolute inset-0 opacity-[0.06] bg-gradient-to-br ${getTierBgGradient(card.tier)}`} />
                           {card.image.startsWith('/cards/') && (
@@ -840,19 +838,21 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         )}
 
                         <div className="mt-0.5 z-10 relative">
-                          <span className="text-[9.5px] font-display font-black tracking-tight text-white block truncate leading-none">
+                          <span className="text-[10px] md:text-[11px] font-display font-black tracking-tight text-white block truncate leading-none">
                             {card.name}
                           </span>
                         </div>
 
-                        <div className="flex flex-wrap justify-center gap-0.5 my-0.5 z-10 relative max-h-[14px] overflow-hidden">
+                        {/* Redesigned readable skills row */}
+                        <div className="flex justify-center gap-1 z-10 relative flex-wrap max-h-[18px] overflow-visible">
                           {card.skills.map((s, sIdx) => (
-                            <span
+                            <div 
                               key={sIdx}
-                              className={`text-[5.5px] px-0.5 py-0.2 rounded border ${getSkillBadgeStyle(s.type)}`}
+                              className={`flex items-center gap-0.5 text-[8px] font-mono font-black px-1 py-0.5 rounded-md border ${getSkillBadgeStyle(s.type)}`}
                             >
-                              {getSkillIcon(s.type)}{s.value}
-                            </span>
+                              <span>{getSkillIcon(s.type)}</span>
+                              <span className="leading-none">{s.value}</span>
+                            </div>
                           ))}
                         </div>
 
@@ -867,10 +867,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         <div className="h-2 z-10 relative" />
 
                         {/* Overlapping Badges on Corners */}
-                        <div className="absolute -bottom-2 -left-2 w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-2 border-[#151a21] flex items-center justify-center shadow-md z-20">
+                        <div className="absolute -bottom-2 -left-2 w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border border-[#151a21] flex items-center justify-center shadow-md z-20">
                           <span className="text-white text-[10px] font-black font-mono">⚔️{card.attack}</span>
                         </div>
-                        <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-red-700 border-2 border-[#151a21] flex items-center justify-center shadow-md z-20">
+                        <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-red-700 border border-[#151a21] flex items-center justify-center shadow-md z-20">
                           <span className="text-white text-[10px] font-black font-mono">❤️{card.health}</span>
                         </div>
                       </motion.div>
@@ -916,7 +916,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           animate={{ opacity: [0, 0.9, 0.9, 0], scale: [0.7, 1.15, 1.15, 1] }}
                           exit={{ opacity: 0 }}
                           transition={{ duration: 0.6 }}
-                          className="absolute inset-0 bg-emerald-950/60 border-2 border-emerald-500/80 z-35 flex items-center justify-center rounded-xl pointer-events-none"
+                          className="absolute inset-0 bg-[#0e2c1e]/70 border-2 border-emerald-500/80 z-35 flex items-center justify-center rounded-xl pointer-events-none"
                         >
                           <span className="text-xl drop-shadow-[0_0_8px_rgba(77,240,48,0.8)]">🤢</span>
                         </motion.div>
@@ -971,8 +971,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{
                           opacity: isDeath ? 0 : 1,
-                          scale: isActing ? 1.15 : isDeath ? 0.7 : isHeal ? 1.05 : 1,
-                          y: isActing ? -30 : 0,
+                          scale: isActing ? 1.15 : isDeath ? 0.2 : isHeal ? 1.05 : 1,
+                          y: isActing ? -35 : 0,
+                          rotate: isDeath ? 12 : 0,
                           x: isHit ? [0, -6, 6, -4, 4, 0] : 0,
                           boxShadow: card.delay === 0
                             ? "0 0 15px rgba(102, 252, 241, 0.4)"
@@ -981,8 +982,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         }}
                         transition={{
                           type: "spring",
-                          stiffness: 280,
-                          damping: 14,
+                          stiffness: 350,
+                          damping: 12,
                           x: { duration: 0.25 }
                         }}
                         className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 text-center relative overflow-visible select-none transition-all bg-[#151a21] text-white cursor-help shadow-lg`}
@@ -1015,7 +1016,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                         {/* Centered top status badge */}
                         {card.delay > 0 ? (
-                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-cyan-400 to-blue-600 border border-cyan-300 rounded-full px-1.5 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-black text-white shadow-md z-20 animate-pulse">
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-cyan-400 to-blue-600 border border-cyan-300 rounded-full px-1.5 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-bold text-white shadow-md z-20 animate-pulse">
                             ⏳{card.delay}
                           </div>
                         ) : (
@@ -1025,19 +1026,21 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         )}
 
                         <div className="mt-0.5 z-10 relative">
-                          <span className="text-[9.5px] font-display font-black tracking-tight text-white block truncate leading-none">
+                          <span className="text-[10px] md:text-[11px] font-display font-black tracking-tight text-white block truncate leading-none">
                             {card.name}
                           </span>
                         </div>
 
-                        <div className="flex flex-wrap justify-center gap-0.5 my-0.5 z-10 relative max-h-[14px] overflow-hidden">
+                        {/* Redesigned readable skills row */}
+                        <div className="flex justify-center gap-1 z-10 relative flex-wrap max-h-[18px] overflow-visible">
                           {card.skills.map((s, sIdx) => (
-                            <span
+                            <div 
                               key={sIdx}
-                              className={`text-[5.5px] px-0.5 py-0.2 rounded border ${getSkillBadgeStyle(s.type)}`}
+                              className={`flex items-center gap-0.5 text-[8px] font-mono font-black px-1 py-0.5 rounded-md border ${getSkillBadgeStyle(s.type)}`}
                             >
-                              {getSkillIcon(s.type)}{s.value}
-                            </span>
+                              <span>{getSkillIcon(s.type)}</span>
+                              <span className="leading-none">{s.value}</span>
+                            </div>
                           ))}
                         </div>
 
@@ -1052,10 +1055,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         <div className="h-2 z-10 relative" />
 
                         {/* Overlapping Badges on Corners */}
-                        <div className="absolute -bottom-2 -left-2 w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-2 border-[#151a21] flex items-center justify-center shadow-md z-20">
+                        <div className="absolute -bottom-2 -left-2 w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border border-[#151a21] flex items-center justify-center shadow-md z-20">
                           <span className="text-white text-[10px] font-black font-mono">⚔️{card.attack}</span>
                         </div>
-                        <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-red-700 border-2 border-[#151a21] flex items-center justify-center shadow-md z-20">
+                        <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-red-700 border border-[#151a21] flex items-center justify-center shadow-md z-20">
                           <span className="text-white text-[10px] font-black font-mono">❤️{card.health}</span>
                         </div>
                       </motion.div>
@@ -1110,7 +1113,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           animate={{ opacity: [0, 0.9, 0.9, 0], scale: [0.7, 1.15, 1.15, 1] }}
                           exit={{ opacity: 0 }}
                           transition={{ duration: 0.6 }}
-                          className="absolute inset-0 bg-emerald-950/60 border-2 border-emerald-500/80 z-35 flex items-center justify-center rounded-xl pointer-events-none"
+                          className="absolute inset-0 bg-[#0e2c1e]/70 border-2 border-emerald-500/80 z-35 flex items-center justify-center rounded-xl pointer-events-none"
                         >
                           <span className="text-xl drop-shadow-[0_0_8px_rgba(77,240,48,0.8)]">🤢</span>
                         </motion.div>
@@ -1173,7 +1176,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               </div>
               <div>
                 <span className="text-[8px] font-mono font-bold text-[#66fcf1] tracking-wider uppercase block leading-none">Your Hero</span>
-                <h4 className="font-display font-bold text-xs text-white leading-none mt-0.5">{profile.username || 'Wind Summoner'}</h4>
+                <h4 className="font-display font-black text-sm text-white leading-none mt-0.5">{profile.username || 'Wind Summoner'}</h4>
               </div>
             </div>
 
@@ -1184,7 +1187,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             {/* Right: HP Bar & Play Turn Button */}
             <div className="flex items-center gap-3 w-1/3 justify-end">
               <div className="text-right space-y-0.5 font-mono w-28 md:w-36 shrink-0">
-                <div className="flex justify-between text-[10px] font-bold text-[#66fcf1] leading-none">
+                <div className="flex justify-between text-xs font-black text-[#66fcf1] leading-none">
                   <span>Health:</span>
                   <span>{visualState.playerHeroHealth} / {visualState.playerHeroMaxHealth} HP</span>
                 </div>
@@ -1203,7 +1206,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   <button
                     disabled={isSimulating}
                     onClick={handleEndTurnWithoutCard}
-                    className="bg-gradient-to-r from-teal-900 to-[#1f2833] hover:from-[#4df030] hover:to-teal-900 border border-[#66fcf1]/40 hover:border-emerald-500/60 text-[#66fcf1] hover:text-white text-[9px] md:text-[10px] font-display font-black py-1 px-3 rounded-lg shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none cursor-pointer h-[32px] flex items-center justify-center"
+                    className="bg-gradient-to-r from-teal-900 to-[#1f2833] hover:from-[#4df030] hover:to-teal-900 border border-[#66fcf1]/40 hover:border-emerald-500/60 text-[#66fcf1] hover:text-white text-[10px] font-display font-black py-1 px-4 rounded-lg shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none cursor-pointer h-[32px] flex items-center justify-center"
                   >
                     ⏳ PLAY
                   </button>
@@ -1375,7 +1378,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         </AnimatePresence>
 
         {/* PLAYER HAND FAN ZONE - animated interactively using state-driven slide-aside positioning */}
-        <div className="absolute bottom-[-15px] left-1/2 -translate-x-1/2 flex justify-center items-end h-[140px] z-40 select-none pointer-events-none w-[520px]">
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex justify-center items-end h-[150px] z-40 select-none pointer-events-none w-[540px]">
           <div className="flex justify-center items-end relative w-full h-full pointer-events-auto">
             {visualState.playerHand.map((card, idx) => {
               const isSelected = selectedHandCardId === card.id;
@@ -1388,20 +1391,20 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               
               let translateX = offset * 45;
               // Push cards slightly down when not hovered, but raise them so they are readable
-              let translateY = Math.abs(offset) * 5 + (isSelected ? -25 : 35);
+              let translateY = Math.abs(offset) * 5 + (isSelected ? -25 : 30);
               let scale = 1.0;
               let zIndex = 10 + idx;
 
               // If a card is hovered, slide other cards aside (Hearthstone style)
               if (hoveredHandCardIndex !== null) {
                 if (hoveredHandCardIndex === idx) {
-                  translateY = -55;
-                  scale = 1.45;
+                  translateY = -70;
+                  scale = 1.5;
                   zIndex = 100;
                 } else if (idx < hoveredHandCardIndex) {
-                  translateX -= 30; // Slide left
+                  translateX -= 35; // Slide left
                 } else if (idx > hoveredHandCardIndex) {
-                  translateX += 30; // Slide right
+                  translateX += 35; // Slide right
                 }
               }
 
@@ -1473,14 +1476,16 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap justify-center gap-0.5 my-0.5 z-10 relative max-h-[14px] overflow-hidden">
+                    {/* Redesigned readable skills row for hand cards */}
+                    <div className="flex justify-center gap-1 z-10 relative flex-wrap max-h-[18px] overflow-visible">
                       {card.skills.map((s, sIdx) => (
-                        <span
+                        <div 
                           key={sIdx}
-                          className={`text-[5.5px] px-0.5 py-0.2 rounded border ${getSkillBadgeStyle(s.type)}`}
+                          className={`flex items-center gap-0.5 text-[8px] font-mono font-black px-1 py-0.5 rounded-md border ${getSkillBadgeStyle(s.type)}`}
                         >
-                          {getSkillIcon(s.type)}{s.value}
-                        </span>
+                          <span>{getSkillIcon(s.type)}</span>
+                          <span className="leading-none">{s.value}</span>
+                        </div>
                       ))}
                     </div>
 
