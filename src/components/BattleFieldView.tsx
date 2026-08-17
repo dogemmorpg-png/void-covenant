@@ -905,11 +905,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         {/* Gothic style corner badges (NO emojis) */}
                         <div className="absolute -bottom-3.5 -left-3.5 w-9 h-9 z-20 flex items-center justify-center">
                           <img src="/icons/gothic_attack.jpg" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                          <span className="relative text-[#fcd34d] text-[13px] font-black font-mono leading-none select-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{card.attack}</span>
+                          <span className="relative text-[#fcd34d] text-[14px] font-black font-mono leading-none select-none z-10" style={{ WebkitTextStroke: '2.5px #000000', paintOrder: 'stroke fill' }}>{card.attack}</span>
                         </div>
                         <div className="absolute -bottom-3.5 -right-3.5 w-9 h-9 z-20 flex items-center justify-center">
                           <img src="/icons/gothic_health.jpg" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                          <span className="relative text-[#fecaca] text-[13px] font-black font-mono leading-none select-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{card.health}</span>
+                          <span className="relative text-[#ffffff] text-[14px] font-black font-mono leading-none select-none z-10" style={{ WebkitTextStroke: '2.5px #000000', paintOrder: 'stroke fill' }}>{card.health}</span>
                         </div>
                       </motion.div>
                     ) : (
@@ -1095,11 +1095,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         {/* Gothic style corner badges (NO emojis) */}
                         <div className="absolute -bottom-3.5 -left-3.5 w-9 h-9 z-20 flex items-center justify-center">
                           <img src="/icons/gothic_attack.jpg" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                          <span className="relative text-[#fcd34d] text-[13px] font-black font-mono leading-none select-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{card.attack}</span>
+                          <span className="relative text-[#fcd34d] text-[14px] font-black font-mono leading-none select-none z-10" style={{ WebkitTextStroke: '2.5px #000000', paintOrder: 'stroke fill' }}>{card.attack}</span>
                         </div>
                         <div className="absolute -bottom-3.5 -right-3.5 w-9 h-9 z-20 flex items-center justify-center">
                           <img src="/icons/gothic_health.jpg" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                          <span className="relative text-[#fecaca] text-[13px] font-black font-mono leading-none select-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{card.health}</span>
+                          <span className="relative text-[#ffffff] text-[14px] font-black font-mono leading-none select-none z-10" style={{ WebkitTextStroke: '2.5px #000000', paintOrder: 'stroke fill' }}>{card.health}</span>
                         </div>
                       </motion.div>
                     ) : (
@@ -1361,11 +1361,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 {/* Gothic style corner badges (NO emojis) */}
                 <div className="absolute -bottom-3 -left-3 w-8 h-8 z-20 flex items-center justify-center">
                   <img src="/icons/gothic_attack.jpg" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                  <span className="relative text-[#fcd34d] text-[12px] font-black font-mono leading-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{hoveredCard.attack}</span>
+                  <span className="relative text-[#fcd34d] text-[12.5px] font-black font-mono leading-none z-10" style={{ WebkitTextStroke: '2.2px #000000', paintOrder: 'stroke fill' }}>{hoveredCard.attack}</span>
                 </div>
                 <div className="absolute -bottom-3 -right-3 w-8 h-8 z-20 flex items-center justify-center">
                   <img src="/icons/gothic_health.jpg" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                  <span className="relative text-[#fecaca] text-[12px] font-black font-mono leading-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{hoveredCard.health}</span>
+                  <span className="relative text-[#ffffff] text-[12.5px] font-black font-mono leading-none z-10" style={{ WebkitTextStroke: '2.2px #000000', paintOrder: 'stroke fill' }}>{hoveredCard.health}</span>
                 </div>
               </div>
 
@@ -1537,11 +1537,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     {/* Gothic style corner badges (NO emojis) */}
                     <div className="absolute -bottom-3.5 -left-3.5 w-9 h-9 z-20 flex items-center justify-center">
                       <img src="/icons/gothic_attack.jpg" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                      <span className="relative text-[#fcd34d] text-[13px] font-black font-mono leading-none select-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{card.attack}</span>
+                      <span className="relative text-[#fcd34d] text-[14px] font-black font-mono leading-none select-none z-10" style={{ WebkitTextStroke: '2.5px #000000', paintOrder: 'stroke fill' }}>{card.attack}</span>
                     </div>
                     <div className="absolute -bottom-3.5 -right-3.5 w-9 h-9 z-20 flex items-center justify-center">
                       <img src="/icons/gothic_health.jpg" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                      <span className="relative text-[#fecaca] text-[13px] font-black font-mono leading-none select-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{card.health}</span>
+                      <span className="relative text-[#ffffff] text-[14px] font-black font-mono leading-none select-none z-10" style={{ WebkitTextStroke: '2.5px #000000', paintOrder: 'stroke fill' }}>{card.health}</span>
                     </div>
                   </>
                 </motion.div>
