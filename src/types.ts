@@ -116,6 +116,9 @@ export interface BattleCardState {
   level: number;
   hexedAmount: number; // active Hex stack on this card
   isDead: boolean;
+  armor?: number; // incoming damage mitigation
+  ward?: boolean; // blocks the next attack entirely
+  buffs?: { type: 'attack' | 'armor', amount: number, turnsRemaining: number }[];
   attackFlash?: boolean; // animation flags
   damageTakenFlash?: boolean;
   healedFlash?: boolean;

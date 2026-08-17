@@ -19,7 +19,10 @@ export function toBattleCard(card: Card): BattleCardState {
     tier: card.tier,
     level: card.level,
     hexedAmount: 0,
-    isDead: false
+    isDead: false,
+    armor: 0,
+    ward: false,
+    buffs: []
   };
 }
 
@@ -82,24 +85,68 @@ export function simulateCombatTurn(
         
         if (activeEnemies.length > 0) {
           const targets = [activeEnemies[Math.floor(Math.random() * activeEnemies.length)]];
-          if ((stats as any).chainChance > 0 && Math.random() * 100 < (stats as any).chainChance && activeEnemies.length > 1) {
+          const s = stats as any;
+          if (s.chainChance > 0 && Math.random() * 100 < s.chainChance && activeEnemies.length > 1) {
              const remaining = activeEnemies.filter(i => i !== targets[0]);
              targets.push(remaining[Math.floor(Math.random() * remaining.length)]);
           }
+          if (s.singularity) {
+             // Ultimate: hits target and adjacent enemies for 50% damage
+             // Wait, for simplicity, let's just hit all active enemies for 50% if singularity is on? Or actually just adjacent.
+             // adjacent to target[0]
+             const mainTarget = targets[0];
+             [mainTarget - 1, mainTarget + 1].forEach(adj => {
+               if (activeEnemies.includes(adj) && !targets.includes(adj)) {
+                 targets.push(adj);
+               }
+             });
+          }
           
+          let totalLeech = 0;
           for (const targetIdx of targets) {
              const targetCard = state.enemyBoard[targetIdx]!;
-             let dmg = (stats as any).baseDamage;
-             if ((stats as any).execute && (targetCard.health / targetCard.maxHealth) <= 0.5) dmg += 1;
+             let dmg = s.baseDamage;
+             if (targetIdx !== targets[0] && s.singularity) {
+               dmg = Math.max(1, Math.floor(dmg / 2)); // Adjacent take 50%
+             }
+             if (s.executeDamage > 0 && (targetCard.health / targetCard.maxHealth) <= 0.5) dmg += s.executeDamage;
              
-             targetCard.health -= dmg;
-             logs.push(`⚡ Void Strike hits ${targetCard.name} for ${dmg} damage!`);
-             animateSequence.push({ type: 'hero_skill', stance: 'void_strike', targetSlot: targetIdx, damage: dmg });
+             // Apply damage
+             let actualDamage = dmg;
+             if (!s.pierce) {
+               if (targetCard.ward) {
+                 actualDamage = 0;
+                 targetCard.ward = false;
+                 logs.push(`⚡ Void Strike's damage on ${targetCard.name} was blocked by Ward!`);
+               } else if ((targetCard.armor || 0) > 0) {
+                 if ((targetCard.armor || 0) >= actualDamage) {
+                   targetCard.armor! -= actualDamage;
+                   actualDamage = 0;
+                 } else {
+                   actualDamage -= targetCard.armor!;
+                   targetCard.armor = 0;
+                 }
+               }
+             } else {
+               logs.push(`⚡ Void Strike Pierces through defenses!`);
+             }
+             
+             targetCard.health -= actualDamage;
+             if (actualDamage > 0) totalLeech += actualDamage;
+             logs.push(`⚡ Void Strike hits ${targetCard.name} for ${actualDamage} damage!`);
+             animateSequence.push({ type: 'hero_skill', stance: 'void_strike', targetSlot: targetIdx, damage: actualDamage });
              if (targetCard.health <= 0) {
                targetCard.isDead = true;
                logs.push(`💀 Enemy card ${targetCard.name} has been destroyed by Void Strike!`);
                animateSequence.push({ type: 'death', side: 'enemy', slot: targetIdx });
              }
+          }
+          if (s.leechPercent > 0 && totalLeech > 0) {
+            const heal = Math.floor(totalLeech * (s.leechPercent / 100));
+            if (heal > 0) {
+              state.playerHeroHealth = Math.min(state.playerHeroMaxHealth, state.playerHeroHealth + heal);
+              logs.push(`⚡ Void Strike leeches ${heal} HP to the Hero!`);
+            }
           }
         }
       } 
@@ -108,47 +155,79 @@ export function simulateCombatTurn(
         for (let i = 0; i < 5; i++) if (state.playerBoard[i] && !state.playerBoard[i].isDead) activeAllies.push(i);
         
         if (activeAllies.length > 0) {
-          // find lowest health ally
-          activeAllies.sort((a, b) => (state.playerBoard[a]!.health / state.playerBoard[a]!.maxHealth) - (state.playerBoard[b]!.health / state.playerBoard[b]!.maxHealth));
-          const targetSlot = activeAllies[0];
-          const targetCard = state.playerBoard[targetSlot]!;
-          const heal = (stats as any).baseHealing;
-          
-          if (targetCard.health >= targetCard.maxHealth && (stats as any).overflow) {
-            state.playerHeroHealth = Math.min(state.playerHeroMaxHealth, state.playerHeroHealth + heal);
-            logs.push(`🩸 Blood Aura healed Hero for ${heal} HP (Overflow).`);
-          } else {
-            targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + heal);
-            logs.push(`🩸 Blood Aura healed ${targetCard.name} for ${heal} HP.`);
+          const s = stats as any;
+          const triggers = s.doubleTrigger && Math.random() < 0.5 ? 2 : 1;
+          for (let t = 0; t < triggers; t++) {
+            // find lowest health ally
+            const currentActiveAllies = [];
+            for (let i = 0; i < 5; i++) if (state.playerBoard[i] && !state.playerBoard[i].isDead) currentActiveAllies.push(i);
+            if (currentActiveAllies.length === 0) break;
+
+            currentActiveAllies.sort((a, b) => (state.playerBoard[a]!.health / state.playerBoard[a]!.maxHealth) - (state.playerBoard[b]!.health / state.playerBoard[b]!.maxHealth));
+            const targetSlot = currentActiveAllies[0];
+            const targetCard = state.playerBoard[targetSlot]!;
+            const heal = s.baseHealing;
             
-            if ((stats as any).cleanseChance > 0 && Math.random() * 100 < (stats as any).cleanseChance) {
-              if (targetCard.hexedAmount > 0) {
-                 targetCard.hexedAmount = 0;
-                 logs.push(`🩸 Blood Aura cleansed Hex from ${targetCard.name}!`);
+            if (targetCard.health >= targetCard.maxHealth && s.overflowPercent > 0) {
+              const lordHeal = Math.max(1, Math.floor(heal * (s.overflowPercent / 100)));
+              state.playerHeroHealth = Math.min(state.playerHeroMaxHealth, state.playerHeroHealth + lordHeal);
+              logs.push(`🩸 Blood Aura healed Hero for ${lordHeal} HP (Overflow).`);
+            } else {
+              targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + heal);
+              logs.push(`🩸 Blood Aura healed ${targetCard.name} for ${heal} HP.`);
+              
+              if (s.cleanseChance > 0 && Math.random() * 100 < s.cleanseChance) {
+                if (targetCard.hexedAmount > 0) {
+                   targetCard.hexedAmount = 0;
+                   logs.push(`🩸 Blood Aura cleansed Hex from ${targetCard.name}!`);
+                }
               }
             }
+            if (s.ward && !targetCard.ward) {
+              targetCard.ward = true;
+              logs.push(`🩸 Blood Aura granted Ward to ${targetCard.name}!`);
+            }
+            if (s.bonusMaxHp > 0) {
+              targetCard.maxHealth += s.bonusMaxHp;
+              targetCard.health += s.bonusMaxHp; // also heal the amount it expanded
+              logs.push(`🩸 Blood Aura expanded ${targetCard.name}'s max HP by ${s.bonusMaxHp}!`);
+            }
+            animateSequence.push({ type: 'hero_skill', stance: 'blood_aura', targetSlot: targetSlot, heal: heal });
           }
-          animateSequence.push({ type: 'hero_skill', stance: 'blood_aura', targetSlot: targetSlot, heal: heal });
         }
       }
       else if (stance === 'warlord_cry') {
-        let activeAllies = [];
+        const activeAllies = [];
         for (let i = 0; i < 5; i++) if (state.playerBoard[i] && !state.playerBoard[i].isDead) activeAllies.push(i);
         
         if (activeAllies.length > 0) {
-          if ((stats as any).prioritizeActive) {
-            const readyAllies = activeAllies.filter(i => state.playerBoard[i]!.delay === 0);
-            if (readyAllies.length > 0) activeAllies = readyAllies;
-          }
           const targetSlot = activeAllies[Math.floor(Math.random() * activeAllies.length)];
           const targetCard = state.playerBoard[targetSlot]!;
+          const s = stats as any;
           
-          targetCard.attack += 1;
-          logs.push(`🔥 Warlord's Cry boosts ${targetCard.name}'s ATK by 1!`);
+          targetCard.buffs = targetCard.buffs || [];
           
-          if ((stats as any).delayReduceChance > 0 && Math.random() * 100 < (stats as any).delayReduceChance) {
+          if (s.bonusAtk > 0) {
+            targetCard.attack += s.bonusAtk;
+            if (!s.permanent) {
+              targetCard.buffs.push({ type: 'attack', amount: s.bonusAtk, turnsRemaining: s.durationTurns });
+            }
+            logs.push(`🔥 Warlord's Cry boosts ${targetCard.name}'s ATK by ${s.bonusAtk}!`);
+          }
+          if (s.bonusArmor > 0) {
+            targetCard.armor = (targetCard.armor || 0) + s.bonusArmor;
+            if (!s.permanent) {
+              targetCard.buffs.push({ type: 'armor', amount: s.bonusArmor, turnsRemaining: s.durationTurns });
+            }
+            logs.push(`🔥 Warlord's Cry grants ${targetCard.name} ${s.bonusArmor} Armor!`);
+          }
+          if (s.momentumChance > 0 && Math.random() * 100 < s.momentumChance) {
              targetCard.delay = Math.max(0, targetCard.delay - 1);
              logs.push(`🔥 Warlord's Cry reduced ${targetCard.name}'s Delay by 1!`);
+          }
+          if (s.aoeHeal > 0) {
+            targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + s.aoeHeal);
+            logs.push(`🔥 Warlord's Cry heals ${targetCard.name} for ${s.aoeHeal}!`);
           }
           animateSequence.push({ type: 'hero_skill', stance: 'warlord_cry', targetSlot: targetSlot });
         }
@@ -156,6 +235,22 @@ export function simulateCombatTurn(
     }
   }
 
+  // Process expiring buffs on Player Board
+  for (let i = 0; i < 5; i++) {
+    const card = state.playerBoard[i];
+    if (card && card.buffs && card.buffs.length > 0) {
+      card.buffs = card.buffs.filter(buff => {
+        buff.turnsRemaining -= 1;
+        if (buff.turnsRemaining <= 0) {
+          if (buff.type === 'attack') card.attack = Math.max(0, card.attack - buff.amount);
+          if (buff.type === 'armor') card.armor = Math.max(0, (card.armor || 0) - buff.amount);
+          logs.push(`⏳ ${card.name}'s Warlord buff (+${buff.amount} ${buff.type}) has expired.`);
+          return false;
+        }
+        return true;
+      });
+    }
+  }
 
   // 1. Process player played card if not already processed
   // (We handle the Sacrifice mechanic here when placing the card)
@@ -324,13 +419,31 @@ export function simulateCombatTurn(
         }
         
         // Calculate total damage with Hex
-        const totalDamage = attackDmg + eCard.hexedAmount;
+        let totalDamage = attackDmg + eCard.hexedAmount;
+        
+        if (eCard.ward) {
+           totalDamage = 0;
+           eCard.ward = false;
+           logs.push(`🛡️ ${eCard.name}'s Ward blocked the attack!`);
+        } else if ((eCard.armor || 0) > 0) {
+           if (eCard.armor! >= totalDamage) {
+             eCard.armor! -= totalDamage;
+             totalDamage = 0;
+           } else {
+             totalDamage -= eCard.armor!;
+             eCard.armor = 0;
+           }
+           logs.push(`🛡️ ${eCard.name}'s Armor mitigated the damage!`);
+        }
+        
         eCard.health -= totalDamage;
-        logs.push(`🗡️ ${pCard.name} attacks ${eCard.name} for ${totalDamage} damage! (Enemy HP: ${eCard.health}/${eCard.maxHealth})`);
+        if (totalDamage > 0) {
+          logs.push(`🗡️ ${pCard.name} attacks ${eCard.name} for ${totalDamage} damage! (Enemy HP: ${eCard.health}/${eCard.maxHealth})`);
+        }
         
         // Vampirism check
         const vampSkill = pCard.skills.find(s => s.type === 'vampirism');
-        if (vampSkill && eCard.health < eCard.maxHealth) {
+        if (vampSkill && eCard.health < eCard.maxHealth && totalDamage > 0) {
           const healAmount = vampSkill.value;
           const oldHP = pCard.health;
           pCard.health = Math.min(pCard.maxHealth, pCard.health + healAmount);
@@ -346,7 +459,7 @@ export function simulateCombatTurn(
           slot: i,
           targetSlot: i,
           damage: totalDamage,
-          vampireHeal: vampSkill ? vampSkill.value : 0
+          vampireHeal: (vampSkill && totalDamage > 0) ? vampSkill.value : 0
         });
 
         // Check death
@@ -384,13 +497,31 @@ export function simulateCombatTurn(
           logs.push(`🔮 [Enemy] ${eCard.name} casts Hex on ${activePCard.name} (+${hexSkill.value} damage).`);
         }
         
-        const totalDamage = attackDmg + activePCard.hexedAmount;
+        let totalDamage = attackDmg + activePCard.hexedAmount;
+        
+        if (activePCard.ward) {
+           totalDamage = 0;
+           activePCard.ward = false;
+           logs.push(`🛡️ ${activePCard.name}'s Ward blocked the attack!`);
+        } else if ((activePCard.armor || 0) > 0) {
+           if (activePCard.armor! >= totalDamage) {
+             activePCard.armor! -= totalDamage;
+             totalDamage = 0;
+           } else {
+             totalDamage -= activePCard.armor!;
+             activePCard.armor = 0;
+           }
+           logs.push(`🛡️ ${activePCard.name}'s Armor mitigated the damage!`);
+        }
+        
         activePCard.health -= totalDamage;
-        logs.push(`🗡️ [Enemy] ${eCard.name} hits ${activePCard.name} for ${totalDamage} damage! (Your HP: ${activePCard.health}/${activePCard.maxHealth})`);
+        if (totalDamage > 0) {
+          logs.push(`🗡️ [Enemy] ${eCard.name} hits ${activePCard.name} for ${totalDamage} damage! (Your HP: ${activePCard.health}/${activePCard.maxHealth})`);
+        }
         
         // Vampirism
         const vampSkill = eCard.skills.find(s => s.type === 'vampirism');
-        if (vampSkill) {
+        if (vampSkill && totalDamage > 0) {
           const healAmount = vampSkill.value;
           eCard.health = Math.min(eCard.maxHealth, eCard.health + healAmount);
           logs.push(`🩸 [Enemy] Vampirism: ${eCard.name} heals +${healAmount} HP.`);
