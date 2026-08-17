@@ -279,12 +279,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         
         // Embedded directly to prevent Vercel ESM module resolution issues on API routes
         const TALENT_TREES = [
-          { id: 'void_base', maxLevel: 20 }, { id: 'void_dmg', maxLevel: 10 }, { id: 'void_chain', maxLevel: 10 },
-          { id: 'void_pierce', maxLevel: 1 }, { id: 'void_execute', maxLevel: 3 }, { id: 'void_leech', maxLevel: 3 }, { id: 'void_ultimate', maxLevel: 1 },
-          { id: 'blood_base', maxLevel: 20 }, { id: 'blood_heal', maxLevel: 10 }, { id: 'blood_cleanse', maxLevel: 10 },
-          { id: 'blood_ward', maxLevel: 1 }, { id: 'blood_overflow', maxLevel: 3 }, { id: 'blood_shield', maxLevel: 3 }, { id: 'blood_ultimate', maxLevel: 1 },
-          { id: 'war_base', maxLevel: 20 }, { id: 'war_atk', maxLevel: 10 }, { id: 'war_armor', maxLevel: 10 },
-          { id: 'war_duration', maxLevel: 1 }, { id: 'war_momentum', maxLevel: 3 }, { id: 'war_heal', maxLevel: 3 }, { id: 'war_ultimate', maxLevel: 1 }
+          { id: 'void_base', maxLevel: 20, cost: 1 }, { id: 'void_dmg', maxLevel: 10, cost: 1 }, { id: 'void_chain', maxLevel: 10, cost: 1 },
+          { id: 'void_pierce', maxLevel: 1, cost: 5 }, { id: 'void_execute', maxLevel: 3, cost: 5 }, { id: 'void_leech', maxLevel: 3, cost: 5 }, { id: 'void_ultimate', maxLevel: 1, cost: 10 },
+          { id: 'blood_base', maxLevel: 20, cost: 1 }, { id: 'blood_heal', maxLevel: 10, cost: 1 }, { id: 'blood_cleanse', maxLevel: 10, cost: 1 },
+          { id: 'blood_ward', maxLevel: 1, cost: 5 }, { id: 'blood_overflow', maxLevel: 3, cost: 5 }, { id: 'blood_shield', maxLevel: 3, cost: 5 }, { id: 'blood_ultimate', maxLevel: 1, cost: 10 },
+          { id: 'war_base', maxLevel: 20, cost: 1 }, { id: 'war_atk', maxLevel: 10, cost: 1 }, { id: 'war_armor', maxLevel: 10, cost: 1 },
+          { id: 'war_duration', maxLevel: 1, cost: 5 }, { id: 'war_momentum', maxLevel: 3, cost: 5 }, { id: 'war_heal', maxLevel: 3, cost: 5 }, { id: 'war_ultimate', maxLevel: 1, cost: 10 }
         ];
 
         for (const [nodeId, level] of Object.entries(requestedTalents)) {
@@ -300,7 +300,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
              valid = false;
              break;
            }
-           totalSpent += numLevel; // Frontend costs 1 point per level unconditionally
+           totalSpent += (numLevel * node.cost);
         }
         
         const playerLevel = currentProfile.level || 1;

@@ -28,17 +28,20 @@ export const TalentsView: React.FC = () => {
   if (!profile) return null;
 
   const totalPoints = Math.max(0, profile.level - 1);
-  const spentPoints = Object.values(profile.talents || {}).reduce((sum, val) => sum + val, 0);
+  const spentPoints = Object.entries(profile.talents || {}).reduce((sum, [nodeId, lvl]) => {
+    const node = TALENT_TREES.find(t => t.id === nodeId);
+    return sum + (lvl * (node?.cost || 1));
+  }, 0);
   const availablePoints = totalPoints - spentPoints;
 
   const handlePurchase = (nodeId: string) => {
-    if (availablePoints <= 0) {
-      toast('Not enough skill points! Level up to get more.', 'warning');
-      return;
-    }
-
     const node = TALENT_TREES.find(n => n.id === nodeId);
     if (!node) return;
+
+    if (availablePoints < node.cost) {
+      toast(`Not enough skill points! Need ${node.cost} points.`, 'warning');
+      return;
+    }
 
     const currentLevel = profile.talents?.[nodeId] || 0;
     if (currentLevel >= node.maxLevel) {
@@ -415,11 +418,11 @@ export const TalentsView: React.FC = () => {
                       </p>
                     </div>
 
-                    {/* Cost Badge (only shown on hover if available) */}
+                    {/* Cost Badge */}
                     {!isLocked && !isMaxed && (
-                       <div className="absolute -top-3 -right-3 bg-black border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity transform scale-75 group-hover:scale-100">
-                         <span className="text-[10px] font-bold text-gray-300 flex items-center gap-0.5">
-                           <LucideIcons.Star className="w-3 h-3 text-amber-500 fill-current" />
+                       <div className="absolute -top-3 -right-3 bg-black border border-amber-500/50 rounded-full w-8 h-8 flex items-center justify-center shadow-[0_0_10px_rgba(251,191,36,0.3)] z-30 transition-transform group-hover:scale-110 group-hover:border-amber-400">
+                         <span className="text-[11px] font-black text-amber-400 flex flex-col items-center leading-none mt-0.5">
+                           <LucideIcons.Star className="w-3 h-3 text-amber-500 fill-amber-500 mb-0.5" />
                            {node.cost}
                          </span>
                        </div>
