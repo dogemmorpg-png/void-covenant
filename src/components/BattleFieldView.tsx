@@ -726,35 +726,40 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           <AnimatePresence mode="wait">
             {isAnimating && (
               <motion.div
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                className="absolute top-16 left-1/2 -translate-x-1/2 bg-[#120d0a]/95 border border-[#66fcf1]/35 rounded-lg p-1.5 px-3 flex justify-between items-center gap-2 shadow-md backdrop-blur-sm h-[38px] w-[500px] shrink-0 z-35"
+                initial={{ opacity: 0, y: -15, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -15, scale: 0.95 }}
+                className="absolute top-16 left-1/2 -translate-x-1/2 bg-gradient-to-b from-[#1c140e] to-[#0d0906] border-2 border-[#ebd09b]/35 rounded-xl p-2 px-4 flex justify-between items-center gap-4 shadow-[0_8px_30px_rgba(0,0,0,0.9),_0_0_15px_rgba(235,208,155,0.1)] backdrop-blur-md h-[54px] w-[560px] shrink-0 z-35"
               >
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#66fcf1] animate-ping" />
-                  <div>
-                    <h5 className="font-display font-bold text-[10px] text-white leading-none">
+                {/* Combat Message Announcer */}
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping shrink-0" />
+                  <div className="min-w-0">
+                    <span className="text-[7.5px] font-mono font-bold text-amber-500/80 uppercase tracking-widest block leading-none">Combat Log Step</span>
+                    <h5 className="font-display font-black text-[11.5px] text-white tracking-wide truncate mt-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
                       {activeLogStepText || 'Starting combat duelist...'}
                     </h5>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2.5">
-                  <span className="text-[8px] font-mono text-gray-400">
-                    Step {currentStepIndex + 1} / {animateSequence.length}
-                  </span>
+                {/* Announcer Controls */}
+                <div className="flex items-center gap-3 shrink-0">
+                  {/* Step indicator */}
+                  <div className="text-right font-mono text-[9.5px] text-gray-400 leading-none">
+                    <div>STEP</div>
+                    <div className="font-bold text-white mt-0.5">{currentStepIndex + 1}/{animateSequence.length}</div>
+                  </div>
 
-                  {/* Playback speed selector */}
-                  <div className="flex bg-black/40 p-0.5 rounded border border-gray-800 h-6 items-center">
+                  {/* Speed Buttons */}
+                  <div className="flex bg-black/60 p-0.5 rounded-lg border border-amber-950/40 h-7 items-center">
                     {[1, 2, 3].map((s) => (
                       <button
                         key={s}
                         onClick={() => setSpeedMultiplier(s)}
-                        className={`px-1.5 py-0.5 text-[8px] font-mono font-black rounded transition-all cursor-pointer ${
+                        className={`w-6 h-6 flex items-center justify-center text-[9.5px] font-mono font-black rounded-md transition-all cursor-pointer ${
                           speedMultiplier === s
-                            ? 'bg-[#66fcf1] text-black font-bold'
-                            : 'text-gray-400 hover:text-white'
+                            ? 'bg-gradient-to-b from-amber-400 to-yellow-600 text-black font-bold shadow-md'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
                         }`}
                       >
                         {s}x
@@ -762,25 +767,25 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     ))}
                   </div>
 
-                  {/* Pause / Resume buttons */}
+                  {/* Play / Pause */}
                   <button
                     onClick={() => setIsPaused(!isPaused)}
-                    className="bg-black/50 hover:bg-gray-800 border border-gray-800 text-white text-[8px] font-mono font-bold py-0.5 px-2 rounded cursor-pointer transition-all flex items-center gap-0.5 h-6"
+                    className="bg-black/60 hover:bg-amber-950/30 border border-amber-900/40 text-white text-[9px] font-mono font-bold h-7 px-2.5 rounded-md cursor-pointer transition-all flex items-center gap-1 shadow-sm active:scale-95"
                   >
-                    {isPaused ? <Play className="w-2 h-2 text-emerald-400" /> : <Pause className="w-2 h-2 text-yellow-400" />}
-                    {isPaused ? 'START' : 'PAUSE'}
+                    {isPaused ? <Play className="w-2.5 h-2.5 text-emerald-400 fill-emerald-400" /> : <Pause className="w-2.5 h-2.5 text-yellow-400 fill-yellow-400" />}
+                    <span>{isPaused ? 'RESUME' : 'PAUSE'}</span>
                   </button>
 
-                  {/* Manual trigger for next step when paused */}
+                  {/* Manual Step */}
                   {isPaused && (
                     <button
                       onClick={() => {
                         setAnimatingSlot(null);
                         setCurrentStepIndex(prev => Math.min(animateSequence.length, prev + 1));
                       }}
-                      className="bg-cyan-950/50 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-300 text-[8px] font-mono font-bold py-0.5 px-1.5 rounded cursor-pointer transition-all h-6"
+                      className="bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-cyan-300 text-[9px] font-mono font-bold h-7 px-2.5 rounded-md cursor-pointer transition-all active:scale-95 shadow-sm"
                     >
-                      STEP ➡️
+                      NEXT ➡️
                     </button>
                   )}
                 </div>
@@ -898,11 +903,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         </div>
 
                         {/* Gothic style corner badges (NO emojis) */}
-                        <div className="absolute -bottom-2.5 -left-2.5 w-8 h-8 bg-gradient-to-br from-[#1b1c20] via-[#2c2e35] to-[#121316] border border-[#7d8291]/50 rounded-lg rotate-45 flex items-center justify-center shadow-lg z-20">
-                          <span className="text-[#e2e8f0] text-[12px] font-black font-mono rotate-[-45deg] leading-none select-none">{card.attack}</span>
+                        <div className="absolute -bottom-3.5 -left-3.5 w-9 h-9 z-20 flex items-center justify-center">
+                          <img src="/icons/gothic_attack.jpg" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                          <span className="relative text-[#fcd34d] text-[13px] font-black font-mono leading-none select-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{card.attack}</span>
                         </div>
-                        <div className="absolute -bottom-2.5 -right-2.5 w-8 h-8 bg-gradient-to-br from-[#3b0f11] via-[#52161a] to-[#25090b] border border-[#f87171]/40 rounded-b-xl rounded-t-sm flex items-center justify-center shadow-lg z-20">
-                          <span className="text-[#fecaca] text-[12px] font-black font-mono leading-none select-none">{card.health}</span>
+                        <div className="absolute -bottom-3.5 -right-3.5 w-9 h-9 z-20 flex items-center justify-center">
+                          <img src="/icons/gothic_health.jpg" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                          <span className="relative text-[#fecaca] text-[13px] font-black font-mono leading-none select-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{card.health}</span>
                         </div>
                       </motion.div>
                     ) : (
@@ -1086,11 +1093,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         </div>
 
                         {/* Gothic style corner badges (NO emojis) */}
-                        <div className="absolute -bottom-2.5 -left-2.5 w-8 h-8 bg-gradient-to-br from-[#1b1c20] via-[#2c2e35] to-[#121316] border border-[#7d8291]/50 rounded-lg rotate-45 flex items-center justify-center shadow-lg z-20">
-                          <span className="text-[#e2e8f0] text-[12px] font-black font-mono rotate-[-45deg] leading-none select-none">{card.attack}</span>
+                        <div className="absolute -bottom-3.5 -left-3.5 w-9 h-9 z-20 flex items-center justify-center">
+                          <img src="/icons/gothic_attack.jpg" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                          <span className="relative text-[#fcd34d] text-[13px] font-black font-mono leading-none select-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{card.attack}</span>
                         </div>
-                        <div className="absolute -bottom-2.5 -right-2.5 w-8 h-8 bg-gradient-to-br from-[#3b0f11] via-[#52161a] to-[#25090b] border border-[#f87171]/40 rounded-b-xl rounded-t-sm flex items-center justify-center shadow-lg z-20">
-                          <span className="text-[#fecaca] text-[12px] font-black font-mono leading-none select-none">{card.health}</span>
+                        <div className="absolute -bottom-3.5 -right-3.5 w-9 h-9 z-20 flex items-center justify-center">
+                          <img src="/icons/gothic_health.jpg" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                          <span className="relative text-[#fecaca] text-[13px] font-black font-mono leading-none select-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{card.health}</span>
                         </div>
                       </motion.div>
                     ) : (
@@ -1211,12 +1220,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         {/* Collapsible log button */}
         <button
           onClick={() => setShowLogDrawer(true)}
-          className="absolute top-14 right-4 bg-[#120d0a]/90 border border-amber-900/40 text-[#ebd09b] hover:text-white p-2.5 rounded-full cursor-pointer shadow-lg hover:border-amber-500 transition-all z-35 flex items-center justify-center group"
-          title="Open Duel Log"
+          className="absolute top-14 right-4 bg-[#120d0a]/95 border border-[#ebd09b]/25 hover:border-amber-500 text-[#ebd09b] hover:text-white px-3 py-1.5 rounded-lg cursor-pointer shadow-lg transition-all z-35 flex items-center gap-1.5 font-display font-black text-[10px] uppercase tracking-wider group"
         >
-          <Scroll className="w-4.5 h-4.5 group-hover:scale-110 transition-transform" />
+          <Scroll className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+          <span>DUEL LOG</span>
           {visualState.combatLog.length > 1 && (
-            <span className="absolute -top-1 -right-1 bg-red-600 text-white font-mono text-[8px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border border-black animate-pulse">
+            <span className="bg-red-600 text-white font-mono text-[8px] font-black px-1.5 py-0.2 rounded-full border border-black animate-pulse leading-none">
               {visualState.combatLog.length - 1}
             </span>
           )}
@@ -1350,11 +1359,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 <div className="h-0.5 shrink-0" />
 
                 {/* Gothic style corner badges (NO emojis) */}
-                <div className="absolute -bottom-2.5 -left-2.5 w-7 h-7 bg-gradient-to-br from-[#1b1c20] via-[#2c2e35] to-[#121316] border border-[#7d8291]/50 rounded-lg rotate-45 flex items-center justify-center shadow-md z-20">
-                  <span className="text-[#e2e8f0] text-[11px] font-black font-mono rotate-[-45deg] leading-none">{hoveredCard.attack}</span>
+                <div className="absolute -bottom-3 -left-3 w-8 h-8 z-20 flex items-center justify-center">
+                  <img src="/icons/gothic_attack.jpg" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                  <span className="relative text-[#fcd34d] text-[12px] font-black font-mono leading-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{hoveredCard.attack}</span>
                 </div>
-                <div className="absolute -bottom-2.5 -right-2.5 w-7 h-7 bg-gradient-to-br from-[#3b0f11] via-[#52161a] to-[#25090b] border border-[#f87171]/40 rounded-b-xl rounded-t-sm flex items-center justify-center shadow-md z-20">
-                  <span className="text-[#fecaca] text-[11px] font-black font-mono leading-none">{hoveredCard.health}</span>
+                <div className="absolute -bottom-3 -right-3 w-8 h-8 z-20 flex items-center justify-center">
+                  <img src="/icons/gothic_health.jpg" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                  <span className="relative text-[#fecaca] text-[12px] font-black font-mono leading-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{hoveredCard.health}</span>
                 </div>
               </div>
 
@@ -1524,11 +1535,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     <div className="h-1 shrink-0" />
 
                     {/* Gothic style corner badges (NO emojis) */}
-                    <div className="absolute -bottom-2.5 -left-2.5 w-8 h-8 bg-gradient-to-br from-[#1b1c20] via-[#2c2e35] to-[#121316] border border-[#7d8291]/50 rounded-lg rotate-45 flex items-center justify-center shadow-lg z-20">
-                      <span className="text-[#e2e8f0] text-[12px] font-black font-mono rotate-[-45deg] leading-none select-none">{card.attack}</span>
+                    <div className="absolute -bottom-3.5 -left-3.5 w-9 h-9 z-20 flex items-center justify-center">
+                      <img src="/icons/gothic_attack.jpg" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                      <span className="relative text-[#fcd34d] text-[13px] font-black font-mono leading-none select-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{card.attack}</span>
                     </div>
-                    <div className="absolute -bottom-2.5 -right-2.5 w-8 h-8 bg-gradient-to-br from-[#3b0f11] via-[#52161a] to-[#25090b] border border-[#f87171]/40 rounded-b-xl rounded-t-sm flex items-center justify-center shadow-lg z-20">
-                      <span className="text-[#fecaca] text-[12px] font-black font-mono leading-none select-none">{card.health}</span>
+                    <div className="absolute -bottom-3.5 -right-3.5 w-9 h-9 z-20 flex items-center justify-center">
+                      <img src="/icons/gothic_health.jpg" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                      <span className="relative text-[#fecaca] text-[13px] font-black font-mono leading-none select-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10">{card.health}</span>
                     </div>
                   </>
                 </motion.div>
