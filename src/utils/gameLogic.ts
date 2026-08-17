@@ -168,8 +168,8 @@ export function simulateCombatTurn(
             const targetSlot = currentActiveAllies[0];
             const targetCard = state.playerBoard[targetSlot]!;
             const heal = s.baseHealing;
-            
-            if (targetCard.health >= targetCard.maxHealth && s.overflowPercent > 0) {
+              let cleansed = false;
+              if (targetCard.health >= targetCard.maxHealth && s.overflowPercent > 0) {
               const lordHeal = Math.max(1, Math.floor(heal * (s.overflowPercent / 100)));
               state.playerHeroHealth = Math.min(state.playerHeroMaxHealth, state.playerHeroHealth + lordHeal);
                 animateSequence.push({ type: 'hero_heal', heal: lordHeal });
@@ -178,8 +178,7 @@ export function simulateCombatTurn(
               targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + heal);
               logs.push(`🩸 Blood Aura healed ${targetCard.name} for ${heal} HP.`);
               
-              let cleansed = false;
-                if (s.cleanseChance > 0 && Math.random() * 100 < s.cleanseChance) {
+              if (s.cleanseChance > 0 && Math.random() * 100 < s.cleanseChance) {
                 if (targetCard.hexedAmount > 0) {
                    targetCard.hexedAmount = 0;
                      cleansed = true;
