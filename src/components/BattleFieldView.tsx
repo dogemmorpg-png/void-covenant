@@ -680,25 +680,26 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             </div>
           </div>
 
-          {/* 2. PLAYER HERO PORTRAIT (Bottom-Left corner) */}
-          <div className="absolute bottom-4 left-4 flex flex-col items-center z-30">
+          {/* 2. PLAYER HERO PORTRAIT (Bottom-Left corner - large format) */}
+          <div className="absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-black/50 p-2 rounded-2xl border border-cyan-950/30 backdrop-blur-sm shadow-md">
             <div className="relative">
-              <div className="w-14 h-14 rounded-full border-4 border-cyan-600/80 bg-[#0d161d] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
+              <div className="w-18 h-18 rounded-full border-4 border-cyan-600/80 bg-[#0d161d] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
                 {renderFloatingTextsFor('player-hero')}
                 {profile.avatarUrl ? (
                   <img src={profile.avatarUrl} alt="Hero Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <Shield className="w-6 h-6 text-[#66fcf1]" />
+                  <Shield className="w-7 h-7 text-[#66fcf1]" />
                 )}
               </div>
               {/* Health Shield */}
-              <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-red-600 to-red-800 border-2 border-red-300 flex items-center justify-center shadow-lg z-30">
+              <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-gradient-to-br from-red-600 to-red-800 border-2 border-red-300 flex items-center justify-center shadow-lg z-30">
                 <span className="text-white text-xs font-black font-mono leading-none select-none">{visualState.playerHeroHealth}</span>
               </div>
             </div>
-            <span className="text-[9px] font-display font-black text-cyan-400 tracking-wider mt-1 uppercase text-shadow-sm leading-none">
-              {profile.username || 'Summoner'}
-            </span>
+            <div>
+              <span className="text-[8px] font-mono font-bold text-cyan-400/70 tracking-wider uppercase block leading-none">Your Hero</span>
+              <h4 className="font-display font-black text-xs text-white mt-1 leading-none">{profile.username || 'Summoner'}</h4>
+            </div>
           </div>
 
           {/* Hearthstone Style Flip End Turn Button (Right center) */}
@@ -1478,10 +1479,16 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         </>
                       )}
                       {card.delay > 0 && (
-                        <div className="absolute inset-0 bg-black/45 flex items-center justify-center z-15">
-                          <div className="w-9 h-9 rounded-full bg-gradient-to-b from-amber-500/90 to-amber-700/90 border-2 border-amber-300/80 flex flex-col items-center justify-center shadow-[0_0_12px_rgba(245,158,11,0.5)] animate-pulse">
-                            <span className="text-[10px] leading-none select-none">⏳</span>
-                            <span className="text-white text-[10px] font-black font-mono leading-none mt-0.5 select-none">{card.delay}</span>
+                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-15">
+                          <div className="flex flex-col items-center justify-center relative">
+                            <img 
+                              src="/icons/gothic_hourglass.jpg" 
+                              alt="Locked" 
+                              className="w-10 h-10 object-contain rounded-full border border-purple-500/30 shadow-[0_0_12px_rgba(168,85,247,0.5)] animate-pulse" 
+                            />
+                            <div className="absolute -bottom-2.5 bg-gradient-to-b from-[#180f2b] to-[#0c051a] border border-[#a855f7]/60 rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
+                              <span className="text-[#c084fc] text-[10px] font-black font-mono leading-none">{card.delay}</span>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -1516,12 +1523,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                     <div className="h-1 shrink-0" />
 
-                    {/* Hearthstone style corner badges (NO emojis) */}
-                    <div className="absolute -bottom-2.5 -left-2.5 w-8 h-8 bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 border-2 border-yellow-200 rounded-lg rotate-45 flex items-center justify-center shadow-lg z-20">
-                      <span className="text-black text-[12px] font-black font-mono rotate-[-45deg] leading-none select-none">{card.attack}</span>
+                    {/* Gothic style corner badges (NO emojis) */}
+                    <div className="absolute -bottom-2.5 -left-2.5 w-8 h-8 bg-gradient-to-br from-[#1b1c20] via-[#2c2e35] to-[#121316] border border-[#7d8291]/50 rounded-lg rotate-45 flex items-center justify-center shadow-lg z-20">
+                      <span className="text-[#e2e8f0] text-[12px] font-black font-mono rotate-[-45deg] leading-none select-none">{card.attack}</span>
                     </div>
-                    <div className="absolute -bottom-2.5 -right-2.5 w-8 h-8 bg-gradient-to-br from-red-500 via-rose-600 to-red-700 border-2 border-red-300 rounded-b-2xl rounded-t-lg flex items-center justify-center shadow-lg z-20">
-                      <span className="text-white text-[12px] font-black font-mono leading-none select-none">{card.health}</span>
+                    <div className="absolute -bottom-2.5 -right-2.5 w-8 h-8 bg-gradient-to-br from-[#3b0f11] via-[#52161a] to-[#25090b] border border-[#f87171]/40 rounded-b-xl rounded-t-sm flex items-center justify-center shadow-lg z-20">
+                      <span className="text-[#fecaca] text-[12px] font-black font-mono leading-none select-none">{card.health}</span>
                     </div>
                   </>
                 </motion.div>
