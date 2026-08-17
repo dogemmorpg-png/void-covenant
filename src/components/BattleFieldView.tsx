@@ -772,7 +772,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 const side = 'enemy';
 
                 return (
-                  <div key={idx} className="relative aspect-[3/4.1] max-h-[165px] max-w-[120px] mx-auto w-full shrink-0">
+                  <div key={idx} className="relative aspect-[13/18] max-h-[190px] max-w-[140px] mx-auto w-full shrink-0">
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       {renderFloatingTextsFor({ side: 'enemy', slot: idx })}
                     </div>
@@ -789,8 +789,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           rotate: isDeath ? 12 : 0,
                           x: isHit ? [0, -6, 6, -4, 4, 0] : 0,
                           boxShadow: card.delay === 0
-                            ? "0 0 15px rgba(220, 38, 64, 0.4)"
-                            : "0 4px 6px rgba(0, 0, 0, 0.3)",
+                            ? "0 0 15px rgba(220, 38, 64, 0.45)"
+                            : "0 4px 10px rgba(0, 0, 0, 0.4)",
                           borderColor: isHit ? "#ef4444" : getTierBorderColor(card.tier)
                         }}
                         transition={{
@@ -799,65 +799,60 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           damping: 12,
                           x: { duration: 0.25 }
                         }}
-                        className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 text-center relative overflow-visible select-none transition-all bg-[#151a21] text-white cursor-help shadow-lg`}
+                        className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none transition-all bg-[#151a21] text-white cursor-help shadow-lg`}
                       >
                         {/* Card Background & Artwork inside wrapper for rounded overflow-hidden */}
                         <div className="absolute inset-0 rounded-xl overflow-hidden z-0 pointer-events-none">
                           <div className={`absolute inset-0 opacity-[0.06] bg-gradient-to-br ${getTierBgGradient(card.tier)}`} />
                           {card.image.startsWith('/cards/') && (
                             <>
-                              <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                              <img 
+                                src={card.image} 
+                                alt={card.name} 
+                                className={`absolute inset-0 w-full h-full object-cover transition-all ${card.delay > 0 ? 'opacity-40 filter saturate-50 brightness-75' : 'opacity-85'}`} 
+                              />
                               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
                             </>
                           )}
                         </div>
 
+                        {/* Prominent clock badge on top */}
                         {card.delay > 0 && (
-                          <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center gap-1 pointer-events-none rounded-xl">
-                            <div className="w-7 h-7 rounded-full bg-black/85 border border-red-500/40 flex items-center justify-center shadow-[0_0_8px_rgba(239,68,68,0.3)] animate-pulse">
-                              <span className="text-red-400 font-mono text-xs font-black tracking-tighter">⏳{card.delay}</span>
-                            </div>
+                          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-b from-amber-400 to-amber-600 border-2 border-amber-200 rounded-full px-2 py-0.5 flex items-center gap-0.5 text-[9px] font-mono font-black text-white shadow-lg z-30 animate-pulse">
+                            ⏳ <span className="leading-none text-shadow-sm">{card.delay}</span>
                           </div>
                         )}
 
-                        <div className="flex justify-between items-center text-[6px] font-mono font-bold text-gray-500 z-10 relative">
+                        <div className="flex justify-between items-center text-[7px] md:text-[8px] font-mono font-black text-gray-400 z-10 relative px-1">
                           <span className={`uppercase tracking-wider ${getTierTextColor(card.tier)}`}>
                             {card.tier}
                           </span>
                           <span>Lvl {card.level}</span>
                         </div>
 
-                        {/* Centered top status badge */}
-                        {card.delay > 0 ? (
-                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-red-600 to-red-800 border border-red-500 rounded-full px-1.5 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-bold text-white shadow-md z-20 animate-pulse">
-                            ⏳{card.delay}
-                          </div>
-                        ) : (
-                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-red-600 to-rose-700 border border-white rounded-full w-4 h-4 flex items-center justify-center text-[7px] font-mono font-bold text-white shadow-md z-20 animate-bounce">
-                            ⚔️
-                          </div>
-                        )}
-
-                        <div className="mt-0.5 z-10 relative">
+                        <div className="mt-1 z-10 relative px-1 bg-black/45 py-0.5 rounded border border-white/5">
                           <span className="text-[10px] md:text-[11px] font-display font-black tracking-tight text-white block truncate leading-none">
                             {card.name}
                           </span>
                         </div>
 
-                        {/* Redesigned readable skills row */}
-                        <div className="flex justify-center gap-1 z-10 relative flex-wrap max-h-[18px] overflow-visible">
+                        {/* Dedicated skills bar at the bottom center */}
+                        <div className="w-full py-1 bg-black/60 border-y border-white/5 flex justify-center gap-1 z-10 relative flex-wrap max-h-[30px] overflow-visible mt-auto mb-1">
                           {card.skills.map((s, sIdx) => (
                             <div 
                               key={sIdx}
-                              className={`flex items-center gap-0.5 text-[8px] font-mono font-black px-1 py-0.5 rounded-md border ${getSkillBadgeStyle(s.type)}`}
+                              className={`flex items-center gap-0.5 text-[9px] font-mono font-black px-1.5 py-0.5 rounded-full border ${getSkillBadgeStyle(s.type)}`}
                             >
                               <span>{getSkillIcon(s.type)}</span>
                               <span className="leading-none">{s.value}</span>
                             </div>
                           ))}
+                          {card.skills.length === 0 && (
+                            <span className="text-[7.5px] font-mono font-bold text-gray-500 uppercase tracking-widest leading-none my-0.5">No Skills</span>
+                          )}
                         </div>
 
-                        <div className="w-full bg-black/40 h-0.5 rounded-full overflow-hidden z-10 border border-black/30 relative">
+                        <div className="w-full bg-black/50 h-1 rounded-full overflow-hidden z-10 border border-black/30 relative mb-1.5 shrink-0">
                           <motion.div
                             className="bg-red-500 h-full rounded-full"
                             animate={{ width: `${(card.health / card.maxHealth) * 100}%` }}
@@ -865,14 +860,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           />
                         </div>
 
-                        <div className="h-2 z-10 relative" />
-
-                        {/* Overlapping Badges on Corners */}
-                        <div className="absolute -bottom-2 -left-2 w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border border-[#151a21] flex items-center justify-center shadow-md z-20">
-                          <span className="text-white text-[10px] font-black font-mono">⚔️{card.attack}</span>
+                        {/* Hearthstone style corner badges (NO emojis) */}
+                        <div className="absolute -bottom-2.5 -left-2.5 w-8 h-8 bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 border-2 border-yellow-200 rounded-lg rotate-45 flex items-center justify-center shadow-lg z-20">
+                          <span className="text-black text-[12px] font-black font-mono rotate-[-45deg] leading-none select-none">{card.attack}</span>
                         </div>
-                        <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-red-700 border border-[#151a21] flex items-center justify-center shadow-md z-20">
-                          <span className="text-white text-[10px] font-black font-mono">❤️{card.health}</span>
+                        <div className="absolute -bottom-2.5 -right-2.5 w-8 h-8 bg-gradient-to-br from-red-500 via-rose-600 to-red-700 border-2 border-red-300 rounded-b-2xl rounded-t-lg flex items-center justify-center shadow-lg z-20">
+                          <span className="text-white text-[12px] font-black font-mono leading-none select-none">{card.health}</span>
                         </div>
                       </motion.div>
                     ) : (
@@ -960,7 +953,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 const side = 'player';
 
                 return (
-                  <div key={idx} className="relative aspect-[3/4.1] max-h-[165px] max-w-[120px] mx-auto w-full shrink-0">
+                  <div key={idx} className="relative aspect-[13/18] max-h-[190px] max-w-[140px] mx-auto w-full shrink-0">
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       {renderFloatingTextsFor({ side: 'player', slot: idx })}
                     </div>
@@ -977,8 +970,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           rotate: isDeath ? 12 : 0,
                           x: isHit ? [0, -6, 6, -4, 4, 0] : 0,
                           boxShadow: card.delay === 0
-                            ? "0 0 15px rgba(102, 252, 241, 0.4)"
-                            : "0 4px 6px rgba(0, 0, 0, 0.3)",
+                            ? "0 0 15px rgba(102, 252, 241, 0.45)"
+                            : "0 4px 10px rgba(0, 0, 0, 0.4)",
                           borderColor: isHit ? "#ef4444" : getTierBorderColor(card.tier)
                         }}
                         transition={{
@@ -987,65 +980,60 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           damping: 12,
                           x: { duration: 0.25 }
                         }}
-                        className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 text-center relative overflow-visible select-none transition-all bg-[#151a21] text-white cursor-help shadow-lg`}
+                        className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none transition-all bg-[#151a21] text-white cursor-help shadow-lg`}
                       >
                         {/* Card Background & Artwork */}
                         <div className="absolute inset-0 rounded-xl overflow-hidden z-0 pointer-events-none">
                           <div className={`absolute inset-0 opacity-[0.06] bg-gradient-to-br ${getTierBgGradient(card.tier)}`} />
                           {card.image.startsWith('/cards/') && (
                             <>
-                              <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                              <img 
+                                src={card.image} 
+                                alt={card.name} 
+                                className={`absolute inset-0 w-full h-full object-cover transition-all ${card.delay > 0 ? 'opacity-40 filter saturate-50 brightness-75' : 'opacity-85'}`} 
+                              />
                               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
                             </>
                           )}
                         </div>
 
+                        {/* Prominent clock badge on top */}
                         {card.delay > 0 && (
-                          <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center gap-1 pointer-events-none rounded-xl">
-                            <div className="w-7 h-7 rounded-full bg-black/85 border border-cyan-500/40 flex items-center justify-center shadow-[0_0_8px_rgba(6,182,212,0.3)] animate-pulse">
-                              <span className="text-cyan-400 font-mono text-xs font-black tracking-tighter">⏳{card.delay}</span>
-                            </div>
+                          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-b from-cyan-400 to-blue-600 border-2 border-cyan-300 rounded-full px-2 py-0.5 flex items-center gap-0.5 text-[9px] font-mono font-black text-white shadow-lg z-30 animate-pulse">
+                            ⏳ <span className="leading-none text-shadow-sm">{card.delay}</span>
                           </div>
                         )}
 
-                        <div className="flex justify-between items-center text-[6px] font-mono font-bold text-gray-500 z-10 relative">
+                        <div className="flex justify-between items-center text-[7px] md:text-[8px] font-mono font-black text-gray-400 z-10 relative px-1">
                           <span className={`uppercase tracking-wider ${getTierTextColor(card.tier)}`}>
                             {card.tier}
                           </span>
                           <span>Lvl {card.level}</span>
                         </div>
 
-                        {/* Centered top status badge */}
-                        {card.delay > 0 ? (
-                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-cyan-400 to-blue-600 border border-cyan-300 rounded-full px-1.5 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-bold text-white shadow-md z-20 animate-pulse">
-                            ⏳{card.delay}
-                          </div>
-                        ) : (
-                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-emerald-500 to-green-700 border border-emerald-300 rounded-full w-4 h-4 flex items-center justify-center text-[7px] font-mono font-black text-white shadow-md z-20 animate-bounce">
-                            ⚔️
-                          </div>
-                        )}
-
-                        <div className="mt-0.5 z-10 relative">
+                        <div className="mt-1 z-10 relative px-1 bg-black/45 py-0.5 rounded border border-white/5">
                           <span className="text-[10px] md:text-[11px] font-display font-black tracking-tight text-white block truncate leading-none">
                             {card.name}
                           </span>
                         </div>
 
-                        {/* Redesigned readable skills row */}
-                        <div className="flex justify-center gap-1 z-10 relative flex-wrap max-h-[18px] overflow-visible">
+                        {/* Dedicated skills bar at the bottom center */}
+                        <div className="w-full py-1 bg-black/60 border-y border-white/5 flex justify-center gap-1 z-10 relative flex-wrap max-h-[30px] overflow-visible mt-auto mb-1">
                           {card.skills.map((s, sIdx) => (
                             <div 
                               key={sIdx}
-                              className={`flex items-center gap-0.5 text-[8px] font-mono font-black px-1 py-0.5 rounded-md border ${getSkillBadgeStyle(s.type)}`}
+                              className={`flex items-center gap-0.5 text-[9px] font-mono font-black px-1.5 py-0.5 rounded-full border ${getSkillBadgeStyle(s.type)}`}
                             >
                               <span>{getSkillIcon(s.type)}</span>
                               <span className="leading-none">{s.value}</span>
                             </div>
                           ))}
+                          {card.skills.length === 0 && (
+                            <span className="text-[7.5px] font-mono font-bold text-gray-500 uppercase tracking-widest leading-none my-0.5">No Skills</span>
+                          )}
                         </div>
 
-                        <div className="w-full bg-black/40 h-0.5 rounded-full overflow-hidden z-10 border border-black/30 relative">
+                        <div className="w-full bg-black/50 h-1 rounded-full overflow-hidden z-10 border border-black/30 relative mb-1.5 shrink-0">
                           <motion.div
                             className="bg-emerald-500 h-full rounded-full"
                             animate={{ width: `${(card.health / card.maxHealth) * 100}%` }}
@@ -1053,14 +1041,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           />
                         </div>
 
-                        <div className="h-2 z-10 relative" />
-
-                        {/* Overlapping Badges on Corners */}
-                        <div className="absolute -bottom-2 -left-2 w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border border-[#151a21] flex items-center justify-center shadow-md z-20">
-                          <span className="text-white text-[10px] font-black font-mono">⚔️{card.attack}</span>
+                        {/* Hearthstone style corner badges (NO emojis) */}
+                        <div className="absolute -bottom-2.5 -left-2.5 w-8 h-8 bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 border-2 border-yellow-200 rounded-lg rotate-45 flex items-center justify-center shadow-lg z-20">
+                          <span className="text-black text-[12px] font-black font-mono rotate-[-45deg] leading-none select-none">{card.attack}</span>
                         </div>
-                        <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-red-700 border border-[#151a21] flex items-center justify-center shadow-md z-20">
-                          <span className="text-white text-[10px] font-black font-mono">❤️{card.health}</span>
+                        <div className="absolute -bottom-2.5 -right-2.5 w-8 h-8 bg-gradient-to-br from-red-500 via-rose-600 to-red-700 border-2 border-red-300 rounded-b-2xl rounded-t-lg flex items-center justify-center shadow-lg z-20">
+                          <span className="text-white text-[12px] font-black font-mono leading-none select-none">{card.health}</span>
                         </div>
                       </motion.div>
                     ) : (
@@ -1319,59 +1305,107 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           )}
         </AnimatePresence>
 
-        {/* Floating Card Analyzer Tooltip */}
+        {/* Floating Card Analyzer Tooltip - Large and readable details */}
         <AnimatePresence>
           {hoveredCard && (
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="absolute bottom-[160px] left-4 w-60 bg-[#151a21]/95 border border-[#ebd09b]/25 rounded-xl p-3 z-45 shadow-2xl backdrop-blur-md pointer-events-none text-left"
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="absolute bottom-[175px] left-6 w-[350px] bg-[#0d1117]/98 border-2 border-[#ebd09b]/35 rounded-2xl p-4 z-45 shadow-[0_10px_35px_rgba(0,0,0,0.85)] backdrop-blur-md pointer-events-none text-left flex gap-3.5"
             >
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between items-start border-b border-gray-800 pb-1.5">
-                  <div>
-                    <span className={`text-[7px] font-mono uppercase tracking-widest ${getTierTextColor(hoveredCard.tier)} block`}>
-                      {hoveredCard.tier} • Lvl {hoveredCard.level}
-                    </span>
-                    <h4 className="font-display font-black text-xs text-white">{hoveredCard.name}</h4>
-                  </div>
-                  {hoveredCard.delay > 0 && (
-                    <div className="bg-black/40 border border-gray-800 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold text-gray-400">
-                      ⏳ {hoveredCard.delay} turns
-                    </div>
+              {/* Card visual representation inside analyzer */}
+              <div 
+                className="w-[110px] h-[155px] rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible bg-[#151a21] text-white shadow-md shrink-0"
+                style={{ borderColor: getTierBorderColor(hoveredCard.tier) }}
+              >
+                {/* Background art */}
+                <div className="absolute inset-0 rounded-xl overflow-hidden z-0 pointer-events-none">
+                  <div className={`absolute inset-0 opacity-[0.05] bg-gradient-to-br ${getTierBgGradient(hoveredCard.tier)}`} />
+                  {hoveredCard.image.startsWith('/cards/') && (
+                    <>
+                      <img src={hoveredCard.image} alt={hoveredCard.name} className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
+                    </>
                   )}
                 </div>
-                
-                <div className="grid grid-cols-3 gap-1 text-center font-mono text-[9px]">
-                  <div className="bg-black/30 p-1 rounded border border-red-950/45">
-                    <span className="text-gray-500 text-[7px] block">ATK</span>
-                    <span className="text-red-400 font-bold">⚔️ {hoveredCard.attack}</span>
+
+                {hoveredCard.delay > 0 && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-b from-amber-400 to-amber-600 border-2 border-amber-200 rounded-full px-2 py-0.5 flex items-center gap-0.5 text-[9px] font-mono font-black text-white shadow-lg z-30 animate-pulse">
+                    ⏳ <span className="leading-none">{hoveredCard.delay}</span>
                   </div>
-                  <div className="bg-black/30 p-1 rounded border border-emerald-950/45">
-                    <span className="text-gray-500 text-[7px] block">HP</span>
-                    <span className="text-emerald-400 font-bold">❤️ {hoveredCard.health}/{hoveredCard.maxHealth}</span>
+                )}
+
+                <div className="flex justify-between items-center text-[7px] font-mono font-bold text-gray-500 z-10 relative">
+                  <span className={`uppercase tracking-wider ${getTierTextColor(hoveredCard.tier)}`}>{hoveredCard.tier}</span>
+                  <span>Lvl {hoveredCard.level}</span>
+                </div>
+
+                <div className="mt-1 z-10 relative bg-black/45 py-0.5 rounded border border-white/5">
+                  <span className="text-[10px] font-display font-black tracking-tight text-white block truncate leading-none">
+                    {hoveredCard.name}
+                  </span>
+                </div>
+
+                {/* Dedicated skills bar at the bottom center */}
+                <div className="w-full py-0.5 bg-black/60 border-y border-white/5 flex justify-center gap-1 z-10 relative flex-wrap max-h-[30px] overflow-visible mt-auto mb-1">
+                  {hoveredCard.skills.map((s, sIdx) => (
+                    <div 
+                      key={sIdx}
+                      className={`flex items-center gap-0.5 text-[8px] font-mono font-black px-1.5 py-0.2 rounded-full border ${getSkillBadgeStyle(s.type)}`}
+                    >
+                      <span>{getSkillIcon(s.type)}</span>
+                      <span className="leading-none">{s.value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="h-0.5 shrink-0" />
+
+                {/* Hearthstone style corner badges (NO emojis) */}
+                <div className="absolute -bottom-2.5 -left-2.5 w-7 h-7 bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 border-2 border-yellow-200 rounded-lg rotate-45 flex items-center justify-center shadow-md z-20">
+                  <span className="text-black text-[11px] font-black font-mono rotate-[-45deg] leading-none">{hoveredCard.attack}</span>
+                </div>
+                <div className="absolute -bottom-2.5 -right-2.5 w-7 h-7 bg-gradient-to-br from-red-500 via-rose-600 to-red-700 border-2 border-red-300 rounded-b-2xl rounded-t-lg flex items-center justify-center shadow-md z-20">
+                  <span className="text-white text-[11px] font-black font-mono leading-none">{hoveredCard.health}</span>
+                </div>
+              </div>
+
+              {/* Descriptions & specs */}
+              <div className="flex-1 flex flex-col justify-between min-w-0">
+                <div>
+                  <h4 className="font-display font-black text-sm text-white leading-none mb-1">{hoveredCard.name}</h4>
+                  <div className="flex gap-2 text-[9px] font-mono text-gray-400 border-b border-gray-800 pb-1.5 mb-1.5">
+                    <span className="text-[#ebd09b] font-bold">{hoveredCard.tier.toUpperCase()}</span>
+                    <span>•</span>
+                    <span>Level {hoveredCard.level}</span>
                   </div>
-                  <div className="bg-black/30 p-1 rounded border border-blue-950/45">
-                    <span className="text-gray-500 text-[7px] block">DELAY</span>
-                    <span className="text-blue-400 font-bold">⏳ {hoveredCard.delay}</span>
+                  
+                  <div className="space-y-2 overflow-y-auto max-h-[85px] pr-1">
+                    {hoveredCard.skills.map((s, sIdx) => (
+                      <div key={sIdx} className="space-y-0.5">
+                        <div className="font-mono font-black text-[10px] flex items-center gap-1 text-white">
+                          <span>{getSkillIcon(s.type)}</span>
+                          <span className="uppercase tracking-wider">{getSkillNameEnglish(s.type)} {s.value}</span>
+                        </div>
+                        <p className="text-gray-400 font-sans text-[9.5px] leading-relaxed pl-4">{getSkillDescEnglish(s.type, s.value)}</p>
+                      </div>
+                    ))}
+                    {hoveredCard.skills.length === 0 && (
+                      <p className="text-[9.5px] text-gray-500 font-mono italic">No special abilities.</p>
+                    )}
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <span className="text-[7px] text-gray-500 font-bold tracking-wider block uppercase">ABILITIES</span>
-                  {hoveredCard.skills.map((s, sIdx) => (
-                    <div key={sIdx} className={`p-1 rounded text-[8px] leading-snug border ${getSkillBadgeStyle(s.type)}`}>
-                      <div className="font-bold flex items-center gap-0.5">
-                        <span>{getSkillIcon(s.type)}</span>
-                        <span>{getSkillNameEnglish(s.type)} {s.value}</span>
-                      </div>
-                      <p className="text-gray-300 font-sans text-[7.5px] mt-0.5">{getSkillDescEnglish(s.type, s.value)}</p>
-                    </div>
-                  ))}
-                  {hoveredCard.skills.length === 0 && (
-                    <p className="text-[8px] text-gray-500 font-mono italic">No abilities.</p>
-                  )}
+                <div className="bg-black/45 p-1.5 rounded-lg border border-gray-800/60 grid grid-cols-2 gap-1 text-center font-mono text-[9px] mt-1.5">
+                  <div>
+                    <span className="text-gray-500 text-[7px] block">ARMOR</span>
+                    <span className="text-gray-300 font-bold">🛡️ {hoveredCard.armor || 0}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 text-[7px] block">WARD</span>
+                    <span className="text-cyan-400 font-bold">{hoveredCard.ward ? 'ACTIVE' : 'NONE'}</span>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -1379,7 +1413,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         </AnimatePresence>
 
         {/* PLAYER HAND FAN ZONE - animated interactively using state-driven slide-aside positioning */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex justify-center items-end h-[150px] z-40 select-none pointer-events-none w-[540px]">
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex justify-center items-end h-[170px] z-40 select-none pointer-events-none w-[560px]">
           <div className="flex justify-center items-end relative w-full h-full pointer-events-auto">
             {visualState.playerHand.map((card, idx) => {
               const isSelected = selectedHandCardId === card.id;
@@ -1390,22 +1424,22 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               const offset = idx - middle;
               const rotate = offset * 5; 
               
-              let translateX = offset * 45;
+              let translateX = offset * 52;
               // Push cards slightly down when not hovered, but raise them so they are readable
-              let translateY = Math.abs(offset) * 5 + (isSelected ? -25 : 30);
+              let translateY = Math.abs(offset) * 5 + (isSelected ? -25 : 35);
               let scale = 1.0;
               let zIndex = 10 + idx;
 
               // If a card is hovered, slide other cards aside (Hearthstone style)
               if (hoveredHandCardIndex !== null) {
                 if (hoveredHandCardIndex === idx) {
-                  translateY = -70;
+                  translateY = -75;
                   scale = 1.5;
                   zIndex = 100;
                 } else if (idx < hoveredHandCardIndex) {
-                  translateX -= 35; // Slide left
+                  translateX -= 40; // Slide left
                 } else if (idx > hoveredHandCardIndex) {
-                  translateX += 35; // Slide right
+                  translateX += 40; // Slide right
                 }
               }
 
@@ -1437,7 +1471,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     setHoveredHandCardIndex(null);
                     setHoveredCard(null);
                   }}
-                  className={`absolute bottom-[0px] left-[calc(50%-48px)] w-[96px] h-[135px] origin-bottom rounded-xl border flex flex-col justify-between p-1.5 text-center cursor-pointer transition-shadow bg-[#151a21] text-white select-none overflow-visible shadow-lg ${
+                  className={`absolute bottom-[0px] left-[calc(50%-55px)] w-[110px] h-[155px] origin-bottom rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center cursor-pointer transition-shadow bg-[#151a21] text-white select-none overflow-visible shadow-lg ${
                     isSelected 
                       ? 'border-[#66fcf1] shadow-[0_0_15px_rgba(102,252,241,0.6)]' 
                       : 'border-gray-800 hover:border-gray-600'
@@ -1449,56 +1483,58 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       <div className={`absolute inset-0 opacity-[0.05] bg-gradient-to-br ${getTierBgGradient(card.tier)}`} />
                       {card.image.startsWith('/cards/') && (
                         <>
-                          <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <img 
+                            src={card.image} 
+                            alt={card.name} 
+                            className={`absolute inset-0 w-full h-full object-cover transition-all ${card.delay > 0 ? 'opacity-40 filter saturate-50 brightness-75' : 'opacity-85'}`} 
+                          />
                           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
                         </>
                       )}
                     </div>
                     
-                    <div className="flex justify-between items-center text-[6px] font-mono font-bold text-gray-500 z-10 relative">
+                    {/* Prominent clock badge on top */}
+                    {card.delay > 0 && (
+                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-b from-cyan-400 to-blue-600 border-2 border-cyan-300 rounded-full px-2 py-0.5 flex items-center gap-0.5 text-[9px] font-mono font-black text-white shadow-lg z-30 animate-pulse">
+                        ⏳ <span className="leading-none text-shadow-sm">{card.delay}</span>
+                      </div>
+                    )}
+
+                    <div className="flex justify-between items-center text-[7px] md:text-[8px] font-mono font-black text-gray-400 z-10 relative px-1">
                       <span className={`${getTierTextColor(card.tier)}`}>{card.tier}</span>
                       <span>Lvl {card.level}</span>
                     </div>
 
-                    {/* Delay top status badge */}
-                    {card.delay > 0 ? (
-                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-cyan-400 to-blue-600 border border-cyan-300 rounded-full px-1.5 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-black text-white shadow-md z-20 animate-pulse leading-none">
-                        ⏳{card.delay}
-                      </div>
-                    ) : (
-                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-b from-emerald-500 to-green-700 border border-[#66fcf1] rounded-full px-1.5 py-0.2 flex items-center justify-center text-[7px] font-mono font-black text-white shadow-md z-20 animate-pulse leading-none">
-                        READY
-                      </div>
-                    )}
-
-                    <div className="mt-0.5 z-10 relative">
-                      <span className="text-[7.5px] font-display font-black tracking-tight text-white block truncate leading-none">
+                    <div className="mt-1 z-10 relative px-1 bg-black/45 py-0.5 rounded border border-white/5">
+                      <span className="text-[10px] md:text-[11px] font-display font-black tracking-tight text-white block truncate leading-none">
                         {card.name}
                       </span>
                     </div>
 
-                    {/* Redesigned readable skills row for hand cards */}
-                    <div className="flex justify-center gap-1 z-10 relative flex-wrap max-h-[18px] overflow-visible">
+                    {/* Dedicated skills bar at the bottom center */}
+                    <div className="w-full py-1 bg-black/60 border-y border-white/5 flex justify-center gap-1 z-10 relative flex-wrap max-h-[30px] overflow-visible mt-auto mb-1">
                       {card.skills.map((s, sIdx) => (
                         <div 
                           key={sIdx}
-                          className={`flex items-center gap-0.5 text-[8px] font-mono font-black px-1 py-0.5 rounded-md border ${getSkillBadgeStyle(s.type)}`}
+                          className={`flex items-center gap-0.5 text-[9px] font-mono font-black px-1.5 py-0.5 rounded-full border ${getSkillBadgeStyle(s.type)}`}
                         >
                           <span>{getSkillIcon(s.type)}</span>
                           <span className="leading-none">{s.value}</span>
                         </div>
                       ))}
+                      {card.skills.length === 0 && (
+                        <span className="text-[7.5px] font-mono font-bold text-gray-500 uppercase tracking-widest leading-none my-0.5">No Skills</span>
+                      )}
                     </div>
 
-                    {/* blank space for badges */}
-                    <div className="h-2 z-10 relative" />
+                    <div className="h-1 shrink-0" />
 
-                    {/* Corner badges overlapping card limits */}
-                    <div className="absolute -bottom-2 -left-2 w-6.5 h-6.5 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border border-[#151a21] flex items-center justify-center shadow-md z-20">
-                      <span className="text-white text-[9px] font-black font-mono">⚔️{card.attack}</span>
+                    {/* Hearthstone style corner badges (NO emojis) */}
+                    <div className="absolute -bottom-2.5 -left-2.5 w-8 h-8 bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 border-2 border-yellow-200 rounded-lg rotate-45 flex items-center justify-center shadow-lg z-20">
+                      <span className="text-black text-[12px] font-black font-mono rotate-[-45deg] leading-none select-none">{card.attack}</span>
                     </div>
-                    <div className="absolute -bottom-2 -right-2 w-6.5 h-6.5 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-red-700 border border-[#151a21] flex items-center justify-center shadow-md z-20">
-                      <span className="text-white text-[9px] font-black font-mono">❤️{card.health}</span>
+                    <div className="absolute -bottom-2.5 -right-2.5 w-8 h-8 bg-gradient-to-br from-red-500 via-rose-600 to-red-700 border-2 border-red-300 rounded-b-2xl rounded-t-lg flex items-center justify-center shadow-lg z-20">
+                      <span className="text-white text-[12px] font-black font-mono leading-none select-none">{card.health}</span>
                     </div>
                   </>
                 </motion.div>
