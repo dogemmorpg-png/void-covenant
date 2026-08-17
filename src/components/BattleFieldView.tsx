@@ -173,6 +173,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
   const [showLogDrawer, setShowLogDrawer] = useState<boolean>(false);
   const [screenShake, setScreenShake] = useState<boolean>(false);
+  const [hoveredHandCardIndex, setHoveredHandCardIndex] = useState<number | null>(null);
 
   // Track the final target battle state once the calculation resolves
   const [finalBattleState, setFinalBattleState] = useState<BattleState | null>(null);
