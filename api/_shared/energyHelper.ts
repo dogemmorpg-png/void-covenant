@@ -55,13 +55,14 @@ export function getRequiredExpForLevel(level: number): number {
 }
 
 export function processExpGain(profile: PlayerProfile, expGained: number): { profile: PlayerProfile; leveledUp: boolean } {
+  if ((profile.level || 1) >= 100) return { profile, leveledUp: false };
   profile.exp = (profile.exp || 0) + expGained;
   let level = profile.level || 1;
   let heroMaxHealth = profile.heroMaxHealth || 30;
   let leveledUp = false;
   
   let required = getRequiredExpForLevel(level);
-  while (profile.exp >= required) {
+  while (profile.exp >= required && level < 100) {
     profile.exp -= required;
     level += 1;
     heroMaxHealth += 2;
@@ -69,9 +70,11 @@ export function processExpGain(profile: PlayerProfile, expGained: number): { pro
     required = getRequiredExpForLevel(level);
   }
   
+  if (level >= 100) profile.exp = 0;
   profile.level = level;
   profile.heroMaxHealth = heroMaxHealth;
   return { profile, leveledUp };
 }
+
 
 

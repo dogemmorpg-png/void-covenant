@@ -160,19 +160,24 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addExp = (amount: number) => {
     setProfile(current => {
+      if (current.level >= 100) return current;
+
       let newExp = current.exp + amount;
       let newLevel = current.level;
       let newMaxHealth = current.heroMaxHealth;
       
       let required = getRequiredExpForLevel(newLevel);
-      while (newExp >= required) {
+      while (newExp >= required && newLevel < 100) {
         newExp -= required;
         newLevel++;
-        // Lord gains 1-3 Max HP per level (randomized for flavor, or fixed to 2 to be fair, let's use +2)
         newMaxHealth += 2;
         required = getRequiredExpForLevel(newLevel);
       }
       
+      if (newLevel >= 100) {
+        newExp = 0; // Or keep it at required-1, but 0 is cleaner for max level
+      }
+
       const updated = { ...current, exp: newExp, level: newLevel, heroMaxHealth: newMaxHealth };
       saveProfile(updated);
       return updated;
