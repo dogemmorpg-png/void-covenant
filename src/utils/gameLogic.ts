@@ -156,7 +156,7 @@ export function simulateCombatTurn(
         
         if (activeAllies.length > 0) {
           const s = stats as any;
-          const triggers = s.doubleTrigger && Math.random() < 0.5 ? 2 : 1;
+          const triggers = s.doubleTrigger ? 2 : 1;
           for (let t = 0; t < triggers; t++) {
             // find lowest health ally
             const currentActiveAllies = [];
