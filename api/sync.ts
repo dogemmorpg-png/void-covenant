@@ -1,4 +1,3 @@
-import { TALENT_TREES } from './_shared/talents.js';
 // @ts-nocheck
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
@@ -278,22 +277,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const requestedTalents = safeProfileData.talents;
         let valid = true;
         
+        // Embedded directly to prevent Vercel ESM module resolution issues on API routes
+        const TALENT_TREES = [
+          { id: 'void_base', maxLevel: 20 }, { id: 'void_dmg', maxLevel: 10 }, { id: 'void_chain', maxLevel: 10 },
+          { id: 'void_pierce', maxLevel: 1 }, { id: 'void_execute', maxLevel: 3 }, { id: 'void_leech', maxLevel: 3 }, { id: 'void_ultimate', maxLevel: 1 },
+          { id: 'blood_base', maxLevel: 20 }, { id: 'blood_heal', maxLevel: 10 }, { id: 'blood_cleanse', maxLevel: 10 },
+          { id: 'blood_ward', maxLevel: 1 }, { id: 'blood_overflow', maxLevel: 3 }, { id: 'blood_shield', maxLevel: 3 }, { id: 'blood_ultimate', maxLevel: 1 },
+          { id: 'war_base', maxLevel: 20 }, { id: 'war_atk', maxLevel: 10 }, { id: 'war_armor', maxLevel: 10 },
+          { id: 'war_duration', maxLevel: 1 }, { id: 'war_momentum', maxLevel: 3 }, { id: 'war_heal', maxLevel: 3 }, { id: 'war_ultimate', maxLevel: 1 }
+        ];
+
         for (const [nodeId, level] of Object.entries(requestedTalents)) {
            const node = TALENT_TREES.find((t: any) => t.id === nodeId);
            if (!node) {
+             console.warn(`Anti-cheat: Invalid talent node ID '${nodeId}' for wallet ${walletAddress}`);
              valid = false;
              break;
            }
+
            const numLevel = Number(level) || 0;
            if (numLevel < 0 || numLevel > node.maxLevel) {
              valid = false;
              break;
            }
-           totalSpent += (numLevel * node.cost);
+           totalSpent += numLevel; // Frontend costs 1 point per level unconditionally
         }
         
         const playerLevel = currentProfile.level || 1;
-        if (valid && totalSpent <= playerLevel) {
+        // The total allowed points is playerLevel - 1
+        const maxAllowedPoints = Math.max(0, playerLevel - 1);
+        if (valid && totalSpent <= maxAllowedPoints) {
           currentProfile.talents = requestedTalents;
         } else {
           console.warn(`Cheating detected for wallet ${walletAddress}: Spent ${totalSpent} points at Level ${playerLevel}`);
