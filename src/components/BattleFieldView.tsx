@@ -21,7 +21,9 @@ import {
   Activity,
   Plus,
   Star,
-  Award
+  Award,
+  Scroll,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -171,6 +173,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   // Hover analyst and modal info
   const [hoveredCard, setHoveredCard] = useState<BattleCardState | null>(null);
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
+  const [showLogDrawer, setShowLogDrawer] = useState<boolean>(false);
+  const [screenShake, setScreenShake] = useState<boolean>(false);
 
   // Track the final target battle state once the calculation resolves
   const [finalBattleState, setFinalBattleState] = useState<BattleState | null>(null);
@@ -201,6 +205,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     setTimeout(() => {
       setFloatingTexts(prev => prev.filter(f => f.id !== id));
     }, 1000);
+  };
+
+  const triggerScreenShake = () => {
+    setScreenShake(true);
+    setTimeout(() => setScreenShake(false), 300);
   };
 
   // Setup the visual starting state before playing steps
@@ -301,8 +310,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
       
       switch (step.type) {
-      
-
         case 'sacrifice': {
           const placingCard = copy.playerBoard[step.slot];
           const sacrCard = copy.playerBoard[step.targetSlot];
@@ -342,10 +349,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           stepDescription = `🗡️ Duel: ${attackerCard?.name || 'Creature'} deals -${step.damage} damage to ${defenderCard?.name || 'Target'}`;
 
           audioSystem.playAttack();
-          // Trigger physical slide forward attack movement
           setAnimatingSlot({ side: step.attacker, slot: step.slot, type: 'strike' });
 
-          // Delay the impact visual slightly to sync with card strike position
           setTimeout(() => {
             setAnimatingSlot({ side: step.attacker === 'player' ? 'enemy' : 'player', slot: step.targetSlot, type: 'hit' });
             
@@ -376,7 +381,59 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               copy.playerHeroHealth = Math.max(0, copy.playerHeroHealth - step.damage);
               addFloatingText(`-${step.damage} 💥`, 'player-hero', 'text-red-500 font-black text-xl scale-125 text-shadow-glow');
             }
+            triggerScreenShake();
           }, 180 / speedMultiplier);
+          break;
+        }
+
+        case 'hero_skill': {
+          const isPlayerSide = step.stance === 'blood_aura' || step.stance === 'warlord_cry';
+          const cardName = isPlayerSide ? copy.playerBoard[step.targetSlot]?.name : copy.enemyBoard[step.targetSlot]?.name;
+          
+          if (step.stance === 'void_strike') {
+            stepDescription = `⚡ Void Strike: Lord deals -${step.damage} damage to ${cardName || 'target'}`;
+            audioSystem.playAttack();
+            setAnimatingSlot({ side: 'enemy', slot: step.targetSlot, type: 'hit' });
+            const target = copy.enemyBoard[step.targetSlot];
+            if (target) target.health = Math.max(0, target.health - step.damage);
+            addFloatingText(`⚡ -${step.damage}`, { side: 'enemy', slot: step.targetSlot }, 'text-cyan-400 font-black text-sm scale-125');
+            addFloatingText('VOID STRIKE ⚡', 'enemy-hero', 'text-cyan-400 font-bold text-xs');
+          } else if (step.stance === 'blood_aura') {
+            stepDescription = `🩸 Blood Aura: Lord heals ${cardName || 'ally'} for +${step.heal} HP`;
+            audioSystem.playHeal();
+            setAnimatingSlot({ side: 'player', slot: step.targetSlot, type: 'heal' });
+            const target = copy.playerBoard[step.targetSlot];
+            if (target) {
+              target.health = Math.min(target.maxHealth, target.health + step.heal);
+              if (step.ward) target.ward = true;
+              if (step.bonusMaxHp > 0) {
+                target.maxHealth += step.bonusMaxHp;
+                target.health += step.bonusMaxHp;
+              }
+            }
+            addFloatingText(`🩸 +${step.heal}`, { side: 'player', slot: step.targetSlot }, 'text-emerald-400 font-bold');
+            addFloatingText('BLOOD AURA 🩸', 'player-hero', 'text-rose-400 font-bold text-xs');
+          } else if (step.stance === 'warlord_cry') {
+            stepDescription = `🔥 Warlord's Cry: Boosts ${cardName || 'ally'} stats!`;
+            audioSystem.playPlace();
+            setAnimatingSlot({ side: 'player', slot: step.targetSlot, type: 'heal' });
+            const target = copy.playerBoard[step.targetSlot];
+            if (target) {
+              if (step.bonusAtk > 0) target.attack += step.bonusAtk;
+              if (step.bonusArmor > 0) target.armor = (target.armor || 0) + step.bonusArmor;
+              if (step.aoeHeal > 0) target.health = Math.min(target.maxHealth, target.health + step.aoeHeal);
+            }
+            addFloatingText('🔥 BUFF', { side: 'player', slot: step.targetSlot }, 'text-yellow-400 font-bold');
+            addFloatingText("WARLORD'S CRY 🔥", 'player-hero', 'text-yellow-400 font-bold text-xs');
+          }
+          break;
+        }
+
+        case 'hero_heal': {
+          stepDescription = `💚 Commander heals for +${step.heal} HP`;
+          audioSystem.playHeal();
+          copy.playerHeroHealth = Math.min(copy.playerHeroMaxHealth, copy.playerHeroHealth + step.heal);
+          addFloatingText(`+${step.heal} HP 💚`, 'player-hero', 'text-emerald-400 font-black text-sm');
           break;
         }
 
@@ -421,8 +478,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             copy.enemyBoard[step.slot] = null;
           }
           break;
-        }
-      }
+        }      }
 
       return copy;
     });
@@ -551,65 +607,80 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
 
 
+  const currentStep = currentStepIndex !== -1 && currentStepIndex < animateSequence.length
+    ? animateSequence[currentStepIndex]
+    : null;
+
   return (
-    <div className="min-h-screen bg-[#06070a] text-gray-200 p-3 md:p-4 font-sans flex flex-col justify-between">
+    <div className="h-screen max-h-screen overflow-hidden bg-[#06070a] text-gray-200 p-2 md:p-3 font-sans flex flex-col justify-between select-none relative">
       
       {/* Header Bar */}
-      <div className="bg-[#151a21] border border-[#ebd09b]/20 rounded-xl p-3 flex justify-between items-center max-w-7xl mx-auto w-full mb-4 shadow-lg">
+      <div className="bg-[#151a21]/90 border border-[#ebd09b]/10 rounded-lg p-1.5 px-3 flex justify-between items-center max-w-5xl mx-auto w-full mb-2 shadow-md h-[40px] shrink-0">
         <button
           onClick={() => {
             if (window.confirm('Are you sure you want to escape? Energy will not be refunded.')) {
               onExitBattle(false);
             }
           }}
-          className="flex items-center gap-1.5 text-xs font-mono font-bold text-gray-400 hover:text-white transition-all bg-black/40 py-1 px-3 border border-gray-800 rounded-lg cursor-pointer"
+          className="flex items-center gap-1 text-[10px] font-mono font-bold text-gray-400 hover:text-white transition-all bg-black/40 py-1 px-2 border border-gray-800 rounded cursor-pointer"
         >
-          <ArrowLeft className="w-3.5 h-3.5" /> ESCAPE BATTLEFIELD
+          <ArrowLeft className="w-3 h-3" /> ESCAPE
         </button>
 
-        <div className="text-center font-display font-black text-xs md:text-sm tracking-widest text-shadow-gold text-white uppercase">
-          {stage.name} — BATTLE TURN {visualState.turn}
+        <div className="text-center font-display font-black text-xs tracking-widest text-shadow-gold text-white uppercase flex items-center gap-3">
+          <span>{stage.name}</span>
+          <span className="text-gray-500">•</span>
+          <span className="text-cyan-400 font-mono text-[11px] font-bold">TURN {visualState.turn}</span>
         </div>
 
-        <button
-          onClick={toggleSound}
-          className="text-gray-500 hover:text-white transition-all bg-black/30 p-1.5 border border-gray-800/80 rounded-lg cursor-pointer"
-        >
-          {soundOn ? <Volume2 className="w-4 h-4 text-[#ebd09b]" /> : <VolumeX className="w-4 h-4" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowHelpModal(true)}
+            className="text-[10px] font-mono text-[#ebd09b] hover:text-white bg-black/40 py-1 px-2 border border-[#ebd09b]/25 rounded cursor-pointer transition-all"
+          >
+            RULES
+          </button>
+          <button
+            onClick={toggleSound}
+            className="text-gray-500 hover:text-white transition-all bg-black/30 p-1 border border-gray-800 rounded cursor-pointer"
+          >
+            {soundOn ? <Volume2 className="w-3.5 h-3.5 text-[#ebd09b]" /> : <VolumeX className="w-3.5 h-3.5" />}
+          </button>
+        </div>
       </div>
 
-      <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-4 gap-4 items-stretch flex-1">
+      {/* Main Container */}
+      <div className={`max-w-5xl mx-auto w-full flex-1 flex flex-col justify-between relative min-h-0 pb-20 ${screenShake ? 'animate-shake' : ''}`}>
         
-        {/* Battle Arena (Left 3 columns) */}
-        <div className="lg:col-span-3 flex flex-col justify-between bg-gradient-to-b from-[#0b0c10] to-[#06070a] border border-[#c5a880]/15 rounded-2xl p-4 md:p-6 shadow-2xl relative">
+        {/* Battle Arena */}
+        <div className="flex-1 flex flex-col justify-between bg-gradient-to-b from-[#0b0c10] to-[#06070a] border border-[#c5a880]/15 rounded-2xl p-3 md:p-4 shadow-2xl relative min-h-0 overflow-hidden">
           
           {/* ENEMY HERO ZONE */}
-          <div className="flex justify-between items-center bg-black/35 border border-red-950 p-3 rounded-xl mb-4 relative overflow-hidden">
+          <div className="flex justify-between items-center bg-black/35 border border-red-950/40 p-2 rounded-xl mb-2 relative overflow-hidden h-[44px] shrink-0">
             <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-red-900/10 to-transparent pointer-events-none" />
             
-            <div className="flex items-center gap-3 relative z-10">
-              <div className="w-10 h-10 rounded-full bg-[#4e0707] border border-[#dd2c40]/40 flex items-center justify-center shadow-inner relative overflow-hidden">
+            <div className="flex items-center gap-2 relative z-10">
+              <div className="w-8 h-8 rounded-full bg-[#4e0707] border border-[#dd2c40]/40 flex items-center justify-center shadow-inner relative overflow-hidden shrink-0">
                 {renderFloatingTextsFor('enemy-hero')}
                 {stage.enemyHeroImage?.startsWith('/') ? (
                   <img src={stage.enemyHeroImage} alt="Enemy Hero" className="w-full h-full object-cover" />
                 ) : (
-                  <Skull className="w-5 h-5 text-[#dd2c40]" />
+                  <Skull className="w-4 h-4 text-[#dd2c40]" />
                 )}
               </div>
               <div>
-                <span className="text-[9px] font-mono font-bold text-[#dd2c40] tracking-widest uppercase block">Enemy Lord</span>
-                <h4 className="font-display font-bold text-sm text-white leading-none">{stage.enemyHeroName}</h4>
+                <span className="text-[8px] font-mono font-bold text-[#dd2c40] tracking-wider uppercase block leading-none">Enemy Lord</span>
+                <h4 className="font-display font-bold text-xs text-white leading-none mt-0.5">{stage.enemyHeroName}</h4>
               </div>
             </div>
 
             {/* Enemy HP Bar */}
-            <div className="text-right space-y-1 font-mono w-44 md:w-64 relative z-10">
-              <div className="flex justify-between text-xs font-bold text-red-400">
+            <div className="text-right space-y-0.5 font-mono w-40 md:w-56 relative z-10">
+              <div className="flex justify-between text-[10px] font-bold text-red-400 leading-none">
                 <span>Health:</span>
                 <span>{visualState.enemyHeroHealth} / {visualState.enemyHeroMaxHealth} HP</span>
               </div>
-              <div className="w-full bg-[#4e0707]/30 h-2.5 rounded-full border border-red-900/20 overflow-hidden">
+              <div className="w-full bg-[#4e0707]/30 h-1.5 rounded-full border border-red-900/20 overflow-hidden">
                 <motion.div
                   className="bg-[#dd2c40] h-full rounded-full"
                   animate={{ width: `${Math.max(0, (visualState.enemyHeroHealth / visualState.enemyHeroMaxHealth) * 100)}%` }}
@@ -623,35 +694,34 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           <AnimatePresence mode="wait">
             {isAnimating && (
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="bg-[#151a21]/95 border border-[#66fcf1]/35 rounded-xl p-3 flex flex-col md:flex-row justify-between items-center mb-4 gap-3 shadow-lg backdrop-blur-sm"
+                exit={{ opacity: 0, y: -5 }}
+                className="bg-[#151a21]/95 border border-[#66fcf1]/35 rounded-lg p-1.5 px-3 flex justify-between items-center mb-2 gap-2 shadow-md backdrop-blur-sm h-[38px] shrink-0"
               >
-                <div className="flex items-center gap-2.5">
-                  <div className="w-2 h-2 rounded-full bg-[#66fcf1] animate-ping" />
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#66fcf1] animate-ping" />
                   <div>
-                    <span className="text-[9px] font-mono font-bold text-[#66fcf1] tracking-widest uppercase block">Battle Phase</span>
-                    <h5 className="font-display font-bold text-xs text-white leading-none mt-0.5">
+                    <h5 className="font-display font-bold text-[10px] text-white leading-none">
                       {activeLogStepText || 'Starting combat duelist...'}
                     </h5>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] font-mono text-gray-400">
-                    Turn {currentStepIndex + 1} / {animateSequence.length}
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[8px] font-mono text-gray-400">
+                    Step {currentStepIndex + 1} / {animateSequence.length}
                   </span>
 
                   {/* Playback speed selector */}
-                  <div className="flex bg-black/40 p-0.5 rounded-lg border border-gray-800">
+                  <div className="flex bg-black/40 p-0.5 rounded border border-gray-800 h-6 items-center">
                     {[1, 2, 3].map((s) => (
                       <button
                         key={s}
                         onClick={() => setSpeedMultiplier(s)}
-                        className={`px-2 py-1 text-[9px] font-mono font-black rounded-md transition-all cursor-pointer ${
+                        className={`px-1.5 py-0.5 text-[8px] font-mono font-black rounded transition-all cursor-pointer ${
                           speedMultiplier === s
-                            ? 'bg-[#66fcf1] text-black shadow-lg font-bold'
+                            ? 'bg-[#66fcf1] text-black font-bold'
                             : 'text-gray-400 hover:text-white'
                         }`}
                       >
@@ -663,9 +733,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   {/* Pause / Resume buttons */}
                   <button
                     onClick={() => setIsPaused(!isPaused)}
-                    className="bg-black/50 hover:bg-gray-800 border border-gray-800 text-white text-[9px] font-mono font-bold py-1 px-3 rounded-lg cursor-pointer transition-all flex items-center gap-1"
+                    className="bg-black/50 hover:bg-gray-800 border border-gray-800 text-white text-[8px] font-mono font-bold py-0.5 px-2 rounded cursor-pointer transition-all flex items-center gap-0.5 h-6"
                   >
-                    {isPaused ? <Play className="w-2.5 h-2.5 text-emerald-400" /> : <Pause className="w-2.5 h-2.5 text-yellow-400" />}
+                    {isPaused ? <Play className="w-2 h-2 text-emerald-400" /> : <Pause className="w-2 h-2 text-yellow-400" />}
                     {isPaused ? 'START' : 'PAUSE'}
                   </button>
 
@@ -676,7 +746,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         setAnimatingSlot(null);
                         setCurrentStepIndex(prev => Math.min(animateSequence.length, prev + 1));
                       }}
-                      className="bg-cyan-950/50 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-300 text-[9px] font-mono font-bold py-1 px-2 rounded-lg cursor-pointer transition-all"
+                      className="bg-cyan-950/50 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-300 text-[8px] font-mono font-bold py-0.5 px-1.5 rounded cursor-pointer transition-all h-6"
                     >
                       STEP ➡️
                     </button>
@@ -687,19 +757,20 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           </AnimatePresence>
 
           {/* BOARD STAGE FIELD (LINEAR DUELS) */}
-          <div className="flex-1 grid grid-rows-2 gap-6 items-center my-4">
+          <div className="flex-1 flex flex-col justify-around my-2 min-h-0">
             
             {/* 1. ENEMY BOARD */}
-            <div className="grid grid-cols-5 gap-2 md:gap-4 relative">
-              <div className="absolute inset-x-0 -bottom-3 h-[1px] bg-red-950/25" />
+            <div className="grid grid-cols-5 gap-2 md:gap-3 relative">
+              <div className="absolute inset-x-0 -bottom-2 h-[1px] bg-red-950/25" />
               {visualState.enemyBoard.map((card, idx) => {
                 const isActing = animatingSlot?.side === 'enemy' && animatingSlot?.slot === idx && animatingSlot?.type === 'strike';
                 const isHit = animatingSlot?.side === 'enemy' && animatingSlot?.slot === idx && animatingSlot?.type === 'hit';
                 const isDeath = animatingSlot?.side === 'enemy' && animatingSlot?.slot === idx && animatingSlot?.type === 'death';
                 const isHeal = animatingSlot?.side === 'enemy' && animatingSlot?.slot === idx && animatingSlot?.type === 'heal';
+                const side = 'enemy';
 
                 return (
-                  <div key={idx} className="relative aspect-[3/4.2]">
+                  <div key={idx} className="relative aspect-[3/4.1] max-h-[135px] max-w-[95px] mx-auto w-full shrink-0">
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       {renderFloatingTextsFor({ side: 'enemy', slot: idx })}
                     </div>
@@ -711,11 +782,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       animate={{
                         opacity: isDeath ? 0 : 1,
                         scale: isActing ? 1.15 : isDeath ? 0.7 : isHeal ? 1.05 : 1,
-                        y: isActing ? 45 : 0,
-                        x: isHit ? [0, -8, 8, -6, 6, 0] : 0,
+                        y: isActing ? 30 : 0,
+                        x: isHit ? [0, -6, 6, -4, 4, 0] : 0,
                         boxShadow: card && card.delay === 0
-                          ? "0 0 12px rgba(220, 38, 64, 0.5)"
-                          : "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                          ? "0 0 10px rgba(220, 38, 64, 0.4)"
+                          : "0 2px 4px rgba(0, 0, 0, 0.15)",
                         borderColor: isHit ? "#ef4444" : card ? getTierBorderColor(card.tier) : "#151a21"
                       }}
                       transition={{
@@ -724,9 +795,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         damping: 14,
                         x: { duration: 0.25 }
                       }}
-                      className={`w-full h-full rounded-xl border flex flex-col justify-between p-2 text-center relative overflow-hidden select-none transition-all ${
+                      className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 text-center relative overflow-hidden select-none transition-all ${
                         card
-                          ? `${card.delay > 0 ? 'brightness-[0.4] saturate-[0.6]' : ''} bg-[#151a21] text-white cursor-help shadow-lg`
+                          ? `${card.delay > 0 ? 'brightness-[0.4] saturate-[0.6]' : ''} bg-[#151a21] text-white cursor-help shadow-md`
                           : 'bg-black/30 border-red-950/25 border-dashed flex items-center justify-center'
                       }`}
                     >
@@ -735,21 +806,20 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           <div className={`absolute inset-0 opacity-[0.06] bg-gradient-to-br ${getTierBgGradient(card.tier)}`} />
                           {card.image.startsWith('/cards/') && (
                             <>
-                              <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 rounded-xl opacity-90" />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/10 z-0 rounded-xl pointer-events-none" />
+                              <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 rounded-xl opacity-85" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10 z-0 rounded-xl pointer-events-none" />
                             </>
                           )}
                           
                           {card.delay > 0 && (
-                            <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] z-20 flex flex-col items-center justify-center gap-1.5 pointer-events-none rounded-xl">
-                              <div className="w-10 h-10 rounded-full bg-black/80 border-2 border-red-500/40 flex items-center justify-center shadow-[0_0_15px_rgba(239,68,68,0.3)] animate-pulse">
-                                <span className="text-red-400 font-mono text-base font-black tracking-tighter">⏳{card.delay}</span>
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] z-20 flex flex-col items-center justify-center gap-1 pointer-events-none rounded-xl">
+                              <div className="w-7 h-7 rounded-full bg-black/80 border border-red-500/40 flex items-center justify-center shadow-[0_0_8px_rgba(239,68,68,0.3)] animate-pulse">
+                                <span className="text-red-400 font-mono text-xs font-black tracking-tighter">⏳{card.delay}</span>
                               </div>
-                              <span className="text-[8px] font-mono font-bold tracking-widest text-red-500/80 uppercase">Delay</span>
                             </div>
                           )}
 
-                          <div className="flex justify-between items-center text-[7px] md:text-[8px] font-mono font-bold text-gray-500 z-10 relative">
+                          <div className="flex justify-between items-center text-[6px] font-mono font-bold text-gray-500 z-10 relative">
                             <span className={`uppercase tracking-wider ${getTierTextColor(card.tier)}`}>
                               {card.tier}
                             </span>
@@ -757,36 +827,33 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           </div>
 
                           {card.delay > 0 ? (
-                            <div className="absolute -top-1.5 -right-1.5 bg-[#4e0707] border border-[#dd2c40] rounded-full px-1 py-0.5 flex items-center gap-0.5 text-[8px] font-mono font-bold text-white shadow animate-pulse z-20">
+                            <div className="absolute -top-1 -right-1 bg-[#4e0707] border border-[#dd2c40] rounded-full px-1 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-bold text-white shadow animate-pulse z-20">
                               ⏳{card.delay}
                             </div>
                           ) : (
-                            <div className="absolute -top-1.5 -right-1.5 bg-red-600 border border-white rounded-full w-4.5 h-4.5 flex items-center justify-center text-[8px] font-mono font-bold text-white shadow z-20 animate-bounce">
+                            <div className="absolute -top-1 -right-1 bg-red-600 border border-white rounded-full w-4 h-4 flex items-center justify-center text-[7px] font-mono font-bold text-white shadow z-20 animate-bounce">
                               ⚔️
                             </div>
                           )}
 
-                          <div className="mt-1 z-10 relative">
-                            <span className="text-[9px] md:text-xs font-display font-black tracking-tight text-white block truncate leading-none">
+                          <div className="mt-0.5 z-10 relative">
+                            <span className="text-[8.5px] font-display font-black tracking-tight text-white block truncate leading-none">
                               {card.name}
                             </span>
                           </div>
 
-                          <div className="flex flex-wrap justify-center gap-0.5 my-1 z-10 relative max-h-[16px] overflow-hidden">
+                          <div className="flex flex-wrap justify-center gap-0.5 my-0.5 z-10 relative max-h-[14px] overflow-hidden">
                             {card.skills.map((s, sIdx) => (
                               <span
                                 key={sIdx}
-                                className={`text-[6.5px] px-1 py-0.2 rounded border ${getSkillBadgeStyle(s.type)}`}
+                                className={`text-[5.5px] px-0.5 py-0.2 rounded border ${getSkillBadgeStyle(s.type)}`}
                               >
                                 {getSkillIcon(s.type)}{s.value}
                               </span>
                             ))}
-                            {card.skills.length === 0 && (
-                              <span className="text-[6.5px] font-mono text-gray-600">no skills</span>
-                            )}
                           </div>
 
-                          <div className="w-full bg-black/40 h-1 rounded-full overflow-hidden mt-1 z-10 border border-black/30 relative">
+                          <div className="w-full bg-black/40 h-0.5 rounded-full overflow-hidden z-10 border border-black/30 relative">
                             <motion.div
                               className="bg-red-500 h-full rounded-full"
                               animate={{ width: `${(card.health / card.maxHealth) * 100}%` }}
@@ -794,32 +861,93 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                             />
                           </div>
 
-                          <div className="flex justify-between items-center text-[9px] font-mono font-black pt-1 border-t border-gray-800/80 mt-1 z-10 relative">
+                          <div className="flex justify-between items-center text-[8px] font-mono font-black pt-0.5 border-t border-gray-800/80 mt-0.5 z-10 relative">
                             <span className="text-red-400">⚔️ {card.attack}</span>
                             <span className="text-emerald-400">❤️ {card.health}</span>
                           </div>
                         </>
                       ) : (
-                        <span className="text-[8px] font-mono text-gray-700 uppercase tracking-widest">Slot {idx+1}</span>
+                        <span className="text-[7px] font-mono text-gray-700 uppercase tracking-widest">Slot {idx+1}</span>
                       )}
                     </motion.div>
+
+                    {/* Skill Overlay Animations */}
+                    <AnimatePresence>
+                      {isHit && (
+                        <motion.div
+                          initial={{ opacity: 0.8 }}
+                          animate={{ opacity: 0 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="absolute inset-0 bg-red-600/40 z-30 pointer-events-none rounded-xl"
+                        />
+                      )}
+                    </AnimatePresence>
+                    <AnimatePresence>
+                      {isHeal && (
+                        <motion.div
+                          initial={{ opacity: 0.8 }}
+                          animate={{ opacity: 0 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.4 }}
+                          className="absolute inset-0 bg-emerald-500/35 z-30 pointer-events-none rounded-xl"
+                        />
+                      )}
+                    </AnimatePresence>
+                    <AnimatePresence>
+                      {currentStep?.type === 'plague' && 
+                       ((currentStep.sourceSide === 'player' ? 'enemy' : 'player') === side) && 
+                       currentStep.targetSlot === idx && 
+                       isHit && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.7 }}
+                          animate={{ opacity: [0, 0.9, 0.9, 0], scale: [0.7, 1.15, 1.15, 1] }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.6 }}
+                          className="absolute inset-0 bg-emerald-950/60 border-2 border-emerald-500/80 z-35 flex items-center justify-center rounded-xl pointer-events-none"
+                        >
+                          <span className="text-xl drop-shadow-[0_0_8px_rgba(77,240,48,0.8)]">🤢</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <AnimatePresence>
+                      {currentStep?.type === 'attack' && 
+                       (currentStep.attacker === 'player' ? 'enemy' : 'player') === side && 
+                       currentStep.targetSlot === idx && 
+                       currentStepIndex !== -1 && 
+                       (currentStep.attacker === 'player' 
+                         ? visualState.playerBoard[currentStep.slot]?.skills?.some(s => s.type === 'hex')
+                         : visualState.enemyBoard[currentStep.slot]?.skills?.some(s => s.type === 'hex')
+                       ) && (
+                        <motion.div
+                          initial={{ opacity: 0, rotate: -20 }}
+                          animate={{ opacity: [0, 0.8, 0.8, 0], rotate: [0, 15, 15, 0] }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.6 }}
+                          className="absolute inset-0 bg-purple-950/50 border border-purple-500/50 z-35 flex items-center justify-center rounded-xl pointer-events-none"
+                        >
+                          <span className="text-xl drop-shadow-[0_0_8px_rgba(182,77,250,0.8)]">🔮</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 );
               })}
             </div>
 
             {/* 2. PLAYER BOARD */}
-            <div className="grid grid-cols-5 gap-2 md:gap-4 relative">
-              <div className="absolute inset-x-0 -top-3 h-[1px] bg-cyan-950/25" />
+            <div className="grid grid-cols-5 gap-2 md:gap-3 relative">
+              <div className="absolute inset-x-0 -top-2 h-[1px] bg-cyan-950/25" />
               {visualState.playerBoard.map((card, idx) => {
                 const canPlace = selectedHandCardId && card === null && !isSimulating;
                 const isActing = animatingSlot?.side === 'player' && animatingSlot?.slot === idx && animatingSlot?.type === 'strike';
                 const isHit = animatingSlot?.side === 'player' && animatingSlot?.slot === idx && animatingSlot?.type === 'hit';
                 const isDeath = animatingSlot?.side === 'player' && animatingSlot?.slot === idx && animatingSlot?.type === 'death';
                 const isHeal = animatingSlot?.side === 'player' && animatingSlot?.slot === idx && animatingSlot?.type === 'heal';
+                const side = 'player';
 
                 return (
-                  <div key={idx} className="relative aspect-[3/4.2]">
+                  <div key={idx} className="relative aspect-[3/4.1] max-h-[135px] max-w-[95px] mx-auto w-full shrink-0">
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       {renderFloatingTextsFor({ side: 'player', slot: idx })}
                     </div>
@@ -832,13 +960,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       animate={{
                         opacity: isDeath ? 0 : 1,
                         scale: isActing ? 1.15 : isDeath ? 0.7 : isHeal ? 1.05 : canPlace ? 1.02 : 1,
-                        y: isActing ? -45 : 0,
-                        x: isHit ? [0, -8, 8, -6, 6, 0] : 0,
+                        y: isActing ? -30 : 0,
+                        x: isHit ? [0, -6, 6, -4, 4, 0] : 0,
                         boxShadow: card && card.delay === 0
-                          ? "0 0 12px rgba(102, 252, 241, 0.5)"
+                          ? "0 0 10px rgba(102, 252, 241, 0.4)"
                           : canPlace
-                            ? "0 0 10px rgba(16, 185, 129, 0.4)"
-                            : "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                            ? "0 0 8px rgba(16, 185, 129, 0.3)"
+                            : "0 2px 4px rgba(0, 0, 0, 0.15)",
                         borderColor: isHit ? "#ef4444" : canPlace ? "#10b981" : card ? getTierBorderColor(card.tier) : "#151a21"
                       }}
                       transition={{
@@ -847,11 +975,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         damping: 14,
                         x: { duration: 0.25 }
                       }}
-                      className={`w-full h-full rounded-xl border flex flex-col justify-between p-2 text-center relative overflow-hidden select-none transition-all ${
+                      className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 text-center relative overflow-hidden select-none transition-all ${
                         canPlace
                           ? 'bg-emerald-950/20 border-emerald-500/50 cursor-pointer border-dashed animate-pulse'
                           : card
-                            ? `${card.delay > 0 ? 'brightness-[0.4] saturate-[0.6]' : ''} bg-[#151a21] text-white cursor-help shadow-lg`
+                            ? `${card.delay > 0 ? 'brightness-[0.4] saturate-[0.6]' : ''} bg-[#151a21] text-white cursor-help shadow-md`
                             : 'bg-black/30 border-cyan-950/20 border-dashed flex items-center justify-center'
                       }`}
                     >
@@ -860,21 +988,20 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           <div className={`absolute inset-0 opacity-[0.06] bg-gradient-to-br ${getTierBgGradient(card.tier)}`} />
                           {card.image.startsWith('/cards/') && (
                             <>
-                              <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 rounded-xl opacity-90" />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/10 z-0 rounded-xl pointer-events-none" />
+                              <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 rounded-xl opacity-85" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10 z-0 rounded-xl pointer-events-none" />
                             </>
                           )}
                           
                           {card.delay > 0 && (
-                            <div className="absolute inset-0 bg-black/60 backdrop-blur-[1.5px] z-20 flex flex-col items-center justify-center gap-1.5 pointer-events-none rounded-xl">
-                              <div className="w-10 h-10 rounded-full bg-black/80 border-2 border-cyan-500/40 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)] animate-pulse">
-                                <span className="text-cyan-400 font-mono text-base font-black tracking-tighter">⏳{card.delay}</span>
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] z-20 flex flex-col items-center justify-center gap-1 pointer-events-none rounded-xl">
+                              <div className="w-7 h-7 rounded-full bg-black/80 border border-cyan-500/40 flex items-center justify-center shadow-[0_0_8px_rgba(6,182,212,0.3)] animate-pulse">
+                                <span className="text-cyan-400 font-mono text-xs font-black tracking-tighter">⏳{card.delay}</span>
                               </div>
-                              <span className="text-[8px] font-mono font-bold tracking-widest text-cyan-400/80 uppercase">Delay</span>
                             </div>
                           )}
 
-                          <div className="flex justify-between items-center text-[7px] md:text-[8px] font-mono font-bold text-gray-500 z-10 relative">
+                          <div className="flex justify-between items-center text-[6px] font-mono font-bold text-gray-500 z-10 relative">
                             <span className={`uppercase tracking-wider ${getTierTextColor(card.tier)}`}>
                               {card.tier}
                             </span>
@@ -882,36 +1009,33 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           </div>
 
                           {card.delay > 0 ? (
-                            <div className="absolute -top-1.5 -right-1.5 bg-[#091a2f] border border-cyan-500 rounded-full px-1 py-0.5 flex items-center gap-0.5 text-[8px] font-mono font-bold text-cyan-300 shadow z-20">
+                            <div className="absolute -top-1 -right-1 bg-[#091a2f] border border-cyan-500 rounded-full px-1 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-bold text-cyan-300 shadow z-20">
                               ⏳{card.delay}
                             </div>
                           ) : (
-                            <div className="absolute -top-1.5 -right-1.5 bg-emerald-600 border border-white rounded-full w-4.5 h-4.5 flex items-center justify-center text-[8px] font-mono font-bold text-white shadow z-20 animate-bounce">
+                            <div className="absolute -top-1 -right-1 bg-emerald-600 border border-white rounded-full w-4 h-4 flex items-center justify-center text-[7px] font-mono font-bold text-white shadow z-20 animate-bounce">
                               ⚔️
                             </div>
                           )}
 
-                          <div className="mt-1 z-10 relative">
-                            <span className="text-[9px] md:text-xs font-display font-black tracking-tight text-white block truncate leading-none">
+                          <div className="mt-0.5 z-10 relative">
+                            <span className="text-[8.5px] font-display font-black tracking-tight text-white block truncate leading-none">
                               {card.name}
                             </span>
                           </div>
 
-                          <div className="flex flex-wrap justify-center gap-0.5 my-1 z-10 relative max-h-[16px] overflow-hidden">
+                          <div className="flex flex-wrap justify-center gap-0.5 my-0.5 z-10 relative max-h-[14px] overflow-hidden">
                             {card.skills.map((s, sIdx) => (
                               <span
                                 key={sIdx}
-                                className={`text-[6.5px] px-1 py-0.2 rounded border ${getSkillBadgeStyle(s.type)}`}
+                                className={`text-[5.5px] px-0.5 py-0.2 rounded border ${getSkillBadgeStyle(s.type)}`}
                               >
                                 {getSkillIcon(s.type)}{s.value}
                               </span>
                             ))}
-                            {card.skills.length === 0 && (
-                              <span className="text-[6.5px] font-mono text-gray-600">no skills</span>
-                            )}
                           </div>
 
-                          <div className="w-full bg-black/40 h-1 rounded-full overflow-hidden mt-1 z-10 border border-black/30 relative">
+                          <div className="w-full bg-black/40 h-0.5 rounded-full overflow-hidden z-10 border border-black/30 relative">
                             <motion.div
                               className="bg-emerald-500 h-full rounded-full"
                               animate={{ width: `${(card.health / card.maxHealth) * 100}%` }}
@@ -919,17 +1043,92 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                             />
                           </div>
 
-                          <div className="flex justify-between items-center text-[9px] font-mono font-black pt-1 border-t border-gray-800/80 mt-1 z-10 relative">
+                          <div className="flex justify-between items-center text-[8px] font-mono font-black pt-0.5 border-t border-gray-800/80 mt-0.5 z-10 relative">
                             <span className="text-red-400">⚔️ {card.attack}</span>
                             <span className="text-emerald-400">❤️ {card.health}</span>
                           </div>
                         </>
                       ) : (
-                        <span className="text-[8px] font-mono text-gray-700 uppercase tracking-widest">
-                          {canPlace ? 'Select 📥' : `Slot ${idx+1}`}
+                        <span className="text-[7px] font-mono text-gray-700 uppercase tracking-widest">
+                          {canPlace ? 'Place 📥' : `Slot ${idx+1}`}
                         </span>
                       )}
                     </motion.div>
+
+                    {/* Skill Overlay Animations */}
+                    <AnimatePresence>
+                      {isHit && (
+                        <motion.div
+                          initial={{ opacity: 0.8 }}
+                          animate={{ opacity: 0 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="absolute inset-0 bg-red-600/40 z-30 pointer-events-none rounded-xl"
+                        />
+                      )}
+                    </AnimatePresence>
+                    <AnimatePresence>
+                      {isHeal && (
+                        <motion.div
+                          initial={{ opacity: 0.8 }}
+                          animate={{ opacity: 0 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.4 }}
+                          className="absolute inset-0 bg-emerald-500/35 z-30 pointer-events-none rounded-xl"
+                        />
+                      )}
+                    </AnimatePresence>
+                    <AnimatePresence>
+                      {currentStep?.type === 'plague' && 
+                       ((currentStep.sourceSide === 'player' ? 'enemy' : 'player') === side) && 
+                       currentStep.targetSlot === idx && 
+                       isHit && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.7 }}
+                          animate={{ opacity: [0, 0.9, 0.9, 0], scale: [0.7, 1.15, 1.15, 1] }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.6 }}
+                          className="absolute inset-0 bg-emerald-950/60 border-2 border-emerald-500/80 z-35 flex items-center justify-center rounded-xl pointer-events-none"
+                        >
+                          <span className="text-xl drop-shadow-[0_0_8px_rgba(77,240,48,0.8)]">🤢</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <AnimatePresence>
+                      {currentStep?.type === 'sacrifice' && 
+                       side === 'player' && 
+                       currentStep.targetSlot === idx && (
+                        <motion.div
+                          initial={{ opacity: 1, scale: 1 }}
+                          animate={{ opacity: 0, scale: 1.5 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.6 }}
+                          className="absolute inset-0 bg-[#3f1a66]/80 border-2 border-[#b64dfa]/80 z-35 flex items-center justify-center rounded-xl pointer-events-none"
+                        >
+                          <span className="text-2xl drop-shadow-[0_0_10px_rgba(182,77,250,0.8)]">💀</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <AnimatePresence>
+                      {currentStep?.type === 'attack' && 
+                       (currentStep.attacker === 'player' ? 'enemy' : 'player') === side && 
+                       currentStep.targetSlot === idx && 
+                       currentStepIndex !== -1 && 
+                       (currentStep.attacker === 'player' 
+                         ? visualState.playerBoard[currentStep.slot]?.skills?.some(s => s.type === 'hex')
+                         : visualState.enemyBoard[currentStep.slot]?.skills?.some(s => s.type === 'hex')
+                       ) && (
+                        <motion.div
+                          initial={{ opacity: 0, rotate: -20 }}
+                          animate={{ opacity: [0, 0.8, 0.8, 0], rotate: [0, 15, 15, 0] }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.6 }}
+                          className="absolute inset-0 bg-purple-950/50 border border-purple-500/50 z-35 flex items-center justify-center rounded-xl pointer-events-none"
+                        >
+                          <span className="text-xl drop-shadow-[0_0_8px_rgba(182,77,250,0.8)]">🔮</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 );
               })}
@@ -938,44 +1137,44 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           </div>
 
           {/* PLAYER HERO ZONE & CONTROLS */}
-          <div className="flex flex-col md:flex-row justify-between items-center bg-black/35 border border-cyan-950 p-4 rounded-xl mt-4 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-center bg-black/35 border border-cyan-950/40 p-2 px-3 rounded-xl mt-2 gap-2 h-[48px] shrink-0 relative z-30">
             
             {/* Player Profile Hero */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#151a21] border border-[#66fcf1]/40 flex items-center justify-center shadow-inner relative overflow-hidden">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-[#151a21] border border-[#66fcf1]/40 flex items-center justify-center shadow-inner relative overflow-hidden shrink-0">
                 {renderFloatingTextsFor('player-hero')}
                 {profile.avatarUrl ? (
                   <img src={profile.avatarUrl} alt="Hero Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <Shield className="w-5 h-5 text-[#66fcf1]" />
+                  <Shield className="w-4 h-4 text-[#66fcf1]" />
                 )}
               </div>
               <div>
-                <span className="text-[9px] font-mono font-bold text-[#66fcf1] tracking-widest uppercase block">Your Hero</span>
-                <h4 className="font-display font-bold text-sm text-white leading-none">{profile.username || 'Wind Summoner'}</h4>
+                <span className="text-[8px] font-mono font-bold text-[#66fcf1] tracking-wider uppercase block leading-none">Your Hero</span>
+                <h4 className="font-display font-bold text-xs text-white leading-none mt-0.5">{profile.username || 'Wind Summoner'}</h4>
               </div>
             </div>
 
             {/* End Turn / Skip buttons */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {!selectedHandCardId && (
                 <button
                   disabled={isSimulating}
                   onClick={handleEndTurnWithoutCard}
-                  className="bg-gradient-to-r from-teal-900 to-[#1f2833] hover:from-[#45a29e] hover:to-teal-900 border border-[#66fcf1]/40 text-[#66fcf1] text-xs font-display font-black py-2.5 px-6 rounded-xl shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+                  className="bg-gradient-to-r from-teal-900 to-[#1f2833] hover:from-[#45a29e] hover:to-teal-900 border border-[#66fcf1]/40 text-[#66fcf1] text-[10px] font-display font-black py-1.5 px-4 rounded-lg shadow transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none cursor-pointer h-[32px] flex items-center justify-center"
                 >
-                  ⏳ PLAY TURN WITHOUT CARD
+                  ⏳ PLAY TURN
                 </button>
               )}
 
               {selectedHandCardId && (
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-bold text-amber-200 mt-2 bg-amber-900/40 border border-amber-500/50 rounded-lg p-2 animate-pulse shadow-neon-gold">
-                📥 Select a free slot on the battlefield
-              </p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-[10px] font-bold text-amber-200 bg-amber-900/40 border border-amber-500/50 rounded px-2 py-1 animate-pulse leading-none">
+                    📥 Select empty slot
+                  </p>
                   <button
                     onClick={() => setSelectedHandCardId(null)}
-                    className="bg-[#4e0707] hover:bg-[#880d1e] border border-[#dd2c40]/40 text-[#dd2c40] text-xs font-mono font-bold py-1.5 px-4 rounded-lg transition-all cursor-pointer"
+                    className="bg-[#4e0707] hover:bg-[#880d1e] border border-[#dd2c40]/40 text-[#dd2c40] text-[9px] font-mono font-bold py-1 px-2.5 rounded transition-all cursor-pointer h-[28px]"
                   >
                     ✕ CANCEL
                   </button>
@@ -984,12 +1183,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             </div>
 
             {/* Player HP bar */}
-            <div className="text-right space-y-1 font-mono w-44 md:w-64">
-              <div className="flex justify-between text-xs font-bold text-[#66fcf1]">
+            <div className="text-right space-y-0.5 font-mono w-40 md:w-56">
+              <div className="flex justify-between text-[10px] font-bold text-[#66fcf1] leading-none">
                 <span>Health:</span>
                 <span>{visualState.playerHeroHealth} / {visualState.playerHeroMaxHealth} HP</span>
               </div>
-              <div className="w-full bg-cyan-950/30 h-2.5 rounded-full border border-[#66fcf1]/20 overflow-hidden">
+              <div className="w-full bg-cyan-950/30 h-1.5 rounded-full border border-[#66fcf1]/20 overflow-hidden">
                 <motion.div
                   className="bg-[#66fcf1] h-full rounded-full"
                   animate={{ width: `${Math.max(0, (visualState.playerHeroHealth / visualState.playerHeroMaxHealth) * 100)}%` }}
@@ -997,190 +1196,243 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 />
               </div>
             </div>
-
           </div>
 
         </div>
 
-        {/* Combat Logs & Player Hand / Codex (Right 1 column) */}
-        <div className="flex flex-col gap-4">
-          
-          {/* PLAYER HAND ZONE */}
-          <div className="bg-[#151a21] border border-[#c5a880]/15 rounded-2xl p-4 flex flex-col justify-between">
-            <h4 className="font-display font-bold text-xs text-[#ebd09b] tracking-wider uppercase border-b border-gray-800 pb-2 mb-3 flex justify-between items-center">
-              <span>🃏 YOUR HAND</span>
-              <span className="bg-black/30 text-[10px] font-mono px-2 py-0.5 rounded border border-gray-800 text-[#ebd09b]">
-                {visualState.playerHand.length}
-              </span>
-            </h4>
+        {/* Collapsible log button */}
+        <button
+          onClick={() => setShowLogDrawer(true)}
+          className="absolute top-12 right-2 bg-[#151a21]/90 border border-red-900/40 text-red-400 hover:text-white p-2 rounded-full cursor-pointer shadow-lg hover:border-red-500 transition-all z-35 flex items-center justify-center group"
+          title="Open Duel Log"
+        >
+          <Scroll className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          {visualState.combatLog.length > 1 && (
+            <span className="absolute -top-1 -right-1 bg-red-600 text-white font-mono text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-black animate-pulse">
+              {visualState.combatLog.length - 1}
+            </span>
+          )}
+        </button>
 
-            <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-              {visualState.playerHand.map((card) => {
-                const isSelected = selectedHandCardId === card.id;
-                return (
-                  <div
-                    key={card.id}
-                    onClick={() => {
-                      if (!isSimulating) {
-                        setSelectedHandCardId(isSelected ? null : card.id);
-                      }
-                    }}
-                    onMouseEnter={() => setHoveredCard(card as any)}
-                    onMouseLeave={() => setHoveredCard(null)}
-                    className={`p-2 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
-                      isSelected 
-                        ? 'bg-black/90 border-[#66fcf1] scale-[1.02] shadow-[0_0_10px_rgba(102,252,241,0.25)]' 
-                        : 'bg-black/45 border-gray-800/80 hover:border-gray-700'
-                    }`}
-                  >
-                    <div>
-                      <span className="font-display font-bold text-xs text-white block leading-tight">{card.name}</span>
-                      <div className="flex items-center gap-2 mt-1 font-mono text-[9px] md:text-[10px]">
-                        <span className="text-red-400 font-bold">⚔️{card.attack}</span>
-                        <span className="text-emerald-400 font-bold">❤️{card.health}</span>
-                        <span className="text-blue-400 font-bold">⏳{card.delay}</span>
-                      </div>
-                    </div>
-                    {isSelected ? (
-                      <span className="text-[9px] text-emerald-400 font-mono font-bold uppercase tracking-wider">Selected</span>
-                    ) : (
-                      <span className="text-[8px] text-gray-500 font-mono uppercase tracking-wider bg-black/40 px-1.5 py-0.5 rounded border border-gray-900">Deploy</span>
-                    )}
-                  </div>
-                );
-              })}
-              
-              {visualState.playerHand.length === 0 && (
-                <div className="text-center text-[10px] text-gray-500 font-mono py-6 border border-dashed border-gray-800 rounded-xl">
-                  Deck is empty.
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* BATTLE CODEX & INTERACTIVE CARD ANALYST */}
-          <div className="bg-[#151a21] border border-[#c5a880]/15 rounded-2xl p-4 flex flex-col justify-between min-h-[170px]">
-            {hoveredCard ? (
+        {/* Combat Log Drawer Overlay */}
+        <AnimatePresence>
+          {showLogDrawer && (
+            <>
               <motion.div
-                key={hoveredCard.id}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowLogDrawer(false)}
+                className="fixed inset-0 bg-black z-45"
+              />
+              <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="fixed right-0 top-0 bottom-0 w-80 bg-[#0d1117]/95 border-l border-[#ebd09b]/25 z-50 p-4 flex flex-col justify-between shadow-2xl backdrop-blur-md"
               >
-                <div className="flex justify-between items-start border-b border-gray-800 pb-2">
+                <div className="flex justify-between items-center border-b border-gray-800 pb-3 mb-3">
+                  <h4 className="font-display font-bold text-xs text-red-400 tracking-wider uppercase flex items-center gap-1.5">
+                    <Scroll className="w-4 h-4 text-red-400" /> BLOODY DUEL LOG
+                  </h4>
+                  <button
+                    onClick={() => setShowLogDrawer(false)}
+                    className="text-gray-500 hover:text-white transition-all cursor-pointer p-1 rounded-lg border border-gray-800/80 hover:border-gray-700 bg-black/40"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div
+                  id="combat-log-scroll"
+                  className="flex-1 overflow-y-auto font-mono text-[9px] text-gray-400 space-y-2 pr-1 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent"
+                >
+                  {visualState.combatLog.map((log, index) => {
+                    let colorClass = 'text-gray-400';
+                    if (log.includes('TURN')) colorClass = 'text-cyan-400 font-bold border-t border-gray-800 pt-2 mt-2';
+                    else if (log.includes('VICTORY') || log.includes('healed')) colorClass = 'text-emerald-400 font-bold';
+                    else if (log.includes('DEFEAT') || log.includes('fell') || log.includes('Death')) colorClass = 'text-red-500 font-bold';
+                    else if (log.includes('Sacrifice') || log.includes('💀')) colorClass = 'text-yellow-500';
+                    else if (log.includes('Hex')) colorClass = 'text-purple-400';
+                    else if (log.includes('Enemy') || log.includes('😈')) colorClass = 'text-rose-300';
+
+                    return (
+                      <div key={index} className="border-b border-gray-900/30 pb-1 leading-relaxed" dangerouslySetInnerHTML={{ __html: log }} />
+                    );
+                  })}
+                </div>
+
+                <div className="border-t border-gray-800 pt-3 mt-3">
+                  <button
+                    onClick={() => setShowLogDrawer(false)}
+                    className="w-full bg-black/40 hover:bg-black/60 border border-gray-800 text-gray-400 hover:text-white py-2 rounded-xl text-xs font-mono font-bold cursor-pointer transition-all"
+                  >
+                    CLOSE LOG
+                  </button>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Floating Card Analyzer Tooltip */}
+        <AnimatePresence>
+          {hoveredCard && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="absolute bottom-[160px] left-4 w-60 bg-[#151a21]/95 border border-[#ebd09b]/25 rounded-xl p-3 z-45 shadow-2xl backdrop-blur-md pointer-events-none text-left"
+            >
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between items-start border-b border-gray-800 pb-1.5">
                   <div>
-                    <span className={`text-[8px] font-mono uppercase tracking-widest ${getTierTextColor(hoveredCard.tier)} block`}>
+                    <span className={`text-[7px] font-mono uppercase tracking-widest ${getTierTextColor(hoveredCard.tier)} block`}>
                       {hoveredCard.tier} • Lvl {hoveredCard.level}
                     </span>
-                    <h4 className="font-display font-black text-sm text-white">{hoveredCard.name}</h4>
+                    <h4 className="font-display font-black text-xs text-white">{hoveredCard.name}</h4>
                   </div>
-                  <div className="bg-black/40 border border-gray-800 px-2 py-0.5 rounded text-[9px] font-mono font-bold text-gray-400">
-                    ⏳ {hoveredCard.delay > 0 ? `${hoveredCard.delay} turns` : 'Ready'}
-                  </div>
+                  {hoveredCard.delay > 0 && (
+                    <div className="bg-black/40 border border-gray-800 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold text-gray-400">
+                      ⏳ {hoveredCard.delay} turns
+                    </div>
+                  )}
                 </div>
                 
-                <div className="grid grid-cols-3 gap-1.5 text-center font-mono text-[10px]">
-                  <div className="bg-black/30 p-1 rounded-lg border border-red-950/45">
-                    <span className="text-gray-500 text-[8px] block">ATTACK</span>
-                    <span className="text-red-400 font-bold text-xs">⚔️ {hoveredCard.attack}</span>
+                <div className="grid grid-cols-3 gap-1 text-center font-mono text-[9px]">
+                  <div className="bg-black/30 p-1 rounded border border-red-950/45">
+                    <span className="text-gray-500 text-[7px] block">ATK</span>
+                    <span className="text-red-400 font-bold">⚔️ {hoveredCard.attack}</span>
                   </div>
-                  <div className="bg-black/30 p-1 rounded-lg border border-emerald-950/45">
-                    <span className="text-gray-500 text-[8px] block">HEALTH</span>
-                    <span className="text-emerald-400 font-bold text-xs">❤️ {hoveredCard.health}/{hoveredCard.maxHealth}</span>
+                  <div className="bg-black/30 p-1 rounded border border-emerald-950/45">
+                    <span className="text-gray-500 text-[7px] block">HP</span>
+                    <span className="text-emerald-400 font-bold">❤️ {hoveredCard.health}/{hoveredCard.maxHealth}</span>
                   </div>
-                  <div className="bg-black/30 p-1 rounded-lg border border-blue-950/45">
-                    <span className="text-gray-500 text-[8px] block">DELAY</span>
-                    <span className="text-blue-400 font-bold text-xs">⏳ {hoveredCard.delay}</span>
+                  <div className="bg-black/30 p-1 rounded border border-blue-950/45">
+                    <span className="text-gray-500 text-[7px] block">DELAY</span>
+                    <span className="text-blue-400 font-bold">⏳ {hoveredCard.delay}</span>
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <span className="text-[8px] text-gray-500 font-bold tracking-wider block uppercase">ACTIVE ABILITIES</span>
+                <div className="space-y-1">
+                  <span className="text-[7px] text-gray-500 font-bold tracking-wider block uppercase">ABILITIES</span>
                   {hoveredCard.skills.map((s, sIdx) => (
-                    <div key={sIdx} className={`p-1.5 rounded-lg border text-[9px] leading-relaxed ${getSkillBadgeStyle(s.type)}`}>
-                      <div className="font-bold flex items-center gap-1">
+                    <div key={sIdx} className={`p-1 rounded text-[8px] leading-snug border ${getSkillBadgeStyle(s.type)}`}>
+                      <div className="font-bold flex items-center gap-0.5">
                         <span>{getSkillIcon(s.type)}</span>
                         <span>{getSkillNameEnglish(s.type)} {s.value}</span>
                       </div>
-                      <p className="text-gray-300 font-sans text-[8.5px] mt-0.5">{getSkillDescEnglish(s.type, s.value)}</p>
+                      <p className="text-gray-300 font-sans text-[7.5px] mt-0.5">{getSkillDescEnglish(s.type, s.value)}</p>
                     </div>
                   ))}
                   {hoveredCard.skills.length === 0 && (
-                    <p className="text-[9px] text-gray-500 font-mono italic">This creature has no dark abilities.</p>
+                    <p className="text-[8px] text-gray-500 font-mono italic">No abilities.</p>
                   )}
                 </div>
-              </motion.div>
-            ) : (
-              <div className="space-y-3 text-xs flex-1 flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-center border-b border-gray-800 pb-2 mb-2">
-                    <h4 className="font-display font-bold text-[11px] text-[#ebd09b] tracking-wider uppercase flex items-center gap-1">
-                      <Activity className="w-3.5 h-3.5 text-[#ebd09b]" /> COMBAT ANALYZER
-                    </h4>
-                    <button
-                      onClick={() => setShowHelpModal(true)}
-                      className="text-[8px] font-mono text-cyan-400 hover:underline bg-cyan-950/30 px-1.5 py-0.5 rounded border border-cyan-800/30 cursor-pointer"
-                    >
-                      RULES
-                    </button>
-                  </div>
-                  <p className="text-gray-400 text-[9.5px] leading-relaxed font-sans">
-                    Hover over any card on board or in hand to get full tactical info.
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-1.5 font-mono text-[8px] border-t border-gray-800/40 pt-2">
-                  <div className="bg-black/35 p-1 rounded border border-gray-900/50 flex items-start gap-1">
-                    <span className="text-blue-400">⏳</span>
-                    <div>
-                      <span className="font-bold text-white block">Delay</span>
-                      <span className="text-gray-500">Turns waiting to attack.</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* PLAYER HAND FAN ZONE */}
+        <div className="absolute bottom-[-10px] left-1/2 -translate-x-1/2 flex justify-center items-end h-[100px] z-40 select-none pointer-events-none w-[480px]">
+          <div className="flex justify-center items-end relative w-full h-full pointer-events-auto">
+            {visualState.playerHand.map((card, idx) => {
+              const isSelected = selectedHandCardId === card.id;
+              
+              // Spellstone fan style
+              const totalHand = visualState.playerHand.length;
+              const middle = (totalHand - 1) / 2;
+              const offset = idx - middle;
+              const rotate = offset * 6; // 6 degrees step
+              const translateY = Math.abs(offset) * 4 + (isSelected ? -25 : 0);
+              const translateX = offset * 32;
+
+              return (
+                <motion.div
+                  key={card.id}
+                  style={{
+                    position: 'absolute',
+                    bottom: '15px',
+                    left: 'calc(50% - 40px)',
+                    width: '80px',
+                    height: '110px',
+                    transformOrigin: 'bottom center',
+                    transform: `translateX(${translateX}px) translateY(${translateY}px) rotate(${rotate}deg)`,
+                    zIndex: isSelected ? 45 : 10 + idx,
+                  }}
+                  whileHover={!isSimulating ? {
+                    y: -40,
+                    scale: 1.3,
+                    rotate: 0,
+                    zIndex: 50,
+                    transition: { duration: 0.15, ease: 'easeOut' }
+                  } : {}}
+                  onClick={() => {
+                    if (!isSimulating) {
+                      setSelectedHandCardId(isSelected ? null : card.id);
+                    }
+                  }}
+                  onMouseEnter={() => setHoveredCard(card as any)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                  className={`rounded-lg border flex flex-col justify-between p-1.5 text-center cursor-pointer transition-shadow bg-[#151a21] text-white select-none ${
+                    isSelected 
+                      ? 'border-[#66fcf1] shadow-[0_0_12px_rgba(102,252,241,0.5)]' 
+                      : 'border-gray-800 hover:border-gray-600 shadow-md'
+                  }`}
+                >
+                  <>
+                    <div className={`absolute inset-0 opacity-[0.05] bg-gradient-to-br ${getTierBgGradient(card.tier)}`} />
+                    {card.image.startsWith('/cards/') && (
+                      <>
+                        <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 rounded-lg opacity-85" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10 z-0 rounded-lg pointer-events-none" />
+                      </>
+                    )}
+                    
+                    <div className="flex justify-between items-center text-[6px] font-mono font-bold text-gray-500 z-10 relative">
+                      <span className={`${getTierTextColor(card.tier)}`}>{card.tier}</span>
+                      <span>Lvl {card.level}</span>
                     </div>
-                  </div>
-                  <div className="bg-black/35 p-1 rounded border border-gray-900/50 flex items-start gap-1">
-                    <span className="text-amber-500">💀</span>
-                    <div>
-                          <span className="font-bold text-white block">Sacrifice</span>
-                      <span className="text-gray-500">Destroys an ally.</span>
+
+                    <div className="mt-0.5 z-10 relative">
+                      <span className="text-[7.5px] font-display font-black tracking-tight text-white block truncate leading-none">
+                        {card.name}
+                      </span>
                     </div>
-                  </div>
-                </div>
+
+                    <div className="flex-1 flex items-center justify-center z-10 relative">
+                      {card.delay > 0 ? (
+                        <div className="bg-black/60 border border-cyan-500/40 rounded px-1 py-0.2 flex items-center gap-0.5 text-[7px] font-mono font-black text-cyan-400">
+                          ⏳{card.delay}
+                        </div>
+                      ) : (
+                        <span className="text-[7px] font-mono text-emerald-400 font-bold animate-pulse">READY ⚔️</span>
+                      )}
+                    </div>
+
+                    <div className="flex justify-between items-center text-[7.5px] font-mono font-black pt-0.5 border-t border-gray-800/80 z-10 relative">
+                      <span className="text-red-400">⚔️ {card.attack}</span>
+                      <span className="text-emerald-400">❤️ {card.health}</span>
+                    </div>
+                  </>
+                </motion.div>
+              );
+            })}
+            
+            {visualState.playerHand.length === 0 && (
+              <div className="absolute bottom-[30px] left-1/2 -translate-x-1/2 text-center text-[8px] text-gray-500 font-mono py-2 px-4 border border-dashed border-gray-800 rounded-lg bg-black/40">
+                Deck empty.
               </div>
             )}
           </div>
-
-          {/* COMBAT CHRONICLES LOG */}
-          <div className="bg-[#151a21] border border-[#c5a880]/15 rounded-2xl p-4 flex-1 flex flex-col justify-between min-h-[160px]">
-            <h4 className="font-display font-bold text-xs text-red-400 tracking-wider uppercase border-b border-gray-800 pb-2 mb-2">
-              📜 BLOODY DUEL LOG
-            </h4>
-
-            {/* Scrollable logs */}
-            <div
-              id="combat-log-scroll"
-              className="flex-1 max-h-[170px] overflow-y-auto font-mono text-[9px] text-gray-400 space-y-1.5 pr-1 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent"
-            >
-              {visualState.combatLog.map((log, index) => {
-                let colorClass = 'text-gray-400';
-                if (log.includes('TURN')) colorClass = 'text-cyan-400 font-bold border-t border-gray-800 pt-1.5 mt-1.5';
-                else if (log.includes('VICTORY') || log.includes('healed')) colorClass = 'text-emerald-400 font-bold';
-                else if (log.includes('DEFEAT') || log.includes('fell') || log.includes('Death')) colorClass = 'text-red-500 font-bold';
-                else if (log.includes('Sacrifice') || log.includes('💀')) colorClass = 'text-yellow-500';
-                else if (log.includes('Hex')) colorClass = 'text-purple-400';
-                else if (log.includes('Enemy') || log.includes('😈')) colorClass = 'text-rose-300';
-
-                return (
-                  <div key={index} className={`border-b border-gray-900/20 pb-0.5 leading-relaxed ${colorClass}`} dangerouslySetInnerHTML={{ __html: log }}>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
         </div>
 
       </div>
 
-      {/* WIN POPUP MODAL */}
+
+            {/* WIN POPUP MODAL */}
       {battle.phase === 'player_won' && (
         <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-md">
           <div className="bg-[#151a21] border border-[#ebd09b]/30 rounded-2xl p-8 max-w-md w-full text-center space-y-6 shadow-2xl gothic-glow-gold">
