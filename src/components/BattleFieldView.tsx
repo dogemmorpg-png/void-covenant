@@ -439,7 +439,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
   // Handle visualizer completion and game-state synchronization
   useEffect(() => {
-    if (currentStepIndex !== -1 && currentStepIndex === animateSequence.length && animateSequence.length > 0) {
+    if (currentStepIndex !== -1 && currentStepIndex === animateSequence.length) {
       if (finalBattleState) {
         setBattle(finalBattleState);
         setVisualState(finalBattleState);
