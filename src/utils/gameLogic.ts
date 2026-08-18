@@ -407,6 +407,7 @@ export function simulateCombatTurn(
 
   // 4. Resolve Combat Duels (Linear combats, slot by slot)
   for (let i = 0; i < 5; i++) {
+    if (state.playerHeroHealth <= 0 || state.enemyHeroHealth <= 0) break;
     const pCard = state.playerBoard[i];
     const eCard = state.enemyBoard[i];
     
@@ -487,6 +488,8 @@ export function simulateCombatTurn(
         });
       }
     }
+
+    if (state.playerHeroHealth <= 0 || state.enemyHeroHealth <= 0) break;
 
     // Enemy Attacks: If eCard is active
     if (eCard && !eCard.isDead && eCard.delay === 0) {
@@ -578,6 +581,7 @@ export function simulateCombatTurn(
   // 5. Trigger end-of-turn periodic skills:
   // **Plague**: "deals X damage to a random enemy card each turn"
   for (let i = 0; i < 5; i++) {
+    if (state.playerHeroHealth <= 0 || state.enemyHeroHealth <= 0) break;
     const pCard = state.playerBoard[i];
     if (pCard && !pCard.isDead && pCard.delay === 0) {
       const plagueSkill = pCard.skills.find(s => s.type === 'plague');
@@ -610,6 +614,8 @@ export function simulateCombatTurn(
         }
       }
     }
+
+    if (state.playerHeroHealth <= 0 || state.enemyHeroHealth <= 0) break;
 
     const eCard = state.enemyBoard[i];
     if (eCard && !eCard.isDead && eCard.delay === 0) {
