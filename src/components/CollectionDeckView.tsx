@@ -190,12 +190,13 @@ export const CollectionDeckView: React.FC = () => {
             )}
           </div>
           
-          <div className="grid grid-cols-5 sm:grid-cols-10 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {Array.from({ length: 10 }).map((_, idx) => {
               const cardId = profile.deck[idx];
               const card = cardId ? profile.collection.find(c => c.id === cardId) : null;
               
               if (card) {
+                const borderGlow = selectedCardId === card.id ? 'border-[#66fcf1] ring-1 ring-[#66fcf1]/30 bg-[#16202b]/90' : 'border-gray-800/80 hover:border-gray-700 bg-[#11161d]/85 hover:bg-[#151d27]/90';
                 return (
                   <div
                     key={card.id}
@@ -203,59 +204,69 @@ export const CollectionDeckView: React.FC = () => {
                       setSelectedCardId(card.id);
                       setIsFusingMode(false);
                     }}
-                    className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer overflow-hidden group border ${getCardTierStyles(card.tier, selectedCardId === card.id, true)}`}
+                    className={`relative flex items-center justify-between p-2.5 rounded-xl border cursor-pointer transition-all duration-350 overflow-hidden group ${borderGlow} h-[46px]`}
                   >
-                    {card.image.startsWith('/cards/') ? (
-                      <>
-                        <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 opacity-60 group-hover:scale-110 transition-transform duration-500" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20 z-0 pointer-events-none" />
-                      </>
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center opacity-40 z-0">
-                        {renderCardIcon(card.image, `w-12 h-12 ${getCardIconColor(card.color)}`)}
+                    {/* Hearthstone-style cropped card background art */}
+                    <div className="absolute inset-y-0 right-0 w-2/3 overflow-hidden rounded-r-xl opacity-[0.22] pointer-events-none group-hover:opacity-[0.35] transition-opacity">
+                      {card.image.startsWith('/cards/') ? (
+                        <img src={card.image} alt="" className="w-full h-full object-cover object-right scale-105" />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-end pr-4 text-cyan-500 opacity-20">
+                          {renderCardIcon(card.image, "w-10 h-10")}
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#11161d]/50 to-[#11161d]" />
+                    </div>
+
+                    <div className="flex items-center gap-2 z-10 min-w-0">
+                      {/* Mana Badge */}
+                      <div className="w-5 h-5 rounded-full bg-cyan-950/80 border border-cyan-400/80 flex items-center justify-center shadow-[0_0_8px_rgba(6,182,212,0.2)] shrink-0">
+                        <span className="text-cyan-400 text-[10px] font-black font-mono leading-none">{card.manaCost || 1}</span>
                       </div>
-                    )}
 
-                    {/* Level badge */}
-                    <div className="absolute top-1 right-1 z-10 bg-black/60 border border-[#c5a880]/40 rounded-full w-4 h-4 flex items-center justify-center text-[8px] font-mono font-bold text-[#ebd09b]">
-                      L{card.level}
+                      {/* Name & Tier info */}
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[10.5px] font-display font-black text-white leading-none tracking-wide truncate group-hover:text-cyan-200 transition-colors">
+                          {card.name}
+                        </span>
+                        <span className="text-[7.5px] text-gray-500 font-mono leading-none mt-1 uppercase font-bold tracking-wider">
+                          L{card.level} • {card.tier}
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="text-center mt-2 relative z-10">
-                      <span className="text-[9px] font-display font-bold text-white block truncate leading-none text-shadow-gold">
-                        {card.name}
-                      </span>
-                      <span className="text-[7px] text-[#ebd09b] uppercase font-mono tracking-wider drop-shadow-md">{card.tier}</span>
-                    </div>
+                    {/* Stats & Actions */}
+                    <div className="flex items-center gap-2.5 z-10 shrink-0">
+                      <div className="flex items-center gap-1.5 font-mono text-[9.5px] font-black">
+                        <span className="text-red-400/90 filter drop-shadow">⚔️{card.attack}</span>
+                        <span className="text-emerald-400/90 filter drop-shadow">❤️{card.health}</span>
+                        <span className="text-blue-400/90 filter drop-shadow" title="Delay">⏳{card.delay}</span>
+                      </div>
 
-                    {/* Stats */}
-                    <div className="relative z-10 flex justify-between items-center text-[9px] font-mono font-bold pt-1.5 border-t border-white/10 mt-auto">
-                      <span className="text-red-400 drop-shadow-md">⚔️{card.attack}</span>
-                      <span className="text-emerald-400 drop-shadow-md">❤️{card.health}</span>
-                      <span className="text-blue-400 drop-shadow-md" title="Turn Delay">⏳{card.delay}</span>
+                      {/* Remove Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleDeck(card.id);
+                        }}
+                        className="bg-red-950/20 hover:bg-red-900/60 border border-red-500/25 rounded-lg p-1 text-red-400 transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center"
+                        title="Remove from deck"
+                      >
+                        <Minus className="w-3 h-3" />
+                      </button>
                     </div>
-
-                    {/* Quick remove */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleDeck(card.id);
-                      }}
-                      className="absolute -bottom-1 -right-1 bg-[#4e0707] hover:bg-[#880d1e] border border-[#dd2c40]/50 rounded-full w-4 h-4 flex items-center justify-center text-white"
-                      title="Remove from deck"
-                    >
-                      <Minus className="w-2.5 h-2.5" />
-                    </button>
                   </div>
                 );
               } else {
                 return (
                   <div
                     key={idx}
-                    className="aspect-[3/4.2] rounded-xl border border-dashed border-white/10 flex flex-col items-center justify-center text-gray-600 bg-black/10"
+                    className="flex items-center justify-between px-3 rounded-xl border border-dashed border-white/5 bg-black/10 text-gray-600 h-[46px]"
                   >
-                    <Swords className="w-5 h-5 opacity-35" />
-                    <span className="text-[8px] font-mono mt-1">EMPTY</span>
+                    <div className="flex items-center gap-2">
+                      <Swords className="w-4 h-4 opacity-25" />
+                      <span className="text-[9px] font-mono tracking-wider font-bold opacity-35">EMPTY SLOT</span>
+                    </div>
                   </div>
                 );
               }
