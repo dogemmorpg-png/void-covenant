@@ -131,11 +131,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const stage = generateCampaignStage(floorNum);
       if (!stage) return res.status(400).json({ error: 'Invalid campaign stage' });
 
-      // Energy check & deduction
-      if ((profile.pveEnergy || 0) < stage.energyCost) {
-        return res.status(400).json({ error: 'Not enough PvE energy' });
+      // Energy is now deducted at battle start on the server to prevent save-scumming.
+      // Verification only:
+      if ((profile.pveEnergy || 0) < 0) {
+        profile.pveEnergy = 0;
       }
-      profile.pveEnergy -= stage.energyCost;
 
       if (result === 'win') {
         goldReward = Math.floor(stage.goldReward * goldMultiplier);
@@ -169,11 +169,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         goldReward = Math.floor(20 * goldMultiplier);
       }
     } else if (battleType === 'pvp') {
-      // Energy check & deduction
-      if ((profile.pvpEnergy || 0) < 1) {
-        return res.status(400).json({ error: 'Not enough PvP energy' });
+      // Energy is now deducted at battle start on the server to prevent save-scumming.
+      // Verification only:
+      if ((profile.pvpEnergy || 0) < 0) {
+        profile.pvpEnergy = 0;
       }
-      profile.pvpEnergy -= 1;
 
       if (result === 'win') {
         goldReward = Math.floor(20 * goldMultiplier);

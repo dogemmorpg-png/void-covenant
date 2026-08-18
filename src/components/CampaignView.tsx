@@ -34,7 +34,6 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
       toast('Not enough PvE energy! Wait for recovery.', 'warning');
       return;
     }
-    usePveEnergy(selectedStage.energyCost);
     onStartBattle(selectedStage);
   };
 

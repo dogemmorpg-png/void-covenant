@@ -24,7 +24,7 @@ import bs58Pkg from 'bs58';
 const bs58 = (bs58Pkg as any).default || bs58Pkg;
 
 function MainAppContent() {
-  const { profile, isLoadingProfile, connectSolanaWallet, registerPlayer, disconnectSolanaWallet } = useGame();
+  const { profile, isLoadingProfile, connectSolanaWallet, registerPlayer, disconnectSolanaWallet, startBattleOnServer } = useGame();
   const { connected, publicKey, signMessage, disconnect } = useWallet();
   const { setVisible } = useWalletModal();
   
@@ -211,15 +211,21 @@ function MainAppContent() {
           {/* Tab content */}
           <div className="py-6">
             {activeTab === 'campaign' && (
-              <CampaignView onStartBattle={(stage) => {
-                setActiveBattleType('campaign');
-                setActiveBattleStage(stage);
+              <CampaignView onStartBattle={async (stage) => {
+                const success = await startBattleOnServer('campaign', stage.id.toString(), stage.energyCost);
+                if (success) {
+                  setActiveBattleType('campaign');
+                  setActiveBattleStage(stage);
+                }
               }} />
           )}
           {activeTab === 'pvp' && (
-            <PvpArenaView onStartBattle={(stage, type) => {
-              setActiveBattleType(type);
-              setActiveBattleStage(stage);
+            <PvpArenaView onStartBattle={async (stage, type) => {
+              const success = await startBattleOnServer('pvp', stage.id.toString(), 1);
+              if (success) {
+                setActiveBattleType(type);
+                setActiveBattleStage(stage);
+              }
             }} />
           )}
           {activeTab === 'collection' && <CollectionDeckView />}

@@ -3,16 +3,15 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
 const jwt = (jwtPkg as any).default || jwtPkg;
 import { createClient } from '@supabase/supabase-js';
+import { generateCampaignStage } from './_shared/cards.js';
+import { calculateEnergy } from './_shared/energyHelper.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
 function getSupabase() {
-  const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-  if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error('Supabase URL or Service Role Key is missing in environment variables.');
-  }
-  return createClient(supabaseUrl, supabaseServiceKey);
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://yetzjqqnmllwufmzopor.supabase.co';
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9';
+  return createClient(supabaseUrl, supabaseKey);
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -38,6 +37,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Token missing wallet address' });
   }
 
+  const { battleType, stageId } = req.body;
+  if (!battleType || !stageId) {
+    return res.status(400).json({ error: 'Missing battle details' });
+  }
+
   try {
     const supabase = getSupabase();
     
@@ -51,11 +55,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
-    const profile = profileRow.data;
+    let profile = profileRow.data;
     const oldUpdatedAt = profileRow.updated_at;
     
-    profile.lastBattleTimestamp = Date.now();
+    // Recalculate energy
+    profile = calculateEnergy(profile);
     
+    // Check and deduct energy
+    if (battleType === 'campaign') {
+      const floorNum = parseInt(stageId);
+      if (isNaN(floorNum)) return res.status(400).json({ error: 'Invalid campaign stage' });
+      
+      const stage = generateCampaignStage(floorNum);
+      if (!stage) return res.status(400).json({ error: 'Invalid campaign stage' });
+      
+      if ((profile.pveEnergy || 0) < stage.energyCost) {
+        return res.status(400).json({ error: 'Not enough PvE energy' });
+      }
+      profile.pveEnergy -= stage.energyCost;
+    } else if (battleType === 'pvp') {
+      if ((profile.pvpEnergy || 0) < 1) {
+        return res.status(400).json({ error: 'Not enough PvP energy' });
+      }
+      profile.pvpEnergy -= 1;
+    }
+    
+    profile.lastBattleTimestamp = Date.now();
 
     let updateQuery = supabase
       .from('profiles')
@@ -72,14 +97,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(409).json({ error: 'Concurrent modification detected. Please try again.' });
     }
 
-    return res.status(200).json({ success: true, message: 'Battle session started' });
+    return res.status(200).json({ success: true, message: 'Battle session started', profile });
 
   } catch (error: any) {
     console.error('Battle Start API error:', error);
     return res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }
-
-
-
-

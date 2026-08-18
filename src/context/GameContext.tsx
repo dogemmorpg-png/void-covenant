@@ -18,6 +18,7 @@ interface GameContextType {
   toggleSound: () => void;
   usePveEnergy: (amount: number) => boolean;
   usePvpEnergy: (amount: number) => boolean;
+  startBattleOnServer: (battleType: 'campaign' | 'pvp', stageId: string, energyCost: number) => Promise<boolean>;
   buyDarkShardsWithSOL: (solAmount: number) => Promise<boolean>;
   verifySolanaPayment: (signature: string, packageId: string) => Promise<{ success: boolean; message: string }>;
   isLoadingProfile: boolean;
@@ -281,6 +282,54 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return updated;
     });
     return true;
+  };
+
+  const startBattleOnServer = async (battleType: 'campaign' | 'pvp', stageId: string, energyCost: number): Promise<boolean> => {
+    const token = localStorage.getItem('void_covenant_token');
+    
+    if (token) {
+      try {
+        const res = await fetch('/api/battle-start', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ battleType, stageId })
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          if (data.profile) {
+            setProfile(data.profile);
+          }
+          return true;
+        } else {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || 'Failed to start battle');
+        }
+      } catch (err: any) {
+        console.error('Network error starting battle:', err);
+        return false;
+      }
+    }
+    
+    // Local fallback for offline/guest/dev mode
+    let success = false;
+    setProfile(current => {
+      const updated = { ...current };
+      if (battleType === 'campaign') {
+        if (updated.pveEnergy < energyCost) return current;
+        updated.pveEnergy -= energyCost;
+      } else {
+        if (updated.pvpEnergy < 1) return current;
+        updated.pvpEnergy -= 1;
+      }
+      saveProfile(updated);
+      success = true;
+      return updated;
+    });
+    return success;
   };
 
   const usePveEnergy = (amount: number): boolean => {
@@ -764,6 +813,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         toggleSound,
         usePveEnergy,
         usePvpEnergy,
+        startBattleOnServer,
         buyDarkShardsWithSOL,
         verifySolanaPayment,
         connectSolanaWallet,
