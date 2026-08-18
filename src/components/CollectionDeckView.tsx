@@ -201,7 +201,15 @@ export const CollectionDeckView: React.FC = () => {
                   return b.level - a.level || a.name.localeCompare(b.name);
                 });
               const paddedDeck = [...deckCards, ...Array(10 - deckCards.length).fill(null)];
-              return paddedDeck.map((card, idx) => {
+              
+              // Rearrange into column-major order to flow top-to-bottom then left-to-right
+              const columnMajorDeck: (Card | null)[] = [];
+              for (let r = 0; r < 5; r++) {
+                columnMajorDeck.push(paddedDeck[r]);     // Left column item
+                columnMajorDeck.push(paddedDeck[r + 5]); // Right column item
+              }
+
+              return columnMajorDeck.map((card, idx) => {
                 if (card) {
                   const borderGlow = selectedCardId === card.id ? 'border-[#66fcf1] ring-1 ring-[#66fcf1]/30 bg-[#16202b]/95' : 'border-gray-800/80 hover:border-gray-700 bg-[#11161d]/90 hover:bg-[#151d27]/95';
                   return (
