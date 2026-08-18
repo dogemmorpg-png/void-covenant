@@ -670,11 +670,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       </div>
 
       {/* Main Container */}
-      <div className={`max-w-7xl mx-auto w-full flex-1 flex flex-col justify-between relative min-h-0 pb-16 ${screenShake ? 'animate-shake' : ''}`}>
+      <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col justify-between relative min-h-0 pb-16">
         
         {/* Battle Arena - Medieval Fantasy Table */}
         <div 
-          className="flex-1 flex flex-col justify-center border-[6px] border-[#251a14] bg-[#120d0a] rounded-2xl p-4 shadow-[inset_0_0_60px_rgba(0,0,0,0.95),_0_10px_30px_rgba(0,0,0,0.85)] relative min-h-0 overflow-hidden"
+          className={`flex-1 flex flex-col justify-center border-[6px] border-[#251a14] bg-[#120d0a] rounded-2xl p-4 shadow-[inset_0_0_60px_rgba(0,0,0,0.95),_0_10px_30px_rgba(0,0,0,0.85)] relative min-h-0 overflow-hidden will-change-transform ${screenShake ? 'animate-shake' : ''}`}
         >
           {/* Wooden Table Board Divider */}
           <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#ebd09b]/15 to-transparent -translate-y-1/2 pointer-events-none z-10" />
