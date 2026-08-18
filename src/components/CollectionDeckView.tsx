@@ -196,7 +196,7 @@ export const CollectionDeckView: React.FC = () => {
               const card = cardId ? profile.collection.find(c => c.id === cardId) : null;
               
               if (card) {
-                const borderGlow = selectedCardId === card.id ? 'border-[#66fcf1] ring-1 ring-[#66fcf1]/30 bg-[#16202b]/90' : 'border-gray-800/80 hover:border-gray-700 bg-[#11161d]/85 hover:bg-[#151d27]/90';
+                const borderGlow = selectedCardId === card.id ? 'border-[#66fcf1] ring-1 ring-[#66fcf1]/30 bg-[#16202b]/95' : 'border-gray-800/80 hover:border-gray-700 bg-[#11161d]/90 hover:bg-[#151d27]/95';
                 return (
                   <div
                     key={card.id}
@@ -204,43 +204,43 @@ export const CollectionDeckView: React.FC = () => {
                       setSelectedCardId(card.id);
                       setIsFusingMode(false);
                     }}
-                    className={`relative flex items-center justify-between p-2.5 rounded-xl border cursor-pointer transition-all duration-350 overflow-hidden group ${borderGlow} h-[46px]`}
+                    className={`relative flex items-center justify-between p-2.5 rounded-xl border cursor-pointer transition-all duration-350 overflow-hidden group ${borderGlow} h-[52px]`}
                   >
-                    {/* Hearthstone-style cropped card background art */}
-                    <div className="absolute inset-y-0 right-0 w-2/3 overflow-hidden rounded-r-xl opacity-[0.22] pointer-events-none group-hover:opacity-[0.35] transition-opacity">
+                    {/* Hearthstone-style cropped card background art (increased opacity/scale) */}
+                    <div className="absolute inset-y-0 right-0 w-2/3 overflow-hidden rounded-r-xl opacity-[0.40] pointer-events-none group-hover:opacity-[0.55] transition-opacity">
                       {card.image.startsWith('/cards/') ? (
-                        <img src={card.image} alt="" className="w-full h-full object-cover object-right scale-105" />
+                        <img src={card.image} alt="" className="w-full h-full object-cover object-right scale-110" />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-end pr-4 text-cyan-500 opacity-20">
-                          {renderCardIcon(card.image, "w-10 h-10")}
+                        <div className="absolute inset-0 flex items-center justify-end pr-4 text-cyan-500 opacity-30">
+                          {renderCardIcon(card.image, "w-11 h-11")}
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#11161d]/50 to-[#11161d]" />
+                      <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#11161d]/65 to-[#11161d]" />
                     </div>
 
-                    <div className="flex items-center gap-2 z-10 min-w-0">
-                      {/* Mana Badge */}
-                      <div className="w-5 h-5 rounded-full bg-cyan-950/80 border border-cyan-400/80 flex items-center justify-center shadow-[0_0_8px_rgba(6,182,212,0.2)] shrink-0">
-                        <span className="text-cyan-400 text-[10px] font-black font-mono leading-none">{card.manaCost || 1}</span>
+                    <div className="flex items-center gap-2.5 z-10 min-w-0">
+                      {/* Mana Badge (larger) */}
+                      <div className="w-[22px] h-[22px] rounded-full bg-cyan-950/90 border border-cyan-400 flex items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.3)] shrink-0">
+                        <span className="text-cyan-400 text-[11px] font-black font-mono leading-none">{card.manaCost || 1}</span>
                       </div>
 
-                      {/* Name & Tier info */}
+                      {/* Name & Tier info (larger text) */}
                       <div className="flex flex-col min-w-0">
-                        <span className="text-[10.5px] font-display font-black text-white leading-none tracking-wide truncate group-hover:text-cyan-200 transition-colors">
+                        <span className="text-xs md:text-[13px] font-display font-black text-white leading-none tracking-wide truncate group-hover:text-cyan-200 transition-colors">
                           {card.name}
                         </span>
-                        <span className="text-[7.5px] text-gray-500 font-mono leading-none mt-1 uppercase font-bold tracking-wider">
+                        <span className="text-[9px] text-gray-400 font-mono leading-none mt-1 uppercase font-bold tracking-wider">
                           L{card.level} • {card.tier}
                         </span>
                       </div>
                     </div>
 
-                    {/* Stats & Actions */}
-                    <div className="flex items-center gap-2.5 z-10 shrink-0">
-                      <div className="flex items-center gap-1.5 font-mono text-[9.5px] font-black">
-                        <span className="text-red-400/90 filter drop-shadow">⚔️{card.attack}</span>
-                        <span className="text-emerald-400/90 filter drop-shadow">❤️{card.health}</span>
-                        <span className="text-blue-400/90 filter drop-shadow" title="Delay">⏳{card.delay}</span>
+                    {/* Stats & Actions (larger text) */}
+                    <div className="flex items-center gap-3 z-10 shrink-0">
+                      <div className="flex items-center gap-2 font-mono text-[11.5px] font-black">
+                        <span className="text-red-400 filter drop-shadow">⚔️{card.attack}</span>
+                        <span className="text-emerald-400 filter drop-shadow">❤️{card.health}</span>
+                        <span className="text-blue-400 filter drop-shadow" title="Delay">⏳{card.delay}</span>
                       </div>
 
                       {/* Remove Button */}
@@ -249,10 +249,10 @@ export const CollectionDeckView: React.FC = () => {
                           e.stopPropagation();
                           handleToggleDeck(card.id);
                         }}
-                        className="bg-red-950/20 hover:bg-red-900/60 border border-red-500/25 rounded-lg p-1 text-red-400 transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center"
+                        className="bg-red-950/20 hover:bg-red-900/60 border border-red-500/25 rounded-lg p-1.5 text-red-400 transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center"
                         title="Remove from deck"
                       >
-                        <Minus className="w-3 h-3" />
+                        <Minus className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
@@ -261,7 +261,7 @@ export const CollectionDeckView: React.FC = () => {
                 return (
                   <div
                     key={idx}
-                    className="flex items-center justify-between px-3 rounded-xl border border-dashed border-white/5 bg-black/10 text-gray-600 h-[46px]"
+                    className="flex items-center justify-between px-3 rounded-xl border border-dashed border-white/5 bg-black/10 text-gray-600 h-[52px]"
                   >
                     <div className="flex items-center gap-2">
                       <Swords className="w-4 h-4 opacity-25" />
