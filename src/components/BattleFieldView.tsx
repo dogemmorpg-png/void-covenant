@@ -679,6 +679,77 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           {/* Wooden Table Board Divider */}
           <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#ebd09b]/15 to-transparent -translate-y-1/2 pointer-events-none z-10" />
 
+          {/* Glowing Lord casting lasers / energy beams */}
+          {isAnimating && currentStep && currentStep.type === 'hero_skill' && animatingSlot !== null && (
+            <svg className="absolute inset-0 w-full h-full pointer-events-none z-25">
+              <defs>
+                <linearGradient id="voidStrikeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.95" />
+                  <stop offset="100%" stopColor="#0891b2" stopOpacity="0.3" />
+                </linearGradient>
+                <linearGradient id="bloodAuraGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ef4444" stopOpacity="0.95" />
+                  <stop offset="100%" stopColor="#b91c1c" stopOpacity="0.3" />
+                </linearGradient>
+                <linearGradient id="warlordCryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.95" />
+                  <stop offset="100%" stopColor="#d97706" stopOpacity="0.3" />
+                </linearGradient>
+              </defs>
+              {(() => {
+                const stance = currentStep.stance;
+                const slot = currentStep.targetSlot;
+                
+                // Casting Lord coordinates (Top-Left or Bottom-Left avatar positions)
+                let startX = '55px';
+                let startY = '46px'; // Enemy Lord Y
+                
+                if (stance === 'blood_aura' || stance === 'warlord_cry') {
+                  startY = 'calc(100% - 46px)'; // Player Lord Y
+                }
+                
+                // Target card coordinates
+                const endX = `${20 * slot + 10}%`;
+                const endY = (stance === 'blood_aura' || stance === 'warlord_cry') ? '70%' : '30%';
+                
+                let strokeColor = 'url(#voidStrikeGrad)';
+                let glowColor = 'rgba(6, 182, 212, 0.95)';
+                
+                if (stance === 'blood_aura') {
+                  strokeColor = 'url(#bloodAuraGrad)';
+                  glowColor = 'rgba(239, 68, 68, 0.95)';
+                } else if (stance === 'warlord_cry') {
+                  strokeColor = 'url(#warlordCryGrad)';
+                  glowColor = 'rgba(245, 158, 11, 0.95)';
+                }
+                
+                return (
+                  <>
+                    <line
+                      x1={startX}
+                      y1={startY}
+                      x2={endX}
+                      y2={endY}
+                      stroke={strokeColor}
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      className="animate-pulse"
+                      style={{ filter: `drop-shadow(0 0 10px ${glowColor})` }}
+                    />
+                    <circle
+                      cx={endX}
+                      cy={endY}
+                      r="6.5"
+                      fill={stance === 'void_strike' ? '#06b6d4' : (stance === 'blood_aura' ? '#ef4444' : '#f59e0b')}
+                      className="animate-ping"
+                      style={{ filter: `drop-shadow(0 0 12px ${glowColor})` }}
+                    />
+                  </>
+                );
+              })()}
+            </svg>
+          )}
+
           {/* Glowing Targeting Arrow Overlay during combat strikes */}
           {isAnimating && currentStep && (currentStep.type === 'attack' || currentStep.type === 'direct_attack') && animatingSlot?.type === 'strike' && (
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-25">
@@ -737,48 +808,81 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           )}
 
           {/* 1. ENEMY HERO PORTRAIT (Top-Left corner - large format) */}
-          <div className="absolute top-4 left-4 flex items-center gap-3 z-30 bg-black/50 p-2 rounded-2xl border border-red-950/30 backdrop-blur-sm shadow-md">
-            <div className="relative">
-              <div className="w-18 h-18 rounded-full border-4 border-red-700/80 bg-[#1c0808] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
-                {renderFloatingTextsFor('enemy-hero')}
-                {stage.enemyHeroImage?.startsWith('/') ? (
-                  <img src={stage.enemyHeroImage} alt="Enemy Hero" className="w-full h-full object-cover" />
-                ) : (
-                  <Skull className="w-7 h-7 text-[#dd2c40]" />
-                )}
-              </div>
-              {/* Health Shield */}
-              <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-gradient-to-br from-red-600 to-red-800 border-2 border-red-300 flex items-center justify-center shadow-lg z-30">
-                <span className="text-white text-xs font-black font-mono leading-none select-none">{visualState.enemyHeroHealth}</span>
-              </div>
-            </div>
-            <div>
-              <span className="text-[8px] font-mono font-bold text-red-500/70 tracking-wider uppercase block leading-none">Enemy Lord</span>
-              <h4 className="font-display font-black text-xs text-white mt-1 leading-none">{stage.enemyHeroName}</h4>
-            </div>
-          </div>
+          {(() => {
+            const isEnemyCasting = currentStep?.type === 'hero_skill' && currentStep.stance === 'void_strike' && animatingSlot !== null;
+            return (
+              <motion.div 
+                animate={{
+                  scale: isEnemyCasting ? [1, 1.12, 1.12, 1] : 1,
+                  rotate: isEnemyCasting ? [0, 4, -4, 4, -4, 0] : 0,
+                  boxShadow: isEnemyCasting 
+                    ? "0 0 25px rgba(6, 182, 212, 0.8)" 
+                    : "0 4px 6px rgba(0, 0, 0, 0.3)"
+                }}
+                transition={{ duration: 0.65 }}
+                className="absolute top-4 left-4 flex items-center gap-3 z-30 bg-black/50 p-2 rounded-2xl border border-red-950/30 backdrop-blur-sm shadow-md"
+              >
+                <div className="relative">
+                  <div className="w-18 h-18 rounded-full border-4 border-red-700/80 bg-[#1c0808] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
+                    {renderFloatingTextsFor('enemy-hero')}
+                    {stage.enemyHeroImage?.startsWith('/') ? (
+                      <img src={stage.enemyHeroImage} alt="Enemy Hero" className="w-full h-full object-cover" />
+                    ) : (
+                      <Skull className="w-7 h-7 text-[#dd2c40]" />
+                    )}
+                  </div>
+                  {/* Health Shield */}
+                  <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-gradient-to-br from-red-600 to-red-800 border-2 border-red-300 flex items-center justify-center shadow-lg z-30">
+                    <span className="text-white text-xs font-black font-mono leading-none select-none">{visualState.enemyHeroHealth}</span>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-[8px] font-mono font-bold text-red-500/70 tracking-wider uppercase block leading-none">Enemy Lord</span>
+                  <h4 className="font-display font-black text-xs text-white mt-1 leading-none">{stage.enemyHeroName}</h4>
+                </div>
+              </motion.div>
+            );
+          })()}
 
           {/* 2. PLAYER HERO PORTRAIT (Bottom-Left corner - large format) */}
-          <div className="absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-black/50 p-2 rounded-2xl border border-cyan-950/30 backdrop-blur-sm shadow-md">
-            <div className="relative">
-              <div className="w-18 h-18 rounded-full border-4 border-cyan-600/80 bg-[#0d161d] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
-                {renderFloatingTextsFor('player-hero')}
-                {profile.avatarUrl ? (
-                  <img src={profile.avatarUrl} alt="Hero Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  <Shield className="w-7 h-7 text-[#66fcf1]" />
-                )}
-              </div>
-              {/* Health Shield */}
-              <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-gradient-to-br from-red-600 to-red-800 border-2 border-red-300 flex items-center justify-center shadow-lg z-30">
-                <span className="text-white text-xs font-black font-mono leading-none select-none">{visualState.playerHeroHealth}</span>
-              </div>
-            </div>
-            <div>
-              <span className="text-[8px] font-mono font-bold text-cyan-400/70 tracking-wider uppercase block leading-none">Your Hero</span>
-              <h4 className="font-display font-black text-xs text-white mt-1 leading-none">{profile.username || 'Summoner'}</h4>
-            </div>
-          </div>
+          {(() => {
+            const isPlayerCasting = currentStep?.type === 'hero_skill' && 
+              (currentStep.stance === 'blood_aura' || currentStep.stance === 'warlord_cry') && 
+              animatingSlot !== null;
+            const glowColor = currentStep?.stance === 'blood_aura' ? 'rgba(239, 68, 68, 0.8)' : 'rgba(245, 158, 11, 0.8)';
+            return (
+              <motion.div 
+                animate={{
+                  scale: isPlayerCasting ? [1, 1.12, 1.12, 1] : 1,
+                  rotate: isPlayerCasting ? [0, 4, -4, 4, -4, 0] : 0,
+                  boxShadow: isPlayerCasting 
+                    ? `0 0 25px ${glowColor}` 
+                    : "0 4px 6px rgba(0, 0, 0, 0.3)"
+                }}
+                transition={{ duration: 0.65 }}
+                className="absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-black/50 p-2 rounded-2xl border border-cyan-950/30 backdrop-blur-sm shadow-md"
+              >
+                <div className="relative">
+                  <div className="w-18 h-18 rounded-full border-4 border-cyan-600/80 bg-[#0d161d] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
+                    {renderFloatingTextsFor('player-hero')}
+                    {profile.avatarUrl ? (
+                      <img src={profile.avatarUrl} alt="Hero Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <Shield className="w-7 h-7 text-[#66fcf1]" />
+                    )}
+                  </div>
+                  {/* Health Shield */}
+                  <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-gradient-to-br from-red-600 to-red-800 border-2 border-red-300 flex items-center justify-center shadow-lg z-30">
+                    <span className="text-white text-xs font-black font-mono leading-none select-none">{visualState.playerHeroHealth}</span>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-[8px] font-mono font-bold text-cyan-400/70 tracking-wider uppercase block leading-none">Your Hero</span>
+                  <h4 className="font-display font-black text-xs text-white mt-1 leading-none">{profile.username || 'Summoner'}</h4>
+                </div>
+              </motion.div>
+            );
+          })()}
 
           {/* Hearthstone Style Flip End Turn Button (Right center) */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 z-35">
@@ -1073,6 +1177,57 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       )}
                     </AnimatePresence>
                     <AnimatePresence>
+                      {currentStep?.type === 'hero_skill' && 
+                       currentStep.stance === 'void_strike' && 
+                       currentStep.targetSlot === idx && 
+                       animatingSlot?.type === 'hit' && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.85 }}
+                          className="absolute inset-0 bg-black/45 border-2 border-cyan-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(6,182,212,0.7)] overflow-hidden"
+                        >
+                          <img src="/icons/void_strike_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <span className="relative text-[9px] font-mono font-black text-cyan-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-cyan-500/30 z-10 animate-pulse">VOID STRIKE</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <AnimatePresence>
+                      {currentStep?.type === 'hero_skill' && 
+                       currentStep.stance === 'blood_aura' && 
+                       currentStep.targetSlot === idx && 
+                       animatingSlot?.type === 'heal' && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.85 }}
+                          className="absolute inset-0 bg-black/45 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(239,68,68,0.7)] overflow-hidden"
+                        >
+                          <img src="/icons/blood_aura_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <span className="relative text-[9px] font-mono font-black text-red-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-red-500/30 z-10 animate-pulse">BLOOD AURA</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <AnimatePresence>
+                      {currentStep?.type === 'hero_skill' && 
+                       currentStep.stance === 'warlord_cry' && 
+                       currentStep.targetSlot === idx && 
+                       animatingSlot?.type === 'heal' && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.85 }}
+                          className="absolute inset-0 bg-black/45 border-2 border-amber-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(245,158,11,0.7)] overflow-hidden"
+                        >
+                          <img src="/icons/warlord_cry_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <span className="relative text-[9px] font-mono font-black text-amber-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-amber-500/30 z-10 animate-pulse">WARLORD CRY</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <AnimatePresence>
                       {currentStep?.type === 'attack' && 
                        (currentStep.attacker === 'player' ? 'enemy' : 'player') === side && 
                        currentStep.targetSlot === idx && 
@@ -1286,6 +1441,57 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         >
                           <img src="/icons/sacrifice_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
                           <span className="relative text-[8.5px] font-mono font-black text-red-500 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-red-500/30 z-10 animate-pulse">SACRIFICED</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <AnimatePresence>
+                      {currentStep?.type === 'hero_skill' && 
+                       currentStep.stance === 'void_strike' && 
+                       currentStep.targetSlot === idx && 
+                       animatingSlot?.type === 'hit' && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.85 }}
+                          className="absolute inset-0 bg-black/45 border-2 border-cyan-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(6,182,212,0.7)] overflow-hidden"
+                        >
+                          <img src="/icons/void_strike_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <span className="relative text-[9px] font-mono font-black text-cyan-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-cyan-500/30 z-10 animate-pulse">VOID STRIKE</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <AnimatePresence>
+                      {currentStep?.type === 'hero_skill' && 
+                       currentStep.stance === 'blood_aura' && 
+                       currentStep.targetSlot === idx && 
+                       animatingSlot?.type === 'heal' && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.85 }}
+                          className="absolute inset-0 bg-black/45 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(239,68,68,0.7)] overflow-hidden"
+                        >
+                          <img src="/icons/blood_aura_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <span className="relative text-[9px] font-mono font-black text-red-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-red-500/30 z-10 animate-pulse">BLOOD AURA</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <AnimatePresence>
+                      {currentStep?.type === 'hero_skill' && 
+                       currentStep.stance === 'warlord_cry' && 
+                       currentStep.targetSlot === idx && 
+                       animatingSlot?.type === 'heal' && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.85 }}
+                          className="absolute inset-0 bg-black/45 border-2 border-amber-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(245,158,11,0.7)] overflow-hidden"
+                        >
+                          <img src="/icons/warlord_cry_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <span className="relative text-[9px] font-mono font-black text-amber-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-amber-500/30 z-10 animate-pulse">WARLORD CRY</span>
                         </motion.div>
                       )}
                     </AnimatePresence>
