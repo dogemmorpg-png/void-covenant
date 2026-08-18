@@ -62,7 +62,7 @@ export const CollectionDeckView: React.FC = () => {
   const selectedCard = profile.collection.find(c => c.id === selectedCardId) || null;
 
   // Filtered & sorted collection
-  const tierWeight = { legendary: 4, gold: 3, rare: 2, basic: 1 };
+  const tierWeight = { legendary: 4, gold: 3, silver: 2, bronze: 1 };
   const filteredCollection = profile.collection
     .filter(card => {
       if (tierFilter === 'all') return true;
