@@ -35,11 +35,8 @@ export function initializeBattle(playerDeck: Card[], stage: CampaignStage, playe
   const playerHand = shuffledDeck.slice(0, 3);
   const remainingDeck = shuffledDeck.slice(3);
   
-  // Enemy deck templates — duplicate only for Bosses, keep standard size for normal fights
-  const isBoss = stage.id % 10 === 0;
-  const enemyDeckTemplates = isBoss
-    ? [...stage.enemyDeck, ...stage.enemyDeck].sort(() => Math.random() - 0.5)
-    : [...stage.enemyDeck].sort(() => Math.random() - 0.5);
+  // Enemy deck templates — duplicate for longer, more challenging battles
+  const enemyDeckTemplates = [...stage.enemyDeck, ...stage.enemyDeck].sort(() => Math.random() - 0.5);
   
   // Create state
   return {
