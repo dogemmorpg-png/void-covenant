@@ -207,15 +207,15 @@ export const CollectionDeckView: React.FC = () => {
                     className={`relative flex items-center justify-between p-2.5 rounded-xl border cursor-pointer transition-all duration-350 overflow-hidden group ${borderGlow} h-[52px]`}
                   >
                     {/* Hearthstone-style cropped card background art (increased opacity/scale) */}
-                    <div className="absolute inset-y-0 right-0 w-2/3 overflow-hidden rounded-r-xl opacity-[0.40] pointer-events-none group-hover:opacity-[0.55] transition-opacity">
+                    <div className="absolute inset-y-0 right-0 w-2/3 overflow-hidden rounded-r-xl opacity-[0.55] pointer-events-none group-hover:opacity-[0.70] transition-opacity">
                       {card.image.startsWith('/cards/') ? (
                         <img src={card.image} alt="" className="w-full h-full object-cover object-right scale-110" />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-end pr-4 text-cyan-500 opacity-30">
+                        <div className="absolute inset-0 flex items-center justify-end pr-4 text-cyan-500 opacity-40">
                           {renderCardIcon(card.image, "w-11 h-11")}
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#11161d]/65 to-[#11161d]" />
+                      <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#11161d]/75 to-[#11161d]" />
                     </div>
 
                     <div className="flex items-center gap-2.5 z-10 min-w-0">
@@ -243,13 +243,13 @@ export const CollectionDeckView: React.FC = () => {
                         <span className="text-blue-400 filter drop-shadow" title="Delay">⏳{card.delay}</span>
                       </div>
 
-                      {/* Remove Button */}
+                      {/* Remove Button (bright and distinct) */}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleToggleDeck(card.id);
                         }}
-                        className="bg-red-950/20 hover:bg-red-900/60 border border-red-500/25 rounded-lg p-1.5 text-red-400 transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center"
+                        className="bg-[#4e0707] hover:bg-[#880d1e] border border-[#dd2c40]/60 rounded-lg p-1.5 text-white transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center"
                         title="Remove from deck"
                       >
                         <Minus className="w-3.5 h-3.5" />
