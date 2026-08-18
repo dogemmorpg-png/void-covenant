@@ -405,12 +405,25 @@ export const CollectionDeckView: React.FC = () => {
                       L{card.level}
                     </div>
 
-                    {/* Deck indicator icon */}
-                    {isInDeck && (
-                      <div className="absolute top-1.5 left-1.5 z-10 bg-[#880d1e] text-white rounded-full p-0.5 shadow-md border border-[#dd2c40]/30" title="In deck">
-                        <Swords className="w-2.5 h-2.5" />
-                      </div>
-                    )}
+                    {/* Quick add/remove toggle button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleDeck(card.id);
+                      }}
+                      className={`absolute top-1.5 left-1.5 z-20 rounded-full w-[18px] h-[18px] flex items-center justify-center border shadow-md transition-all hover:scale-110 active:scale-95 cursor-pointer ${
+                        isInDeck
+                          ? 'bg-[#4e0707] hover:bg-[#880d1e] border-[#dd2c40]/60 text-white'
+                          : 'bg-emerald-950/80 hover:bg-emerald-900 border-emerald-500/60 text-emerald-400'
+                      }`}
+                      title={isInDeck ? "Remove from deck" : "Add to deck"}
+                    >
+                      {isInDeck ? (
+                        <Minus className="w-2.5 h-2.5" />
+                      ) : (
+                        <Plus className="w-2.5 h-2.5" />
+                      )}
+                    </button>
 
                     <div className="text-center mt-4 relative z-10">
                       {!card.image.startsWith('/cards/') && (
