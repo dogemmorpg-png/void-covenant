@@ -4,7 +4,7 @@ import { audioSystem } from '../utils/AudioSystem';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CampaignStage, BattleState, BattleCardState } from '../types';
-import { initializeBattle, simulateCombatTurn, toBattleCard } from '../utils/gameLogic';
+import { initializeBattle, simulateCombatTurn, toBattleCard, placeCardLocally } from '../utils/gameLogic';
 import { 
   Swords, 
   Skull, 
@@ -520,12 +520,52 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     if (!selectedHandCardId) return;
     if (battle.playerBoard[slotIndex] !== null) return; 
     
-    setIsSimulating(true);
-    const { nextState, animateSequence: steps } = simulateCombatTurn(battle, selectedHandCardId, slotIndex, profile);
+    const cardToPlay = battle.playerHand.find(c => c.id === selectedHandCardId);
+    if (!cardToPlay) return;
     
-    setFinalBattleState(nextState);
+    const cost = cardToPlay.manaCost || 1;
+    const newBattleState = placeCardLocally(battle, selectedHandCardId, slotIndex);
+    
+    // Check if placeCardLocally did something (mana deducted, card placed)
+    if (newBattleState !== battle) {
+      // 1. Play place sound
+      audioSystem.playClick();
+      
+      // 2. Play Sacrifice effects if triggered
+      const oldAlliesCount = battle.playerBoard.filter(c => c !== null && !c.isDead).length;
+      const newAlliesCount = newBattleState.playerBoard.filter(c => c !== null && !c.isDead).length;
+      
+      if (newAlliesCount < oldAlliesCount) {
+        // Find which ally slot was sacrificed
+        let sacrificedSlot = -1;
+        for (let i = 0; i < 5; i++) {
+          if (battle.playerBoard[i] && !newBattleState.playerBoard[i]) {
+            sacrificedSlot = i;
+            break;
+          }
+        }
+        
+        if (sacrificedSlot !== -1) {
+          addFloatingText('💀 SACRIFICE', { side: 'player', slot: sacrificedSlot }, 'text-red-500 font-bold scale-110');
+          audioSystem.playEerieClick();
+        }
+        
+        // Sacrifice heal hero and buff stats
+        const sacrificeSkill = cardToPlay.skills.find(s => s.type === 'sacrifice');
+        if (sacrificeSkill) {
+          addFloatingText(`+${sacrificeSkill.value} HP 💚`, 'player-hero', 'text-emerald-400 font-black text-sm');
+          addFloatingText(`+${Math.round(sacrificeSkill.value / 2)}⚔️ +${sacrificeSkill.value}❤️`, { side: 'player', slot: slotIndex }, 'text-yellow-400 font-bold');
+        }
+      } else {
+        // Normal play
+        addFloatingText('SUMMON', { side: 'player', slot: slotIndex }, 'text-[#ebd09b] font-bold tracking-widest');
+      }
+      
+      setBattle(newBattleState);
+      setVisualState(newBattleState); // Update visualState immediately!
+    }
+    
     setSelectedHandCardId(null);
-    setupPlaybackState(selectedHandCardId, slotIndex, steps);
   };
 
   // Handle End Turn click
@@ -839,6 +879,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 <div>
                   <span className="text-[8px] font-mono font-bold text-red-500/70 tracking-wider uppercase block leading-none">Enemy Lord</span>
                   <h4 className="font-display font-black text-xs text-white mt-1 leading-none">{stage.enemyHeroName}</h4>
+                  <div className="flex items-center gap-1 mt-1 bg-black/40 px-1.5 py-0.5 rounded border border-red-950/20">
+                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+                    <span className="text-[8px] font-mono font-bold text-cyan-400 leading-none">
+                      {visualState.enemyMana || 0}/{visualState.enemyMaxMana || 0}
+                    </span>
+                  </div>
                 </div>
               </motion.div>
             );
@@ -879,6 +925,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 <div>
                   <span className="text-[8px] font-mono font-bold text-cyan-400/70 tracking-wider uppercase block leading-none">Your Hero</span>
                   <h4 className="font-display font-black text-xs text-white mt-1 leading-none">{profile.username || 'Summoner'}</h4>
+                  <div className="flex items-center gap-1 mt-1 bg-black/40 px-1.5 py-0.5 rounded border border-cyan-950/20">
+                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.8)] animate-pulse" />
+                    <span className="text-[8px] font-mono font-bold text-cyan-400 leading-none">
+                      {visualState.playerMana || 0}/{visualState.playerMaxMana || 0}
+                    </span>
+                  </div>
                 </div>
               </motion.div>
             );
@@ -1257,7 +1309,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             <div className="grid grid-cols-5 gap-3 relative">
               <div className="absolute inset-x-0 -top-4 h-[1px] bg-cyan-950/15" />
               {visualState.playerBoard.map((card, idx) => {
-                const canPlace = selectedHandCardId && card === null && !isSimulating;
+                const selectedHandCard = selectedHandCardId
+                  ? battle.playerHand.find(c => c.id === selectedHandCardId)
+                  : null;
+                const cardCost = selectedHandCard ? (selectedHandCard.manaCost || 1) : 1;
+                const canAfford = battle.playerMana >= cardCost;
+                const canPlace = selectedHandCardId && card === null && !isSimulating && canAfford;
                 const isActing = animatingSlot?.side === 'player' && animatingSlot?.slot === idx && animatingSlot?.type === 'strike';
                 const isHit = animatingSlot?.side === 'player' && animatingSlot?.slot === idx && animatingSlot?.type === 'hit';
                 const isDeath = animatingSlot?.side === 'player' && animatingSlot?.slot === idx && animatingSlot?.type === 'death';
@@ -1794,7 +1851,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   className={`absolute bottom-[0px] left-[calc(50%-55px)] w-[110px] h-[155px] origin-bottom rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center cursor-pointer transition-shadow bg-[#151a21] text-white select-none overflow-visible shadow-lg ${
                     isSelected 
                       ? 'border-[#66fcf1] shadow-[0_0_15px_rgba(102,252,241,0.6)]' 
-                      : 'border-gray-800 hover:border-gray-600'
+                      : (visualState.playerMana || 0) < (card.manaCost || 1)
+                        ? 'border-red-950/20 opacity-40 brightness-75 grayscale'
+                        : 'border-gray-800 hover:border-gray-600'
                   }`}
                 >
                   <>
@@ -1827,9 +1886,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       )}
                     </div>
 
-                    <div className="flex justify-between items-center text-[7px] md:text-[8px] font-mono font-black text-gray-400 z-10 relative px-1">
-                      <span className={`${getTierTextColor(card.tier)}`}>{card.tier}</span>
-                      <span>Lvl {card.level}</span>
+                    <div className="flex justify-between items-center z-10 relative px-0.5 mt-0.5">
+                      <div className="flex items-center gap-1">
+                        <span className="w-3.5 h-3.5 rounded-full bg-cyan-600 border border-cyan-400 text-white text-[8px] font-black font-mono flex items-center justify-center shadow-sm">
+                          {card.manaCost || 1}
+                        </span>
+                        <span className={`text-[7px] md:text-[8px] font-mono font-black ${getTierTextColor(card.tier)}`}>{card.tier}</span>
+                      </div>
+                      <span className="text-[7px] md:text-[8px] font-mono font-black text-gray-400">Lvl {card.level}</span>
                     </div>
 
                     <div className="mt-1 z-10 relative px-1 bg-black/45 py-0.5 rounded border border-white/5">

@@ -29,6 +29,7 @@ export interface Card {
   health: number;
   maxHealth: number;
   delay: number; // Turn timer delay (e.g., 1, 2, 3)
+  manaCost: number; // Mana cost to play
   skills: CardSkill[];
   image: string; // name of a lucide icon or a descriptive string for visual background
   color: string; // color scheme for the card (e.g., violet, red, green)
@@ -44,6 +45,7 @@ export interface CardTemplate {
   attack: number;
   health: number;
   delay: number;
+  manaCost?: number; // Optional custom cost
   skills: CardSkill[];
   image: string;
   color: string;
@@ -129,6 +131,10 @@ export interface BattleState {
   playerHeroMaxHealth: number;
   enemyHeroHealth: number;
   enemyHeroMaxHealth: number;
+  playerMana: number;
+  playerMaxMana: number;
+  enemyMana: number;
+  enemyMaxMana: number;
   playerBoard: (BattleCardState | null)[]; // length 5 slots
   enemyBoard: (BattleCardState | null)[]; // length 5 slots
   playerHand: Card[]; // cards remaining in hand

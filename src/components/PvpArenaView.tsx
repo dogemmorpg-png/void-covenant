@@ -121,8 +121,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
   }, [searchTimer, isMatching]);
 
   const handleStartMatchmaking = () => {
-    if (profile.deck.length < 5) {
-      toast("Your deck is incomplete! Go to the 'SANCTUARY' tab and select exactly 5 cards for battle.", 'warning');
+    if (profile.deck.length < 10) {
+      toast("Your deck is incomplete! Go to the 'CARDS' tab and select exactly 10 cards for battle.", 'warning');
       return;
     }
 
@@ -297,13 +297,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
               </div>
 
               {/* Deck quality check */}
-              {profile.deck.length < 5 ? (
+              {profile.deck.length < 10 ? (
                 <div className="bg-amber-950/15 border border-amber-500/35 rounded-xl p-4 flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                   <div>
                     <h5 className="font-display font-bold text-xs text-amber-300">DECK NOT READY</h5>
                     <p className="text-[11px] text-gray-400 mt-0.5 leading-relaxed">
-                      You have {profile.deck.length}/5 cards in your battle deck. Please assemble a full deck of 5 creatures in the <strong>SANCTUARY</strong> tab before entering the Void Arena.
+                      You have {profile.deck.length}/10 cards in your battle deck. Please assemble a full deck of 10 creatures in the <strong>CARDS</strong> tab before entering the Void Arena.
                     </p>
                   </div>
                 </div>
@@ -313,7 +313,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
                   <div>
                     <h5 className="font-display font-bold text-xs text-emerald-300">BATTLE DECK READY</h5>
                     <p className="text-[11px] text-gray-400 mt-0.5">
-                      Your squad is fully assembled (5/5 cards) and ready for battle. All fusion skills and stats will be active in the arena!
+                      Your squad is fully assembled (10/10 cards) and ready for battle. All fusion skills and stats will be active in the arena!
                     </p>
                   </div>
                 </div>
@@ -339,15 +339,15 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
             {/* Launch Matchmaker Button */}
             <div className="mt-8 pt-4 border-t border-gray-900">
               <button
-                disabled={profile.deck.length < 5 || profile.pvpEnergy < 1}
+                disabled={profile.deck.length < 10 || profile.pvpEnergy < 1}
                 onClick={handleStartMatchmaking}
                 className={`w-full py-4.5 px-6 rounded-xl font-display font-black tracking-widest flex items-center justify-center gap-2.5 shadow-lg text-sm transition-all relative group cursor-pointer ${
-                  profile.deck.length < 5 || profile.pvpEnergy < 1
+                  profile.deck.length < 10 || profile.pvpEnergy < 1
                     ? 'bg-gray-800/40 text-gray-500 border border-gray-800/55 cursor-not-allowed'
                     : 'bg-gradient-to-r from-cyan-900 to-indigo-900 hover:from-cyan-800 hover:to-indigo-800 border border-cyan-500/50 text-white hover:scale-[1.01] active:scale-[0.99] shadow-[0_0_20px_rgba(6,182,212,0.15)] hover:shadow-[0_0_25px_rgba(6,182,212,0.3)]'
                 }`}
               >
-                <Swords className={`w-5 h-5 ${profile.deck.length < 5 || profile.pvpEnergy < 1 ? '' : 'group-hover:animate-spin-slow'}`} />
+                <Swords className={`w-5 h-5 ${profile.deck.length < 10 || profile.pvpEnergy < 1 ? '' : 'group-hover:animate-spin-slow'}`} />
                 MATCHMAKING
               </button>
               <p className="text-gray-400 text-sm max-w-sm mt-4 text-center">

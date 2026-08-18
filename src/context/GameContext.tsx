@@ -49,6 +49,46 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = 'void_covenant_profile_v1';
 
+const migrateProfileTo10Cards = (p: PlayerProfile): PlayerProfile => {
+  if (!p) return p;
+  if (!p.collection) p.collection = [];
+  if (!p.deck) p.deck = [];
+  
+  // Ensure all cards in collection have a manaCost
+  p.collection = p.collection.map(c => {
+    if (c.manaCost === undefined || c.manaCost === null) {
+      const template = CARD_TEMPLATES.find(t => t.baseId === c.baseId);
+      let manaCost = 1;
+      if (template) {
+        if (template.tier === 'silver') manaCost = 2;
+        else if (template.tier === 'gold') manaCost = 3;
+        else if (template.tier === 'legendary') manaCost = 4;
+        else if (template.delay > 1) manaCost = 2;
+      }
+      return { ...c, manaCost };
+    }
+    return c;
+  });
+
+  // Ensure collection has at least 10 cards
+  if (p.collection.length < 10) {
+    const starterDeck = getStarterDeck();
+    starterDeck.forEach(c => {
+      if (p.collection.length < 10) {
+        c.id = `c_mig_${Math.random().toString(36).substr(2, 5)}_${Date.now()}`;
+        p.collection.push(c);
+      }
+    });
+  }
+  
+  // Ensure deck has exactly 10 cards
+  if (p.deck.length < 10) {
+    p.deck = p.collection.slice(0, 10).map(c => c.id);
+  }
+  
+  return p;
+};
+
 const createDefaultProfile = (): PlayerProfile => {
   const starterDeck = getStarterDeck();
   return {
@@ -56,7 +96,7 @@ const createDefaultProfile = (): PlayerProfile => {
   dust: 100,
   darkShards: 0,
   collection: starterDeck,
-  deck: starterDeck.slice(0, 5).map(c => c.id),
+  deck: starterDeck.map(c => c.id), // All 10 starter cards
   pveEnergy: 10,
   pveEnergyMax: 10,
   pvpEnergy: 5,
@@ -301,7 +341,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (res.ok) {
           const data = await res.json();
           if (data.profile) {
-            setProfile(data.profile);
+            setProfile(migrateProfileTo10Cards(data.profile));
           }
           return true;
         } else {
@@ -399,7 +439,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (data.profile) {
-        setProfile(data.profile);
+        setProfile(migrateProfileTo10Cards(data.profile));
       }
       return { success: true, message: data.message || 'Payment verified!' };
     } catch (err: any) {
@@ -437,7 +477,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
             serverProfile.solBalance = 12.5;
 
-            setProfile(serverProfile);
+            setProfile(migrateProfileTo10Cards(serverProfile));
             setIsLoadingProfile(false);
             return;
           }
@@ -509,7 +549,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (res.ok) {
           const data = await res.json();
-          if (data.profile) setProfile(data.profile);
+          if (data.profile) setProfile(migrateProfileTo10Cards(data.profile));
           return {
             success: true,
             message: 'Fusion successful!',
@@ -592,7 +632,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (res.ok) {
           const data = await res.json();
-          if (data.profile) setProfile(data.profile);
+          if (data.profile) setProfile(migrateProfileTo10Cards(data.profile));
           return { success: true, message: 'Rewards claimed successfully', rewards: data.rewards };
         }
       } catch (err: any) {
@@ -655,7 +695,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         if (res.ok) {
           const data = await res.json();
-          if (data.profile) setProfile(data.profile);
+          if (data.profile) setProfile(migrateProfileTo10Cards(data.profile));
           return { success: true, message: data.message, data };
         }
       } catch (err: any) {
@@ -707,9 +747,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       saveProfile(updated);
       return { success: true, message: 'Card removed from battle deck.' };
     } else {
-      // Add to deck. Check max 5 limit.
-      if (validDeck.length >= 5) {
-        return { success: false, message: 'Maximum 5 cards in deck. Remove a card first.' };
+      // Add to deck. Check max 10 limit.
+      if (validDeck.length >= 10) {
+        return { success: false, message: 'Maximum 10 cards in deck. Remove a card first.' };
       }
       
       const updated = {

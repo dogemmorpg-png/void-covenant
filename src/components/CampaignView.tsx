@@ -30,6 +30,10 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
   const stageStars = profile.campaignStars?.[selectedStage.id.toString()] || 0;
 
   const handleStart = () => {
+    if (profile.deck.length < 10) {
+      toast('Your Combat Deck must have exactly 10 cards to fight! Go to CARDS tab.', 'warning');
+      return;
+    }
     if ((profile.pveEnergy || 0) < selectedStage.energyCost) {
       toast('Not enough PvE energy! Wait for recovery.', 'warning');
       return;

@@ -179,19 +179,19 @@ export const CollectionDeckView: React.FC = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="font-display font-black text-white text-base tracking-widest text-shadow-gold flex items-center gap-2">
-                ⚔️ COMBAT DECK ({profile.deck.length}/5)
+                ⚔️ COMBAT DECK ({profile.deck.length}/10)
               </h3>
               <p className="text-[10px] text-gray-400 font-sans mt-0.5">Cards that will fight in the campaign and arena.</p>
             </div>
-            {profile.deck.length < 5 && (
+            {profile.deck.length < 10 && (
               <span className="text-[10px] bg-[#4e0707] text-[#dd2c40] font-mono font-bold py-1 px-2.5 rounded-full border border-[#dd2c40]/30 animate-pulse">
-                NOT ENOUGH CARDS! ADD UP TO 5
+                NOT ENOUGH CARDS! ADD UP TO 10
               </span>
             )}
           </div>
           
-          <div className="grid grid-cols-5 gap-2.5">
-            {Array.from({ length: 5 }).map((_, idx) => {
+          <div className="grid grid-cols-5 sm:grid-cols-10 gap-2.5">
+            {Array.from({ length: 10 }).map((_, idx) => {
               const cardId = profile.deck[idx];
               const card = cardId ? profile.collection.find(c => c.id === cardId) : null;
               

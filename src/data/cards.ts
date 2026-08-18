@@ -737,6 +737,15 @@ export function createCardInstance(template: CardTemplate, level: number = 1): C
     };
   });
 
+  let manaCost = template.manaCost;
+  if (!manaCost) {
+    if (template.tier === 'silver') manaCost = 2;
+    else if (template.tier === 'gold') manaCost = 3;
+    else if (template.tier === 'legendary') manaCost = 4;
+    else if (template.delay > 1) manaCost = 2;
+    else manaCost = 1;
+  }
+
   return {
     id: `${template.baseId}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
     baseId: template.baseId,
@@ -747,6 +756,7 @@ export function createCardInstance(template: CardTemplate, level: number = 1): C
     health,
     maxHealth: health,
     delay: template.delay,
+    manaCost,
     skills: scaledSkills,
     image: template.image,
     color: template.color,
@@ -757,12 +767,17 @@ export function createCardInstance(template: CardTemplate, level: number = 1): C
 
 // Generate the initial starter deck for a new player
 export function getStarterDeck(): Card[] {
-  // 5 starter cards
+  // 10 starter cards
   const templates = [
     CARD_TEMPLATES.find(c => c.baseId === 'skeleton_warrior')!,
     CARD_TEMPLATES.find(c => c.baseId === 'skeleton_warrior')!,
+    CARD_TEMPLATES.find(c => c.baseId === 'skeleton_warrior')!,
+    CARD_TEMPLATES.find(c => c.baseId === 'plague_rat')!,
+    CARD_TEMPLATES.find(c => c.baseId === 'plague_rat')!,
     CARD_TEMPLATES.find(c => c.baseId === 'plague_rat')!,
     CARD_TEMPLATES.find(c => c.baseId === 'cursed_witch')!,
+    CARD_TEMPLATES.find(c => c.baseId === 'cursed_witch')!,
+    CARD_TEMPLATES.find(c => c.baseId === 'dark_acolyte')!,
     CARD_TEMPLATES.find(c => c.baseId === 'dark_acolyte')!
   ];
   
@@ -787,8 +802,8 @@ export const generateCampaignStage = (floor: number): import('../types').Campaig
   if (floor > 15) permittedTiers.push('gold');
   if (floor > 30) permittedTiers.push('legendary');
   
-  // Generate enemy deck (3 to 5 cards)
-  const deckSize = Math.min(5, 3 + Math.floor(floor / 15));
+  // Generate enemy deck (12 for normal stages, 14 for Bosses)
+  const deckSize = isBoss ? 14 : 12;
   const enemyDeck: ReturnType<typeof createCardInstance>[] = [];
   
   const availableTemplates = CARD_TEMPLATES.filter(t => permittedTiers.includes(t.tier));

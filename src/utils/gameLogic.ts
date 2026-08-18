@@ -35,8 +35,8 @@ export function initializeBattle(playerDeck: Card[], stage: CampaignStage, playe
   const playerHand = shuffledDeck.slice(0, 3);
   const remainingDeck = shuffledDeck.slice(3);
   
-  // Enemy deck templates — duplicate for longer, more challenging battles
-  const enemyDeckTemplates = [...stage.enemyDeck, ...stage.enemyDeck].sort(() => Math.random() - 0.5);
+  // Enemy deck templates (exactly 12 for normal stages, 14 for Bosses)
+  const enemyDeckTemplates = [...stage.enemyDeck].sort(() => Math.random() - 0.5);
   
   // Create state
   return {
@@ -44,6 +44,10 @@ export function initializeBattle(playerDeck: Card[], stage: CampaignStage, playe
     playerHeroMaxHealth: playerHeroMaxHealth,
     enemyHeroHealth: stage.enemyHeroHealth,
     enemyHeroMaxHealth: stage.enemyHeroHealth,
+    playerMana: 1,
+    playerMaxMana: 1,
+    enemyMana: 1,
+    enemyMaxMana: 1,
     playerBoard: Array(5).fill(null),
     enemyBoard: Array(5).fill(null),
     playerHand,
@@ -321,68 +325,70 @@ export function simulateCombatTurn(
   }
 
   // 2. Enemy AI plays a card
-  // Enemy plays a card in an available board slot. Prefer slot opposite player's card, or first available.
+  // Enemy plays a card in an available board slot if they can afford it with their current Mana
   if (state.enemyHand.length > 0) {
     const nextEnemyCardTemplate = state.enemyHand[0];
+    const enemyCard = toBattleCard(nextEnemyCardTemplate as Card);
+    const cost = enemyCard.manaCost || 1;
     
-    // Find empty slots
-    const emptySlots: number[] = [];
-    state.enemyBoard.forEach((slot, index) => {
-      if (slot === null) emptySlots.push(index);
-    });
-    
-    if (emptySlots.length > 0) {
-      // AI logic: try to block player's cards, or choose slot with player card opposite
-      let chosenSlot = emptySlots[0];
-      const playerOccupiedSlots: number[] = [];
-      state.playerBoard.forEach((c, idx) => {
-        if (c !== null && emptySlots.includes(idx)) {
-          playerOccupiedSlots.push(idx);
-        }
+    if (state.enemyMana >= cost) {
+      state.enemyMana -= cost;
+      
+      // Find empty slots
+      const emptySlots: number[] = [];
+      state.enemyBoard.forEach((slot, index) => {
+        if (slot === null) emptySlots.push(index);
       });
       
-      if (playerOccupiedSlots.length > 0) {
-        // block a player card!
-        chosenSlot = playerOccupiedSlots[Math.floor(Math.random() * playerOccupiedSlots.length)];
-      } else {
-        // random empty slot
-        chosenSlot = emptySlots[Math.floor(Math.random() * emptySlots.length)];
-      }
-      
-      // Instantiate card
-      const enemyCard = toBattleCard(nextEnemyCardTemplate as Card);
-      
-      // Trigger enemy sacrifice if any
-      const enemySacSkill = enemyCard.skills.find(s => s.type === 'sacrifice');
-      const enemyAllies = state.enemyBoard.filter(c => c !== null && !c.isDead).length;
-      if (enemySacSkill && enemyAllies > 0) {
-        const enemyActiveSlots: number[] = [];
-        state.enemyBoard.forEach((c, idx) => {
-          if (c && !c.isDead) enemyActiveSlots.push(idx);
+      if (emptySlots.length > 0) {
+        let chosenSlot = emptySlots[0];
+        const playerOccupiedSlots: number[] = [];
+        state.playerBoard.forEach((c, idx) => {
+          if (c !== null && emptySlots.includes(idx)) {
+            playerOccupiedSlots.push(idx);
+          }
         });
-        const randAllySlot = enemyActiveSlots[Math.floor(Math.random() * enemyActiveSlots.length)];
-        const sacrCard = state.enemyBoard[randAllySlot]!;
-        sacrCard.isDead = true;
-        state.enemyBoard[randAllySlot] = null;
         
-        state.enemyHeroHealth = Math.min(state.enemyHeroMaxHealth, state.enemyHeroHealth + enemySacSkill.value);
-        enemyCard.attack += Math.round(enemySacSkill.value / 2);
-        enemyCard.health += enemySacSkill.value;
-        enemyCard.maxHealth += enemySacSkill.value;
+        if (playerOccupiedSlots.length > 0) {
+          chosenSlot = playerOccupiedSlots[Math.floor(Math.random() * playerOccupiedSlots.length)];
+        } else {
+          chosenSlot = emptySlots[Math.floor(Math.random() * emptySlots.length)];
+        }
         
-        logs.push(`💀 [Enemy] ${enemyCard.name} sacrifices ${sacrCard.name}! Enemy hero healed for +${enemySacSkill.value} HP.`);
-      }
+        // Trigger enemy sacrifice if any
+        const enemySacSkill = enemyCard.skills.find(s => s.type === 'sacrifice');
+        const enemyAllies = state.enemyBoard.filter(c => c !== null && !c.isDead).length;
+        if (enemySacSkill && enemyAllies > 0) {
+          const enemyActiveSlots: number[] = [];
+          state.enemyBoard.forEach((c, idx) => {
+            if (c && !c.isDead) enemyActiveSlots.push(idx);
+          });
+          const randAllySlot = enemyActiveSlots[Math.floor(Math.random() * enemyActiveSlots.length)];
+          const sacrCard = state.enemyBoard[randAllySlot]!;
+          sacrCard.isDead = true;
+          state.enemyBoard[randAllySlot] = null;
+          
+          state.enemyHeroHealth = Math.min(state.enemyHeroMaxHealth, state.enemyHeroHealth + enemySacSkill.value);
+          enemyCard.attack += Math.round(enemySacSkill.value / 2);
+          enemyCard.health += enemySacSkill.value;
+          enemyCard.maxHealth += enemySacSkill.value;
+          
+          logs.push(`💀 [Enemy] ${enemyCard.name} sacrifices ${sacrCard.name}! Enemy hero healed for +${enemySacSkill.value} HP.`);
+        }
 
-      state.enemyBoard[chosenSlot] = enemyCard;
-      state.enemyHand.shift();
-      state.enemyDeckSize = state.enemyHand.length;
-      
-      logs.push(`😈 Enemy played ${enemyCard.name} in slot ${chosenSlot + 1}.`);
-      animateSequence.push({
-        type: 'enemy_play',
-        slot: chosenSlot,
-        card: enemyCard
-      });
+        state.enemyBoard[chosenSlot] = enemyCard;
+        state.enemyHand.shift();
+        state.enemyDeckSize = state.enemyHand.length;
+        
+        logs.push(`😈 Enemy played ${enemyCard.name} in slot ${chosenSlot + 1}.`);
+        animateSequence.push({
+          type: 'enemy_play',
+          slot: chosenSlot,
+          card: enemyCard
+        });
+      }
+    } else {
+      logs.push(`😈 Enemy cannot afford to play ${enemyCard.name} (needs ${cost} Mana, has ${state.enemyMana} Mana).`);
     }
   }
 
@@ -683,8 +689,72 @@ export function simulateCombatTurn(
     // Advance turn
     state.turn += 1;
     state.phase = 'player_play';
+    
+    // Increment max mana and refill
+    state.playerMaxMana = Math.min(10, state.playerMaxMana + 1);
+    state.playerMana = state.playerMaxMana;
+    
+    state.enemyMaxMana = Math.min(10, state.enemyMaxMana + 1);
+    state.enemyMana = state.enemyMaxMana;
   }
 
   state.combatLog = [...currentState.combatLog, ...logs];
   return { nextState: state, animateSequence };
+}
+
+export function placeCardLocally(
+  currentState: BattleState,
+  cardId: string,
+  slotIndex: number
+): BattleState {
+  const state = JSON.parse(JSON.stringify(currentState)) as BattleState;
+  const cardHandIndex = state.playerHand.findIndex(c => c.id === cardId);
+  if (cardHandIndex === -1) return state;
+  
+  const card = state.playerHand[cardHandIndex];
+  const battleCard = toBattleCard(card);
+  const cost = battleCard.manaCost || 1;
+  
+  if (state.playerMana < cost) return state;
+  
+  // Deduct mana
+  state.playerMana -= cost;
+  
+  // Handle Sacrifice skill:
+  const sacrificeSkill = battleCard.skills.find(s => s.type === 'sacrifice');
+  const activeAlliesCount = state.playerBoard.filter(c => c !== null && !c.isDead).length;
+  
+  if (sacrificeSkill && activeAlliesCount > 0) {
+    const activeSlots: number[] = [];
+    state.playerBoard.forEach((c, idx) => {
+      if (c && !c.isDead) activeSlots.push(idx);
+    });
+    
+    const randomAllySlot = activeSlots[Math.floor(Math.random() * activeSlots.length)];
+    const sacrificedCard = state.playerBoard[randomAllySlot]!;
+    
+    sacrificedCard.isDead = true;
+    state.playerBoard[randomAllySlot] = null;
+    
+    const healAmt = sacrificeSkill.value;
+    state.playerHeroHealth = Math.min(state.playerHeroMaxHealth, state.playerHeroHealth + healAmt);
+    
+    battleCard.attack += Math.round(sacrificeSkill.value / 2);
+    battleCard.health += sacrificeSkill.value;
+    battleCard.maxHealth += sacrificeSkill.value;
+    
+    state.combatLog.push(`💀 ${battleCard.name} sacrifices ${sacrificedCard.name}! Hero healed for +${healAmt} HP. ${battleCard.name} gains +${Math.round(sacrificeSkill.value / 2)} ATK / +${sacrificeSkill.value} HP.`);
+  }
+  
+  // Apply delay reduction
+  const delayReduc = state.playerDelayReduction || 0;
+  if (delayReduc > 0) {
+    battleCard.delay = Math.max(0, battleCard.delay - delayReduc);
+    battleCard.initialDelay = Math.max(0, battleCard.initialDelay - delayReduc);
+  }
+  
+  state.playerBoard[slotIndex] = battleCard;
+  state.playerHand.splice(cardHandIndex, 1);
+  
+  return state;
 }
