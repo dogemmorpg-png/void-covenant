@@ -191,86 +191,94 @@ export const CollectionDeckView: React.FC = () => {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {Array.from({ length: 10 }).map((_, idx) => {
-              const cardId = profile.deck[idx];
-              const card = cardId ? profile.collection.find(c => c.id === cardId) : null;
-              
-              if (card) {
-                const borderGlow = selectedCardId === card.id ? 'border-[#66fcf1] ring-1 ring-[#66fcf1]/30 bg-[#16202b]/95' : 'border-gray-800/80 hover:border-gray-700 bg-[#11161d]/90 hover:bg-[#151d27]/95';
-                return (
-                  <div
-                    key={card.id}
-                    onClick={() => {
-                      setSelectedCardId(card.id);
-                      setIsFusingMode(false);
-                    }}
-                    className={`relative flex items-center justify-between p-2.5 rounded-xl border cursor-pointer transition-all duration-350 overflow-hidden group ${borderGlow} h-[52px]`}
-                  >
-                    {/* Hearthstone-style cropped card background art (increased opacity/scale) */}
-                    <div className="absolute inset-y-0 right-0 w-2/3 overflow-hidden rounded-r-xl opacity-[0.55] pointer-events-none group-hover:opacity-[0.70] transition-opacity">
-                      {card.image.startsWith('/cards/') ? (
-                        <img src={card.image} alt="" className="w-full h-full object-cover object-right scale-110" />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-end pr-4 text-cyan-500 opacity-40">
-                          {renderCardIcon(card.image, "w-11 h-11")}
+            {(() => {
+              const deckCards = profile.deck
+                .map(id => profile.collection.find(c => c.id === id))
+                .filter((c): c is Card => !!c)
+                .sort((a, b) => {
+                  const tierDiff = (tierWeight[b.tier as keyof typeof tierWeight] || 0) - (tierWeight[a.tier as keyof typeof tierWeight] || 0);
+                  if (tierDiff !== 0) return tierDiff;
+                  return b.level - a.level || a.name.localeCompare(b.name);
+                });
+              const paddedDeck = [...deckCards, ...Array(10 - deckCards.length).fill(null)];
+              return paddedDeck.map((card, idx) => {
+                if (card) {
+                  const borderGlow = selectedCardId === card.id ? 'border-[#66fcf1] ring-1 ring-[#66fcf1]/30 bg-[#16202b]/95' : 'border-gray-800/80 hover:border-gray-700 bg-[#11161d]/90 hover:bg-[#151d27]/95';
+                  return (
+                    <div
+                      key={card.id}
+                      onClick={() => {
+                        setSelectedCardId(card.id);
+                        setIsFusingMode(false);
+                      }}
+                      className={`relative flex items-center justify-between p-2.5 rounded-xl border cursor-pointer transition-all duration-350 overflow-hidden group ${borderGlow} h-[52px]`}
+                    >
+                      {/* Hearthstone-style cropped card background art (increased opacity/scale) */}
+                      <div className="absolute inset-y-0 right-0 w-2/3 overflow-hidden rounded-r-xl opacity-[0.55] pointer-events-none group-hover:opacity-[0.70] transition-opacity">
+                        {card.image.startsWith('/cards/') ? (
+                          <img src={card.image} alt="" className="w-full h-full object-cover object-right scale-110" />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-end pr-4 text-cyan-500 opacity-40">
+                            {renderCardIcon(card.image, "w-11 h-11")}
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#11161d]/75 to-[#11161d]" />
+                      </div>
+
+                      <div className="flex items-center gap-2.5 z-10 min-w-0">
+                        {/* Mana Badge (larger) */}
+                        <div className="w-[22px] h-[22px] rounded-full bg-cyan-950/90 border border-cyan-400 flex items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.3)] shrink-0">
+                          <span className="text-cyan-400 text-[11px] font-black font-mono leading-none">{card.manaCost || 1}</span>
                         </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#11161d]/75 to-[#11161d]" />
-                    </div>
 
-                    <div className="flex items-center gap-2.5 z-10 min-w-0">
-                      {/* Mana Badge (larger) */}
-                      <div className="w-[22px] h-[22px] rounded-full bg-cyan-950/90 border border-cyan-400 flex items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.3)] shrink-0">
-                        <span className="text-cyan-400 text-[11px] font-black font-mono leading-none">{card.manaCost || 1}</span>
+                        {/* Name & Tier info (larger text) */}
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-xs md:text-[13px] font-display font-black text-white leading-none tracking-wide truncate group-hover:text-cyan-200 transition-colors">
+                            {card.name}
+                          </span>
+                          <span className="text-[9px] text-gray-400 font-mono leading-none mt-1 uppercase font-bold tracking-wider">
+                            L{card.level} • {card.tier}
+                          </span>
+                        </div>
                       </div>
 
-                      {/* Name & Tier info (larger text) */}
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-xs md:text-[13px] font-display font-black text-white leading-none tracking-wide truncate group-hover:text-cyan-200 transition-colors">
-                          {card.name}
-                        </span>
-                        <span className="text-[9px] text-gray-400 font-mono leading-none mt-1 uppercase font-bold tracking-wider">
-                          L{card.level} • {card.tier}
-                        </span>
+                      {/* Stats & Actions (larger text) */}
+                      <div className="flex items-center gap-3 z-10 shrink-0">
+                        <div className="flex items-center gap-2 font-mono text-[11.5px] font-black">
+                          <span className="text-red-400 filter drop-shadow">⚔️{card.attack}</span>
+                          <span className="text-emerald-400 filter drop-shadow">❤️{card.health}</span>
+                          <span className="text-blue-400 filter drop-shadow" title="Delay">⏳{card.delay}</span>
+                        </div>
+
+                        {/* Remove Button (bright and distinct) */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleDeck(card.id);
+                          }}
+                          className="bg-[#4e0707] hover:bg-[#880d1e] border border-[#dd2c40]/60 rounded-lg p-1.5 text-white transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center"
+                          title="Remove from deck"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
-
-                    {/* Stats & Actions (larger text) */}
-                    <div className="flex items-center gap-3 z-10 shrink-0">
-                      <div className="flex items-center gap-2 font-mono text-[11.5px] font-black">
-                        <span className="text-red-400 filter drop-shadow">⚔️{card.attack}</span>
-                        <span className="text-emerald-400 filter drop-shadow">❤️{card.health}</span>
-                        <span className="text-blue-400 filter drop-shadow" title="Delay">⏳{card.delay}</span>
+                  );
+                } else {
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between px-3 rounded-xl border border-dashed border-white/5 bg-black/10 text-gray-600 h-[52px]"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Swords className="w-4 h-4 opacity-25" />
+                        <span className="text-[9px] font-mono tracking-wider font-bold opacity-35">EMPTY SLOT</span>
                       </div>
-
-                      {/* Remove Button (bright and distinct) */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleToggleDeck(card.id);
-                        }}
-                        className="bg-[#4e0707] hover:bg-[#880d1e] border border-[#dd2c40]/60 rounded-lg p-1.5 text-white transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center"
-                        title="Remove from deck"
-                      >
-                        <Minus className="w-3.5 h-3.5" />
-                      </button>
                     </div>
-                  </div>
-                );
-              } else {
-                return (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between px-3 rounded-xl border border-dashed border-white/5 bg-black/10 text-gray-600 h-[52px]"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Swords className="w-4 h-4 opacity-25" />
-                      <span className="text-[9px] font-mono tracking-wider font-bold opacity-35">EMPTY SLOT</span>
-                    </div>
-                  </div>
-                );
-              }
-            })}
+                  );
+                }
+              });
+            })()}
           </div>
         </div>
 
