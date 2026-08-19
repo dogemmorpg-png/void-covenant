@@ -986,7 +986,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 initial={{ opacity: 0, y: -15, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -15, scale: 0.95 }}
-                className="absolute top-16 left-1/2 -translate-x-1/2 bg-gradient-to-b from-[#1c140e] to-[#0d0906] border-2 border-[#ebd09b]/35 rounded-xl p-2 px-4 flex justify-between items-center gap-4 shadow-[0_8px_30px_rgba(0,0,0,0.9),_0_0_15px_rgba(235,208,155,0.1)] backdrop-blur-md h-[54px] w-[560px] shrink-0 z-35"
+                className="absolute top-3 left-1/2 -translate-x-1/2 bg-gradient-to-b from-[#1c140e] to-[#0d0906] border-2 border-[#ebd09b]/35 rounded-xl p-2 px-4 flex justify-between items-center gap-4 shadow-[0_8px_30px_rgba(0,0,0,0.9),_0_0_15px_rgba(235,208,155,0.1)] backdrop-blur-md h-[54px] w-[560px] shrink-0 z-35"
               >
                 {/* Combat Message Announcer */}
                 <div className="flex items-center gap-2.5 min-w-0 flex-1">
