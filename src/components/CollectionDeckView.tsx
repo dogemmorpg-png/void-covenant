@@ -381,6 +381,11 @@ export const CollectionDeckView: React.FC = () => {
                         onClick={() => selectFuseCard2(card.id)}
                         className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer border overflow-hidden group ${getCardTierStyles(card.tier, isSelected, true)}`}
                       >
+                        {/* Mana Badge */}
+                        <div className="absolute top-1.5 right-1.5 z-10">
+                          {renderManaIcon(card.manaCost || 1, "w-[16px] h-[16px]")}
+                        </div>
+
                         {card.image.startsWith('/cards/') ? (
                           <>
                             <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 group-hover:scale-110 transition-transform duration-500" />
@@ -397,6 +402,7 @@ export const CollectionDeckView: React.FC = () => {
                         </div>
                         <div className="flex justify-between items-center text-[9px] font-mono font-bold pt-1.5 border-t border-white/10">
                           <span className="text-red-400">⚔️{card.attack}</span>
+                          <span className="text-blue-400" title="Turn Delay">⏳{card.delay}</span>
                           <span className="text-emerald-400">❤️{card.health}</span>
                         </div>
                       </div>
@@ -437,9 +443,12 @@ export const CollectionDeckView: React.FC = () => {
                       <div className="absolute inset-0 bg-[#0b0c10] z-0" />
                     )}
 
-                    {/* Level Badge */}
-                    <div className="absolute top-1.5 right-1.5 z-10 bg-black/70 border border-[#c5a880]/30 rounded-full w-4 h-4 flex items-center justify-center text-[8px] font-mono font-bold text-[#ebd09b]">
+                    {/* Level & Mana Badges */}
+                    <div className="absolute top-1.5 right-1.5 z-10 bg-black/70 border border-[#c5a880]/30 rounded-full w-[18px] h-[18px] flex items-center justify-center text-[8px] font-mono font-bold text-[#ebd09b]">
                       L{card.level}
+                    </div>
+                    <div className="absolute top-1.5 right-[26px] z-10">
+                      {renderManaIcon(card.manaCost || 1, "w-[18px] h-[18px]")}
                     </div>
 
                     {/* Quick add/remove toggle button */}
@@ -493,6 +502,7 @@ export const CollectionDeckView: React.FC = () => {
                       {/* Stats */}
                       <div className="flex justify-between items-center text-[9px] font-mono font-bold pt-1 border-t border-white/10/80 bg-black/50 backdrop-blur-sm rounded px-1 -mx-1">
                         <span className="text-red-400">⚔️{card.attack}</span>
+                        <span className="text-blue-400" title="Turn Delay">⏳{card.delay}</span>
                         <span className="text-emerald-400">❤️{card.health}</span>
                       </div>
                     </div>
