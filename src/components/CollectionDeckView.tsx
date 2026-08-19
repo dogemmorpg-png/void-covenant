@@ -235,8 +235,9 @@ export const CollectionDeckView: React.FC = () => {
 
                       <div className="flex items-center gap-2.5 z-10 min-w-0">
                         {/* Mana Badge (larger) */}
-                        <div className="w-[22px] h-[22px] rounded-full bg-cyan-950/90 border border-cyan-400 flex items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.3)] shrink-0">
-                          <span className="text-cyan-400 text-[11px] font-black font-mono leading-none">{card.manaCost || 1}</span>
+                        <div className="relative w-6 h-6 shrink-0 flex items-center justify-center">
+                          <img src="/icons/icon_mana.png" alt="Mana" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]" />
+                          <span className="relative text-white text-[11px] font-black font-mono leading-none z-10 mt-[-0.5px]">{card.manaCost || 1}</span>
                         </div>
 
                         {/* Name & Tier info (larger text) */}

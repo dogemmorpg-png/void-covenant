@@ -879,9 +879,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 <div>
                   <span className="text-[8px] font-mono font-bold text-red-500/70 tracking-wider uppercase block leading-none">Enemy Lord</span>
                   <h4 className="font-display font-black text-xs text-white mt-1 leading-none">{stage.enemyHeroName}</h4>
-                  <div className="flex items-center gap-1 mt-1 bg-black/40 px-1.5 py-0.5 rounded border border-red-950/20">
-                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-                    <span className="text-[8px] font-mono font-bold text-cyan-400 leading-none">
+                  <div className="flex items-center gap-1.5 mt-1 bg-black/40 px-1.5 py-0.5 rounded border border-red-950/20">
+                    <img src="/icons/icon_mana.png" alt="Mana" className="w-[15px] h-[15px] object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]" />
+                    <span className="text-[9px] font-mono font-bold text-cyan-400 leading-none">
                       {visualState.enemyMana || 0}/{visualState.enemyMaxMana || 0}
                     </span>
                   </div>
@@ -925,9 +925,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 <div>
                   <span className="text-[8px] font-mono font-bold text-cyan-400/70 tracking-wider uppercase block leading-none">Your Hero</span>
                   <h4 className="font-display font-black text-xs text-white mt-1 leading-none">{profile.username || 'Summoner'}</h4>
-                  <div className="flex items-center gap-1 mt-1 bg-black/40 px-1.5 py-0.5 rounded border border-cyan-950/20">
-                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.8)] animate-pulse" />
-                    <span className="text-[8px] font-mono font-bold text-cyan-400 leading-none">
+                  <div className="flex items-center gap-1.5 mt-1 bg-black/40 px-1.5 py-0.5 rounded border border-cyan-950/20">
+                    <img src="/icons/icon_mana.png" alt="Mana" className="w-[15px] h-[15px] object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.6)] animate-pulse" />
+                    <span className="text-[9px] font-mono font-bold text-cyan-400 leading-none">
                       {visualState.playerMana || 0}/{visualState.playerMaxMana || 0}
                     </span>
                   </div>
@@ -1888,9 +1888,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                     <div className="flex justify-between items-center z-10 relative px-0.5 mt-0.5">
                       <div className="flex items-center gap-1">
-                        <span className="w-3.5 h-3.5 rounded-full bg-cyan-600 border border-cyan-400 text-white text-[8px] font-black font-mono flex items-center justify-center shadow-sm">
-                          {card.manaCost || 1}
-                        </span>
+                        <div className="relative w-4.5 h-4.5 shrink-0 flex items-center justify-center">
+                          <img src="/icons/icon_mana.png" alt="" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_0_4px_rgba(6,182,212,0.5)]" />
+                          <span className="relative text-white text-[9px] font-black font-mono leading-none z-10 mt-[-0.5px]">{card.manaCost || 1}</span>
+                        </div>
                         <span className={`text-[7px] md:text-[8px] font-mono font-black ${getTierTextColor(card.tier)}`}>{card.tier}</span>
                       </div>
                       <span className="text-[7px] md:text-[8px] font-mono font-black text-gray-400">Lvl {card.level}</span>
