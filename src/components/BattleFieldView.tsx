@@ -28,6 +28,29 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 
 
+
+const renderManaIcon = (cost: number, sizeClass: string = "w-5 h-5") => {
+  return (
+    <div className={`relative ${sizeClass} shrink-0 flex items-center justify-center`}>
+      <svg className="absolute inset-0 w-full h-full filter drop-shadow-[0_0_5px_rgba(6,182,212,0.85)]" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L4 7v10l8 5 8-5V7l-8-5z" fill="url(#manaCrystalGradField)" stroke="#66fcf1" strokeWidth="1.5" />
+        <path d="M12 2L4 7l8 5 8-5-8-5z" fill="#66fcf1" opacity="0.35" />
+        <path d="M4 7v10l8 5V12L4 7z" fill="#00d2ff" opacity="0.55" />
+        <path d="M20 7v10l8 5V12L20 7z" fill="#005299" opacity="0.75" />
+        <defs>
+          <radialGradient id="manaCrystalGradField" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#00f0ff" />
+            <stop offset="100%" stopColor="#0033aa" />
+          </radialGradient>
+        </defs>
+      </svg>
+      <span className="relative text-white text-[10px] md:text-[11px] font-black font-mono leading-none z-10 drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.95)]">
+        {cost}
+      </span>
+    </div>
+  );
+};
+
 interface BattleFieldViewProps {
   stage: CampaignStage;
   onExitBattle: (victory: boolean) => void;
@@ -879,10 +902,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 <div>
                   <span className="text-[8px] font-mono font-bold text-red-500/70 tracking-wider uppercase block leading-none">Enemy Lord</span>
                   <h4 className="font-display font-black text-xs text-white mt-1 leading-none">{stage.enemyHeroName}</h4>
-                  <div className="flex items-center gap-1.5 mt-1 bg-black/40 px-1.5 py-0.5 rounded border border-red-950/20">
-                    <img src="/icons/icon_mana.png" alt="Mana" className="w-[15px] h-[15px] object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]" />
-                    <span className="text-[9px] font-mono font-bold text-cyan-400 leading-none">
-                      {visualState.enemyMana || 0}/{visualState.enemyMaxMana || 0}
+                  <div className="flex items-center gap-1 mt-1 bg-black/40 px-1.5 py-0.5 rounded border border-red-950/20">
+                    {renderManaIcon(visualState.enemyMana || 0, "w-5 h-5")}
+                    <span className="text-[10px] font-mono font-bold text-cyan-400 leading-none pl-0.5">
+                      / {visualState.enemyMaxMana || 0}
                     </span>
                   </div>
                 </div>
@@ -925,10 +948,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 <div>
                   <span className="text-[8px] font-mono font-bold text-cyan-400/70 tracking-wider uppercase block leading-none">Your Hero</span>
                   <h4 className="font-display font-black text-xs text-white mt-1 leading-none">{profile.username || 'Summoner'}</h4>
-                  <div className="flex items-center gap-1.5 mt-1 bg-black/40 px-1.5 py-0.5 rounded border border-cyan-950/20">
-                    <img src="/icons/icon_mana.png" alt="Mana" className="w-[15px] h-[15px] object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.6)] animate-pulse" />
-                    <span className="text-[9px] font-mono font-bold text-cyan-400 leading-none">
-                      {visualState.playerMana || 0}/{visualState.playerMaxMana || 0}
+                  <div className="flex items-center gap-1 mt-1 bg-black/40 px-1.5 py-0.5 rounded border border-cyan-950/20">
+                    {renderManaIcon(visualState.playerMana || 0, "w-5 h-5")}
+                    <span className="text-[10px] font-mono font-bold text-cyan-400 leading-none pl-0.5">
+                      / {visualState.playerMaxMana || 0}
                     </span>
                   </div>
                 </div>
@@ -1888,10 +1911,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                     <div className="flex justify-between items-center z-10 relative px-0.5 mt-0.5">
                       <div className="flex items-center gap-1">
-                        <div className="relative w-4.5 h-4.5 shrink-0 flex items-center justify-center">
-                          <img src="/icons/icon_mana.png" alt="" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_0_4px_rgba(6,182,212,0.5)]" />
-                          <span className="relative text-white text-[9px] font-black font-mono leading-none z-10 mt-[-0.5px]">{card.manaCost || 1}</span>
-                        </div>
+                        {renderManaIcon(card.manaCost || 1, "w-[18px] h-[18px]")}
                         <span className={`text-[7px] md:text-[8px] font-mono font-black ${getTierTextColor(card.tier)}`}>{card.tier}</span>
                       </div>
                       <span className="text-[7px] md:text-[8px] font-mono font-black text-gray-400">Lvl {card.level}</span>

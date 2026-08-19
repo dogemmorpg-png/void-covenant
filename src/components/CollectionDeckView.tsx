@@ -39,6 +39,29 @@ const renderCardIcon = (imageName: string, className: string) => {
   }
 };
 
+
+const renderManaIcon = (cost: number, sizeClass: string = "w-5 h-5") => {
+  return (
+    <div className={`relative ${sizeClass} shrink-0 flex items-center justify-center`}>
+      <svg className="absolute inset-0 w-full h-full filter drop-shadow-[0_0_5px_rgba(6,182,212,0.85)]" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L4 7v10l8 5 8-5V7l-8-5z" fill="url(#manaCrystalGradDeck)" stroke="#66fcf1" strokeWidth="1.5" />
+        <path d="M12 2L4 7l8 5 8-5-8-5z" fill="#66fcf1" opacity="0.35" />
+        <path d="M4 7v10l8 5V12L4 7z" fill="#00d2ff" opacity="0.55" />
+        <path d="M20 7v10l8 5V12L20 7z" fill="#005299" opacity="0.75" />
+        <defs>
+          <radialGradient id="manaCrystalGradDeck" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#00f0ff" />
+            <stop offset="100%" stopColor="#0033aa" />
+          </radialGradient>
+        </defs>
+      </svg>
+      <span className="relative text-white text-[10px] md:text-[11px] font-black font-mono leading-none z-10 drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.95)]">
+        {cost}
+      </span>
+    </div>
+  );
+};
+
 export const CollectionDeckView: React.FC = () => {
   const { profile, fuseCards, toggleDeckCard } = useGame();
   const toast = useToast();
@@ -235,10 +258,7 @@ export const CollectionDeckView: React.FC = () => {
 
                       <div className="flex items-center gap-2.5 z-10 min-w-0">
                         {/* Mana Badge (larger) */}
-                        <div className="relative w-6 h-6 shrink-0 flex items-center justify-center">
-                          <img src="/icons/icon_mana.png" alt="Mana" className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]" />
-                          <span className="relative text-white text-[11px] font-black font-mono leading-none z-10 mt-[-0.5px]">{card.manaCost || 1}</span>
-                        </div>
+                        {renderManaIcon(card.manaCost || 1, "w-6 h-6")}
 
                         {/* Name & Tier info (larger text) */}
                         <div className="flex flex-col min-w-0">
