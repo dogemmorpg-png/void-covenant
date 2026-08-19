@@ -23,7 +23,9 @@ import {
   Star,
   Award,
   Scroll,
-  X
+  X,
+  Droplet,
+  Bug
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -112,9 +114,9 @@ const getSkillBadgeStyle = (type: string) => {
 const getSkillIcon = (type: string) => {
   switch (type?.toLowerCase()) {
     case 'sacrifice': return <Skull className="w-3.5 h-3.5 inline-block text-red-400" />;
-    case 'vampirism': return <Flame className="w-3.5 h-3.5 inline-block text-rose-400" />;
+    case 'vampirism': return <Droplet className="w-3.5 h-3.5 inline-block text-rose-400 fill-rose-400/20" />;
     case 'hex': return <Zap className="w-3.5 h-3.5 inline-block text-purple-400" />;
-    case 'plague': return <Activity className="w-3.5 h-3.5 inline-block text-emerald-400" />;
+    case 'plague': return <Bug className="w-3.5 h-3.5 inline-block text-emerald-400" />;
     default: return <Star className="w-3.5 h-3.5 inline-block text-yellow-400" />;
   }
 };
@@ -473,7 +475,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           const sourceCard = step.sourceSide === 'player' ? copy.playerBoard[step.sourceSlot] : copy.enemyBoard[step.sourceSlot];
           const targetCard = step.sourceSide === 'player' ? copy.enemyBoard[step.targetSlot] : copy.playerBoard[step.targetSlot];
           
-          stepDescription = `🤢 Plague slime: ${sourceCard?.name || 'Rot'} infects ${targetCard?.name || 'target'} for -${step.damage} HP`;
+          stepDescription = `🦠 Plague slime: ${sourceCard?.name || 'Rot'} infects ${targetCard?.name || 'target'} for -${step.damage} HP`;
 
           audioSystem.playError();
           setAnimatingSlot({ side: step.sourceSide, slot: step.sourceSlot, type: 'heal' });
@@ -2147,7 +2149,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   <h4 className="font-display font-bold text-sm text-[#ebd09b] mb-2 uppercase"><img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> Dark Creature Skills</h4>
                   <div className="space-y-2 font-sans">
                     <div className="p-2.5 rounded-lg bg-red-950/30 border border-red-900/35">
-                      <span className="font-bold text-red-400">💀 Sacrifice [X] (Sacrifice):</span>
+                      <span className="font-bold text-red-400 flex items-center gap-1"><Skull className="w-4 h-4 text-red-400" /> Sacrifice [X]:</span>
                       <p className="text-gray-400 mt-0.5">
                         On play, destroys a random ally on your board. In return, heals your hero by X HP,
                         and creature permanently gets <strong>+(X/2) Attack</strong> and <strong>+X Health</strong>.
@@ -2155,7 +2157,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     </div>
 
                     <div className="p-2.5 rounded-lg bg-rose-950/30 border border-rose-900/35">
-                      <span className="font-bold text-rose-300">🩸 Vampirism [X]:</span>
+                      <span className="font-bold text-rose-300 flex items-center gap-1"><Droplet className="w-4 h-4 text-rose-400 fill-rose-400/20" /> Vampirism [X]:</span>
                       <p className="text-gray-400 mt-0.5">
                         Every time creature attacks and damages another card, it heals itself by X HP
                         (up to max HP).
@@ -2170,7 +2172,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     </div>
 
                     <div className="p-2.5 rounded-lg bg-emerald-950/30 border border-emerald-900/35">
-                      <span className="font-bold text-emerald-300">🤢 Plague [X]:</span>
+                      <span className="font-bold text-emerald-300 flex items-center gap-1"><Bug className="w-4 h-4 text-emerald-400" /> Plague [X]:</span>
                       <p className="text-gray-400 mt-0.5">
                         At the end of each turn, emits poisonous spores dealing X pure damage to a random living enemy on board.
                       </p>

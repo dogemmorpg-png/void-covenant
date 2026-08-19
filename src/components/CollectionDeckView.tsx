@@ -5,7 +5,7 @@ import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { Card, CardTier } from '../types';
 import { CARD_TEMPLATES } from '../data/cards';
-import { Swords, Star, Plus, Minus, ArrowRight, Skull, Shield, Zap, Sparkles, AlertCircle, Crown, ShieldAlert, Bug, Flame } from 'lucide-react';
+import { Swords, Star, Plus, Minus, ArrowRight, Skull, Shield, Zap, Sparkles, AlertCircle, Crown, ShieldAlert, Bug, Flame, Droplet } from 'lucide-react';
 
 const getCardIconColor = (color: string) => {
   const colorMap: Record<string, string> = {
@@ -779,10 +779,10 @@ export const CollectionDeckView: React.FC = () => {
                       selectedCard.skills.map((skill, idx) => (
                         <div key={idx} className="bg-black/30 border border-white/10/40 p-2.5 rounded-lg text-xs">
                           <span className="font-display font-semibold text-[#ebd09b] block uppercase">
-                            {skill.type === 'hex' && <><Zap className="w-4 h-4 inline-block text-purple-400" /> Hex</>}
-                            {skill.type === 'vampirism' && '🩸 Vampirism'}
-                            {skill.type === 'plague' && '🤢 Plague'}
-                            {skill.type === 'sacrifice' && '💀 Sacrifice'}
+                            {skill.type === 'hex' && <span className="flex items-center gap-1"><Zap className="w-4 h-4 text-purple-400" /> Hex</span>}
+                            {skill.type === 'vampirism' && <span className="flex items-center gap-1"><Droplet className="w-4 h-4 text-rose-400 fill-rose-400/20" /> Vampirism</span>}
+                            {skill.type === 'plague' && <span className="flex items-center gap-1"><Bug className="w-4 h-4 text-emerald-400" /> Plague</span>}
+                            {skill.type === 'sacrifice' && <span className="flex items-center gap-1"><Skull className="w-4 h-4 text-red-400" /> Sacrifice</span>}
                           </span>
                           <p className="text-gray-400 font-sans mt-0.5 leading-relaxed text-[10px]">{skill.description}</p>
                         </div>
