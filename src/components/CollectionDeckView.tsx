@@ -137,6 +137,7 @@ export const CollectionDeckView: React.FC = () => {
   // Filter/Sort
   const [tierFilter, setTierFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'level' | 'attack' | 'health' | 'name'>('level');
+  const [showFusableOnly, setShowFusableOnly] = useState(false);
 
   // Currently selected card object
   const selectedCard = profile.collection.find(c => c.id === selectedCardId) || null;
@@ -145,8 +146,23 @@ export const CollectionDeckView: React.FC = () => {
   const tierWeight = { legendary: 4, gold: 3, silver: 2, bronze: 1 };
   const filteredCollection = profile.collection
     .filter(card => {
-      if (tierFilter === 'all') return true;
-      return card.tier === tierFilter;
+      if (tierFilter !== 'all' && card.tier !== tierFilter) return false;
+      
+      if (showFusableOnly) {
+        // Cannot fuse L5 Legendary
+        if (card.level === 5 && card.tier === 'legendary') return false;
+        
+        // Must have at least one identical clone
+        const hasDuplicate = profile.collection.some(c => 
+          c.id !== card.id && 
+          c.baseId === card.baseId && 
+          c.level === card.level && 
+          c.tier === card.tier
+        );
+        if (!hasDuplicate) return false;
+      }
+      
+      return true;
     })
     .sort((a, b) => {
       const tierDiff = (tierWeight[b.tier as keyof typeof tierWeight] || 0) - (tierWeight[a.tier as keyof typeof tierWeight] || 0);
@@ -380,6 +396,18 @@ export const CollectionDeckView: React.FC = () => {
             
             {/* Filters */}
             <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setShowFusableOnly(!showFusableOnly)}
+                className={`flex items-center gap-1.5 py-1 px-2.5 rounded-lg border text-xs font-mono transition-all select-none cursor-pointer ${
+                  showFusableOnly
+                    ? 'bg-purple-950/40 border-purple-500 text-purple-400 shadow-[0_0_10px_rgba(168,85,247,0.35)]'
+                    : 'bg-[#0b0c10] border-[#c5a880]/30 text-gray-500 hover:text-[#ebd09b] hover:border-[#c5a880]/50'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Fusable Only</span>
+              </button>
+
               <select
                 value={tierFilter}
                 onChange={(e) => setTierFilter(e.target.value)}
