@@ -18,6 +18,7 @@ export function toBattleCard(card: Card): BattleCardState {
     color: card.color,
     tier: card.tier,
     level: card.level,
+    manaCost: card.manaCost || 1,
     hexedAmount: 0,
     isDead: false,
     armor: 0,

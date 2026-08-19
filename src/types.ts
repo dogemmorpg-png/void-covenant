@@ -116,6 +116,7 @@ export interface BattleCardState {
   color: string;
   tier: CardTier;
   level: number;
+  manaCost: number;
   hexedAmount: number; // active Hex stack on this card
   isDead: boolean;
   armor?: number; // incoming damage mitigation
