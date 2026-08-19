@@ -398,13 +398,24 @@ export const CollectionDeckView: React.FC = () => {
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setShowFusableOnly(!showFusableOnly)}
-                className={`flex items-center gap-1.5 py-1 px-2.5 rounded-lg border text-xs font-mono transition-all select-none cursor-pointer ${
+                className={`flex items-center gap-2 py-1 px-2.5 rounded-lg border text-xs font-mono transition-all select-none cursor-pointer ${
                   showFusableOnly
                     ? 'bg-purple-950/40 border-purple-500 text-purple-400 shadow-[0_0_10px_rgba(168,85,247,0.35)]'
                     : 'bg-[#0b0c10] border-[#c5a880]/30 text-gray-500 hover:text-[#ebd09b] hover:border-[#c5a880]/50'
                 }`}
               >
-                <Sparkles className="w-3.5 h-3.5" />
+                {/* Custom checkbox box */}
+                <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0 transition-all ${
+                  showFusableOnly
+                    ? 'border-purple-400 bg-purple-500/20 text-purple-300'
+                    : 'border-[#c5a880]/40 bg-black/40'
+                }`}>
+                  {showFusableOnly && (
+                    <svg className="w-2.5 h-2.5 stroke-current" viewBox="0 0 24 24" fill="none" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </div>
                 <span>Fusable Only</span>
               </button>
 
