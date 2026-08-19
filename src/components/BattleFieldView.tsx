@@ -53,6 +53,63 @@ const renderManaIcon = (cost: number, sizeClass: string = "w-5 h-5") => {
   );
 };
 
+
+const renderSkillIcon = (type: string, sizeClass: string = "w-4 h-4") => {
+  const normType = type?.toLowerCase();
+  switch (normType) {
+    case 'vampirism':
+      return (
+        <div className={`relative ${sizeClass} shrink-0 flex items-center justify-center`}>
+          <svg className="w-full h-full filter drop-shadow-[0_0_3px_rgba(239,68,68,0.7)]" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C12 2 4 10 4 15C4 19.4 7.6 23 12 23C16.4 23 20 19.4 20 15C20 10 12 2 12 2Z" fill="#ef4444" stroke="#fca5a5" strokeWidth="1" />
+            <path d="M9 14.5C9 12 11.5 10 11.5 10" stroke="#ffffff" strokeWidth="1.2" strokeLinecap="round" opacity="0.6" />
+          </svg>
+        </div>
+      );
+    case 'plague':
+      return (
+        <div className={`relative ${sizeClass} shrink-0 flex items-center justify-center`}>
+          <svg className="w-full h-full filter drop-shadow-[0_0_3px_rgba(16,185,129,0.7)]" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="5" fill="#10b981" stroke="#a7f3d0" strokeWidth="1" />
+            <circle cx="12" cy="4.5" r="2.1" fill="#10b981" />
+            <circle cx="12" cy="19.5" r="2.1" fill="#10b981" />
+            <circle cx="4.5" cy="12" r="2.1" fill="#10b981" />
+            <circle cx="19.5" cy="12" r="2.1" fill="#10b981" />
+            <circle cx="6.5" cy="6.5" r="1.8" fill="#10b981" />
+            <circle cx="17.5" cy="17.5" r="1.8" fill="#10b981" />
+            <circle cx="6.5" cy="17.5" r="1.8" fill="#10b981" />
+            <circle cx="17.5" cy="6.5" r="1.8" fill="#10b981" />
+            <path d="M12 4.5V19.5M4.5 12H19.5" stroke="#10b981" strokeWidth="1.5" />
+          </svg>
+        </div>
+      );
+    case 'hex':
+      return (
+        <div className={`relative ${sizeClass} shrink-0 flex items-center justify-center`}>
+          <svg className="w-full h-full filter drop-shadow-[0_0_3px_rgba(168,85,247,0.7)]" viewBox="0 0 24 24" fill="none">
+            <path d="M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z" stroke="#c084fc" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="12" cy="12" r="4.5" fill="#a855f7" stroke="#e9d5ff" strokeWidth="1" />
+            <circle cx="12" cy="12" r="1.8" fill="#1e1b4b" />
+          </svg>
+        </div>
+      );
+    case 'sacrifice':
+      return (
+        <div className={`relative ${sizeClass} shrink-0 flex items-center justify-center`}>
+          <svg className="w-full h-full filter drop-shadow-[0_0_3px_rgba(239,68,68,0.8)]" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C7.5 2 4 5.5 4 10C4 12.9 5.5 15.5 8 16.8V20.5C8 21.3 8.7 22 9.5 22H14.5C15.3 22 16 21.3 16 20.5V16.8C18.5 15.5 20 12.9 20 10C20 5.5 16.5 2 12 2Z" fill="#ef4444" stroke="#fca5a5" strokeWidth="1" />
+            <circle cx="9" cy="10" r="1.8" fill="#1a0202" />
+            <circle cx="15" cy="10" r="1.8" fill="#1a0202" />
+            <path d="M12 12.5L10.5 14.5H13.5L12 12.5Z" fill="#1a0202" />
+            <path d="M9.5 18H14.5M10.5 16v4M12.5 16v4" stroke="#1a0202" strokeWidth="1" />
+          </svg>
+        </div>
+      );
+    default:
+      return null;
+  }
+};
+
 interface BattleFieldViewProps {
   stage: CampaignStage;
   onExitBattle: (victory: boolean) => void;
@@ -112,13 +169,7 @@ const getSkillBadgeStyle = (type: string) => {
 };
 
 const getSkillIcon = (type: string) => {
-  switch (type?.toLowerCase()) {
-    case 'sacrifice': return <img src="/icons/icon_sacrifice.png" alt="Sacrifice" className="w-3.5 h-3.5 inline-block object-contain rounded-md" />;
-    case 'vampirism': return <img src="/icons/icon_vampirism.png" alt="Vampirism" className="w-3.5 h-3.5 inline-block object-contain rounded-md" />;
-    case 'hex': return <img src="/icons/icon_hex.png" alt="Hex" className="w-3.5 h-3.5 inline-block object-contain rounded-md" />;
-    case 'plague': return <img src="/icons/icon_plague.png" alt="Plague" className="w-3.5 h-3.5 inline-block object-contain rounded-md" />;
-    default: return <Star className="w-3.5 h-3.5 inline-block text-yellow-400" />;
-  }
+  return renderSkillIcon(type, "w-3.5 h-3.5");
 };
 
 const getSkillNameEnglish = (type: string) => {
@@ -2149,7 +2200,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   <h4 className="font-display font-bold text-sm text-[#ebd09b] mb-2 uppercase"><img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> Dark Creature Skills</h4>
                   <div className="space-y-2 font-sans">
                     <div className="p-2.5 rounded-lg bg-red-950/30 border border-red-900/35">
-                      <span className="font-bold text-red-400 flex items-center gap-1.5"><img src="/icons/icon_sacrifice.png" alt="Sacrifice" className="w-5 h-5 object-contain rounded border border-red-500/30" /> Sacrifice [X]:</span>
+                      <span className="font-bold text-red-400 flex items-center gap-1.5">{renderSkillIcon("sacrifice", "w-5 h-5")} Sacrifice [X]:</span>
                       <p className="text-gray-400 mt-0.5">
                         On play, destroys a random ally on your board. In return, heals your hero by X HP,
                         and creature permanently gets <strong>+(X/2) Attack</strong> and <strong>+X Health</strong>.
@@ -2157,7 +2208,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     </div>
 
                     <div className="p-2.5 rounded-lg bg-rose-950/30 border border-rose-900/35">
-                      <span className="font-bold text-rose-300 flex items-center gap-1.5"><img src="/icons/icon_vampirism.png" alt="Vampirism" className="w-5 h-5 object-contain rounded border border-rose-500/30" /> Vampirism [X]:</span>
+                      <span className="font-bold text-rose-300 flex items-center gap-1.5">{renderSkillIcon("vampirism", "w-5 h-5")} Vampirism [X]:</span>
                       <p className="text-gray-400 mt-0.5">
                         Every time creature attacks and damages another card, it heals itself by X HP
                         (up to max HP).
@@ -2165,14 +2216,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     </div>
 
                     <div className="p-2.5 rounded-lg bg-purple-950/30 border border-purple-900/35">
-                      <span className="font-bold text-purple-300 flex items-center gap-1.5"><img src="/icons/icon_hex.png" alt="Hex" className="w-5 h-5 object-contain rounded border border-purple-500/30" /> Hex [X]:</span>
+                      <span className="font-bold text-purple-300 flex items-center gap-1.5">{renderSkillIcon("hex", "w-5 h-5")} Hex [X]:</span>
                       <p className="text-gray-400 mt-0.5">
                         Before dealing damage, hexes the opposite creature, increasing next incoming damage by +X.
                       </p>
                     </div>
 
                     <div className="p-2.5 rounded-lg bg-emerald-950/30 border border-emerald-900/35">
-                      <span className="font-bold text-emerald-300 flex items-center gap-1.5"><img src="/icons/icon_plague.png" alt="Plague" className="w-5 h-5 object-contain rounded border border-emerald-500/30" /> Plague [X]:</span>
+                      <span className="font-bold text-emerald-300 flex items-center gap-1.5">{renderSkillIcon("plague", "w-5 h-5")} Plague [X]:</span>
                       <p className="text-gray-400 mt-0.5">
                         At the end of each turn, emits poisonous spores dealing X pure damage to a random living enemy on board.
                       </p>

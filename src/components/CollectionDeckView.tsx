@@ -62,6 +62,63 @@ const renderManaIcon = (cost: number, sizeClass: string = "w-5 h-5") => {
   );
 };
 
+
+const renderSkillIcon = (type: string, sizeClass: string = "w-4 h-4") => {
+  const normType = type?.toLowerCase();
+  switch (normType) {
+    case 'vampirism':
+      return (
+        <div className={`relative ${sizeClass} shrink-0 flex items-center justify-center`}>
+          <svg className="w-full h-full filter drop-shadow-[0_0_3px_rgba(239,68,68,0.7)]" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C12 2 4 10 4 15C4 19.4 7.6 23 12 23C16.4 23 20 19.4 20 15C20 10 12 2 12 2Z" fill="#ef4444" stroke="#fca5a5" strokeWidth="1" />
+            <path d="M9 14.5C9 12 11.5 10 11.5 10" stroke="#ffffff" strokeWidth="1.2" strokeLinecap="round" opacity="0.6" />
+          </svg>
+        </div>
+      );
+    case 'plague':
+      return (
+        <div className={`relative ${sizeClass} shrink-0 flex items-center justify-center`}>
+          <svg className="w-full h-full filter drop-shadow-[0_0_3px_rgba(16,185,129,0.7)]" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="5" fill="#10b981" stroke="#a7f3d0" strokeWidth="1" />
+            <circle cx="12" cy="4.5" r="2.1" fill="#10b981" />
+            <circle cx="12" cy="19.5" r="2.1" fill="#10b981" />
+            <circle cx="4.5" cy="12" r="2.1" fill="#10b981" />
+            <circle cx="19.5" cy="12" r="2.1" fill="#10b981" />
+            <circle cx="6.5" cy="6.5" r="1.8" fill="#10b981" />
+            <circle cx="17.5" cy="17.5" r="1.8" fill="#10b981" />
+            <circle cx="6.5" cy="17.5" r="1.8" fill="#10b981" />
+            <circle cx="17.5" cy="6.5" r="1.8" fill="#10b981" />
+            <path d="M12 4.5V19.5M4.5 12H19.5" stroke="#10b981" strokeWidth="1.5" />
+          </svg>
+        </div>
+      );
+    case 'hex':
+      return (
+        <div className={`relative ${sizeClass} shrink-0 flex items-center justify-center`}>
+          <svg className="w-full h-full filter drop-shadow-[0_0_3px_rgba(168,85,247,0.7)]" viewBox="0 0 24 24" fill="none">
+            <path d="M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z" stroke="#c084fc" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="12" cy="12" r="4.5" fill="#a855f7" stroke="#e9d5ff" strokeWidth="1" />
+            <circle cx="12" cy="12" r="1.8" fill="#1e1b4b" />
+          </svg>
+        </div>
+      );
+    case 'sacrifice':
+      return (
+        <div className={`relative ${sizeClass} shrink-0 flex items-center justify-center`}>
+          <svg className="w-full h-full filter drop-shadow-[0_0_3px_rgba(239,68,68,0.8)]" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C7.5 2 4 5.5 4 10C4 12.9 5.5 15.5 8 16.8V20.5C8 21.3 8.7 22 9.5 22H14.5C15.3 22 16 21.3 16 20.5V16.8C18.5 15.5 20 12.9 20 10C20 5.5 16.5 2 12 2Z" fill="#ef4444" stroke="#fca5a5" strokeWidth="1" />
+            <circle cx="9" cy="10" r="1.8" fill="#1a0202" />
+            <circle cx="15" cy="10" r="1.8" fill="#1a0202" />
+            <path d="M12 12.5L10.5 14.5H13.5L12 12.5Z" fill="#1a0202" />
+            <path d="M9.5 18H14.5M10.5 16v4M12.5 16v4" stroke="#1a0202" strokeWidth="1" />
+          </svg>
+        </div>
+      );
+    default:
+      return null;
+  }
+};
+
 export const CollectionDeckView: React.FC = () => {
   const { profile, fuseCards, toggleDeckCard } = useGame();
   const toast = useToast();
@@ -779,10 +836,10 @@ export const CollectionDeckView: React.FC = () => {
                       selectedCard.skills.map((skill, idx) => (
                         <div key={idx} className="bg-black/30 border border-white/10/40 p-2.5 rounded-lg text-xs">
                           <span className="font-display font-semibold text-[#ebd09b] block uppercase">
-                            {skill.type === 'hex' && <span className="flex items-center gap-1.5"><img src="/icons/icon_hex.png" alt="Hex" className="w-5 h-5 object-contain rounded border border-purple-500/30" /> Hex</span>}
-                            {skill.type === 'vampirism' && <span className="flex items-center gap-1.5"><img src="/icons/icon_vampirism.png" alt="Vampirism" className="w-5 h-5 object-contain rounded border border-rose-500/30" /> Vampirism</span>}
-                            {skill.type === 'plague' && <span className="flex items-center gap-1.5"><img src="/icons/icon_plague.png" alt="Plague" className="w-5 h-5 object-contain rounded border border-emerald-500/30" /> Plague</span>}
-                            {skill.type === 'sacrifice' && <span className="flex items-center gap-1.5"><img src="/icons/icon_sacrifice.png" alt="Sacrifice" className="w-5 h-5 object-contain rounded border border-red-500/30" /> Sacrifice</span>}
+                            {skill.type === 'hex' && <span className="flex items-center gap-1.5">{renderSkillIcon("hex", "w-5 h-5")} Hex</span>}
+                            {skill.type === 'vampirism' && <span className="flex items-center gap-1.5">{renderSkillIcon("vampirism", "w-5 h-5")} Vampirism</span>}
+                            {skill.type === 'plague' && <span className="flex items-center gap-1.5">{renderSkillIcon("plague", "w-5 h-5")} Plague</span>}
+                            {skill.type === 'sacrifice' && <span className="flex items-center gap-1.5">{renderSkillIcon("sacrifice", "w-5 h-5")} Sacrifice</span>}
                           </span>
                           <p className="text-gray-400 font-sans mt-0.5 leading-relaxed text-[10px]">{skill.description}</p>
                         </div>
