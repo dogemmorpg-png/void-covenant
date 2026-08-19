@@ -779,10 +779,10 @@ export const CollectionDeckView: React.FC = () => {
                       selectedCard.skills.map((skill, idx) => (
                         <div key={idx} className="bg-black/30 border border-white/10/40 p-2.5 rounded-lg text-xs">
                           <span className="font-display font-semibold text-[#ebd09b] block uppercase">
-                            {skill.type === 'hex' && <span className="flex items-center gap-1"><Zap className="w-4 h-4 text-purple-400" /> Hex</span>}
-                            {skill.type === 'vampirism' && <span className="flex items-center gap-1"><Droplet className="w-4 h-4 text-rose-400 fill-rose-400/20" /> Vampirism</span>}
-                            {skill.type === 'plague' && <span className="flex items-center gap-1"><Bug className="w-4 h-4 text-emerald-400" /> Plague</span>}
-                            {skill.type === 'sacrifice' && <span className="flex items-center gap-1"><Skull className="w-4 h-4 text-red-400" /> Sacrifice</span>}
+                            {skill.type === 'hex' && <span className="flex items-center gap-1.5"><img src="/icons/icon_hex.png" alt="Hex" className="w-5 h-5 object-contain rounded border border-purple-500/30" /> Hex</span>}
+                            {skill.type === 'vampirism' && <span className="flex items-center gap-1.5"><img src="/icons/icon_vampirism.png" alt="Vampirism" className="w-5 h-5 object-contain rounded border border-rose-500/30" /> Vampirism</span>}
+                            {skill.type === 'plague' && <span className="flex items-center gap-1.5"><img src="/icons/icon_plague.png" alt="Plague" className="w-5 h-5 object-contain rounded border border-emerald-500/30" /> Plague</span>}
+                            {skill.type === 'sacrifice' && <span className="flex items-center gap-1.5"><img src="/icons/icon_sacrifice.png" alt="Sacrifice" className="w-5 h-5 object-contain rounded border border-red-500/30" /> Sacrifice</span>}
                           </span>
                           <p className="text-gray-400 font-sans mt-0.5 leading-relaxed text-[10px]">{skill.description}</p>
                         </div>
