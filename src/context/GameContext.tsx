@@ -54,6 +54,11 @@ const migrateProfileTo10Cards = (p: PlayerProfile): PlayerProfile => {
   if (!p.collection) p.collection = [];
   if (!p.deck) p.deck = [];
   
+  // Filter out any cards whose baseId is no longer present in CARD_TEMPLATES (legacy versions)
+  const validBaseIds = new Set(CARD_TEMPLATES.map(t => t.baseId));
+  p.collection = p.collection.filter(c => validBaseIds.has(c.baseId));
+  p.deck = p.deck.filter(cardId => p.collection.some(c => c.id === cardId));
+  
   // Ensure all cards in collection have a manaCost
   p.collection = p.collection.map(c => {
     if (c.manaCost === undefined || c.manaCost === null) {
