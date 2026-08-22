@@ -894,6 +894,218 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     image: '/cards/the_faceless_lord.png',
     color: 'cyan',
     description: 'A tall humanoid in a grand gothic throne room, wearing a crown but having a hollow void face.'
+  },
+  {
+    baseId: 'carrion_beetle',
+    name: 'Carrion Beetle',
+    tier: 'bronze',
+    attack: 2,
+    health: 8,
+    delay: 1,
+    skills: [
+      { type: 'vampirism', value: 2, description: 'Vampirism: heals self for 2 HP on attack.' }
+    ],
+    image: '/cards/carrion_beetle.png',
+    color: 'emerald',
+    description: 'A small flesh-eating beetle that nests inside rotting ribcages.'
+  },
+  {
+    baseId: 'covenant_initiate',
+    name: 'Covenant Initiate',
+    tier: 'bronze',
+    attack: 3,
+    health: 10,
+    delay: 2,
+    skills: [
+      { type: 'sacrifice', value: 3, description: 'Sacrifice: destroys an ally, granting the hero +3 HP.' }
+    ],
+    image: '/cards/covenant_initiate.png',
+    color: 'crimson',
+    description: 'An aspiring dark acolyte willing to offer anything for forbidden secrets.'
+  },
+  {
+    baseId: 'ghostly_specter',
+    name: 'Ghostly Specter',
+    tier: 'bronze',
+    attack: 3,
+    health: 7,
+    delay: 1,
+    skills: [
+      { type: 'hex', value: 1, description: 'Hex: increases enemy incoming damage by 1.' }
+    ],
+    image: '/cards/ghostly_specter.png',
+    color: 'cyan',
+    description: 'A shivering ghost that haunts dark corridors, chilling its victims to the bone.'
+  },
+  {
+    baseId: 'sewage_rat',
+    name: 'Sewage Rat',
+    tier: 'bronze',
+    attack: 1,
+    health: 7,
+    delay: 1,
+    skills: [
+      { type: 'plague', value: 1, description: 'Plague: deals 1 damage to random enemies at end of turn.' }
+    ],
+    image: '/cards/sewage_rat.png',
+    color: 'emerald',
+    description: 'A vile sewer dweller carrying a highly contagious disease.'
+  },
+  {
+    baseId: 'rotting_golem',
+    name: 'Rotting Golem',
+    tier: 'bronze',
+    attack: 2,
+    health: 14,
+    delay: 2,
+    skills: [
+      { type: 'plague', value: 1, description: 'Plague: deals 1 damage to random enemies at end of turn.' }
+    ],
+    image: '/cards/rotting_golem.png',
+    color: 'slate',
+    description: 'A clay golem stuffed with decaying flesh, leaking poisonous swamp gas.'
+  },
+  {
+    baseId: 'shadow_stalker',
+    name: 'Shadow Stalker',
+    tier: 'silver',
+    attack: 4,
+    health: 16,
+    delay: 2,
+    skills: [
+      { type: 'hex', value: 2, description: 'Hex: increases enemy incoming damage by 2.' }
+    ],
+    image: '/cards/shadow_stalker.png',
+    color: 'purple',
+    description: 'A hunter born of the void, stalking prey from the dark shadows.'
+  },
+  {
+    baseId: 'blood_fiend',
+    name: 'Blood Fiend',
+    tier: 'silver',
+    attack: 4,
+    health: 18,
+    delay: 2,
+    skills: [
+      { type: 'vampirism', value: 3, description: 'Vampirism: heals self for 3 HP on attack.' }
+    ],
+    image: '/cards/blood_fiend.png',
+    color: 'rose',
+    description: 'A horrific demon constructed from pure coagulated blood.'
+  },
+  {
+    baseId: 'plague_spreader',
+    name: 'Plague Spreader',
+    tier: 'silver',
+    attack: 3,
+    health: 20,
+    delay: 3,
+    skills: [
+      { type: 'plague', value: 2, description: 'Plague: deals 2 damage to random enemies at end of turn.' }
+    ],
+    image: '/cards/plague_spreader.png',
+    color: 'emerald',
+    description: 'A fanatic tasked with spreading the plague across mortal lands.'
+  },
+  {
+    baseId: 'dark_summoner',
+    name: 'Dark Summoner',
+    tier: 'silver',
+    attack: 3,
+    health: 16,
+    delay: 2,
+    skills: [
+      { type: 'sacrifice', value: 6, description: 'Sacrifice: destroys an ally, granting the hero +6 HP.' }
+    ],
+    image: '/cards/dark_summoner.png',
+    color: 'crimson',
+    description: 'Summons dark power by offering the blood of their servants.'
+  },
+  {
+    baseId: 'void_reaver',
+    name: 'Void Reaver',
+    tier: 'gold',
+    attack: 6,
+    health: 26,
+    delay: 2,
+    skills: [
+      { type: 'hex', value: 3, description: 'Hex: increases enemy incoming damage by 3.' }
+    ],
+    image: '/cards/void_reaver.png',
+    color: 'violet',
+    description: 'A merciless warrior of the dark void, tearing holes in reality.'
+  },
+  {
+    baseId: 'abyssal_monstrosity',
+    name: 'Abyssal Monstrosity',
+    tier: 'gold',
+    attack: 7,
+    health: 32,
+    delay: 3,
+    skills: [
+      { type: 'vampirism', value: 4, description: 'Vampirism: heals self for 4 HP on attack.' }
+    ],
+    image: '/cards/abyssal_monstrosity.png',
+    color: 'slate',
+    description: 'A colossal beast from the bottomless deeps of the void.'
+  },
+  {
+    baseId: 'covenant_inquisitor',
+    name: 'Covenant Inquisitor',
+    tier: 'gold',
+    attack: 6,
+    health: 28,
+    delay: 2,
+    skills: [
+      { type: 'sacrifice', value: 8, description: 'Sacrifice: destroys an ally, granting the hero +8 HP.' }
+    ],
+    image: '/cards/covenant_inquisitor.png',
+    color: 'crimson',
+    description: 'A high-ranking inquisitor who enforces the dark laws through holy sacrifices.'
+  },
+  {
+    baseId: 'plague_bringer',
+    name: 'Plague Bringer',
+    tier: 'gold',
+    attack: 5,
+    health: 30,
+    delay: 3,
+    skills: [
+      { type: 'plague', value: 3, description: 'Plague: deals 3 damage to random enemies at end of turn.' }
+    ],
+    image: '/cards/plague_bringer.png',
+    color: 'emerald',
+    description: 'A herald of pestilence, carrying rotting spores wherever he walks.'
+  },
+  {
+    baseId: 'lilith_queen_of_vampires',
+    name: 'Lilith, Queen of Vampires',
+    tier: 'legendary',
+    attack: 10,
+    health: 38,
+    delay: 3,
+    skills: [
+      { type: 'vampirism', value: 6, description: 'Vampirism: heals self for 6 HP on attack.' },
+      { type: 'hex', value: 3, description: 'Hex: increases enemy incoming damage by 3.' }
+    ],
+    image: '/cards/lilith_queen_of_vampires.png',
+    color: 'rose',
+    description: 'The mother of all vampires. Her gaze seduces, and her kiss drains the soul.'
+  },
+  {
+    baseId: 'beelzebub_lord_of_flies',
+    name: 'Beelzebub, Lord of Flies',
+    tier: 'legendary',
+    attack: 8,
+    health: 45,
+    delay: 4,
+    skills: [
+      { type: 'plague', value: 5, description: 'Plague: deals 5 damage to random enemies at end of turn.' },
+      { type: 'sacrifice', value: 10, description: 'Sacrifice: destroys an ally, granting the hero +10 HP.' }
+    ],
+    image: '/cards/beelzebub_lord_of_flies.png',
+    color: 'emerald',
+    description: 'The prince of demons. A swarm of flesh-eating flies follows his command.'
   }
 ];
 
