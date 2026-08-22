@@ -1107,6 +1107,218 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     image: '/cards/beelzebub_lord_of_flies.png',
     color: 'emerald',
     description: 'The prince of demons. A swarm of flesh-eating flies follows his command.'
+  },
+  {
+    baseId: 'crypt_bat',
+    name: 'Crypt Bat',
+    tier: 'bronze',
+    attack: 2,
+    health: 6,
+    delay: 1,
+    skills: [
+      { type: 'vampirism', value: 1, description: 'Vampirism: heals self for 1 HP on attack.' }
+    ],
+    image: '/cards/crypt_bat.png',
+    color: 'rose',
+    description: 'A red-eyed bat feeding on the blood of intruders in ancient crypts.'
+  },
+  {
+    baseId: 'graveyard_ghoul',
+    name: 'Graveyard Ghoul',
+    tier: 'bronze',
+    attack: 3,
+    health: 9,
+    delay: 2,
+    skills: [
+      { type: 'vampirism', value: 2, description: 'Vampirism: heals self for 2 HP on attack.' }
+    ],
+    image: '/cards/graveyard_ghoul.png',
+    color: 'emerald',
+    description: 'A feral ghoul that digs up fresh graves to feast on decaying remains.'
+  },
+  {
+    baseId: 'plague_beetle',
+    name: 'Plague Beetle',
+    tier: 'bronze',
+    attack: 2,
+    health: 12,
+    delay: 2,
+    skills: [
+      { type: 'plague', value: 1, description: 'Plague: deals 1 damage to random enemies at end of turn.' }
+    ],
+    image: '/cards/plague_beetle.png',
+    color: 'emerald',
+    description: 'A chitinous beetle that spreads pestilence from the rotting swamps.'
+  },
+  {
+    baseId: 'spectral_stalker',
+    name: 'Spectral Stalker',
+    tier: 'bronze',
+    attack: 3,
+    health: 6,
+    delay: 1,
+    skills: [
+      { type: 'hex', value: 1, description: 'Hex: increases enemy incoming damage by 1.' }
+    ],
+    image: '/cards/spectral_stalker.png',
+    color: 'cyan',
+    description: 'A fleeting ghostly assassin whose touch weakens the target\'s resolve.'
+  },
+  {
+    baseId: 'covenant_zealot',
+    name: 'Covenant Zealot',
+    tier: 'bronze',
+    attack: 4,
+    health: 8,
+    delay: 2,
+    skills: [
+      { type: 'sacrifice', value: 4, description: 'Sacrifice: destroys an ally, granting the hero +4 HP.' }
+    ],
+    image: '/cards/covenant_zealot.png',
+    color: 'crimson',
+    description: 'Driven by absolute faith, he eagerly offers himself to the void.'
+  },
+  {
+    baseId: 'banshee_screamer',
+    name: 'Banshee Screamer',
+    tier: 'silver',
+    attack: 4,
+    health: 15,
+    delay: 2,
+    skills: [
+      { type: 'hex', value: 2, description: 'Hex: increases enemy incoming damage by 2.' }
+    ],
+    image: '/cards/banshee_screamer.png',
+    color: 'purple',
+    description: 'A tragic spirit whose piercing scream shatters the defense of any foe.'
+  },
+  {
+    baseId: 'vampiric_mist',
+    name: 'Vampiric Mist',
+    tier: 'silver',
+    attack: 3,
+    health: 18,
+    delay: 2,
+    skills: [
+      { type: 'vampirism', value: 3, description: 'Vampirism: heals self for 3 HP on attack.' }
+    ],
+    image: '/cards/vampiric_mist.png',
+    color: 'rose',
+    description: 'A sentient crimson cloud that drains blood through the pores of its victims.'
+  },
+  {
+    baseId: 'plague_aberration',
+    name: 'Plague Aberration',
+    tier: 'silver',
+    attack: 4,
+    health: 16,
+    delay: 2,
+    skills: [
+      { type: 'plague', value: 2, description: 'Plague: deals 2 damage to random enemies at end of turn.' }
+    ],
+    image: '/cards/plague_aberration.png',
+    color: 'emerald',
+    description: 'A grotesque blob of mutated tissue dripping with infectious slime.'
+  },
+  {
+    baseId: 'blood_cult_priest',
+    name: 'Blood Cult Priest',
+    tier: 'silver',
+    attack: 3,
+    health: 17,
+    delay: 2,
+    skills: [
+      { type: 'sacrifice', value: 7, description: 'Sacrifice: destroys an ally, granting the hero +7 HP.' }
+    ],
+    image: '/cards/blood_cult_priest.png',
+    color: 'crimson',
+    description: 'He channels the life force of lesser souls to mend the wounds of his masters.'
+  },
+  {
+    baseId: 'void_tormenter',
+    name: 'Void Tormenter',
+    tier: 'gold',
+    attack: 6,
+    health: 25,
+    delay: 2,
+    skills: [
+      { type: 'hex', value: 3, description: 'Hex: increases enemy incoming damage by 3.' }
+    ],
+    image: '/cards/void_tormenter.png',
+    color: 'violet',
+    description: 'A terrifying shadow lord that feeds on the pain and despair of mortals.'
+  },
+  {
+    baseId: 'abyssal_devourer',
+    name: 'Abyssal Devourer',
+    tier: 'gold',
+    attack: 5,
+    health: 32,
+    delay: 3,
+    skills: [
+      { type: 'vampirism', value: 5, description: 'Vampirism: heals self for 5 HP on attack.' }
+    ],
+    image: '/cards/abyssal_devourer.png',
+    color: 'slate',
+    description: 'A bottomless gullet of teeth and void energy that absorbs life directly.'
+  },
+  {
+    baseId: 'covenant_archon',
+    name: 'Covenant Archon',
+    tier: 'gold',
+    attack: 7,
+    health: 24,
+    delay: 2,
+    skills: [
+      { type: 'sacrifice', value: 9, description: 'Sacrifice: destroys an ally, granting the hero +9 HP.' }
+    ],
+    image: '/cards/covenant_archon.png',
+    color: 'crimson',
+    description: 'A divine executioner who leads the covenant sacrifices under the solar eclipse.'
+  },
+  {
+    baseId: 'plague_reaper',
+    name: 'Plague Reaper',
+    tier: 'gold',
+    attack: 6,
+    health: 28,
+    delay: 3,
+    skills: [
+      { type: 'plague', value: 4, description: 'Plague: deals 4 damage to random enemies at end of turn.' }
+    ],
+    image: '/cards/plague_reaper.png',
+    color: 'emerald',
+    description: 'A hooded specter with a scythe that spreads black death across fields.'
+  },
+  {
+    baseId: 'elizabeth_bathory',
+    name: 'Elizabeth Bathory',
+    tier: 'legendary',
+    attack: 9,
+    health: 40,
+    delay: 3,
+    skills: [
+      { type: 'vampirism', value: 5, description: 'Vampirism: heals self for 5 HP on attack.' },
+      { type: 'sacrifice', value: 8, description: 'Sacrifice: destroys an ally, granting the hero +8 HP.' }
+    ],
+    image: '/cards/elizabeth_bathory.png',
+    color: 'rose',
+    description: 'The blood countess. She bathes in the blood of her maidens to preserve her eternal youth.'
+  },
+  {
+    baseId: 'mephistopheles',
+    name: 'Mephistopheles',
+    tier: 'legendary',
+    attack: 8,
+    health: 42,
+    delay: 3,
+    skills: [
+      { type: 'hex', value: 4, description: 'Hex: increases enemy incoming damage by 4.' },
+      { type: 'plague', value: 4, description: 'Plague: deals 4 damage to random enemies at end of turn.' }
+    ],
+    image: '/cards/mephistopheles.png',
+    color: 'violet',
+    description: 'A cunning archdevil who seals soul bargains in crimson ink.'
   }
 ];
 
