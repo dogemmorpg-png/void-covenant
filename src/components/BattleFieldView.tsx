@@ -2197,7 +2197,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               onClick={() => onExitBattle(false)}
               className="w-full bg-gradient-to-b from-[#3a0b12] via-[#200508] to-[#140204] border-2 border-red-600/50 hover:border-red-500 text-red-400 hover:text-white font-display font-bold tracking-widest py-3.5 px-6 rounded-xl transition-all duration-300 shadow-lg text-xs hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-[0_0_15px_rgba(220,38,38,0.15)] hover:shadow-[0_0_25px_rgba(239,68,68,0.35)]"
             >
-              RETURN TO HQ
+              {battleType === 'pvp' ? 'RETURN TO ARENA' : 'RETURN TO CAMPAIGN'}
             </button>
           </div>
         </div>
