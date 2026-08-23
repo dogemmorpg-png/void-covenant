@@ -182,6 +182,9 @@ export const HeaderHUD: React.FC = () => {
           {/* Modal content with ornate gothic border */}
           <div className="bg-gradient-to-b from-[#1a1f26] via-[#10141a] to-[#090b0e] border-2 border-[#ebd09b]/35 rounded-2xl w-full max-w-2xl overflow-hidden shadow-[0_0_50px_rgba(235,208,155,0.15)] relative flex flex-col">
             
+            {/* Glow overlay */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(235,208,155,0.03)_0%,transparent_70%)] pointer-events-none" />
+
             {/* Corner Decorative Brackets */}
             <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#ebd09b]/60 pointer-events-none" />
             <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#ebd09b]/60 pointer-events-none" />
@@ -189,7 +192,7 @@ export const HeaderHUD: React.FC = () => {
             <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#ebd09b]/60 pointer-events-none" />
 
             {/* Header */}
-            <div className="border-b border-[#ebd09b]/15 p-5 flex justify-between items-center bg-black/40">
+            <div className="border-b border-[#ebd09b]/15 p-5 flex justify-between items-center bg-black/40 relative z-10">
               <h3 className="font-display font-black text-[#ebd09b] text-base tracking-widest flex items-center gap-2.5 text-shadow-gold">
                 <Share2 className="w-5 h-5 text-[#ebd09b]" /> DARK BROTHERHOOD ORDER
               </h3>
@@ -202,7 +205,7 @@ export const HeaderHUD: React.FC = () => {
             </div>
 
             {/* Body */}
-            <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+            <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar relative z-10">
               
               {/* Rewards info (Ancient Scroll theme) */}
               <div className="bg-gradient-to-br from-[#1c1712] to-[#120f0c] border border-[#ebd09b]/20 rounded-xl p-5 shadow-inner relative overflow-hidden">
@@ -216,17 +219,17 @@ export const HeaderHUD: React.FC = () => {
                     <p className="text-xs text-gray-300 leading-relaxed font-sans">
                       Expand the influence of the Dark Covenant by inviting fellow summoners. When they sign the pact using your link:
                     </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 pt-3 border-t border-[#ebd09b]/10">
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 bg-[#ebd09b] rotate-45 shrink-0" />
-                        <span className="text-[11px] text-gray-300 font-sans">
-                          You get: <strong className="text-amber-400 font-mono">1,000 Gold</strong> & <strong className="text-[#66fcf1] font-mono">100 Dust</strong>
+                    <div className="space-y-2 mt-3 pt-3 border-t border-[#ebd09b]/10">
+                      <div className="flex items-center gap-2 text-[11px] text-gray-300">
+                        <span className="text-[#ebd09b] text-[9px] shrink-0">◆</span>
+                        <span>
+                          You receive: <strong className="text-amber-400 font-mono">1,000 Gold</strong> & <strong className="text-[#66fcf1] font-mono">100 Dust</strong>
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 bg-[#ebd09b] rotate-45 shrink-0" />
-                        <span className="text-[11px] text-gray-300 font-sans">
-                          They get: <strong className="text-amber-400 font-mono">200 Gold</strong> starter bonus
+                      <div className="flex items-center gap-2 text-[11px] text-gray-300">
+                        <span className="text-[#ebd09b] text-[9px] shrink-0">◆</span>
+                        <span>
+                          They receive: <strong className="text-amber-400 font-mono">200 Gold</strong> starter bonus
                         </span>
                       </div>
                     </div>
@@ -269,14 +272,15 @@ export const HeaderHUD: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gradient-to-b from-[#0f1318] to-[#07090c] border border-gray-800/80 rounded-xl p-4 text-center relative group hover:border-[#ebd09b]/25 transition-all">
                   <span className="block text-[9px] font-mono text-gray-500 uppercase tracking-widest">Allies Recruited</span>
-                  <span className="text-2xl font-display font-black text-amber-400 text-shadow-gold mt-1 block">
-                    {profile.referralsCount || 0}
+                  <span className="text-2xl font-display font-black text-amber-400 text-shadow-gold mt-1.5 block flex items-center justify-center gap-1.5">
+                    👥 {profile.referralsCount || 0}
                   </span>
                 </div>
                 <div className="bg-gradient-to-b from-[#0f1318] to-[#07090c] border border-gray-800/80 rounded-xl p-4 text-center relative group hover:border-[#ebd09b]/25 transition-all">
                   <span className="block text-[9px] font-mono text-gray-500 uppercase tracking-widest">Bounty Earned</span>
-                  <span className="text-2xl font-display font-black text-[#66fcf1] text-shadow-cyan mt-1 block">
-                    {((profile.referralsCount || 0) * 1000).toLocaleString()} <span className="text-[10px] text-gray-400">GOLD</span>
+                  <span className="text-2xl font-display font-black text-amber-400 text-shadow-gold mt-1 block flex items-center justify-center gap-1">
+                    <img src="/icons/icon_gold.png" alt="Gold" className="w-7 h-7 object-contain inline-block drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" />
+                    {((profile.referralsCount || 0) * 1000).toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -302,12 +306,16 @@ export const HeaderHUD: React.FC = () => {
                     {referralsList.map((ref, idx) => (
                       <div 
                         key={idx} 
-                        className="bg-gradient-to-r from-[#14181f] to-[#0d1014] border border-gray-850/80 hover:border-[#ebd09b]/25 rounded-xl p-3.5 flex items-center justify-between transition-all duration-200"
+                        className="bg-gradient-to-r from-[#14181f] to-[#0d1014] border border-gray-850/80 hover:border-[#ebd09b]/25 rounded-xl p-3 flex items-center justify-between transition-all duration-200"
                       >
                         {/* Summoner Name & Join Date */}
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-b from-[#ebd09b]/20 to-black border border-[#ebd09b]/30 flex items-center justify-center shadow-inner">
-                            <User className="w-3.5 h-3.5 text-[#ebd09b]" />
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-b from-[#ebd09b]/20 to-black border border-[#ebd09b]/40 overflow-hidden shadow-inner shrink-0 flex items-center justify-center">
+                            {ref.avatarUrl ? (
+                              <img src={ref.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                            ) : (
+                              <User className="w-3.5 h-3.5 text-[#ebd09b]" />
+                            )}
                           </div>
                           <div>
                             <span className="font-display font-black text-sm text-gray-200 block tracking-wide">
