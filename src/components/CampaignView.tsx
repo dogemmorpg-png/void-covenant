@@ -101,46 +101,46 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
 
           {/* Row 2: Large Centered Floor Selector */}
           <div className="flex justify-center items-center py-2">
-            <div className="flex items-center gap-6 bg-black/40 border border-gray-800/50 rounded-3xl py-3 px-6 shadow-inner">
+            <div className="flex items-center gap-8 bg-black/40 border border-gray-800/50 rounded-[32px] py-4.5 px-8 shadow-inner">
               <button 
                 onClick={handlePrev}
                 disabled={viewingFloor === 1}
-                className="p-3 rounded-2xl bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
+                className="p-4 rounded-2xl bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-7 h-7" />
               </button>
 
-              <div className="flex flex-col items-center w-36 select-none">
-                <span className={`text-[10px] font-mono tracking-widest uppercase font-bold ${isBoss ? 'text-red-500 animate-pulse' : 'text-[#ebd09b]'}`}>
+              <div className="flex flex-col items-center w-44 select-none">
+                <span className={`text-[11px] font-mono tracking-widest uppercase font-bold ${isBoss ? 'text-red-500 animate-pulse' : 'text-[#ebd09b]'}`}>
                   {isBoss ? 'Boss Floor' : 'Floor'}
                 </span>
-                <div className="text-5xl font-display font-black text-white text-shadow-gold leading-none my-1">
+                <div className="text-6xl font-display font-black text-white text-shadow-gold leading-none my-1">
                   {viewingFloor}
                 </div>
                 
                 {/* Stars display directly under the floor number */}
-                <div className="flex justify-center gap-1 my-1">
+                <div className="flex justify-center gap-1.5 my-1.5">
                   {[1, 2, 3].map(star => (
                     <Star 
                       key={star} 
-                      className={`w-4.5 h-4.5 ${star <= stageStars ? 'text-[#ebd09b] fill-[#ebd09b] drop-shadow-[0_0_6px_rgba(235,208,155,0.8)]' : 'text-gray-700'}`} 
+                      className={`w-6 h-6 ${star <= stageStars ? 'text-[#ebd09b] fill-[#ebd09b] drop-shadow-[0_0_8px_rgba(235,208,155,0.8)]' : 'text-gray-700'}`} 
                     />
                   ))}
                 </div>
 
                 {viewingFloor === maxFloor ? (
-                  <span className="text-[8px] text-emerald-400 font-mono tracking-wider uppercase font-bold">Current Max</span>
+                  <span className="text-[10px] text-emerald-400 font-mono tracking-wider uppercase font-bold">Current Max</span>
                 ) : (
-                  <span className="text-[8px] text-amber-500 font-mono tracking-wider uppercase font-bold">Farm Mode</span>
+                  <span className="text-[10px] text-amber-500 font-mono tracking-wider uppercase font-bold">Farm Mode</span>
                 )}
               </div>
 
               <button 
                 onClick={handleNext}
                 disabled={viewingFloor >= maxFloor}
-                className="p-3 rounded-2xl bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
+                className="p-4 rounded-2xl bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-7 h-7" />
               </button>
             </div>
           </div>
@@ -170,12 +170,12 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
             {/* Guaranteed Rewards */}
             <div className="space-y-3 flex flex-col justify-between">
               <div className="space-y-3">
-                <span className="text-[10px] font-mono text-gray-500 tracking-widest uppercase font-bold block">Guaranteed Drops</span>
+                <span className="text-[10px] font-mono text-gray-500 tracking-widest uppercase font-bold block">Rewards</span>
                 <div className="grid grid-cols-3 gap-3">
                   <div className="bg-black/50 border border-amber-500/20 p-3.5 rounded-2xl text-center shadow-inner hover:border-amber-500/40 transition-colors flex flex-col items-center justify-center min-h-[90px]">
                     <span className="text-amber-400 font-bold text-lg block flex items-center gap-1.5 justify-center">
                       +{selectedStage.goldReward}
-                      <img src="/icons/icon_gold.png" alt="Gold" className="w-5 h-5 object-contain" />
+                      <img src="/icons/icon_gold.png" alt="Gold" className="w-7 h-7 object-contain" />
                     </span>
                     <span className="text-[9px] text-gray-500 font-mono tracking-wide uppercase mt-1">Gold</span>
                   </div>
@@ -183,7 +183,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                   <div className="bg-black/50 border border-cyan-500/20 p-3.5 rounded-2xl text-center shadow-inner hover:border-cyan-500/40 transition-colors flex flex-col items-center justify-center min-h-[90px]">
                     <span className="text-[#66fcf1] font-bold text-lg block flex items-center gap-1.5 justify-center">
                       +{selectedStage.dustReward}
-                      <img src="/icons/icon_dust.png" alt="Dust" className="w-5 h-5 object-contain" />
+                      <img src="/icons/icon_dust.png" alt="Dust" className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(102,252,241,0.3)]" />
                     </span>
                     <span className="text-[9px] text-gray-500 font-mono tracking-wide uppercase mt-1">Dust</span>
                   </div>
@@ -192,7 +192,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                     <div className="bg-black/50 border border-red-500/20 p-3.5 rounded-2xl text-center shadow-inner hover:border-red-500/40 transition-colors flex flex-col items-center justify-center min-h-[90px]">
                       <span className="text-red-500 font-bold text-lg block flex items-center gap-1.5 justify-center">
                         +{selectedStage.shardsReward}
-                        <img src="/icons/icon_shards.png" alt="Shards" className="w-5 h-5 object-contain" />
+                        <img src="/icons/icon_shards.png" alt="Shards" className="w-7 h-7 object-contain" />
                       </span>
                       <span className="text-[9px] text-gray-500 font-mono tracking-wide uppercase mt-1">Shards</span>
                     </div>
