@@ -103,6 +103,17 @@ const migrateProfileTo10Cards = (p: PlayerProfile): PlayerProfile => {
   if (!p.collection) p.collection = [];
   if (!p.deck) p.deck = [];
   
+  // Convert image extensions to webp
+  if (p.avatarUrl) {
+    p.avatarUrl = p.avatarUrl.replace(/\.png/g, '.webp').replace(/\.jpg/g, '.webp').replace(/\.jpeg/g, '.webp');
+  }
+  p.collection = p.collection.map(c => {
+    if (c.image) {
+      c.image = c.image.replace(/\.png/g, '.webp').replace(/\.jpg/g, '.webp').replace(/\.jpeg/g, '.webp');
+    }
+    return c;
+  });
+  
   // First, migrate any legacy cards in the collection to their new equivalents
   p.collection = p.collection.map(c => migrateCardInstance(c, CARD_TEMPLATES));
   

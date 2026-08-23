@@ -93,7 +93,15 @@ const LEGACY_CARD_MAPPINGS: Record<string, string> = {
 function migrateProfileCards(profile: any): any {
   if (!profile || !profile.collection) return profile;
   
+  if (profile.avatarUrl) {
+    profile.avatarUrl = profile.avatarUrl.replace(/\.png/g, '.webp').replace(/\.jpg/g, '.webp').replace(/\.jpeg/g, '.webp');
+  }
+  
   profile.collection = profile.collection.map((card: any) => {
+    if (card.image) {
+      card.image = card.image.replace(/\.png/g, '.webp').replace(/\.jpg/g, '.webp').replace(/\.jpeg/g, '.webp');
+    }
+    
     const mapped = LEGACY_CARD_MAPPINGS[card.baseId];
     if (mapped) {
       const template = CARD_TEMPLATES.find(t => t.baseId === mapped);
