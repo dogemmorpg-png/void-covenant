@@ -2,10 +2,26 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
+import { CARD_TEMPLATES, createCardInstance } from './_shared/cards.js';
 
 const jwt = (jwtPkg as any).default || jwtPkg;
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
+
+function generateStarterDeck() {
+  const bronzePool = CARD_TEMPLATES.filter(c => c.tier === 'bronze');
+  const collection: any[] = [];
+  const deck: string[] = [];
+  
+  for (let i = 0; i < 10; i++) {
+    const template = bronzePool[Math.floor(Math.random() * bronzePool.length)];
+    const instance = createCardInstance(template, 1);
+    collection.push(instance);
+    deck.push(instance.id);
+  }
+  
+  return { collection, deck };
+}
 
 function calculateEnergy(profile: any): any {
   if (!profile) return profile;
@@ -131,123 +147,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
 
+      const starterDeck = generateStarterDeck();
+
       currentProfile = {
-      gold: isReferred ? 700 : 500,
-      dust: 100,
-      darkShards: 0,
-      collection: [
-        {
-          "id": "c_starter_1",
-          "baseId": "skeleton_warrior",
-          "name": "Skeleton Warrior",
-          "level": 1,
-          "tier": "bronze",
-          "attack": 2,
-          "health": 8,
-          "maxHealth": 8,
-          "delay": 1,
-          "skills": [
-            {
-              "type": "vampirism",
-              "value": 2,
-              "description": "Vampirism: heals self for 2 HP on attack."
-            }
-          ],
-          "image": "/cards/skeleton_warrior.png",
-          "color": "slate",
-          "xp": 0,
-          "maxXp": 50
-        },
-        {
-          "id": "c_starter_2",
-          "baseId": "skeleton_warrior",
-          "name": "Skeleton Warrior",
-          "level": 1,
-          "tier": "bronze",
-          "attack": 2,
-          "health": 8,
-          "maxHealth": 8,
-          "delay": 1,
-          "skills": [
-            {
-              "type": "vampirism",
-              "value": 2,
-              "description": "Vampirism: heals self for 2 HP on attack."
-            }
-          ],
-          "image": "/cards/skeleton_warrior.png",
-          "color": "slate",
-          "xp": 0,
-          "maxXp": 50
-        },
-        {
-          "id": "c_starter_3",
-          "baseId": "plague_rat",
-          "name": "Plague Rat",
-          "level": 1,
-          "tier": "bronze",
-          "attack": 1,
-          "health": 6,
-          "maxHealth": 6,
-          "delay": 1,
-          "skills": [
-            {
-              "type": "plague",
-              "value": 1,
-              "description": "Plague: deals 1 damage to random enemies at end of turn."
-            }
-          ],
-          "image": "/cards/plague_rat.png",
-          "color": "emerald",
-          "xp": 0,
-          "maxXp": 50
-        },
-        {
-          "id": "c_starter_4",
-          "baseId": "cursed_witch",
-          "name": "Cursed Witch",
-          "level": 1,
-          "tier": "bronze",
-          "attack": 3,
-          "health": 10,
-          "maxHealth": 10,
-          "delay": 2,
-          "skills": [
-            {
-              "type": "hex",
-              "value": 2,
-              "description": "Hex: increases enemy incoming damage by 2."
-            }
-          ],
-          "image": "/cards/cursed_witch.png",
-          "color": "purple",
-          "xp": 0,
-          "maxXp": 50
-        },
-        {
-          "id": "c_starter_5",
-          "baseId": "dark_acolyte",
-          "name": "Dark Acolyte",
-          "level": 1,
-          "tier": "bronze",
-          "attack": 2,
-          "health": 12,
-          "maxHealth": 12,
-          "delay": 2,
-          "skills": [
-            {
-              "type": "sacrifice",
-              "value": 4,
-              "description": "Sacrifice: destroys an ally, granting the hero +4 HP."
-            }
-          ],
-          "image": "/cards/dark_acolyte.png",
-          "color": "crimson",
-          "xp": 0,
-          "maxXp": 50
-        }
-      ],
-      deck: ['c_starter_1', 'c_starter_2', 'c_starter_3', 'c_starter_4', 'c_starter_5'],
+        gold: isReferred ? 700 : 500,
+        dust: 100,
+        darkShards: 0,
+        collection: starterDeck.collection,
+        deck: starterDeck.deck,
         pveEnergy: 10,
         pveEnergyMax: 10,
         pvpEnergy: 5,
