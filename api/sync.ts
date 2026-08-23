@@ -127,21 +127,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (referrer && typeof referrer === 'string' && referrer !== walletAddress) {
         const { data: refRows } = await supabase
           .from('profiles')
-          .select('data')
+          .select('wallet_address')
           .eq('wallet_address', referrer)
           .limit(1);
         if (refRows && refRows.length > 0) {
-          const refRow = refRows[0];
-          const refProfile = refRow.data;
-          refProfile.referralsCount = (refProfile.referralsCount || 0) + 1;
-          refProfile.gold = (refProfile.gold || 0) + 1000;
-          refProfile.dust = (refProfile.dust || 0) + 100;
-          
-          await supabase
-            .from('profiles')
-            .update({ data: refProfile, updated_at: new Date().toISOString() })
-            .eq('wallet_address', referrer);
-
           await supabase
             .from('referrals')
             .insert({
@@ -278,6 +267,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
       if (safeProfileData.activeStance) currentProfile.activeStance = safeProfileData.activeStance;
+    }
+
+    // Anti-referral exploit: check if player reached Level 15 and has a referrer, and reward hasn't been paid out yet
+    if (currentProfile.referredBy && (currentProfile.level || 1) >= 15 && !currentProfile.referralRewardClaimed) {
+      const { data: refRows } = await supabase
+        .from('profiles')
+        .select('data')
+        .eq('wallet_address', currentProfile.referredBy)
+        .limit(1);
+        
+      if (refRows && refRows.length > 0) {
+        const refRow = refRows[0];
+        const refProfile = refRow.data;
+        
+        // Reward referrer
+        refProfile.referralsCount = (refProfile.referralsCount || 0) + 1;
+        refProfile.gold = (refProfile.gold || 0) + 1000;
+        refProfile.dust = (refProfile.dust || 0) + 100;
+        
+        await supabase
+          .from('profiles')
+          .update({ data: refProfile, updated_at: new Date().toISOString() })
+          .eq('wallet_address', currentProfile.referredBy);
+          
+        // Mark reward as claimed on referred player so they don't get double rewards
+        currentProfile.referralRewardClaimed = true;
+      }
     }
 
     const newUpdatedAt = new Date().toISOString();
