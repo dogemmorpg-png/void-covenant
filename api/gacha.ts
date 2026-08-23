@@ -118,8 +118,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const walletAddress = decoded.walletAddress || decoded.wallet;
     const { packType } = req.body;
     let numCards = 3;
-    if (packType === 'obsidian') numCards = 5;
-    if (packType === 'abyssal') numCards = 5;
 
     const supabase = getSupabase();
 
