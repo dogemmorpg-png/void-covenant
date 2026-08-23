@@ -71,7 +71,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
     <div className="max-w-5xl mx-auto p-4 flex items-center justify-center min-h-[calc(100vh-220px)] animate-fadeIn">
       
       {/* Unified Majestic Slate Panel */}
-      <div className={`glass-panel rounded-3xl p-8 w-full relative overflow-hidden flex flex-col justify-between ${
+      <div className={`glass-panel rounded-3xl pt-8 px-8 pb-5 w-full relative overflow-hidden flex flex-col justify-between ${
         isBoss 
           ? 'border-red-950/60 shadow-[0_0_50px_rgba(220,38,38,0.12)]' 
           : 'border-[#ebd09b]/20 shadow-[0_0_40px_rgba(0,0,0,0.8)]'
@@ -87,7 +87,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
         <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#ebd09b]/35 pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#ebd09b]/35 pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col justify-between h-full space-y-6">
+        <div className="relative z-10 flex flex-col justify-between h-full space-y-4">
           
           {/* Row 1: Title & Description Centered */}
           <div className="text-center border-b border-gray-800/80 pb-4">
@@ -227,7 +227,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
           )}
 
           {/* Action Buttons Area */}
-          <div className="pt-6 border-t border-gray-800/80 flex flex-col items-center">
+          <div className="pt-4 border-t border-gray-800/80 flex flex-col items-center">
             <div className="flex w-full max-w-xl gap-5">
               <button
                 onClick={handleStart}
