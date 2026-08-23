@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { LogOut, Volume2, VolumeX, Copy, X, Share2, Trophy, User, Clock } from 'lucide-react';
+import { LogOut, Copy, X, Share2, Trophy, User, Clock } from 'lucide-react';
 import { audioSystem } from '../utils/AudioSystem';
 
 export const HeaderHUD: React.FC = () => {
-  const { profile, logoutPlayer, soundOn, toggleSound } = useGame();
+  const { profile, logoutPlayer } = useGame();
   const { disconnect } = useWallet();
 
   const [timeUntilRegen, setTimeUntilRegen] = useState<string>('');
@@ -48,11 +48,6 @@ export const HeaderHUD: React.FC = () => {
     
     fetchReferrals();
   }, [isModalOpen]);
-
-  useEffect(() => {
-    audioSystem.setEnabled(soundOn);
-  }, [soundOn]);
-
   useEffect(() => {
     const pveRegenTime = 1200000;
     
@@ -141,15 +136,6 @@ export const HeaderHUD: React.FC = () => {
 
           {/* User Profile and Controls */}
           <div className="flex items-center gap-2 sm:gap-3 xl:ml-2 xl:border-l border-white/10 xl:pl-4 mt-2 xl:mt-0">
-            {/* Sound Toggle */}
-            <button 
-              onClick={toggleSound}
-              className="bg-black/40 hover:bg-gray-800 border border-white/10 hover:border-gray-500/40 rounded-full p-2 text-gray-400 hover:text-white transition-all flex items-center justify-center"
-              title="Toggle Audio"
-            >
-              {soundOn ? <Volume2 className="w-4 h-4 text-[#ebd09b]" /> : <VolumeX className="w-4 h-4 text-gray-500" />}
-            </button>
-
             <div className="flex items-center gap-2">
               {profile.avatarUrl && (
                 <img src={profile.avatarUrl} alt="Avatar" className="w-8 h-8 rounded-full border border-white/20 object-cover shadow-[0_0_10px_rgba(255,255,255,0.1)]" />

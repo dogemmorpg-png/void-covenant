@@ -12,10 +12,7 @@ import {
   Zap, 
   ChevronRight, 
   HelpCircle, 
-  Flame, 
   ArrowLeft, 
-  Volume2, 
-  VolumeX, 
   Pause, 
   Play, 
   Activity,
@@ -197,7 +194,7 @@ const getSkillDescEnglish = (type: string, value: number) => {
 };
 
 export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitBattle, battleType = 'campaign' }) => {
-  const { profile, setProfile, soundOn, toggleSound, submitBattleResult } = useGame();
+  const { profile, setProfile, submitBattleResult } = useGame();
   const toast = useToast();
   
   // Calculate total bonuses from equipped items by type
@@ -775,12 +772,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             className="text-[10px] font-mono text-[#ebd09b] hover:text-white bg-black/60 py-1 px-2 border border-[#ebd09b]/25 rounded cursor-pointer transition-all"
           >
             RULES
-          </button>
-          <button
-            onClick={toggleSound}
-            className="text-gray-500 hover:text-white transition-all bg-black/50 p-1 border border-amber-950/40 rounded cursor-pointer"
-          >
-            {soundOn ? <Volume2 className="w-3.5 h-3.5 text-[#ebd09b]" /> : <VolumeX className="w-3.5 h-3.5" />}
           </button>
         </div>
       </div>

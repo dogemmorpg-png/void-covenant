@@ -14,8 +14,6 @@ interface GameContextType {
   spendGold: (amount: number) => boolean;
   spendDust: (amount: number) => boolean;
   spendShards: (amount: number) => boolean;
-  soundOn: boolean;
-  toggleSound: () => void;
   usePveEnergy: (amount: number) => boolean;
   usePvpEnergy: (amount: number) => boolean;
   startBattleOnServer: (battleType: 'campaign' | 'pvp', stageId: string, energyCost: number) => Promise<boolean>;
@@ -126,13 +124,6 @@ const createDefaultProfile = (): PlayerProfile => {
 };
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [soundOn, setSoundOn] = useState(false);
-
-  const toggleSound = () => {
-    const newVal = !soundOn;
-    setSoundOn(newVal);
-  };
-
   const [profile, setProfile] = useState<PlayerProfile>(createDefaultProfile);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
 
@@ -851,8 +842,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         spendGold,
         spendDust,
         spendShards,
-        soundOn,
-        toggleSound,
         usePveEnergy,
         usePvpEnergy,
         startBattleOnServer,
