@@ -353,7 +353,7 @@ export const AirdropHubView: React.FC = () => {
       </div>
 
       {/* Grid of Token details, wallet connection and purchase */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Listing Countdown */}
         <div className="bg-[#151a21] border border-[#c5a880]/20 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
@@ -479,35 +479,6 @@ export const AirdropHubView: React.FC = () => {
             <span className="truncate max-w-[140px] text-gray-600" title={TREASURY_WALLET_ADDRESS}>
               To: {TREASURY_WALLET_ADDRESS.slice(0, 4)}...{TREASURY_WALLET_ADDRESS.slice(-4)}
             </span>
-          </div>
-        </div>
-
-        {/* Referrals & Invites */}
-        <div className="bg-[#151a21] border border-[#c5a880]/20 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
-          <div className="space-y-4">
-            <h3 className="font-display font-bold text-sm text-[#ebd09b] tracking-wider uppercase flex items-center gap-2 border-b border-gray-800 pb-2">
-              <Share2 className="w-4 h-4 text-[#ebd09b]" /> DARK BROTHERHOOD ORDER
-            </h3>
-            <p className="text-xs text-gray-300 font-sans leading-relaxed">
-              Invite other summoners and share the loot. Receive <span className="text-amber-500 font-bold">1,000<img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> Gold</span> and <span className="text-[#ebd09b] font-bold">100 Dust</span> for each invitee!
-            </p>
-
-            <div className="bg-black/50 border border-gray-800 p-3 rounded-xl font-mono text-xs flex justify-between items-center">
-              <span className="text-gray-400">Allies invited:</span>
-              <span className="text-amber-400 font-bold">{profile.referralsCount}</span>
-            </div>
-          </div>
-
-          <div className="space-y-2 mt-6">
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(`${window.location.origin}?ref=${profile.solanaAddress || ''}`);
-                toast('Referral link copied to clipboard!', 'info');
-              }}
-              className="w-full bg-[#ebd09b] hover:bg-[#c5a880] text-black font-display font-black py-2.5 px-4 rounded-xl text-xs transition-all tracking-wider cursor-pointer"
-            >
-              📋 COPY REFERRAL LINK
-            </button>
           </div>
         </div>
 
