@@ -229,7 +229,7 @@ export const HeaderHUD: React.FC = () => {
                       <div className="flex items-center gap-2 text-[11px] text-gray-300">
                         <span className="text-[#ebd09b] text-[9px] shrink-0">◆</span>
                         <span>
-                          You receive: <strong className="text-amber-400 font-mono">1,000 Gold</strong> & <strong className="text-[#66fcf1] font-mono">100 Dust</strong> once they reach <strong className="text-emerald-400">Level 15</strong>
+                          You receive: <strong className="text-amber-400 font-mono">1,000 Gold</strong> & <strong className="text-[#66fcf1] font-mono">100 Dust</strong> once they reach <strong className="text-emerald-400">Level 10</strong>
                         </span>
                       </div>
                     </div>
@@ -329,13 +329,13 @@ export const HeaderHUD: React.FC = () => {
                         
                         {/* Level Badge */}
                         <div className="flex items-center gap-2">
-                          {ref.level >= 15 ? (
+                          {ref.level >= 10 ? (
                             <span className="font-mono text-[9px] font-black text-emerald-400 bg-emerald-950/40 border border-emerald-500/35 px-2.5 py-1 rounded-md tracking-wider uppercase">
                               LVL {ref.level} • COMPLETED
                             </span>
                           ) : (
                             <span className="font-mono text-[9px] font-black text-amber-500 bg-amber-950/20 border border-amber-500/25 px-2.5 py-1 rounded-md tracking-wider uppercase">
-                              LVL {ref.level}/15 • IN PROGRESS
+                              LVL {ref.level}/10 • IN PROGRESS
                             </span>
                           )}
                         </div>

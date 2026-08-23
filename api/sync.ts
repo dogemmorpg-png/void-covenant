@@ -269,8 +269,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (safeProfileData.activeStance) currentProfile.activeStance = safeProfileData.activeStance;
     }
 
-    // Anti-referral exploit: check if player reached Level 15 and has a referrer, and reward hasn't been paid out yet
-    if (currentProfile.referredBy && (currentProfile.level || 1) >= 15 && !currentProfile.referralRewardClaimed) {
+    // Anti-referral exploit: check if player reached Level 10 and has a referrer, and reward hasn't been paid out yet
+    if (currentProfile.referredBy && (currentProfile.level || 1) >= 10 && !currentProfile.referralRewardClaimed) {
       const { data: refRows } = await supabase
         .from('profiles')
         .select('data')
