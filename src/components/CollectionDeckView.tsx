@@ -273,7 +273,41 @@ export const CollectionDeckView: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div className="max-w-7xl mx-auto p-4 space-y-6">
+      {/* GOTHIC SUB-TABS */}
+      <div className="flex gap-2 border-b border-[#c5a880]/15 pb-px">
+        <button
+          onClick={() => {
+            setIsFusingMode(false);
+            setFuseCardId1(null);
+            setFuseCardId2(null);
+          }}
+          className={`flex items-center gap-2 py-2.5 px-6 rounded-t-xl font-display font-black text-xs tracking-widest transition-all cursor-pointer border-t border-x ${
+            !isFusingMode
+              ? 'bg-[#151a21] border-[#c5a880]/30 text-[#ebd09b] shadow-[0_-4px_12px_rgba(197,168,128,0.08)]'
+              : 'border-transparent text-gray-500 hover:text-gray-300'
+          }`}
+        >
+          💀 CREATURE SANCTUARY
+        </button>
+        <button
+          onClick={() => {
+            setIsFusingMode(true);
+            setFuseCardId1(null);
+            setFuseCardId2(null);
+            setSelectedCardId(null);
+          }}
+          className={`flex items-center gap-2 py-2.5 px-6 rounded-t-xl font-display font-black text-xs tracking-widest transition-all cursor-pointer border-t border-x ${
+            isFusingMode
+              ? 'bg-[#151a21] border-purple-500/30 text-purple-300 shadow-[0_-4px_12px_rgba(168,85,247,0.08)]'
+              : 'border-transparent text-gray-500 hover:text-purple-400/80'
+          }`}
+        >
+          🧬 FUSION ALTAR
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
       
       {/* LEFT PANEL: Collection & Deck (7 Cols) */}
       <div className="lg:col-span-7 space-y-6">
@@ -404,19 +438,6 @@ export const CollectionDeckView: React.FC = () => {
             
             {/* Filters */}
             <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => {
-                  setIsFusingMode(true);
-                  setFuseCardId1(null);
-                  setFuseCardId2(null);
-                  setSelectedCardId(null);
-                }}
-                className="flex items-center gap-1.5 py-1 px-3 rounded-lg border border-purple-500/40 bg-purple-950/20 text-purple-300 hover:bg-purple-900/30 text-xs font-mono font-bold transition-all shadow-[0_0_10px_rgba(168,85,247,0.15)] cursor-pointer hover:scale-102 active:scale-98"
-                title="Open Fusion Altar to combine duplicates"
-              >
-                🧬 FUSION ALTAR
-              </button>
-
               <button
                 onClick={() => setShowFusableOnly(!showFusableOnly)}
                 className={`flex items-center gap-2 py-1 px-2.5 rounded-lg border text-xs font-mono transition-all select-none cursor-pointer ${
@@ -642,7 +663,7 @@ export const CollectionDeckView: React.FC = () => {
 
       {/* RIGHT PANEL: Ritual Lab / Details (5 Cols) */}
       <div className="lg:col-span-5">
-        <div className="bg-[#151a21] border border-[#c5a880]/30 rounded-2xl p-6 shadow-2xl h-full flex flex-col justify-between">
+        <div className={`bg-[#151a21] border border-[#c5a880]/30 rounded-2xl p-6 shadow-2xl ${isFusingMode ? 'h-full flex flex-col justify-between' : 'h-fit'}`}>
           
           {isFusingMode ? (
             /* RITUAL FUSION LAB UI */
@@ -857,8 +878,7 @@ export const CollectionDeckView: React.FC = () => {
             </div>
           ) : selectedCard ? (
             /* NORMAL CARD DETAIL / STATS UPGRADE UI */
-            <div className="space-y-4 flex flex-col justify-between h-full">
-              <div className="space-y-4">
+            <div className="space-y-4">
                 <div className="text-center border-b border-white/10 pb-2">
                   <span className="text-xs font-mono font-bold text-[#c5a880] uppercase tracking-widest">Level {selectedCard.level} / 5</span>
                 </div>
@@ -938,8 +958,6 @@ export const CollectionDeckView: React.FC = () => {
                 <p className="text-[11px] text-gray-400 italic font-sans leading-relaxed border-l-2 border-[#c5a880]/30 pl-3">
                   {CARD_TEMPLATES.find(t => t.baseId === selectedCard.baseId)?.description}
                 </p>
-              </div>
-
             </div>
           ) : (
             <div className="text-center py-20 text-gray-500 flex flex-col items-center justify-center">
@@ -950,6 +968,8 @@ export const CollectionDeckView: React.FC = () => {
           )}
           
         </div>
+      </div>
+
       </div>
 
       {/* Fusion Confirm Modal */}
