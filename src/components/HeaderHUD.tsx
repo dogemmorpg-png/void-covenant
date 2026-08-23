@@ -102,25 +102,25 @@ export const HeaderHUD: React.FC = () => {
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
             {/* Gold */}
             <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors cursor-default py-1 px-3 shadow-inner" title="Gold (For basic packs and upgrades)">
-              <img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " />
+              <img src="/icons/icon_gold.webp" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " />
               <span className="font-mono font-bold text-amber-400">{profile.gold}</span>
             </div>
 
             {/* Dust */}
             <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors cursor-default py-1 px-3 shadow-inner" title="Dark Dust (For skill enhancement)">
-              <img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " />
+              <img src="/icons/icon_dust.webp" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " />
               <span className="font-mono font-bold text-[#66fcf1]">{profile.dust}</span>
             </div>
 
             {/* Shards */}
             <div className="flex items-center gap-1.5 bg-red-500/5 border border-red-500/20 rounded-full hover:bg-red-500/10 transition-colors cursor-default py-1 px-3 shadow-inner" title="Dark Shards (Premium currency)">
-              <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " />
+              <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " />
               <span className="font-mono font-bold text-[#dd2c40]">{profile.darkShards}</span>
             </div>
 
             {/* PvE Energy (Main Energy) */}
             <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors cursor-default py-1 px-3 shadow-inner" title="Energy (Restores 1 per 20 mins)">
-              <img src="/icons/icon_energy.png" alt="Energy" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " />
+              <img src="/icons/icon_energy.webp" alt="Energy" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " />
               <div className="flex flex-col">
                 <span className="font-mono text-xs font-bold text-emerald-400">
                   Energy: {profile.pveEnergy}/{profile.pveEnergyMax}
@@ -195,7 +195,7 @@ export const HeaderHUD: React.FC = () => {
               
               {/* Rewards info (Ancient Scroll theme) */}
               <div className="bg-gradient-to-br from-[#1c1712] to-[#120f0c] border border-[#ebd09b]/20 rounded-xl p-5 shadow-inner relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[url('/icons/icon_gold.png')] bg-contain bg-no-repeat opacity-5 pointer-events-none -mr-4 -mt-4" />
+                <div className="absolute top-0 right-0 w-24 h-24 bg-[url('/icons/icon_gold.webp')] bg-contain bg-no-repeat opacity-5 pointer-events-none -mr-4 -mt-4" />
                 <div className="flex gap-4">
                   <div className="w-10 h-10 rounded-xl bg-[#ebd09b]/10 border border-[#ebd09b]/30 flex items-center justify-center shrink-0 shadow-lg">
                     <Trophy className="w-5 h-5 text-[#ebd09b]" />
@@ -265,7 +265,7 @@ export const HeaderHUD: React.FC = () => {
                 <div className="bg-gradient-to-b from-[#0f1318] to-[#07090c] border border-gray-800/80 rounded-xl p-4 text-center relative group hover:border-[#ebd09b]/25 transition-all">
                   <span className="block text-[9px] font-mono text-gray-500 uppercase tracking-widest">Bounty Earned</span>
                   <span className="text-2xl font-display font-black text-amber-400 text-shadow-gold mt-1 block flex items-center justify-center gap-1">
-                    <img src="/icons/icon_gold.png" alt="Gold" className="w-7 h-7 object-contain inline-block drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" />
+                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-7 h-7 object-contain inline-block drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" />
                     {((profile.referralsCount || 0) * 1000).toLocaleString()}
                   </span>
                 </div>

@@ -141,7 +141,7 @@ export const GachaStoreView: React.FC = () => {
             <div className="space-y-4">
               <div className="h-44 rounded-xl bg-gradient-to-b from-amber-950/20 to-black/50 border border-amber-900/10 flex flex-col items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(197,168,128,0.1),transparent_70%)]" />
-                <img src="/packs/pack_bronze.png" alt="Bronze Pack" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(197,168,128,0.4)]" />
+                <img src="/packs/pack_bronze.webp" alt="Bronze Pack" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(197,168,128,0.4)]" />
                 <span className="font-display font-black text-sm text-amber-500 mt-2 tracking-widest uppercase">BRONZE PACK</span>
               </div>
               
@@ -163,7 +163,7 @@ export const GachaStoreView: React.FC = () => {
                 onClick={buyBronzePack}
                 className="w-full bg-[#c5a880] hover:bg-[#ebd09b] text-black font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow flex items-center justify-center gap-2 text-xs"
               >
-                <img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> BUY FOR 300 <img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
+                <img src="/icons/icon_gold.webp" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> BUY FOR 300 <img src="/icons/icon_gold.webp" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
               </button>
             </div>
           </div>
@@ -173,7 +173,7 @@ export const GachaStoreView: React.FC = () => {
             <div className="space-y-4">
               <div className="h-44 rounded-xl bg-gradient-to-b from-indigo-950/20 to-black/50 border border-indigo-900/10 flex flex-col items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(102,252,241,0.15),transparent_70%)]" />
-                <img src="/packs/pack_obsidian.png" alt="Obsidian Pack" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(102,252,241,0.4)]" />
+                <img src="/packs/pack_obsidian.webp" alt="Obsidian Pack" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(102,252,241,0.4)]" />
                 <span className="font-display font-black text-sm text-[#66fcf1] mt-2 tracking-widest uppercase text-shadow-gold">OBSIDIAN PACK</span>
               </div>
               
@@ -195,7 +195,7 @@ export const GachaStoreView: React.FC = () => {
                 onClick={buyObsidianPack}
                 className="w-full bg-gradient-to-r from-indigo-900 to-[#1f2833] hover:from-[#45a29e] hover:to-indigo-900 text-[#66fcf1] border border-[#66fcf1]/30 font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow flex items-center justify-center gap-2 text-xs"
               >
-                <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> SUMMON FOR 30 <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
+                <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> SUMMON FOR 30 <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
               </button>
             </div>
           </div>
@@ -205,7 +205,7 @@ export const GachaStoreView: React.FC = () => {
             <div className="space-y-4">
               <div className="h-44 rounded-xl bg-gradient-to-b from-red-950/20 to-black/50 border border-red-900/10 flex flex-col items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(221,44,64,0.15),transparent_70%)]" />
-                <img src="/packs/pack_abyssal.png" alt="Abyssal Pack" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(221,44,64,0.4)]" />
+                <img src="/packs/pack_abyssal.webp" alt="Abyssal Pack" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(221,44,64,0.4)]" />
                 <span className="font-display font-black text-sm text-[#dd2c40] mt-2 tracking-widest uppercase text-shadow-crimson">ABYSSAL PACK</span>
               </div>
               
@@ -227,7 +227,7 @@ export const GachaStoreView: React.FC = () => {
                 onClick={buyAbyssalPack}
                 className="w-full bg-gradient-to-r from-[#880d1e] to-[#4e0707] hover:from-[#dd2c40] hover:to-[#880d1e] text-white border border-[#dd2c40]/30 font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow flex items-center justify-center gap-2 text-xs"
               >
-                <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> SUMMON FOR 70 <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
+                <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> SUMMON FOR 70 <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
               </button>
             </div>
           </div>
@@ -238,7 +238,7 @@ export const GachaStoreView: React.FC = () => {
           <div className="bg-[#151a21] border border-[#c5a880]/30 rounded-2xl p-5 flex flex-col justify-between hover:-translate-y-1 transition-all shadow-xl">
             <div className="space-y-4">
               <div className="h-44 rounded-xl bg-gradient-to-b from-[#4a3f35] to-black/50 border border-[#c5a880]/10 flex flex-col items-center justify-center relative overflow-hidden">
-                <img src="/packs/chest_basic.png" alt="Basic Relics" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(197,168,128,0.4)]" />
+                <img src="/packs/chest_basic.webp" alt="Basic Relics" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(197,168,128,0.4)]" />
                 <span className="font-display font-black text-sm text-[#ebd09b] mt-2 tracking-widest uppercase">BASIC RELICS</span>
               </div>
               <div className="space-y-2">
@@ -257,7 +257,7 @@ export const GachaStoreView: React.FC = () => {
                 onClick={buyBasicEquipmentPack}
                 className="w-full bg-[#1f2833] hover:bg-[#2b3746] text-[#ebd09b] border border-[#c5a880]/30 font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow flex items-center justify-center gap-2 text-xs"
               >
-                <img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> OPEN FOR 500 <img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
+                <img src="/icons/icon_gold.webp" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> OPEN FOR 500 <img src="/icons/icon_gold.webp" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
               </button>
             </div>
           </div>
@@ -267,7 +267,7 @@ export const GachaStoreView: React.FC = () => {
             <div className="space-y-4">
               <div className="h-44 rounded-xl bg-gradient-to-b from-indigo-950/20 to-black/50 border border-indigo-900/10 flex flex-col items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(102,252,241,0.15),transparent_70%)]" />
-                <img src="/packs/chest_rare.png" alt="Rare Relics" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(102,252,241,0.4)]" />
+                <img src="/packs/chest_rare.webp" alt="Rare Relics" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(102,252,241,0.4)]" />
                 <span className="font-display font-black text-sm text-[#66fcf1] mt-2 tracking-widest uppercase text-shadow-gold">RARE RELICS</span>
               </div>
               <div className="space-y-2">
@@ -287,7 +287,7 @@ export const GachaStoreView: React.FC = () => {
                 onClick={buyRareEquipmentPack}
                 className="w-full bg-gradient-to-r from-indigo-900 to-[#1f2833] hover:from-[#45a29e] hover:to-indigo-900 text-[#66fcf1] border border-[#66fcf1]/30 font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow flex items-center justify-center gap-2 text-xs"
               >
-                <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> OPEN FOR 30 <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
+                <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> OPEN FOR 30 <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
               </button>
             </div>
           </div>
@@ -297,7 +297,7 @@ export const GachaStoreView: React.FC = () => {
             <div className="space-y-4">
               <div className="h-44 rounded-xl bg-gradient-to-b from-red-950/40 to-black/50 border border-red-500/20 flex flex-col items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(221,44,64,0.15),transparent_70%)]" />
-                <img src="/packs/chest_premium.png" alt="Premium Relics" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(221,44,64,0.4)]" />
+                <img src="/packs/chest_premium.webp" alt="Premium Relics" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(221,44,64,0.4)]" />
                 <span className="font-display font-black text-sm text-[#dd2c40] mt-2 tracking-widest uppercase text-shadow-crimson">PREMIUM RELICS</span>
               </div>
               <div className="space-y-2">
@@ -317,7 +317,7 @@ export const GachaStoreView: React.FC = () => {
                 onClick={buyPremiumEquipmentPack}
                 className="w-full bg-gradient-to-r from-[#880d1e] to-[#4e0707] hover:from-[#dd2c40] hover:to-[#880d1e] text-white border border-[#dd2c40]/30 font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow flex items-center justify-center gap-2 text-xs"
               >
-                <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> OPEN FOR 70 <img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
+                <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> OPEN FOR 70 <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
               </button>
             </div>
           </div>

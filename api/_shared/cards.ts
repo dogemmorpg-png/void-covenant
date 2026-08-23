@@ -12,7 +12,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 2, description: 'Vampirism: heals self for 2 HP on attack.' }
     ],
-    image: '/cards/skeleton_warrior.png',
+    image: '/cards/skeleton_warrior.webp',
     color: 'slate',
     description: 'A common footsoldier of the death legions, risen by the covenant\'s call.'
   },
@@ -26,7 +26,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'plague', value: 1, description: 'Plague: deals 1 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/plague_rat.png',
+    image: '/cards/plague_rat.webp',
     color: 'emerald',
     description: 'A carrier of the plague pens, devouring the flesh of fallen heroes.'
   },
@@ -40,7 +40,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 2, description: 'Hex: increases enemy incoming damage by 2.' }
     ],
-    image: '/cards/cursed_witch.png',
+    image: '/cards/cursed_witch.webp',
     color: 'purple',
     description: 'A warlock weaving webs of corruption and casting void curses.'
   },
@@ -54,7 +54,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'sacrifice', value: 4, description: 'Sacrifice: destroys an ally, granting the hero +4 HP.' }
     ],
-    image: '/cards/dark_acolyte.png',
+    image: '/cards/dark_acolyte.webp',
     color: 'crimson',
     description: 'A fanatic willing to sacrifice another\'s soul for a dark blessing.'
   },
@@ -68,7 +68,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 1, description: 'Vampirism: heals self for 1 HP on attack.' }
     ],
-    image: '/cards/grave_ghoul.png',
+    image: '/cards/grave_ghoul.webp',
     color: 'slate',
     description: 'A feral undead beast that hungers for fresh corpses.'
   },
@@ -82,7 +82,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 1, description: 'Hex: increases enemy incoming damage by 1.' }
     ],
-    image: '/cards/bone_archer.png',
+    image: '/cards/bone_archer.webp',
     color: 'slate',
     description: 'Skeletal archers whose arrows are tipped with dark magic.'
   },
@@ -96,7 +96,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'plague', value: 1, description: 'Plague: deals 1 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/swamp_zombie.png',
+    image: '/cards/swamp_zombie.webp',
     color: 'emerald',
     description: 'Dripping with toxic sludge, it spreads disease just by being near.'
   },
@@ -110,7 +110,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'sacrifice', value: 2, description: 'Sacrifice: destroys an ally, granting the hero +2 HP.' }
     ],
-    image: '/cards/blood_imp.png',
+    image: '/cards/blood_imp.webp',
     color: 'crimson',
     description: 'A minor demon used as fodder for greater summoning rituals.'
   },
@@ -124,7 +124,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 2, description: 'Hex: increases enemy incoming damage by 2.' }
     ],
-    image: '/cards/shade.png',
+    image: '/cards/shade.webp',
     color: 'violet',
     description: 'A restless spirit that drains the warmth from the living.'
   },
@@ -138,7 +138,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 2, description: 'Vampirism: heals self for 2 HP on attack.' }
     ],
-    image: '/cards/carrion_crow.png',
+    image: '/cards/carrion_crow.webp',
     color: 'slate',
     description: 'A cursed bird that feasts on the eyes of the dying.'
   },
@@ -152,7 +152,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'plague', value: 2, description: 'Plague: deals 2 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/rot_hound.png',
+    image: '/cards/rot_hound.webp',
     color: 'emerald',
     description: 'An undead dog, its bite infects the victim with severe rot.'
   },
@@ -166,7 +166,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 1, description: 'Hex: increases enemy incoming damage by 1.' }
     ],
-    image: '/cards/goblin_thief.png',
+    image: '/cards/goblin_thief.webp',
     color: 'amber',
     description: 'A sneaky creature of the dark that steals life force.'
   },
@@ -180,7 +180,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'sacrifice', value: 5, description: 'Sacrifice: destroys an ally, granting the hero +5 HP.' }
     ],
-    image: '/cards/mud_golem.png',
+    image: '/cards/mud_golem.webp',
     color: 'amber',
     description: 'A slow, lumbering construct of cursed earth.'
   },
@@ -194,7 +194,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 3, description: 'Vampirism: heals self for 3 HP on attack.' }
     ],
-    image: '/cards/vampire_bat.png',
+    image: '/cards/vampire_bat.webp',
     color: 'crimson',
     description: 'A giant bat that drains the blood of the unwary.'
   },
@@ -208,7 +208,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 3, description: 'Hex: increases enemy incoming damage by 3.' }
     ],
-    image: '/cards/lost_soul.png',
+    image: '/cards/lost_soul.webp',
     color: 'cyan',
     description: 'Wandering spirits whose wails shatter the mind.'
   },
@@ -222,7 +222,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'sacrifice', value: 3, description: 'Sacrifice: destroys an ally, granting the hero +3 HP.' }
     ],
-    image: '/cards/cultist_brute.png',
+    image: '/cards/cultist_brute.webp',
     color: 'crimson',
     description: 'A heavily muscled zealot corrupted by dark magic.'
   },
@@ -236,7 +236,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'plague', value: 2, description: 'Plague: deals 2 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/spore_carrier.png',
+    image: '/cards/spore_carrier.webp',
     color: 'emerald',
     description: 'A walking fungal infection, bursting with toxic spores.'
   },
@@ -250,7 +250,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 1, description: 'Vampirism: heals self for 1 HP on attack.' }
     ],
-    image: '/cards/skeleton_guard.png',
+    image: '/cards/skeleton_guard.webp',
     color: 'slate',
     description: 'Armored skeletons holding the line for the covenant.'
   },
@@ -264,7 +264,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 2, description: 'Hex: increases enemy incoming damage by 2.' }
     ],
-    image: '/cards/shadow_wisp.png',
+    image: '/cards/shadow_wisp.webp',
     color: 'violet',
     description: 'A fleeting shadow that curses those it touches.'
   },
@@ -278,7 +278,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 2, description: 'Vampirism: heals self for 2 HP on attack.' }
     ],
-    image: '/cards/blood_thrall.png',
+    image: '/cards/blood_thrall.webp',
     color: 'crimson',
     description: 'A mind-controlled servant bound by blood magic.'
   },
@@ -293,7 +293,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'hex', value: 3, description: 'Hex: increases enemy incoming damage by 3.' },
       { type: 'vampirism', value: 3, description: 'Vampirism: heals self for 3 HP on attack.' }
     ],
-    image: '/cards/abyss_reaper.png',
+    image: '/cards/abyss_reaper.webp',
     color: 'violet',
     description: 'A merciless executioner of the Abyss, draining the life force of victims.'
   },
@@ -307,7 +307,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'plague', value: 2, description: 'Plague: deals 2 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/hell_rider.png',
+    image: '/cards/hell_rider.webp',
     color: 'amber',
     description: 'A death knight on a spectral steed, bringing doom and decay.'
   },
@@ -321,7 +321,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'plague', value: 3, description: 'Plague: deals 3 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/plague_doctor.png',
+    image: '/cards/plague_doctor.webp',
     color: 'emerald',
     description: 'Spreading virulent diseases instead of curing them.'
   },
@@ -335,7 +335,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 4, description: 'Vampirism: heals self for 4 HP on attack.' }
     ],
-    image: '/cards/vampire_knight.png',
+    image: '/cards/vampire_knight.webp',
     color: 'crimson',
     description: 'Aristocrats of blood who fight with elegant, deadly precision.'
   },
@@ -349,7 +349,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'sacrifice', value: 5, description: 'Sacrifice: destroys an ally, granting the hero +5 HP.' }
     ],
-    image: '/cards/bone_golem.png',
+    image: '/cards/bone_golem.webp',
     color: 'slate',
     description: 'A towering construct built from a thousand corpses.'
   },
@@ -363,7 +363,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 4, description: 'Hex: increases enemy incoming damage by 4.' }
     ],
-    image: '/cards/banshee.png',
+    image: '/cards/banshee.webp',
     color: 'cyan',
     description: 'Her scream curses the souls of those who hear it.'
   },
@@ -377,7 +377,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'plague', value: 2, description: 'Plague: deals 2 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/flesh_abomination.png',
+    image: '/cards/flesh_abomination.webp',
     color: 'emerald',
     description: 'A stitched horror leaking toxic fluids.'
   },
@@ -392,7 +392,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'vampirism', value: 2, description: 'Vampirism: heals self for 2 HP on attack.' },
       { type: 'sacrifice', value: 3, description: 'Sacrifice: destroys an ally, granting the hero +3 HP.' }
     ],
-    image: '/cards/dark_templar.png',
+    image: '/cards/dark_templar.webp',
     color: 'purple',
     description: 'Fallen knights who have sworn allegiance to the Void.'
   },
@@ -406,7 +406,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 2, description: 'Hex: increases enemy incoming damage by 2.' }
     ],
-    image: '/cards/phantom_assassin.png',
+    image: '/cards/phantom_assassin.webp',
     color: 'violet',
     description: 'A ghost that strikes from the shadows, bypassing armor.'
   },
@@ -420,7 +420,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'sacrifice', value: 8, description: 'Sacrifice: destroys an ally, granting the hero +8 HP.' }
     ],
-    image: '/cards/blood_priest.png',
+    image: '/cards/blood_priest.webp',
     color: 'crimson',
     description: 'Masters of blood magic who channel their allies\' life force.'
   },
@@ -434,7 +434,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'plague', value: 4, description: 'Plague: deals 4 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/toxic_slime.png',
+    image: '/cards/toxic_slime.webp',
     color: 'emerald',
     description: 'An acidic blob that dissolves anything it touches.'
   },
@@ -449,7 +449,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'vampirism', value: 2, description: 'Vampirism: heals self for 2 HP on attack.' },
       { type: 'hex', value: 2, description: 'Hex: increases enemy incoming damage by 2.' }
     ],
-    image: '/cards/gargoyle.png',
+    image: '/cards/gargoyle.webp',
     color: 'slate',
     description: 'A stone statue brought to life by dark rituals.'
   },
@@ -463,7 +463,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 5, description: 'Hex: increases enemy incoming damage by 5.' }
     ],
-    image: '/cards/void_walker.png',
+    image: '/cards/void_walker.webp',
     color: 'purple',
     description: 'An entity composed purely of void energy.'
   },
@@ -477,7 +477,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'sacrifice', value: 10, description: 'Sacrifice: destroys an ally, granting the hero +10 HP.' }
     ],
-    image: '/cards/necromantic_totem.png',
+    image: '/cards/necromantic_totem.webp',
     color: 'slate',
     description: 'An immobile pillar of bones that constantly fuels the hero.'
   },
@@ -491,7 +491,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 3, description: 'Vampirism: heals self for 3 HP on attack.' }
     ],
-    image: '/cards/dullahan.png',
+    image: '/cards/dullahan.webp',
     color: 'slate',
     description: 'A headless horseman seeking to harvest souls.'
   },
@@ -506,7 +506,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'plague', value: 3, description: 'Plague: deals 3 damage to random enemies at end of turn.' },
       { type: 'sacrifice', value: 6, description: 'Sacrifice: destroys an ally, granting the hero +6 HP.' }
     ],
-    image: '/cards/covenant_necromancer.png',
+    image: '/cards/covenant_necromancer.webp',
     color: 'cyan',
     description: 'Master of forbidden arts, controlling the boundary between life and death.'
   },
@@ -521,7 +521,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'vampirism', value: 5, description: 'Vampirism: heals self for 5 HP on attack.' },
       { type: 'hex', value: 4, description: 'Hex: increases enemy incoming damage by 4.' }
     ],
-    image: '/cards/fallen_angel.png',
+    image: '/cards/fallen_angel.webp',
     color: 'rose',
     description: 'A former guardian of the heavens, cast down for pride and sworn to the Covenant.'
   },
@@ -536,7 +536,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'hex', value: 6, description: 'Hex: increases enemy incoming damage by 6.' },
       { type: 'vampirism', value: 4, description: 'Vampirism: heals self for 4 HP on attack.' }
     ],
-    image: '/cards/lich_king.png',
+    image: '/cards/lich_king.webp',
     color: 'cyan',
     description: 'An undead monarch whose frozen heart commands the undead legions.'
   },
@@ -550,7 +550,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 7, description: 'Vampirism: heals self for 7 HP on attack.' }
     ],
-    image: '/cards/blood_queen.png',
+    image: '/cards/blood_queen.webp',
     color: 'crimson',
     description: 'The regal matriarch of the vampire clans, unquenchable in her thirst.'
   },
@@ -564,7 +564,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'plague', value: 5, description: 'Plague: deals 5 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/plague_behemoth.png',
+    image: '/cards/plague_behemoth.webp',
     color: 'emerald',
     description: 'A walking disaster that turns the land into a toxic wasteland.'
   },
@@ -579,7 +579,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'hex', value: 4, description: 'Hex: increases enemy incoming damage by 4.' },
       { type: 'sacrifice', value: 8, description: 'Sacrifice: destroys an ally, granting the hero +8 HP.' }
     ],
-    image: '/cards/soul_devourer.png',
+    image: '/cards/soul_devourer.webp',
     color: 'violet',
     description: 'A demon that eats the very essence of its enemies.'
   },
@@ -593,7 +593,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 5, description: 'Hex: increases enemy incoming damage by 5.' }
     ],
-    image: '/cards/abyssal_dragon.png',
+    image: '/cards/abyssal_dragon.webp',
     color: 'purple',
     description: 'A dragon corrupted by the void, breathing dark fire.'
   },
@@ -607,7 +607,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 4, description: 'Vampirism: heals self for 4 HP on attack.' }
     ],
-    image: '/cards/doom_bringer.png',
+    image: '/cards/doom_bringer.webp',
     color: 'amber',
     description: 'A herald of the apocalypse, striking with immense power.'
   },
@@ -622,7 +622,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'plague', value: 4, description: 'Plague: deals 4 damage to random enemies at end of turn.' },
       { type: 'hex', value: 3, description: 'Hex: increases enemy incoming damage by 3.' }
     ],
-    image: '/cards/spider_queen.png',
+    image: '/cards/spider_queen.webp',
     color: 'emerald',
     description: 'Mother of the brood, her venom causes agonizing death.'
   },
@@ -637,7 +637,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'vampirism', value: 4, description: 'Vampirism: heals self for 4 HP on attack.' },
       { type: 'hex', value: 2, description: 'Hex: increases enemy incoming damage by 2.' }
     ],
-    image: '/cards/death_knight_champion.png',
+    image: '/cards/death_knight_champion.webp',
     color: 'slate',
     description: 'The most elite of the death knights, unyielding in combat.'
   },
@@ -653,7 +653,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'plague', value: 4, description: 'Plague: deals 4 damage to random enemies at end of turn.' },
       { type: 'vampirism', value: 4, description: 'Vampirism: heals self for 4 HP on attack.' }
     ],
-    image: '/cards/void_overlord.png',
+    image: '/cards/void_overlord.webp',
     color: 'red',
     description: 'An ancient deity of the Abyss whose very presence poisons all living things.'
   },
@@ -668,7 +668,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'hex', value: 8, description: 'Hex: increases enemy incoming damage by 8.' },
       { type: 'sacrifice', value: 10, description: 'Sacrifice: destroys an ally, granting the hero +10 HP.' }
     ],
-    image: '/cards/belial_lord_of_lies.png',
+    image: '/cards/belial_lord_of_lies.webp',
     color: 'purple',
     description: 'A prime evil whose illusions shatter reality itself.'
   },
@@ -682,7 +682,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 10, description: 'Vampirism: heals self for 10 HP on attack.' }
     ],
-    image: '/cards/dracula_the_first.png',
+    image: '/cards/dracula_the_first.webp',
     color: 'crimson',
     description: 'The progenitor of all vampires. He cannot be stopped.'
   },
@@ -697,7 +697,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'plague', value: 8, description: 'Plague: deals 8 damage to random enemies at end of turn.' },
       { type: 'vampirism', value: 5, description: 'Vampirism: heals self for 5 HP on attack.' }
     ],
-    image: '/cards/pestilence_incarnate.png',
+    image: '/cards/pestilence_incarnate.webp',
     color: 'emerald',
     description: 'The living embodiment of disease and decay. It outlasts everything.'
   },
@@ -712,7 +712,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'hex', value: 5, description: 'Hex: increases enemy incoming damage by 5.' },
       { type: 'sacrifice', value: 15, description: 'Sacrifice: destroys an ally, granting the hero +15 HP.' }
     ],
-    image: '/cards/azrael_angel_of_death.png',
+    image: '/cards/azrael_angel_of_death.webp',
     color: 'slate',
     description: 'The final judge. His blade cuts through soul and flesh alike.'
   },
@@ -724,7 +724,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     health: 8,
     delay: 1,
     skills: [],
-    image: '/cards/grave_digger.png',
+    image: '/cards/grave_digger.webp',
     color: 'slate',
     description: 'A creepy mortal undertaker carrying a lantern and a dirt-caked shovel.'
   },
@@ -736,7 +736,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     health: 14,
     delay: 2,
     skills: [],
-    image: '/cards/spitfire_toad.png',
+    image: '/cards/spitfire_toad.webp',
     color: 'emerald',
     description: 'A bloated swamp toad covered in pustules, spitting toxic acid.'
   },
@@ -748,7 +748,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     health: 6,
     delay: 1,
     skills: [],
-    image: '/cards/possessed_cleaver.png',
+    image: '/cards/possessed_cleaver.webp',
     color: 'crimson',
     description: 'A floating, blood-stained iron executioner axe bound by spectral chains.'
   },
@@ -760,7 +760,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     health: 15,
     delay: 2,
     skills: [],
-    image: '/cards/petrified_basilisk.png',
+    image: '/cards/petrified_basilisk.webp',
     color: 'amber',
     description: 'A lizard-like beast half-turned to stone, possessing immense physical weight.'
   },
@@ -772,7 +772,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     health: 8,
     delay: 1,
     skills: [],
-    image: '/cards/gothic_harpy.png',
+    image: '/cards/gothic_harpy.webp',
     color: 'slate',
     description: 'A half-woman, half-bird monster with black feathers perched on a cathedral belfry.'
   },
@@ -784,7 +784,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     health: 10,
     delay: 1,
     skills: [],
-    image: '/cards/crypt_wisp.png',
+    image: '/cards/crypt_wisp.webp',
     color: 'cyan',
     description: 'A floating sphere of cold, blue graveyard fire that lights up ancient tombstones.'
   },
@@ -796,7 +796,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     health: 18,
     delay: 3,
     skills: [],
-    image: '/cards/chasm_worm.png',
+    image: '/cards/chasm_worm.webp',
     color: 'emerald',
     description: 'A giant subterranean worm with rings of teeth emerging from a rocky fissure.'
   },
@@ -808,7 +808,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     health: 20,
     delay: 2,
     skills: [],
-    image: '/cards/fallen_inquisitor.png',
+    image: '/cards/fallen_inquisitor.webp',
     color: 'violet',
     description: 'A sinister priest in an iron mask holding a cursed, burning scripture book.'
   },
@@ -820,7 +820,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     health: 24,
     delay: 3,
     skills: [],
-    image: '/cards/stitched_chimera.png',
+    image: '/cards/stitched_chimera.webp',
     color: 'crimson',
     description: 'A grotesque lion-goat-snake hybrid stitched from various crypt monsters.'
   },
@@ -832,7 +832,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     health: 22,
     delay: 2,
     skills: [],
-    image: '/cards/iron_maiden_golem.png',
+    image: '/cards/iron_maiden_golem.webp',
     color: 'slate',
     description: 'A living metal torture cage spiked with iron needles, walking on heavy iron gears.'
   },
@@ -844,7 +844,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     health: 18,
     delay: 2,
     skills: [],
-    image: '/cards/tomb_weaver.png',
+    image: '/cards/tomb_weaver.webp',
     color: 'amber',
     description: 'A giant arachnid that weaves sticky, dark webbing around stone sarcophagi.'
   },
@@ -856,7 +856,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     health: 35,
     delay: 3,
     skills: [],
-    image: '/cards/belfry_colossus.png',
+    image: '/cards/belfry_colossus.webp',
     color: 'slate',
     description: 'A massive stone giant carrying a giant heavy bronze cathedral bell on its back.'
   },
@@ -868,7 +868,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     health: 42,
     delay: 4,
     skills: [],
-    image: '/cards/abyssal_leviathan.png',
+    image: '/cards/abyssal_leviathan.webp',
     color: 'violet',
     description: 'A giant prehistoric void sea leviathan with glowing violet scales and tentacles.'
   },
@@ -880,7 +880,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     health: 34,
     delay: 2,
     skills: [],
-    image: '/cards/pharaoh_of_the_void.png',
+    image: '/cards/pharaoh_of_the_void.webp',
     color: 'amber',
     description: 'An ancient embalmed king in a gold funerary mask, wrapped in cursed void shrouds.'
   },
@@ -892,7 +892,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     health: 52,
     delay: 4,
     skills: [],
-    image: '/cards/the_faceless_lord.png',
+    image: '/cards/the_faceless_lord.webp',
     color: 'cyan',
     description: 'A tall humanoid in a grand gothic throne room, wearing a crown but having a hollow void face.'
   },
@@ -906,7 +906,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 2, description: 'Vampirism: heals self for 2 HP on attack.' }
     ],
-    image: '/cards/carrion_beetle.png',
+    image: '/cards/carrion_beetle.webp',
     color: 'emerald',
     description: 'A small flesh-eating beetle that nests inside rotting ribcages.'
   },
@@ -920,7 +920,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'sacrifice', value: 3, description: 'Sacrifice: destroys an ally, granting the hero +3 HP.' }
     ],
-    image: '/cards/covenant_initiate.png',
+    image: '/cards/covenant_initiate.webp',
     color: 'crimson',
     description: 'An aspiring dark acolyte willing to offer anything for forbidden secrets.'
   },
@@ -934,7 +934,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 1, description: 'Hex: increases enemy incoming damage by 1.' }
     ],
-    image: '/cards/ghostly_specter.png',
+    image: '/cards/ghostly_specter.webp',
     color: 'cyan',
     description: 'A shivering ghost that haunts dark corridors, chilling its victims to the bone.'
   },
@@ -948,7 +948,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'plague', value: 1, description: 'Plague: deals 1 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/sewage_rat.png',
+    image: '/cards/sewage_rat.webp',
     color: 'emerald',
     description: 'A vile sewer dweller carrying a highly contagious disease.'
   },
@@ -962,7 +962,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'plague', value: 1, description: 'Plague: deals 1 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/rotting_golem.png',
+    image: '/cards/rotting_golem.webp',
     color: 'slate',
     description: 'A clay golem stuffed with decaying flesh, leaking poisonous swamp gas.'
   },
@@ -976,7 +976,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 2, description: 'Hex: increases enemy incoming damage by 2.' }
     ],
-    image: '/cards/shadow_stalker.png',
+    image: '/cards/shadow_stalker.webp',
     color: 'purple',
     description: 'A hunter born of the void, stalking prey from the dark shadows.'
   },
@@ -990,7 +990,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 3, description: 'Vampirism: heals self for 3 HP on attack.' }
     ],
-    image: '/cards/blood_fiend.png',
+    image: '/cards/blood_fiend.webp',
     color: 'rose',
     description: 'A horrific demon constructed from pure coagulated blood.'
   },
@@ -1004,7 +1004,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'plague', value: 2, description: 'Plague: deals 2 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/plague_spreader.png',
+    image: '/cards/plague_spreader.webp',
     color: 'emerald',
     description: 'A fanatic tasked with spreading the plague across mortal lands.'
   },
@@ -1018,7 +1018,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'sacrifice', value: 6, description: 'Sacrifice: destroys an ally, granting the hero +6 HP.' }
     ],
-    image: '/cards/dark_summoner.png',
+    image: '/cards/dark_summoner.webp',
     color: 'crimson',
     description: 'Summons dark power by offering the blood of their servants.'
   },
@@ -1032,7 +1032,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 3, description: 'Hex: increases enemy incoming damage by 3.' }
     ],
-    image: '/cards/void_reaver.png',
+    image: '/cards/void_reaver.webp',
     color: 'violet',
     description: 'A merciless warrior of the dark void, tearing holes in reality.'
   },
@@ -1046,7 +1046,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 4, description: 'Vampirism: heals self for 4 HP on attack.' }
     ],
-    image: '/cards/abyssal_monstrosity.png',
+    image: '/cards/abyssal_monstrosity.webp',
     color: 'slate',
     description: 'A colossal beast from the bottomless deeps of the void.'
   },
@@ -1060,7 +1060,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'sacrifice', value: 8, description: 'Sacrifice: destroys an ally, granting the hero +8 HP.' }
     ],
-    image: '/cards/covenant_inquisitor.png',
+    image: '/cards/covenant_inquisitor.webp',
     color: 'crimson',
     description: 'A high-ranking inquisitor who enforces the dark laws through holy sacrifices.'
   },
@@ -1074,7 +1074,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'plague', value: 3, description: 'Plague: deals 3 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/plague_bringer.png',
+    image: '/cards/plague_bringer.webp',
     color: 'emerald',
     description: 'A herald of pestilence, carrying rotting spores wherever he walks.'
   },
@@ -1089,7 +1089,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'vampirism', value: 6, description: 'Vampirism: heals self for 6 HP on attack.' },
       { type: 'hex', value: 3, description: 'Hex: increases enemy incoming damage by 3.' }
     ],
-    image: '/cards/lilith_queen_of_vampires.png',
+    image: '/cards/lilith_queen_of_vampires.webp',
     color: 'rose',
     description: 'The mother of all vampires. Her gaze seduces, and her kiss drains the soul.'
   },
@@ -1104,7 +1104,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'plague', value: 5, description: 'Plague: deals 5 damage to random enemies at end of turn.' },
       { type: 'sacrifice', value: 10, description: 'Sacrifice: destroys an ally, granting the hero +10 HP.' }
     ],
-    image: '/cards/beelzebub_lord_of_flies.png',
+    image: '/cards/beelzebub_lord_of_flies.webp',
     color: 'emerald',
     description: 'The prince of demons. A swarm of flesh-eating flies follows his command.'
   },
@@ -1118,7 +1118,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 1, description: 'Vampirism: heals self for 1 HP on attack.' }
     ],
-    image: '/cards/crypt_bat.png',
+    image: '/cards/crypt_bat.webp',
     color: 'rose',
     description: 'A red-eyed bat feeding on the blood of intruders in ancient crypts.'
   },
@@ -1132,7 +1132,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 2, description: 'Vampirism: heals self for 2 HP on attack.' }
     ],
-    image: '/cards/graveyard_ghoul.png',
+    image: '/cards/graveyard_ghoul.webp',
     color: 'emerald',
     description: 'A feral ghoul that digs up fresh graves to feast on decaying remains.'
   },
@@ -1146,7 +1146,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'plague', value: 1, description: 'Plague: deals 1 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/plague_beetle.png',
+    image: '/cards/plague_beetle.webp',
     color: 'emerald',
     description: 'A chitinous beetle that spreads pestilence from the rotting swamps.'
   },
@@ -1160,7 +1160,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 1, description: 'Hex: increases enemy incoming damage by 1.' }
     ],
-    image: '/cards/spectral_stalker.png',
+    image: '/cards/spectral_stalker.webp',
     color: 'cyan',
     description: 'A fleeting ghostly assassin whose touch weakens the target\'s resolve.'
   },
@@ -1174,7 +1174,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'sacrifice', value: 4, description: 'Sacrifice: destroys an ally, granting the hero +4 HP.' }
     ],
-    image: '/cards/covenant_zealot.png',
+    image: '/cards/covenant_zealot.webp',
     color: 'crimson',
     description: 'Driven by absolute faith, he eagerly offers himself to the void.'
   },
@@ -1188,7 +1188,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 2, description: 'Hex: increases enemy incoming damage by 2.' }
     ],
-    image: '/cards/banshee_screamer.png',
+    image: '/cards/banshee_screamer.webp',
     color: 'purple',
     description: 'A tragic spirit whose piercing scream shatters the defense of any foe.'
   },
@@ -1202,7 +1202,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 3, description: 'Vampirism: heals self for 3 HP on attack.' }
     ],
-    image: '/cards/vampiric_mist.png',
+    image: '/cards/vampiric_mist.webp',
     color: 'rose',
     description: 'A sentient crimson cloud that drains blood through the pores of its victims.'
   },
@@ -1216,7 +1216,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'plague', value: 2, description: 'Plague: deals 2 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/plague_aberration.png',
+    image: '/cards/plague_aberration.webp',
     color: 'emerald',
     description: 'A grotesque blob of mutated tissue dripping with infectious slime.'
   },
@@ -1230,7 +1230,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'sacrifice', value: 7, description: 'Sacrifice: destroys an ally, granting the hero +7 HP.' }
     ],
-    image: '/cards/blood_cult_priest.png',
+    image: '/cards/blood_cult_priest.webp',
     color: 'crimson',
     description: 'He channels the life force of lesser souls to mend the wounds of his masters.'
   },
@@ -1244,7 +1244,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'hex', value: 3, description: 'Hex: increases enemy incoming damage by 3.' }
     ],
-    image: '/cards/void_tormenter.png',
+    image: '/cards/void_tormenter.webp',
     color: 'violet',
     description: 'A terrifying shadow lord that feeds on the pain and despair of mortals.'
   },
@@ -1258,7 +1258,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'vampirism', value: 5, description: 'Vampirism: heals self for 5 HP on attack.' }
     ],
-    image: '/cards/abyssal_devourer.png',
+    image: '/cards/abyssal_devourer.webp',
     color: 'slate',
     description: 'A bottomless gullet of teeth and void energy that absorbs life directly.'
   },
@@ -1272,7 +1272,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     skills: [
       { type: 'sacrifice', value: 9, description: 'Sacrifice: destroys an ally, granting the hero +9 HP.' }
     ],
-    image: '/cards/covenant_archon.png',
+    image: '/cards/covenant_archon.webp',
     color: 'crimson',
     description: 'A divine executioner who leads the covenant sacrifices under the solar eclipse.'
   },
@@ -1287,7 +1287,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'vampirism', value: 5, description: 'Vampirism: heals self for 5 HP on attack.' },
       { type: 'sacrifice', value: 8, description: 'Sacrifice: destroys an ally, granting the hero +8 HP.' }
     ],
-    image: '/cards/elizabeth_bathory.png',
+    image: '/cards/elizabeth_bathory.webp',
     color: 'rose',
     description: 'The blood countess. She bathes in the blood of her maidens to preserve her eternal youth.'
   },
@@ -1302,7 +1302,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { type: 'hex', value: 4, description: 'Hex: increases enemy incoming damage by 4.' },
       { type: 'plague', value: 4, description: 'Plague: deals 4 damage to random enemies at end of turn.' }
     ],
-    image: '/cards/mephistopheles.png',
+    image: '/cards/mephistopheles.webp',
     color: 'violet',
     description: 'A cunning archdevil who seals soul bargains in crimson ink.'
   }
@@ -1416,7 +1416,7 @@ export const generateCampaignStage = (floor: number): import('./types').Campaign
     shardsReward,
     enemyHeroName: isBoss ? 'Abyssal Overlord' : 'Abyss Dweller',
     enemyHeroHealth,
-    enemyHeroImage: isBoss ? '/mobs/overlord.png' : '/mobs/dweller.png',
+    enemyHeroImage: isBoss ? '/mobs/overlord.webp' : '/mobs/dweller.webp',
     enemyDeck,
     cardReward
   };

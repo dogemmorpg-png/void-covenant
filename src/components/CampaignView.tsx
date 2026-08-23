@@ -176,7 +176,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                   <div className="bg-gradient-to-b from-[#1b150d] via-[#100c07] to-[#070503] border border-amber-500/25 hover:border-amber-400/50 p-3.5 rounded-2xl text-center shadow-md transition-all duration-300 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)] hover:scale-[1.03] flex flex-col items-center justify-center min-h-[96px] group cursor-default">
                     <span className="text-amber-400 font-display font-bold text-lg block flex items-center gap-1.5 justify-center text-shadow-gold">
                       +{selectedStage.goldReward}
-                      <img src="/icons/icon_gold.png" alt="Gold" className="w-7 h-7 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.45)] group-hover:scale-110 transition-transform duration-300" />
+                      <img src="/icons/icon_gold.webp" alt="Gold" className="w-7 h-7 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.45)] group-hover:scale-110 transition-transform duration-300" />
                     </span>
                     <span className="text-[10px] text-amber-500/80 font-mono tracking-widest uppercase font-bold mt-2 group-hover:text-amber-400 transition-colors">Gold</span>
                   </div>
@@ -185,7 +185,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                   <div className="bg-gradient-to-b from-[#0b1a1f] via-[#050f12] to-[#020709] border border-cyan-500/25 hover:border-cyan-400/50 p-3.5 rounded-2xl text-center shadow-md transition-all duration-300 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] hover:scale-[1.03] flex flex-col items-center justify-center min-h-[96px] group cursor-default">
                     <span className="text-cyan-400 font-display font-bold text-lg block flex items-center gap-1.5 justify-center text-shadow-cyan">
                       +{selectedStage.dustReward}
-                      <img src="/icons/icon_dust.png" alt="Dust" className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(102,252,241,0.55)] group-hover:scale-110 transition-transform duration-300" />
+                      <img src="/icons/icon_dust.webp" alt="Dust" className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(102,252,241,0.55)] group-hover:scale-110 transition-transform duration-300" />
                     </span>
                     <span className="text-[10px] text-cyan-400/80 font-mono tracking-widest uppercase font-bold mt-2 group-hover:text-cyan-300 transition-colors">Dust</span>
                   </div>
@@ -195,7 +195,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                     <div className="bg-gradient-to-b from-[#1e0b0d] via-[#120507] to-[#090203] border border-red-500/25 hover:border-red-400/50 p-3.5 rounded-2xl text-center shadow-md transition-all duration-300 hover:shadow-[0_0_20px_rgba(239,68,68,0.15)] hover:scale-[1.03] flex flex-col items-center justify-center min-h-[96px] group cursor-default">
                       <span className="text-red-500 font-display font-bold text-lg block flex items-center gap-1.5 justify-center text-shadow-crimson">
                         +{selectedStage.shardsReward}
-                        <img src="/icons/icon_shards.png" alt="Shards" className="w-7 h-7 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.45)] group-hover:scale-110 transition-transform duration-300" />
+                        <img src="/icons/icon_shards.webp" alt="Shards" className="w-7 h-7 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.45)] group-hover:scale-110 transition-transform duration-300" />
                       </span>
                       <span className="text-[10px] text-red-500/80 font-mono tracking-widest uppercase font-bold mt-2 group-hover:text-red-450 transition-colors">Shards</span>
                     </div>
@@ -247,7 +247,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                   isBoss ? 'border-red-500/30' : 'border-[#ebd09b]/35'
                 }`}>
                   {selectedStage.energyCost}
-                  <img src="/icons/icon_energy.png" alt="Energy" className="w-7 h-7 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
+                  <img src="/icons/icon_energy.webp" alt="Energy" className="w-7 h-7 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
                 </span>
               </button>
               
@@ -260,7 +260,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                   <span className="mr-0.5">SWEEP</span>
                   <span className="flex items-center gap-1.5 bg-black/50 border border-purple-500/30 rounded-full px-3 py-1 font-mono text-lg font-bold text-emerald-400 shadow-inner">
                     {selectedStage.energyCost}
-                    <img src="/icons/icon_energy.png" alt="Energy" className="w-7 h-7 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
+                    <img src="/icons/icon_energy.webp" alt="Energy" className="w-7 h-7 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
                   </span>
                 </button>
               )}

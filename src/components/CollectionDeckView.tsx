@@ -700,7 +700,7 @@ export const CollectionDeckView: React.FC = () => {
                             <span className="text-emerald-400 font-bold">❤️ {c1.health} ➔ {nextHealth} (+15%)</span>
                           </li>
                           <li className="text-[10px] text-amber-300 border-t border-purple-950/50 pt-1.5 mt-1">
-                            <img src="/icons/icon_energy.png" alt="Energy" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> <span className="font-sans">Enhances the creature's base stats and skills!</span>
+                            <img src="/icons/icon_energy.webp" alt="Energy" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> <span className="font-sans">Enhances the creature's base stats and skills!</span>
                           </li>
                         </ul>
                       );
@@ -737,7 +737,7 @@ export const CollectionDeckView: React.FC = () => {
                             <span className="text-blue-400 font-bold">⏳ {nextDelay} turns (Reduced!)</span>
                           </li>
                           <li className="text-[10px] text-purple-300 border-t border-purple-950 pt-1.5 mt-1">
-                            <img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> <span className="font-sans">Unlocks new improved skills of tier {nextT}!</span>
+                            <img src="/icons/icon_dust.webp" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> <span className="font-sans">Unlocks new improved skills of tier {nextT}!</span>
                           </li>
                         </ul>
                       );
@@ -757,13 +757,13 @@ export const CollectionDeckView: React.FC = () => {
                       <div className="bg-black/45 border border-purple-950 p-2 rounded-lg">
                         <span className="text-[10px] text-gray-500 block font-mono">Gold Required</span>
                         <span className={`font-mono text-xs font-bold ${profile.gold >= goldCost ? 'text-amber-500' : 'text-red-500'}`}>
-                          {goldCost} / {profile.gold}<img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
+                          {goldCost} / {profile.gold}<img src="/icons/icon_gold.webp" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
                         </span>
                       </div>
                       <div className="bg-black/45 border border-purple-950 p-2 rounded-lg">
                         <span className="text-[10px] text-gray-500 block font-mono">Dust Required</span>
                         <span className={`font-mono text-xs font-bold ${profile.dust >= dustCost ? 'text-[#66fcf1]' : 'text-red-500'}`}>
-                          {dustCost} / {profile.dust}<img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
+                          {dustCost} / {profile.dust}<img src="/icons/icon_dust.webp" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
                         </span>
                       </div>
                     </div>
@@ -979,11 +979,11 @@ export const CollectionDeckView: React.FC = () => {
                 <div className="flex justify-center gap-6 mb-6 bg-black/40 py-3 rounded-xl border border-white/5">
                   <div className="flex items-center gap-2">
                     <span className="text-amber-500 font-bold font-mono">{goldCost}</span>
-                    <img src="/icons/icon_gold.png" alt="Gold" className="w-5 h-5 drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125" />
+                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125" />
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-[#66fcf1] font-bold font-mono">{dustCost}</span>
-                    <img src="/icons/icon_dust.png" alt="Dust" className="w-5 h-5 drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125" />
+                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-5 h-5 drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125" />
                   </div>
                 </div>
 

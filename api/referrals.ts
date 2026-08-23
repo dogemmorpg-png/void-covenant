@@ -88,7 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         wallet: r.referred_wallet,
         username: profileData.username || 'Anonymous',
         level: profileData.level || 1,
-        avatarUrl: profileData.avatarUrl || '/avatars/knight.png',
+        avatarUrl: profileData.avatarUrl || '/avatars/knight.webp',
         joinedAt: r.created_at
       };
     });

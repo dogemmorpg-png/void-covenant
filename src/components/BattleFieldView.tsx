@@ -1187,7 +1187,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                             <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-15">
                               <div className="flex flex-col items-center justify-center relative">
                                 <img 
-                                  src="/icons/gothic_hourglass.jpg" 
+                                  src="/icons/gothic_hourglass.webp" 
                                   alt="Locked" 
                                   className="w-10 h-10 object-contain rounded-full border border-purple-500/30 shadow-[0_0_12px_rgba(168,85,247,0.5)]" 
                                 />
@@ -1238,11 +1238,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                         {/* Gothic style corner badges (NO emojis) */}
                         <div className="absolute -bottom-3.5 -left-3.5 w-9 h-9 z-20 flex items-center justify-center">
-                          <img src="/icons/gothic_attack.jpg" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                          <img src="/icons/gothic_attack.webp" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
                           <span className="relative text-[#ff4500] text-[15px] font-black font-mono leading-none select-none z-10" style={{ WebkitTextStroke: '2px #000000', paintOrder: 'stroke fill' }}>{card.attack}</span>
                         </div>
                         <div className="absolute -bottom-3.5 -right-3.5 w-9 h-9 z-20 flex items-center justify-center">
-                          <img src="/icons/gothic_health.jpg" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                          <img src="/icons/gothic_health.webp" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
                           <span className="relative text-[#ffffff] text-[14px] font-black font-mono leading-none select-none z-10" style={{ WebkitTextStroke: '2.5px #000000', paintOrder: 'stroke fill' }}>{card.health}</span>
                         </div>
                       </motion.div>
@@ -1290,7 +1290,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           transition={{ duration: 0.85 }}
                           className="absolute inset-0 bg-black/45 border-2 border-emerald-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(16,185,129,0.7)] overflow-hidden"
                         >
-                          <img src="/icons/plague_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-80" />
+                          <img src="/icons/plague_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-80" />
                           <span className="relative text-[8.5px] font-mono font-black text-emerald-400 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-emerald-500/30 z-10 animate-pulse">PLAGUE INFECT</span>
                         </motion.div>
                       )}
@@ -1307,7 +1307,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           transition={{ duration: 0.85 }}
                           className="absolute inset-0 bg-black/45 border-2 border-cyan-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(6,182,212,0.7)] overflow-hidden"
                         >
-                          <img src="/icons/void_strike_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <img src="/icons/void_strike_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
                           <span className="relative text-[9px] font-mono font-black text-cyan-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-cyan-500/30 z-10 animate-pulse">VOID STRIKE</span>
                         </motion.div>
                       )}
@@ -1324,7 +1324,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           transition={{ duration: 0.85 }}
                           className="absolute inset-0 bg-black/45 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(239,68,68,0.7)] overflow-hidden"
                         >
-                          <img src="/icons/blood_aura_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <img src="/icons/blood_aura_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
                           <span className="relative text-[9px] font-mono font-black text-red-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-red-500/30 z-10 animate-pulse">BLOOD AURA</span>
                         </motion.div>
                       )}
@@ -1341,7 +1341,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           transition={{ duration: 0.85 }}
                           className="absolute inset-0 bg-black/45 border-2 border-amber-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(245,158,11,0.7)] overflow-hidden"
                         >
-                          <img src="/icons/warlord_cry_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <img src="/icons/warlord_cry_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
                           <span className="relative text-[9px] font-mono font-black text-amber-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-amber-500/30 z-10 animate-pulse">WARLORD CRY</span>
                         </motion.div>
                       )}
@@ -1362,7 +1362,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           transition={{ duration: 0.85 }}
                           className="absolute inset-0 bg-black/45 border-2 border-purple-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(168,85,247,0.7)] overflow-hidden"
                         >
-                          <img src="/icons/hex_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <img src="/icons/hex_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
                           <span className="relative text-[9px] font-mono font-black text-purple-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-purple-500/30 z-10 animate-pulse">HEX CURSED</span>
                         </motion.div>
                       )}
@@ -1435,7 +1435,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                             <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-15">
                               <div className="flex flex-col items-center justify-center relative">
                                 <img 
-                                  src="/icons/gothic_hourglass.jpg" 
+                                  src="/icons/gothic_hourglass.webp" 
                                   alt="Locked" 
                                   className="w-10 h-10 object-contain rounded-full border border-purple-500/30 shadow-[0_0_12px_rgba(168,85,247,0.5)]" 
                                 />
@@ -1486,11 +1486,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                         {/* Gothic style corner badges (NO emojis) */}
                         <div className="absolute -bottom-3.5 -left-3.5 w-9 h-9 z-20 flex items-center justify-center">
-                          <img src="/icons/gothic_attack.jpg" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                          <img src="/icons/gothic_attack.webp" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
                           <span className="relative text-[#ff4500] text-[15px] font-black font-mono leading-none select-none z-10" style={{ WebkitTextStroke: '2px #000000', paintOrder: 'stroke fill' }}>{card.attack}</span>
                         </div>
                         <div className="absolute -bottom-3.5 -right-3.5 w-9 h-9 z-20 flex items-center justify-center">
-                          <img src="/icons/gothic_health.jpg" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                          <img src="/icons/gothic_health.webp" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
                           <span className="relative text-[#ffffff] text-[14px] font-black font-mono leading-none select-none z-10" style={{ WebkitTextStroke: '2.5px #000000', paintOrder: 'stroke fill' }}>{card.health}</span>
                         </div>
                       </motion.div>
@@ -1547,7 +1547,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           transition={{ duration: 0.85 }}
                           className="absolute inset-0 bg-black/45 border-2 border-emerald-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(16,185,129,0.7)] overflow-hidden"
                         >
-                          <img src="/icons/plague_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-80" />
+                          <img src="/icons/plague_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-80" />
                           <span className="relative text-[8.5px] font-mono font-black text-emerald-400 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-emerald-500/30 z-10 animate-pulse">PLAGUE INFECT</span>
                         </motion.div>
                       )}
@@ -1563,7 +1563,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           transition={{ duration: 0.85 }}
                           className="absolute inset-0 bg-black/45 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(239,68,68,0.7)] overflow-hidden"
                         >
-                          <img src="/icons/sacrifice_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <img src="/icons/sacrifice_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
                           <span className="relative text-[8.5px] font-mono font-black text-red-500 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-red-500/30 z-10 animate-pulse">SACRIFICED</span>
                         </motion.div>
                       )}
@@ -1580,7 +1580,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           transition={{ duration: 0.85 }}
                           className="absolute inset-0 bg-black/45 border-2 border-cyan-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(6,182,212,0.7)] overflow-hidden"
                         >
-                          <img src="/icons/void_strike_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <img src="/icons/void_strike_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
                           <span className="relative text-[9px] font-mono font-black text-cyan-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-cyan-500/30 z-10 animate-pulse">VOID STRIKE</span>
                         </motion.div>
                       )}
@@ -1597,7 +1597,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           transition={{ duration: 0.85 }}
                           className="absolute inset-0 bg-black/45 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(239,68,68,0.7)] overflow-hidden"
                         >
-                          <img src="/icons/blood_aura_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <img src="/icons/blood_aura_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
                           <span className="relative text-[9px] font-mono font-black text-red-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-red-500/30 z-10 animate-pulse">BLOOD AURA</span>
                         </motion.div>
                       )}
@@ -1614,7 +1614,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           transition={{ duration: 0.85 }}
                           className="absolute inset-0 bg-black/45 border-2 border-amber-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(245,158,11,0.7)] overflow-hidden"
                         >
-                          <img src="/icons/warlord_cry_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <img src="/icons/warlord_cry_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
                           <span className="relative text-[9px] font-mono font-black text-amber-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-amber-500/30 z-10 animate-pulse">WARLORD CRY</span>
                         </motion.div>
                       )}
@@ -1635,7 +1635,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           transition={{ duration: 0.85 }}
                           className="absolute inset-0 bg-black/45 border-2 border-purple-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(168,85,247,0.7)] overflow-hidden"
                         >
-                          <img src="/icons/hex_fx.jpg" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+                          <img src="/icons/hex_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
                           <span className="relative text-[9px] font-mono font-black text-purple-300 tracking-widest uppercase leading-none bg-black/75 px-1.5 py-0.5 rounded border border-purple-500/30 z-10 animate-pulse">HEX CURSED</span>
                         </motion.div>
                       )}
@@ -1766,7 +1766,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-15">
                       <div className="flex flex-col items-center justify-center relative">
                         <img 
-                          src="/icons/gothic_hourglass.jpg" 
+                          src="/icons/gothic_hourglass.webp" 
                           alt="Locked" 
                           className="w-9 h-9 object-contain rounded-full border border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.5)]" 
                         />
@@ -1806,11 +1806,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                 {/* Gothic style corner badges (NO emojis) */}
                 <div className="absolute -bottom-3 -left-3 w-8 h-8 z-20 flex items-center justify-center">
-                  <img src="/icons/gothic_attack.jpg" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                  <img src="/icons/gothic_attack.webp" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
                   <span className="relative text-[#ff4500] text-[13.5px] font-black font-mono leading-none z-10" style={{ WebkitTextStroke: '1.8px #000000', paintOrder: 'stroke fill' }}>{hoveredCard.attack}</span>
                 </div>
                 <div className="absolute -bottom-3 -right-3 w-8 h-8 z-20 flex items-center justify-center">
-                  <img src="/icons/gothic_health.jpg" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                  <img src="/icons/gothic_health.webp" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
                   <span className="relative text-[#ffffff] text-[12.5px] font-black font-mono leading-none z-10" style={{ WebkitTextStroke: '2.2px #000000', paintOrder: 'stroke fill' }}>{hoveredCard.health}</span>
                 </div>
               </div>
@@ -1941,7 +1941,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-15">
                           <div className="flex flex-col items-center justify-center relative">
                             <img 
-                              src="/icons/gothic_hourglass.jpg" 
+                              src="/icons/gothic_hourglass.webp" 
                               alt="Locked" 
                               className="w-10 h-10 object-contain rounded-full border border-purple-500/30 shadow-[0_0_12px_rgba(168,85,247,0.5)] animate-pulse" 
                             />
@@ -1987,11 +1987,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                     {/* Gothic style corner badges (NO emojis) */}
                     <div className="absolute -bottom-3.5 -left-3.5 w-9 h-9 z-20 flex items-center justify-center">
-                      <img src="/icons/gothic_attack.jpg" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                      <img src="/icons/gothic_attack.webp" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
                       <span className="relative text-[#ff4500] text-[15px] font-black font-mono leading-none select-none z-10" style={{ WebkitTextStroke: '2px #000000', paintOrder: 'stroke fill' }}>{card.attack}</span>
                     </div>
                     <div className="absolute -bottom-3.5 -right-3.5 w-9 h-9 z-20 flex items-center justify-center">
-                      <img src="/icons/gothic_health.jpg" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                      <img src="/icons/gothic_health.webp" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
                       <span className="relative text-[#ffffff] text-[14px] font-black font-mono leading-none select-none z-10" style={{ WebkitTextStroke: '2.5px #000000', paintOrder: 'stroke fill' }}>{card.health}</span>
                     </div>
                   </>
@@ -2083,7 +2083,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 <div className="bg-gradient-to-b from-[#1b150d] via-[#100c07] to-[#070503] border border-amber-500/20 px-3 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[76px]">
                   <span className="text-amber-400 font-display font-bold text-sm flex items-center gap-1 text-shadow-gold">
                     +{stage.goldReward}
-                    <img src="/icons/icon_gold.png" alt="Gold" className="w-5 h-5 object-contain drop-shadow-[0_0_4px_rgba(245,158,11,0.4)]" />
+                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 object-contain drop-shadow-[0_0_4px_rgba(245,158,11,0.4)]" />
                   </span>
                   <span className="text-[9px] text-amber-500/70 font-mono uppercase tracking-wider mt-1.5">Gold</span>
                 </div>
@@ -2091,7 +2091,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 <div className="bg-gradient-to-b from-[#0b1a1f] via-[#050f12] to-[#020709] border border-cyan-500/20 px-3 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[76px]">
                   <span className="text-cyan-400 font-display font-bold text-sm flex items-center gap-1 text-shadow-cyan">
                     +{stage.dustReward}
-                    <img src="/icons/icon_dust.png" alt="Dust" className="w-5.5 h-5.5 object-contain drop-shadow-[0_0_6px_rgba(102,252,241,0.5)]" />
+                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-5.5 h-5.5 object-contain drop-shadow-[0_0_6px_rgba(102,252,241,0.5)]" />
                   </span>
                   <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider mt-1.5">Dust</span>
                 </div>
@@ -2120,7 +2120,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   <div className="bg-gradient-to-b from-[#1e0b0d] via-[#120507] to-[#090203] border border-red-500/20 px-3 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[76px]">
                     <span className="text-red-500 font-display font-bold text-sm flex items-center gap-1 text-shadow-crimson">
                       +{stage.shardsReward}
-                      <img src="/icons/icon_shards.png" alt="Shards" className="w-5 h-5 object-contain drop-shadow-[0_0_4px_rgba(239,68,68,0.4)]" />
+                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-5 h-5 object-contain drop-shadow-[0_0_4px_rgba(239,68,68,0.4)]" />
                     </span>
                     <span className="text-[9px] text-red-500/70 font-mono uppercase tracking-wider mt-1.5">Shards</span>
                   </div>
@@ -2176,7 +2176,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 <div className="bg-gradient-to-b from-[#1b150d] via-[#100c07] to-[#070503] border border-amber-500/20 px-4 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[84px]">
                   <span className="text-amber-500 font-display font-bold text-sm flex items-center gap-1 text-shadow-gold">
                     +20
-                    <img src="/icons/icon_gold.png" alt="Gold" className="w-5 h-5 object-contain drop-shadow-[0_0_4px_rgba(245,158,11,0.4)]" />
+                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 object-contain drop-shadow-[0_0_4px_rgba(245,158,11,0.4)]" />
                   </span>
                   <span className="text-[9px] text-amber-500/70 font-mono uppercase tracking-wider mt-1.5">Gold</span>
                 </div>
@@ -2243,7 +2243,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 </div>
 
                 <div>
-                  <h4 className="font-display font-bold text-sm text-[#ebd09b] mb-2 uppercase"><img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> Dark Creature Skills</h4>
+                  <h4 className="font-display font-bold text-sm text-[#ebd09b] mb-2 uppercase"><img src="/icons/icon_dust.webp" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> Dark Creature Skills</h4>
                   <div className="space-y-2 font-sans">
                     <div className="p-2.5 rounded-lg bg-red-950/30 border border-red-900/35">
                       <span className="font-bold text-red-400 flex items-center gap-1.5">{renderSkillIcon("sacrifice", "w-5 h-5")} Sacrifice [X]:</span>

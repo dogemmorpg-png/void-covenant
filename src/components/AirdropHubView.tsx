@@ -345,7 +345,7 @@ export const AirdropHubView: React.FC = () => {
       {/* Intro Header */}
       <div className="text-center space-y-2">
         <h2 className="font-display font-black text-2xl text-white tracking-widest text-shadow-gold flex items-center justify-center gap-2">
-          <img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> WEB3 AIRDROP & TOKEN HUB
+          <img src="/icons/icon_gold.webp" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> WEB3 AIRDROP & TOKEN HUB
         </h2>
         <p className="text-xs text-gray-400 font-sans max-w-lg mx-auto">
           Official covenant token distribution portal — <span className="text-[#66fcf1] font-mono font-bold">$VOID</span> on Solana.
@@ -450,7 +450,7 @@ export const AirdropHubView: React.FC = () => {
                           )}
                         </div>
                         <span className="text-[10px] text-gray-400 block mt-0.5 flex items-center">
-                          +{pkg.shardsReward} Dark Shards <img src="/icons/icon_shards.png" alt="Shards" className="w-3.5 h-3.5 inline ml-1" />
+                          +{pkg.shardsReward} Dark Shards <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 inline ml-1" />
                           {pkg.dustBonus > 0 && <span className="text-cyan-400 ml-1.5">+{pkg.dustBonus} Dust</span>}
                         </span>
                       </div>

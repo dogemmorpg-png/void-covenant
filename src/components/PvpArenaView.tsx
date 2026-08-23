@@ -281,7 +281,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
                 
                 <div className="bg-[#0b0c10] border border-cyan-950/50 p-4 rounded-xl flex items-center gap-4 shadow-inner">
                   <div className="w-10 h-10 rounded-full bg-cyan-950/40 border border-cyan-500/35 flex items-center justify-center">
-                    <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shadow-[0_0_8px_rgba(16,185,129,0.4)]"><img src="/icons/icon_energy.png" alt="Energy" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /></div>
+                    <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shadow-[0_0_8px_rgba(16,185,129,0.4)]"><img src="/icons/icon_energy.webp" alt="Energy" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /></div>
                   </div>
                   <div>
                     <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest block font-bold">PvP Energy</span>
@@ -324,10 +324,10 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
                 <span className="text-[10px] font-mono text-gray-500 tracking-widest uppercase font-bold block">EXPECTED VICTORY REWARDS</span>
                 <div className="flex flex-wrap gap-4 font-mono text-xs">
                   <div className="bg-black/60 px-3 py-1.5 rounded-lg border border-yellow-950/50">
-                    <span className="text-yellow-500 font-bold">+{300 + Math.floor(profile.pvpRating / 4)}<img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /></span> <span className="text-gray-500 text-[10px]">Gold</span>
+                    <span className="text-yellow-500 font-bold">+{300 + Math.floor(profile.pvpRating / 4)}<img src="/icons/icon_gold.webp" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /></span> <span className="text-gray-500 text-[10px]">Gold</span>
                   </div>
                   <div className="bg-black/60 px-3 py-1.5 rounded-lg border border-cyan-950/50">
-                    <span className="text-cyan-400 font-bold">+{30 + Math.floor(profile.pvpRating / 20)}<img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /></span> <span className="text-gray-500 text-[10px]">Dark Dust</span>
+                    <span className="text-cyan-400 font-bold">+{30 + Math.floor(profile.pvpRating / 20)}<img src="/icons/icon_dust.webp" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /></span> <span className="text-gray-500 text-[10px]">Dark Dust</span>
                   </div>
                 </div>
               </div>

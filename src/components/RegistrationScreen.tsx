@@ -7,10 +7,10 @@ interface RegistrationScreenProps {
 }
 
 const AVATARS = [
-  { id: 'knight', name: 'Death Knight', url: '/avatars/knight.png' },
-  { id: 'lich', name: 'Ancient Lich', url: '/avatars/lich.png' },
-  { id: 'vampire', name: 'Blood Mage', url: '/avatars/vampire.png' },
-  { id: 'rogue', name: 'Shadow Rogue', url: '/avatars/rogue.png' }
+  { id: 'knight', name: 'Death Knight', url: '/avatars/knight.webp' },
+  { id: 'lich', name: 'Ancient Lich', url: '/avatars/lich.webp' },
+  { id: 'vampire', name: 'Blood Mage', url: '/avatars/vampire.webp' },
+  { id: 'rogue', name: 'Shadow Rogue', url: '/avatars/rogue.webp' }
 ];
 
 export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegister }) => {

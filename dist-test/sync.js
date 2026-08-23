@@ -23229,7 +23229,7 @@ var StorageFileApi = class extends BaseApiClient {
   * Uploads a file to an existing bucket or replaces an existing file at the specified path with a new one.
   *
   * @param method HTTP method.
-  * @param path The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+  * @param path The relative file path. Should be of the format `folder/subfolder/filename.webp`. The bucket must already exist before attempting to upload.
   * @param fileBody The body of the file to be stored in the bucket.
   */
   async uploadOrUpdate(method, path, fileBody, fileOptions) {
@@ -23271,7 +23271,7 @@ var StorageFileApi = class extends BaseApiClient {
   *
   * @category Storage
   * @subcategory File Buckets
-  * @param path The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+  * @param path The file path, including the file name. Should be of the format `folder/subfolder/filename.webp`. The bucket must already exist before attempting to upload.
   * @param fileBody The body of the file to be stored in the bucket.
   * @param fileOptions Optional file upload options including cacheControl, contentType, upsert, and metadata.
   * @returns Promise with response containing file path, id, and fullPath or error
@@ -23282,7 +23282,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .upload('public/avatar1.png', avatarFile, {
+  *   .upload('public/avatar1.webp', avatarFile, {
   *     cacheControl: '3600',
   *     upsert: false
   *   })
@@ -23292,8 +23292,8 @@ var StorageFileApi = class extends BaseApiClient {
   * ```json
   * {
   *   "data": {
-  *     "path": "public/avatar1.png",
-  *     "fullPath": "avatars/public/avatar1.png"
+  *     "path": "public/avatar1.webp",
+  *     "fullPath": "avatars/public/avatar1.webp"
   *   },
   *   "error": null
   * }
@@ -23306,7 +23306,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .upload('public/avatar1.png', decode('base64FileData'), {
+  *   .upload('public/avatar1.webp', decode('base64FileData'), {
   *     contentType: 'image/png'
   *   })
   * ```
@@ -23316,7 +23316,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .upload('public/avatar1.png', avatarFile)
+  *   .upload('public/avatar1.webp', avatarFile)
   *
   * if (error) {
   *   // Log the full error so fields like `statusCode` and `error` (the
@@ -23341,7 +23341,7 @@ var StorageFileApi = class extends BaseApiClient {
   *
   * @category Storage
   * @subcategory File Buckets
-  * @param path The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+  * @param path The file path, including the file name. Should be of the format `folder/subfolder/filename.webp`. The bucket must already exist before attempting to upload.
   * @param token The token generated from `createSignedUploadUrl`
   * @param fileBody The body of the file to be stored in the bucket.
   * @param fileOptions HTTP headers (cacheControl, contentType, etc.).
@@ -23354,15 +23354,15 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .uploadToSignedUrl('folder/cat.jpg', 'token-from-createSignedUploadUrl', file)
+  *   .uploadToSignedUrl('folder/cat.webp', 'token-from-createSignedUploadUrl', file)
   * ```
   *
   * Response:
   * ```json
   * {
   *   "data": {
-  *     "path": "folder/cat.jpg",
-  *     "fullPath": "avatars/folder/cat.jpg"
+  *     "path": "folder/cat.webp",
+  *     "fullPath": "avatars/folder/cat.webp"
   *   },
   *   "error": null
   * }
@@ -23415,7 +23415,7 @@ var StorageFileApi = class extends BaseApiClient {
   *
   * @category Storage
   * @subcategory File Buckets
-  * @param path The file path, including the current file name. For example `folder/image.png`.
+  * @param path The file path, including the current file name. For example `folder/image.webp`.
   * @param options.upsert If set to true, allows the file to be overwritten if it already exists.
   * @returns Promise with response containing signed upload URL, token, and path or error
   *
@@ -23424,15 +23424,15 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .createSignedUploadUrl('folder/cat.jpg')
+  *   .createSignedUploadUrl('folder/cat.webp')
   * ```
   *
   * Response:
   * ```json
   * {
   *   "data": {
-  *     "signedUrl": "https://example.supabase.co/storage/v1/object/upload/sign/avatars/folder/cat.jpg?token=<TOKEN>",
-  *     "path": "folder/cat.jpg",
+  *     "signedUrl": "https://example.supabase.co/storage/v1/object/upload/sign/avatars/folder/cat.webp?token=<TOKEN>",
+  *     "path": "folder/cat.webp",
   *     "token": "<TOKEN>"
   *   },
   *   "error": null
@@ -23467,7 +23467,7 @@ var StorageFileApi = class extends BaseApiClient {
   *
   * @category Storage
   * @subcategory File Buckets
-  * @param path The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to update.
+  * @param path The relative file path. Should be of the format `folder/subfolder/filename.webp`. The bucket must already exist before attempting to update.
   * @param fileBody The body of the file to be stored in the bucket.
   * @param fileOptions Optional file upload options including cacheControl, contentType, and metadata.
   * **Note:** The `upsert` option has no effect here. `update()` always replaces the
@@ -23481,7 +23481,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .update('public/avatar1.png', avatarFile, {
+  *   .update('public/avatar1.webp', avatarFile, {
   *     cacheControl: '3600'
   *   })
   * ```
@@ -23490,8 +23490,8 @@ var StorageFileApi = class extends BaseApiClient {
   * ```json
   * {
   *   "data": {
-  *     "path": "public/avatar1.png",
-  *     "fullPath": "avatars/public/avatar1.png"
+  *     "path": "public/avatar1.webp",
+  *     "fullPath": "avatars/public/avatar1.webp"
   *   },
   *   "error": null
   * }
@@ -23504,7 +23504,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .update('public/avatar1.png', decode('base64FileData'), {
+  *   .update('public/avatar1.webp', decode('base64FileData'), {
   *     contentType: 'image/png'
   *   })
   * ```
@@ -23525,8 +23525,8 @@ var StorageFileApi = class extends BaseApiClient {
   *
   * @category Storage
   * @subcategory File Buckets
-  * @param fromPath The original file path, including the current file name. For example `folder/image.png`.
-  * @param toPath The new file path, including the new file name. For example `folder/image-new.png`.
+  * @param fromPath The original file path, including the current file name. For example `folder/image.webp`.
+  * @param toPath The new file path, including the new file name. For example `folder/image-new.webp`.
   * @param options The destination options.
   * @returns Promise with response containing success message or error
   *
@@ -23535,7 +23535,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .move('public/avatar1.png', 'private/avatar2.png')
+  *   .move('public/avatar1.webp', 'private/avatar2.webp')
   * ```
   *
   * Response:
@@ -23570,8 +23570,8 @@ var StorageFileApi = class extends BaseApiClient {
   *
   * @category Storage
   * @subcategory File Buckets
-  * @param fromPath The original file path, including the current file name. For example `folder/image.png`.
-  * @param toPath The new file path, including the new file name. For example `folder/image-copy.png`.
+  * @param fromPath The original file path, including the current file name. For example `folder/image.webp`.
+  * @param toPath The new file path, including the new file name. For example `folder/image-copy.webp`.
   * @param options The destination options.
   * @returns Promise with response containing copied file path or error
   *
@@ -23580,14 +23580,14 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .copy('public/avatar1.png', 'private/avatar2.png')
+  *   .copy('public/avatar1.webp', 'private/avatar2.webp')
   * ```
   *
   * Response:
   * ```json
   * {
   *   "data": {
-  *     "path": "avatars/private/avatar2.png"
+  *     "path": "avatars/private/avatar2.webp"
   *   },
   *   "error": null
   * }
@@ -23615,7 +23615,7 @@ var StorageFileApi = class extends BaseApiClient {
   *
   * @category Storage
   * @subcategory File Buckets
-  * @param path The file path, including the current file name. For example `folder/image.png`.
+  * @param path The file path, including the current file name. For example `folder/image.webp`.
   * @param expiresIn The number of seconds until the signed URL expires. For example, `60` for a URL which is valid for one minute.
   * @param options.download triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
   * @param options.transform Transform the asset before serving it to the client.
@@ -23627,14 +23627,14 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .createSignedUrl('folder/avatar1.png', 60)
+  *   .createSignedUrl('folder/avatar1.webp', 60)
   * ```
   *
   * Response:
   * ```json
   * {
   *   "data": {
-  *     "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
+  *     "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.webp?token=<TOKEN>"
   *   },
   *   "error": null
   * }
@@ -23645,7 +23645,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .createSignedUrl('folder/avatar1.png', 60, {
+  *   .createSignedUrl('folder/avatar1.webp', 60, {
   *     transform: {
   *       width: 100,
   *       height: 100,
@@ -23658,7 +23658,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .createSignedUrl('folder/avatar1.png', 60, {
+  *   .createSignedUrl('folder/avatar1.webp', 60, {
   *     download: true,
   *   })
   * ```
@@ -23687,7 +23687,7 @@ var StorageFileApi = class extends BaseApiClient {
   *
   * @category Storage
   * @subcategory File Buckets
-  * @param paths The file paths to be downloaded, including the current file names. For example `['folder/image.png', 'folder2/image2.png']`.
+  * @param paths The file paths to be downloaded, including the current file names. For example `['folder/image.webp', 'folder2/image2.webp']`.
   * @param expiresIn The number of seconds until the signed URLs expire. For example, `60` for URLs which are valid for one minute.
   * @param options.download triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
   * @param options.cacheNonce Append a cache nonce parameter to the URL to invalidate the cache.
@@ -23698,7 +23698,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60)
+  *   .createSignedUrls(['folder/avatar1.webp', 'folder/avatar2.webp'], 60)
   * ```
   *
   * Response:
@@ -23707,15 +23707,15 @@ var StorageFileApi = class extends BaseApiClient {
   *   "data": [
   *     {
   *       "error": null,
-  *       "path": "folder/avatar1.png",
-  *       "signedURL": "/object/sign/avatars/folder/avatar1.png?token=<TOKEN>",
-  *       "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
+  *       "path": "folder/avatar1.webp",
+  *       "signedURL": "/object/sign/avatars/folder/avatar1.webp?token=<TOKEN>",
+  *       "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.webp?token=<TOKEN>"
   *     },
   *     {
   *       "error": null,
-  *       "path": "folder/avatar2.png",
-  *       "signedURL": "/object/sign/avatars/folder/avatar2.png?token=<TOKEN>",
-  *       "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar2.png?token=<TOKEN>"
+  *       "path": "folder/avatar2.webp",
+  *       "signedURL": "/object/sign/avatars/folder/avatar2.webp?token=<TOKEN>",
+  *       "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar2.webp?token=<TOKEN>"
   *     }
   *   ],
   *   "error": null
@@ -23747,7 +23747,7 @@ var StorageFileApi = class extends BaseApiClient {
   *
   * @category Storage
   * @subcategory File Buckets
-  * @param path The full path and file name of the file to be downloaded. For example `folder/image.png`.
+  * @param path The full path and file name of the file to be downloaded. For example `folder/image.webp`.
   * @param options.transform Transform the asset before serving it to the client.
   * @param options.cacheNonce Append a cache nonce parameter to the URL to invalidate the cache.
   * @param parameters Additional fetch parameters like signal for cancellation. Supports standard fetch options including cache control.
@@ -23758,7 +23758,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .download('folder/avatar1.png')
+  *   .download('folder/avatar1.webp')
   * ```
   *
   * Response:
@@ -23774,7 +23774,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .download('folder/avatar1.png', {
+  *   .download('folder/avatar1.webp', {
   *     transform: {
   *       width: 100,
   *       height: 100,
@@ -23788,7 +23788,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .download('folder/avatar1.png', {}, { cache: 'no-store' })
+  *   .download('folder/avatar1.webp', {}, { cache: 'no-store' })
   * ```
   *
   * @example Download with abort signal
@@ -23799,7 +23799,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .download('folder/avatar1.png', {}, { signal: controller.signal })
+  *   .download('folder/avatar1.webp', {}, { signal: controller.signal })
   * ```
   *
   * @remarks
@@ -23829,7 +23829,7 @@ var StorageFileApi = class extends BaseApiClient {
   *
   * @category Storage
   * @subcategory File Buckets
-  * @param path The file path, including the file name. For example `folder/image.png`.
+  * @param path The file path, including the file name. For example `folder/image.webp`.
   * @returns Promise with response containing file metadata or error
   *
   * @example Get file info
@@ -23837,7 +23837,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .info('folder/avatar1.png')
+  *   .info('folder/avatar1.webp')
   *
   * if (data) {
   *   console.log('Last modified:', data.lastModified)
@@ -23857,7 +23857,7 @@ var StorageFileApi = class extends BaseApiClient {
   *
   * @category Storage
   * @subcategory File Buckets
-  * @param path The file path, including the file name. For example `folder/image.png`.
+  * @param path The file path, including the file name. For example `folder/image.webp`.
   * @returns Promise with response containing boolean indicating file existence or error
   *
   * @example Check file existence
@@ -23865,7 +23865,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .exists('folder/avatar1.png')
+  *   .exists('folder/avatar1.webp')
   * ```
   */
   async exists(path) {
@@ -23896,7 +23896,7 @@ var StorageFileApi = class extends BaseApiClient {
   *
   * @category Storage
   * @subcategory File Buckets
-  * @param path The path and name of the file to generate the public URL for. For example `folder/image.png`.
+  * @param path The path and name of the file to generate the public URL for. For example `folder/image.webp`.
   * @param options.download Triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
   * @param options.transform Transform the asset before serving it to the client.
   * @param options.cacheNonce Append a cache nonce parameter to the URL to invalidate the cache.
@@ -23907,14 +23907,14 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data } = supabase
   *   .storage
   *   .from('public-bucket')
-  *   .getPublicUrl('folder/avatar1.png')
+  *   .getPublicUrl('folder/avatar1.webp')
   * ```
   *
   * Response:
   * ```json
   * {
   *   "data": {
-  *     "publicUrl": "https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png"
+  *     "publicUrl": "https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.webp"
   *   }
   * }
   * ```
@@ -23924,7 +23924,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data } = supabase
   *   .storage
   *   .from('public-bucket')
-  *   .getPublicUrl('folder/avatar1.png', {
+  *   .getPublicUrl('folder/avatar1.webp', {
   *     transform: {
   *       width: 100,
   *       height: 100,
@@ -23937,7 +23937,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data } = supabase
   *   .storage
   *   .from('public-bucket')
-  *   .getPublicUrl('folder/avatar1.png', {
+  *   .getPublicUrl('folder/avatar1.webp', {
   *     download: true,
   *   })
   * ```
@@ -23967,7 +23967,7 @@ var StorageFileApi = class extends BaseApiClient {
   *
   * @category Storage
   * @subcategory File Buckets
-  * @param paths An array of files to delete, including the path and file name. For example [`'folder/image.png'`].
+  * @param paths An array of files to delete, including the path and file name. For example [`'folder/image.webp'`].
   * @returns Promise with response containing array of deleted file objects or error
   *
   * @example Delete file
@@ -23975,7 +23975,7 @@ var StorageFileApi = class extends BaseApiClient {
   * const { data, error } = await supabase
   *   .storage
   *   .from('avatars')
-  *   .remove(['folder/avatar1.png'])
+  *   .remove(['folder/avatar1.webp'])
   * ```
   *
   * Response:
@@ -24050,7 +24050,7 @@ var StorageFileApi = class extends BaseApiClient {
   * {
   *   "data": [
   *     {
-  *       "name": "avatar1.png",
+  *       "name": "avatar1.webp",
   *       "id": "e668cf7f-821b-4a2f-9dce-7dfa5dd1cfd2",
   *       "updated_at": "2024-05-22T23:06:05.580Z",
   *       "created_at": "2024-05-22T23:04:34.443Z",
@@ -26354,7 +26354,7 @@ async function handler(req, res) {
                 "description": "Vampirism: heals self for 2 HP on attack."
               }
             ],
-            "image": "/cards/skeleton_warrior.png",
+            "image": "/cards/skeleton_warrior.webp",
             "color": "slate",
             "xp": 0,
             "maxXp": 50
@@ -26376,7 +26376,7 @@ async function handler(req, res) {
                 "description": "Vampirism: heals self for 2 HP on attack."
               }
             ],
-            "image": "/cards/skeleton_warrior.png",
+            "image": "/cards/skeleton_warrior.webp",
             "color": "slate",
             "xp": 0,
             "maxXp": 50
@@ -26398,7 +26398,7 @@ async function handler(req, res) {
                 "description": "Plague: deals 1 damage to random enemies at end of turn."
               }
             ],
-            "image": "/cards/plague_rat.png",
+            "image": "/cards/plague_rat.webp",
             "color": "emerald",
             "xp": 0,
             "maxXp": 50
@@ -26420,7 +26420,7 @@ async function handler(req, res) {
                 "description": "Hex: increases enemy incoming damage by 2."
               }
             ],
-            "image": "/cards/cursed_witch.png",
+            "image": "/cards/cursed_witch.webp",
             "color": "purple",
             "xp": 0,
             "maxXp": 50
@@ -26442,7 +26442,7 @@ async function handler(req, res) {
                 "description": "Sacrifice: destroys an ally, granting the hero +4 HP."
               }
             ],
-            "image": "/cards/dark_acolyte.png",
+            "image": "/cards/dark_acolyte.webp",
             "color": "crimson",
             "xp": 0,
             "maxXp": 50
