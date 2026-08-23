@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { Coins, Database, Gem, Zap, LogOut, Volume2, VolumeX, Copy, X, Share2, Trophy, ExternalLink, User, Clock } from 'lucide-react';
+import { LogOut, Volume2, VolumeX, Copy, X, Share2, Trophy, User, Clock } from 'lucide-react';
 import { audioSystem } from '../utils/AudioSystem';
 
 export const HeaderHUD: React.FC = () => {
@@ -178,118 +178,155 @@ export const HeaderHUD: React.FC = () => {
 
       {/* Referrals & Invites Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
-          {/* Modal content */}
-          <div className="bg-[#151a21] border border-[#c5a880]/30 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl relative flex flex-col gothic-glow">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+          {/* Modal content with ornate gothic border */}
+          <div className="bg-gradient-to-b from-[#1a1f26] via-[#10141a] to-[#090b0e] border-2 border-[#ebd09b]/35 rounded-2xl w-full max-w-2xl overflow-hidden shadow-[0_0_50px_rgba(235,208,155,0.15)] relative flex flex-col">
             
+            {/* Corner Decorative Brackets */}
+            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#ebd09b]/60 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#ebd09b]/60 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#ebd09b]/60 pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#ebd09b]/60 pointer-events-none" />
+
             {/* Header */}
-            <div className="border-b border-[#c5a880]/15 p-4 flex justify-between items-center bg-black/30">
-              <h3 className="font-display font-black text-[#ebd09b] text-base tracking-widest flex items-center gap-2">
+            <div className="border-b border-[#ebd09b]/15 p-5 flex justify-between items-center bg-black/40">
+              <h3 className="font-display font-black text-[#ebd09b] text-base tracking-widest flex items-center gap-2.5 text-shadow-gold">
                 <Share2 className="w-5 h-5 text-[#ebd09b]" /> DARK BROTHERHOOD ORDER
               </h3>
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-white transition-colors p-1 rounded-full hover:bg-white/5 cursor-pointer"
+                className="text-gray-400 hover:text-[#ebd09b] transition-colors p-1.5 rounded-full hover:bg-[#ebd09b]/5 cursor-pointer border border-transparent hover:border-[#ebd09b]/25"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Body */}
-            <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+            <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
               
-              {/* Rewards info */}
-              <div className="bg-amber-600/5 border border-[#c5a880]/20 rounded-xl p-4 flex items-start gap-3">
-                <Trophy className="w-6 h-6 text-amber-500 shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <h4 className="font-display font-bold text-xs text-white uppercase tracking-wider">Recruitment Bounty</h4>
-                  <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                    Invite new summoners to join the Covenant. When they sign the pact:
-                  </p>
-                  <ul className="list-disc list-inside text-xs text-gray-400 space-y-1 font-sans mt-2">
-                    <li>You receive <span className="text-amber-400 font-bold">1,000 Gold</span> & <span className="text-cyan-400 font-bold">100 Dust</span></li>
-                    <li>They receive a starter bonus of <span className="text-amber-400 font-bold">200 Gold</span></li>
-                  </ul>
+              {/* Rewards info (Ancient Scroll theme) */}
+              <div className="bg-gradient-to-br from-[#1c1712] to-[#120f0c] border border-[#ebd09b]/20 rounded-xl p-5 shadow-inner relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-[url('/icons/icon_gold.png')] bg-contain bg-no-repeat opacity-5 pointer-events-none -mr-4 -mt-4" />
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-[#ebd09b]/10 border border-[#ebd09b]/30 flex items-center justify-center shrink-0 shadow-lg">
+                    <Trophy className="w-5 h-5 text-[#ebd09b]" />
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-display font-black text-xs text-[#ebd09b] uppercase tracking-widest">Recruitment Bounty</h4>
+                    <p className="text-xs text-gray-300 leading-relaxed font-sans">
+                      Expand the influence of the Dark Covenant by inviting fellow summoners. When they sign the pact using your link:
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 pt-3 border-t border-[#ebd09b]/10">
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 bg-[#ebd09b] rotate-45 shrink-0" />
+                        <span className="text-[11px] text-gray-300 font-sans">
+                          You get: <strong className="text-amber-400 font-mono">1,000 Gold</strong> & <strong className="text-[#66fcf1] font-mono">100 Dust</strong>
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 bg-[#ebd09b] rotate-45 shrink-0" />
+                        <span className="text-[11px] text-gray-300 font-sans">
+                          They get: <strong className="text-amber-400 font-mono">200 Gold</strong> starter bonus
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Referral Link Copy Section */}
-              <div className="space-y-2">
-                <label className="block text-xs font-mono font-bold text-gray-400 uppercase tracking-widest">
-                  Your Invitation Link
+              {/* Runic Separator */}
+              <div className="flex items-center justify-center my-4">
+                <div className="h-[1px] bg-gradient-to-r from-transparent via-[#ebd09b]/25 to-transparent w-full" />
+                <div className="w-1.5 h-1.5 rotate-45 border border-[#ebd09b] bg-black mx-3 shrink-0" />
+                <div className="h-[1px] bg-gradient-to-r from-transparent via-[#ebd09b]/25 to-transparent w-full" />
+              </div>
+
+              {/* Referral Link Copy Section (Dark Metal Plate theme) */}
+              <div className="space-y-2.5">
+                <label className="block text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest">
+                  Your Unique Invitation Link
                 </label>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <div className="bg-black/60 border border-gray-800 rounded-xl px-4 py-3 font-mono text-xs text-[#ebd09b] overflow-x-auto whitespace-nowrap grow select-all">
+                <div className="bg-black/85 border border-[#ebd09b]/15 rounded-xl p-1.5 flex flex-col sm:flex-row items-center gap-2 shadow-inner">
+                  <div className="px-3 py-2 font-mono text-xs text-[#ebd09b]/80 overflow-x-auto whitespace-nowrap grow select-all w-full text-center sm:text-left scrollbar-thin">
                     {`${window.location.origin}?ref=${profile.solanaAddress || ''}`}
                   </div>
                   <button
                     onClick={handleCopyLink}
-                    className="bg-[#ebd09b] hover:bg-[#c5a880] text-black font-display font-black px-6 py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0"
+                    className="w-full sm:w-auto bg-gradient-to-b from-[#ebd09b] to-[#c5a880] hover:from-[#f3ddb3] hover:to-[#ebd09b] text-black font-display font-black px-6 py-2.5 rounded-lg text-xs tracking-wider transition-all duration-200 flex items-center justify-center gap-1.5 shadow-md active:scale-95 cursor-pointer border-t border-white/20 uppercase"
                   >
-                    {copySuccess ? 'COPIED!' : (
+                    {copySuccess ? (
+                      'COPIED!'
+                    ) : (
                       <>
-                        <Copy className="w-4 h-4" /> COPY
+                        <Copy className="w-3.5 h-3.5" /> COPY LINK
                       </>
                     )}
                   </button>
                 </div>
               </div>
 
-              {/* Stats overview */}
+              {/* Stats overview (Artifact look) */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-black/40 border border-gray-800 rounded-xl p-3 text-center">
-                  <span className="block text-[10px] font-mono text-gray-500 uppercase tracking-wider">Total Recruits</span>
-                  <span className="text-xl font-display font-black text-amber-400">{profile.referralsCount || 0}</span>
+                <div className="bg-gradient-to-b from-[#0f1318] to-[#07090c] border border-gray-800/80 rounded-xl p-4 text-center relative group hover:border-[#ebd09b]/25 transition-all">
+                  <span className="block text-[9px] font-mono text-gray-500 uppercase tracking-widest">Allies Recruited</span>
+                  <span className="text-2xl font-display font-black text-amber-400 text-shadow-gold mt-1 block">
+                    {profile.referralsCount || 0}
+                  </span>
                 </div>
-                <div className="bg-black/40 border border-gray-800 rounded-xl p-3 text-center">
-                  <span className="block text-[10px] font-mono text-gray-500 uppercase tracking-wider">Active Bonuses</span>
-                  <span className="text-xl font-display font-black text-cyan-400">{(profile.referralsCount || 0) * 1000} Gold</span>
+                <div className="bg-gradient-to-b from-[#0f1318] to-[#07090c] border border-gray-800/80 rounded-xl p-4 text-center relative group hover:border-[#ebd09b]/25 transition-all">
+                  <span className="block text-[9px] font-mono text-gray-500 uppercase tracking-widest">Bounty Earned</span>
+                  <span className="text-2xl font-display font-black text-[#66fcf1] text-shadow-cyan mt-1 block">
+                    {((profile.referralsCount || 0) * 1000).toLocaleString()} <span className="text-[10px] text-gray-400">GOLD</span>
+                  </span>
                 </div>
               </div>
 
-              {/* Referrals table */}
-              <div className="space-y-3">
-                <h4 className="font-display font-bold text-xs text-white uppercase tracking-wider">Referred Allies List</h4>
+              {/* Referrals list (Immersive Card layout instead of generic table) */}
+              <div className="space-y-3.5">
+                <h4 className="font-display font-bold text-xs text-[#ebd09b] uppercase tracking-widest flex items-center gap-2">
+                  <User className="w-4 h-4 text-[#ebd09b]" /> Referred Allies List
+                </h4>
                 
                 {isLoadingReferrals ? (
-                  <div className="text-center py-6 text-xs text-gray-400 font-mono animate-pulse">
-                    Retrieving brotherhood records...
+                  <div className="text-center py-10 border border-gray-850 bg-black/10 rounded-xl">
+                    <div className="w-6 h-6 border-2 border-[#ebd09b] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                    <span className="text-xs text-gray-400 font-mono animate-pulse">Consulting the dark ledger...</span>
                   </div>
                 ) : referralsList.length === 0 ? (
-                  <div className="text-center py-8 border border-dashed border-gray-800 rounded-xl text-xs text-gray-500 font-sans">
-                    No allies have joined your cause yet. Share your invitation link to expand your influence!
+                  <div className="text-center py-10 border border-dashed border-[#ebd09b]/15 rounded-xl bg-black/10 text-xs text-gray-500 font-sans px-4 leading-relaxed">
+                    No summoners have pledged their allegiance yet. <br />
+                    Share your invitation link to recruit brothers into the Order.
                   </div>
                 ) : (
-                  <div className="border border-gray-800 rounded-xl overflow-hidden bg-black/20">
-                    <table className="w-full border-collapse font-sans text-xs">
-                      <thead>
-                        <tr className="bg-black/50 text-gray-400 border-b border-gray-800 font-mono text-[10px] uppercase tracking-wider">
-                          <th className="px-4 py-2.5 text-left font-bold">Summoner</th>
-                          <th className="px-4 py-2.5 text-center font-bold">Level</th>
-                          <th className="px-4 py-2.5 text-right font-bold">Joined At</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-800/50">
-                        {referralsList.map((ref, idx) => (
-                          <tr key={idx} className="hover:bg-white/5 transition-colors">
-                            <td className="px-4 py-3 flex items-center gap-2">
-                              <div className="w-5 h-5 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
-                                <User className="w-3 h-3 text-amber-400" />
-                              </div>
-                              <span className="font-bold text-gray-200">{ref.username}</span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono font-bold px-2 py-0.5 rounded-full">
-                                LVL {ref.level}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-right text-gray-400 font-mono text-[10px]">
-                              {new Date(ref.joinedAt).toLocaleDateString()}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <div className="space-y-2.5 max-h-[220px] overflow-y-auto pr-1 custom-scrollbar">
+                    {referralsList.map((ref, idx) => (
+                      <div 
+                        key={idx} 
+                        className="bg-gradient-to-r from-[#14181f] to-[#0d1014] border border-gray-850/80 hover:border-[#ebd09b]/25 rounded-xl p-3.5 flex items-center justify-between transition-all duration-200"
+                      >
+                        {/* Summoner Name & Join Date */}
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-b from-[#ebd09b]/20 to-black border border-[#ebd09b]/30 flex items-center justify-center shadow-inner">
+                            <User className="w-3.5 h-3.5 text-[#ebd09b]" />
+                          </div>
+                          <div>
+                            <span className="font-display font-black text-sm text-gray-200 block tracking-wide">
+                              {ref.username}
+                            </span>
+                            <span className="text-[9px] text-gray-500 font-mono flex items-center gap-1 mt-0.5">
+                              <Clock className="w-3 h-3" /> Joined {new Date(ref.joinedAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {/* Level Badge */}
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-[10px] font-black text-[#66fcf1] bg-[#66fcf1]/5 border border-[#66fcf1]/25 px-2.5 py-1 rounded-md tracking-wider uppercase">
+                            LVL {ref.level}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
