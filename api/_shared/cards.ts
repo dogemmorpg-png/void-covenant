@@ -1277,20 +1277,6 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     description: 'A divine executioner who leads the covenant sacrifices under the solar eclipse.'
   },
   {
-    baseId: 'plague_reaper',
-    name: 'Plague Reaper',
-    tier: 'gold',
-    attack: 6,
-    health: 28,
-    delay: 3,
-    skills: [
-      { type: 'plague', value: 4, description: 'Plague: deals 4 damage to random enemies at end of turn.' }
-    ],
-    image: '/cards/plague_reaper.png',
-    color: 'emerald',
-    description: 'A hooded specter with a scythe that spreads black death across fields.'
-  },
-  {
     baseId: 'elizabeth_bathory',
     name: 'Elizabeth Bathory',
     tier: 'legendary',
