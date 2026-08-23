@@ -193,31 +193,41 @@ export const CollectionDeckView: React.FC = () => {
     setFuseCardId2(null);
   };
 
-  // Select card 2 for fusion
-  const selectFuseCard2 = (cardId: string) => {
-    if (cardId === fuseCardId1) {
-      toast('You cannot fuse a card with itself!', 'warning');
-      return;
+  // Handle card clicks when Fusion Altar mode is active
+  const handleCardClickInFusion = (cardId: string) => {
+    if (!fuseCardId1) {
+      const card = profile.collection.find(c => c.id === cardId);
+      if (card && card.level === 5 && card.tier === 'legendary') {
+        toast('Level 5 legendary cards have already reached the absolute limit of power!', 'warning');
+        return;
+      }
+      setFuseCardId1(cardId);
+      setFuseCardId2(null);
+    } else {
+      if (cardId === fuseCardId1) {
+        toast('You cannot fuse a card with itself!', 'warning');
+        return;
+      }
+      const card2 = profile.collection.find(c => c.id === cardId);
+      const card1 = profile.collection.find(c => c.id === fuseCardId1);
+      
+      if (!card1 || !card2) return;
+      
+      if (card2.baseId !== card1.baseId) {
+        toast('Fusion cards must be identical entities (e.g. two Skeleton Warriors)!', 'warning');
+        return;
+      }
+      if (card2.tier !== card1.tier) {
+        toast('Fusion cards must be of the same tier!', 'warning');
+        return;
+      }
+      if (card2.level !== card1.level) {
+        toast('The second card must be of the same level!', 'warning');
+        return;
+      }
+      
+      setFuseCardId2(cardId);
     }
-    const card2 = profile.collection.find(c => c.id === cardId);
-    const card1 = profile.collection.find(c => c.id === fuseCardId1);
-    
-    if (!card1 || !card2) return;
-    
-    if (card2.baseId !== card1.baseId) {
-      toast('Fusion cards must be identical entities (e.g. two Skeleton Warriors)!', 'warning');
-      return;
-    }
-    if (card2.tier !== card1.tier) {
-      toast('Fusion cards must be of the same tier!', 'warning');
-      return;
-    }
-    if (card2.level !== card1.level) {
-      toast('The second card must be of the same level!', 'warning');
-      return;
-    }
-    
-    setFuseCardId2(cardId);
   };
 
   // Execute fusion
@@ -236,13 +246,11 @@ export const CollectionDeckView: React.FC = () => {
     const res = await fuseCards(fusionConfirmData.card1.id, fusionConfirmData.card2.id);
     if (res.success) {
       audioSystem.playMagic();
-      setIsFusingMode(false);
+      // Keep isFusingMode(true) open so players can do consecutive fusions!
       setFuseCardId1(null);
       setFuseCardId2(null);
       setFusionConfirmData(null);
-      if (res.newCard) {
-        setSelectedCardId(res.newCard.id);
-      }
+      setSelectedCardId(null);
       const isLevelUpgrade = fusionConfirmData.card1.level < 5;
       toast(isLevelUpgrade 
         ? `Fusion complete! Your card ${fusionConfirmData.card1.name} leveled up to L${fusionConfirmData.card1.level + 1}!` 
@@ -397,6 +405,19 @@ export const CollectionDeckView: React.FC = () => {
             {/* Filters */}
             <div className="flex flex-wrap items-center gap-2">
               <button
+                onClick={() => {
+                  setIsFusingMode(true);
+                  setFuseCardId1(null);
+                  setFuseCardId2(null);
+                  setSelectedCardId(null);
+                }}
+                className="flex items-center gap-1.5 py-1 px-3 rounded-lg border border-purple-500/40 bg-purple-950/20 text-purple-300 hover:bg-purple-900/30 text-xs font-mono font-bold transition-all shadow-[0_0_10px_rgba(168,85,247,0.15)] cursor-pointer hover:scale-102 active:scale-98"
+                title="Open Fusion Altar to combine duplicates"
+              >
+                🧬 FUSION ALTAR
+              </button>
+
+              <button
                 onClick={() => setShowFusableOnly(!showFusableOnly)}
                 className={`flex items-center gap-2 py-1 px-2.5 rounded-lg border text-xs font-mono transition-all select-none cursor-pointer ${
                   showFusableOnly
@@ -451,62 +472,71 @@ export const CollectionDeckView: React.FC = () => {
               <div className="bg-purple-950/20 border border-purple-500/30 rounded-xl p-3 flex items-start gap-2 text-xs text-purple-300">
                 <AlertCircle className="w-4 h-4 text-purple-400 mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-semibold">FUSION MODE:</p>
-                  <p>Select a second identical card of the same level and tier to fuse it with the first.</p>
+                  <p className="font-semibold">FUSION ALTAR ACTIVE:</p>
+                  <p>
+                    {!fuseCardId1 
+                      ? 'Select the first copy (Base card) from the collection below.' 
+                      : 'Select the second identical card of the same level and tier to fuse it with the first.'}
+                  </p>
                   <button
-                    onClick={() => setIsFusingMode(false)}
-                    className="text-[#66fcf1] underline text-[10px] font-mono mt-1 font-bold tracking-wide uppercase"
+                    onClick={() => {
+                      setIsFusingMode(false);
+                      setFuseCardId1(null);
+                      setFuseCardId2(null);
+                    }}
+                    className="text-[#66fcf1] underline text-[10px] font-mono mt-1 font-bold tracking-wide uppercase cursor-pointer"
                   >
-                    Cancel fusion
+                    Cancel and exit Altar
                   </button>
                 </div>
               </div>
 
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[350px] overflow-y-auto pr-1">
-                {profile.collection
-                  .filter(c => {
-                    const card1 = profile.collection.find(x => x.id === fuseCardId1);
-                    if (!card1) return false;
-                    return c.baseId === card1.baseId && c.id !== fuseCardId1 && c.level === card1.level && c.tier === card1.tier;
-                  })
-                  .map(card => {
-                    const isSelected = fuseCardId2 === card.id;
-                    return (
-                      <div
-                        key={card.id}
-                        onClick={() => selectFuseCard2(card.id)}
-                        className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer border overflow-hidden group ${getCardTierStyles(card.tier, isSelected, true)}`}
-                      >
-                        {/* Mana Badge */}
-                        <div className="absolute top-1.5 right-1.5 z-10">
-                          {renderManaIcon(card.manaCost || 1, "w-[16px] h-[16px]")}
-                        </div>
-
-                        {card.image.startsWith('/cards/') ? (
-                          <>
-                            <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 group-hover:scale-110 transition-transform duration-500" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20 z-0 pointer-events-none" />
-                          </>
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center opacity-40 z-0">
-                            {renderCardIcon(card.image, `w-12 h-12 ${getCardIconColor(card.color)}`)}
-                          </div>
-                        )}
-                        <div className="text-center mt-2 relative z-10 drop-shadow-md">
-                          <span className="text-[9px] font-display font-bold text-white block truncate leading-none">{card.name}</span>
-                          <span className="text-[7px] text-purple-400 uppercase font-mono tracking-wider">{card.tier}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-[9px] font-mono font-bold pt-1.5 border-t border-white/10">
-                          <span className="text-red-400">⚔️{card.attack}</span>
-                          <span className="text-blue-400" title="Turn Delay">⏳{card.delay}</span>
-                          <span className="text-emerald-400">❤️{card.health}</span>
-                        </div>
+                {(fuseCardId1
+                  ? profile.collection.filter(c => {
+                      const card1 = profile.collection.find(x => x.id === fuseCardId1);
+                      if (!card1) return false;
+                      return c.baseId === card1.baseId && c.id !== fuseCardId1 && c.level === card1.level && c.tier === card1.tier;
+                    })
+                  : filteredCollection
+                ).map(card => {
+                  const isSelected = fuseCardId1 === card.id || fuseCardId2 === card.id;
+                  return (
+                    <div
+                      key={card.id}
+                      onClick={() => handleCardClickInFusion(card.id)}
+                      className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer border overflow-hidden group ${getCardTierStyles(card.tier, isSelected, true)}`}
+                    >
+                      {/* Mana Badge */}
+                      <div className="absolute top-1.5 right-1.5 z-10">
+                        {renderManaIcon(card.manaCost || 1, "w-[16px] h-[16px]")}
                       </div>
-                    );
-                  })}
+
+                      {card.image.startsWith('/cards/') ? (
+                        <>
+                          <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 group-hover:scale-110 transition-transform duration-500" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20 z-0 pointer-events-none" />
+                        </>
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center opacity-40 z-0">
+                          {renderCardIcon(card.image, `w-12 h-12 ${getCardIconColor(card.color)}`)}
+                        </div>
+                      )}
+                      <div className="text-center mt-2 relative z-10 drop-shadow-md">
+                        <span className="text-[9px] font-display font-bold text-white block truncate leading-none">{card.name}</span>
+                        <span className="text-[7px] text-purple-400 uppercase font-mono tracking-wider">{card.tier}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-[9px] font-mono font-bold pt-1.5 border-t border-white/10">
+                        <span className="text-red-400">⚔️{card.attack}</span>
+                        <span className="text-blue-400" title="Turn Delay">⏳{card.delay}</span>
+                        <span className="text-emerald-400">❤️{card.health}</span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
               
-              {profile.collection.filter(c => {
+              {fuseCardId1 && profile.collection.filter(c => {
                 const card1 = profile.collection.find(x => x.id === fuseCardId1);
                 if (!card1) return false;
                 return c.baseId === card1.baseId && c.id !== fuseCardId1 && c.level === card1.level && c.tier === card1.tier;
@@ -626,14 +656,29 @@ export const CollectionDeckView: React.FC = () => {
                 <div className="flex items-center justify-around bg-[#0b0c10] border border-purple-500/20 rounded-xl p-4">
                   {/* Card 1 */}
                   <div className="text-center">
-                    <div className="w-16 h-20 bg-purple-950/20 border border-purple-500/50 rounded-lg flex flex-col justify-center items-center text-xs text-white">
-                      <span className="font-display font-bold text-[10px] block truncate max-w-[55px]">
-                        {profile.collection.find(c => c.id === fuseCardId1)?.name}
-                      </span>
-                      <span className="text-[8px] text-purple-400 font-mono mt-1 font-bold">
-                        L{profile.collection.find(c => c.id === fuseCardId1)?.level}
-                      </span>
-                    </div>
+                    {fuseCardId1 ? (
+                      <div className="w-16 h-20 bg-purple-950/20 border border-purple-500/50 rounded-lg flex flex-col justify-center items-center text-xs text-white relative">
+                        <span className="font-display font-bold text-[10px] block truncate max-w-[55px]">
+                          {profile.collection.find(c => c.id === fuseCardId1)?.name}
+                        </span>
+                        <span className="text-[8px] text-purple-400 font-mono mt-1 font-bold">
+                          L{profile.collection.find(c => c.id === fuseCardId1)?.level}
+                        </span>
+                        <button
+                          onClick={() => {
+                            setFuseCardId1(null);
+                            setFuseCardId2(null);
+                          }}
+                          className="absolute -top-1 -right-1 bg-black text-red-500 rounded-full w-3.5 h-3.5 flex items-center justify-center text-[8px] cursor-pointer"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="w-16 h-20 border border-dashed border-purple-900/40 rounded-lg flex flex-col justify-center items-center text-[10px] text-purple-900 bg-black/10">
+                        <span>Select copy 1</span>
+                      </div>
+                    )}
                     <span className="text-[10px] text-gray-500 mt-1 block">Base</span>
                   </div>
 
@@ -651,14 +696,14 @@ export const CollectionDeckView: React.FC = () => {
                         </span>
                         <button
                           onClick={() => setFuseCardId2(null)}
-                          className="absolute -top-1 -right-1 bg-black text-red-500 rounded-full w-3.5 h-3.5 flex items-center justify-center text-[8px]"
+                          className="absolute -top-1 -right-1 bg-black text-red-500 rounded-full w-3.5 h-3.5 flex items-center justify-center text-[8px] cursor-pointer"
                         >
                           ✕
                         </button>
                       </div>
                     ) : (
                       <div className="w-16 h-20 border border-dashed border-purple-900/40 rounded-lg flex flex-col justify-center items-center text-[10px] text-purple-900 bg-black/10">
-                        <span>Second copy</span>
+                        <span>Select copy 2</span>
                       </div>
                     )}
                     <span className="text-[10px] text-gray-500 mt-1 block">Sacrifice</span>
@@ -742,7 +787,11 @@ export const CollectionDeckView: React.FC = () => {
                         </ul>
                       );
                     }
-                  })() : null}
+                  })() : (
+                    <div className="text-center py-6 text-gray-500 text-xs italic">
+                      Select first card to see preview...
+                    </div>
+                  )}
                 </div>
 
                 {/* Costs */}
@@ -808,14 +857,10 @@ export const CollectionDeckView: React.FC = () => {
             </div>
           ) : selectedCard ? (
             /* NORMAL CARD DETAIL / STATS UPGRADE UI */
-            <div className="space-y-5 flex flex-col justify-between h-full">
+            <div className="space-y-4 flex flex-col justify-between h-full">
               <div className="space-y-4">
-                <div className="text-center border-b border-white/10 pb-3">
-                  <div className="inline-block px-3 py-1 rounded-full text-[9px] font-mono font-bold uppercase border mb-1.5 shadow-sm bg-black/40 border-white/10">
-                    <span className={getTierBadgeStyles(selectedCard.tier)}>{selectedCard.tier}</span>
-                  </div>
-                  <h3 className="font-display font-black text-xl text-white tracking-widest text-shadow-gold">{selectedCard.name}</h3>
-                  <span className="text-[10px] font-mono text-[#c5a880]">Level {selectedCard.level} / 5</span>
+                <div className="text-center border-b border-white/10 pb-2">
+                  <span className="text-xs font-mono font-bold text-[#c5a880] uppercase tracking-widest">Level {selectedCard.level} / 5</span>
                 </div>
 
                 {/* High Fidelity Visual Card Illustration Representation */}
@@ -895,53 +940,6 @@ export const CollectionDeckView: React.FC = () => {
                 </p>
               </div>
 
-              {/* Interaction Buttons (Fusion / Level Up, Add to Deck) */}
-              <div className="space-y-3 mt-6 border-t border-white/10/40 pt-4">
-                
-                {selectedCard.level === 5 && selectedCard.tier === 'legendary' ? (
-                  <div className="bg-purple-950/20 border border-purple-500/30 rounded-xl p-3 text-center">
-                    <p className="text-xs font-bold text-purple-400">🔥 ABSOLUTE POWER!</p>
-                    <p className="text-[10px] text-gray-400 font-sans mt-0.5">This legendary entity has reached the peak of its power.</p>
-                  </div>
-                ) : (() => {
-                  const hasDuplicate = profile.collection.filter(c => c.baseId === selectedCard.baseId && c.level === selectedCard.level && c.tier === selectedCard.tier).length >= 2;
-                  return (
-                    <div className="bg-purple-950/20 border border-purple-500/30 rounded-xl p-3 text-center space-y-2">
-                      <p className={`text-xs font-bold ${hasDuplicate ? 'text-purple-400' : 'text-gray-500'}`}>
-                        {hasDuplicate ? '🧬 FUSION AVAILABLE!' : '🧬 REQUIRES DUPLICATE'}
-                      </p>
-                      <p className="text-[10px] text-gray-400 font-sans leading-relaxed text-left">
-                        {selectedCard.level < 5 
-                          ? `Fuse this card with another identical card of level L${selectedCard.level} tier ${selectedCard.tier} to reach level L${selectedCard.level + 1}!`
-                          : `Fuse this card with another identical card of level L5 tier ${selectedCard.tier} to perform the Tier Ascension Ritual!`
-                        }
-                      </p>
-                      <button
-                        onClick={() => startFusing(selectedCard)}
-                        className={`w-full text-xs font-mono font-bold py-2 px-4 rounded-xl tracking-wider transition-all cursor-pointer ${
-                          hasDuplicate 
-                            ? 'bg-[#151a21] hover:bg-[#1f2833] border border-purple-500/40 text-purple-200' 
-                            : 'bg-black/50 border border-gray-800 text-gray-600 hover:text-gray-400'
-                        }`}
-                      >
-                        🧬 OPEN FUSION ALTAR
-                      </button>
-                    </div>
-                  );
-                })()}
-
-                {/* Add to / Remove from Deck Button */}
-                <button
-                  onClick={() => handleToggleDeck(selectedCard.id)}
-                  className={`w-full font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all text-xs border cursor-pointer ${
-                    profile.deck.includes(selectedCard.id)
-                      ? 'bg-gradient-to-r from-[#4e0707] to-black hover:from-[#dd2c40]/20 hover:to-[#4e0707] border-[#dd2c40]/30 text-[#dd2c40]'
-                      : 'bg-gradient-to-r from-[#1f2833] to-[#151a21] hover:from-[#45a29e]/20 hover:to-[#1f2833] border-[#66fcf1]/30 text-[#66fcf1]'
-                  }`}
-                >
-                  {profile.deck.includes(selectedCard.id) ? '⚔️ REMOVE FROM COMBAT DECK' : '⚔️ ADD TO COMBAT DECK'}
-                </button>
-              </div>
             </div>
           ) : (
             <div className="text-center py-20 text-gray-500 flex flex-col items-center justify-center">
