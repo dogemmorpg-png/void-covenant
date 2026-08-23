@@ -1384,7 +1384,7 @@ export const generateCampaignStage = (floor: number): import('../types').Campaig
   // Rewards
   const goldReward = 100 + (floor * 15);
   const dustReward = 10 + (floor * 3);
-  const shardsReward = isBoss ? 15 + Math.floor(floor / 2) : 0;
+  const shardsReward = 0;
   
   // Pick permitted card tiers based on floor
   const permittedTiers = ['bronze'];
@@ -1407,16 +1407,12 @@ export const generateCampaignStage = (floor: number): import('../types').Campaig
   
   // Boss drop
   let cardReward = undefined;
-  if (isBoss) {
-    const rareTemplates = CARD_TEMPLATES.filter(t => t.tier === 'silver' || t.tier === 'gold' || t.tier === 'legendary');
-    cardReward = rareTemplates[Math.floor(Math.random() * rareTemplates.length)];
-  }
 
   return {
     id: floor,
     name: isBoss ? `Abyssal Lord - Floor ${floor}` : `The Abyss - Floor ${floor}`,
     description: isBoss 
-      ? `A terrifying guardian of the Abyss blocks your path. Defeat it to earn Shards and a guaranteed rare card!` 
+      ? `A terrifying guardian of the Abyss blocks your path. Defeat it to claim victory and descend deeper!` 
       : `Endless descending catacombs. Face the dark entities that lurk in the shadows.`,
     energyCost: 1, // Always 1 energy
     goldReward,
