@@ -246,8 +246,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const [hoveredCard, setHoveredCard] = useState<BattleCardState | null>(null);
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
   const [showLogDrawer, setShowLogDrawer] = useState<boolean>(false);
-  const [screenShake, setScreenShake] = useState<boolean>(false);
-  const [screenShakeEnabled, setScreenShakeEnabled] = useState<boolean>(true);
   const [hoveredHandCardIndex, setHoveredHandCardIndex] = useState<number | null>(null);
 
   // Track the final target battle state once the calculation resolves
@@ -282,11 +280,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     }, 1000);
   };
 
-  const triggerScreenShake = () => {
-    if (!screenShakeEnabled) return;
-    setScreenShake(true);
-    setTimeout(() => setScreenShake(false), 300 / speedMultiplier);
-  };
 
   // Setup the visual starting state before playing steps
   const setupPlaybackState = (playedCardId: string | null, playedSlotIndex: number | null, steps: any[]) => {
@@ -457,7 +450,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               copy.playerHeroHealth = Math.max(0, copy.playerHeroHealth - step.damage);
               addFloatingText(`-${step.damage} 💥`, 'player-hero', 'text-red-500 font-black text-xl scale-125 text-shadow-glow');
             }
-            triggerScreenShake();
           }, 180 / speedMultiplier);
           break;
         }
@@ -783,7 +775,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         
         {/* Battle Arena - Medieval Fantasy Table */}
         <div 
-          className={`flex-1 flex flex-col justify-center border-[6px] border-[#251a14] bg-[#120d0a] rounded-2xl p-4 shadow-[inset_0_0_60px_rgba(0,0,0,0.95),_0_10px_30px_rgba(0,0,0,0.85)] relative min-h-0 overflow-hidden will-change-transform ${screenShake ? 'animate-shake' : ''}`}
+          className="flex-1 flex flex-col justify-center border-[6px] border-[#251a14] bg-[#120d0a] rounded-2xl p-4 shadow-[inset_0_0_60px_rgba(0,0,0,0.95),_0_10px_30px_rgba(0,0,0,0.85)] relative min-h-0 overflow-hidden will-change-transform"
         >
           {/* Wooden Table Board Divider */}
           <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#ebd09b]/15 to-transparent -translate-y-1/2 pointer-events-none z-10" />
@@ -1077,19 +1069,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   >
                     {isPaused ? <Play className="w-2.5 h-2.5 text-emerald-400 fill-emerald-400" /> : <Pause className="w-2.5 h-2.5 text-yellow-400 fill-yellow-400" />}
                     <span>{isPaused ? 'RESUME' : 'PAUSE'}</span>
-                  </button>
-
-                  {/* Screen Shake Toggle */}
-                  <button
-                    onClick={() => setScreenShakeEnabled(!screenShakeEnabled)}
-                    className={`h-7 px-2.5 rounded-md border font-mono text-[9px] font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${
-                      screenShakeEnabled
-                        ? 'bg-[#2a1b10] border-[#ebd09b]/40 text-[#ebd09b] hover:bg-[#3d2717]'
-                        : 'bg-black/60 border-gray-800 text-gray-500 hover:text-gray-400 hover:bg-white/5'
-                    }`}
-                    title="Toggle Screen Shake"
-                  >
-                    <span>📳 SHAKE: {screenShakeEnabled ? 'ON' : 'OFF'}</span>
                   </button>
 
                   {/* Manual Step */}
