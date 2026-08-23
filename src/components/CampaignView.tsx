@@ -228,24 +228,24 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
 
           {/* Action Buttons Area */}
           <div className="pt-6 border-t border-gray-800/80 flex flex-col items-center">
-            <div className="flex w-full max-w-md gap-4">
+            <div className="flex w-full max-w-lg gap-5">
               <button
                 onClick={handleStart}
-                className={`flex-1 font-display font-black tracking-widest py-4 px-6 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2.5 cursor-pointer hover:scale-[1.03] active:scale-[0.97] text-xs ${
+                className={`flex-1 font-display font-bold tracking-widest py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase ${
                   isBoss 
-                    ? 'glass-button-crimson'
-                    : 'glass-button-gold'
+                    ? 'bg-gradient-to-b from-[#3a0b12] via-[#200508] to-[#140204] border-2 border-red-600/50 hover:border-red-500 text-red-400 hover:text-white shadow-[0_0_15px_rgba(220,38,38,0.15)] hover:shadow-[0_0_25px_rgba(239,68,68,0.35)]'
+                    : 'bg-gradient-to-b from-[#221a12] via-[#150f0a] to-[#0c0805] border-2 border-[#c5a880]/50 hover:border-[#ebd09b] text-[#ebd09b] hover:text-white shadow-[0_0_15px_rgba(197,168,128,0.15)] hover:shadow-[0_0_25px_rgba(235,208,155,0.35)]'
                 }`}
               >
-                <Swords className="w-5 h-5" /> BATTLE ({selectedStage.energyCost} ⚡)
+                <Swords className="w-4.5 h-4.5" /> BATTLE ({selectedStage.energyCost} ⚡)
               </button>
               
               {stageStars === 3 && (
                 <button
                   onClick={handleSweep}
-                  className="flex-1 font-display font-black tracking-widest py-4 px-6 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2.5 cursor-pointer hover:scale-[1.03] active:scale-[0.97] bg-gradient-to-br from-indigo-900/80 to-purple-900/80 border border-purple-500/40 hover:bg-purple-800/80 text-purple-200 text-xs"
+                  className="flex-1 font-display font-bold tracking-widest py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase bg-gradient-to-b from-[#1b122c] via-[#0e071a] to-[#06020c] border-2 border-purple-600/50 hover:border-purple-400 text-purple-400 hover:text-white shadow-[0_0_15px_rgba(147,51,234,0.15)] hover:shadow-[0_0_25px_rgba(168,85,247,0.35)]"
                 >
-                  <FastForward className="w-5 h-5" /> SWEEP ({selectedStage.energyCost} ⚡)
+                  <FastForward className="w-4.5 h-4.5" /> SWEEP ({selectedStage.energyCost} ⚡)
                 </button>
               )}
             </div>
