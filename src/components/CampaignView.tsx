@@ -231,21 +231,33 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
             <div className="flex w-full max-w-lg gap-5">
               <button
                 onClick={handleStart}
-                className={`flex-1 font-display font-bold tracking-widest py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase ${
+                className={`flex-1 font-display font-bold tracking-widest py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase ${
                   isBoss 
                     ? 'bg-gradient-to-b from-[#3a0b12] via-[#200508] to-[#140204] border-2 border-red-600/50 hover:border-red-500 text-red-400 hover:text-white shadow-[0_0_15px_rgba(220,38,38,0.15)] hover:shadow-[0_0_25px_rgba(239,68,68,0.35)]'
                     : 'bg-gradient-to-b from-[#221a12] via-[#150f0a] to-[#0c0805] border-2 border-[#c5a880]/50 hover:border-[#ebd09b] text-[#ebd09b] hover:text-white shadow-[0_0_15px_rgba(197,168,128,0.15)] hover:shadow-[0_0_25px_rgba(235,208,155,0.35)]'
                 }`}
               >
-                <Swords className="w-4.5 h-4.5" /> BATTLE ({selectedStage.energyCost} ⚡)
+                <Swords className="w-4.5 h-4.5" /> 
+                <span className="mr-0.5">BATTLE</span>
+                <span className={`flex items-center gap-1 bg-black/50 border rounded-full px-2 py-0.5 font-mono text-xs font-bold text-emerald-400 shadow-inner ${
+                  isBoss ? 'border-red-500/30' : 'border-[#ebd09b]/35'
+                }`}>
+                  {selectedStage.energyCost}
+                  <img src="/icons/icon_energy.png" alt="Energy" className="w-4 h-4 object-contain brightness-110 drop-shadow-[0_0_4px_rgba(16,185,129,0.4)]" />
+                </span>
               </button>
               
               {stageStars === 3 && (
                 <button
                   onClick={handleSweep}
-                  className="flex-1 font-display font-bold tracking-widest py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase bg-gradient-to-b from-[#1b122c] via-[#0e071a] to-[#06020c] border-2 border-purple-600/50 hover:border-purple-400 text-purple-400 hover:text-white shadow-[0_0_15px_rgba(147,51,234,0.15)] hover:shadow-[0_0_25px_rgba(168,85,247,0.35)]"
+                  className="flex-1 font-display font-bold tracking-widest py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase bg-gradient-to-b from-[#1b122c] via-[#0e071a] to-[#06020c] border-2 border-purple-600/50 hover:border-purple-400 text-purple-400 hover:text-white shadow-[0_0_15px_rgba(147,51,234,0.15)] hover:shadow-[0_0_25px_rgba(168,85,247,0.35)]"
                 >
-                  <FastForward className="w-4.5 h-4.5" /> SWEEP ({selectedStage.energyCost} ⚡)
+                  <FastForward className="w-4.5 h-4.5" /> 
+                  <span className="mr-0.5">SWEEP</span>
+                  <span className="flex items-center gap-1 bg-black/50 border border-purple-500/30 rounded-full px-2 py-0.5 font-mono text-xs font-bold text-emerald-400 shadow-inner">
+                    {selectedStage.energyCost}
+                    <img src="/icons/icon_energy.png" alt="Energy" className="w-4 h-4 object-contain brightness-110 drop-shadow-[0_0_4px_rgba(16,185,129,0.4)]" />
+                  </span>
                 </button>
               )}
             </div>
