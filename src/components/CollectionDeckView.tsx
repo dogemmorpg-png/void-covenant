@@ -272,20 +272,74 @@ export const CollectionDeckView: React.FC = () => {
     }
   };
 
+  // Render a large card slot thumbnail in the Altar
+  const renderAltarCardSlot = (cardId: string | null, label: string, onClear: () => void) => {
+    const card = profile.collection.find(c => c.id === cardId);
+    if (!card) {
+      return (
+        <div className="w-24 h-32 border-2 border-dashed border-purple-900/40 bg-black/35 rounded-xl flex flex-col items-center justify-center text-center p-2 text-purple-400/50 shadow-inner">
+          <span className="text-xl mb-1 animate-pulse">🧬</span>
+          <span className="text-[9px] font-mono uppercase tracking-wider font-bold">{label}</span>
+        </div>
+      );
+    }
+    return (
+      <div className={`relative w-24 h-32 rounded-xl p-1.5 flex flex-col justify-between cursor-default border overflow-hidden ${getCardTierStyles(card.tier, false, true)} shadow-lg`}>
+        {/* Card Image */}
+        {card.image.startsWith('/cards/') ? (
+          <>
+            <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 opacity-80" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/10 z-0 pointer-events-none" />
+          </>
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center opacity-30 z-0">
+            {renderCardIcon(card.image, `w-8 h-8 ${getCardIconColor(card.color)}`)}
+          </div>
+        )}
+        {/* Mana cost */}
+        <div className="absolute top-1 right-1 z-10 scale-90">
+          {renderManaIcon(card.manaCost || 1, "w-3.5 h-3.5")}
+        </div>
+
+        <div className="text-center mt-1 relative z-10 drop-shadow-md">
+          <span className="text-[8px] font-display font-bold text-white block truncate leading-none max-w-[76px] mx-auto">{card.name}</span>
+          <span className="text-[7px] text-purple-400 font-mono font-bold tracking-wider">L{card.level}</span>
+        </div>
+
+        <div className="flex justify-between items-center text-[8px] font-mono font-bold pt-1 border-t border-white/10 relative z-10 drop-shadow-md">
+          <span className="text-red-400">⚔️{card.attack}</span>
+          <span className="text-emerald-400">❤️{card.health}</span>
+        </div>
+
+        {/* LARGE CLOSE BUTTON */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClear();
+          }}
+          className="absolute -top-1.5 -right-1.5 bg-black hover:bg-red-950 border border-red-500/50 text-red-500 hover:text-red-300 rounded-full w-6 h-6 flex items-center justify-center text-[10px] z-20 cursor-pointer shadow-md font-bold transition-all hover:scale-110 active:scale-90"
+          title="Remove from Altar"
+        >
+          ✕
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
       {/* GOTHIC SUB-TABS */}
-      <div className="flex gap-2 border-b border-[#c5a880]/15 pb-px">
+      <div className="flex gap-2 border-b border-white/10 pb-px mb-2">
         <button
           onClick={() => {
             setIsFusingMode(false);
             setFuseCardId1(null);
             setFuseCardId2(null);
           }}
-          className={`flex items-center gap-2 py-2.5 px-6 rounded-t-xl font-display font-black text-xs tracking-widest transition-all cursor-pointer border-t border-x ${
+          className={`flex items-center gap-2 py-3 px-6 rounded-t-xl font-display font-black text-xs tracking-widest transition-all cursor-pointer border-t border-x ${
             !isFusingMode
-              ? 'bg-[#151a21] border-[#c5a880]/30 text-[#ebd09b] shadow-[0_-4px_12px_rgba(197,168,128,0.08)]'
-              : 'border-transparent text-gray-500 hover:text-gray-300'
+              ? 'bg-[#151a21] border-t-2 border-x border-[#ebd09b] border-x-white/10 text-[#ebd09b] shadow-[0_-4px_15px_rgba(197,168,128,0.15)] z-10 translate-y-[2px] border-b-[#151a21]'
+              : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'
           }`}
         >
           💀 CREATURE SANCTUARY
@@ -297,10 +351,10 @@ export const CollectionDeckView: React.FC = () => {
             setFuseCardId2(null);
             setSelectedCardId(null);
           }}
-          className={`flex items-center gap-2 py-2.5 px-6 rounded-t-xl font-display font-black text-xs tracking-widest transition-all cursor-pointer border-t border-x ${
+          className={`flex items-center gap-2 py-3 px-6 rounded-t-xl font-display font-black text-xs tracking-widest transition-all cursor-pointer border-t border-x ${
             isFusingMode
-              ? 'bg-[#151a21] border-purple-500/30 text-purple-300 shadow-[0_-4px_12px_rgba(168,85,247,0.08)]'
-              : 'border-transparent text-gray-500 hover:text-purple-400/80'
+              ? 'bg-[#151a21] border-t-2 border-x border-purple-500 border-x-white/10 text-purple-300 shadow-[0_-4px_15px_rgba(168,85,247,0.25)] z-10 translate-y-[2px] border-b-[#151a21]'
+              : 'border-transparent text-gray-400 hover:text-purple-400 hover:bg-purple-950/10'
           }`}
         >
           🧬 FUSION ALTAR
@@ -519,7 +573,16 @@ export const CollectionDeckView: React.FC = () => {
                       if (!card1) return false;
                       return c.baseId === card1.baseId && c.id !== fuseCardId1 && c.level === card1.level && c.tier === card1.tier;
                     })
-                  : filteredCollection
+                  : filteredCollection.filter(card => {
+                      if (card.level === 5 && card.tier === 'legendary') return false;
+                      const hasDuplicate = profile.collection.some(c => 
+                        c.id !== card.id && 
+                        c.baseId === card.baseId && 
+                        c.level === card.level && 
+                        c.tier === card.tier
+                      );
+                      return hasDuplicate;
+                    })
                 ).map(card => {
                   const isSelected = fuseCardId1 === card.id || fuseCardId2 === card.id;
                   return (
@@ -674,60 +737,24 @@ export const CollectionDeckView: React.FC = () => {
                   <h3 className="font-display font-black text-xl text-white tracking-wide mt-1 text-shadow-gold">FUSION RITUAL</h3>
                 </div>
 
-                <div className="flex items-center justify-around bg-[#0b0c10] border border-purple-500/20 rounded-xl p-4">
+                <div className="flex items-center justify-around bg-[#0b0c10]/60 border border-purple-500/25 rounded-2xl p-5 shadow-inner">
                   {/* Card 1 */}
                   <div className="text-center">
-                    {fuseCardId1 ? (
-                      <div className="w-16 h-20 bg-purple-950/20 border border-purple-500/50 rounded-lg flex flex-col justify-center items-center text-xs text-white relative">
-                        <span className="font-display font-bold text-[10px] block truncate max-w-[55px]">
-                          {profile.collection.find(c => c.id === fuseCardId1)?.name}
-                        </span>
-                        <span className="text-[8px] text-purple-400 font-mono mt-1 font-bold">
-                          L{profile.collection.find(c => c.id === fuseCardId1)?.level}
-                        </span>
-                        <button
-                          onClick={() => {
-                            setFuseCardId1(null);
-                            setFuseCardId2(null);
-                          }}
-                          className="absolute -top-1 -right-1 bg-black text-red-500 rounded-full w-3.5 h-3.5 flex items-center justify-center text-[8px] cursor-pointer"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="w-16 h-20 border border-dashed border-purple-900/40 rounded-lg flex flex-col justify-center items-center text-[10px] text-purple-900 bg-black/10">
-                        <span>Select copy 1</span>
-                      </div>
-                    )}
-                    <span className="text-[10px] text-gray-500 mt-1 block">Base</span>
+                    {renderAltarCardSlot(fuseCardId1, "Base Card", () => {
+                      setFuseCardId1(null);
+                      setFuseCardId2(null);
+                    })}
+                    <span className="text-[10px] font-mono text-gray-500 mt-2 block uppercase tracking-wider font-bold">Base</span>
                   </div>
 
-                  <ArrowRight className="w-5 h-5 text-purple-400 animate-pulse" />
+                  <ArrowRight className="w-5 h-5 text-purple-400 animate-pulse shrink-0" />
 
                   {/* Card 2 */}
                   <div className="text-center">
-                    {fuseCardId2 ? (
-                      <div className="w-16 h-20 bg-purple-950/20 border border-purple-500/50 rounded-lg flex flex-col justify-center items-center text-xs text-white relative">
-                        <span className="font-display font-bold text-[10px] block truncate max-w-[55px]">
-                          {profile.collection.find(c => c.id === fuseCardId2)?.name}
-                        </span>
-                        <span className="text-[8px] text-purple-400 font-mono mt-1 font-bold">
-                          L{profile.collection.find(c => c.id === fuseCardId2)?.level}
-                        </span>
-                        <button
-                          onClick={() => setFuseCardId2(null)}
-                          className="absolute -top-1 -right-1 bg-black text-red-500 rounded-full w-3.5 h-3.5 flex items-center justify-center text-[8px] cursor-pointer"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="w-16 h-20 border border-dashed border-purple-900/40 rounded-lg flex flex-col justify-center items-center text-[10px] text-purple-900 bg-black/10">
-                        <span>Select copy 2</span>
-                      </div>
-                    )}
-                    <span className="text-[10px] text-gray-500 mt-1 block">Sacrifice</span>
+                    {renderAltarCardSlot(fuseCardId2, "Sacrifice", () => {
+                      setFuseCardId2(null);
+                    })}
+                    <span className="text-[10px] font-mono text-gray-500 mt-2 block uppercase tracking-wider font-bold">Sacrifice</span>
                   </div>
                 </div>
 
