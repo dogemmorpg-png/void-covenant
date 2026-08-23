@@ -697,8 +697,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             updated.campaignStars[stageId] = stars;
           }
         }
-
-        updated.battlePassPoints = (updated.battlePassPoints || 0) + 50;
       } else {
         rewards.gold = 20;
         updated.gold = (updated.gold || 0) + rewards.gold;
@@ -746,7 +744,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updated.pveEnergy = Math.max(0, (updated.pveEnergy || 0) - (payload?.energyCost || 3));
         updated.gold = (updated.gold || 0) + goldReward;
         updated.dust = (updated.dust || 0) + dustReward;
-        updated.battlePassPoints = (updated.battlePassPoints || 0) + 50;
 
         msg = `Fast sweep complete! +${goldReward} Gold & +${dustReward} Dust claimed!`;
         saveProfile(updated);

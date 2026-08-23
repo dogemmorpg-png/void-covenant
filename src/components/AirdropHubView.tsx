@@ -491,7 +491,7 @@ export const AirdropHubView: React.FC = () => {
             <Sparkles className="w-5 h-5 text-[#ebd09b]" /> COVENANT AIRDROP TASKS
           </h3>
           <p className="text-xs text-gray-400 font-sans mt-1">
-            Complete tasks to accumulate early rewards, gold, and seasonal battle pass experience.
+            Complete tasks to accumulate early rewards and gold.
           </p>
         </div>
 
@@ -519,8 +519,6 @@ export const AirdropHubView: React.FC = () => {
                   <p className="text-xs text-gray-400">{task.description}</p>
                   <div className="flex items-center gap-2 text-[10px] font-mono text-amber-400 pt-1">
                     <span>Reward: +{task.rewardAmount} {task.rewardType.toUpperCase()}</span>
-                    <span className="text-gray-600">•</span>
-                    <span className="text-purple-400">+30 BP</span>
                   </div>
                 </div>
 

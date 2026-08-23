@@ -329,9 +329,6 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
                   <div className="bg-black/60 px-3 py-1.5 rounded-lg border border-cyan-950/50">
                     <span className="text-cyan-400 font-bold">+{30 + Math.floor(profile.pvpRating / 20)}<img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /></span> <span className="text-gray-500 text-[10px]">Dark Dust</span>
                   </div>
-                  <div className="bg-black/60 px-3 py-1.5 rounded-lg border border-purple-950/50">
-                    <span className="text-purple-400 font-bold">+50 BP <img src="/icons/icon_pass.png" alt="Pass" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /></span> <span className="text-gray-500 text-[10px]">Dark Pass</span>
-                  </div>
                 </div>
               </div>
             </div>

@@ -2090,9 +2090,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   </>
                 )}
               </div>
-              <div className="border-t border-gray-900 pt-2 text-purple-400 font-bold text-[10px] uppercase flex items-center justify-center gap-1.5">
-                <Award className="w-3.5 h-3.5" /> +50 Dark Pass Points (BP)
-              </div>
             </div>
 
             <button

@@ -177,8 +177,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const task = CARD_TEMPLATES ? null : null; // We can reward directly:
       profile.completedTasks.push(taskId);
       profile.gold = (profile.gold || 0) + 200;
-      profile.battlePassPoints = (profile.battlePassPoints || 0) + 30;
-      successMessage = 'Airdrop task completed (+200 Gold, +30 BP)';
+      successMessage = 'Airdrop task completed (+200 Gold)';
     } else {
       return res.status(400).json({ error: 'Unknown action' });
     }
