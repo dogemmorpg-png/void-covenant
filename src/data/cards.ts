@@ -1427,59 +1427,7 @@ export const generateCampaignStage = (floor: number): import('../types').Campaig
 };
 
 
-// Battle Pass Tiers
-export const BATTLE_PASS_TIERS: BattlePassTier[] = [
-  {
-    level: 1,
-    pointsRequired: 100,
-    freeRewardType: 'gold',
-    freeRewardAmount: 200,
-    freeRewardLabel: '200 Gold',
-    premiumRewardType: 'shards',
-    premiumRewardAmount: 50,
-    premiumRewardLabel: '50 Dark Shards'
-  },
-  {
-    level: 2,
-    pointsRequired: 200,
-    freeRewardType: 'dust',
-    freeRewardAmount: 50,
-    freeRewardLabel: '50 Dark Dust',
-    premiumRewardType: 'dust',
-    premiumRewardAmount: 150,
-    premiumRewardLabel: '150 Dark Dust'
-  },
-  {
-    level: 3,
-    pointsRequired: 300,
-    freeRewardType: 'dust',
-    freeRewardAmount: 100,
-    freeRewardLabel: '100 Dark Dust',
-    premiumRewardType: 'card',
-    premiumRewardAmount: 1,
-    premiumRewardLabel: 'Abyss Reaper (Silver)' // we will instantiate in claimant handler
-  },
-  {
-    level: 4,
-    pointsRequired: 400,
-    freeRewardType: 'gold',
-    freeRewardAmount: 500,
-    freeRewardLabel: '500 Gold',
-    premiumRewardType: 'shards',
-    premiumRewardAmount: 200,
-    premiumRewardLabel: '200 Dark Shards'
-  },
-  {
-    level: 5,
-    pointsRequired: 500,
-    freeRewardType: 'card',
-    freeRewardAmount: 1,
-    freeRewardLabel: 'Random Gold Card',
-    premiumRewardType: 'legendary_pack',
-    premiumRewardAmount: 1,
-    premiumRewardLabel: 'Exclusive Abyss Pack'
-  }
-];
+
 
 // Airdrop and social tasks
 export const AIRDROP_TASKS: AirdropTask[] = [

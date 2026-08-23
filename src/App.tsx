@@ -7,14 +7,13 @@ import { CampaignView } from './components/CampaignView';
 import { CollectionDeckView } from './components/CollectionDeckView';
 import { GachaStoreView } from './components/GachaStoreView';
 import { AirdropHubView } from './components/AirdropHubView';
-import { BattlePassView } from './components/BattlePassView';
 import { BattleFieldView } from './components/BattleFieldView';
 import { PvpArenaView } from './components/PvpArenaView';
 import { HeroInventoryView } from './components/HeroInventoryView';
 import { TalentsView } from './components/TalentsView';
 import { CampaignStage } from './types';
 import { Swords, FolderGit, Sparkles, Wallet, Award, Trophy, UserCircle2 } from 'lucide-react';
-import { BATTLE_PASS_TIERS, AIRDROP_TASKS } from './data/cards';
+import { AIRDROP_TASKS } from './data/cards';
 import { LandingPage } from './components/LandingPage';
 import { RegistrationScreen } from './components/RegistrationScreen';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -32,7 +31,7 @@ function MainAppContent() {
   const [isSigning, setIsSigning] = useState(false);
   
   // Tab states
-  const [activeTab, setActiveTab] = useState<'campaign' | 'pvp' | 'collection' | 'hero' | 'talents' | 'altar' | 'airdrop' | 'battlepass'>('campaign');
+  const [activeTab, setActiveTab] = useState<'campaign' | 'pvp' | 'collection' | 'hero' | 'talents' | 'altar' | 'airdrop'>('campaign');
   
   // Active Battle stage state
   const [activeBattleStage, setActiveBattleStage] = useState<CampaignStage | null>(null);
@@ -43,13 +42,6 @@ function MainAppContent() {
     setActiveBattleStage(null);
     setActiveTab(activeBattleType === 'pvp' ? 'pvp' : 'campaign');
   };
-
-  // Notification badges
-  const hasUnclaimedBP = BATTLE_PASS_TIERS.some((tier, idx) => {
-    const isUnlocked = profile.battlePassPoints >= tier.pointsRequired;
-    const freeClaimId = idx * 2;
-    return isUnlocked && !profile.battlePassClaimed.includes(freeClaimId);
-  });
 
   const hasUnfinishedTasks = AIRDROP_TASKS.some(task => 
     !profile.completedTasks.includes(task.id) && 
@@ -233,7 +225,6 @@ function MainAppContent() {
           {activeTab === 'talents' && <TalentsView />}
           {activeTab === 'altar' && <GachaStoreView />}
           {activeTab === 'airdrop' && <AirdropHubView />}
-          {activeTab === 'battlepass' && <BattlePassView />}
         </div>
       </div>
 
@@ -316,20 +307,7 @@ function MainAppContent() {
             )}
           </button>
 
-          {/* Battle Pass Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('battlepass'); }}
-            className={`relative flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
-              activeTab === 'battlepass'
-                ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <Award className="w-5 h-5" />
-            <span className="text-[10px] font-display font-bold tracking-wider">BATTLE PASS</span>
-            {hasUnclaimedBP && (
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#dd2c40] rounded-full animate-ping" />
-            )}
-          </button>
+
 
         </div>
       </div>

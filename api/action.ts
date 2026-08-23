@@ -4,7 +4,7 @@ import * as jwtPkg from 'jsonwebtoken';
 const jwt = (jwtPkg as any).default || jwtPkg;
 import { createClient } from '@supabase/supabase-js';
 import { PlayerProfile } from './_shared/types.js';
-import { CARD_TEMPLATES, createCardInstance, generateCampaignStage, BATTLE_PASS_TIERS, AIRDROP_TASKS } from './_shared/cards.js';
+import { CARD_TEMPLATES, createCardInstance, generateCampaignStage, AIRDROP_TASKS } from './_shared/cards.js';
 import { calculateEnergy, processExpGain } from './_shared/energyHelper.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
@@ -147,7 +147,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       profile.gold = (profile.gold || 0) + goldReward;
       profile.dust = (profile.dust || 0) + dustReward;
       profile.darkShards = (profile.darkShards || 0) + shardsReward;
-      profile.battlePassPoints = (profile.battlePassPoints || 0) + 50;
 
       const { leveledUp } = processExpGain(profile, expReward);
 
@@ -167,48 +166,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       profile.darkShards = (profile.darkShards || 0) + shardsBought;
       successMessage = `Bought ${shardsBought} Dark Shards`;
       
-    } else if (action === 'claim_battlepass') {
-      const { tierIndex, isPremium } = payload;
-      const tier = BATTLE_PASS_TIERS[tierIndex];
-      if (!tier) return res.status(400).json({ error: 'Invalid tier index' });
-      
-      if ((profile.battlePassPoints || 0) < tier.pointsRequired) {
-        return res.status(400).json({ error: 'Not enough Battle Pass points' });
-      }
-      
-      const claimId = tierIndex * 2 + (isPremium ? 1 : 0);
-      profile.battlePassClaimed = profile.battlePassClaimed || [];
-      if (profile.battlePassClaimed.includes(claimId)) {
-        return res.status(400).json({ error: 'Reward already claimed' });
-      }
-
-      if (isPremium && !profile.isPremiumBP) {
-        return res.status(400).json({ error: 'Premium Battle Pass not unlocked' });
-      }
-
-      const rewardType = isPremium ? tier.premiumRewardType : tier.freeRewardType;
-      const rewardAmount = isPremium ? tier.premiumRewardAmount : tier.freeRewardAmount;
-
-      if (rewardType === 'gold') profile.gold = (profile.gold || 0) + rewardAmount;
-      else if (rewardType === 'dust') profile.dust = (profile.dust || 0) + rewardAmount;
-      else if (rewardType === 'shards') profile.darkShards = (profile.darkShards || 0) + rewardAmount;
-      else if (rewardType === 'card' || rewardType === 'legendary_pack') {
-        const rareTemplates = CARD_TEMPLATES.filter((t: any) => t.tier === 'silver' || t.tier === 'gold');
-        const randomTemplate = rareTemplates[Math.floor(Math.random() * rareTemplates.length)];
-        const newCard = createCardInstance(randomTemplate, 1);
-        profile.collection = profile.collection || [];
-        profile.collection.push(newCard);
-        responseData.newCardName = newCard.name;
-      }
-      profile.battlePassClaimed.push(claimId);
-      successMessage = 'Battle Pass reward claimed';
-
-    } else if (action === 'buy_premium_bp') {
-      if (profile.isPremiumBP) return res.status(400).json({ error: 'Already unlocked' });
-      if ((profile.darkShards || 0) < 40) return res.status(400).json({ error: 'Not enough Shards' });
-      profile.darkShards -= 40;
-      profile.isPremiumBP = true;
-      successMessage = 'Premium Battle Pass Unlocked!';
     } else if (action === 'airdrop_task') {
       const { taskId } = payload;
       profile.completedTasks = profile.completedTasks || [];

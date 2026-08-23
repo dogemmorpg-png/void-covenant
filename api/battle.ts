@@ -163,8 +163,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             profile.campaignStars[stageId.toString()] = stars;
           }
         }
-
-        profile.battlePassPoints = (profile.battlePassPoints || 0) + 50;
       } else {
         goldReward = Math.floor(20 * goldMultiplier);
       }
@@ -179,7 +177,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         goldReward = Math.floor(20 * goldMultiplier);
         expReward = Math.floor(80 * expMultiplier);
         profile.pvpRating = (profile.pvpRating || 1000) + 15;
-        profile.battlePassPoints = (profile.battlePassPoints || 0) + 50;
       } else {
         goldReward = Math.floor(20 * goldMultiplier);
         profile.pvpRating = Math.max(0, (profile.pvpRating || 1000) - 10);
