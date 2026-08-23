@@ -141,6 +141,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             .from('profiles')
             .update({ data: refProfile, updated_at: new Date().toISOString() })
             .eq('wallet_address', referrer);
+
+          await supabase
+            .from('referrals')
+            .insert({
+              referrer_wallet: referrer,
+              referred_wallet: walletAddress
+            });
           
           isReferred = true;
           referrerAddress = referrer;

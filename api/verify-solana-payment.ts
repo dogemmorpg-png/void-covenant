@@ -233,6 +233,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         continue; // Retry loop
       }
       
+      await supabase
+        .from('purchases')
+        .insert({
+          wallet_address: walletAddress,
+          package_id: packageId,
+          sol_amount: pkg.solCost,
+          shards_amount: pkg.shards,
+          signature: signature,
+          status: 'success'
+        });
+
       success = true;
       finalProfile = profile;
     }
