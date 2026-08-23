@@ -247,6 +247,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
   const [showLogDrawer, setShowLogDrawer] = useState<boolean>(false);
   const [screenShake, setScreenShake] = useState<boolean>(false);
+  const [screenShakeEnabled, setScreenShakeEnabled] = useState<boolean>(true);
   const [hoveredHandCardIndex, setHoveredHandCardIndex] = useState<number | null>(null);
 
   // Track the final target battle state once the calculation resolves
@@ -282,8 +283,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   };
 
   const triggerScreenShake = () => {
+    if (!screenShakeEnabled) return;
     setScreenShake(true);
-    setTimeout(() => setScreenShake(false), 300);
+    setTimeout(() => setScreenShake(false), 300 / speedMultiplier);
   };
 
   // Setup the visual starting state before playing steps
@@ -1075,6 +1077,19 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   >
                     {isPaused ? <Play className="w-2.5 h-2.5 text-emerald-400 fill-emerald-400" /> : <Pause className="w-2.5 h-2.5 text-yellow-400 fill-yellow-400" />}
                     <span>{isPaused ? 'RESUME' : 'PAUSE'}</span>
+                  </button>
+
+                  {/* Screen Shake Toggle */}
+                  <button
+                    onClick={() => setScreenShakeEnabled(!screenShakeEnabled)}
+                    className={`h-7 px-2.5 rounded-md border font-mono text-[9px] font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${
+                      screenShakeEnabled
+                        ? 'bg-[#2a1b10] border-[#ebd09b]/40 text-[#ebd09b] hover:bg-[#3d2717]'
+                        : 'bg-black/60 border-gray-800 text-gray-500 hover:text-gray-400 hover:bg-white/5'
+                    }`}
+                    title="Toggle Screen Shake"
+                  >
+                    <span>📳 SHAKE: {screenShakeEnabled ? 'ON' : 'OFF'}</span>
                   </button>
 
                   {/* Manual Step */}
