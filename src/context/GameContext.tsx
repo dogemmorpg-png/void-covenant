@@ -43,10 +43,68 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = 'void_covenant_profile_v1';
 
+const LEGACY_CARD_MAPPINGS: Record<string, string> = {
+  'grave_hound': 'grave_digger',
+  'zombie_footsoldier': 'spitfire_toad',
+  'plague_beetle': 'possessed_cleaver',
+  'blood_guard': 'petrified_basilisk',
+  'cave_bat': 'gothic_harpy',
+  'stone_gargoyle': 'crypt_wisp',
+  'swamp_beast': 'chasm_worm',
+  'dread_knight': 'fallen_inquisitor',
+  'flesh_gorgon': 'stitched_chimera',
+  'tomb_guardian': 'iron_maiden_golem',
+  'spectral_stalker': 'tomb_weaver',
+  'crypt_abomination': 'belfry_colossus',
+  'void_behemoth': 'abyssal_leviathan',
+  'grave_titan': 'pharaoh_of_the_void',
+  'the_ancient_one': 'the_faceless_lord'
+};
+
+const migrateCardInstance = (card: any, templates: any[]): any => {
+  if (!card) return card;
+  const mappedBaseId = LEGACY_CARD_MAPPINGS[card.baseId];
+  if (mappedBaseId) {
+    const template = templates.find(t => t.baseId === mappedBaseId);
+    if (template) {
+      const level = card.level || 1;
+      const scale = 1 + (level - 1) * 0.2;
+      const attack = Math.round(template.attack * scale);
+      const health = Math.round(template.health * scale);
+      
+      let manaCost = 1;
+      if (template.tier === 'silver') manaCost = 2;
+      else if (template.tier === 'gold') manaCost = 3;
+      else if (template.tier === 'legendary') manaCost = 4;
+      else if (template.delay > 1) manaCost = 2;
+
+      return {
+        ...card,
+        baseId: mappedBaseId,
+        name: template.name,
+        tier: template.tier,
+        attack,
+        health,
+        maxHealth: health,
+        delay: template.delay,
+        skills: template.skills,
+        image: template.image,
+        color: template.color,
+        description: template.description,
+        manaCost
+      };
+    }
+  }
+  return card;
+};
+
 const migrateProfileTo10Cards = (p: PlayerProfile): PlayerProfile => {
   if (!p) return p;
   if (!p.collection) p.collection = [];
   if (!p.deck) p.deck = [];
+  
+  // First, migrate any legacy cards in the collection to their new equivalents
+  p.collection = p.collection.map(c => migrateCardInstance(c, CARD_TEMPLATES));
   
   // Filter out any cards whose baseId is no longer present in CARD_TEMPLATES (legacy versions)
   const validBaseIds = new Set(CARD_TEMPLATES.map(t => t.baseId));
@@ -536,7 +594,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const data = await res.json();
       if (data.profile) {
-        setProfile(calculateEnergy(data.profile));
+        setProfile(migrateProfileTo10Cards(calculateEnergy(data.profile)));
         return { success: true, message: 'Pact sealed successfully!' };
       }
       return { success: false, message: 'Server did not return updated profile' };

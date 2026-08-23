@@ -72,6 +72,66 @@ function calculateEnergy(profile: any): any {
   return profile;
 }
 
+const LEGACY_CARD_MAPPINGS: Record<string, string> = {
+  'grave_hound': 'grave_digger',
+  'zombie_footsoldier': 'spitfire_toad',
+  'plague_beetle': 'possessed_cleaver',
+  'blood_guard': 'petrified_basilisk',
+  'cave_bat': 'gothic_harpy',
+  'stone_gargoyle': 'crypt_wisp',
+  'swamp_beast': 'chasm_worm',
+  'dread_knight': 'fallen_inquisitor',
+  'flesh_gorgon': 'stitched_chimera',
+  'tomb_guardian': 'iron_maiden_golem',
+  'spectral_stalker': 'tomb_weaver',
+  'crypt_abomination': 'belfry_colossus',
+  'void_behemoth': 'abyssal_leviathan',
+  'grave_titan': 'pharaoh_of_the_void',
+  'the_ancient_one': 'the_faceless_lord'
+};
+
+function migrateProfileCards(profile: any): any {
+  if (!profile || !profile.collection) return profile;
+  
+  profile.collection = profile.collection.map((card: any) => {
+    const mapped = LEGACY_CARD_MAPPINGS[card.baseId];
+    if (mapped) {
+      const template = CARD_TEMPLATES.find(t => t.baseId === mapped);
+      if (template) {
+        const level = card.level || 1;
+        const scale = 1 + (level - 1) * 0.2;
+        const attack = Math.round(template.attack * scale);
+        const health = Math.round(template.health * scale);
+        
+        let manaCost = 1;
+        if (template.tier === 'silver') manaCost = 2;
+        else if (template.tier === 'gold') manaCost = 3;
+        else if (template.tier === 'legendary') manaCost = 4;
+        else if (template.delay > 1) manaCost = 2;
+
+        return {
+          ...card,
+          baseId: mapped,
+          name: template.name,
+          tier: template.tier,
+          attack,
+          health,
+          maxHealth: health,
+          delay: template.delay,
+          skills: template.skills,
+          image: template.image,
+          color: template.color,
+          description: template.description,
+          manaCost
+        };
+      }
+    }
+    return card;
+  });
+
+  return profile;
+}
+
 function getSupabase() {
   const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://yetzjqqnmllwufmzopor.supabase.co';
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlldHpqcXFubWxsd3VmbXpvcG9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NTkwMzgsImV4cCI6MjA5ODMzNTAzOH0.Ra2mdK9QS4Aq5WZsUmULvqfdaJkdLJBcEzPch9EpwB4';
@@ -187,7 +247,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
     } else {
-      currentProfile = profileRow.data;
+      currentProfile = migrateProfileCards(profileRow.data);
     }
 
     currentProfile = calculateEnergy(currentProfile);
