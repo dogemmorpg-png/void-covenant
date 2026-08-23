@@ -87,43 +87,43 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
         <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#ebd09b]/35 pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#ebd09b]/35 pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col justify-between h-full">
+        <div className="relative z-10 flex flex-col justify-between h-full space-y-6">
           
-          {/* Header Row: Title on Left, Floor Selector on Right */}
-          <div className="flex flex-col md:flex-row justify-between items-center border-b border-gray-800/80 pb-6 mb-4 gap-4">
-            <div className="text-center md:text-left">
-              <h2 className="font-display font-black text-2xl md:text-3xl text-white tracking-widest text-shadow-gold">
-                THE ENDLESS ABYSS
-              </h2>
-              <p className="text-xs text-gray-400 mt-1.5 max-w-md font-sans leading-relaxed">
-                Descend into the infinite depths. Defeat the dark entities to claim ancient resources and rare cards.
-              </p>
-            </div>
+          {/* Row 1: Title & Description Centered */}
+          <div className="text-center border-b border-gray-800/80 pb-4">
+            <h2 className="font-display font-black text-2xl md:text-3xl text-white tracking-widest text-shadow-gold">
+              THE ENDLESS ABYSS
+            </h2>
+            <p className="text-xs text-gray-400 mt-1.5 max-w-xl mx-auto font-sans leading-relaxed">
+              Descend into the infinite depths. Defeat the dark entities to claim ancient resources.
+            </p>
+          </div>
 
-            {/* Large Floor Selector with Stars */}
-            <div className="flex items-center gap-5 bg-black/40 border border-gray-800/50 rounded-2xl py-2 px-4 shadow-inner">
+          {/* Row 2: Large Centered Floor Selector */}
+          <div className="flex justify-center items-center py-2">
+            <div className="flex items-center gap-6 bg-black/40 border border-gray-800/50 rounded-3xl py-3 px-6 shadow-inner">
               <button 
                 onClick={handlePrev}
                 disabled={viewingFloor === 1}
-                className="p-2 rounded-xl bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
+                className="p-3 rounded-2xl bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-6 h-6" />
               </button>
 
-              <div className="flex flex-col items-center w-28 select-none">
-                <span className={`text-[9px] font-mono tracking-widest uppercase font-bold ${isBoss ? 'text-red-500' : 'text-[#ebd09b]'}`}>
+              <div className="flex flex-col items-center w-36 select-none">
+                <span className={`text-[10px] font-mono tracking-widest uppercase font-bold ${isBoss ? 'text-red-500 animate-pulse' : 'text-[#ebd09b]'}`}>
                   {isBoss ? 'Boss Floor' : 'Floor'}
                 </span>
-                <div className="text-4xl font-display font-black text-white text-shadow-gold leading-none my-0.5">
+                <div className="text-5xl font-display font-black text-white text-shadow-gold leading-none my-1">
                   {viewingFloor}
                 </div>
                 
                 {/* Stars display directly under the floor number */}
-                <div className="flex justify-center gap-0.5 my-1">
+                <div className="flex justify-center gap-1 my-1">
                   {[1, 2, 3].map(star => (
                     <Star 
                       key={star} 
-                      className={`w-3.5 h-3.5 ${star <= stageStars ? 'text-[#ebd09b] fill-[#ebd09b] drop-shadow-[0_0_6px_rgba(235,208,155,0.8)]' : 'text-gray-700'}`} 
+                      className={`w-4.5 h-4.5 ${star <= stageStars ? 'text-[#ebd09b] fill-[#ebd09b] drop-shadow-[0_0_6px_rgba(235,208,155,0.8)]' : 'text-gray-700'}`} 
                     />
                   ))}
                 </div>
@@ -138,17 +138,17 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
               <button 
                 onClick={handleNext}
                 disabled={viewingFloor >= maxFloor}
-                className="p-2 rounded-xl bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
+                className="p-3 rounded-2xl bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
               >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-6 h-6" />
               </button>
             </div>
           </div>
 
-          {/* Details Section: Encounter & Drops */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6 mt-2">
+          {/* Row 3: Encounter & Drops Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-4">
             
-            {/* Left side: Encounter */}
+            {/* Encounter details */}
             <div className="space-y-3">
               <span className="text-[10px] font-mono text-gray-500 tracking-widest uppercase font-bold block">Encounter</span>
               <div className="bg-black/50 border border-gray-800/60 rounded-2xl p-5 flex items-center gap-4 shadow-inner min-h-[110px]">
@@ -167,7 +167,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
               </div>
             </div>
 
-            {/* Right side: Rewards info */}
+            {/* Guaranteed Rewards */}
             <div className="space-y-3 flex flex-col justify-between">
               <div className="space-y-3">
                 <span className="text-[10px] font-mono text-gray-500 tracking-widest uppercase font-bold block">Guaranteed Drops</span>
@@ -212,7 +212,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
 
           {/* Card Reward Info if exists */}
           {selectedStage.cardReward && (
-            <div className="bg-black/50 border border-emerald-500/20 p-4 rounded-2xl flex items-center justify-between shadow-inner mb-6">
+            <div className="bg-black/50 border border-emerald-500/20 p-4 rounded-2xl flex items-center justify-between shadow-inner mb-2">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-emerald-950/40 flex items-center justify-center border border-emerald-500/30 shrink-0">
                   <Award className="w-5 h-5 text-emerald-400" />
@@ -228,35 +228,35 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
 
           {/* Action Buttons Area */}
           <div className="pt-6 border-t border-gray-800/80 flex flex-col items-center">
-            <div className="flex w-full max-w-lg gap-5">
+            <div className="flex w-full max-w-xl gap-5">
               <button
                 onClick={handleStart}
-                className={`flex-1 font-display font-bold tracking-widest py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase ${
+                className={`flex-1 font-display font-bold tracking-widest py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-4 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase ${
                   isBoss 
                     ? 'bg-gradient-to-b from-[#3a0b12] via-[#200508] to-[#140204] border-2 border-red-600/50 hover:border-red-500 text-red-400 hover:text-white shadow-[0_0_15px_rgba(220,38,38,0.15)] hover:shadow-[0_0_25px_rgba(239,68,68,0.35)]'
                     : 'bg-gradient-to-b from-[#221a12] via-[#150f0a] to-[#0c0805] border-2 border-[#c5a880]/50 hover:border-[#ebd09b] text-[#ebd09b] hover:text-white shadow-[0_0_15px_rgba(197,168,128,0.15)] hover:shadow-[0_0_25px_rgba(235,208,155,0.35)]'
                 }`}
               >
-                <Swords className="w-4.5 h-4.5" /> 
+                <Swords className="w-5 h-5 animate-pulse" /> 
                 <span className="mr-0.5">BATTLE</span>
-                <span className={`flex items-center gap-1 bg-black/50 border rounded-full px-2 py-0.5 font-mono text-xs font-bold text-emerald-400 shadow-inner ${
+                <span className={`flex items-center gap-1.5 bg-black/50 border rounded-full px-3 py-1 font-mono text-lg font-bold text-emerald-400 shadow-inner ${
                   isBoss ? 'border-red-500/30' : 'border-[#ebd09b]/35'
                 }`}>
                   {selectedStage.energyCost}
-                  <img src="/icons/icon_energy.png" alt="Energy" className="w-4 h-4 object-contain brightness-110 drop-shadow-[0_0_4px_rgba(16,185,129,0.4)]" />
+                  <img src="/icons/icon_energy.png" alt="Energy" className="w-7 h-7 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
                 </span>
               </button>
               
               {stageStars === 3 && (
                 <button
                   onClick={handleSweep}
-                  className="flex-1 font-display font-bold tracking-widest py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase bg-gradient-to-b from-[#1b122c] via-[#0e071a] to-[#06020c] border-2 border-purple-600/50 hover:border-purple-400 text-purple-400 hover:text-white shadow-[0_0_15px_rgba(147,51,234,0.15)] hover:shadow-[0_0_25px_rgba(168,85,247,0.35)]"
+                  className="flex-1 font-display font-bold tracking-widest py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-4 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase bg-gradient-to-b from-[#1b122c] via-[#0e071a] to-[#06020c] border-2 border-purple-600/50 hover:border-purple-400 text-purple-400 hover:text-white shadow-[0_0_15px_rgba(147,51,234,0.15)] hover:shadow-[0_0_25px_rgba(168,85,247,0.35)]"
                 >
-                  <FastForward className="w-4.5 h-4.5" /> 
+                  <FastForward className="w-5 h-5" /> 
                   <span className="mr-0.5">SWEEP</span>
-                  <span className="flex items-center gap-1 bg-black/50 border border-purple-500/30 rounded-full px-2 py-0.5 font-mono text-xs font-bold text-emerald-400 shadow-inner">
+                  <span className="flex items-center gap-1.5 bg-black/50 border border-purple-500/30 rounded-full px-3 py-1 font-mono text-lg font-bold text-emerald-400 shadow-inner">
                     {selectedStage.energyCost}
-                    <img src="/icons/icon_energy.png" alt="Energy" className="w-4 h-4 object-contain brightness-110 drop-shadow-[0_0_4px_rgba(16,185,129,0.4)]" />
+                    <img src="/icons/icon_energy.png" alt="Energy" className="w-7 h-7 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
                   </span>
                 </button>
               )}
