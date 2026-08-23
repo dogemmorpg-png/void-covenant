@@ -9,7 +9,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Transaction, SystemProgram, PublicKey, LAMPORTS_PER_SOL, ComputeBudgetProgram } from '@solana/web3.js';
 
 export const AirdropHubView: React.FC = () => {
-  const { profile, completeAirdropTask, addReferral, verifySolanaPayment, addShards, addDust, saveProfile } = useGame();
+  const { profile, completeAirdropTask, verifySolanaPayment, addShards, addDust, saveProfile } = useGame();
   const toast = useToast();
   const { setVisible } = useWalletModal();
   const { connection } = useConnection();
@@ -489,7 +489,7 @@ export const AirdropHubView: React.FC = () => {
               <Share2 className="w-4 h-4 text-[#ebd09b]" /> DARK BROTHERHOOD ORDER
             </h3>
             <p className="text-xs text-gray-300 font-sans leading-relaxed">
-              Invite other summoners and share the loot. Receive <span className="text-amber-500 font-bold">1,000<img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> Gold</span> and battle pass points for each invitee!
+              Invite other summoners and share the loot. Receive <span className="text-amber-500 font-bold">1,000<img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> Gold</span> and <span className="text-[#ebd09b] font-bold">100 Dust</span> for each invitee!
             </p>
 
             <div className="bg-black/50 border border-gray-800 p-3 rounded-xl font-mono text-xs flex justify-between items-center">
@@ -501,21 +501,12 @@ export const AirdropHubView: React.FC = () => {
           <div className="space-y-2 mt-6">
             <button
               onClick={() => {
-                addReferral();
-                toast('Ally invited! Reward: +1000 Gold and +80 Battle Pass points!', 'success');
+                navigator.clipboard.writeText(`${window.location.origin}?ref=${profile.solanaAddress || ''}`);
+                toast('Referral link copied to clipboard!', 'info');
               }}
               className="w-full bg-[#ebd09b] hover:bg-[#c5a880] text-black font-display font-black py-2.5 px-4 rounded-xl text-xs transition-all tracking-wider cursor-pointer"
             >
-              👥 SIMULATE INVITE
-            </button>
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(`https://voidcovenant.com?ref=${profile.solanaAddress || 'ref'}`);
-                toast('Referral link copied to clipboard!', 'info');
-              }}
-              className="w-full bg-[#1f2833] hover:bg-[#151a21] border border-[#c5a880]/20 text-gray-300 font-mono text-xs py-2 rounded-lg transition-all cursor-pointer"
-            >
-              Copy link
+              📋 COPY REFERRAL LINK
             </button>
           </div>
         </div>

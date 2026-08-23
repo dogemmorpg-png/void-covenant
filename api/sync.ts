@@ -85,7 +85,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Token missing wallet address' });
   }
 
-  const { safeProfileData } = req.body || {};
+  const { safeProfileData, referrer } = req.body || {};
 
   try {
     const supabase = getSupabase();
@@ -106,8 +106,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let oldUpdatedAt = profileRow ? profileRow.updated_at : null;
 
     if (!profileRow) {
+      let isReferred = false;
+      let referrerAddress = '';
+      if (referrer && typeof referrer === 'string' && referrer !== walletAddress) {
+        const { data: refRows } = await supabase
+          .from('profiles')
+          .select('data')
+          .eq('wallet_address', referrer)
+          .limit(1);
+        if (refRows && refRows.length > 0) {
+          const refRow = refRows[0];
+          const refProfile = refRow.data;
+          refProfile.referralsCount = (refProfile.referralsCount || 0) + 1;
+          refProfile.gold = (refProfile.gold || 0) + 1000;
+          refProfile.dust = (refProfile.dust || 0) + 100;
+          
+          await supabase
+            .from('profiles')
+            .update({ data: refProfile, updated_at: new Date().toISOString() })
+            .eq('wallet_address', referrer);
+          
+          isReferred = true;
+          referrerAddress = referrer;
+        }
+      }
+
       currentProfile = {
-      gold: 500,
+      gold: isReferred ? 700 : 500,
       dust: 100,
       darkShards: 0,
       collection: [
@@ -246,7 +271,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         solBalance: 12.5,
         isPremiumBP: false,
         username: '',
-        isRegistered: false
+        isRegistered: false,
+        referredBy: isReferred ? referrerAddress : null
       };
       // Prevent creating duplicates by checking again or using insert
       const { data: existingCheck } = await supabase.from('profiles').select('wallet_address').eq('wallet_address', walletAddress).limit(1);

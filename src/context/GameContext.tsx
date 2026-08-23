@@ -29,16 +29,12 @@ interface GameContextType {
   submitAction: (action: string, payload: any) => Promise<{ success: boolean; message: string; data?: any }>;
   addCardToCollection: (cardTemplate: CardTemplate, level?: number) => Card;
   toggleDeckCard: (cardId: string) => { success: boolean; message: string };
-  claimBattlePassReward: (tierIndex: number, isPremium: boolean) => Promise<{ success: boolean; message: string }>;
   completeAirdropTask: (taskId: string) => Promise<{ success: boolean; message: string }>;
-  addBattlePassPoints: (amount: number) => void;
-  claimBattlePassTier: (index: number) => void;
   addExp: (amount: number) => void;
   addCampaignStars: (stageId: string, stars: number) => void;
   addEquipment: (equipment: Equipment) => void;
   equipItem: (slot: EquipmentSlot, equipmentId: string) => void;
   unequipItem: (slot: EquipmentSlot) => void;
-  addReferral: () => void;
   registerPlayer: (username: string, avatarUrl: string) => void;
   logoutPlayer: () => void;
   resetProfile: () => void;
@@ -140,6 +136,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<PlayerProfile>(createDefaultProfile);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref && ref.length >= 32) {
+      localStorage.setItem('void_covenant_referrer', ref);
+    }
+  }, []);
+
   // Ref to track latest profile for synchronous reads in spend functions
   const profileRef = useRef(profile);
   useEffect(() => { profileRef.current = profile; }, [profile]);
@@ -152,13 +156,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const token = localStorage.getItem('void_covenant_token');
       if (token) {
         // Send safe profile updates to the server (e.g. deck, equipped, sound)
+        const referrer = localStorage.getItem('void_covenant_referrer') || undefined;
         fetch('/api/sync', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ safeProfileData: newProfile })
+          body: JSON.stringify({ safeProfileData: newProfile, referrer })
         }).catch(err => console.error('Failed to sync profile settings', err));
       }
     }
@@ -462,13 +467,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (token) {
       try {
         // Fetch strictly from the backend to ensure a unique DB profile is created/returned
+        const referrer = localStorage.getItem('void_covenant_referrer') || undefined;
         const res = await fetch('/api/sync', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({})
+          body: JSON.stringify({ referrer })
         });
 
         if (res.ok) {
@@ -766,47 +772,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Claim Battle Pass Tier reward
-  const claimBattlePassReward = async (tierIndex: number, isPremium: boolean): Promise<{ success: boolean; message: string }> => {
-    return submitAction('claim_battlepass', { tierIndex, isPremium });
-  };
-
-  const claimBattlePassTier = (index: number) => {
-    // Wrapper/alias if needed for specific logic
-  };
-
   // Complete Airdrop / social tasks
   const completeAirdropTask = async (taskId: string): Promise<{ success: boolean; message: string }> => {
     return submitAction('airdrop_task', { taskId });
-  };
-
-  // Battle pass points progression helper
-  const addBattlePassPoints = (amount: number) => {
-    setProfile(current => {
-      const updated = {
-        ...current,
-        battlePassPoints: current.battlePassPoints + amount
-      };
-      saveProfile(updated);
-      return updated;
-    });
-  };
-
-  // Simulated referral sharing
-  const addReferral = () => {
-    setProfile(current => {
-      const pointsReward = 80;
-      const goldReward = 1000;
-      
-      const updated = {
-        ...current,
-        referralsCount: current.referralsCount + 1,
-        gold: current.gold + goldReward,
-        battlePassPoints: current.battlePassPoints + pointsReward
-      };
-      saveProfile(updated);
-      return updated;
-    });
   };
 
   // Sync profile cards with new images if updated
@@ -868,16 +836,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         submitAction,
         addCardToCollection,
         toggleDeckCard,
-        claimBattlePassReward,
         completeAirdropTask,
-        addBattlePassPoints,
-        claimBattlePassTier,
         addExp,
         addCampaignStars,
         addEquipment,
         equipItem,
         unequipItem,
-        addReferral,
         registerPlayer,
         logoutPlayer,
         resetProfile,
