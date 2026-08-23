@@ -3,7 +3,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { CheckCircle } from 'lucide-react';
 
 interface RegistrationScreenProps {
-  onRegister: (username: string, avatarUrl: string) => void;
+  onRegister: (username: string, avatarUrl: string) => Promise<{ success: boolean; message: string }>;
 }
 
 const AVATARS = [
@@ -15,14 +15,29 @@ const AVATARS = [
 
 export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegister }) => {
   const { publicKey } = useWallet();
-  const defaultUsername = publicKey ? 'Summoner_' + publicKey.toBase58().substring(0, 4) : '';
+  const defaultUsername = publicKey ? 'Sum_' + publicKey.toBase58().substring(0, 4) : '';
   const [username, setUsername] = useState(defaultUsername);
   const [selectedAvatar, setSelectedAvatar] = useState(AVATARS[0].url);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username.trim()) {
-      onRegister(username.trim(), selectedAvatar);
+    setError(null);
+    const trimmed = username.trim();
+
+    const usernameRegex = /^[a-zA-Z0-9_]{4,12}$/;
+    if (!usernameRegex.test(trimmed)) {
+      setError('Name must be 4-12 characters long and contain only English letters, numbers, or underscores.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    const res = await onRegister(trimmed, selectedAvatar);
+    setIsSubmitting(false);
+
+    if (!res.success) {
+      setError(res.message);
     }
   };
 
@@ -45,18 +60,24 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="space-y-3">
             <label className="block text-xs font-mono font-bold text-[#ebd09b] uppercase tracking-widest">
-              Summoner Name
+              Summoner Name (4-12 chars, English, 0-9, _)
             </label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              maxLength={20}
+              maxLength={12}
               required
               className="w-full bg-[#0b0c10] border border-[#c5a880]/50 rounded-lg p-3 text-white font-display text-lg focus:outline-none focus:border-[#c5a880] focus:shadow-[0_0_15px_rgba(197,168,128,0.3)] transition-all"
               placeholder="Enter your name..."
             />
           </div>
+
+          {error && (
+            <div className="bg-red-950/40 border border-red-500/30 text-red-200 text-xs p-3 rounded-lg flex items-center gap-2 font-mono">
+              <span>⚠️</span> {error}
+            </div>
+          )}
 
           <div className="space-y-4">
             <label className="block text-xs font-mono font-bold text-[#ebd09b] uppercase tracking-widest text-center">
@@ -89,9 +110,10 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
 
           <button
             type="submit"
-            className="w-full bg-[#ebd09b] hover:bg-[#c5a880] text-black font-display font-black tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(235,208,155,0.3)] transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+            disabled={isSubmitting}
+            className="w-full bg-[#ebd09b] hover:bg-[#c5a880] text-black font-display font-black tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(235,208,155,0.3)] transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            SEAL THE PACT
+            {isSubmitting ? 'SEALING THE PACT...' : 'SEAL THE PACT'}
           </button>
         </form>
       </div>

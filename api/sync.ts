@@ -203,7 +203,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (safeProfileData.equipped) currentProfile.equipped = safeProfileData.equipped;
       if (safeProfileData.soundOn !== undefined) currentProfile.soundOn = safeProfileData.soundOn;
       if (safeProfileData.isRegistered !== undefined) currentProfile.isRegistered = safeProfileData.isRegistered;
-      if (safeProfileData.username) currentProfile.username = safeProfileData.username;
+      if (safeProfileData.username) {
+        const reqUsername = safeProfileData.username.trim();
+        const usernameRegex = /^[a-zA-Z0-9_]{4,12}$/;
+        if (!usernameRegex.test(reqUsername)) {
+          return res.status(400).json({ error: 'Username must be 4-12 characters long and contain only English letters, numbers, or underscores.' });
+        }
+        
+        if (currentProfile.username !== reqUsername) {
+          const { data: duplicateRows, error: dupError } = await supabase
+            .from('profiles')
+            .select('wallet_address')
+            .eq('data->>username', reqUsername)
+            .neq('wallet_address', walletAddress)
+            .limit(1);
+            
+          if (dupError) {
+            console.error('Database error checking duplicate username:', dupError);
+            return res.status(500).json({ error: 'Database check failed' });
+          }
+          
+          if (duplicateRows && duplicateRows.length > 0) {
+            return res.status(400).json({ error: 'This username is already taken by another player.' });
+          }
+          currentProfile.username = reqUsername;
+        }
+      }
       if (safeProfileData.avatarUrl) currentProfile.avatarUrl = safeProfileData.avatarUrl;
       if (safeProfileData.talents) {
         let totalSpent = 0;

@@ -35,7 +35,7 @@ interface GameContextType {
   addEquipment: (equipment: Equipment) => void;
   equipItem: (slot: EquipmentSlot, equipmentId: string) => void;
   unequipItem: (slot: EquipmentSlot) => void;
-  registerPlayer: (username: string, avatarUrl: string) => void;
+  registerPlayer: (username: string, avatarUrl: string) => Promise<{ success: boolean; message: string }>;
   logoutPlayer: () => void;
   resetProfile: () => void;
   updateProfile: (updates: Partial<PlayerProfile>) => void;
@@ -513,17 +513,46 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setProfile(createDefaultProfile());
   }, []);
 
-  const registerPlayer = (username: string, avatarUrl: string) => {
-    setProfile(current => {
-      const updated = {
-        ...current,
+  const registerPlayer = async (username: string, avatarUrl: string): Promise<{ success: boolean; message: string }> => {
+    const token = localStorage.getItem('void_covenant_token');
+    if (!token) return { success: false, message: 'Not authenticated. Connect wallet first.' };
+
+    try {
+      const updatedProfile = {
+        ...profile,
         username,
         avatarUrl,
         isRegistered: true
       };
-      saveProfile(updated);
-      return updated;
-    });
+
+      const res = await fetch('/api/sync', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ safeProfileData: updatedProfile })
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        let parsedError = 'Registration failed';
+        try {
+          parsedError = JSON.parse(errorText).error || parsedError;
+        } catch (e) {}
+        return { success: false, message: parsedError };
+      }
+
+      const data = await res.json();
+      if (data.profile) {
+        setProfile(calculateEnergy(data.profile));
+        return { success: true, message: 'Pact sealed successfully!' };
+      }
+      return { success: false, message: 'Server did not return updated profile' };
+    } catch (e: any) {
+      console.error('Registration failed:', e);
+      return { success: false, message: e.message || 'Network error during registration' };
+    }
   };
 
   const logoutPlayer = () => {
