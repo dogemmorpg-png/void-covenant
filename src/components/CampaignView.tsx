@@ -68,7 +68,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-4 flex items-center justify-center min-h-[calc(100vh-220px)]">
+    <div className="max-w-5xl mx-auto p-4 flex items-center justify-center min-h-[calc(100vh-220px)] animate-fadeIn">
       
       {/* Unified Majestic Slate Panel */}
       <div className={`glass-panel rounded-3xl p-8 w-full relative overflow-hidden flex flex-col justify-between ${
@@ -90,7 +90,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
         <div className="relative z-10 flex flex-col justify-between h-full">
           
           {/* Header Row: Title on Left, Floor Selector on Right */}
-          <div className="flex flex-col md:flex-row justify-between items-center border-b border-gray-800/80 pb-6 mb-6 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-center border-b border-gray-800/80 pb-6 mb-4 gap-4">
             <div className="text-center md:text-left">
               <h2 className="font-display font-black text-2xl md:text-3xl text-white tracking-widest text-shadow-gold">
                 THE ENDLESS ABYSS
@@ -100,7 +100,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
               </p>
             </div>
 
-            {/* Large Floor Selector */}
+            {/* Large Floor Selector with Stars */}
             <div className="flex items-center gap-5 bg-black/40 border border-gray-800/50 rounded-2xl py-2 px-4 shadow-inner">
               <button 
                 onClick={handlePrev}
@@ -117,6 +117,17 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                 <div className="text-4xl font-display font-black text-white text-shadow-gold leading-none my-0.5">
                   {viewingFloor}
                 </div>
+                
+                {/* Stars display directly under the floor number */}
+                <div className="flex justify-center gap-0.5 my-1">
+                  {[1, 2, 3].map(star => (
+                    <Star 
+                      key={star} 
+                      className={`w-3.5 h-3.5 ${star <= stageStars ? 'text-[#ebd09b] fill-[#ebd09b] drop-shadow-[0_0_6px_rgba(235,208,155,0.8)]' : 'text-gray-700'}`} 
+                    />
+                  ))}
+                </div>
+
                 {viewingFloor === maxFloor ? (
                   <span className="text-[8px] text-emerald-400 font-mono tracking-wider uppercase font-bold">Current Max</span>
                 ) : (
@@ -135,93 +146,88 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
           </div>
 
           {/* Details Section: Encounter & Drops */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6 mt-2">
             
-            {/* Left side: Stage description & Encounter */}
-            <div className="space-y-5">
-              <div>
-                <h3 className={`font-display font-black text-xl tracking-wider text-shadow-gold ${isBoss ? 'text-red-400' : 'text-white'}`}>
-                  {selectedStage.name}
-                </h3>
-                <p className="text-xs text-gray-400 mt-1 font-sans leading-relaxed">{selectedStage.description}</p>
-                {/* Stars display */}
-                <div className="flex gap-1 mt-2.5">
-                  {[1, 2, 3].map(star => (
-                    <Star 
-                      key={star} 
-                      className={`w-5 h-5 ${star <= stageStars ? 'text-[#ebd09b] fill-[#ebd09b] drop-shadow-[0_0_8px_rgba(235,208,155,0.8)]' : 'text-gray-700'}`} 
-                    />
-                  ))}
+            {/* Left side: Encounter */}
+            <div className="space-y-3">
+              <span className="text-[10px] font-mono text-gray-500 tracking-widest uppercase font-bold block">Encounter</span>
+              <div className="bg-black/50 border border-gray-800/60 rounded-2xl p-5 flex items-center gap-4 shadow-inner min-h-[110px]">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center border shrink-0 ${isBoss ? 'bg-[#4e0707] border-[#dd2c40]/50' : 'bg-[#1f2833] border-cyan-900'} overflow-hidden`}>
+                  {selectedStage.enemyHeroImage?.startsWith('/') ? (
+                    <img src={selectedStage.enemyHeroImage} alt="Enemy Hero" className="w-full h-full object-cover animate-pulse" />
+                  ) : (
+                    isBoss ? <Crown className="w-8 h-8 text-purple-500 drop-shadow-[0_0_12px_rgba(168,85,247,0.8)] animate-pulse" /> : <Skull className="w-7 h-7 text-red-500/90" />
+                  )}
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <span className="text-[10px] font-mono text-gray-500 tracking-widest uppercase font-bold block">Encounter</span>
-                <div className="bg-black/50 border border-gray-800/60 rounded-2xl p-4 flex items-center gap-4 shadow-inner">
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center border shrink-0 ${isBoss ? 'bg-[#4e0707] border-[#dd2c40]/50' : 'bg-[#1f2833] border-cyan-900'} overflow-hidden`}>
-                    {selectedStage.enemyHeroImage?.startsWith('/') ? (
-                      <img src={selectedStage.enemyHeroImage} alt="Enemy Hero" className="w-full h-full object-cover" />
-                    ) : (
-                      isBoss ? <Crown className="w-8 h-8 text-purple-500 drop-shadow-[0_0_12px_rgba(168,85,247,0.8)] animate-pulse" /> : <Skull className="w-7 h-7 text-red-500/90" />
-                    )}
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-white text-base leading-none">{selectedStage.enemyHeroName}</h4>
-                    <p className="text-xs font-mono text-gray-400 mt-1.5">Hero Health: <span className="text-[#dd2c40] font-bold">{selectedStage.enemyHeroHealth} HP</span></p>
-                    <p className="text-[10px] text-gray-500 font-mono mt-0.5">Deck Size: {selectedStage.enemyDeck.length} Cards</p>
-                  </div>
+                <div>
+                  <h4 className="font-display font-bold text-white text-lg leading-none">{selectedStage.enemyHeroName}</h4>
+                  <p className="text-xs font-mono text-gray-400 mt-2.5">Hero Health: <span className="text-[#dd2c40] font-bold">{selectedStage.enemyHeroHealth} HP</span></p>
+                  <p className="text-[10px] text-gray-500 font-mono mt-0.5">Deck Size: {selectedStage.enemyDeck.length} Cards</p>
                 </div>
               </div>
             </div>
 
             {/* Right side: Rewards info */}
-            <div className="space-y-5 flex flex-col justify-between">
-              
-              <div className="space-y-2">
+            <div className="space-y-3 flex flex-col justify-between">
+              <div className="space-y-3">
                 <span className="text-[10px] font-mono text-gray-500 tracking-widest uppercase font-bold block">Guaranteed Drops</span>
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-black/50 border border-amber-500/20 p-3.5 rounded-2xl text-center shadow-inner hover:border-amber-500/40 transition-colors">
-                    <span className="text-amber-400 font-bold text-base block">+{selectedStage.goldReward}</span>
-                    <span className="text-[10px] text-gray-500 font-mono">Gold</span>
+                  <div className="bg-black/50 border border-amber-500/20 p-3.5 rounded-2xl text-center shadow-inner hover:border-amber-500/40 transition-colors flex flex-col items-center justify-center min-h-[90px]">
+                    <span className="text-amber-400 font-bold text-lg block flex items-center gap-1.5 justify-center">
+                      +{selectedStage.goldReward}
+                      <img src="/icons/icon_gold.png" alt="Gold" className="w-5 h-5 object-contain" />
+                    </span>
+                    <span className="text-[9px] text-gray-500 font-mono tracking-wide uppercase mt-1">Gold</span>
                   </div>
-                  <div className="bg-black/50 border border-cyan-500/20 p-3.5 rounded-2xl text-center shadow-inner hover:border-cyan-500/40 transition-colors">
-                    <span className="text-[#66fcf1] font-bold text-base block">+{selectedStage.dustReward}</span>
-                    <span className="text-[10px] text-gray-500 font-mono">Dark Dust</span>
+                  
+                  <div className="bg-black/50 border border-cyan-500/20 p-3.5 rounded-2xl text-center shadow-inner hover:border-cyan-500/40 transition-colors flex flex-col items-center justify-center min-h-[90px]">
+                    <span className="text-[#66fcf1] font-bold text-lg block flex items-center gap-1.5 justify-center">
+                      +{selectedStage.dustReward}
+                      <img src="/icons/icon_dust.png" alt="Dust" className="w-5 h-5 object-contain" />
+                    </span>
+                    <span className="text-[9px] text-gray-500 font-mono tracking-wide uppercase mt-1">Dust</span>
                   </div>
+
                   {selectedStage.shardsReward > 0 ? (
-                    <div className="bg-black/50 border border-red-500/20 p-3.5 rounded-2xl text-center shadow-inner hover:border-red-500/40 transition-colors">
-                      <span className="text-red-500 font-bold text-base block">+{selectedStage.shardsReward}</span>
-                      <span className="text-[10px] text-gray-500 font-mono">Shards</span>
+                    <div className="bg-black/50 border border-red-500/20 p-3.5 rounded-2xl text-center shadow-inner hover:border-red-500/40 transition-colors flex flex-col items-center justify-center min-h-[90px]">
+                      <span className="text-red-500 font-bold text-lg block flex items-center gap-1.5 justify-center">
+                        +{selectedStage.shardsReward}
+                        <img src="/icons/icon_shards.png" alt="Shards" className="w-5 h-5 object-contain" />
+                      </span>
+                      <span className="text-[9px] text-gray-500 font-mono tracking-wide uppercase mt-1">Shards</span>
                     </div>
                   ) : (
-                    <div className="bg-black/50 border border-emerald-500/20 p-3.5 rounded-2xl text-center shadow-inner hover:border-emerald-500/40 transition-colors">
-                      <span className="text-emerald-400 font-bold text-base block">+50✨</span>
-                      <span className="text-[10px] text-gray-500 font-mono">EXP</span>
+                    <div className="bg-black/50 border border-emerald-500/20 p-3.5 rounded-2xl text-center shadow-inner hover:border-emerald-500/40 transition-colors flex flex-col items-center justify-center min-h-[90px]">
+                      <span className="text-emerald-400 font-bold text-lg block">
+                        +50✨
+                      </span>
+                      <span className="text-[9px] text-gray-500 font-mono tracking-wide uppercase mt-1">EXP</span>
                     </div>
                   )}
                 </div>
               </div>
-
-              {selectedStage.cardReward && (
-                <div className="bg-black/50 border border-emerald-500/20 p-4 rounded-2xl flex items-center justify-between shadow-inner">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-emerald-950/40 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                      <Award className="w-5 h-5 text-emerald-400" />
-                    </div>
-                    <div>
-                      <span className="text-emerald-400 font-bold text-xs block leading-none">Guaranteed Card Drop</span>
-                      <span className="text-[10px] text-gray-400 font-mono mt-1">{selectedStage.cardReward.name}</span>
-                    </div>
-                  </div>
-                  <span className="text-[10px] bg-emerald-950/40 text-emerald-400 px-3 py-1 rounded-lg font-mono border border-emerald-500/20">Guaranteed</span>
-                </div>
-              )}
             </div>
 
           </div>
 
-          {/* Action Buttons & Energy Cost */}
-          <div className="pt-5 border-t border-gray-800/80 flex flex-col items-center">
+          {/* Card Reward Info if exists */}
+          {selectedStage.cardReward && (
+            <div className="bg-black/50 border border-emerald-500/20 p-4 rounded-2xl flex items-center justify-between shadow-inner mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-emerald-950/40 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                  <Award className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div>
+                  <span className="text-emerald-400 font-bold text-xs block leading-none">Guaranteed Card Drop</span>
+                  <span className="text-[10px] text-gray-400 font-mono mt-1.5">{selectedStage.cardReward.name}</span>
+                </div>
+              </div>
+              <span className="text-[10px] bg-emerald-950/40 text-emerald-400 px-3 py-1 rounded-lg font-mono border border-emerald-500/20">Guaranteed</span>
+            </div>
+          )}
+
+          {/* Action Buttons Area */}
+          <div className="pt-6 border-t border-gray-800/80 flex flex-col items-center">
             <div className="flex w-full max-w-md gap-4">
               <button
                 onClick={handleStart}
@@ -231,7 +237,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                     : 'glass-button-gold'
                 }`}
               >
-                <Swords className="w-5 h-5" /> BATTLE
+                <Swords className="w-5 h-5" /> BATTLE ({selectedStage.energyCost} ⚡)
               </button>
               
               {stageStars === 3 && (
@@ -239,19 +245,9 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                   onClick={handleSweep}
                   className="flex-1 font-display font-black tracking-widest py-4 px-6 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2.5 cursor-pointer hover:scale-[1.03] active:scale-[0.97] bg-gradient-to-br from-indigo-900/80 to-purple-900/80 border border-purple-500/40 hover:bg-purple-800/80 text-purple-200 text-xs"
                 >
-                  <FastForward className="w-5 h-5" /> SWEEP
+                  <FastForward className="w-5 h-5" /> SWEEP ({selectedStage.energyCost} ⚡)
                 </button>
               )}
-            </div>
-            
-            <div className="flex items-center gap-2 mt-3.5 text-xs font-mono">
-              <span className="text-gray-500 uppercase tracking-wide text-[10px]">Cost:</span>
-              <span className="text-emerald-400 font-bold flex items-center gap-1.5">
-                <img src="/icons/icon_energy.png" alt="Energy" className="w-4.5 h-4.5 object-contain inline-block drop-shadow-[0_0_8px_rgba(16,185,129,0.35)]" />
-                {selectedStage.energyCost} Energy
-              </span>
-              <span className="text-gray-700 mx-2">|</span>
-              <span className="text-gray-500">Your Energy: {profile.pveEnergy}/{profile.pveEnergyMax}</span>
             </div>
           </div>
 
