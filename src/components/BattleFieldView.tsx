@@ -455,44 +455,80 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         }
 
         case 'hero_skill': {
-          const isPlayerSide = step.stance === 'blood_aura' || step.stance === 'warlord_cry';
-          const cardName = isPlayerSide ? copy.playerBoard[step.targetSlot]?.name : copy.enemyBoard[step.targetSlot]?.name;
+          const casterSide = step.side || 'player';
+          const isPlayerCaster = casterSide === 'player';
+          const targetSide = isPlayerCaster
+            ? (step.stance === 'void_strike' ? 'enemy' : 'player')
+            : (step.stance === 'void_strike' ? 'player' : 'enemy');
+            
+          const targetBoard = targetSide === 'player' ? copy.playerBoard : copy.enemyBoard;
+          const cardName = targetBoard[step.targetSlot]?.name;
+          const casterHeroLabel = isPlayerCaster ? 'player-hero' : 'enemy-hero';
+          const targetHeroLabel = isPlayerCaster ? 'enemy-hero' : 'player-hero';
           
           if (step.stance === 'void_strike') {
-            stepDescription = `⚡ Void Strike: Lord deals -${step.damage} damage to ${cardName || 'target'}`;
-            audioSystem.playAttack();
-            setAnimatingSlot({ side: 'enemy', slot: step.targetSlot, type: 'hit' });
-            const target = copy.enemyBoard[step.targetSlot];
-            if (target) target.health = Math.max(0, target.health - step.damage);
-            addFloatingText(`⚡ -${step.damage}`, { side: 'enemy', slot: step.targetSlot }, 'text-cyan-400 font-black text-sm scale-125');
-            addFloatingText('VOID STRIKE ⚡', 'enemy-hero', 'text-cyan-400 font-bold text-xs');
-          } else if (step.stance === 'blood_aura') {
-            stepDescription = `🩸 Blood Aura: Lord heals ${cardName || 'ally'} for +${step.heal} HP`;
-            audioSystem.playHeal();
-            setAnimatingSlot({ side: 'player', slot: step.targetSlot, type: 'heal' });
-            const target = copy.playerBoard[step.targetSlot];
-            if (target) {
-              target.health = Math.min(target.maxHealth, target.health + step.heal);
-              if (step.ward) target.ward = true;
-              if (step.bonusMaxHp > 0) {
-                target.maxHealth += step.bonusMaxHp;
-                target.health += step.bonusMaxHp;
+            if (step.targetSlot === -1) {
+              stepDescription = `⚡ Void Strike: ${isPlayerCaster ? 'Lord' : 'Boss'} deals -${step.damage} damage to ${isPlayerCaster ? 'Enemy' : 'Player'} Lord directly!`;
+              audioSystem.playAttack();
+              if (targetSide === 'player') {
+                copy.playerHeroHealth = Math.max(0, copy.playerHeroHealth - step.damage);
+              } else {
+                copy.enemyHeroHealth = Math.max(0, copy.enemyHeroHealth - step.damage);
               }
+              addFloatingText(`⚡ -${step.damage}`, targetHeroLabel, 'text-cyan-400 font-black text-lg scale-125 text-shadow-glow');
+              addFloatingText('VOID STRIKE ⚡', casterHeroLabel, 'text-cyan-400 font-bold text-xs');
+            } else {
+              stepDescription = `⚡ Void Strike: ${isPlayerCaster ? 'Lord' : 'Boss'} deals -${step.damage} damage to ${cardName || 'target'}`;
+              audioSystem.playAttack();
+              setAnimatingSlot({ side: targetSide, slot: step.targetSlot, type: 'hit' });
+              const target = targetBoard[step.targetSlot];
+              if (target) target.health = Math.max(0, target.health - step.damage);
+              addFloatingText(`⚡ -${step.damage}`, { side: targetSide, slot: step.targetSlot }, 'text-cyan-400 font-black text-sm scale-125');
+              addFloatingText('VOID STRIKE ⚡', casterHeroLabel, 'text-cyan-400 font-bold text-xs');
             }
-            addFloatingText(`🩸 +${step.heal}`, { side: 'player', slot: step.targetSlot }, 'text-emerald-400 font-bold');
-            addFloatingText('BLOOD AURA 🩸', 'player-hero', 'text-rose-400 font-bold text-xs');
+          } else if (step.stance === 'blood_aura') {
+            if (step.targetSlot === -1) {
+              stepDescription = `🩸 Blood Aura: ${isPlayerCaster ? 'Lord' : 'Boss'} heals directly for +${step.heal} HP`;
+              audioSystem.playHeal();
+              if (targetSide === 'player') {
+                copy.playerHeroHealth = Math.min(copy.playerHeroMaxHealth, copy.playerHeroHealth + step.heal);
+              } else {
+                copy.enemyHeroHealth = Math.min(copy.enemyHeroMaxHealth, copy.enemyHeroHealth + step.heal);
+              }
+              addFloatingText(`🩸 +${step.heal}`, targetHeroLabel, 'text-emerald-400 font-bold');
+              addFloatingText('BLOOD AURA 🩸', casterHeroLabel, 'text-rose-400 font-bold text-xs');
+            } else {
+              stepDescription = `🩸 Blood Aura: ${isPlayerCaster ? 'Lord' : 'Boss'} heals ${cardName || 'ally'} for +${step.heal} HP`;
+              audioSystem.playHeal();
+              setAnimatingSlot({ side: targetSide, slot: step.targetSlot, type: 'heal' });
+              const target = targetBoard[step.targetSlot];
+              if (target) {
+                target.health = Math.min(target.maxHealth, target.health + step.heal);
+                if (isPlayerCaster) {
+                  if (step.ward) target.ward = true;
+                  if (step.bonusMaxHp > 0) {
+                    target.maxHealth += step.bonusMaxHp;
+                    target.health += step.bonusMaxHp;
+                  }
+                }
+              }
+              addFloatingText(`🩸 +${step.heal}`, { side: targetSide, slot: step.targetSlot }, 'text-emerald-400 font-bold');
+              addFloatingText('BLOOD AURA 🩸', casterHeroLabel, 'text-rose-400 font-bold text-xs');
+            }
           } else if (step.stance === 'warlord_cry') {
             stepDescription = `🔥 Warlord's Cry: Boosts ${cardName || 'ally'} stats!`;
             audioSystem.playPlace();
-            setAnimatingSlot({ side: 'player', slot: step.targetSlot, type: 'heal' });
-            const target = copy.playerBoard[step.targetSlot];
+            setAnimatingSlot({ side: targetSide, slot: step.targetSlot, type: 'heal' });
+            const target = targetBoard[step.targetSlot];
             if (target) {
               if (step.bonusAtk > 0) target.attack += step.bonusAtk;
-              if (step.bonusArmor > 0) target.armor = (target.armor || 0) + step.bonusArmor;
-              if (step.aoeHeal > 0) target.health = Math.min(target.maxHealth, target.health + step.aoeHeal);
+              if (isPlayerCaster) {
+                if (step.bonusArmor > 0) target.armor = (target.armor || 0) + step.bonusArmor;
+                if (step.aoeHeal > 0) target.health = Math.min(target.maxHealth, target.health + step.aoeHeal);
+              }
             }
-            addFloatingText('🔥 BUFF', { side: 'player', slot: step.targetSlot }, 'text-yellow-400 font-bold');
-            addFloatingText("WARLORD'S CRY 🔥", 'player-hero', 'text-yellow-400 font-bold text-xs');
+            addFloatingText('🔥 BUFF', { side: targetSide, slot: step.targetSlot }, 'text-yellow-400 font-bold');
+            addFloatingText("WARLORD'S CRY 🔥", casterHeroLabel, 'text-yellow-400 font-bold text-xs');
           }
           break;
         }
@@ -638,7 +674,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   // Handle End Turn click
   const handleEndTurnWithoutCard = () => {
     setIsSimulating(true);
-    const { nextState, animateSequence: steps } = simulateCombatTurn(battle, null, null, profile);
+    const { nextState, animateSequence: steps } = simulateCombatTurn(battle, null, null, profile, battleType === 'campaign' ? stage : null);
     
     setFinalBattleState(nextState);
     setupPlaybackState(null, null, steps);
