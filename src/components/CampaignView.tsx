@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { audioSystem } from '../utils/AudioSystem';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { generateCampaignStage } from '../data/cards';
 import { CampaignStage } from '../types';
-import { Skull, Swords, Zap, Award, Gem, Lock, ChevronLeft, ChevronRight, Crown, Star, FastForward } from 'lucide-react';
+import { Skull, Swords, Award, Lock, ChevronLeft, ChevronRight, Crown, Star, FastForward } from 'lucide-react';
 
 interface CampaignViewProps {
   onStartBattle: (stage: CampaignStage) => void;
 }
 
 export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => {
-  const { profile, submitAction, usePveEnergy } = useGame();
+  const { profile, submitAction } = useGame();
   const toast = useToast();
   const [isSweeping, setIsSweeping] = useState(false);
   
@@ -69,164 +68,193 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 space-y-6">
+    <div className="max-w-5xl mx-auto p-4 flex flex-col lg:flex-row gap-6 items-stretch justify-center h-full">
       
-      {/* Title & Floor Selector */}
-      <div className="glass-panel rounded-3xl p-8 flex flex-col items-center relative overflow-hidden">
+      {/* Left Column: Floor Selector */}
+      <div className="glass-panel rounded-3xl p-6 lg:w-2/5 flex flex-col justify-center relative overflow-hidden shrink-0 min-h-[220px]">
         {isBoss && <div className="absolute inset-0 bg-red-900/10 gothic-glow-crimson pointer-events-none" />}
-        
-        <h2 className="font-display font-black text-2xl md:text-3xl text-white tracking-widest text-shadow-gold text-center relative z-10">
-          THE ENDLESS ABYSS
-        </h2>
-        <p className="text-xs text-gray-400 mt-2 max-w-md text-center relative z-10">
-          Descend into the infinite depths. Defeat the dark entities to claim ancient resources and rare cards.
-        </p>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(235,208,155,0.02)_0%,transparent_70%)] pointer-events-none" />
 
-        <div className="flex items-center gap-6 mt-8 relative z-10">
-          <button 
-            onClick={handlePrev}
-            disabled={viewingFloor === 1}
-            className="p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-[#c5a880] hover:bg-[#1f2833] disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
+        {/* Decorative corner brackets */}
+        <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-[#ebd09b]/35 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-[#ebd09b]/35 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-[#ebd09b]/35 pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-[#ebd09b]/35 pointer-events-none" />
 
-          <div className="flex flex-col items-center w-32">
-            <span className={`text-[10px] font-mono tracking-widest uppercase font-bold ${isBoss ? 'text-red-500' : 'text-[#c5a880]'}`}>
-              {isBoss ? 'Boss Floor' : 'Floor'}
-            </span>
-            <div className="text-5xl font-display font-black text-white text-shadow-gold">
-              {viewingFloor}
+        <div className="space-y-4 my-auto relative z-10 flex flex-col items-center">
+          <h2 className="font-display font-black text-xl md:text-2xl text-white tracking-widest text-shadow-gold text-center">
+            THE ENDLESS ABYSS
+          </h2>
+          <p className="text-[11px] text-gray-400 max-w-xs text-center leading-relaxed font-sans">
+            Descend into the infinite depths. Defeat the dark entities to claim ancient resources and rare cards.
+          </p>
+
+          <div className="flex items-center gap-6 mt-2">
+            <button 
+              onClick={handlePrev}
+              disabled={viewingFloor === 1}
+              className="p-2 rounded-full bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            <div className="flex flex-col items-center w-28">
+              <span className={`text-[9px] font-mono tracking-widest uppercase font-bold ${isBoss ? 'text-red-500' : 'text-[#ebd09b]'}`}>
+                {isBoss ? 'Boss Floor' : 'Floor'}
+              </span>
+              <div className="text-5xl font-display font-black text-white text-shadow-gold leading-none my-1">
+                {viewingFloor}
+              </div>
+              {viewingFloor === maxFloor ? (
+                <span className="text-[9px] text-emerald-400 font-mono tracking-wide">Current Max</span>
+              ) : (
+                <span className="text-[9px] text-amber-500 font-mono tracking-wide">Farm Mode</span>
+              )}
             </div>
-            {viewingFloor === maxFloor ? (
-              <span className="text-[9px] text-emerald-400 font-mono mt-1">Current Max</span>
-            ) : (
-              <span className="text-[9px] text-gray-500 font-mono mt-1">Farm Mode</span>
-            )}
-          </div>
 
-          <button 
-            onClick={handleNext}
-            disabled={viewingFloor >= maxFloor}
-            className="p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-[#c5a880] hover:bg-[#1f2833] disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
+            <button 
+              onClick={handleNext}
+              disabled={viewingFloor >= maxFloor}
+              className="p-2 rounded-full bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Stage Details */}
-      <div className={`glass-panel rounded-3xl p-8 relative overflow-hidden ${isBoss ? 'border-red-900/50 shadow-[0_0_30px_rgba(221,44,64,0.15)]' : ''}`}>
-        <div className="space-y-6 relative z-10">
-          <div className="text-center border-b border-gray-800 pb-4 relative">
-            <h3 className={`font-display font-black text-xl tracking-wider text-shadow-gold ${isBoss ? 'text-red-400' : 'text-white'}`}>
+      {/* Right Column: Stage Details */}
+      <div className={`glass-panel rounded-3xl p-6 lg:w-3/5 flex-1 relative overflow-hidden flex flex-col justify-between min-h-[300px] ${isBoss ? 'border-red-900/50 shadow-[0_0_30px_rgba(221,44,64,0.15)]' : ''}`}>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(235,208,155,0.02)_0%,transparent_70%)] pointer-events-none" />
+
+        {/* Decorative corner brackets */}
+        <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-[#ebd09b]/35 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-[#ebd09b]/35 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-[#ebd09b]/35 pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-[#ebd09b]/35 pointer-events-none" />
+
+        <div className="space-y-4 relative z-10 flex flex-col h-full justify-between">
+          
+          {/* Header: Stage Name & Description */}
+          <div className="text-center border-b border-gray-800/80 pb-3 relative">
+            <h3 className={`font-display font-black text-lg tracking-wider text-shadow-gold leading-tight ${isBoss ? 'text-red-400' : 'text-white'}`}>
               {selectedStage.name}
             </h3>
-            <p className="text-xs text-gray-400 mt-2">{selectedStage.description}</p>
+            <p className="text-[11px] text-gray-400 mt-1">{selectedStage.description}</p>
             {/* Stars display */}
-            <div className="flex justify-center gap-1 mt-3">
+            <div className="flex justify-center gap-1 mt-2">
               {[1, 2, 3].map(star => (
                 <Star 
                   key={star} 
-                  className={`w-5 h-5 ${star <= stageStars ? 'text-[#ebd09b] fill-[#ebd09b] drop-shadow-[0_0_8px_rgba(235,208,155,0.8)]' : 'text-gray-700'}`} 
+                  className={`w-4 h-4 ${star <= stageStars ? 'text-[#ebd09b] fill-[#ebd09b] drop-shadow-[0_0_8px_rgba(235,208,155,0.8)]' : 'text-gray-700'}`} 
                 />
               ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left: Enemy Info */}
-            <div className="space-y-4">
-              <span className="text-[10px] font-mono text-gray-500 tracking-widest uppercase font-bold block">Encounter</span>
-              <div className="bg-black/50 border border-white/5 rounded-xl p-4 flex items-center gap-4">
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center border ${isBoss ? 'bg-[#4e0707] border-[#dd2c40]/50' : 'bg-[#1f2833] border-cyan-900'} overflow-hidden`}>
+          {/* Details Row: Encounter & Drops */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            {/* Enemy Info */}
+            <div className="space-y-1.5">
+              <span className="text-[9px] font-mono text-gray-500 tracking-widest uppercase font-bold block">Encounter</span>
+              <div className="bg-black/55 border border-gray-800/50 rounded-xl p-3 flex items-center gap-3">
+                <div className={`w-11 h-11 rounded-full flex items-center justify-center border shrink-0 ${isBoss ? 'bg-[#4e0707] border-[#dd2c40]/50' : 'bg-[#1f2833] border-cyan-900'} overflow-hidden`}>
                   {selectedStage.enemyHeroImage?.startsWith('/') ? (
                     <img src={selectedStage.enemyHeroImage} alt="Enemy Hero" className="w-full h-full object-cover" />
                   ) : (
-                    isBoss ? <Crown className="w-8 h-8 text-purple-500 drop-shadow-[0_0_12px_rgba(168,85,247,0.8)] animate-pulse" /> : <Skull className="w-6 h-6 text-red-500/90 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)] hover:scale-110 transition-transform" />
+                    isBoss ? <Crown className="w-6 h-6 text-purple-500 drop-shadow-[0_0_12px_rgba(168,85,247,0.8)] animate-pulse" /> : <Skull className="w-5 h-5 text-red-500/90" />
                   )}
                 </div>
                 <div>
-                  <h4 className="font-display font-bold text-white text-lg">{selectedStage.enemyHeroName}</h4>
-                  <p className="text-xs font-mono text-gray-400">Hero Health: <span className="text-[#dd2c40] font-bold">{selectedStage.enemyHeroHealth} HP</span></p>
-                  <p className="text-[10px] text-gray-500 font-mono mt-1">Deck Size: {selectedStage.enemyDeck.length} Cards</p>
+                  <h4 className="font-display font-bold text-white text-sm leading-none">{selectedStage.enemyHeroName}</h4>
+                  <p className="text-[10px] font-mono text-gray-400 mt-1">Health: <span className="text-[#dd2c40] font-bold">{selectedStage.enemyHeroHealth} HP</span></p>
+                  <p className="text-[9px] text-gray-500 font-mono mt-0.5">Deck: {selectedStage.enemyDeck.length} Cards</p>
                 </div>
               </div>
             </div>
 
-            {/* Right: Rewards Info */}
-            <div className="space-y-4">
-              <span className="text-[10px] font-mono text-gray-500 tracking-widest uppercase font-bold block">Guaranteed Drops</span>
-              <div className="grid grid-cols-3 gap-2">
-                <div className="bg-black/50 border border-amber-500/20 p-3 rounded-xl text-center">
-                  <span className="text-amber-500 font-bold text-sm block">+{selectedStage.goldReward}<img src="/icons/icon_gold.png" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /></span>
-                  <span className="text-[9px] text-gray-500 font-mono">Gold</span>
+            {/* Guaranteed Rewards */}
+            <div className="space-y-1.5">
+              <span className="text-[9px] font-mono text-gray-500 tracking-widest uppercase font-bold block">Guaranteed Drops</span>
+              <div className="grid grid-cols-3 gap-1.5">
+                <div className="bg-black/55 border border-amber-500/10 p-2 rounded-xl text-center flex flex-col justify-center items-center">
+                  <span className="text-amber-500 font-bold text-xs block">+{selectedStage.goldReward}</span>
+                  <span className="text-[8px] text-gray-500 font-mono">Gold</span>
                 </div>
-                <div className="bg-black/50 border border-cyan-500/20 p-3 rounded-xl text-center">
-                  <span className="text-[#66fcf1] font-bold text-sm block">+{selectedStage.dustReward}<img src="/icons/icon_dust.png" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /></span>
-                  <span className="text-[9px] text-gray-500 font-mono">Dark Dust</span>
+                <div className="bg-black/55 border border-cyan-500/10 p-2 rounded-xl text-center flex flex-col justify-center items-center">
+                  <span className="text-[#66fcf1] font-bold text-xs block">+{selectedStage.dustReward}</span>
+                  <span className="text-[8px] text-gray-500 font-mono">Dust</span>
                 </div>
                 {selectedStage.shardsReward > 0 ? (
-                  <div className="bg-black/50 border border-red-500/20 p-3 rounded-xl text-center">
-                    <span className="text-red-500 font-bold text-sm block">+{selectedStage.shardsReward}<img src="/icons/icon_shards.png" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /></span>
-                    <span className="text-[9px] text-gray-500 font-mono">Shards</span>
+                  <div className="bg-black/55 border border-red-500/10 p-2 rounded-xl text-center flex flex-col justify-center items-center">
+                    <span className="text-red-500 font-bold text-xs block">+{selectedStage.shardsReward}</span>
+                    <span className="text-[8px] text-gray-500 font-mono">Shards</span>
                   </div>
                 ) : (
-                  <div className="bg-black/50 border border-emerald-500/20 p-3 rounded-xl text-center">
-                    <span className="text-emerald-400 font-bold text-sm block">+50✨</span>
-                    <span className="text-[9px] text-gray-500 font-mono">EXP</span>
+                  <div className="bg-black/55 border border-emerald-500/10 p-2 rounded-xl text-center flex flex-col justify-center items-center">
+                    <span className="text-emerald-400 font-bold text-xs block">+50✨</span>
+                    <span className="text-[8px] text-gray-500 font-mono">EXP</span>
                   </div>
                 )}
               </div>
-              {selectedStage.cardReward && (
-                <div className="bg-black/50 border border-emerald-500/20 p-3 rounded-xl flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-emerald-900/20 flex items-center justify-center border border-emerald-500/30">
-                      <Award className="w-4 h-4 text-emerald-400" />
-                    </div>
-                    <div>
-                      <span className="text-emerald-400 font-bold text-xs block">Card Drop!</span>
-                      <span className="text-[9px] text-gray-400 font-mono">{selectedStage.cardReward.name}</span>
-                    </div>
-                  </div>
-                  <span className="text-[10px] bg-emerald-900/40 text-emerald-400 px-2 py-1 rounded font-mono border border-emerald-500/20">Guaranteed</span>
-                </div>
-              )}
             </div>
+
           </div>
 
-          {/* Action Area */}
-          <div className="pt-6 mt-6 border-t border-gray-800 flex flex-col items-center">
+          {/* Card Reward Info if exists */}
+          {selectedStage.cardReward && (
+            <div className="bg-black/55 border border-emerald-500/15 p-2 rounded-xl flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-emerald-950/40 flex items-center justify-center border border-emerald-500/20 shrink-0">
+                  <Award className="w-3.5 h-3.5 text-emerald-400" />
+                </div>
+                <div>
+                  <span className="text-emerald-400 font-bold text-[10px] block leading-none">Guaranteed Card Drop</span>
+                  <span className="text-[9px] text-gray-400 font-mono mt-0.5">{selectedStage.cardReward.name}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Battle / Sweep Actions Area */}
+          <div className="pt-3 border-t border-gray-800/80 flex flex-col items-center">
             <div className="flex w-full max-w-md gap-3">
               <button
                 onClick={handleStart}
-                className={`flex-1 font-display font-black tracking-widest py-4 px-6 rounded-xl transition-all shadow-lg flex items-center justify-center gap-3 cursor-pointer hover:scale-105 active:scale-95 ${
+                className={`flex-1 font-display font-black tracking-widest py-3 px-5 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.03] active:scale-[0.97] text-xs ${
                   isBoss 
                     ? 'glass-button-crimson'
                     : 'glass-button-gold'
                 }`}
               >
-                <Swords className="w-5 h-5" /> BATTLE
+                <Swords className="w-4 h-4" /> BATTLE
               </button>
               
               {stageStars === 3 && (
                 <button
                   onClick={handleSweep}
-                  className="flex-1 font-display font-black tracking-widest py-4 px-6 rounded-xl transition-all shadow-lg flex items-center justify-center gap-3 cursor-pointer hover:scale-105 active:scale-95 bg-gradient-to-br from-indigo-900/80 to-purple-900/80 border border-purple-500/50 hover:bg-purple-800/80 text-purple-200"
+                  className="flex-1 font-display font-black tracking-widest py-3 px-5 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.03] active:scale-[0.97] bg-gradient-to-br from-indigo-900/80 to-purple-900/80 border border-purple-500/40 hover:bg-purple-800/80 text-purple-200 text-xs"
                 >
-                  <FastForward className="w-5 h-5" /> SWEEP
+                  <FastForward className="w-4 h-4" /> SWEEP
                 </button>
               )}
             </div>
-            <div className="flex items-center gap-1.5 mt-3 text-xs font-mono">
-              <span className="text-gray-400">Cost:</span>
-              <span className="text-emerald-400 font-bold flex items-center gap-1"><div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shadow-[0_0_8px_rgba(16,185,129,0.4)]"><img src="/icons/icon_energy.png" alt="Energy" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /></div> {selectedStage.energyCost} Energy</span>
-              <span className="text-gray-600 mx-2">|</span>
-              <span className="text-gray-400">Your Energy: {profile.pveEnergy}/{profile.pveEnergyMax}</span>
+            
+            <div className="flex items-center gap-1.5 mt-2.5 text-[10px] font-mono">
+              <span className="text-gray-500">Cost:</span>
+              <span className="text-emerald-400 font-bold flex items-center gap-1">
+                <img src="/icons/icon_energy.png" alt="Energy" className="w-4 h-4 object-contain inline-block drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                {selectedStage.energyCost} Energy
+              </span>
+              <span className="text-gray-700 mx-1.5">|</span>
+              <span className="text-gray-500">Your Energy: {profile.pveEnergy}/{profile.pveEnergyMax}</span>
             </div>
           </div>
+
         </div>
       </div>
+
     </div>
   );
 };
