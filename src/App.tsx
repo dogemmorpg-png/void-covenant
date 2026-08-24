@@ -213,12 +213,14 @@ function MainAppContent() {
               }} />
           )}
           {activeTab === 'pvp' && (
-            <PvpArenaView onStartBattle={async (stage, type) => {
-              const success = await startBattleOnServer('pvp', stage.id.toString(), 1);
+            <PvpArenaView onStartBattle={async (stage, type, opponentPayload) => {
+              const success = await startBattleOnServer('pvp', stage.id.toString(), 1, opponentPayload);
               if (success) {
                 setActiveBattleType(type);
                 setActiveBattleStage(stage);
+                return true;
               }
+              return false;
             }} />
           )}
           {activeTab === 'collection' && <CollectionDeckView />}

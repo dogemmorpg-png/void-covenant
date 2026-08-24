@@ -5,7 +5,7 @@ import { CampaignStage } from '../types';
 import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, Clock, History, ListOrdered } from 'lucide-react';
 
 interface PvpArenaViewProps {
-  onStartBattle: (stage: CampaignStage, type: 'campaign' | 'pvp') => void;
+  onStartBattle: (stage: CampaignStage, type: 'campaign' | 'pvp', opponentPayload?: any) => Promise<boolean> | void;
 }
 
 export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => {
@@ -165,39 +165,35 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
     setIsMatching(true);
     setMatchStatus(`Locking signature keys against ${opponent.username}...`);
 
-    try {
-      const success = await startBattleOnServer('pvp', 'pvp', 1, {
-        opponentWalletAddress: opponent.walletAddress,
-        opponentName: opponent.username,
-        opponentRating: opponent.pvpRating,
-        opponentDeck: opponent.deck,
-        opponentStance: opponent.activeStance
-      });
+    const opponentPayload = {
+      opponentWalletAddress: opponent.walletAddress,
+      opponentName: opponent.username,
+      opponentRating: opponent.pvpRating,
+      opponentDeck: opponent.deck,
+      opponentStance: opponent.activeStance
+    };
 
-      if (success) {
-        setMatchStatus('Accessing local battlefield simulation channel...');
-        setTimeout(() => {
-          setIsMatching(false);
-          const pvpStage: CampaignStage = {
-            id: -1, // PvP indicator
-            name: `Arena: ${opponent.username}`,
-            description: `Ranked PvP battle for Covenant glory. Opponent: ${opponent.username} [${opponent.pvpRating} MMR]`,
-            energyCost: 1,
-            goldReward: 300 + Math.floor(profile.pvpRating / 4),
-            dustReward: 30 + Math.floor(profile.pvpRating / 20),
-            shardsReward: 0,
-            enemyHeroName: opponent.username,
-            enemyHeroHealth: 30 + Math.min(20, Math.floor(opponent.pvpRating / 150)),
-            enemyHeroImage: 'swords',
-            enemyDeck: opponent.deck,
-            enemyStance: opponent.activeStance,
-            enemyTalents: opponent.talents
-          };
-          onStartBattle(pvpStage, 'pvp');
-        }, 1000);
-      } else {
+    const pvpStage: CampaignStage = {
+      id: -1, // PvP indicator
+      name: `Arena: ${opponent.username}`,
+      description: `Ranked PvP battle for Covenant glory. Opponent: ${opponent.username} [${opponent.pvpRating} MMR]`,
+      energyCost: 1,
+      goldReward: 300 + Math.floor(profile.pvpRating / 4),
+      dustReward: 30 + Math.floor(profile.pvpRating / 20),
+      shardsReward: 0,
+      enemyHeroName: opponent.username,
+      enemyHeroHealth: 30 + Math.min(20, Math.floor(opponent.pvpRating / 150)),
+      enemyHeroImage: 'swords',
+      enemyDeck: opponent.deck,
+      enemyStance: opponent.activeStance,
+      enemyTalents: opponent.talents
+    };
+
+    try {
+      setMatchStatus('Accessing local battlefield simulation channel...');
+      const success = await onStartBattle(pvpStage, 'pvp', opponentPayload);
+      if (!success) {
         setIsMatching(false);
-        toast('Failed to synchronize PvP session with server.', 'error');
       }
     } catch (err) {
       setIsMatching(false);
