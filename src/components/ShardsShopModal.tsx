@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { SOLANA_PACKAGES, SolanaPackage, TREASURY_WALLET_ADDRESS } from '../data/solanaConfig';
-import { X, Wallet, ExternalLink, CheckCircle, RefreshCw, AlertCircle, ShieldCheck } from 'lucide-react';
+import { X, Wallet, ExternalLink, CheckCircle, RefreshCw, AlertCircle } from 'lucide-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Transaction, SystemProgram, PublicKey, LAMPORTS_PER_SOL, ComputeBudgetProgram } from '@solana/web3.js';
@@ -452,16 +452,6 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
             </div>
           </div>
         ) : null}
-
-        {/* Footer */}
-        <div className="pt-3 border-t border-white/5 flex items-center justify-between text-[9px] text-gray-500 font-mono">
-          <span className="flex items-center gap-1">
-            <ShieldCheck className="w-3 h-3 text-emerald-400" /> Secure Solana Mainnet
-          </span>
-          <span className="truncate max-w-[150px] text-gray-600" title={TREASURY_WALLET_ADDRESS}>
-            Treasury: {TREASURY_WALLET_ADDRESS.slice(0, 4)}...{TREASURY_WALLET_ADDRESS.slice(-4)}
-          </span>
-        </div>
       </div>
     </div>
   );

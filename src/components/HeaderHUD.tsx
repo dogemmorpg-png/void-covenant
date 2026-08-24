@@ -115,20 +115,19 @@ export const HeaderHUD: React.FC = () => {
             </div>
 
             {/* Shards */}
-            <div className="flex flex-col items-center gap-0.5">
-              <div className="flex items-center gap-1.5 bg-red-500/5 border border-red-500/20 rounded-full hover:bg-red-500/10 transition-colors cursor-default py-1 px-3 shadow-inner" title="Dark Shards (Premium currency)">
-                <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " />
-                <span className="font-mono font-bold text-[#dd2c40]">{profile.darkShards}</span>
-              </div>
-              <button
-                onClick={() => {
-                  audioSystem.playClick();
-                  setIsShardsShopOpen(true);
-                }}
-                className="text-[9px] font-display font-black text-rose-400 hover:text-rose-300 underline tracking-wider uppercase cursor-pointer"
-              >
-                + Buy Shards
-              </button>
+            <div 
+              onClick={() => {
+                audioSystem.playClick();
+                setIsShardsShopOpen(true);
+              }}
+              className="flex items-center gap-2 bg-red-500/5 hover:bg-red-500/10 border border-red-500/25 hover:border-red-500/50 rounded-full py-1 px-3 shadow-inner cursor-pointer transition-all duration-300 group" 
+              title="Dark Shards (Click to Buy)"
+            >
+              <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain group-hover:scale-110 transition-transform duration-300" />
+              <span className="font-mono font-bold text-[#dd2c40]">{profile.darkShards}</span>
+              <span className="text-[10px] bg-red-950/60 text-rose-400 group-hover:bg-red-900 group-hover:text-rose-200 w-4 h-4 rounded-full flex items-center justify-center font-bold border border-red-500/30 transition-all font-mono">
+                +
+              </span>
             </div>
 
             {/* PvE Energy (Main Energy) */}
