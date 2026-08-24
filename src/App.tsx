@@ -3,6 +3,7 @@ import { GameProvider, useGame } from './context/GameContext';
 import { ToastProvider } from './components/Toast';
 import { audioSystem } from './utils/AudioSystem';
 import { HeaderHUD } from './components/HeaderHUD';
+import { ShardsShopModal } from './components/ShardsShopModal';
 import { CampaignView } from './components/CampaignView';
 import { CollectionDeckView } from './components/CollectionDeckView';
 import { GachaStoreView } from './components/GachaStoreView';
@@ -23,7 +24,7 @@ import bs58Pkg from 'bs58';
 const bs58 = (bs58Pkg as any).default || bs58Pkg;
 
 function MainAppContent() {
-  const { profile, isLoadingProfile, connectSolanaWallet, registerPlayer, disconnectSolanaWallet, startBattleOnServer } = useGame();
+  const { profile, isLoadingProfile, connectSolanaWallet, registerPlayer, disconnectSolanaWallet, startBattleOnServer, isShardsShopOpen, setIsShardsShopOpen } = useGame();
   const { connected, publicKey, signMessage, disconnect } = useWallet();
   const { setVisible } = useWalletModal();
   
@@ -312,6 +313,9 @@ function MainAppContent() {
         </div>
       </div>
     </div>
+      {isShardsShopOpen && (
+        <ShardsShopModal onClose={() => setIsShardsShopOpen(false)} />
+      )}
     </>
   );
 }

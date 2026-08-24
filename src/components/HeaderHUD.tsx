@@ -3,15 +3,13 @@ import { useGame } from '../context/GameContext';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { LogOut, Copy, X, Share2, Trophy, User, Clock } from 'lucide-react';
 import { audioSystem } from '../utils/AudioSystem';
-import { ShardsShopModal } from './ShardsShopModal';
 
 export const HeaderHUD: React.FC = () => {
-  const { profile, logoutPlayer } = useGame();
+  const { profile, logoutPlayer, isShardsShopOpen, setIsShardsShopOpen } = useGame();
   const { disconnect } = useWallet();
 
   const [timeUntilRegen, setTimeUntilRegen] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isShardsShopOpen, setIsShardsShopOpen] = useState(false);
   const [referralsList, setReferralsList] = useState<any[]>([]);
   const [isLoadingReferrals, setIsLoadingReferrals] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
@@ -347,10 +345,6 @@ export const HeaderHUD: React.FC = () => {
 
           </div>
         </div>
-      )}
-
-      {isShardsShopOpen && (
-        <ShardsShopModal onClose={() => setIsShardsShopOpen(false)} />
       )}
     </div>
   );
