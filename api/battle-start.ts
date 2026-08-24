@@ -78,6 +78,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Not enough PvP energy' });
       }
       profile.pvpEnergy -= 1;
+
+      const { opponentWalletAddress, opponentName, opponentRating, opponentDeck, opponentStance } = req.body;
+      if (!opponentName || opponentRating === undefined || !opponentDeck) {
+        return res.status(400).json({ error: 'Missing opponent details for PvP' });
+      }
+
+      profile.activePvpOpponent = {
+        walletAddress: opponentWalletAddress || 'bot',
+        name: opponentName,
+        rating: opponentRating,
+        deck: opponentDeck,
+        stance: opponentStance || 'void_strike'
+      };
     }
     
     profile.lastBattleTimestamp = Date.now();

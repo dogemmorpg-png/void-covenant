@@ -101,6 +101,8 @@ export interface CampaignStage {
   enemyHeroImage: string;
   enemyDeck: Omit<Card, 'id'>[]; // templates of enemy cards
   cardReward?: Omit<Card, 'id'>; // guaranteed card template drop on boss levels
+  enemyStance?: string;
+  enemyTalents?: Record<string, number>;
 }
 
 export interface BattleCardState {

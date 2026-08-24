@@ -1,126 +1,157 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
-import { CARD_TEMPLATES } from '../data/cards';
 import { CampaignStage } from '../types';
-import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, Droplet } from 'lucide-react';
+import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, Clock, History, ListOrdered } from 'lucide-react';
 
 interface PvpArenaViewProps {
   onStartBattle: (stage: CampaignStage, type: 'campaign' | 'pvp') => void;
 }
 
-interface LeaderboardEntry {
-  name: string;
-  rating: number;
-  isPlayer?: boolean;
-}
-
-const STATIC_LEADERBOARD: LeaderboardEntry[] = [
-  { name: 'Spectre_Lord', rating: 3120 },
-  { name: 'Archon_Dark', rating: 2850 },
-  { name: 'VoidReaper', rating: 2620 },
-  { name: 'DoomBringer', rating: 2480 },
-  { name: 'HexMage', rating: 2250 },
-  { name: 'Cultist_Master', rating: 1950 },
-  { name: 'Blood_Torn', rating: 1550 },
-  { name: 'Shadow_Whisper', rating: 1200 },
-  { name: 'GloomWielder', rating: 850 },
-  { name: 'Apprentice_V', rating: 450 },
-];
-
 export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => {
-  const { profile, usePvpEnergy } = useGame();
+  const { profile, startBattleOnServer } = useGame();
   const toast = useToast();
+
+  const [activeTab, setActiveTab] = useState<'duels' | 'history'>('duels');
+  const [opponents, setOpponents] = useState<any[]>([]);
+  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [isLoadingOpponents, setIsLoadingOpponents] = useState(true);
+  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true);
   const [isMatching, setIsMatching] = useState(false);
   const [matchStatus, setMatchStatus] = useState('');
-  const [searchTimer, setSearchTimer] = useState(0);
+  const [refreshCooldown, setRefreshCooldown] = useState(0);
 
   // League calculation helper
   const getLeagueDetails = (rating: number) => {
-    if (rating < 200) {
+    if (rating < 500) {
+      const div = rating < 150 ? 'III' : (rating < 300 ? 'II' : 'I');
       return {
-        name: 'Recruit League',
-        color: 'text-gray-400 border-gray-700 bg-gray-950/40',
-        glow: 'shadow-[0_0_15px_rgba(156,163,175,0.15)]',
-        accent: 'text-gray-500'
+        name: `Bronze ${div}`,
+        badge: '🥉',
+        color: 'text-amber-600 border-amber-800 bg-amber-950/20',
+        glow: 'shadow-[0_0_15px_rgba(180,83,9,0.15)]',
+        accent: 'text-amber-700'
       };
-    } else if (rating < 500) {
+    } else if (rating < 1000) {
+      const div = rating < 650 ? 'III' : (rating < 800 ? 'II' : 'I');
       return {
-        name: 'Shadow League',
-        color: 'text-indigo-400 border-indigo-900/50 bg-indigo-950/25',
+        name: `Silver ${div}`,
+        badge: '🥈',
+        color: 'text-gray-300 border-gray-600 bg-gray-900/25',
+        glow: 'shadow-[0_0_15px_rgba(209,213,219,0.15)]',
+        accent: 'text-gray-400'
+      };
+    } else if (rating < 1500) {
+      const div = rating < 1150 ? 'III' : (rating < 1300 ? 'II' : 'I');
+      return {
+        name: `Gold ${div}`,
+        badge: '🥇',
+        color: 'text-amber-400 border-amber-500/40 bg-amber-500/5',
+        glow: 'shadow-[0_0_15px_rgba(245,158,11,0.2)]',
+        accent: 'text-amber-500'
+      };
+    } else if (rating < 2000) {
+      const div = rating < 1650 ? 'III' : (rating < 1800 ? 'II' : 'I');
+      return {
+        name: `Platinum ${div}`,
+        badge: '🔮',
+        color: 'text-indigo-400 border-indigo-500/40 bg-indigo-500/5',
         glow: 'shadow-[0_0_15px_rgba(129,140,248,0.25)]',
         accent: 'text-indigo-500'
       };
-    } else if (rating < 1000) {
+    } else if (rating < 2500) {
+      const div = rating < 2150 ? 'III' : (rating < 2300 ? 'II' : 'I');
       return {
-        name: 'Blood League',
-        color: 'text-rose-400 border-rose-950/50 bg-rose-950/25',
-        glow: 'shadow-[0_0_15px_rgba(244,63,94,0.25)]',
-        accent: 'text-rose-500'
-      };
-    } else if (rating < 2000) {
-      return {
-        name: 'Covenant League',
-        color: 'text-[#ebd09b] border-[#c5a880]/30 bg-[#ebd09b]/5',
-        glow: 'shadow-[0_0_15px_rgba(235,208,155,0.25)]',
-        accent: 'text-[#c5a880]'
-      };
-    } else {
-      return {
-        name: 'Void Magister',
-        color: 'text-cyan-400 border-cyan-900 bg-cyan-950/25',
-        glow: 'shadow-[0_0_20px_rgba(34,211,238,0.35)]',
+        name: `Diamond ${div}`,
+        badge: '💎',
+        color: 'text-cyan-400 border-cyan-500/40 bg-cyan-500/5',
+        glow: 'shadow-[0_0_20px_rgba(34,211,238,0.3)]',
         accent: 'text-cyan-400'
       };
-    }
-  };
-
-  const league = getLeagueDetails(profile.pvpRating);
-
-  // Dynamic Leaderboard sorting
-  const getSortedLeaderboard = (): (LeaderboardEntry & { rank: number })[] => {
-    const list: LeaderboardEntry[] = [
-      ...STATIC_LEADERBOARD,
-      { name: 'You (Covenant Summoner)', rating: profile.pvpRating, isPlayer: true }
-    ];
-    return list
-      .sort((a, b) => b.rating - a.rating)
-      .map((entry, idx) => ({ ...entry, rank: idx + 1 }));
-  };
-
-  const sortedLeaderboard = getSortedLeaderboard();
-  const playerRank = sortedLeaderboard.find(e => e.isPlayer)?.rank || 11;
-
-  // Search logic simulation
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isMatching) {
-      interval = setInterval(() => {
-        setSearchTimer(t => t + 1);
-      }, 1000);
     } else {
-      setSearchTimer(0);
+      return {
+        name: 'Void Overlord',
+        badge: '👑',
+        color: 'text-rose-500 border-rose-500/40 bg-rose-500/5',
+        glow: 'shadow-[0_0_25px_rgba(244,63,94,0.4)]',
+        accent: 'text-rose-500'
+      };
     }
-    return () => clearInterval(interval);
-  }, [isMatching]);
+  };
+
+  const league = getLeagueDetails(profile.pvpRating || 100);
+
+  const fetchOpponents = async (silent: boolean = false) => {
+    if (!silent) setIsLoadingOpponents(true);
+    try {
+      const token = localStorage.getItem('void_covenant_token');
+      if (!token) return;
+
+      const res = await fetch('/api/matchmaking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setOpponents(data.opponents || []);
+      }
+    } catch (err) {
+      console.error('Matchmaking fetch error:', err);
+    } finally {
+      setIsLoadingOpponents(false);
+    }
+  };
+
+  const fetchLeaderboard = async (silent: boolean = false) => {
+    if (!silent) setIsLoadingLeaderboard(true);
+    try {
+      const token = localStorage.getItem('void_covenant_token');
+      if (!token) return;
+
+      const res = await fetch('/api/leaderboard', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setLeaderboard(data.leaderboard || []);
+      }
+    } catch (err) {
+      console.error('Leaderboard fetch error:', err);
+    } finally {
+      setIsLoadingLeaderboard(false);
+    }
+  };
+
+  const handleRefreshOpponents = () => {
+    if (refreshCooldown > 0) return;
+    fetchOpponents();
+    setRefreshCooldown(5);
+  };
+
+  // Cooldown countdown timer
+  useEffect(() => {
+    let t: NodeJS.Timeout;
+    if (refreshCooldown > 0) {
+      t = setTimeout(() => {
+        setRefreshCooldown(c => c - 1);
+      }, 1000);
+    }
+    return () => clearTimeout(t);
+  }, [refreshCooldown]);
 
   useEffect(() => {
-    if (!isMatching) return;
+    fetchOpponents();
+    fetchLeaderboard();
+  }, []);
 
-    if (searchTimer === 0) {
-      setMatchStatus('Initializing combat encryption...');
-    } else if (searchTimer === 1) {
-      setMatchStatus('Searching for summoner in range ' + (profile.pvpRating - 100) + '..' + (profile.pvpRating + 100) + ' MMR...');
-    } else if (searchTimer === 2) {
-      setMatchStatus('Establishing stable astral connection...');
-    } else if (searchTimer >= 3) {
-      // Find opponent & launch
-      setIsMatching(false);
-      launchPvpBattle();
-    }
-  }, [searchTimer, isMatching]);
-
-  const handleStartMatchmaking = () => {
+  const handleFight = async (opponent: any) => {
     if (profile.deck.length < 10) {
       toast("Your deck is incomplete! Go to the 'CARDS' tab and select exactly 10 cards for battle.", 'warning');
       return;
@@ -132,127 +163,112 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
     }
 
     setIsMatching(true);
+    setMatchStatus(`Locking signature keys against ${opponent.username}...`);
+
+    try {
+      const success = await startBattleOnServer('pvp', 'pvp', 1, {
+        opponentWalletAddress: opponent.walletAddress,
+        opponentName: opponent.username,
+        opponentRating: opponent.pvpRating,
+        opponentDeck: opponent.deck,
+        opponentStance: opponent.activeStance
+      });
+
+      if (success) {
+        setMatchStatus('Accessing local battlefield simulation channel...');
+        setTimeout(() => {
+          setIsMatching(false);
+          const pvpStage: CampaignStage = {
+            id: -1, // PvP indicator
+            name: `Arena: ${opponent.username}`,
+            description: `Ranked PvP battle for Covenant glory. Opponent: ${opponent.username} [${opponent.pvpRating} MMR]`,
+            energyCost: 1,
+            goldReward: 300 + Math.floor(profile.pvpRating / 4),
+            dustReward: 30 + Math.floor(profile.pvpRating / 20),
+            shardsReward: 0,
+            enemyHeroName: opponent.username,
+            enemyHeroHealth: 30 + Math.min(20, Math.floor(opponent.pvpRating / 150)),
+            enemyHeroImage: 'swords',
+            enemyDeck: opponent.deck,
+            enemyStance: opponent.activeStance,
+            enemyTalents: opponent.talents
+          };
+          onStartBattle(pvpStage, 'pvp');
+        }, 1000);
+      } else {
+        setIsMatching(false);
+        toast('Failed to synchronize PvP session with server.', 'error');
+      }
+    } catch (err) {
+      setIsMatching(false);
+      toast('Connection error establishing PvP session.', 'error');
+    }
   };
 
-  const launchPvpBattle = () => {
-    // Names for simulated PvP enemies
-    const enemyNames = [
-      'Lilith_Gloom', 'Warlock_Eldritch', 'Covenant_Slayer', 'Spectre_X',
-      'Blood_Priestess', 'Void_Stalker', 'Acheron_Cultist', 'Shadow_Phantom',
-      'Demon_Aura', 'Soul_Weaver'
-    ];
-    const enemyName = enemyNames[Math.floor(Math.random() * enemyNames.length)];
-
-    // Opponent rating near player's rating
-    const variance = Math.floor(Math.random() * 61) - 30; // -30 to +30
-    const enemyRating = Math.max(100, profile.pvpRating + variance);
-
-    // Generate opponent deck (5 random card templates scaled up slightly if high MMR)
-    const enemyDeck = Array.from({ length: 5 }, () => {
-      const randomTemplate = CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)];
-      
-      // Scale attributes with rating
-      const mmrMultiplier = 1 + (enemyRating - 100) * 0.0003;
-      const scaledHealth = Math.round(randomTemplate.health * mmrMultiplier);
-      return {
-        baseId: randomTemplate.baseId,
-        name: randomTemplate.name,
-        tier: randomTemplate.tier,
-        attack: Math.round(randomTemplate.attack * mmrMultiplier),
-        health: scaledHealth,
-        maxHealth: scaledHealth,
-        delay: randomTemplate.delay,
-        skills: JSON.parse(JSON.stringify(randomTemplate.skills)),
-        image: randomTemplate.image,
-        color: randomTemplate.color,
-        xp: 0,
-        maxXp: 100,
-        level: 1 + Math.min(4, Math.floor(enemyRating / 400))
-      };
-    });
-
-    // Create a special PvP stage
-    const pvpStage: CampaignStage = {
-      id: -1, // PvP Special indicator
-      name: `Arena: ${enemyName}`,
-      description: `Ranked PvP battle for Covenant glory and rewards. Opponent: ${enemyName} [${enemyRating} MMR]`,
-      energyCost: 1,
-      goldReward: 300 + Math.floor(profile.pvpRating / 4),
-      dustReward: 30 + Math.floor(profile.pvpRating / 20),
-      shardsReward: Math.random() < 0.35 ? 3 : 0, // 35% chance to win dark shards
-      enemyHeroName: enemyName,
-      enemyHeroHealth: 30 + Math.floor(enemyRating / 80),
-      enemyHeroImage: 'swords',
-      enemyDeck: enemyDeck
-    };
-
-    // Launch battle
-    onStartBattle(pvpStage, 'pvp');
+  const getRankNumber = (walletAddr: string) => {
+    const idx = leaderboard.findIndex(p => p.walletAddress === walletAddr);
+    return idx !== -1 ? idx + 1 : null;
   };
+
+  const playerRank = getRankNumber(profile.solanaAddress || '') || '?';
 
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
       
-      {/* Search HUD / Matchmaking screen */}
+      {/* Matchmaking Overlay */}
       {isMatching && (
-        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-6 space-y-6">
-          <div className="w-24 h-24 rounded-full border-4 border-[#ebd09b] border-t-transparent animate-spin flex items-center justify-center shadow-[0_0_25px_rgba(235,208,155,0.2)]">
-            <Swords className="w-10 h-10 text-[#ebd09b] animate-pulse" />
+        <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-6 space-y-6 animate-fade-in">
+          <div className="w-24 h-24 rounded-full border-4 border-rose-500 border-t-transparent animate-spin flex items-center justify-center shadow-[0_0_25px_rgba(239,68,68,0.25)]">
+            <Swords className="w-10 h-10 text-rose-500 animate-pulse" />
           </div>
           
           <div className="text-center space-y-2 max-w-sm">
-            <h3 className="font-display font-black text-xl text-[#ebd09b] tracking-widest uppercase animate-pulse">MATCHMAKING</h3>
+            <h3 className="font-display font-black text-xl text-rose-500 tracking-widest uppercase animate-pulse">WAR ENCRYPTION</h3>
             <p className="text-sm font-mono text-cyan-400 font-bold">{matchStatus}</p>
-            <p className="text-[10px] font-mono text-gray-500">Elapsed seconds: {searchTimer}s</p>
           </div>
-
-          <button
-            onClick={() => setIsMatching(false)}
-            className="border border-[#dd2c40]/40 text-[#dd2c40] bg-[#4e0707]/20 hover:bg-[#dd2c40]/10 font-mono text-xs font-bold py-2 px-6 rounded-lg transition-all tracking-widest uppercase cursor-pointer"
-          >
-            CANCEL SEARCH
-          </button>
         </div>
       )}
 
-      {/* Main Header */}
+      {/* Main Header Banner */}
       <div className="bg-[#151a21] border border-[#c5a880]/20 rounded-2xl p-6 relative overflow-hidden shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-950/10 via-transparent to-[#151a21] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-red-950/15 via-transparent to-[#151a21] pointer-events-none" />
         
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
           
-          {/* Title & League Description */}
           <div className="space-y-2 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-2.5">
-              <Trophy className="w-6 h-6 text-[#ebd09b] animate-bounce" />
+              <Trophy className="w-6 h-6 text-amber-400 animate-bounce" />
               <h2 className="font-display font-black text-xl md:text-2xl text-white tracking-widest text-shadow-gold">
                 VOID ARENA
               </h2>
             </div>
             <p className="text-xs text-gray-400 font-sans max-w-xl">
-              Battle other dark summoners for a place at the top of the Void. Each victory increases your MMR rating and brings you closer to legendary status.
+              Duel other summoners asynchronously. Beat their defending decks controlled by AI to rise in MMR rating, unlock high-tier leagues, and secure your place in the Hall of Fame.
             </p>
           </div>
 
-          {/* Player stats box */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 bg-black/40 border border-[#c5a880]/10 rounded-xl p-4 w-full md:w-auto">
-            {/* Rating display */}
-            <div className="text-center px-4">
+          {/* Stats Bar */}
+          <div className="flex flex-col sm:flex-row items-center gap-4 bg-black/40 border border-[#c5a880]/15 rounded-xl p-4 w-full md:w-auto">
+            {/* MMR */}
+            <div className="text-center px-4 border-b sm:border-b-0 sm:border-r border-white/5 pb-2 sm:pb-0 w-full sm:w-auto">
               <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold">YOUR RATING</span>
-              <div className="font-mono text-2xl font-black text-[#ebd09b] flex items-center justify-center gap-1.5 mt-0.5">
-                <Award className="w-5 h-5 text-[#ebd09b]" />
-                {profile.pvpRating} <span className="text-xs text-gray-500">MMR</span>
+              <div className="font-mono text-2xl font-black text-rose-400 flex items-center justify-center gap-1.5 mt-0.5">
+                <Award className="w-5 h-5 text-rose-400" />
+                {profile.pvpRating || 100} <span className="text-xs text-gray-500 font-normal">MMR</span>
               </div>
             </div>
 
-            {/* League Badge */}
-            <div className={`px-4 py-2 border rounded-xl text-center font-display font-bold text-xs uppercase tracking-widest ${league.color} ${league.glow}`}>
-              {league.name}
+            {/* League */}
+            <div className="text-center px-4 w-full sm:w-auto">
+              <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold block mb-1">LEAGUE</span>
+              <span className={`px-3 py-1 border rounded-full text-[10px] font-display font-black uppercase tracking-widest ${league.color} ${league.glow}`}>
+                {league.badge} {league.name}
+              </span>
             </div>
 
-            {/* Global Position */}
-            <div className="text-center px-4">
-              <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold">TOP RANK</span>
+            {/* Rank Position */}
+            <div className="text-center px-4 border-t sm:border-t-0 sm:border-l border-white/5 pt-2 sm:pt-0 w-full sm:w-auto">
+              <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold">GLOBAL RANK</span>
               <div className="font-mono text-lg font-black text-white mt-0.5">
                 #{playerRank}
               </div>
@@ -262,143 +278,290 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
         </div>
       </div>
 
+      {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Play Panel */}
-        <div className="lg:col-span-2 space-y-6">
+        {/* Left Side: Matchmaking / History */}
+        <div className="lg:col-span-2 space-y-6 flex flex-col">
           
-          {/* Main Queue Card */}
-          <div className="bg-[#151a21] border border-cyan-900/35 rounded-2xl p-6 flex flex-col justify-between shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 blur-3xl pointer-events-none" />
-            
-            <div className="space-y-6">
-              <h3 className="font-display font-bold text-base text-white tracking-widest border-b border-gray-900 pb-3 flex items-center gap-2">
-                <Search className="w-4 h-4 text-cyan-400" /> RANKED QUEUE
-              </h3>
+          {/* Section Selector Tabs */}
+          <div className="flex border-b border-gray-900 gap-4 mb-2">
+            <button
+              onClick={() => setActiveTab('duels')}
+              className={`pb-2 px-1 text-sm font-display font-bold tracking-widest transition-all cursor-pointer flex items-center gap-2 ${
+                activeTab === 'duels'
+                  ? 'text-cyan-400 border-b-2 border-cyan-400 font-black'
+                  : 'text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              <Swords className="w-4 h-4" /> ARENA DUELS
+            </button>
+            <button
+              onClick={() => setActiveTab('history')}
+              className={`pb-2 px-1 text-sm font-display font-bold tracking-widest transition-all cursor-pointer flex items-center gap-2 ${
+                activeTab === 'history'
+                  ? 'text-cyan-400 border-b-2 border-cyan-400 font-black'
+                  : 'text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              <History className="w-4 h-4" /> BATTLE HISTORY
+            </button>
+          </div>
 
-              {/* Energy display */}
-              <div className="grid grid-cols-1 gap-4">
-                
-                <div className="bg-[#0b0c10] border border-cyan-950/50 p-4 rounded-xl flex items-center gap-4 shadow-inner">
-                  <div className="w-10 h-10 rounded-full bg-cyan-950/40 border border-cyan-500/35 flex items-center justify-center">
-                    <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shadow-[0_0_8px_rgba(16,185,129,0.4)]"><img src="/icons/icon_energy.webp" alt="Energy" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /></div>
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest block font-bold">PvP Energy</span>
-                    <span className="font-mono font-bold text-cyan-400 text-lg">
-                      {profile.pvpEnergy}/{profile.pvpEnergyMax}
-                    </span>
-                    <span className="text-[9px] text-gray-400 block font-mono mt-0.5">
-                      1 pt restores every 15 mins
-                    </span>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Deck quality check */}
+          {/* DUELS TAB CONTENT */}
+          {activeTab === 'duels' && (
+            <div className="space-y-6 flex-1">
+              
+              {/* Deck Ready Check */}
               {profile.deck.length < 10 ? (
                 <div className="bg-amber-950/15 border border-amber-500/35 rounded-xl p-4 flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                   <div>
-                    <h5 className="font-display font-bold text-xs text-amber-300">DECK NOT READY</h5>
+                    <h5 className="font-display font-bold text-xs text-amber-300">DECK INCOMPLETE</h5>
                     <p className="text-[11px] text-gray-400 mt-0.5 leading-relaxed">
-                      You have {profile.deck.length}/10 cards in your battle deck. Please assemble a full deck of 10 creatures in the <strong>CARDS</strong> tab before entering the Void Arena.
+                      You have selected {profile.deck.length}/10 cards for battle. Please add exactly 10 creatures to your battle deck in the <strong>CARDS</strong> tab before entering the arena.
                     </p>
                   </div>
                 </div>
               ) : (
-                <div className="bg-emerald-950/15 border border-emerald-500/35 rounded-xl p-4 flex items-start gap-3">
-                  <Shield className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
-                  <div>
-                    <h5 className="font-display font-bold text-xs text-emerald-300">BATTLE DECK READY</h5>
-                    <p className="text-[11px] text-gray-400 mt-0.5">
-                      Your squad is fully assembled (10/10 cards) and ready for battle. All fusion skills and stats will be active in the arena!
-                    </p>
+                <div className="bg-emerald-950/10 border border-emerald-500/20 rounded-xl p-3 px-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Shield className="w-5 h-5 text-emerald-400" />
+                    <div>
+                      <h5 className="font-display font-bold text-xs text-emerald-400">DEFENSE & OFFENSE DECK LOCKED</h5>
+                      <span className="text-[10px] text-gray-500 font-mono block">Equipped items, stances, and fusions are synced.</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-black/40 border border-white/5 px-3 py-1 rounded-full font-mono text-xs">
+                    <Zap className="w-3.5 h-3.5 text-cyan-400" />
+                    <span className="text-gray-400">Energy:</span>
+                    <span className="text-cyan-400 font-bold">{profile.pvpEnergy}/{profile.pvpEnergyMax}</span>
                   </div>
                 </div>
               )}
 
-              {/* Reward Preview */}
-              <div className="bg-black/35 rounded-xl p-4 border border-gray-900 space-y-2">
-                <span className="text-[10px] font-mono text-gray-500 tracking-widest uppercase font-bold block">EXPECTED VICTORY REWARDS</span>
-                <div className="flex flex-wrap gap-4 font-mono text-xs">
-                  <div className="bg-black/60 px-3 py-1.5 rounded-lg border border-yellow-950/50">
-                    <span className="text-yellow-500 font-bold">+{300 + Math.floor(profile.pvpRating / 4)}<img src="/icons/icon_gold.webp" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /></span> <span className="text-gray-500 text-[10px]">Gold</span>
-                  </div>
-                  <div className="bg-black/60 px-3 py-1.5 rounded-lg border border-cyan-950/50">
-                    <span className="text-cyan-400 font-bold">+{30 + Math.floor(profile.pvpRating / 20)}<img src="/icons/icon_dust.webp" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /></span> <span className="text-gray-500 text-[10px]">Dark Dust</span>
-                  </div>
+              {/* Opponent Selection Grid */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-gray-900 pb-2">
+                  <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest font-bold">CHALLENGE OPPONENTS</span>
+                  
+                  <button
+                    disabled={refreshCooldown > 0 || isLoadingOpponents}
+                    onClick={handleRefreshOpponents}
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[10px] font-mono font-bold tracking-wider transition-all cursor-pointer ${
+                      refreshCooldown > 0
+                        ? 'border-gray-800 text-gray-600 bg-transparent cursor-not-allowed'
+                        : 'border-cyan-500/30 hover:border-cyan-400 text-cyan-400 hover:bg-cyan-500/5'
+                    }`}
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingOpponents ? 'animate-spin' : ''}`} />
+                    {refreshCooldown > 0 ? `RETRY IN ${refreshCooldown}S` : 'FIND NEW TARGETS'}
+                  </button>
                 </div>
+
+                {isLoadingOpponents ? (
+                  <div className="h-64 flex flex-col items-center justify-center space-y-3">
+                    <div className="w-10 h-10 rounded-full border-2 border-cyan-500 border-t-transparent animate-spin" />
+                    <span className="text-[10px] font-mono text-gray-500 uppercase tracking-wider animate-pulse">Summoning candidates from the abyss...</span>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {opponents.map((opponent, idx) => {
+                      const oppLeague = getLeagueDetails(opponent.pvpRating);
+                      return (
+                        <div 
+                          key={opponent.walletAddress + idx}
+                          className="bg-[#151a21] border border-gray-900 hover:border-[#ebd09b]/25 rounded-xl p-4 flex flex-col justify-between transition-all duration-300 shadow-lg relative group overflow-hidden"
+                        >
+                          {/* Top accent line */}
+                          <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                          
+                          <div className="space-y-4">
+                            {/* Opponent Identity Header */}
+                            <div className="flex items-center gap-2.5">
+                              <img 
+                                src={opponent.avatarUrl || '/avatars/knight.webp'} 
+                                alt="Avatar" 
+                                className="w-10 h-10 rounded-full border border-white/10 bg-black/40 object-cover" 
+                              />
+                              <div className="min-w-0">
+                                <span className="text-white text-xs font-display font-black tracking-wide block truncate" title={opponent.username}>
+                                  {opponent.username}
+                                </span>
+                                <span className={`text-[9px] font-mono uppercase font-bold tracking-widest ${oppLeague.color.split(' ')[0]}`}>
+                                  {oppLeague.badge} {oppLeague.name}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Opponent Stats */}
+                            <div className="bg-black/30 border border-gray-950 p-2 rounded-lg flex items-center justify-between text-[11px] font-mono text-gray-400">
+                              <span>MMR Rating:</span>
+                              <span className="text-[#ebd09b] font-bold">{opponent.pvpRating} MMR</span>
+                            </div>
+
+                            {/* Opponent Deck Preview */}
+                            <div className="space-y-1.5">
+                              <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold block">Defending Deck Preview</span>
+                              <div className="flex gap-1 justify-between">
+                                {opponent.deck.slice(0, 5).map((card: any, cIdx: number) => (
+                                  <div 
+                                    key={cIdx} 
+                                    className="w-8 h-10 rounded border border-gray-950/60 bg-black/50 flex flex-col items-center justify-center relative overflow-hidden"
+                                    title={`${card.name} (Lvl ${card.level})`}
+                                  >
+                                    <div className={`absolute inset-x-0 bottom-0 h-1 ${card.tier === 'legendary' ? 'bg-orange-500' : (card.tier === 'gold' ? 'bg-yellow-500' : (card.tier === 'silver' ? 'bg-gray-400' : 'bg-amber-800'))}`} />
+                                    <span className="text-[8px] font-mono text-gray-300 font-bold -mt-1">{card.attack}</span>
+                                    <span className="text-[8px] font-mono text-red-500 font-bold -mt-0.5">{card.health}</span>
+                                  </div>
+                                ))}
+                                {opponent.deck.length > 5 && (
+                                  <div className="w-8 h-10 rounded border border-gray-950/60 bg-black/70 flex items-center justify-center text-[9px] font-mono text-gray-500">
+                                    +{opponent.deck.length - 5}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => handleFight(opponent)}
+                            disabled={profile.deck.length < 10 || profile.pvpEnergy < 1}
+                            className={`w-full mt-5 py-2 px-3 rounded-lg font-display font-black tracking-widest text-[10px] transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
+                              profile.deck.length < 10 || profile.pvpEnergy < 1
+                                ? 'bg-gray-800/20 border-gray-850 text-gray-600 cursor-not-allowed'
+                                : 'bg-gradient-to-r from-red-950/40 to-black/60 border-red-500/25 text-red-300 hover:text-white hover:from-red-900/40 hover:to-red-950/40 hover:border-red-400/50 shadow-md active:scale-95'
+                            }`}
+                          >
+                            <Swords className="w-3.5 h-3.5" /> ENGAGE DUEL
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            </div>
 
-            {/* Launch Matchmaker Button */}
-            <div className="mt-8 pt-4 border-t border-gray-900">
-              <button
-                disabled={profile.deck.length < 10 || profile.pvpEnergy < 1}
-                onClick={handleStartMatchmaking}
-                className={`w-full py-4.5 px-6 rounded-xl font-display font-black tracking-widest flex items-center justify-center gap-2.5 shadow-lg text-sm transition-all relative group cursor-pointer ${
-                  profile.deck.length < 10 || profile.pvpEnergy < 1
-                    ? 'bg-gray-800/40 text-gray-500 border border-gray-800/55 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-cyan-900 to-indigo-900 hover:from-cyan-800 hover:to-indigo-800 border border-cyan-500/50 text-white hover:scale-[1.01] active:scale-[0.99] shadow-[0_0_20px_rgba(6,182,212,0.15)] hover:shadow-[0_0_25px_rgba(6,182,212,0.3)]'
-                }`}
-              >
-                <Swords className={`w-5 h-5 ${profile.deck.length < 10 || profile.pvpEnergy < 1 ? '' : 'group-hover:animate-spin-slow'}`} />
-                MATCHMAKING
-              </button>
-              <p className="text-gray-400 text-sm max-w-sm mt-4 text-center">
-                Entry cost: <span className="text-cyan-400 font-bold">1 PvP Energy</span>. 
-                Defeat penalty: <span className="text-red-400 font-bold">-15 MMR</span>.
-              </p>
             </div>
+          )}
 
-          </div>
+          {/* HISTORY TAB CONTENT */}
+          {activeTab === 'history' && (
+            <div className="bg-[#151a21] border border-gray-900 rounded-xl p-5 flex-1 space-y-4">
+              <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest font-bold block border-b border-gray-900 pb-2">RECENT COMBAT LOGS</span>
+              
+              {!profile.pvpHistory || profile.pvpHistory.length === 0 ? (
+                <div className="h-64 flex flex-col items-center justify-center text-center space-y-2">
+                  <History className="w-8 h-8 text-gray-600" />
+                  <span className="text-xs text-gray-400 font-sans">No recent duels logged. Engage in Arena duels to earn MMR!</span>
+                </div>
+              ) : (
+                <div className="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
+                  {profile.pvpHistory.map((record: any) => {
+                    const isWin = (record.winner === 'attacker' && !record.isDefense) || (record.winner === 'defender' && record.isDefense);
+                    const mmrChange = record.isDefense ? record.defenderRatingChange : record.attackerRatingChange;
+                    const dateStr = new Date(record.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    
+                    return (
+                      <div 
+                        key={record.id}
+                        className={`flex items-center justify-between p-3 rounded-lg border text-xs font-mono transition-all ${
+                          isWin 
+                            ? 'bg-emerald-950/5 border-emerald-500/10 shadow-[0_0_10px_rgba(16,185,129,0.02)]' 
+                            : 'bg-red-950/5 border-red-500/10 shadow-[0_0_10px_rgba(239,68,68,0.02)]'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-full border flex items-center justify-center ${
+                            record.isDefense 
+                              ? 'bg-blue-950/30 border-blue-500/20 text-blue-400' 
+                              : 'bg-amber-950/30 border-amber-500/20 text-amber-400'
+                          }`} title={record.isDefense ? 'Defended while offline' : 'You initiated this duel'}>
+                            {record.isDefense ? <Shield className="w-3.5 h-3.5" /> : <Swords className="w-3.5 h-3.5" />}
+                          </div>
+
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-white text-xs">
+                                {record.isDefense ? `Defended vs ${record.attackerName}` : `Attacked ${record.defenderName}`}
+                              </span>
+                              <span className="text-[9px] text-gray-500 font-sans">{dateStr}</span>
+                            </div>
+                            <span className={`text-[10px] uppercase font-bold ${isWin ? 'text-emerald-400' : 'text-red-400'}`}>
+                              {isWin ? 'VICTORY 🎉' : 'DEFEAT 💀'}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <span className={`font-mono font-black text-sm ${mmrChange >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                            {mmrChange >= 0 ? `+${mmrChange}` : mmrChange} MMR
+                          </span>
+                          <span className="text-[9px] text-gray-500 block">Rating: {record.isDefense ? record.defenderRatingBefore : record.attackerRatingBefore} → {record.isDefense ? (record.defenderRatingBefore + record.defenderRatingChange) : (record.attackerRatingBefore + record.attackerRatingChange)}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
 
         </div>
 
-        {/* Dynamic Leaderboard Sidebar */}
-        <div className="bg-[#151a21] border border-[#c5a880]/15 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+        {/* Right Side: Leaderboard */}
+        <div className="bg-[#151a21] border border-[#c5a880]/15 rounded-2xl p-5 shadow-xl flex flex-col justify-between h-[590px]">
           <div className="space-y-4">
             <h3 className="font-display font-bold text-sm text-white tracking-widest border-b border-gray-900 pb-3 flex items-center gap-2">
-              <Award className="w-4 h-4 text-[#ebd09b]" /> HALL OF FAME
+              <Award className="w-4 h-4 text-[#ebd09b]" /> LEADERBOARD HALL
             </h3>
             
             <p className="text-xs text-gray-400 mt-2">
-              Rankings of the top Void Covenant summoners. Win in PvP to climb the ladder!
+              Leaderboard rankings of top registered Void Covenant players.
             </p>
 
-            <div className="space-y-1.5 max-h-[360px] overflow-y-auto pr-1">
-              {sortedLeaderboard.map((player) => (
-                <div
-                  key={player.name}
-                  className={`flex items-center justify-between p-2.5 rounded-lg border text-xs font-mono transition-all ${
-                    player.isPlayer
-                      ? 'bg-cyan-950/30 border-cyan-500/50 text-cyan-400 font-bold shadow-[0_0_10px_rgba(34,211,238,0.1)]'
-                      : 'bg-black/30 border-gray-950 text-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className={`w-5 text-center font-bold font-mono text-[10px] ${
-                      player.rank === 1 ? 'text-yellow-400' :
-                      player.rank === 2 ? 'text-gray-400' :
-                      player.rank === 3 ? 'text-amber-600' : 'text-gray-600'
-                    }`}>
-                      #{player.rank}
-                    </span>
-                    <span className="truncate max-w-[120px] md:max-w-[140px]">{player.name}</span>
-                  </div>
-                  <span className={`font-bold ${player.isPlayer ? 'text-cyan-400' : 'text-[#ebd09b]'}`}>
-                    {player.rating} MMR
-                  </span>
-                </div>
-              ))}
-            </div>
+            {isLoadingLeaderboard ? (
+              <div className="h-64 flex flex-col items-center justify-center space-y-2">
+                <div className="w-6 h-6 rounded-full border border-cyan-500 border-t-transparent animate-spin" />
+                <span className="text-[9px] font-mono text-gray-500 uppercase">Updating table...</span>
+              </div>
+            ) : (
+              <div className="space-y-1.5 max-h-[400px] overflow-y-auto pr-1">
+                {leaderboard.map((player, idx) => {
+                  const rank = idx + 1;
+                  const isSelf = player.walletAddress === (profile.solanaAddress || '');
+                  return (
+                    <div
+                      key={player.walletAddress + idx}
+                      className={`flex items-center justify-between p-2.5 rounded-lg border text-xs font-mono transition-all ${
+                        isSelf
+                          ? 'bg-cyan-950/20 border-cyan-500/40 text-cyan-400 font-bold shadow-[0_0_10px_rgba(34,211,238,0.05)]'
+                          : 'bg-black/35 border-gray-950 text-gray-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className={`w-5 text-center font-bold font-mono text-[10px] ${
+                          rank === 1 ? 'text-yellow-400' :
+                          rank === 2 ? 'text-gray-400' :
+                          rank === 3 ? 'text-amber-600' : 'text-gray-600'
+                        }`}>
+                          #{rank}
+                        </span>
+                        <span className="truncate max-w-[120px]">{player.username}</span>
+                      </div>
+                      <span className={`font-bold ${isSelf ? 'text-cyan-400' : 'text-rose-400/90'}`}>
+                        {player.pvpRating} MMR
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           <div className="border-t border-gray-900 pt-3 mt-4 text-center">
             <span className="text-[9px] text-gray-500 font-mono flex items-center justify-center gap-1">
-              <RefreshCw className="w-3 h-3 text-cyan-500 animate-spin-slow" /> Updated in real-time
+              <RefreshCw className="w-3 h-3 text-cyan-500 animate-spin-slow" /> Real-time database updates
             </span>
           </div>
 

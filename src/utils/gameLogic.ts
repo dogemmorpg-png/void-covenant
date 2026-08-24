@@ -247,18 +247,18 @@ export function simulateCombatTurn(
   }
 
   // --- ENEMY BOSS HERO PHASE ---
-  if (stage && stage.id % 5 === 0) {
-    const bossStance = stage.id % 15 === 5 ? 'warlord_cry' : (stage.id % 15 === 10 ? 'blood_aura' : 'void_strike');
-    const triggerChance = Math.min(35, 15 + Math.floor(stage.id / 5) * 1.5);
+  if (stage && (stage.id % 5 === 0 || stage.id === -1)) {
+    const bossStance = stage.id === -1 ? (stage.enemyStance || 'void_strike') : (stage.id % 15 === 5 ? 'warlord_cry' : (stage.id % 15 === 10 ? 'blood_aura' : 'void_strike'));
+    const triggerChance = stage.id === -1 ? 25 : Math.min(35, 15 + Math.floor(stage.id / 5) * 1.5);
     
     if (Math.random() * 100 < triggerChance) {
-      logs.push(`⚡ Enemy Boss activated ${bossStance.toUpperCase()} (${triggerChance.toFixed(1)}% chance)!`);
+      logs.push(`⚡ Enemy Commander activated ${bossStance.toUpperCase()} (${triggerChance.toFixed(1)}% chance)!`);
       
       if (bossStance === 'void_strike') {
         const activePlayers = [];
         for (let i = 0; i < 5; i++) if (state.playerBoard[i] && !state.playerBoard[i].isDead) activePlayers.push(i);
         
-        const damage = 2 + Math.floor((stage.id - 15) / 10);
+        const damage = stage.id === -1 ? 4 : 2 + Math.floor((stage.id - 15) / 10);
         if (activePlayers.length > 0) {
           const targetSlot = activePlayers[Math.floor(Math.random() * activePlayers.length)];
           const targetCard = state.playerBoard[targetSlot];
@@ -286,7 +286,7 @@ export function simulateCombatTurn(
           if (c && !c.isDead && c.health < c.maxHealth) damagedEnemies.push(i);
         }
         
-        const heal = 3 + Math.floor((stage.id - 10) / 10);
+        const heal = stage.id === -1 ? 6 : 3 + Math.floor((stage.id - 10) / 10);
         if (damagedEnemies.length > 0) {
           const targetSlot = damagedEnemies[Math.floor(Math.random() * damagedEnemies.length)];
           const targetCard = state.enemyBoard[targetSlot];
@@ -306,7 +306,7 @@ export function simulateCombatTurn(
         for (let i = 0; i < 5; i++) if (state.enemyBoard[i] && !state.enemyBoard[i].isDead) activeEnemies.push(i);
         
         if (activeEnemies.length > 0) {
-          const bonusAtk = 1 + Math.floor((stage.id - 5) / 15);
+          const bonusAtk = stage.id === -1 ? 2 : 1 + Math.floor((stage.id - 5) / 15);
           const targetSlot = activeEnemies[Math.floor(Math.random() * activeEnemies.length)];
           const targetCard = state.enemyBoard[targetSlot];
           if (targetCard) {

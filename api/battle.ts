@@ -173,14 +173,101 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         profile.pvpEnergy = 0;
       }
 
+      const opponent = profile.activePvpOpponent || { 
+        walletAddress: 'bot', 
+        name: 'Simulated Challenger', 
+        rating: profile.pvpRating || 100 
+      };
+
+      const rPlayer = profile.pvpRating || 100;
+      const rOpponent = opponent.rating || 100;
+      const expected = 1 / (1 + Math.pow(10, (rOpponent - rPlayer) / 400));
+      
+      let attackerRatingChange = 0;
+      let defenderRatingChange = 0;
+
       if (result === 'win') {
         goldReward = Math.floor(20 * goldMultiplier);
         expReward = Math.floor(80 * expMultiplier);
-        profile.pvpRating = (profile.pvpRating || 1000) + 15;
+        
+        const gain = Math.round(32 * (1 - expected));
+        attackerRatingChange = Math.max(10, Math.min(32, gain));
+        defenderRatingChange = -Math.max(5, Math.min(25, Math.round(32 * (1 - expected))));
       } else {
         goldReward = Math.floor(20 * goldMultiplier);
-        profile.pvpRating = Math.max(0, (profile.pvpRating || 1000) - 10);
+        
+        const loss = Math.round(32 * expected);
+        attackerRatingChange = -Math.max(5, Math.min(25, loss));
+        
+        const gain = Math.round(32 * expected);
+        defenderRatingChange = Math.max(10, Math.min(32, gain));
       }
+
+      profile.pvpRating = Math.max(0, rPlayer + attackerRatingChange);
+
+      const recordId = 'pvp_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+      
+      // Save record in player's (attacker) history
+      const attackerRecord = {
+        id: recordId,
+        timestamp: Date.now(),
+        attackerName: profile.username || 'You',
+        defenderName: opponent.name,
+        attackerWallet: walletAddress,
+        defenderWallet: opponent.walletAddress,
+        winner: result === 'win' ? 'attacker' : 'defender',
+        attackerRatingBefore: rPlayer,
+        defenderRatingBefore: rOpponent,
+        attackerRatingChange: attackerRatingChange,
+        defenderRatingChange: defenderRatingChange,
+        isDefense: false
+      };
+      
+      profile.pvpHistory = [attackerRecord, ...(profile.pvpHistory || [])].slice(0, 30);
+
+      // Process Offline Defense if defender is a real player
+      if (opponent.walletAddress && opponent.walletAddress !== 'bot' && !opponent.walletAddress.startsWith('bot_')) {
+        try {
+          const { data: defenderRow } = await supabase
+            .from('profiles')
+            .select('data, updated_at')
+            .eq('wallet_address', opponent.walletAddress)
+            .single();
+
+          if (defenderRow) {
+            let defProfile = defenderRow.data;
+            const rDefBefore = defProfile.pvpRating || 100;
+            defProfile.pvpRating = Math.max(0, rDefBefore + defenderRatingChange);
+            
+            const defenderRecord = {
+              id: recordId,
+              timestamp: Date.now(),
+              attackerName: profile.username || 'Opponent',
+              defenderName: defProfile.username || 'You',
+              attackerWallet: walletAddress,
+              defenderWallet: opponent.walletAddress,
+              winner: result === 'win' ? 'attacker' : 'defender',
+              attackerRatingBefore: rPlayer,
+              defenderRatingBefore: rDefBefore,
+              attackerRatingChange: attackerRatingChange,
+              defenderRatingChange: defenderRatingChange,
+              isDefense: true
+            };
+            
+            defProfile.pvpHistory = [defenderRecord, ...(defProfile.pvpHistory || [])].slice(0, 30);
+            
+            await supabase
+              .from('profiles')
+              .update({ data: defProfile, updated_at: new Date().toISOString() })
+              .eq('wallet_address', opponent.walletAddress);
+          }
+        } catch (defErr) {
+          console.error('Offline defense update failed for:', opponent.walletAddress, defErr);
+        }
+      }
+
+      // Clear current match lock
+      delete profile.activePvpOpponent;
     }
 
     profile.gold = (profile.gold || 0) + goldReward;

@@ -16,7 +16,7 @@ interface GameContextType {
   spendShards: (amount: number) => boolean;
   usePveEnergy: (amount: number) => boolean;
   usePvpEnergy: (amount: number) => boolean;
-  startBattleOnServer: (battleType: 'campaign' | 'pvp', stageId: string, energyCost: number) => Promise<boolean>;
+  startBattleOnServer: (battleType: 'campaign' | 'pvp', stageId: string, energyCost: number, opponentPayload?: any) => Promise<boolean>;
   buyDarkShardsWithSOL: (solAmount: number) => Promise<boolean>;
   verifySolanaPayment: (signature: string, packageId: string) => Promise<{ success: boolean; message: string }>;
   isLoadingProfile: boolean;
@@ -400,7 +400,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  const startBattleOnServer = async (battleType: 'campaign' | 'pvp', stageId: string, energyCost: number): Promise<boolean> => {
+  const startBattleOnServer = async (battleType: 'campaign' | 'pvp', stageId: string, energyCost: number, opponentPayload?: any): Promise<boolean> => {
     const token = localStorage.getItem('void_covenant_token');
     
     if (token) {
@@ -411,7 +411,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ battleType, stageId })
+          body: JSON.stringify({ battleType, stageId, ...opponentPayload })
         });
         
         if (res.ok) {
