@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
-import { AIRDROP_TASKS } from '../data/cards';
 import { SOLANA_PACKAGES, SolanaPackage, TREASURY_WALLET_ADDRESS } from '../data/solanaConfig';
-import { Wallet, Share2, ExternalLink, CheckCircle, Clock, RefreshCw, Sparkles, Check, AlertCircle, ShieldCheck } from 'lucide-react';
+import { Wallet, ExternalLink, CheckCircle, Clock, RefreshCw, AlertCircle, ShieldCheck } from 'lucide-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Transaction, SystemProgram, PublicKey, LAMPORTS_PER_SOL, ComputeBudgetProgram } from '@solana/web3.js';
 
 export const AirdropHubView: React.FC = () => {
-  const { profile, completeAirdropTask, verifySolanaPayment, addShards, addDust, saveProfile } = useGame();
+  const { profile, verifySolanaPayment, addShards, addDust, saveProfile } = useGame();
   const toast = useToast();
   const { setVisible } = useWalletModal();
   const { connection } = useConnection();
@@ -17,7 +16,6 @@ export const AirdropHubView: React.FC = () => {
 
   const [realSolBalance, setRealSolBalance] = useState<number | null>(null);
   const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
-  const [isCompletingTask, setIsCompletingTask] = useState<string | null>(null);
 
   // Payment processing state modal
   const [paymentState, setPaymentState] = useState<{
@@ -137,28 +135,6 @@ export const AirdropHubView: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleCompleteTask = (taskId: string) => {
-    if (taskId === 'wallet_connect' && !profile.solanaAddress) {
-      setVisible(true);
-      return;
-    }
-    
-    const task = AIRDROP_TASKS.find(t => t.id === taskId);
-    if (task?.actionUrl) {
-      window.open(task.actionUrl, '_blank');
-      setIsCompletingTask(taskId);
-    }
-
-    setTimeout(async () => {
-      const res = await completeAirdropTask(taskId);
-      if (res.success) {
-        toast(res.message, 'success');
-      } else {
-        toast(res.message, 'error');
-      }
-      setIsCompletingTask(null);
-    }, 1000);
-  };
 
   // Blazing fast purchase handler with automatic dual verification
   const handlePurchasePackage = async (pkg: SolanaPackage) => {
@@ -484,68 +460,7 @@ export const AirdropHubView: React.FC = () => {
 
       </div>
 
-      {/* Social & Airdrop Tasks Section */}
-      <div className="bg-[#151a21] border border-gray-800 rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl">
-        <div className="border-b border-gray-800 pb-4">
-          <h3 className="font-display font-black text-lg text-white tracking-widest text-shadow-gold flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#ebd09b]" /> COVENANT AIRDROP TASKS
-          </h3>
-          <p className="text-xs text-gray-400 font-sans mt-1">
-            Complete tasks to accumulate early rewards and gold.
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {AIRDROP_TASKS.map(task => {
-            const isCompleted = profile.completedTasks?.includes(task.id);
-            return (
-              <div 
-                key={task.id}
-                className={`p-4 rounded-2xl border transition-all flex items-center justify-between gap-4 ${
-                  isCompleted 
-                    ? 'bg-black/30 border-emerald-900/30 opacity-70' 
-                    : 'bg-black/50 border-gray-800 hover:border-gray-700'
-                }`}
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-display font-bold text-sm text-white">{task.title}</span>
-                    {isCompleted && (
-                      <span className="bg-emerald-950 text-emerald-400 border border-emerald-800/50 text-[9px] px-1.5 py-0.2 rounded flex items-center gap-0.5">
-                        <Check className="w-2.5 h-2.5" /> Done
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-400">{task.description}</p>
-                  <div className="flex items-center gap-2 text-[10px] font-mono text-amber-400 pt-1">
-                    <span>Reward: +{task.rewardAmount} {task.rewardType.toUpperCase()}</span>
-                  </div>
-                </div>
-
-                <div>
-                  {isCompleted ? (
-                    <div className="w-8 h-8 rounded-full bg-emerald-900/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                      <Check className="w-4 h-4" />
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => handleCompleteTask(task.id)}
-                      disabled={isCompletingTask === task.id}
-                      className="bg-[#ebd09b] hover:bg-[#c5a880] text-black font-display font-bold text-xs py-2 px-4 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-                    >
-                      {isCompletingTask === task.id ? (
-                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                      ) : (
-                        <>Complete <ExternalLink className="w-3 h-3" /></>
-                      )}
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
 
       {/* Payment Processing Modal */}
       {paymentState.status !== 'idle' && (
