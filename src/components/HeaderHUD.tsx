@@ -3,6 +3,7 @@ import { useGame } from '../context/GameContext';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { LogOut, Copy, X, Share2, Trophy, User, Clock } from 'lucide-react';
 import { audioSystem } from '../utils/AudioSystem';
+import { ShardsShopModal } from './ShardsShopModal';
 
 export const HeaderHUD: React.FC = () => {
   const { profile, logoutPlayer } = useGame();
@@ -10,6 +11,7 @@ export const HeaderHUD: React.FC = () => {
 
   const [timeUntilRegen, setTimeUntilRegen] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isShardsShopOpen, setIsShardsShopOpen] = useState(false);
   const [referralsList, setReferralsList] = useState<any[]>([]);
   const [isLoadingReferrals, setIsLoadingReferrals] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
@@ -113,9 +115,20 @@ export const HeaderHUD: React.FC = () => {
             </div>
 
             {/* Shards */}
-            <div className="flex items-center gap-1.5 bg-red-500/5 border border-red-500/20 rounded-full hover:bg-red-500/10 transition-colors cursor-default py-1 px-3 shadow-inner" title="Dark Shards (Premium currency)">
-              <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " />
-              <span className="font-mono font-bold text-[#dd2c40]">{profile.darkShards}</span>
+            <div className="flex flex-col items-center gap-0.5">
+              <div className="flex items-center gap-1.5 bg-red-500/5 border border-red-500/20 rounded-full hover:bg-red-500/10 transition-colors cursor-default py-1 px-3 shadow-inner" title="Dark Shards (Premium currency)">
+                <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " />
+                <span className="font-mono font-bold text-[#dd2c40]">{profile.darkShards}</span>
+              </div>
+              <button
+                onClick={() => {
+                  audioSystem.playClick();
+                  setIsShardsShopOpen(true);
+                }}
+                className="text-[9px] font-display font-black text-rose-400 hover:text-rose-300 underline tracking-wider uppercase cursor-pointer"
+              >
+                + Buy Shards
+              </button>
             </div>
 
             {/* PvE Energy (Main Energy) */}
@@ -335,6 +348,10 @@ export const HeaderHUD: React.FC = () => {
 
           </div>
         </div>
+      )}
+
+      {isShardsShopOpen && (
+        <ShardsShopModal onClose={() => setIsShardsShopOpen(false)} />
       )}
     </div>
   );
