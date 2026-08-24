@@ -120,12 +120,12 @@ export const HeaderHUD: React.FC = () => {
                 audioSystem.playClick();
                 setIsShardsShopOpen(true);
               }}
-              className="flex items-center gap-2 bg-red-500/5 hover:bg-red-500/10 border border-red-500/25 hover:border-red-500/50 rounded-full py-1 px-3 shadow-inner cursor-pointer transition-all duration-300 group" 
+              className="flex items-center gap-2.5 bg-red-950/20 hover:bg-red-950/40 border border-red-500/35 hover:border-red-500/60 rounded-full py-1.5 px-3.5 shadow-inner cursor-pointer transition-all duration-300 group shadow-[0_0_10px_rgba(239,68,68,0.05)] hover:shadow-[0_0_15px_rgba(239,68,68,0.2)]" 
               title="Dark Shards (Click to Buy)"
             >
-              <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain group-hover:scale-110 transition-transform duration-300" />
-              <span className="font-mono font-bold text-[#dd2c40]">{profile.darkShards}</span>
-              <span className="text-[10px] bg-red-950/60 text-rose-400 group-hover:bg-red-900 group-hover:text-rose-200 w-4 h-4 rounded-full flex items-center justify-center font-bold border border-red-500/30 transition-all font-mono">
+              <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_10px_rgba(239,68,68,0.4)] brightness-110 contrast-125 w-8 h-8 object-contain group-hover:scale-110 transition-transform duration-300" />
+              <span className="font-mono font-extrabold text-red-400 group-hover:text-red-300 text-sm tracking-wide transition-colors">{profile.darkShards}</span>
+              <span className="text-[12px] bg-gradient-to-r from-red-600 to-rose-500 text-white w-5 h-5 rounded-full flex items-center justify-center font-black border border-red-400 shadow-[0_0_8px_rgba(239,68,68,0.6)] group-hover:scale-110 transition-all font-mono leading-none">
                 +
               </span>
             </div>
