@@ -10,7 +10,7 @@ import { getRandomEquipmentByTier, generateEquipmentInstance } from '../data/equ
 import { Gem, Coins, Sparkles, Box, Trash2, Shield, Flame, Skull, Sword } from 'lucide-react';
 
 export const GachaStoreView: React.FC = () => {
-  const { profile, spendGold, spendShards, addCardToCollection, addEquipment, setProfile } = useGame();
+  const { profile, spendGold, spendShards, addCardToCollection, addEquipment, setProfile, setIsShardsShopOpen } = useGame();
   const toast = useToast();
   
   const [activeTab, setActiveTab] = useState<'cards' | 'equipment'>('cards');
@@ -41,6 +41,27 @@ export const GachaStoreView: React.FC = () => {
   };
 
   const buyPackBackend = async (packType: string, isEquipment: boolean = false) => {
+    // Check local shards / gold balances first before requesting backend
+    if (packType === 'obsidian' || packType === 'eq_rare') {
+      if (profile.darkShards < 30) {
+        setIsShardsShopOpen(true);
+        toast('Insufficient Dark Shards! Opening Abyssal Shop...', 'warning');
+        return;
+      }
+    } else if (packType === 'abyssal' || packType === 'eq_premium') {
+      if (profile.darkShards < 70) {
+        setIsShardsShopOpen(true);
+        toast('Insufficient Dark Shards! Opening Abyssal Shop...', 'warning');
+        return;
+      }
+    } else if (packType === 'bronze' && profile.gold < 300) {
+      toast('Insufficient Gold!', 'warning');
+      return;
+    } else if (packType === 'eq_basic' && profile.gold < 500) {
+      toast('Insufficient Gold!', 'warning');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('void_covenant_token');
       if (token) {

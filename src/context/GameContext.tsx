@@ -37,6 +37,8 @@ interface GameContextType {
   logoutPlayer: () => void;
   resetProfile: () => void;
   updateProfile: (updates: Partial<PlayerProfile>) => void;
+  isShardsShopOpen: boolean;
+  setIsShardsShopOpen: (open: boolean) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -195,6 +197,7 @@ const createDefaultProfile = (): PlayerProfile => {
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [profile, setProfile] = useState<PlayerProfile>(createDefaultProfile);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const [isShardsShopOpen, setIsShardsShopOpen] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -384,7 +387,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const spendShards = (amount: number): boolean => {
-    if (profileRef.current.darkShards < amount) return false;
+    if (profileRef.current.darkShards < amount) {
+      setIsShardsShopOpen(true);
+      return false;
+    }
     setProfile(current => {
       if (current.darkShards < amount) return current;
       const updated = { ...current, darkShards: current.darkShards - amount };
@@ -929,7 +935,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         registerPlayer,
         logoutPlayer,
         resetProfile,
-        updateProfile
+        updateProfile,
+        isShardsShopOpen,
+        setIsShardsShopOpen
       }}
     >
       {children}
