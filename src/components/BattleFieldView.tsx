@@ -782,7 +782,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         <button
           onClick={async () => {
             const confirmMsg = battleType === 'pvp'
-              ? 'Are you sure you want to surrender? You will lose MMR.'
+              ? 'Are you sure you want to surrender? You will lose crowns.'
               : 'Are you sure you want to escape? Energy will not be refunded.';
             if (window.confirm(confirmMsg)) {
               if (battleType === 'pvp') {
@@ -2143,12 +2143,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 )}
                 
                 {battleType === 'pvp' && (
-                  <div className="bg-gradient-to-b from-[#0b1a1f] via-[#050f12] to-[#020709] border border-cyan-500/20 px-3 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[76px]">
-                    <span className="text-cyan-400 font-display font-bold text-sm flex items-center gap-1 text-shadow-cyan">
-                      +25
-                      <span className="text-sm drop-shadow-[0_0_4px_rgba(6,182,212,0.5)]">🏆</span>
+                  <div className="bg-gradient-to-b from-[#1c140c] via-[#0f0a07] to-[#070503] border border-amber-500/20 px-3 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[76px]">
+                    <span className="text-amber-400 font-display font-bold text-sm flex items-center gap-1 text-shadow-gold">
+                      +20
+                      <span className="text-sm drop-shadow-[0_0_4px_rgba(245,158,11,0.5)]">👑</span>
                     </span>
-                    <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider mt-1.5">Rating</span>
+                    <span className="text-[9px] text-amber-500/70 font-mono uppercase tracking-wider mt-1.5">Crowns</span>
                   </div>
                 )}
 
@@ -2221,9 +2221,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   <div className="bg-gradient-to-b from-[#1e0b0d] via-[#120507] to-[#090203] border border-red-500/20 px-4 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[84px]">
                     <span className="text-red-500 font-display font-bold text-sm flex items-center gap-1 text-shadow-crimson">
                       -15
-                      <span className="text-sm drop-shadow-[0_0_4px_rgba(239,68,68,0.4)]">💔</span>
+                      <span className="text-sm drop-shadow-[0_0_4px_rgba(239,68,68,0.4)]">👑</span>
                     </span>
-                    <span className="text-[9px] text-red-500/70 font-mono uppercase tracking-wider mt-1.5">Rating</span>
+                    <span className="text-[9px] text-red-500/70 font-mono uppercase tracking-wider mt-1.5">Crowns</span>
                   </div>
                 )}
               </div>

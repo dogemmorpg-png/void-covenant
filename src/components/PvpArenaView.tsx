@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CampaignStage } from '../types';
-import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History } from 'lucide-react';
+import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown } from 'lucide-react';
 
 interface PvpArenaViewProps {
   onStartBattle: (stage: CampaignStage, type: 'campaign' | 'pvp', opponentPayload?: any) => Promise<boolean> | void;
@@ -31,47 +31,43 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
 
   // League calculation helper
-  const getLeagueDetails = (rating: number) => {
-    if (rating < 500) {
-      const div = rating < 150 ? 'III' : (rating < 300 ? 'II' : 'I');
+  const getLeagueDetails = (leagueName: string) => {
+    const name = leagueName || 'Bronze';
+    if (name.startsWith('Bronze')) {
       return {
-        name: `Bronze ${div}`,
+        name: 'Bronze',
         badge: '🥉',
         color: 'text-amber-600 border-amber-800 bg-amber-950/20',
         glow: 'shadow-[0_0_15px_rgba(180,83,9,0.15)]',
         accent: 'text-amber-700'
       };
-    } else if (rating < 1000) {
-      const div = rating < 650 ? 'III' : (rating < 800 ? 'II' : 'I');
+    } else if (name.startsWith('Silver')) {
       return {
-        name: `Silver ${div}`,
+        name: 'Silver',
         badge: '🥈',
         color: 'text-gray-300 border-gray-600 bg-gray-900/25',
         glow: 'shadow-[0_0_15px_rgba(209,213,219,0.15)]',
         accent: 'text-gray-400'
       };
-    } else if (rating < 1500) {
-      const div = rating < 1150 ? 'III' : (rating < 1300 ? 'II' : 'I');
+    } else if (name.startsWith('Gold')) {
       return {
-        name: `Gold ${div}`,
+        name: 'Gold',
         badge: '🥇',
         color: 'text-amber-400 border-amber-500/40 bg-amber-500/5',
         glow: 'shadow-[0_0_15px_rgba(245,158,11,0.2)]',
         accent: 'text-amber-500'
       };
-    } else if (rating < 2000) {
-      const div = rating < 1650 ? 'III' : (rating < 1800 ? 'II' : 'I');
+    } else if (name.startsWith('Platinum')) {
       return {
-        name: `Platinum ${div}`,
+        name: 'Platinum',
         badge: '🔮',
         color: 'text-indigo-400 border-indigo-500/40 bg-indigo-500/5',
         glow: 'shadow-[0_0_15px_rgba(129,140,248,0.25)]',
         accent: 'text-indigo-500'
       };
-    } else if (rating < 2500) {
-      const div = rating < 2150 ? 'III' : (rating < 2300 ? 'II' : 'I');
+    } else if (name.startsWith('Diamond')) {
       return {
-        name: `Diamond ${div}`,
+        name: 'Diamond',
         badge: '💎',
         color: 'text-cyan-400 border-cyan-500/40 bg-cyan-500/5',
         glow: 'shadow-[0_0_20px_rgba(34,211,238,0.3)]',
@@ -88,7 +84,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
     }
   };
 
-  const league = getLeagueDetails(profile.pvpRating || 100);
+  const league = getLeagueDetails(profile.pvpLeague || 'Bronze');
 
   const fetchLeaderboard = async (silent: boolean = false) => {
     if (!silent) setIsLoadingLeaderboard(true);
@@ -243,10 +239,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
     setIsMatching(true);
     setMatchStatus(`Locking signature keys against ${opponent.name || opponent.username}...`);
 
+    const opponentLP = opponent.lp !== undefined ? opponent.lp : (opponent.pvpLP !== undefined ? opponent.pvpLP : (opponent.rating || opponent.pvpRating || 0));
+
     const opponentPayload = {
       opponentWalletAddress: opponent.walletAddress,
       opponentName: opponent.name || opponent.username,
       opponentRating: opponent.rating || opponent.pvpRating,
+      opponentLP: opponentLP,
       opponentDeck: opponent.deck,
       opponentStance: opponent.stance || opponent.activeStance
     };
@@ -254,13 +253,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
     const pvpStage: CampaignStage = {
       id: -1, // PvP indicator
       name: `Arena: ${opponent.name || opponent.username}`,
-      description: `Ranked PvP battle for Covenant glory. Opponent: ${opponent.name || opponent.username} [${opponent.rating || opponent.pvpRating} MMR]`,
+      description: `Ranked PvP battle for Covenant glory. Opponent: ${opponent.name || opponent.username} [${opponentLP} 👑]`,
       energyCost: 1,
-      goldReward: 300 + Math.floor(profile.pvpRating / 4),
-      dustReward: 30 + Math.floor(profile.pvpRating / 20),
+      goldReward: 300 + Math.floor((profile.pvpLP || 0) / 4),
+      dustReward: 30 + Math.floor((profile.pvpLP || 0) / 20),
       shardsReward: 0,
       enemyHeroName: opponent.name || opponent.username,
-      enemyHeroHealth: 30 + Math.min(20, Math.floor((opponent.rating || opponent.pvpRating || 0) / 150)),
+      enemyHeroHealth: 30 + Math.min(20, Math.floor(opponentLP / 150)),
       enemyHeroImage: opponent.avatarUrl || '/avatars/knight.webp', // Pass the opponent's real avatar URL!
       enemyDeck: opponent.deck,
       enemyStance: opponent.stance || opponent.activeStance,
@@ -344,15 +343,15 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
               <div className="space-y-1.5">
                 <h4 className="text-white font-display font-black text-lg tracking-wide leading-none">{activeOpponent.name || activeOpponent.username}</h4>
-                <span className={`px-2.5 py-0.5 border rounded-full text-[9px] font-display font-black uppercase tracking-widest leading-none inline-block ${getLeagueDetails(activeOpponent.rating || activeOpponent.pvpRating).color}`}>
-                  {getLeagueDetails(activeOpponent.rating || activeOpponent.pvpRating).badge} {getLeagueDetails(activeOpponent.rating || activeOpponent.pvpRating).name}
+                <span className={`px-2.5 py-0.5 border rounded-full text-[9px] font-display font-black uppercase tracking-widest leading-none inline-block ${getLeagueDetails(activeOpponent.league || 'Bronze').color}`}>
+                  {getLeagueDetails(activeOpponent.league || 'Bronze').badge} {getLeagueDetails(activeOpponent.league || 'Bronze').name}
                 </span>
               </div>
 
-              {/* MMR */}
+              {/* Crowns */}
               <div className="bg-black/50 border border-gray-950 px-4 py-2 rounded-xl flex items-center gap-1.5 text-xs font-mono font-bold text-[#ebd09b]">
-                <Trophy className="w-4 h-4 text-[#ebd09b]" />
-                <span>{activeOpponent.rating || activeOpponent.pvpRating} MMR</span>
+                <Crown className="w-4 h-4 text-amber-400" />
+                <span>{activeOpponent.lp !== undefined ? activeOpponent.lp : (activeOpponent.rating || 0)} 👑</span>
               </div>
 
               {/* Active stance skill */}
@@ -405,24 +404,24 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
           
           <div className="space-y-2 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-2.5">
-              <Trophy className="w-6 h-6 text-amber-400 animate-bounce" />
+              <Crown className="w-6 h-6 text-amber-400 animate-bounce" />
               <h2 className="font-display font-black text-xl md:text-2xl text-white tracking-widest text-shadow-gold">
                 VOID ARENA
               </h2>
             </div>
             <p className="text-xs text-gray-400 font-sans max-w-xl">
-              Duel other summoners asynchronously. Beat their defending decks controlled by AI to rise in MMR rating, unlock high-tier leagues, and secure your place in the Hall of Fame.
+              Duel other summoners asynchronously. Beat their defending decks controlled by AI to earn crowns, promote to high-tier leagues, and secure your place in the Hall of Fame.
             </p>
           </div>
 
           {/* Stats Bar */}
           <div className="flex flex-col sm:flex-row items-center gap-4 bg-black/40 border border-[#c5a880]/15 rounded-xl p-4 w-full md:w-auto">
-            {/* MMR */}
+            {/* Crowns */}
             <div className="text-center px-4 border-b sm:border-b-0 sm:border-r border-white/5 pb-2 sm:pb-0 w-full sm:w-auto">
-              <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold">YOUR RATING</span>
-              <div className="font-mono text-2xl font-black text-rose-400 flex items-center justify-center gap-1.5 mt-0.5">
-                <Award className="w-5 h-5 text-rose-400" />
-                {profile.pvpRating || 100} <span className="text-xs text-gray-500 font-normal">MMR</span>
+              <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold">YOUR CROWNS</span>
+              <div className="font-mono text-2xl font-black text-amber-400 flex items-center justify-center gap-1.5 mt-0.5">
+                <Crown className="w-5 h-5 text-amber-400" />
+                {profile.pvpLP || 0} <span className="text-xs text-gray-500 font-normal">👑</span>
               </div>
             </div>
 
@@ -559,13 +558,15 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               {!profile.pvpHistory || profile.pvpHistory.length === 0 ? (
                 <div className="h-64 flex flex-col items-center justify-center text-center space-y-2">
                   <History className="w-8 h-8 text-gray-600" />
-                  <span className="text-xs text-gray-400 font-sans">No recent duels logged. Engage in Arena duels to earn MMR!</span>
+                  <span className="text-xs text-gray-400 font-sans">No recent duels logged. Engage in Arena duels to earn crowns!</span>
                 </div>
               ) : (
                 <div className="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
                   {profile.pvpHistory.map((record: any) => {
                     const isWin = (record.winner === 'attacker' && !record.isDefense) || (record.winner === 'defender' && record.isDefense);
-                    const mmrChange = record.isDefense ? record.defenderRatingChange : record.attackerRatingChange;
+                    const lpChange = record.isDefense 
+                      ? (record.defenderLPChange !== undefined ? record.defenderLPChange : record.defenderRatingChange)
+                      : (record.attackerLPChange !== undefined ? record.attackerLPChange : record.attackerRatingChange);
                     const dateStr = new Date(record.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                     
                     return (
@@ -600,10 +601,16 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                         </div>
 
                         <div className="text-right">
-                          <span className={`font-mono font-black text-sm ${mmrChange >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                            {mmrChange >= 0 ? `+${mmrChange}` : mmrChange} MMR
+                          <span className={`font-mono font-black text-sm ${lpChange >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                            {lpChange >= 0 ? `+${lpChange}` : lpChange} 👑
                           </span>
-                          <span className="text-[9px] text-gray-500 block">Rating: {record.isDefense ? record.defenderRatingBefore : record.attackerRatingBefore} → {record.isDefense ? (record.defenderRatingBefore + record.defenderRatingChange) : (record.attackerRatingBefore + record.attackerRatingChange)}</span>
+                          <span className="text-[9px] text-gray-500 block">
+                            Crowns: {record.isDefense 
+                              ? (record.defenderLPBefore !== undefined ? record.defenderLPBefore : record.defenderRatingBefore) 
+                              : (record.attackerLPBefore !== undefined ? record.attackerLPBefore : record.attackerRatingBefore)} → {record.isDefense 
+                              ? ((record.defenderLPBefore !== undefined ? record.defenderLPBefore : record.defenderRatingBefore) + lpChange) 
+                              : ((record.attackerLPBefore !== undefined ? record.attackerLPBefore : record.attackerRatingBefore) + lpChange)}
+                          </span>
                         </div>
                       </div>
                     );
@@ -655,8 +662,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                         </span>
                         <span className="truncate max-w-[120px]">{player.username}</span>
                       </div>
-                      <span className={`font-bold ${isSelf ? 'text-cyan-400' : 'text-rose-400/90'}`}>
-                        {player.pvpRating} MMR
+                      <span className={`font-bold ${isSelf ? 'text-cyan-400' : 'text-amber-500'}`}>
+                        {player.pvpLP !== undefined ? player.pvpLP : (player.pvpRating || 0)} 👑
                       </span>
                     </div>
                   );

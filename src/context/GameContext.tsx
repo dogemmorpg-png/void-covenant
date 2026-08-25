@@ -156,6 +156,10 @@ const migrateProfileTo10Cards = (p: PlayerProfile): PlayerProfile => {
     p.deck = p.collection.slice(0, 10).map(c => c.id);
   }
   
+  // Ensure league and LP fields are populated
+  p.pvpLeague = p.pvpLeague || 'Bronze';
+  p.pvpLP = p.pvpLP !== undefined ? p.pvpLP : 0;
+  
   return p;
 };
 
@@ -176,6 +180,8 @@ const createDefaultProfile = (): PlayerProfile => {
   lastPvpEnergyRefill: Date.now(),
   pveProgress: 1,
   pvpRating: 100,
+  pvpLeague: 'Bronze',
+  pvpLP: 0,
   heroMaxHealth: 30,
   level: 1,
   exp: 0,

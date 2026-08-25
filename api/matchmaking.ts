@@ -66,6 +66,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const profileData = currentPlayerRow.data;
     const playerRating = profileData.pvpRating || 100;
+    const playerLeague = profileData.pvpLeague || 'Bronze';
 
     // 2. Spend resource (Energy or Shards) or Cancel
     const { spendShards, spendEnergy, cancel } = req.body || {};
@@ -118,6 +119,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (rows && rows.length > 0) {
       const realPlayers = rows
         .filter(r => r.data && r.data.username && r.data.username.trim() !== '')
+        .filter(r => (r.data.pvpLeague || 'Bronze') === playerLeague)
         .map(r => {
           const data = r.data;
           
@@ -146,6 +148,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             walletAddress: r.wallet_address,
             username: data.username,
             pvpRating: data.pvpRating || 100,
+            pvpLeague: data.pvpLeague || 'Bronze',
+            pvpLP: data.pvpLP !== undefined ? data.pvpLP : 0,
             avatarUrl: data.avatarUrl || '/avatars/knight.webp',
             level: data.level || 1,
             activeStance: data.activeStance || 'void_strike',
@@ -208,6 +212,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         walletAddress: 'bot_' + botName.toLowerCase() + '_' + Date.now(),
         username: botName,
         pvpRating: botRating,
+        pvpLeague: playerLeague,
+        pvpLP: Math.max(0, (profileData.pvpLP || 0) + Math.floor(Math.random() * 41) - 20),
         avatarUrl: botAvatars[Math.floor(Math.random() * botAvatars.length)],
         level: botLevel,
         activeStance: Math.random() < 0.35 ? 'warlord_cry' : (Math.random() < 0.5 ? 'blood_aura' : 'void_strike'),
@@ -222,6 +228,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       walletAddress: opponent.walletAddress,
       name: opponent.username,
       rating: opponent.pvpRating,
+      league: opponent.pvpLeague || 'Bronze',
+      lp: opponent.pvpLP !== undefined ? opponent.pvpLP : 0,
       deck: opponent.deck,
       stance: opponent.activeStance || 'void_strike',
       talents: opponent.talents || {},

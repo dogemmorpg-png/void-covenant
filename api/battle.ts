@@ -78,6 +78,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         lastPvpEnergyRefill: Date.now(),
         pveProgress: 1,
         pvpRating: 100,
+        pvpLeague: 'Bronze',
+        pvpLP: 0,
         heroMaxHealth: 30,
         level: 1,
         exp: 0,
@@ -97,6 +99,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await supabase.from('profiles').upsert({ wallet_address: walletAddress, data: profile });
     } else {
       profile = profileRow.data;
+      profile.pvpLeague = profile.pvpLeague || 'Bronze';
+      profile.pvpLP = profile.pvpLP !== undefined ? profile.pvpLP : 0;
       
       // Anti-Cheat: Simple cooldown check (must be at least 3 seconds between battles)
       if (profile.lastBattleTime && now - profile.lastBattleTime < 3000) {
@@ -185,6 +189,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       
       let attackerRatingChange = 0;
       let defenderRatingChange = 0;
+      let attackerLPChange = 0;
+      let defenderLPChange = 0;
 
       if (result === 'win') {
         goldReward = Math.floor(20 * goldMultiplier);
@@ -193,6 +199,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const gain = Math.round(32 * (1 - expected));
         attackerRatingChange = Math.max(10, Math.min(32, gain));
         defenderRatingChange = -Math.max(5, Math.min(25, Math.round(32 * (1 - expected))));
+        
+        attackerLPChange = 20;
+        defenderLPChange = -15;
       } else {
         goldReward = Math.floor(20 * goldMultiplier);
         
@@ -201,9 +210,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         
         const gain = Math.round(32 * expected);
         defenderRatingChange = Math.max(10, Math.min(32, gain));
+        
+        attackerLPChange = -15;
+        defenderLPChange = 20;
       }
 
+      const lpPlayer = profile.pvpLP !== undefined ? profile.pvpLP : 0;
+      const lpOpponent = opponent.lp !== undefined ? opponent.lp : (opponent.pvpLP !== undefined ? opponent.pvpLP : 0);
+
       profile.pvpRating = Math.max(0, rPlayer + attackerRatingChange);
+      profile.pvpLP = Math.max(0, lpPlayer + attackerLPChange);
 
       const recordId = 'pvp_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
       
@@ -220,6 +236,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         defenderRatingBefore: rOpponent,
         attackerRatingChange: attackerRatingChange,
         defenderRatingChange: defenderRatingChange,
+        attackerLPBefore: lpPlayer,
+        defenderLPBefore: lpOpponent,
+        attackerLPChange: attackerLPChange,
+        defenderLPChange: defenderLPChange,
         isDefense: false
       };
       
@@ -239,6 +259,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const rDefBefore = defProfile.pvpRating || 100;
             defProfile.pvpRating = Math.max(0, rDefBefore + defenderRatingChange);
             
+            const lpDefBefore = defProfile.pvpLP !== undefined ? defProfile.pvpLP : 0;
+            defProfile.pvpLeague = defProfile.pvpLeague || 'Bronze';
+            defProfile.pvpLP = Math.max(0, lpDefBefore + defenderLPChange);
+            
             const defenderRecord = {
               id: recordId,
               timestamp: Date.now(),
@@ -251,6 +275,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               defenderRatingBefore: rDefBefore,
               attackerRatingChange: attackerRatingChange,
               defenderRatingChange: defenderRatingChange,
+              attackerLPBefore: lpPlayer,
+              defenderLPBefore: lpDefBefore,
+              attackerLPChange: attackerLPChange,
+              defenderLPChange: defenderLPChange,
               isDefense: true
             };
             

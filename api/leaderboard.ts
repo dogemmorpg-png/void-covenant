@@ -34,6 +34,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const supabase = getSupabase();
 
+    const authHeader = req.headers.authorization;
+    let playerLeague = 'Bronze';
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const walletAddress = decoded.walletAddress;
+        if (walletAddress) {
+          const { data: profileRow } = await supabase
+            .from('profiles')
+            .select('data')
+            .eq('wallet_address', walletAddress)
+            .limit(1);
+          if (profileRow && profileRow.length > 0 && profileRow[0].data) {
+            playerLeague = profileRow[0].data.pvpLeague || 'Bronze';
+          }
+        }
+      } catch (err) {
+        // Ignore token errors and fallback to Bronze
+      }
+    }
+
     // Fetch all profiles to build leaderboard
     const { data: rows, error } = await supabase
       .from('profiles')
@@ -47,13 +70,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const leaderboard = (rows || [])
       .filter(r => r.data && r.data.username && r.data.username.trim() !== '')
+      .filter(r => (r.data.pvpLeague || 'Bronze') === playerLeague)
       .map(r => ({
         username: r.data.username,
         pvpRating: r.data.pvpRating || 100,
+        pvpLeague: r.data.pvpLeague || 'Bronze',
+        pvpLP: r.data.pvpLP !== undefined ? r.data.pvpLP : 0,
         avatarUrl: r.data.avatarUrl || '/avatars/knight.webp',
         walletAddress: r.wallet_address
       }))
-      .sort((a, b) => b.pvpRating - a.pvpRating)
+      .sort((a, b) => (b.pvpLP - a.pvpLP) || (b.pvpRating - a.pvpRating))
       .slice(0, 15);
 
     return res.status(200).json({ success: true, leaderboard });

@@ -67,6 +67,8 @@ export interface PlayerProfile {
   collection: Card[]; // list of owned card instances
   pveProgress: number; // stage index unlocked
   pvpRating: number; // rating points (MMR)
+  pvpLeague?: string; // current PvP League
+  pvpLP?: number; // current PvP LP (Crowns)
   battlePassPoints: number; // xp towards seasonal pass
   battlePassClaimed: number[]; // list of indices of claimed tiers
   referralsCount: number;
