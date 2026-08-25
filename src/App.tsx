@@ -38,6 +38,7 @@ function MainAppContent() {
   const [activeBattleStage, setActiveBattleStage] = useState<CampaignStage | null>(null);
   const [activeBattleType, setActiveBattleType] = useState<'campaign' | 'pvp'>('campaign');
   const [isPvpMatching, setIsPvpMatching] = useState(false);
+  const [isPvpModalOpen, setIsPvpModalOpen] = useState(false);
 
   // When battle ends
   const handleExitBattle = (isVictory: boolean) => {
@@ -200,7 +201,7 @@ function MainAppContent() {
       <div className="min-h-screen flex flex-col justify-between relative z-10">
         <div>
           {/* Top bar resource hud and wallet */}
-          {!isPvpMatching && <HeaderHUD />}
+           {!isPvpMatching && !isPvpModalOpen && <HeaderHUD />}
 
           {/* Tab content */}
           <div className="py-6">
@@ -226,6 +227,8 @@ function MainAppContent() {
               }}
               isMatching={isPvpMatching}
               setIsMatching={setIsPvpMatching}
+              isModalOpen={isPvpModalOpen}
+              setIsModalOpen={setIsPvpModalOpen}
             />
           )}
           {activeTab === 'collection' && <CollectionDeckView />}
@@ -237,7 +240,7 @@ function MainAppContent() {
       </div>
 
       {/* Navigation Footer Tab Bar (Mobile responsive and desktop styled) */}
-      {!isPvpMatching && (
+      {!isPvpMatching && !isPvpModalOpen && (
         <div className="bg-[#151a21]/95 border-t border-[#c5a880]/20 sticky bottom-0 z-50 backdrop-blur-md py-2.5">
           <div className="max-w-4xl mx-auto flex items-center justify-around gap-2 px-4">
           

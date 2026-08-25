@@ -67,16 +67,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const profileData = currentPlayerRow.data;
     const playerRating = profileData.pvpRating || 100;
 
-    // 2. Spend shards if rerolling
-    const { spendShards } = req.body || {};
-    let shardsDeducted = false;
+    // 2. Spend resource (Energy or Shards)
+    const { spendShards, spendEnergy } = req.body || {};
+    
+    if (spendEnergy) {
+      const currentEnergy = profileData.pvpEnergy || 0;
+      if (currentEnergy < 1) {
+        return res.status(400).json({ error: 'Not enough PvP energy' });
+      }
+      profileData.pvpEnergy = currentEnergy - 1;
+    }
+
     if (spendShards) {
       const currentShards = profileData.darkShards || 0;
       if (currentShards < 5) {
         return res.status(400).json({ error: 'Insufficient Dark Shards' });
       }
       profileData.darkShards = currentShards - 5;
-      shardsDeducted = true;
     }
 
     // 3. Fetch potential opponents (real profiles)
@@ -194,16 +201,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       };
     }
 
-    // 5. Save player profile if shards were spent
-    if (shardsDeducted) {
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ data: profileData, updated_at: new Date().toISOString() })
-        .eq('wallet_address', walletAddress);
-        
-      if (updateError) {
-        console.error('Failed to update shards count:', updateError);
-      }
+    // 5. Lock this active opponent in the database
+    profileData.activePvpOpponent = {
+      walletAddress: opponent.walletAddress,
+      name: opponent.username,
+      rating: opponent.pvpRating,
+      deck: opponent.deck,
+      stance: opponent.activeStance || 'void_strike',
+      talents: opponent.talents || {},
+      avatarUrl: opponent.avatarUrl || '/avatars/knight.webp',
+      level: opponent.level || 1
+    };
+
+    // 6. Save player profile to DB
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ data: profileData, updated_at: new Date().toISOString() })
+      .eq('wallet_address', walletAddress);
+      
+    if (updateError) {
+      console.error('Failed to update player profile:', updateError);
     }
 
     return res.status(200).json({ success: true, opponent, profile: profileData });

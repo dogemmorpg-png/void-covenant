@@ -8,9 +8,17 @@ interface PvpArenaViewProps {
   onStartBattle: (stage: CampaignStage, type: 'campaign' | 'pvp', opponentPayload?: any) => Promise<boolean> | void;
   isMatching: boolean;
   setIsMatching: (val: boolean) => void;
+  isModalOpen: boolean;
+  setIsModalOpen: (val: boolean) => void;
 }
 
-export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMatching, setIsMatching }) => {
+export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ 
+  onStartBattle, 
+  isMatching, 
+  setIsMatching,
+  isModalOpen,
+  setIsModalOpen
+}) => {
   const { profile, updateProfile } = useGame();
   const toast = useToast();
 
@@ -20,20 +28,12 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMat
   const [matchStatus, setMatchStatus] = useState('');
   const [refreshCooldown, setRefreshCooldown] = useState(0);
 
-  // Matchmaking single opponent cache
-  const [activeOpponent, setActiveOpponent] = useState<any>(() => {
-    const saved = localStorage.getItem('void_covenant_pvp_opponent');
-    return saved ? JSON.parse(saved) : null;
-  });
-
-  const saveOpponent = (opp: any) => {
-    setActiveOpponent(opp);
-    if (opp) {
-      localStorage.setItem('void_covenant_pvp_opponent', JSON.stringify(opp));
-    } else {
-      localStorage.removeItem('void_covenant_pvp_opponent');
+  // If there's an active opponent in profile, make sure modal is open on mount
+  useEffect(() => {
+    if (profile && profile.activePvpOpponent) {
+      setIsModalOpen(true);
     }
-  };
+  }, [profile?.activePvpOpponent]);
 
   // League calculation helper
   const getLeagueDetails = (rating: number) => {
@@ -119,10 +119,17 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMat
     }
   };
 
-  const handleFindOpponent = async (spendShards: boolean = false) => {
+  const handleFindOpponent = async (spendShards: boolean = false, spendEnergy: boolean = false) => {
     if (profile.deck.length < 10) {
       toast("Your deck is incomplete! Go to the 'CARDS' tab and select exactly 10 cards for battle.", 'warning');
       return;
+    }
+
+    if (spendEnergy) {
+      if (profile.pvpEnergy < 1) {
+        toast('Not enough PvP Energy!', 'warning');
+        return;
+      }
     }
 
     if (spendShards) {
@@ -133,7 +140,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMat
     }
 
     setIsMatching(true);
-    setMatchStatus(spendShards ? 'Deducting 5 Shards and finding new opponent...' : 'Searching for rival summoner in range...');
+    setMatchStatus(spendShards ? 'Deducting 5 Shards and finding new opponent...' : 'Spending 1 PvP Energy and finding opponent...');
 
     try {
       const token = localStorage.getItem('void_covenant_token');
@@ -148,15 +155,15 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMat
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ spendShards })
+        body: JSON.stringify({ spendShards, spendEnergy })
       });
 
       if (res.ok) {
         const data = await res.json();
-        saveOpponent(data.opponent);
         if (data.profile) {
           updateProfile(data.profile);
         }
+        setIsModalOpen(true);
         if (spendShards) {
           toast('Opponent re-rolled! 5 Dark Shards deducted.', 'success');
           setRefreshCooldown(3); // 3-second cooldown on re-rolls to prevent spamming
@@ -168,6 +175,38 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMat
     } catch (err) {
       console.error('Matchmaking query failed:', err);
       toast('Connection error establishing matchmaking session.', 'error');
+    } finally {
+      setIsMatching(false);
+    }
+  };
+
+  const handleCancelMatch = async () => {
+    setIsMatching(true);
+    setMatchStatus('Forfeiting challenger connection...');
+    try {
+      const token = localStorage.getItem('void_covenant_token');
+      if (!token) return;
+
+      const res = await fetch('/api/matchmaking-cancel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.profile) {
+          updateProfile(data.profile);
+        }
+        setIsModalOpen(false);
+        toast('Matchmaking canceled. PvP Energy forfeited.', 'info');
+      } else {
+        toast('Failed to cancel matchmaking.', 'error');
+      }
+    } catch (err) {
+      console.error('Matchmaking cancel failed:', err);
+      toast('Connection error canceling matchmaking.', 'error');
     } finally {
       setIsMatching(false);
     }
@@ -191,11 +230,6 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMat
   const handleFight = async (opponent: any) => {
     if (profile.deck.length < 10) {
       toast("Your deck is incomplete! Go to the 'CARDS' tab and select exactly 10 cards for battle.", 'warning');
-      return;
-    }
-
-    if (profile.pvpEnergy < 1) {
-      toast('Not enough PvP Energy! It restores automatically (1 per 15 mins).', 'warning');
       return;
     }
 
@@ -229,10 +263,9 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMat
     try {
       setMatchStatus('Accessing local battlefield simulation channel...');
       const success = await onStartBattle(pvpStage, 'pvp', opponentPayload);
+      setIsMatching(false); // Fix loading screen hang!
       if (success) {
-        saveOpponent(null); // Clear cache so they search fresh after the match!
-      } else {
-        setIsMatching(false);
+        setIsModalOpen(false); // Close the modal
       }
     } catch (err) {
       setIsMatching(false);
@@ -246,6 +279,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMat
   };
 
   const playerRank = getRankNumber(profile.solanaAddress || '') || '?';
+  const activeOpponent = profile.activePvpOpponent;
 
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
@@ -265,7 +299,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMat
       )}
 
       {/* Opponent Modal Window (Request #2) */}
-      {activeOpponent && (
+      {isModalOpen && activeOpponent && (
         <div className="fixed inset-0 z-[90] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-gradient-to-b from-[#151a21] via-[#0b0c10] to-[#040507] border-2 border-cyan-500/35 rounded-3xl p-7 max-w-sm w-full text-center space-y-6 shadow-2xl relative overflow-hidden gothic-glow-cyan">
             
@@ -275,10 +309,11 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMat
             <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-cyan-500/30 pointer-events-none" />
             <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-cyan-500/30 pointer-events-none" />
 
-            {/* Close Cross */}
+            {/* Close Cross (Pre-paid loss on close) */}
             <button
-              onClick={() => saveOpponent(null)}
+              onClick={handleCancelMatch}
               className="absolute top-4 right-4 text-gray-500 hover:text-white font-sans text-lg font-black transition-colors cursor-pointer w-6 h-6 flex items-center justify-center bg-black/40 border border-white/5 rounded-full"
+              title="Close and forfeit spent PvP energy"
             >
               ✕
             </button>
@@ -301,25 +336,25 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMat
               </div>
 
               <div className="space-y-1.5">
-                <h4 className="text-white font-display font-black text-lg tracking-wide leading-none">{activeOpponent.username}</h4>
-                <span className={`px-2.5 py-0.5 border rounded-full text-[9px] font-display font-black uppercase tracking-widest leading-none inline-block ${getLeagueDetails(activeOpponent.pvpRating).color}`}>
-                  {getLeagueDetails(activeOpponent.pvpRating).badge} {getLeagueDetails(activeOpponent.pvpRating).name}
+                <h4 className="text-white font-display font-black text-lg tracking-wide leading-none">{activeOpponent.name || activeOpponent.username}</h4>
+                <span className={`px-2.5 py-0.5 border rounded-full text-[9px] font-display font-black uppercase tracking-widest leading-none inline-block ${getLeagueDetails(activeOpponent.rating || activeOpponent.pvpRating).color}`}>
+                  {getLeagueDetails(activeOpponent.rating || activeOpponent.pvpRating).badge} {getLeagueDetails(activeOpponent.rating || activeOpponent.pvpRating).name}
                 </span>
               </div>
 
               {/* MMR */}
               <div className="bg-black/50 border border-gray-950 px-4 py-2 rounded-xl flex items-center gap-1.5 text-xs font-mono font-bold text-[#ebd09b]">
                 <Trophy className="w-4 h-4 text-[#ebd09b]" />
-                <span>{activeOpponent.pvpRating} MMR</span>
+                <span>{activeOpponent.rating || activeOpponent.pvpRating} MMR</span>
               </div>
 
               {/* Active stance skill */}
               <div className="space-y-1">
                 <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold block">Active Stance</span>
                 <span className="px-3 py-1 bg-cyan-950/40 border border-cyan-500/20 rounded-lg text-xs font-mono font-bold text-cyan-300 uppercase tracking-wide inline-block shadow-sm">
-                  {activeOpponent.activeStance === 'void_strike' ? 'Void Strike ⚡' : 
-                   activeOpponent.activeStance === 'blood_aura' ? 'Blood Aura 🩸' : 
-                   activeOpponent.activeStance === 'warlord_cry' ? "Warlord's Cry 🔊" : 'Void Strike ⚡'}
+                  {activeOpponent.stance === 'void_strike' ? 'Void Strike ⚡' : 
+                   activeOpponent.stance === 'blood_aura' ? 'Blood Aura 🩸' : 
+                   activeOpponent.stance === 'warlord_cry' ? "Warlord's Cry 🔊" : 'Void Strike ⚡'}
                 </span>
               </div>
             </div>
@@ -328,7 +363,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMat
             <div className="grid grid-cols-2 gap-3.5 pt-2 border-t border-gray-900">
               <button
                 disabled={refreshCooldown > 0}
-                onClick={() => handleFindOpponent(true)}
+                onClick={() => handleFindOpponent(true, false)}
                 className={`py-3 px-3 rounded-xl border font-display font-bold text-[10px] tracking-wider transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
                   refreshCooldown > 0
                     ? 'border-gray-850 bg-gray-900/20 text-gray-600 cursor-not-allowed'
@@ -343,12 +378,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMat
               
               <button
                 onClick={() => handleFight(activeOpponent)}
-                disabled={profile.pvpEnergy < 1}
-                className={`py-3 px-4 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border ${
-                  profile.pvpEnergy < 1
-                    ? 'bg-gray-800/20 border-gray-850 text-gray-600 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-emerald-900 to-teal-900 border-emerald-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
-                }`}
+                className="py-3 px-4 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border bg-gradient-to-r from-emerald-900 to-teal-900 border-emerald-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
               >
                 <Swords className="w-4 h-4 shrink-0" /> FIGHT
               </button>
@@ -488,18 +518,26 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMat
                     
                     <div className="flex flex-col items-center gap-2">
                       <button
-                        onClick={() => handleFindOpponent(false)}
-                        className="py-3 px-8 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center gap-2 cursor-pointer border bg-gradient-to-r from-cyan-900 to-indigo-900 border-cyan-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+                        disabled={profile.pvpEnergy < 1}
+                        onClick={() => handleFindOpponent(false, true)}
+                        className={`py-3 px-8 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border ${
+                          profile.pvpEnergy < 1
+                            ? 'bg-gray-800/20 border-gray-850 text-gray-600 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-cyan-900 to-indigo-900 border-cyan-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
+                        }`}
                       >
-                        <Search className="w-4 h-4 animate-pulse" /> FIND OPPONENT
+                        <Search className="w-4 h-4 shrink-0" />
+                        <span>FIND OPPONENT (1</span>
+                        <img src="/icons/icon_energy.webp" alt="Energy" className="w-4 h-4 object-contain inline-block shrink-0 -mt-0.5" />
+                        <span>)</span>
                       </button>
                       
                       {activeOpponent && (
                         <button
-                          onClick={() => saveOpponent(activeOpponent)}
+                          onClick={() => setIsModalOpen(true)}
                           className="text-[10px] font-mono text-cyan-400 hover:text-white underline cursor-pointer mt-1 bg-transparent border-0"
                         >
-                          View currently matched opponent ({activeOpponent.username})
+                          View currently matched opponent ({activeOpponent.name || activeOpponent.username})
                         </button>
                       )}
                     </div>

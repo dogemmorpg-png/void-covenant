@@ -74,23 +74,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       profile.pveEnergy -= stage.energyCost;
     } else if (battleType === 'pvp') {
-      if ((profile.pvpEnergy || 0) < 1) {
-        return res.status(400).json({ error: 'Not enough PvP energy' });
+      // PvP energy is already pre-deducted during matchmaking search.
+      // We just verify that an active opponent is locked in profile.
+      if (!profile.activePvpOpponent) {
+        return res.status(400).json({ error: 'No active PvP opponent found. Please search first.' });
       }
-      profile.pvpEnergy -= 1;
-
-      const { opponentWalletAddress, opponentName, opponentRating, opponentDeck, opponentStance } = req.body;
-      if (!opponentName || opponentRating === undefined || !opponentDeck) {
-        return res.status(400).json({ error: 'Missing opponent details for PvP' });
-      }
-
-      profile.activePvpOpponent = {
-        walletAddress: opponentWalletAddress || 'bot',
-        name: opponentName,
-        rating: opponentRating,
-        deck: opponentDeck,
-        stance: opponentStance || 'void_strike'
-      };
     }
     
     profile.lastBattleTimestamp = Date.now();
