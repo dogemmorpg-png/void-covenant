@@ -302,7 +302,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
             )}
 
             {/* Packages Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[320px] overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[440px] overflow-y-auto pr-1">
               {SOLANA_PACKAGES.map(pkg => {
                 const isPopular = pkg.popular;
                 return (
@@ -323,10 +323,19 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                     )}
 
                     <div className="space-y-1">
-                      <span className="text-white font-sans font-bold text-xs block">
+                      {pkg.image && (
+                        <div className="w-full flex items-center justify-center py-2.5 shrink-0">
+                          <img 
+                            src={pkg.image} 
+                            alt={pkg.name} 
+                            className="w-16 h-16 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.35)]" 
+                          />
+                        </div>
+                      )}
+                      <span className="text-white font-sans font-bold text-xs block text-center">
                         {pkg.name}
                       </span>
-                      <p className="text-[10px] text-gray-500 font-sans leading-tight">
+                      <p className="text-[10px] text-gray-500 font-sans leading-tight text-center">
                         {pkg.description}
                       </p>
                     </div>

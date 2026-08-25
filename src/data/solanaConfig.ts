@@ -26,6 +26,7 @@ export interface SolanaPackage {
   shardsReward: number;
   dustBonus: number;
   description: string;
+  image?: string;
   badge?: string;
   popular?: boolean;
 }
@@ -38,6 +39,7 @@ export const SOLANA_PACKAGES: SolanaPackage[] = [
     shardsReward: 25,
     dustBonus: 0,
     description: 'Quick top-up for 1 booster pack.',
+    image: '/shop/pouch_of_shards.png'
   },
   {
     id: 'shards_pouch',
@@ -47,7 +49,8 @@ export const SOLANA_PACKAGES: SolanaPackage[] = [
     dustBonus: 100,
     description: 'Enough for an Obsidian pack + 15 shards.',
     popular: true,
-    badge: 'POPULAR'
+    badge: 'POPULAR',
+    image: '/shop/dark_shard_chest.png'
   },
   {
     id: 'shards_vault',
@@ -56,7 +59,8 @@ export const SOLANA_PACKAGES: SolanaPackage[] = [
     shardsReward: 250,
     dustBonus: 350,
     description: 'Supreme horde. Guaranteed to summon high-tier lords.',
-    badge: 'BEST VALUE'
+    badge: 'BEST VALUE',
+    image: '/shop/abyssal_treasury.png'
   },
   {
     id: 'shards_overlord',
@@ -65,6 +69,7 @@ export const SOLANA_PACKAGES: SolanaPackage[] = [
     shardsReward: 700,
     dustBonus: 1000,
     description: 'Massive hoard of Dark Shards + 1,000 Dark Dust bonus.',
-    badge: 'SUPREME'
+    badge: 'SUPREME',
+    image: '/shop/void_overlord_vault.png'
   }
 ];
