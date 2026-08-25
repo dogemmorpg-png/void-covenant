@@ -67,9 +67,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const profileData = currentPlayerRow.data;
     const playerRating = profileData.pvpRating || 100;
 
-    // 2. Spend resource (Energy or Shards)
-    const { spendShards, spendEnergy } = req.body || {};
+    // 2. Spend resource (Energy or Shards) or Cancel
+    const { spendShards, spendEnergy, cancel } = req.body || {};
     
+    if (cancel) {
+      if (profileData.activePvpOpponent) {
+        delete profileData.activePvpOpponent;
+      }
+      
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ data: profileData, updated_at: new Date().toISOString() })
+        .eq('wallet_address', walletAddress);
+        
+      if (updateError) {
+        console.error('Failed to update player profile during cancel:', updateError);
+      }
+      return res.status(200).json({ success: true, profile: profileData });
+    }
+
     if (spendEnergy) {
       const currentEnergy = profileData.pvpEnergy || 0;
       if (currentEnergy < 1) {

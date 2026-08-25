@@ -187,12 +187,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       const token = localStorage.getItem('void_covenant_token');
       if (!token) return;
 
-      const res = await fetch('/api/matchmaking-cancel', {
+      const res = await fetch('/api/matchmaking', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        }
+        },
+        body: JSON.stringify({ cancel: true })
       });
       if (res.ok) {
         const data = await res.json();
