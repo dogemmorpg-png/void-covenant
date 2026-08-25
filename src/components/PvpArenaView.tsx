@@ -371,16 +371,18 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               <button
                 disabled={refreshCooldown > 0}
                 onClick={() => handleFindOpponent(true, false)}
-                className={`py-3 px-3 rounded-xl border font-display font-bold text-[10px] tracking-wider transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
+                className={`py-3 px-3 rounded-xl border font-display font-bold text-[10px] tracking-wider transition-all flex items-center justify-center gap-3 cursor-pointer active:scale-95 ${
                   refreshCooldown > 0
                     ? 'border-gray-850 bg-gray-900/20 text-gray-600 cursor-not-allowed'
                     : 'border-rose-950/40 bg-rose-950/10 hover:bg-rose-900/20 text-rose-300'
                 }`}
               >
                 <RefreshCw className="w-3.5 h-3.5 shrink-0" />
-                <span>RE-ROLL (5</span>
-                <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain inline-block shrink-0 -mt-0.5" />
-                <span>)</span>
+                <span className="mr-0.5">RE-ROLL</span>
+                <span className="flex items-center gap-1 bg-black/50 border border-rose-500/25 rounded-full px-2 py-0.5 font-mono text-[11px] font-bold text-[#ebd09b] shadow-inner">
+                  5
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain brightness-110 drop-shadow-[0_0_4px_rgba(239,68,68,0.45)]" />
+                </span>
               </button>
               
               <button
@@ -527,16 +529,18 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                       <button
                         disabled={profile.pvpEnergy < 1}
                         onClick={() => handleFindOpponent(false, true)}
-                        className={`py-3 px-8 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border ${
+                        className={`py-3 px-8 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-3 cursor-pointer border ${
                           profile.pvpEnergy < 1
                             ? 'bg-gray-800/20 border-gray-850 text-gray-600 cursor-not-allowed'
                             : 'bg-gradient-to-r from-cyan-900 to-indigo-900 border-cyan-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
                         }`}
                       >
                         <Search className="w-4 h-4 shrink-0" />
-                        <span>FIND OPPONENT (1</span>
-                        <img src="/icons/icon_energy.webp" alt="Energy" className="w-4 h-4 object-contain inline-block shrink-0 -mt-0.5" />
-                        <span>)</span>
+                        <span className="mr-0.5">FIND OPPONENT</span>
+                        <span className="flex items-center gap-1 bg-black/50 border border-cyan-500/30 rounded-full px-2 py-0.5 font-mono text-[11px] font-bold text-emerald-450 shadow-inner">
+                          1
+                          <img src="/icons/icon_energy.webp" alt="Energy" className="w-4 h-4 object-contain brightness-110 drop-shadow-[0_0_4px_rgba(16,185,129,0.45)]" />
+                        </span>
                       </button>
                       
                     </div>
