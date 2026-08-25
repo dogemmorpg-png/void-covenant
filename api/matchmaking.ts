@@ -53,7 +53,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const supabase = getSupabase();
 
-    // 1. Fetch current player's rating
+    // 1. Fetch current player's rating and profile
     const { data: currentPlayerRow, error: currentPlayerError } = await supabase
       .from('profiles')
       .select('data')
@@ -64,20 +64,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(404).json({ error: 'Player profile not found' });
     }
 
-    const playerRating = currentPlayerRow.data.pvpRating || 100;
+    const profileData = currentPlayerRow.data;
+    const playerRating = profileData.pvpRating || 100;
 
-    // 2. Fetch potential opponents (real profiles)
+    // 2. Spend shards if rerolling
+    const { spendShards } = req.body || {};
+    let shardsDeducted = false;
+    if (spendShards) {
+      const currentShards = profileData.darkShards || 0;
+      if (currentShards < 5) {
+        return res.status(400).json({ error: 'Insufficient Dark Shards' });
+      }
+      profileData.darkShards = currentShards - 5;
+      shardsDeducted = true;
+    }
+
+    // 3. Fetch potential opponents (real profiles)
     const { data: rows, error } = await supabase
       .from('profiles')
       .select('wallet_address, data')
       .neq('wallet_address', walletAddress)
-      .limit(100);
+      .limit(150);
 
     if (error) {
       console.error('Failed to query profiles:', error);
     }
 
-    const opponents: any[] = [];
+    let opponent: any = null;
 
     if (rows && rows.length > 0) {
       const realPlayers = rows
@@ -111,6 +124,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             username: data.username,
             pvpRating: data.pvpRating || 100,
             avatarUrl: data.avatarUrl || '/avatars/knight.webp',
+            level: data.level || 1,
             activeStance: data.activeStance || 'void_strike',
             talents: data.talents || {},
             deck: mappedDeck,
@@ -119,22 +133,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         })
         .filter(p => p.deck.length > 0);
 
-      // Sort by closest rating to the current player
-      realPlayers.sort((a, b) => Math.abs(a.pvpRating - playerRating) - Math.abs(b.pvpRating - playerRating));
-      
-      // Grab top matches (up to 3)
-      opponents.push(...realPlayers.slice(0, 3));
+      if (realPlayers.length > 0) {
+        // Filter players within +/- 300 MMR
+        const inRange = realPlayers.filter(p => Math.abs(p.pvpRating - playerRating) <= 300);
+        if (inRange.length > 0) {
+          opponent = inRange[Math.floor(Math.random() * inRange.length)];
+        } else {
+          // If none in range, sort by closest rating and pick from the top 3 closest at random
+          realPlayers.sort((a, b) => Math.abs(a.pvpRating - playerRating) - Math.abs(b.pvpRating - playerRating));
+          const topClosest = realPlayers.slice(0, 3);
+          opponent = topClosest[Math.floor(Math.random() * topClosest.length)];
+        }
+      }
     }
 
-    // 3. Fallback to bots to fill slots up to 3
-    const botNames = ['Void_Stalker', 'Acheron_Cultist', 'Lilith_Gloom', 'DoomBringer', 'HexMage', 'Doom_Herald', 'Soul_Reaver'];
-    const botAvatars = ['/avatars/knight.webp', '/avatars/mage.webp', '/avatars/thief.webp'];
-    
-    while (opponents.length < 3) {
-      const botIndex = opponents.length;
-      const botName = botNames[botIndex % botNames.length] + '_' + Math.floor(Math.random() * 90 + 10);
+    // 4. Fallback to bot if no real player found
+    if (!opponent) {
+      const botNames = ['Void_Stalker', 'Acheron_Cultist', 'Lilith_Gloom', 'DoomBringer', 'HexMage', 'Doom_Herald', 'Soul_Reaver'];
+      const botAvatars = ['/avatars/knight.webp', '/avatars/mage.webp', '/avatars/thief.webp'];
+      
+      const botName = botNames[Math.floor(Math.random() * botNames.length)] + '_' + Math.floor(Math.random() * 90 + 10);
       const variance = Math.floor(Math.random() * 101) - 50; // -50 to +50 MMR
       const botRating = Math.max(100, playerRating + variance);
+      const botLevel = Math.max(1, Math.min(30, Math.floor(botRating / 100) + Math.floor(Math.random() * 3)));
 
       // Generate bot deck (10 cards from CARD_TEMPLATES)
       const botDeck = Array.from({ length: 10 }, () => {
@@ -160,19 +181,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         };
       });
 
-      opponents.push({
+      opponent = {
         walletAddress: 'bot_' + botName.toLowerCase() + '_' + Date.now(),
         username: botName,
         pvpRating: botRating,
         avatarUrl: botAvatars[Math.floor(Math.random() * botAvatars.length)],
+        level: botLevel,
         activeStance: Math.random() < 0.35 ? 'warlord_cry' : (Math.random() < 0.5 ? 'blood_aura' : 'void_strike'),
         talents: {},
         deck: botDeck,
         isBot: true
-      });
+      };
     }
 
-    return res.status(200).json({ success: true, opponents });
+    // 5. Save player profile if shards were spent
+    if (shardsDeducted) {
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ data: profileData, updated_at: new Date().toISOString() })
+        .eq('wallet_address', walletAddress);
+        
+      if (updateError) {
+        console.error('Failed to update shards count:', updateError);
+      }
+    }
+
+    return res.status(200).json({ success: true, opponent, profile: profileData });
 
   } catch (error: any) {
     console.error('Matchmaking API error:', error);

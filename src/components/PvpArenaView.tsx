@@ -2,24 +2,37 @@ import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CampaignStage } from '../types';
-import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, Clock, History, ListOrdered } from 'lucide-react';
+import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History } from 'lucide-react';
 
 interface PvpArenaViewProps {
   onStartBattle: (stage: CampaignStage, type: 'campaign' | 'pvp', opponentPayload?: any) => Promise<boolean> | void;
 }
 
 export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => {
-  const { profile, startBattleOnServer } = useGame();
+  const { profile, updateProfile } = useGame();
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState<'duels' | 'history'>('duels');
-  const [opponents, setOpponents] = useState<any[]>([]);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
-  const [isLoadingOpponents, setIsLoadingOpponents] = useState(true);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true);
   const [isMatching, setIsMatching] = useState(false);
   const [matchStatus, setMatchStatus] = useState('');
   const [refreshCooldown, setRefreshCooldown] = useState(0);
+
+  // Matchmaking single opponent cache
+  const [activeOpponent, setActiveOpponent] = useState<any>(() => {
+    const saved = localStorage.getItem('void_covenant_pvp_opponent');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const saveOpponent = (opp: any) => {
+    setActiveOpponent(opp);
+    if (opp) {
+      localStorage.setItem('void_covenant_pvp_opponent', JSON.stringify(opp));
+    } else {
+      localStorage.removeItem('void_covenant_pvp_opponent');
+    }
+  };
 
   // League calculation helper
   const getLeagueDetails = (rating: number) => {
@@ -81,30 +94,6 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
 
   const league = getLeagueDetails(profile.pvpRating || 100);
 
-  const fetchOpponents = async (silent: boolean = false) => {
-    if (!silent) setIsLoadingOpponents(true);
-    try {
-      const token = localStorage.getItem('void_covenant_token');
-      if (!token) return;
-
-      const res = await fetch('/api/matchmaking', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setOpponents(data.opponents || []);
-      }
-    } catch (err) {
-      console.error('Matchmaking fetch error:', err);
-    } finally {
-      setIsLoadingOpponents(false);
-    }
-  };
-
   const fetchLeaderboard = async (silent: boolean = false) => {
     if (!silent) setIsLoadingLeaderboard(true);
     try {
@@ -129,10 +118,58 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
     }
   };
 
-  const handleRefreshOpponents = () => {
-    if (refreshCooldown > 0) return;
-    fetchOpponents();
-    setRefreshCooldown(5);
+  const handleFindOpponent = async (spendShards: boolean = false) => {
+    if (profile.deck.length < 10) {
+      toast("Your deck is incomplete! Go to the 'CARDS' tab and select exactly 10 cards for battle.", 'warning');
+      return;
+    }
+
+    if (spendShards) {
+      if ((profile.darkShards || 0) < 5) {
+        toast('Недостаточно осколков Бездны для повторного поиска!', 'warning');
+        return;
+      }
+    }
+
+    setIsMatching(true);
+    setMatchStatus(spendShards ? 'Списание 5 💎 и переподбор оппонента...' : 'Searching for rival summoner in range...');
+
+    try {
+      const token = localStorage.getItem('void_covenant_token');
+      if (!token) {
+        setIsMatching(false);
+        return;
+      }
+
+      const res = await fetch('/api/matchmaking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ spendShards })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        saveOpponent(data.opponent);
+        if (data.profile) {
+          updateProfile(data.profile);
+        }
+        if (spendShards) {
+          toast('Соперник успешно переподбран! Списано 5 осколков.', 'success');
+          setRefreshCooldown(3); // 3-second cooldown on re-rolls to prevent spamming
+        }
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast(data.error || 'Failed to query matchmaking', 'error');
+      }
+    } catch (err) {
+      console.error('Matchmaking query failed:', err);
+      toast('Connection error establishing matchmaking session.', 'error');
+    } finally {
+      setIsMatching(false);
+    }
   };
 
   // Cooldown countdown timer
@@ -147,7 +184,6 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
   }, [refreshCooldown]);
 
   useEffect(() => {
-    fetchOpponents();
     fetchLeaderboard();
   }, []);
 
@@ -183,7 +219,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
       shardsReward: 0,
       enemyHeroName: opponent.username,
       enemyHeroHealth: 30 + Math.min(20, Math.floor(opponent.pvpRating / 150)),
-      enemyHeroImage: 'swords',
+      enemyHeroImage: opponent.avatarUrl || '/avatars/knight.webp', // Pass the opponent's real avatar URL!
       enemyDeck: opponent.deck,
       enemyStance: opponent.activeStance,
       enemyTalents: opponent.talents
@@ -192,7 +228,9 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
     try {
       setMatchStatus('Accessing local battlefield simulation channel...');
       const success = await onStartBattle(pvpStage, 'pvp', opponentPayload);
-      if (!success) {
+      if (success) {
+        saveOpponent(null); // Clear cache so they search fresh after the match!
+      } else {
         setIsMatching(false);
       }
     } catch (err) {
@@ -336,107 +374,95 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
                 </div>
               )}
 
-              {/* Opponent Selection Grid */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-gray-900 pb-2">
-                  <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest font-bold">CHALLENGE OPPONENTS</span>
-                  
-                  <button
-                    disabled={refreshCooldown > 0 || isLoadingOpponents}
-                    onClick={handleRefreshOpponents}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[10px] font-mono font-bold tracking-wider transition-all cursor-pointer ${
-                      refreshCooldown > 0
-                        ? 'border-gray-800 text-gray-600 bg-transparent cursor-not-allowed'
-                        : 'border-cyan-500/30 hover:border-cyan-400 text-cyan-400 hover:bg-cyan-500/5'
-                    }`}
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingOpponents ? 'animate-spin' : ''}`} />
-                    {refreshCooldown > 0 ? `RETRY IN ${refreshCooldown}S` : 'FIND NEW TARGETS'}
-                  </button>
-                </div>
+              {/* Opponent Matching Console */}
+              {profile.deck.length >= 10 && (
+                <div className="space-y-4">
+                  <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest font-bold block border-b border-gray-900 pb-2">CHALLENGE OPPONENT</span>
 
-                {isLoadingOpponents ? (
-                  <div className="h-64 flex flex-col items-center justify-center space-y-3">
-                    <div className="w-10 h-10 rounded-full border-2 border-cyan-500 border-t-transparent animate-spin" />
-                    <span className="text-[10px] font-mono text-gray-500 uppercase tracking-wider animate-pulse">Summoning candidates from the abyss...</span>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {opponents.map((opponent, idx) => {
-                      const oppLeague = getLeagueDetails(opponent.pvpRating);
-                      return (
-                        <div 
-                          key={opponent.walletAddress + idx}
-                          className="bg-[#151a21] border border-gray-900 hover:border-[#ebd09b]/25 rounded-xl p-4 flex flex-col justify-between transition-all duration-300 shadow-lg relative group overflow-hidden"
-                        >
-                          {/* Top accent line */}
-                          <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                          
-                          <div className="space-y-4">
-                            {/* Opponent Identity Header */}
-                            <div className="flex items-center gap-2.5">
-                              <img 
-                                src={opponent.avatarUrl || '/avatars/knight.webp'} 
-                                alt="Avatar" 
-                                className="w-10 h-10 rounded-full border border-white/10 bg-black/40 object-cover" 
-                              />
-                              <div className="min-w-0">
-                                <span className="text-white text-xs font-display font-black tracking-wide block truncate" title={opponent.username}>
-                                  {opponent.username}
-                                </span>
-                                <span className={`text-[9px] font-mono uppercase font-bold tracking-widest ${oppLeague.color.split(' ')[0]}`}>
-                                  {oppLeague.badge} {oppLeague.name}
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Opponent Stats */}
-                            <div className="bg-black/30 border border-gray-950 p-2 rounded-lg flex items-center justify-between text-[11px] font-mono text-gray-400">
-                              <span>MMR Rating:</span>
-                              <span className="text-[#ebd09b] font-bold">{opponent.pvpRating} MMR</span>
-                            </div>
-
-                            {/* Opponent Deck Preview */}
-                            <div className="space-y-1.5">
-                              <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold block">Defending Deck Preview</span>
-                              <div className="flex gap-1 justify-between">
-                                {opponent.deck.slice(0, 5).map((card: any, cIdx: number) => (
-                                  <div 
-                                    key={cIdx} 
-                                    className="w-8 h-10 rounded border border-gray-950/60 bg-black/50 flex flex-col items-center justify-center relative overflow-hidden"
-                                    title={`${card.name} (Lvl ${card.level})`}
-                                  >
-                                    <div className={`absolute inset-x-0 bottom-0 h-1 ${card.tier === 'legendary' ? 'bg-orange-500' : (card.tier === 'gold' ? 'bg-yellow-500' : (card.tier === 'silver' ? 'bg-gray-400' : 'bg-amber-800'))}`} />
-                                    <span className="text-[8px] font-mono text-gray-300 font-bold -mt-1">{card.attack}</span>
-                                    <span className="text-[8px] font-mono text-red-500 font-bold -mt-0.5">{card.health}</span>
-                                  </div>
-                                ))}
-                                {opponent.deck.length > 5 && (
-                                  <div className="w-8 h-10 rounded border border-gray-950/60 bg-black/70 flex items-center justify-center text-[9px] font-mono text-gray-500">
-                                    +{opponent.deck.length - 5}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
+                  {!activeOpponent ? (
+                    /* Initial Matchmaking Button */
+                    <div className="bg-[#151a21] border border-gray-900 rounded-xl p-8 flex flex-col items-center justify-center text-center space-y-6 shadow-xl relative overflow-hidden h-[300px]">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 blur-3xl pointer-events-none" />
+                      <div className="w-16 h-16 rounded-full bg-cyan-950/40 border border-cyan-500/35 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                        <Swords className="w-8 h-8 text-cyan-400" />
+                      </div>
+                      <div className="space-y-2 max-w-sm">
+                        <h3 className="font-display font-bold text-sm text-white tracking-widest uppercase">READY FOR DUEL</h3>
+                        <p className="text-[11px] text-gray-400 font-sans leading-relaxed">
+                          Find an active rival within your MMR bracket. Defeat them to secure victory points.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleFindOpponent(false)}
+                        className="py-3 px-8 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center gap-2 cursor-pointer border bg-gradient-to-r from-cyan-900 to-indigo-900 border-cyan-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+                      >
+                        <Search className="w-4 h-4 animate-pulse" /> FIND OPPONENT
+                      </button>
+                    </div>
+                  ) : (
+                    /* Found Opponent Display Panel */
+                    <div className="bg-[#151a21] border border-cyan-950/40 rounded-xl p-6 flex flex-col items-center justify-between shadow-xl relative overflow-hidden h-[300px]">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 blur-3xl pointer-events-none" />
+                      
+                      <div className="flex flex-col items-center space-y-3 text-center mt-2">
+                        {/* Avatar */}
+                        <div className="relative">
+                          <img 
+                            src={activeOpponent.avatarUrl || '/avatars/knight.webp'} 
+                            alt="Avatar" 
+                            className="w-16 h-16 rounded-full border-2 border-[#ebd09b]/50 bg-black/40 object-cover shadow-[0_0_12px_rgba(235,208,155,0.15)]" 
+                          />
+                          <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-cyan-950 border border-cyan-500/40 flex items-center justify-center font-mono text-[9px] font-bold text-cyan-400 shadow-md">
+                            Lvl{activeOpponent.level || 1}
                           </div>
-
-                          <button
-                            onClick={() => handleFight(opponent)}
-                            disabled={profile.deck.length < 10 || profile.pvpEnergy < 1}
-                            className={`w-full mt-5 py-2 px-3 rounded-lg font-display font-black tracking-widest text-[10px] transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
-                              profile.deck.length < 10 || profile.pvpEnergy < 1
-                                ? 'bg-gray-800/20 border-gray-850 text-gray-600 cursor-not-allowed'
-                                : 'bg-gradient-to-r from-red-950/40 to-black/60 border-red-500/25 text-red-300 hover:text-white hover:from-red-900/40 hover:to-red-950/40 hover:border-red-400/50 shadow-md active:scale-95'
-                            }`}
-                          >
-                            <Swords className="w-3.5 h-3.5" /> ENGAGE DUEL
-                          </button>
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+
+                        {/* Name & League Badge */}
+                        <div className="space-y-1">
+                          <h4 className="text-white font-display font-black text-base tracking-wide leading-none">{activeOpponent.username}</h4>
+                          <span className={`px-2.5 py-0.5 border rounded-full text-[9px] font-display font-bold uppercase tracking-widest leading-none inline-block ${getLeagueDetails(activeOpponent.pvpRating).color}`}>
+                            {getLeagueDetails(activeOpponent.pvpRating).badge} {getLeagueDetails(activeOpponent.pvpRating).name}
+                          </span>
+                        </div>
+
+                        {/* MMR */}
+                        <div className="bg-black/40 border border-gray-950 px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-mono font-bold text-[#ebd09b]">
+                          <Trophy className="w-3.5 h-3.5 text-[#ebd09b]" />
+                          <span>{activeOpponent.pvpRating} MMR</span>
+                        </div>
+                      </div>
+
+                      {/* Control Action Buttons */}
+                      <div className="w-full grid grid-cols-2 gap-4 border-t border-gray-900/60 pt-4">
+                        <button
+                          disabled={refreshCooldown > 0}
+                          onClick={() => handleFindOpponent(true)}
+                          className={`py-3 px-4 rounded-xl border font-display font-bold text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                            refreshCooldown > 0
+                              ? 'border-gray-850 bg-gray-900/20 text-gray-600 cursor-not-allowed'
+                              : 'border-rose-950/40 bg-rose-950/10 hover:bg-rose-900/20 text-rose-300'
+                          }`}
+                        >
+                          <RefreshCw className={`w-3.5 h-3.5 ${isMatching && refreshCooldown > 0 ? 'animate-spin' : ''}`} />
+                          {refreshCooldown > 0 ? `COOLDOWN ${refreshCooldown}S` : 'RE-ROLL (5 💎)'}
+                        </button>
+                        
+                        <button
+                          onClick={() => handleFight(activeOpponent)}
+                          disabled={profile.pvpEnergy < 1}
+                          className={`py-3 px-4 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border ${
+                            profile.pvpEnergy < 1
+                              ? 'bg-gray-800/20 border-gray-850 text-gray-600 cursor-not-allowed'
+                              : 'bg-gradient-to-r from-emerald-900 to-teal-900 border-emerald-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                          }`}
+                        >
+                          <Swords className="w-3.5 h-3.5" /> FIGHT
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
             </div>
           )}
@@ -506,7 +532,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
         </div>
 
         {/* Right Side: Leaderboard */}
-        <div className="bg-[#151a21] border border-[#c5a880]/15 rounded-2xl p-5 shadow-xl flex flex-col justify-between h-[590px]">
+        <div className="bg-[#151a21] border border-[#c5a880]/15 rounded-2xl p-5 shadow-xl flex flex-col justify-between h-[510px]">
           <div className="space-y-4">
             <h3 className="font-display font-bold text-sm text-white tracking-widest border-b border-gray-900 pb-3 flex items-center gap-2">
               <Award className="w-4 h-4 text-[#ebd09b]" /> LEADERBOARD HALL
@@ -522,7 +548,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
                 <span className="text-[9px] font-mono text-gray-500 uppercase">Updating table...</span>
               </div>
             ) : (
-              <div className="space-y-1.5 max-h-[400px] overflow-y-auto pr-1">
+              <div className="space-y-1.5 max-h-[300px] overflow-y-auto pr-1">
                 {leaderboard.map((player, idx) => {
                   const rank = idx + 1;
                   const isSelf = player.walletAddress === (profile.solanaAddress || '');
