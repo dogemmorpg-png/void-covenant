@@ -324,11 +324,11 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
 
                     <div className="space-y-1">
                       {pkg.image && (
-                        <div className="w-full flex items-center justify-center py-2.5 shrink-0">
+                        <div className="w-full flex items-center justify-center py-1 shrink-0">
                           <img 
                             src={pkg.image} 
                             alt={pkg.name} 
-                            className="w-16 h-16 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.35)]" 
+                            className="w-24 h-24 object-contain drop-shadow-[0_0_12px_rgba(239,68,68,0.4)]" 
                           />
                         </div>
                       )}
