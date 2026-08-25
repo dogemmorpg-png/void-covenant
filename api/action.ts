@@ -20,6 +20,105 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const { action, payload } = req.body || {};
+  if (!action) {
+    return res.status(400).json({ error: 'Missing action.' });
+  }
+
+  if (action === 'pvp_rollover') {
+    const cronSecret = process.env.CRON_SECRET || 'void-covenant-pvp-secret-1337';
+    const authHeader = req.headers.authorization;
+    if (authHeader !== `Bearer ${cronSecret}`) {
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(401).json({ error: 'Unauthorized cron rollover trigger' });
+      }
+    }
+
+    try {
+      const supabase = getSupabase();
+      const { data: rows, error } = await supabase
+        .from('profiles')
+        .select('wallet_address, data');
+
+      if (error) {
+        console.error('Failed to query profiles:', error);
+        return res.status(500).json({ error: 'Database query failed' });
+      }
+
+      const players = (rows || []).map(r => ({
+        walletAddress: r.wallet_address,
+        profile: r.data || {}
+      }));
+
+      const updates: { walletAddress: string; profile: any }[] = [];
+      const LEAGUES = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Void Overlord'];
+
+      for (const league of LEAGUES) {
+        const leaguePlayers = players.filter(p => (p.profile.pvpLeague || 'Bronze') === league);
+        
+        leaguePlayers.forEach(p => {
+          if (p.profile.pvpLP === undefined) {
+            p.profile.pvpLP = 0;
+          }
+          if (p.profile.pvpRating === undefined) {
+            p.profile.pvpRating = 100;
+          }
+        });
+
+        leaguePlayers.sort((a, b) => (b.profile.pvpLP - a.profile.pvpLP) || (b.profile.pvpRating - a.profile.pvpRating));
+        const leagueIdx = LEAGUES.indexOf(league);
+
+        for (let i = 0; i < leaguePlayers.length; i++) {
+          const p = leaguePlayers[i];
+          const rank = i + 1;
+          let modified = false;
+
+          if (rank <= 20 && leagueIdx < LEAGUES.length - 1) {
+            const nextLeague = LEAGUES[leagueIdx + 1];
+            p.profile.pvpLeague = nextLeague;
+            p.profile.pvpLP = 100;
+            modified = true;
+          }
+          else if (rank > 100 && leagueIdx > 0) {
+            const prevLeague = LEAGUES[leagueIdx - 1];
+            p.profile.pvpLeague = prevLeague;
+            p.profile.pvpLP = 100;
+            modified = true;
+          }
+
+          if (modified) {
+            updates.push(p);
+          }
+        }
+      }
+
+      let updatedCount = 0;
+      for (const update of updates) {
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ data: update.profile, updated_at: new Date().toISOString() })
+          .eq('wallet_address', update.walletAddress);
+
+        if (updateError) {
+          console.error(`Failed to update rollover profile for ${update.walletAddress}:`, updateError);
+        } else {
+          updatedCount++;
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: 'PvP daily rollover complete',
+        totalChecked: players.length,
+        totalUpdated: updatedCount
+      });
+
+    } catch (error: any) {
+      console.error('PvP Rollover API error:', error);
+      return res.status(500).json({ error: error.message || 'Internal server error' });
+    }
+  }
+
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Missing or invalid authorization header' });
@@ -36,11 +135,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const walletAddress = decoded.walletAddress;
   if (!walletAddress) {
     return res.status(400).json({ error: 'Token missing wallet address' });
-  }
-
-  const { action, payload } = req.body;
-  if (!action) {
-    return res.status(400).json({ error: 'Missing action.' });
   }
 
   try {
