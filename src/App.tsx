@@ -37,6 +37,7 @@ function MainAppContent() {
   // Active Battle stage state
   const [activeBattleStage, setActiveBattleStage] = useState<CampaignStage | null>(null);
   const [activeBattleType, setActiveBattleType] = useState<'campaign' | 'pvp'>('campaign');
+  const [isPvpMatching, setIsPvpMatching] = useState(false);
 
   // When battle ends
   const handleExitBattle = (isVictory: boolean) => {
@@ -199,7 +200,7 @@ function MainAppContent() {
       <div className="min-h-screen flex flex-col justify-between relative z-10">
         <div>
           {/* Top bar resource hud and wallet */}
-          <HeaderHUD />
+          {!isPvpMatching && <HeaderHUD />}
 
           {/* Tab content */}
           <div className="py-6">
@@ -213,15 +214,19 @@ function MainAppContent() {
               }} />
           )}
           {activeTab === 'pvp' && (
-            <PvpArenaView onStartBattle={async (stage, type, opponentPayload) => {
-              const success = await startBattleOnServer('pvp', stage.id.toString(), 1, opponentPayload);
-              if (success) {
-                setActiveBattleType(type);
-                setActiveBattleStage(stage);
-                return true;
-              }
-              return false;
-            }} />
+            <PvpArenaView 
+              onStartBattle={async (stage, type, opponentPayload) => {
+                const success = await startBattleOnServer('pvp', stage.id.toString(), 1, opponentPayload);
+                if (success) {
+                  setActiveBattleType(type);
+                  setActiveBattleStage(stage);
+                  return true;
+                }
+                return false;
+              }}
+              isMatching={isPvpMatching}
+              setIsMatching={setIsPvpMatching}
+            />
           )}
           {activeTab === 'collection' && <CollectionDeckView />}
           {activeTab === 'hero' && <HeroInventoryView />}
@@ -232,8 +237,9 @@ function MainAppContent() {
       </div>
 
       {/* Navigation Footer Tab Bar (Mobile responsive and desktop styled) */}
-      <div className="bg-[#151a21]/95 border-t border-[#c5a880]/20 sticky bottom-0 z-50 backdrop-blur-md py-2.5">
-        <div className="max-w-4xl mx-auto flex items-center justify-around gap-2 px-4">
+      {!isPvpMatching && (
+        <div className="bg-[#151a21]/95 border-t border-[#c5a880]/20 sticky bottom-0 z-50 backdrop-blur-md py-2.5">
+          <div className="max-w-4xl mx-auto flex items-center justify-around gap-2 px-4">
           
           {/* Campaign Tab */}
           <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('campaign'); }}
@@ -314,6 +320,7 @@ function MainAppContent() {
 
         </div>
       </div>
+      )}
     </div>
       {isShardsShopOpen && (
         <ShardsShopModal onClose={() => setIsShardsShopOpen(false)} />

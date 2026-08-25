@@ -780,8 +780,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       {/* Header Bar */}
       <div className="bg-[#120d0a]/95 border border-[#ebd09b]/15 rounded-lg p-1.5 px-3 flex justify-between items-center max-w-7xl mx-auto w-full mb-2 shadow-md h-[40px] shrink-0 z-20">
         <button
-          onClick={() => {
-            if (window.confirm('Are you sure you want to escape? Energy will not be refunded.')) {
+          onClick={async () => {
+            const confirmMsg = battleType === 'pvp'
+              ? 'Are you sure you want to surrender? You will lose MMR.'
+              : 'Are you sure you want to escape? Energy will not be refunded.';
+            if (window.confirm(confirmMsg)) {
+              if (battleType === 'pvp') {
+                await submitBattleResult('pvp', 'pvp', 'loss');
+              }
               onExitBattle(false);
             }
           }}

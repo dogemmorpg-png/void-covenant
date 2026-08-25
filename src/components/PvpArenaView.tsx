@@ -6,16 +6,17 @@ import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, H
 
 interface PvpArenaViewProps {
   onStartBattle: (stage: CampaignStage, type: 'campaign' | 'pvp', opponentPayload?: any) => Promise<boolean> | void;
+  isMatching: boolean;
+  setIsMatching: (val: boolean) => void;
 }
 
-export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => {
+export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle, isMatching, setIsMatching }) => {
   const { profile, updateProfile } = useGame();
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState<'duels' | 'history'>('duels');
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true);
-  const [isMatching, setIsMatching] = useState(false);
   const [matchStatus, setMatchStatus] = useState('');
   const [refreshCooldown, setRefreshCooldown] = useState(0);
 
@@ -126,13 +127,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
 
     if (spendShards) {
       if ((profile.darkShards || 0) < 5) {
-        toast('Недостаточно осколков Бездны для повторного поиска!', 'warning');
+        toast('Insufficient Dark Shards for re-roll!', 'warning');
         return;
       }
     }
 
     setIsMatching(true);
-    setMatchStatus(spendShards ? 'Списание 5 💎 и переподбор оппонента...' : 'Searching for rival summoner in range...');
+    setMatchStatus(spendShards ? 'Deducting 5 Shards and finding new opponent...' : 'Searching for rival summoner in range...');
 
     try {
       const token = localStorage.getItem('void_covenant_token');
@@ -157,7 +158,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
           updateProfile(data.profile);
         }
         if (spendShards) {
-          toast('Соперник успешно переподбран! Списано 5 осколков.', 'success');
+          toast('Opponent re-rolled! 5 Dark Shards deducted.', 'success');
           setRefreshCooldown(3); // 3-second cooldown on re-rolls to prevent spamming
         }
       } else {
@@ -259,6 +260,100 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
           <div className="text-center space-y-2 max-w-sm">
             <h3 className="font-display font-black text-xl text-rose-500 tracking-widest uppercase animate-pulse">WAR ENCRYPTION</h3>
             <p className="text-sm font-mono text-cyan-400 font-bold">{matchStatus}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Opponent Modal Window (Request #2) */}
+      {activeOpponent && (
+        <div className="fixed inset-0 z-[90] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-gradient-to-b from-[#151a21] via-[#0b0c10] to-[#040507] border-2 border-cyan-500/35 rounded-3xl p-7 max-w-sm w-full text-center space-y-6 shadow-2xl relative overflow-hidden gothic-glow-cyan">
+            
+            {/* Decorative corners */}
+            <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-cyan-500/30 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-cyan-500/30 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-cyan-500/30 pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-cyan-500/30 pointer-events-none" />
+
+            {/* Close Cross */}
+            <button
+              onClick={() => saveOpponent(null)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-white font-sans text-lg font-black transition-colors cursor-pointer w-6 h-6 flex items-center justify-center bg-black/40 border border-white/5 rounded-full"
+            >
+              ✕
+            </button>
+
+            <h3 className="font-display font-black text-sm text-white tracking-widest uppercase border-b border-gray-900 pb-2.5">
+              CHALLENGER FOUND
+            </h3>
+
+            {/* Beautiful Opponent Card Details (Request #4) */}
+            <div className="flex flex-col items-center space-y-4">
+              <div className="relative">
+                <img 
+                  src={activeOpponent.avatarUrl || '/avatars/knight.webp'} 
+                  alt="Avatar" 
+                  className="w-20 h-20 rounded-full border-2 border-[#ebd09b]/50 bg-black/40 object-cover shadow-[0_0_15px_rgba(235,208,155,0.15)]" 
+                />
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-cyan-950 border border-cyan-500/40 flex items-center justify-center font-mono text-[9px] font-bold text-cyan-400 shadow-md">
+                  Lvl{activeOpponent.level || 1}
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <h4 className="text-white font-display font-black text-lg tracking-wide leading-none">{activeOpponent.username}</h4>
+                <span className={`px-2.5 py-0.5 border rounded-full text-[9px] font-display font-black uppercase tracking-widest leading-none inline-block ${getLeagueDetails(activeOpponent.pvpRating).color}`}>
+                  {getLeagueDetails(activeOpponent.pvpRating).badge} {getLeagueDetails(activeOpponent.pvpRating).name}
+                </span>
+              </div>
+
+              {/* MMR */}
+              <div className="bg-black/50 border border-gray-950 px-4 py-2 rounded-xl flex items-center gap-1.5 text-xs font-mono font-bold text-[#ebd09b]">
+                <Trophy className="w-4 h-4 text-[#ebd09b]" />
+                <span>{activeOpponent.pvpRating} MMR</span>
+              </div>
+
+              {/* Active stance skill */}
+              <div className="space-y-1">
+                <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold block">Active Stance</span>
+                <span className="px-3 py-1 bg-cyan-950/40 border border-cyan-500/20 rounded-lg text-xs font-mono font-bold text-cyan-300 uppercase tracking-wide inline-block shadow-sm">
+                  {activeOpponent.activeStance === 'void_strike' ? 'Void Strike ⚡' : 
+                   activeOpponent.activeStance === 'blood_aura' ? 'Blood Aura 🩸' : 
+                   activeOpponent.activeStance === 'warlord_cry' ? "Warlord's Cry 🔊" : 'Void Strike ⚡'}
+                </span>
+              </div>
+            </div>
+
+            {/* Action buttons (Reroll / Fight) */}
+            <div className="grid grid-cols-2 gap-3.5 pt-2 border-t border-gray-900">
+              <button
+                disabled={refreshCooldown > 0}
+                onClick={() => handleFindOpponent(true)}
+                className={`py-3 px-3 rounded-xl border font-display font-bold text-[10px] tracking-wider transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
+                  refreshCooldown > 0
+                    ? 'border-gray-850 bg-gray-900/20 text-gray-600 cursor-not-allowed'
+                    : 'border-rose-950/40 bg-rose-950/10 hover:bg-rose-900/20 text-rose-300'
+                }`}
+              >
+                <RefreshCw className="w-3.5 h-3.5 shrink-0" />
+                <span>RE-ROLL (5</span>
+                <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain inline-block shrink-0 -mt-0.5" />
+                <span>)</span>
+              </button>
+              
+              <button
+                onClick={() => handleFight(activeOpponent)}
+                disabled={profile.pvpEnergy < 1}
+                className={`py-3 px-4 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border ${
+                  profile.pvpEnergy < 1
+                    ? 'bg-gray-800/20 border-gray-850 text-gray-600 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-emerald-900 to-teal-900 border-emerald-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                }`}
+              >
+                <Swords className="w-4 h-4 shrink-0" /> FIGHT
+              </button>
+            </div>
+
           </div>
         </div>
       )}
@@ -379,88 +474,36 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ onStartBattle }) => 
                 <div className="space-y-4">
                   <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest font-bold block border-b border-gray-900 pb-2">CHALLENGE OPPONENT</span>
 
-                  {!activeOpponent ? (
-                    /* Initial Matchmaking Button */
-                    <div className="bg-[#151a21] border border-gray-900 rounded-xl p-8 flex flex-col items-center justify-center text-center space-y-6 shadow-xl relative overflow-hidden h-[300px]">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 blur-3xl pointer-events-none" />
-                      <div className="w-16 h-16 rounded-full bg-cyan-950/40 border border-cyan-500/35 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.15)]">
-                        <Swords className="w-8 h-8 text-cyan-400" />
-                      </div>
-                      <div className="space-y-2 max-w-sm">
-                        <h3 className="font-display font-bold text-sm text-white tracking-widest uppercase">READY FOR DUEL</h3>
-                        <p className="text-[11px] text-gray-400 font-sans leading-relaxed">
-                          Find an active rival within your MMR bracket. Defeat them to secure victory points.
-                        </p>
-                      </div>
+                  <div className="bg-[#151a21] border border-gray-900 rounded-xl p-8 flex flex-col items-center justify-center text-center space-y-6 shadow-xl relative overflow-hidden h-[300px]">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 blur-3xl pointer-events-none" />
+                    <div className="w-16 h-16 rounded-full bg-cyan-950/40 border border-cyan-500/35 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                      <Swords className="w-8 h-8 text-cyan-400" />
+                    </div>
+                    <div className="space-y-2 max-w-sm">
+                      <h3 className="font-display font-bold text-sm text-white tracking-widest uppercase">READY FOR DUEL</h3>
+                      <p className="text-[11px] text-gray-400 font-sans leading-relaxed">
+                        Find an active rival within your MMR bracket. Defeat them to secure victory points.
+                      </p>
+                    </div>
+                    
+                    <div className="flex flex-col items-center gap-2">
                       <button
                         onClick={() => handleFindOpponent(false)}
                         className="py-3 px-8 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center gap-2 cursor-pointer border bg-gradient-to-r from-cyan-900 to-indigo-900 border-cyan-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
                       >
                         <Search className="w-4 h-4 animate-pulse" /> FIND OPPONENT
                       </button>
-                    </div>
-                  ) : (
-                    /* Found Opponent Display Panel */
-                    <div className="bg-[#151a21] border border-cyan-950/40 rounded-xl p-6 flex flex-col items-center justify-between shadow-xl relative overflow-hidden h-[300px]">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 blur-3xl pointer-events-none" />
                       
-                      <div className="flex flex-col items-center space-y-3 text-center mt-2">
-                        {/* Avatar */}
-                        <div className="relative">
-                          <img 
-                            src={activeOpponent.avatarUrl || '/avatars/knight.webp'} 
-                            alt="Avatar" 
-                            className="w-16 h-16 rounded-full border-2 border-[#ebd09b]/50 bg-black/40 object-cover shadow-[0_0_12px_rgba(235,208,155,0.15)]" 
-                          />
-                          <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-cyan-950 border border-cyan-500/40 flex items-center justify-center font-mono text-[9px] font-bold text-cyan-400 shadow-md">
-                            Lvl{activeOpponent.level || 1}
-                          </div>
-                        </div>
-
-                        {/* Name & League Badge */}
-                        <div className="space-y-1">
-                          <h4 className="text-white font-display font-black text-base tracking-wide leading-none">{activeOpponent.username}</h4>
-                          <span className={`px-2.5 py-0.5 border rounded-full text-[9px] font-display font-bold uppercase tracking-widest leading-none inline-block ${getLeagueDetails(activeOpponent.pvpRating).color}`}>
-                            {getLeagueDetails(activeOpponent.pvpRating).badge} {getLeagueDetails(activeOpponent.pvpRating).name}
-                          </span>
-                        </div>
-
-                        {/* MMR */}
-                        <div className="bg-black/40 border border-gray-950 px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-mono font-bold text-[#ebd09b]">
-                          <Trophy className="w-3.5 h-3.5 text-[#ebd09b]" />
-                          <span>{activeOpponent.pvpRating} MMR</span>
-                        </div>
-                      </div>
-
-                      {/* Control Action Buttons */}
-                      <div className="w-full grid grid-cols-2 gap-4 border-t border-gray-900/60 pt-4">
+                      {activeOpponent && (
                         <button
-                          disabled={refreshCooldown > 0}
-                          onClick={() => handleFindOpponent(true)}
-                          className={`py-3 px-4 rounded-xl border font-display font-bold text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
-                            refreshCooldown > 0
-                              ? 'border-gray-850 bg-gray-900/20 text-gray-600 cursor-not-allowed'
-                              : 'border-rose-950/40 bg-rose-950/10 hover:bg-rose-900/20 text-rose-300'
-                          }`}
+                          onClick={() => saveOpponent(activeOpponent)}
+                          className="text-[10px] font-mono text-cyan-400 hover:text-white underline cursor-pointer mt-1 bg-transparent border-0"
                         >
-                          <RefreshCw className={`w-3.5 h-3.5 ${isMatching && refreshCooldown > 0 ? 'animate-spin' : ''}`} />
-                          {refreshCooldown > 0 ? `COOLDOWN ${refreshCooldown}S` : 'RE-ROLL (5 💎)'}
+                          View currently matched opponent ({activeOpponent.username})
                         </button>
-                        
-                        <button
-                          onClick={() => handleFight(activeOpponent)}
-                          disabled={profile.pvpEnergy < 1}
-                          className={`py-3 px-4 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border ${
-                            profile.pvpEnergy < 1
-                              ? 'bg-gray-800/20 border-gray-850 text-gray-600 cursor-not-allowed'
-                              : 'bg-gradient-to-r from-emerald-900 to-teal-900 border-emerald-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
-                          }`}
-                        >
-                          <Swords className="w-3.5 h-3.5" /> FIGHT
-                        </button>
-                      </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
 
