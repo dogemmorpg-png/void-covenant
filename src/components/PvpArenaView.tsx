@@ -27,6 +27,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true);
   const [matchStatus, setMatchStatus] = useState('');
   const [refreshCooldown, setRefreshCooldown] = useState(0);
+  const [viewingLeague, setViewingLeague] = useState<string>(profile.pvpLeague || 'Bronze');
+  const [timeRemaining, setTimeRemaining] = useState<number>(0);
 
 
 
@@ -86,7 +88,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
   const league = getLeagueDetails(profile.pvpLeague || 'Bronze');
 
-  const fetchLeaderboard = async (silent: boolean = false) => {
+  const fetchLeaderboard = async (leagueName: string = profile.pvpLeague || 'Bronze', silent: boolean = false) => {
     if (!silent) setIsLoadingLeaderboard(true);
     try {
       const token = localStorage.getItem('void_covenant_token');
@@ -97,7 +99,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        }
+        },
+        body: JSON.stringify({ league: leagueName })
       });
       if (res.ok) {
         const data = await res.json();
@@ -219,9 +222,43 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
     return () => clearTimeout(t);
   }, [refreshCooldown]);
 
+  // Keep leaderboard in sync when viewingLeague changes
   useEffect(() => {
-    fetchLeaderboard();
+    fetchLeaderboard(viewingLeague);
+  }, [viewingLeague]);
+
+  // Sync viewingLeague when player's league updates
+  useEffect(() => {
+    if (profile?.pvpLeague) {
+      setViewingLeague(profile.pvpLeague);
+    }
+  }, [profile?.pvpLeague]);
+
+  // Daily UTC midnight countdown timer
+  useEffect(() => {
+    const calculateTimeRemaining = () => {
+      const now = new Date();
+      const nextRollover = new Date(Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate() + 1, // Tomorrow
+        0, 0, 0, 0 // 00:00:00 UTC
+      ));
+      const diff = Math.max(0, Math.floor((nextRollover.getTime() - now.getTime()) / 1000));
+      setTimeRemaining(diff);
+    };
+
+    calculateTimeRemaining();
+    const interval = setInterval(calculateTimeRemaining, 1000);
+    return () => clearInterval(interval);
   }, []);
+
+  const formatCountdown = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h}h ${m}m ${s}s`;
+  };
 
   // Silently clear any leftover PvP opponent when entering the Arena tab
   useEffect(() => {
@@ -229,6 +266,18 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       handleCancelMatch(true);
     }
   }, []);
+
+  const cycleLeague = (dir: 'prev' | 'next') => {
+    const LEAGUES = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Void Overlord'];
+    const idx = LEAGUES.indexOf(viewingLeague);
+    if (dir === 'prev') {
+      const prevIdx = idx > 0 ? idx - 1 : LEAGUES.length - 1;
+      setViewingLeague(LEAGUES[prevIdx]);
+    } else {
+      const nextIdx = idx < LEAGUES.length - 1 ? idx + 1 : 0;
+      setViewingLeague(LEAGUES[nextIdx]);
+    }
+  };
 
   const handleFight = async (opponent: any) => {
     if (profile.deck.length < 10) {
@@ -412,6 +461,11 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             <p className="text-xs text-gray-400 font-sans max-w-xl">
               Duel other summoners asynchronously. Beat their defending decks controlled by AI to earn crowns, promote to high-tier leagues, and secure your place in the Hall of Fame.
             </p>
+            <div className="flex items-center justify-center md:justify-start gap-2 pt-1.5">
+              <span className="text-[9px] font-mono text-cyan-400/80 bg-cyan-950/30 border border-cyan-500/25 px-2.5 py-0.5 rounded-lg uppercase tracking-widest font-black shadow-inner">
+                Round Ends: {formatCountdown(timeRemaining)}
+              </span>
+            </div>
           </div>
 
           {/* Stats Bar */}
@@ -629,9 +683,25 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               <Award className="w-4 h-4 text-[#ebd09b]" /> LEADERBOARD HALL
             </h3>
             
-            <p className="text-xs text-gray-400 mt-2">
-              Leaderboard rankings of top registered Void Covenant players.
-            </p>
+            {/* LEAGUE SELECTOR/NAVIGATOR */}
+            <div className="flex items-center justify-between bg-black/30 border border-white/5 rounded-xl p-2 mt-2">
+              <button
+                onClick={() => cycleLeague('prev')}
+                className="w-8 h-8 rounded-lg bg-black/30 border border-white/5 text-gray-400 hover:text-white flex items-center justify-center cursor-pointer transition-colors active:scale-95 text-[10px]"
+              >
+                ◀
+              </button>
+              <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-display font-black uppercase tracking-widest ${getLeagueDetails(viewingLeague).color} ${getLeagueDetails(viewingLeague).glow}`}>
+                <span>{getLeagueDetails(viewingLeague).badge}</span>
+                <span>{getLeagueDetails(viewingLeague).name}</span>
+              </div>
+              <button
+                onClick={() => cycleLeague('next')}
+                className="w-8 h-8 rounded-lg bg-black/30 border border-white/5 text-gray-400 hover:text-white flex items-center justify-center cursor-pointer transition-colors active:scale-95 text-[10px]"
+              >
+                ▶
+              </button>
+            </div>
 
             {isLoadingLeaderboard ? (
               <div className="h-64 flex flex-col items-center justify-center space-y-2">

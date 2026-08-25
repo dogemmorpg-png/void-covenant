@@ -34,10 +34,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const supabase = getSupabase();
 
+    const { league } = req.body || {};
     const authHeader = req.headers.authorization;
-    let playerLeague = 'Bronze';
+    let playerLeague = league || 'Bronze';
 
-    if (authHeader && authHeader.startsWith('Bearer ')) {
+    if (!league && authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
       try {
         const decoded = jwt.verify(token, JWT_SECRET);
