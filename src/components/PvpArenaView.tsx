@@ -28,12 +28,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   const [matchStatus, setMatchStatus] = useState('');
   const [refreshCooldown, setRefreshCooldown] = useState(0);
 
-  // If there's an active opponent in profile, make sure modal is open on mount
-  useEffect(() => {
-    if (profile && profile.activePvpOpponent) {
-      setIsModalOpen(true);
-    }
-  }, [profile?.activePvpOpponent]);
+
 
   // League calculation helper
   const getLeagueDetails = (rating: number) => {
@@ -180,9 +175,11 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
     }
   };
 
-  const handleCancelMatch = async () => {
-    setIsMatching(true);
-    setMatchStatus('Forfeiting challenger connection...');
+  const handleCancelMatch = async (silent: boolean = false) => {
+    if (!silent) {
+      setIsMatching(true);
+      setMatchStatus('Forfeiting challenger connection...');
+    }
     try {
       const token = localStorage.getItem('void_covenant_token');
       if (!token) return;
@@ -201,15 +198,17 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
           updateProfile(data.profile);
         }
         setIsModalOpen(false);
-        toast('Matchmaking canceled. PvP Energy forfeited.', 'info');
+        if (!silent) {
+          toast('Matchmaking canceled. PvP Energy forfeited.', 'info');
+        }
       } else {
-        toast('Failed to cancel matchmaking.', 'error');
+        if (!silent) toast('Failed to cancel matchmaking.', 'error');
       }
     } catch (err) {
       console.error('Matchmaking cancel failed:', err);
-      toast('Connection error canceling matchmaking.', 'error');
+      if (!silent) toast('Connection error canceling matchmaking.', 'error');
     } finally {
-      setIsMatching(false);
+      if (!silent) setIsMatching(false);
     }
   };
 
@@ -228,6 +227,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
     fetchLeaderboard();
   }, []);
 
+  // Silently clear any leftover PvP opponent when entering the Arena tab
+  useEffect(() => {
+    if (profile && profile.activePvpOpponent) {
+      handleCancelMatch(true);
+    }
+  }, []);
+
   const handleFight = async (opponent: any) => {
     if (profile.deck.length < 10) {
       toast("Your deck is incomplete! Go to the 'CARDS' tab and select exactly 10 cards for battle.", 'warning');
@@ -235,29 +241,29 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
     }
 
     setIsMatching(true);
-    setMatchStatus(`Locking signature keys against ${opponent.username}...`);
+    setMatchStatus(`Locking signature keys against ${opponent.name || opponent.username}...`);
 
     const opponentPayload = {
       opponentWalletAddress: opponent.walletAddress,
-      opponentName: opponent.username,
-      opponentRating: opponent.pvpRating,
+      opponentName: opponent.name || opponent.username,
+      opponentRating: opponent.rating || opponent.pvpRating,
       opponentDeck: opponent.deck,
-      opponentStance: opponent.activeStance
+      opponentStance: opponent.stance || opponent.activeStance
     };
 
     const pvpStage: CampaignStage = {
       id: -1, // PvP indicator
-      name: `Arena: ${opponent.username}`,
-      description: `Ranked PvP battle for Covenant glory. Opponent: ${opponent.username} [${opponent.pvpRating} MMR]`,
+      name: `Arena: ${opponent.name || opponent.username}`,
+      description: `Ranked PvP battle for Covenant glory. Opponent: ${opponent.name || opponent.username} [${opponent.rating || opponent.pvpRating} MMR]`,
       energyCost: 1,
       goldReward: 300 + Math.floor(profile.pvpRating / 4),
       dustReward: 30 + Math.floor(profile.pvpRating / 20),
       shardsReward: 0,
-      enemyHeroName: opponent.username,
-      enemyHeroHealth: 30 + Math.min(20, Math.floor(opponent.pvpRating / 150)),
+      enemyHeroName: opponent.name || opponent.username,
+      enemyHeroHealth: 30 + Math.min(20, Math.floor((opponent.rating || opponent.pvpRating || 0) / 150)),
       enemyHeroImage: opponent.avatarUrl || '/avatars/knight.webp', // Pass the opponent's real avatar URL!
       enemyDeck: opponent.deck,
-      enemyStance: opponent.activeStance,
+      enemyStance: opponent.stance || opponent.activeStance,
       enemyTalents: opponent.talents
     };
 
@@ -533,14 +539,6 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                         <span>)</span>
                       </button>
                       
-                      {activeOpponent && (
-                        <button
-                          onClick={() => setIsModalOpen(true)}
-                          className="text-[10px] font-mono text-cyan-400 hover:text-white underline cursor-pointer mt-1 bg-transparent border-0"
-                        >
-                          View currently matched opponent ({activeOpponent.name || activeOpponent.username})
-                        </button>
-                      )}
                     </div>
                   </div>
                 </div>
