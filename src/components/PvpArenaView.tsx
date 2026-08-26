@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CampaignStage } from '../types';
-import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown } from 'lucide-react';
+import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown, Timer } from 'lucide-react';
 
 interface PvpArenaViewProps {
   onStartBattle: (stage: CampaignStage, type: 'campaign' | 'pvp', opponentPayload?: any) => Promise<boolean> | void;
@@ -457,48 +457,61 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       <div className="bg-[#151a21] border border-[#c5a880]/20 rounded-2xl p-6 relative overflow-hidden shadow-xl">
         <div className="absolute inset-0 bg-gradient-to-r from-red-950/15 via-transparent to-[#151a21] pointer-events-none" />
         
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-6 relative z-10">
           
-          <div className="space-y-2 text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start gap-2.5">
+          <div className="space-y-2 text-center lg:text-left">
+            <div className="flex items-center justify-center lg:justify-start gap-2.5">
               <Crown className="w-6 h-6 text-amber-400 animate-bounce" />
               <h2 className="font-display font-black text-xl md:text-2xl text-white tracking-widest text-shadow-gold">
                 VOID ARENA
               </h2>
             </div>
-            <p className="text-xs text-gray-400 font-sans max-w-xl">
-              Duel other summoners asynchronously. Beat their defending decks controlled by AI to earn crowns, promote to high-tier leagues, and secure your place in the Hall of Fame.
+            <p className="text-xs text-gray-300 font-sans max-w-xl leading-relaxed">
+              Сражайтесь с другими игроками в дуэлях, продвигайтесь по лигам и зарабатывайте ценные награды.
             </p>
-            <div className="flex items-center justify-center md:justify-start gap-2 pt-1.5">
-              <span className="text-[9px] font-mono text-cyan-400/80 bg-cyan-950/30 border border-cyan-500/25 px-2.5 py-0.5 rounded-lg uppercase tracking-widest font-black shadow-inner">
-                Round Ends: {formatCountdown(timeRemaining)}
-              </span>
-            </div>
           </div>
 
           {/* Stats Bar */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 bg-black/40 border border-[#c5a880]/15 rounded-xl p-4 w-full md:w-auto">
+          <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 bg-black/50 border border-[#c5a880]/20 rounded-xl p-3.5 w-full lg:w-auto shadow-lg">
             {/* Crowns */}
-            <div className="text-center px-4 border-b sm:border-b-0 sm:border-r border-white/5 pb-2 sm:pb-0 w-full sm:w-auto">
-              <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold">YOUR CROWNS</span>
-              <div className="font-mono text-2xl font-black text-amber-400 flex items-center justify-center gap-2 mt-0.5">
-                <img src="/icons/crown.png" alt="Crown" className="w-6 h-6 object-contain" />
+            <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[95px]">
+              <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest font-bold block">CROWNS</span>
+              <div className="font-mono text-xl font-black text-amber-400 flex items-center justify-center gap-1.5 mt-0.5">
+                <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain" />
                 {profile.pvpLP || 0}
               </div>
             </div>
 
+            {/* Arena Tickets (Prominent counter + Buy button) */}
+            <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[125px] flex flex-col items-center">
+              <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest font-bold block">ARENA TICKETS</span>
+              <div className="flex items-center justify-center gap-2 mt-0.5">
+                <div className="font-mono text-lg font-black text-rose-400 flex items-center gap-1.5">
+                  <img src="/icons/ticket.png" alt="Ticket" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(255,40,60,0.6)]" />
+                  <span>{profile.pvpTickets !== undefined ? profile.pvpTickets : profile.pvpEnergy}/5</span>
+                </div>
+                <button
+                  onClick={() => setIsBuyTicketsModalOpen(true)}
+                  className="py-0.5 px-2 rounded-md bg-gradient-to-r from-amber-600/30 to-rose-600/30 hover:from-amber-600/60 hover:to-rose-600/60 border border-amber-400/40 hover:border-amber-300 text-[9px] font-display font-black uppercase text-[#ebd09b] hover:text-white cursor-pointer transition-all hover:scale-105 active:scale-95 shadow-sm"
+                  title="Buy Arena Tickets"
+                >
+                  + BUY
+                </button>
+              </div>
+            </div>
+
             {/* League */}
-            <div className="text-center px-4 w-full sm:w-auto">
-              <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold block mb-1">LEAGUE</span>
-              <span className={`px-3 py-1 border rounded-full text-[10px] font-display font-black uppercase tracking-widest inline-flex items-center gap-1.5 ${league.color} ${league.glow}`}>
-                <img src={league.icon} alt="Crest" className="w-4 h-4 object-contain" />
+            <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[100px]">
+              <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest font-bold block mb-1">LEAGUE</span>
+              <span className={`px-2.5 py-0.5 border rounded-full text-[9px] font-display font-black uppercase tracking-widest inline-flex items-center gap-1 ${league.color} ${league.glow}`}>
+                <img src={league.icon} alt="Crest" className="w-3.5 h-3.5 object-contain" />
                 {league.name}
               </span>
             </div>
 
             {/* Rank Position */}
-            <div className="text-center px-4 border-t sm:border-t-0 sm:border-l border-white/5 pt-2 sm:pt-0 w-full sm:w-auto">
-              <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold">GLOBAL RANK</span>
+            <div className="text-center px-3 min-w-[80px]">
+              <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest font-bold block">RANK</span>
               <div className="font-mono text-lg font-black text-white mt-0.5">
                 #{playerRank}
               </div>
@@ -542,8 +555,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
           {activeTab === 'duels' && (
             <div className="space-y-6 flex-1">
               
-              {/* Deck Ready Check */}
-              {profile.deck.length < 10 ? (
+              {/* Deck Incomplete Alert */}
+              {profile.deck.length < 10 && (
                 <div className="bg-amber-950/15 border border-amber-500/35 rounded-xl p-4 flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                   <div>
@@ -551,29 +564,6 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                     <p className="text-[11px] text-gray-400 mt-0.5 leading-relaxed">
                       You have selected {profile.deck.length}/10 cards for battle. Please add exactly 10 creatures to your battle deck in the <strong>CARDS</strong> tab before entering the arena.
                     </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-emerald-950/10 border border-emerald-500/20 rounded-xl p-3 px-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Shield className="w-5 h-5 text-emerald-400" />
-                    <div>
-                      <h5 className="font-display font-bold text-xs text-emerald-400">DEFENSE & OFFENSE DECK LOCKED</h5>
-                      <span className="text-[10px] text-gray-500 font-mono block">Equipped items, stances, and fusions are synced.</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-center gap-1.5 min-w-[100px]">
-                    <div className="flex items-center gap-1.5 bg-black/40 border border-white/5 px-2.5 py-1.5 rounded-full font-mono text-xs w-full justify-center">
-                      <img src="/icons/ticket.png" alt="Ticket" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(255,40,60,0.4)]" />
-                      <span className="text-gray-400">Tickets:</span>
-                      <span className="text-amber-400 font-bold">{profile.pvpTickets !== undefined ? profile.pvpTickets : profile.pvpEnergy}/5</span>
-                    </div>
-                    <button
-                      onClick={() => setIsBuyTicketsModalOpen(true)}
-                      className="w-full py-1 px-2.5 rounded-lg bg-gradient-to-r from-amber-600/15 to-yellow-600/15 hover:from-amber-600/35 hover:to-yellow-600/35 border border-amber-500/35 hover:border-amber-400 text-[9px] font-display font-black uppercase tracking-wider text-[#ebd09b] hover:text-white cursor-pointer transition-all shadow-[0_0_10px_rgba(245,158,11,0.05)] hover:scale-[1.03] active:scale-[0.97]"
-                    >
-                      + BUY TICKETS
-                    </button>
                   </div>
                 </div>
               )}
@@ -687,14 +677,30 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         </div>
 
         {/* Right Side: Leaderboard */}
-        <div className="bg-[#151a21] border border-[#c5a880]/15 rounded-2xl p-5 shadow-xl flex flex-col justify-between h-[510px]">
-          <div className="space-y-4">
+        <div className="bg-[#151a21] border border-[#c5a880]/15 rounded-2xl p-5 shadow-xl flex flex-col justify-between h-[540px]">
+          <div className="space-y-3.5">
             <h3 className="font-display font-bold text-sm text-white tracking-widest border-b border-gray-900 pb-3 flex items-center gap-2">
               <Award className="w-4 h-4 text-[#ebd09b]" /> LEADERBOARD HALL
             </h3>
+
+            {/* ROUND COUNTDOWN TIMER BANNER */}
+            <div className="bg-gradient-to-r from-amber-950/40 via-red-950/25 to-black/50 border border-amber-500/35 rounded-xl p-3 flex items-center justify-between shadow-[0_0_15px_rgba(245,158,11,0.08)]">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shadow-inner">
+                  <Timer className="w-4 h-4 text-amber-400 animate-pulse" />
+                </div>
+                <div>
+                  <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest block font-bold">ROUND ENDS IN</span>
+                  <span className="text-[10px] text-amber-400/90 font-sans font-medium">Daily Reset: 00:00 UTC</span>
+                </div>
+              </div>
+              <div className="font-mono text-xs sm:text-sm font-black text-amber-300 bg-black/70 border border-amber-500/40 px-2.5 py-1.5 rounded-lg shadow-inner tracking-wider">
+                {formatCountdown(timeRemaining)}
+              </div>
+            </div>
             
             {/* LEAGUE SELECTOR/NAVIGATOR */}
-            <div className="flex items-center justify-between bg-black/30 border border-white/5 rounded-xl p-2 mt-2">
+            <div className="flex items-center justify-between bg-black/30 border border-white/5 rounded-xl p-2">
               <button
                 onClick={() => cycleLeague('prev')}
                 className="w-8 h-8 rounded-lg bg-black/30 border border-white/5 text-gray-400 hover:text-white flex items-center justify-center cursor-pointer transition-colors active:scale-95 text-[10px]"
