@@ -585,9 +585,6 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                       <h3 className="font-display font-black text-xl text-white tracking-widest uppercase text-shadow-gold">
                         READY FOR RANKED DUEL
                       </h3>
-                      <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mt-0.5">
-                        Asynchronous PvP Combat
-                      </span>
                     </div>
                   </div>
 
@@ -621,13 +618,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                           <span className="text-[8px] text-cyan-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">Dust</span>
                         </div>
 
-                        {/* Crowns */}
-                        <div className="bg-black/50 border border-amber-400/30 p-2 rounded-xl text-center flex flex-col items-center justify-center">
-                          <span className="text-emerald-400 font-display font-black text-sm block flex items-center gap-1">
+                        {/* Crowns (Prominent golden spotlight card) */}
+                        <div className="bg-gradient-to-b from-[#2a1d08] to-[#120a02] border border-amber-400/50 hover:border-amber-300 p-2 rounded-xl text-center flex flex-col items-center justify-center shadow-[0_0_12px_rgba(245,158,11,0.15)] group">
+                          <span className="text-amber-300 font-display font-black text-sm block flex items-center gap-1.5 text-shadow-gold">
                             +20
-                            <img src="/icons/crown.png" alt="Crowns" className="w-4 h-4 object-contain drop-shadow-[0_0_4px_rgba(251,191,36,0.5)]" />
+                            <img src="/icons/crown.png" alt="Crowns" className="w-5 h-5 object-contain brightness-110 drop-shadow-[0_0_8px_rgba(251,191,36,0.85)] group-hover:scale-110 transition-transform" />
                           </span>
-                          <span className="text-[8px] text-emerald-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">Crowns</span>
+                          <span className="text-[8px] text-amber-400 font-mono tracking-wider uppercase font-bold mt-0.5">Crowns</span>
                         </div>
                       </div>
                     </div>
@@ -684,18 +681,30 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             </div>
           )}
 
-          {/* HISTORY TAB CONTENT */}
+          {/* HISTORY TAB CONTENT (Redesigned RPG Combat Log) */}
           {activeTab === 'history' && (
-            <div className="bg-[#151a21] border border-gray-900 rounded-xl p-5 flex-1 space-y-4">
-              <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest font-bold block border-b border-gray-900 pb-2">RECENT COMBAT LOGS</span>
+            <div className="bg-gradient-to-b from-[#181216] via-[#120c11] to-[#0a0709] border border-[#c5a880]/25 rounded-2xl p-5 sm:p-6 flex-1 space-y-4 shadow-2xl relative overflow-hidden min-h-[480px]">
+              <div className="flex items-center justify-between border-b border-gray-900 pb-3">
+                <span className="text-[11px] font-mono text-gray-400 uppercase tracking-widest font-bold flex items-center gap-2">
+                  <History className="w-4 h-4 text-cyan-400" /> RECENT COMBAT LOGS
+                </span>
+                <span className="text-[9px] font-mono text-gray-500 bg-black/40 border border-white/5 px-2.5 py-1 rounded-full">
+                  {profile.pvpHistory?.length || 0} Recorded
+                </span>
+              </div>
               
               {!profile.pvpHistory || profile.pvpHistory.length === 0 ? (
-                <div className="h-64 flex flex-col items-center justify-center text-center space-y-2">
-                  <History className="w-8 h-8 text-gray-600" />
-                  <span className="text-xs text-gray-400 font-sans">No recent duels logged. Engage in Arena duels to earn crowns!</span>
+                <div className="h-72 flex flex-col items-center justify-center text-center space-y-3 p-6">
+                  <div className="w-16 h-16 rounded-2xl bg-black/50 border border-white/10 flex items-center justify-center shadow-inner">
+                    <History className="w-8 h-8 text-gray-600 animate-pulse" />
+                  </div>
+                  <h4 className="font-display font-bold text-sm text-gray-300 uppercase tracking-wider">No Combat Records</h4>
+                  <p className="text-xs text-gray-500 font-sans max-w-xs leading-relaxed">
+                    You haven't fought any arena duels yet. Step into the arena and fight for crowns!
+                  </p>
                 </div>
               ) : (
-                <div className="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
+                <div className="space-y-3 max-h-[450px] overflow-y-auto pr-1">
                   {profile.pvpHistory.map((record: any) => {
                     const isWin = (record.winner === 'attacker' && !record.isDefense) || (record.winner === 'defender' && record.isDefense);
                     const lpChange = record.isDefense 
@@ -703,48 +712,79 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                       : (record.attackerLPChange !== undefined ? record.attackerLPChange : record.attackerRatingChange);
                     const dateStr = new Date(record.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                     
+                    const beforeLP = record.isDefense 
+                      ? (record.defenderLPBefore !== undefined ? record.defenderLPBefore : record.defenderRatingBefore) 
+                      : (record.attackerLPBefore !== undefined ? record.attackerLPBefore : record.attackerRatingBefore);
+                    const afterLP = beforeLP + lpChange;
+
                     return (
                       <div 
                         key={record.id}
-                        className={`flex items-center justify-between p-3 rounded-lg border text-xs font-mono transition-all ${
+                        className={`group flex items-center justify-between p-3.5 sm:p-4 rounded-xl border transition-all duration-200 hover:scale-[1.01] ${
                           isWin 
-                            ? 'bg-emerald-950/5 border-emerald-500/10 shadow-[0_0_10px_rgba(16,185,129,0.02)]' 
-                            : 'bg-red-950/5 border-red-500/10 shadow-[0_0_10px_rgba(239,68,68,0.02)]'
+                            ? 'bg-gradient-to-r from-emerald-950/20 via-[#101914]/40 to-black/50 border-emerald-500/25 hover:border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.04)]' 
+                            : 'bg-gradient-to-r from-rose-950/20 via-[#191012]/40 to-black/50 border-rose-500/25 hover:border-rose-500/50 shadow-[0_0_15px_rgba(244,63,94,0.04)]'
                         }`}
                       >
-                        <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-full border flex items-center justify-center ${
+                        {/* Left side: Mode Icon + Target details */}
+                        <div className="flex items-center gap-3.5">
+                          <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 shadow-md ${
                             record.isDefense 
-                              ? 'bg-blue-950/30 border-blue-500/20 text-blue-400' 
-                              : 'bg-amber-950/30 border-amber-500/20 text-amber-400'
+                              ? 'bg-gradient-to-b from-blue-950/60 to-indigo-950/60 border-blue-500/40 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.15)]' 
+                              : 'bg-gradient-to-b from-rose-950/60 to-red-950/60 border-rose-500/40 text-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.15)]'
                           }`} title={record.isDefense ? 'Defended while offline' : 'You initiated this duel'}>
-                            {record.isDefense ? <Shield className="w-3.5 h-3.5" /> : <Swords className="w-3.5 h-3.5" />}
+                            {record.isDefense ? <Shield className="w-4 h-4" /> : <Swords className="w-4 h-4" />}
                           </div>
 
-                          <div className="space-y-0.5">
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-white text-xs">
-                                {record.isDefense ? `Defended vs ${record.attackerName}` : `Attacked ${record.defenderName}`}
+                          <div className="space-y-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className={`text-[9px] font-mono font-black uppercase px-2 py-0.5 rounded border ${
+                                record.isDefense 
+                                  ? 'bg-blue-950/40 text-cyan-400 border-blue-500/30' 
+                                  : 'bg-rose-950/40 text-rose-400 border-rose-500/30'
+                              }`}>
+                                {record.isDefense ? 'DEFENSE' : 'OFFENSE'}
                               </span>
-                              <span className="text-[9px] text-gray-500 font-sans">{dateStr}</span>
+                              <span className="font-display font-black text-sm text-white tracking-wide">
+                                {record.isDefense ? `vs ${record.attackerName}` : `vs ${record.defenderName}`}
+                              </span>
                             </div>
-                            <span className={`text-[10px] uppercase font-bold ${isWin ? 'text-emerald-400' : 'text-red-400'}`}>
-                              {isWin ? 'VICTORY 🎉' : 'DEFEAT 💀'}
-                            </span>
+                            
+                            <div className="flex items-center gap-2">
+                              <span className={`text-[10px] font-display font-black tracking-wider uppercase px-2 py-0.5 rounded-full border inline-flex items-center gap-1 ${
+                                isWin 
+                                  ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.25)]' 
+                                  : 'bg-rose-950/60 border-rose-500/40 text-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.25)]'
+                              }`}>
+                                {isWin ? 'VICTORY' : 'DEFEAT'}
+                              </span>
+                              <span className="text-[10px] text-gray-500 font-sans">{dateStr}</span>
+                            </div>
                           </div>
                         </div>
 
-                        <div className="text-right">
-                          <span className={`font-mono font-black text-sm ${lpChange >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                            {lpChange >= 0 ? `+${lpChange}` : lpChange} 👑
-                          </span>
-                          <span className="text-[9px] text-gray-500 block">
-                            Crowns: {record.isDefense 
-                              ? (record.defenderLPBefore !== undefined ? record.defenderLPBefore : record.defenderRatingBefore) 
-                              : (record.attackerLPBefore !== undefined ? record.attackerLPBefore : record.attackerRatingBefore)} → {record.isDefense 
-                              ? ((record.defenderLPBefore !== undefined ? record.defenderLPBefore : record.defenderRatingBefore) + lpChange) 
-                              : ((record.attackerLPBefore !== undefined ? record.attackerLPBefore : record.attackerRatingBefore) + lpChange)}
-                          </span>
+                        {/* Right side: Crowns Change & Range Pill */}
+                        <div className="text-right space-y-1">
+                          <div className={`font-display font-black text-base sm:text-lg flex items-center justify-end gap-1.5 ${
+                            lpChange >= 0 ? 'text-emerald-400 text-shadow-emerald' : 'text-rose-400 text-shadow-crimson'
+                          }`}>
+                            <span>{lpChange >= 0 ? `+${lpChange}` : lpChange}</span>
+                            <img 
+                              src="/icons/crown.png" 
+                              alt="Crown" 
+                              className={`w-5 h-5 object-contain ${
+                                lpChange >= 0 
+                                  ? 'brightness-110 drop-shadow-[0_0_8px_rgba(251,191,36,0.85)]' 
+                                  : 'grayscale opacity-70'
+                              }`} 
+                            />
+                          </div>
+
+                          <div className="bg-black/60 border border-white/10 px-2.5 py-0.5 rounded-lg font-mono text-[10px] text-gray-400 inline-flex items-center gap-1.5 shadow-inner">
+                            <span>{beforeLP}</span>
+                            <span className="text-gray-600">→</span>
+                            <span className={lpChange >= 0 ? 'text-amber-400 font-bold' : 'text-gray-300'}>{afterLP}</span>
+                          </div>
                         </div>
                       </div>
                     );
