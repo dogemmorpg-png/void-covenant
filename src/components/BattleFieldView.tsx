@@ -2144,9 +2144,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 
                 {battleType === 'pvp' && (
                   <div className="bg-gradient-to-b from-[#1c140c] via-[#0f0a07] to-[#070503] border border-amber-500/20 px-3 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[76px]">
-                    <span className="text-amber-400 font-display font-bold text-sm flex items-center gap-1 text-shadow-gold">
+                    <span className="text-amber-400 font-display font-bold text-sm flex items-center gap-1.5 text-shadow-gold">
                       +20
-                      <span className="text-sm drop-shadow-[0_0_4px_rgba(245,158,11,0.5)]">👑</span>
+                      <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain" />
                     </span>
                     <span className="text-[9px] text-amber-500/70 font-mono uppercase tracking-wider mt-1.5">Crowns</span>
                   </div>
@@ -2219,9 +2219,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 
                 {battleType === 'pvp' && (
                   <div className="bg-gradient-to-b from-[#1e0b0d] via-[#120507] to-[#090203] border border-red-500/20 px-4 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[84px]">
-                    <span className="text-red-500 font-display font-bold text-sm flex items-center gap-1 text-shadow-crimson">
+                    <span className="text-red-500 font-display font-bold text-sm flex items-center gap-1.5 text-shadow-crimson">
                       -15
-                      <span className="text-sm drop-shadow-[0_0_4px_rgba(239,68,68,0.4)]">👑</span>
+                      <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain" />
                     </span>
                     <span className="text-[9px] text-red-500/70 font-mono uppercase tracking-wider mt-1.5">Crowns</span>
                   </div>

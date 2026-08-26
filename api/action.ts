@@ -290,16 +290,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       profile.gold = (profile.gold || 0) + 200;
       successMessage = 'Airdrop task completed (+200 Gold)';
     } else if (action === 'buy_pvp_tickets') {
-      const ticketCost = 50;
-      const ticketReward = 5;
+      const ticketCount = payload?.ticketCount || 5;
+      let ticketCost = 50;
+      if (ticketCount === 1) ticketCost = 12;
+      else if (ticketCount === 10) ticketCost = 90;
+      else if (ticketCount !== 5) {
+        return res.status(400).json({ error: 'Invalid ticket count package' });
+      }
+
       const currentShards = profile.darkShards || 0;
       if (currentShards < ticketCost) {
         return res.status(400).json({ error: 'Not enough Dark Shards' });
       }
       profile.darkShards = currentShards - ticketCost;
-      profile.pvpTickets = (profile.pvpTickets !== undefined ? profile.pvpTickets : 5) + ticketReward;
+      profile.pvpTickets = (profile.pvpTickets !== undefined ? profile.pvpTickets : 5) + ticketCount;
       profile.pvpEnergy = profile.pvpTickets;
-      successMessage = 'Bought 5 Arena Tickets for 50 Shards!';
+      successMessage = `Bought ${ticketCount} Arena Tickets for ${ticketCost} Shards!`;
     } else {
       return res.status(400).json({ error: 'Unknown action' });
     }

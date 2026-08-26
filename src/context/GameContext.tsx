@@ -16,7 +16,7 @@ interface GameContextType {
   spendShards: (amount: number) => boolean;
   usePveEnergy: (amount: number) => boolean;
   usePvpEnergy: (amount: number) => boolean;
-  buyPvpTickets: () => Promise<boolean>;
+  buyPvpTickets: (ticketCount?: number) => Promise<boolean>;
   startBattleOnServer: (battleType: 'campaign' | 'pvp', stageId: string, energyCost: number, opponentPayload?: any) => Promise<boolean>;
   buyDarkShardsWithSOL: (solAmount: number) => Promise<boolean>;
   verifySolanaPayment: (signature: string, packageId: string) => Promise<{ success: boolean; message: string }>;
@@ -489,8 +489,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  const buyPvpTickets = async (): Promise<boolean> => {
-    const res = await submitAction('buy_pvp_tickets', {});
+  const buyPvpTickets = async (ticketCount: number = 5): Promise<boolean> => {
+    const res = await submitAction('buy_pvp_tickets', { ticketCount });
     if (res.success && res.profile) {
       setProfile(res.profile);
       saveProfile(res.profile);
@@ -844,6 +844,39 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       return { success: true, message: msg };
+    }
+
+    if (action === 'buy_pvp_tickets') {
+      const ticketCount = payload?.ticketCount || 5;
+      let ticketCost = 50;
+      if (ticketCount === 1) ticketCost = 12;
+      else if (ticketCount === 10) ticketCost = 90;
+ 
+      let msg = '';
+      let success = false;
+      let updatedProfile: any = null;
+ 
+      setProfile(current => {
+        const currentShards = current.darkShards || 0;
+        if (currentShards < ticketCost) {
+          msg = `Not enough Dark Shards! Need ${ticketCost} shards.`;
+          success = false;
+          return current;
+        }
+        success = true;
+        const updated = { 
+          ...current,
+          darkShards: currentShards - ticketCost,
+          pvpTickets: (current.pvpTickets !== undefined ? current.pvpTickets : 5) + ticketCount,
+          pvpEnergy: (current.pvpTickets !== undefined ? current.pvpTickets : 5) + ticketCount
+        };
+        msg = `Successfully purchased ${ticketCount} Arena Tickets for ${ticketCost} Shards!`;
+        updatedProfile = updated;
+        saveProfile(updated);
+        return updated;
+      });
+ 
+      return { success, message: msg, profile: updatedProfile };
     }
 
     return { success: true, message: 'Action saved locally.' };

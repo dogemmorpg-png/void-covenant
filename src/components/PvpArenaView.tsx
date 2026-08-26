@@ -19,7 +19,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   isModalOpen,
   setIsModalOpen
 }) => {
-  const { profile, updateProfile } = useGame();
+  const { profile, updateProfile, buyPvpTickets } = useGame();
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState<'duels' | 'history'>('duels');
@@ -29,6 +29,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   const [refreshCooldown, setRefreshCooldown] = useState(0);
   const [viewingLeague, setViewingLeague] = useState<string>(profile.pvpLeague || 'Bronze');
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
+  const [isBuyTicketsModalOpen, setIsBuyTicketsModalOpen] = useState(false);
 
 
 
@@ -39,6 +40,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       return {
         name: 'Bronze',
         badge: '🥉',
+        icon: '/icons/league_bronze.png',
         color: 'text-amber-600 border-amber-800 bg-amber-950/20',
         glow: 'shadow-[0_0_15px_rgba(180,83,9,0.15)]',
         accent: 'text-amber-700'
@@ -47,6 +49,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       return {
         name: 'Silver',
         badge: '🥈',
+        icon: '/icons/league_silver.png',
         color: 'text-gray-300 border-gray-600 bg-gray-900/25',
         glow: 'shadow-[0_0_15px_rgba(209,213,219,0.15)]',
         accent: 'text-gray-400'
@@ -55,6 +58,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       return {
         name: 'Gold',
         badge: '🥇',
+        icon: '/icons/league_gold.png',
         color: 'text-amber-400 border-amber-500/40 bg-amber-500/5',
         glow: 'shadow-[0_0_15px_rgba(245,158,11,0.2)]',
         accent: 'text-amber-500'
@@ -63,6 +67,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       return {
         name: 'Platinum',
         badge: '🔮',
+        icon: '/icons/league_platinum.png',
         color: 'text-indigo-400 border-indigo-500/40 bg-indigo-500/5',
         glow: 'shadow-[0_0_15px_rgba(129,140,248,0.25)]',
         accent: 'text-indigo-500'
@@ -71,6 +76,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       return {
         name: 'Diamond',
         badge: '💎',
+        icon: '/icons/league_diamond.png',
         color: 'text-cyan-400 border-cyan-500/40 bg-cyan-500/5',
         glow: 'shadow-[0_0_20px_rgba(34,211,238,0.3)]',
         accent: 'text-cyan-400'
@@ -79,6 +85,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       return {
         name: 'Void Overlord',
         badge: '👑',
+        icon: '/icons/league_void_overlord.png',
         color: 'text-rose-500 border-rose-500/40 bg-rose-500/5',
         glow: 'shadow-[0_0_25px_rgba(244,63,94,0.4)]',
         accent: 'text-rose-500'
@@ -392,15 +399,16 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
               <div className="space-y-1.5">
                 <h4 className="text-white font-display font-black text-lg tracking-wide leading-none">{activeOpponent.name || activeOpponent.username}</h4>
-                <span className={`px-2.5 py-0.5 border rounded-full text-[9px] font-display font-black uppercase tracking-widest leading-none inline-block ${getLeagueDetails(activeOpponent.league || 'Bronze').color}`}>
-                  {getLeagueDetails(activeOpponent.league || 'Bronze').badge} {getLeagueDetails(activeOpponent.league || 'Bronze').name}
+                <span className={`px-2.5 py-0.5 border rounded-full text-[9px] font-display font-black uppercase tracking-widest leading-none inline-flex items-center gap-1 ${getLeagueDetails(activeOpponent.league || 'Bronze').color}`}>
+                  <img src={getLeagueDetails(activeOpponent.league || 'Bronze').icon} alt="Crest" className="w-3 h-3 object-contain" />
+                  {getLeagueDetails(activeOpponent.league || 'Bronze').name}
                 </span>
               </div>
 
               {/* Crowns */}
               <div className="bg-black/50 border border-gray-950 px-4 py-2 rounded-xl flex items-center gap-1.5 text-xs font-mono font-bold text-[#ebd09b]">
-                <Crown className="w-4 h-4 text-amber-400" />
-                <span>{activeOpponent.lp !== undefined ? activeOpponent.lp : (activeOpponent.rating || 0)} 👑</span>
+                <img src="/icons/crown.png" alt="Crown" className="w-4 h-4 object-contain" />
+                <span>{activeOpponent.lp !== undefined ? activeOpponent.lp : (activeOpponent.rating || 0)}</span>
               </div>
 
               {/* Active stance skill */}
@@ -474,16 +482,17 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             <div className="text-center px-4 border-b sm:border-b-0 sm:border-r border-white/5 pb-2 sm:pb-0 w-full sm:w-auto">
               <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold">YOUR CROWNS</span>
               <div className="font-mono text-2xl font-black text-amber-400 flex items-center justify-center gap-1.5 mt-0.5">
-                <Crown className="w-5 h-5 text-amber-400" />
-                {profile.pvpLP || 0} <span className="text-xs text-gray-500 font-normal">👑</span>
+                <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain" />
+                {profile.pvpLP || 0}
               </div>
             </div>
 
             {/* League */}
             <div className="text-center px-4 w-full sm:w-auto">
               <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold block mb-1">LEAGUE</span>
-              <span className={`px-3 py-1 border rounded-full text-[10px] font-display font-black uppercase tracking-widest ${league.color} ${league.glow}`}>
-                {league.badge} {league.name}
+              <span className={`px-3 py-1 border rounded-full text-[10px] font-display font-black uppercase tracking-widest inline-flex items-center gap-1.5 ${league.color} ${league.glow}`}>
+                <img src={league.icon} alt="Crest" className="w-4 h-4 object-contain" />
+                {league.name}
               </span>
             </div>
 
@@ -553,18 +562,27 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                       <span className="text-[10px] text-gray-500 font-mono block">Equipped items, stances, and fusions are synced.</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-black/40 border border-white/5 px-3 py-1 rounded-full font-mono text-xs">
-                    <span className="text-gray-400">🎫 Tickets:</span>
-                    <span className="text-amber-400 font-bold">{profile.pvpTickets !== undefined ? profile.pvpTickets : profile.pvpEnergy}/5</span>
+                  <div className="flex flex-col items-end gap-1">
+                    <div className="flex items-center gap-1.5 bg-black/40 border border-white/5 px-3 py-1 rounded-full font-mono text-xs">
+                      <img src="/icons/ticket.png" alt="Ticket" className="w-3.5 h-3.5 object-contain" />
+                      <span className="text-gray-400">Tickets:</span>
+                      <span className="text-amber-400 font-bold">{profile.pvpTickets !== undefined ? profile.pvpTickets : profile.pvpEnergy}/5</span>
+                    </div>
+                    <button
+                      onClick={() => setIsBuyTicketsModalOpen(true)}
+                      className="text-[9px] font-display font-bold uppercase tracking-wider text-[#ebd09b] hover:text-white underline cursor-pointer hover:scale-105 active:scale-95 transition-all mr-1"
+                    >
+                      + BUY TICKETS
+                    </button>
                   </div>
                 </div>
               )}
-
+ 
               {/* Opponent Matching Console */}
               {profile.deck.length >= 10 && (
                 <div className="space-y-4">
                   <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest font-bold block border-b border-gray-900 pb-2">CHALLENGE OPPONENT</span>
-
+ 
                   <div className="bg-[#151a21] border border-gray-900 rounded-xl p-8 flex flex-col items-center justify-center text-center space-y-6 shadow-xl relative overflow-hidden h-[300px]">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 blur-3xl pointer-events-none" />
                     <div className="w-16 h-16 rounded-full bg-cyan-950/40 border border-cyan-500/35 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.15)]">
@@ -578,36 +596,16 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                     </div>
                     
                     <div className="flex flex-col items-center gap-2">
-                      {(profile.pvpTickets !== undefined ? profile.pvpTickets : profile.pvpEnergy) < 1 ? (
-                        <button
-                          onClick={async () => {
-                            if ((profile.darkShards || 0) < 50) {
-                              toast('Insufficient Dark Shards! Need 50 shards to purchase tickets.', 'warning');
-                              return;
-                            }
-                            const ok = await buyPvpTickets();
-                            if (ok) {
-                              toast('Successfully purchased 5 Arena Tickets!', 'success');
-                            } else {
-                              toast('Failed to purchase tickets. Please try again.', 'error');
-                            }
-                          }}
-                          className="py-3 px-6 rounded-xl bg-gradient-to-b from-[#3a0b12] via-[#200508] to-[#140204] border-2 border-red-600/50 hover:border-red-500 text-red-400 hover:text-white font-display font-bold tracking-widest text-xs transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-lg shadow-[0_0_15px_rgba(220,38,38,0.15)] hover:shadow-[0_0_25px_rgba(239,68,68,0.35)]"
-                        >
-                          <span>BUY 5 TICKETS (50 🧬)</span>
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleFindOpponent(false, true)}
-                          className="py-3 px-8 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-3 cursor-pointer border bg-gradient-to-r from-cyan-900 to-indigo-900 border-cyan-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
-                        >
-                          <Search className="w-4 h-4 shrink-0" />
-                          <span className="mr-0.5">FIND OPPONENT</span>
-                          <span className="flex items-center gap-1 bg-black/50 border border-cyan-500/30 rounded-full px-2 py-0.5 font-mono text-[11px] font-bold text-amber-400 shadow-inner">
-                            1 🎫
-                          </span>
-                        </button>
-                      )}
+                      <button
+                        onClick={() => handleFindOpponent(false, true)}
+                        className="py-3 px-8 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-3 cursor-pointer border bg-gradient-to-r from-cyan-900 to-indigo-900 border-cyan-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+                      >
+                        <Search className="w-4 h-4 shrink-0" />
+                        <span className="mr-0.5">FIND OPPONENT</span>
+                        <span className="flex items-center gap-1 bg-black/50 border border-cyan-500/30 rounded-full px-2.5 py-0.5 font-mono text-[11px] font-bold text-amber-400 shadow-inner">
+                          1 <img src="/icons/ticket.png" alt="Ticket" className="w-3.5 h-3.5 object-contain" />
+                        </span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -703,8 +701,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               >
                 ◀
               </button>
-              <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-display font-black uppercase tracking-widest ${getLeagueDetails(viewingLeague).color} ${getLeagueDetails(viewingLeague).glow}`}>
-                <span>{getLeagueDetails(viewingLeague).badge}</span>
+              <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-display font-black uppercase tracking-widest inline-flex items-center ${getLeagueDetails(viewingLeague).color} ${getLeagueDetails(viewingLeague).glow}`}>
+                <img src={getLeagueDetails(viewingLeague).icon} alt="Crest" className="w-3.5 h-3.5 object-contain" />
                 <span>{getLeagueDetails(viewingLeague).name}</span>
               </div>
               <button
@@ -744,8 +742,9 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                         </span>
                         <span className="truncate max-w-[120px]">{player.username}</span>
                       </div>
-                      <span className={`font-bold ${isSelf ? 'text-cyan-400' : 'text-amber-500'}`}>
-                        {player.pvpLP !== undefined ? player.pvpLP : (player.pvpRating || 0)} 👑
+                      <span className={`font-bold flex items-center gap-1 ${isSelf ? 'text-cyan-400' : 'text-amber-500'}`}>
+                        {player.pvpLP !== undefined ? player.pvpLP : (player.pvpRating || 0)}
+                        <img src="/icons/crown.png" alt="Crown" className="w-3.5 h-3.5 object-contain" />
                       </span>
                     </div>
                   );
@@ -761,9 +760,96 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
           </div>
 
         </div>
-
+ 
       </div>
-
+ 
+      {/* Ticket Purchase Modal */}
+      {isBuyTicketsModalOpen && (
+        <div className="fixed inset-0 z-[110] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-[#151a21] border-2 border-[#ebd09b]/35 rounded-2xl p-6 max-w-md w-full relative shadow-2xl space-y-6">
+            <button
+              onClick={() => setIsBuyTicketsModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-white font-sans text-lg font-black transition-colors cursor-pointer w-6 h-6 flex items-center justify-center bg-black/40 border border-white/5 rounded-full"
+            >
+              ✕
+            </button>
+ 
+            <div className="text-center space-y-1.5">
+              <div className="w-12 h-12 mx-auto rounded-full bg-amber-950/20 border border-amber-500/35 flex items-center justify-center shadow-lg">
+                <img src="/icons/ticket.png" alt="Ticket" className="w-7 h-7 object-contain" />
+              </div>
+              <h3 className="font-display font-black text-base text-white tracking-widest uppercase">
+                ARENA TICKET OFFICE
+              </h3>
+              <p className="text-[10px] text-gray-400 font-sans max-w-xs mx-auto">
+                Exchange Dark Shards to purchase Arena Tickets.
+              </p>
+            </div>
+ 
+            <div className="bg-black/40 border border-white/5 rounded-xl p-3 flex items-center justify-between font-mono text-xs">
+              <span className="text-gray-400">Your Shard Balance:</span>
+              <span className="font-bold text-[#ebd09b] flex items-center gap-1.5">
+                {(profile.darkShards || 0)}
+                <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+              </span>
+            </div>
+ 
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { count: 1, cost: 12, label: 'Single Pass' },
+                { count: 5, cost: 50, label: 'Challenger Pack', popular: true },
+                { count: 10, cost: 90, label: 'Gladiator Bundle' }
+              ].map((pack) => (
+                <button
+                  key={pack.count}
+                  onClick={async () => {
+                    if ((profile.darkShards || 0) < pack.cost) {
+                      toast('Insufficient Dark Shards for this package!', 'warning');
+                      return;
+                    }
+                    const ok = await buyPvpTickets(pack.count);
+                    if (ok) {
+                      toast(`Successfully purchased ${pack.count} Tickets!`, 'success');
+                    } else {
+                      toast('Transaction failed.', 'error');
+                    }
+                  }}
+                  className={`relative p-3 py-4 rounded-xl border flex flex-col items-center justify-between text-center gap-2 cursor-pointer transition-all hover:scale-[1.03] active:scale-[0.97] ${
+                    pack.popular 
+                      ? 'border-amber-500/50 bg-amber-950/20 shadow-md shadow-amber-500/5' 
+                      : 'border-gray-900 bg-black/30 hover:border-gray-800 text-gray-300 hover:text-white'
+                  }`}
+                >
+                  {pack.popular && (
+                    <span className="absolute -top-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-display font-black text-[7px] px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      Best Value
+                    </span>
+                  )}
+                  <span className="text-[9px] text-gray-500 font-mono uppercase tracking-tight block">
+                    {pack.label}
+                  </span>
+                  <div className="flex items-center justify-center gap-1">
+                    <span className="font-display font-black text-lg">
+                      +{pack.count}
+                    </span>
+                    <img src="/icons/ticket.png" alt="Ticket" className="w-5 h-5 object-contain" />
+                  </div>
+                  <div className="bg-black/50 border border-white/5 w-full py-1 rounded-lg flex items-center justify-center gap-1 font-mono text-[10px] font-bold text-amber-400">
+                    {pack.cost} 🧬
+                  </div>
+                </button>
+              ))}
+            </div>
+ 
+            <button
+              onClick={() => setIsBuyTicketsModalOpen(false)}
+              className="w-full py-2.5 rounded-xl border border-gray-900 hover:border-gray-800 bg-black/20 hover:bg-black/40 text-gray-400 hover:text-white font-display font-bold tracking-widest text-[10px] transition-colors cursor-pointer uppercase"
+            >
+              Back to Arena
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
