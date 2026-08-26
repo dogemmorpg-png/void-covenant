@@ -572,83 +572,112 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
  
               {/* Opponent Matching Console */}
               {profile.deck.length >= 10 && (
-                <div className="space-y-4">
-                  <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest font-bold block border-b border-gray-900 pb-2">CHALLENGE OPPONENT</span>
-
-                  <div className="bg-gradient-to-b from-[#181216] via-[#120c11] to-[#0a0709] border border-[#c5a880]/25 rounded-2xl p-6 sm:p-7 flex flex-col justify-between shadow-2xl relative overflow-hidden space-y-6 min-h-[380px]">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-rose-500/10 blur-3xl pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-500/5 blur-3xl pointer-events-none" />
-                    
-                    {/* Header with Emblem & League info */}
-                    <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left relative z-10">
-                      <div className="w-20 h-20 rounded-2xl bg-black/60 border border-rose-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.25)] shrink-0 overflow-hidden group">
-                        <img src="/icons/arena_duel_emblem.png" alt="Arena Sigil" className="w-16 h-16 object-contain group-hover:scale-110 transition-transform duration-300" />
-                      </div>
-                      <div className="space-y-1.5">
-                        <h3 className="font-display font-black text-lg text-white tracking-widest uppercase text-shadow-gold">
-                          READY FOR RANKED DUEL
-                        </h3>
-                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                          <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider">MATCHMAKING POOL:</span>
-                          <span className={`px-2.5 py-0.5 border rounded-full text-[9px] font-display font-black uppercase tracking-widest inline-flex items-center gap-1 ${league.color} ${league.glow}`}>
-                            <img src={league.icon} alt="Crest" className="w-3 h-3 object-contain" />
-                            {league.name} Tier
-                          </span>
-                        </div>
-                      </div>
+                <div className="bg-gradient-to-b from-[#181216] via-[#120c11] to-[#0a0709] border border-[#c5a880]/25 rounded-2xl p-6 sm:p-7 flex flex-col justify-between shadow-2xl relative overflow-hidden space-y-6 min-h-[380px]">
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-rose-500/10 blur-3xl pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-500/5 blur-3xl pointer-events-none" />
+                  
+                  {/* Clean Header with Shield Sigil */}
+                  <div className="flex items-center gap-4 text-left relative z-10">
+                    <div className="w-16 h-16 rounded-2xl bg-black/60 border border-rose-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.25)] shrink-0 overflow-hidden group">
+                      <img src="/icons/arena_duel_emblem.png" alt="Arena Sigil" className="w-13 h-13 object-contain group-hover:scale-110 transition-transform duration-300" />
                     </div>
-
-                    {/* Guaranteed Victory Rewards (PvE Campaign style) */}
-                    <div className="space-y-2.5 relative z-10">
-                      <span className="text-xs font-display text-[#ebd09b] tracking-wider uppercase font-bold block">
-                        VICTORY REWARDS
+                    <div>
+                      <h3 className="font-display font-black text-xl text-white tracking-widest uppercase text-shadow-gold">
+                        READY FOR RANKED DUEL
+                      </h3>
+                      <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest block mt-0.5">
+                        Asynchronous PvP Combat
                       </span>
-                      <div className="grid grid-cols-3 gap-3">
-                        {/* Gold Reward Card */}
-                        <div className="bg-gradient-to-b from-[#1b150d] via-[#100c07] to-[#070503] border border-amber-500/25 hover:border-amber-400/50 p-3 rounded-2xl text-center shadow-md transition-all duration-300 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)] flex flex-col items-center justify-center min-h-[85px] group cursor-default">
-                          <span className="text-amber-400 font-display font-bold text-base block flex items-center gap-1.5 justify-center text-shadow-gold">
+                    </div>
+                  </div>
+
+                  {/* Victory & Defeat Rewards Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 relative z-10">
+                    {/* Victory Rewards Card */}
+                    <div className="bg-gradient-to-b from-[#181a10]/90 via-[#0e1208]/90 to-[#060804]/90 border border-emerald-500/30 rounded-2xl p-3.5 space-y-2.5 shadow-lg shadow-emerald-950/20">
+                      <div className="flex items-center justify-between border-b border-emerald-500/20 pb-1.5">
+                        <span className="text-[11px] font-display text-emerald-400 uppercase font-black tracking-wider flex items-center gap-1.5">
+                          <Trophy className="w-3.5 h-3.5 text-emerald-400" /> VICTORY REWARDS
+                        </span>
+                        <span className="text-[8px] font-mono text-emerald-400 font-bold tracking-widest bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">WIN</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-2">
+                        {/* Gold */}
+                        <div className="bg-black/50 border border-amber-500/20 p-2 rounded-xl text-center flex flex-col items-center justify-center">
+                          <span className="text-amber-400 font-display font-bold text-sm block flex items-center gap-1 text-shadow-gold">
                             +{300 + Math.floor((profile.pvpLP || 0) / 4)}
-                            <img src="/icons/icon_gold.webp" alt="Gold" className="w-6 h-6 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.45)] group-hover:scale-110 transition-transform duration-300" />
+                            <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain drop-shadow-[0_0_4px_rgba(245,158,11,0.5)]" />
                           </span>
-                          <span className="text-[9px] text-amber-500/80 font-mono tracking-widest uppercase font-bold mt-1.5 group-hover:text-amber-400 transition-colors">Gold</span>
-                        </div>
-                        
-                        {/* Crowns Rating Card */}
-                        <div className="bg-gradient-to-b from-[#1e1309] via-[#120b05] to-[#070402] border border-amber-400/35 hover:border-amber-300/60 p-3 rounded-2xl text-center shadow-md transition-all duration-300 hover:shadow-[0_0_20px_rgba(251,191,36,0.2)] flex flex-col items-center justify-center min-h-[85px] group cursor-default">
-                          <span className="text-amber-300 font-display font-bold text-base block flex items-center gap-1.5 justify-center text-shadow-gold">
-                            +25..35
-                            <img src="/icons/crown.png" alt="Crowns" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(251,191,36,0.5)] group-hover:scale-110 transition-transform duration-300" />
-                          </span>
-                          <span className="text-[9px] text-amber-400/80 font-mono tracking-widest uppercase font-bold mt-1.5 group-hover:text-amber-300 transition-colors">Crowns</span>
+                          <span className="text-[8px] text-amber-500/80 font-mono tracking-wider uppercase font-bold mt-0.5">Gold</span>
                         </div>
 
-                        {/* Dust Reward Card */}
-                        <div className="bg-gradient-to-b from-[#0b1a1f] via-[#050f12] to-[#020709] border border-cyan-500/25 hover:border-cyan-400/50 p-3 rounded-2xl text-center shadow-md transition-all duration-300 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] flex flex-col items-center justify-center min-h-[85px] group cursor-default">
-                          <span className="text-cyan-400 font-display font-bold text-base block flex items-center gap-1.5 justify-center text-shadow-cyan">
+                        {/* Dust */}
+                        <div className="bg-black/50 border border-cyan-500/20 p-2 rounded-xl text-center flex flex-col items-center justify-center">
+                          <span className="text-cyan-400 font-display font-bold text-sm block flex items-center gap-1 text-shadow-cyan">
                             +{30 + Math.floor((profile.pvpLP || 0) / 20)}
-                            <img src="/icons/icon_dust.webp" alt="Dust" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(102,252,241,0.55)] group-hover:scale-110 transition-transform duration-300" />
+                            <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 object-contain drop-shadow-[0_0_4px_rgba(6,182,212,0.5)]" />
                           </span>
-                          <span className="text-[9px] text-cyan-400/80 font-mono tracking-widest uppercase font-bold mt-1.5 group-hover:text-cyan-300 transition-colors">Dust</span>
+                          <span className="text-[8px] text-cyan-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">Dust</span>
+                        </div>
+
+                        {/* Crowns */}
+                        <div className="bg-black/50 border border-amber-400/30 p-2 rounded-xl text-center flex flex-col items-center justify-center">
+                          <span className="text-emerald-400 font-display font-black text-sm block flex items-center gap-1">
+                            +20
+                            <img src="/icons/crown.png" alt="Crowns" className="w-4 h-4 object-contain drop-shadow-[0_0_4px_rgba(251,191,36,0.5)]" />
+                          </span>
+                          <span className="text-[8px] text-emerald-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">Crowns</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Battle Action Button Area (PvE Campaign Style with large ticket price) */}
-                    <div className="pt-2 relative z-10 flex flex-col items-center">
-                      <button
-                        onClick={() => handleFindOpponent(false, true)}
-                        className="w-full max-w-lg font-display font-black tracking-widest py-4 px-8 rounded-xl transition-all duration-300 flex items-center justify-center gap-4 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase bg-gradient-to-b from-[#2f1116] via-[#1c080b] to-[#100305] border-2 border-rose-600/50 hover:border-rose-400 text-rose-200 hover:text-white shadow-[0_0_15px_rgba(225,29,72,0.2)] hover:shadow-[0_0_25px_rgba(244,63,94,0.4)]"
-                      >
-                        <Swords className="w-5 h-5 animate-pulse text-rose-400 shrink-0" />
-                        <span className="mr-0.5 text-sm sm:text-base tracking-wider">FIND OPPONENT</span>
-                        <span className="flex items-center gap-1.5 bg-black/60 border border-rose-500/40 rounded-full px-3.5 py-1 font-mono text-base font-bold text-rose-400 shadow-inner">
-                          1
-                          <img src="/icons/ticket.png" alt="Ticket" className="w-6 h-6 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(255,40,60,0.55)]" />
+                    {/* Defeat Penalty Card */}
+                    <div className="bg-gradient-to-b from-[#1a0c0e]/90 via-[#120608]/90 to-[#080304]/90 border border-rose-500/25 rounded-2xl p-3.5 space-y-2.5 shadow-lg shadow-rose-950/20">
+                      <div className="flex items-center justify-between border-b border-rose-500/20 pb-1.5">
+                        <span className="text-[11px] font-display text-rose-400 uppercase font-black tracking-wider flex items-center gap-1.5">
+                          <Shield className="w-3.5 h-3.5 text-rose-400" /> DEFEAT PENALTY
                         </span>
-                      </button>
-                    </div>
+                        <span className="text-[8px] font-mono text-rose-400 font-bold tracking-widest bg-rose-950/60 px-2 py-0.5 rounded border border-rose-500/30">LOSS</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2">
+                        {/* Crown Loss */}
+                        <div className="bg-black/50 border border-rose-500/25 p-2 rounded-xl text-center flex flex-col items-center justify-center">
+                          <span className="text-rose-400 font-display font-black text-sm block flex items-center gap-1">
+                            -15
+                            <img src="/icons/crown.png" alt="Crowns" className="w-4 h-4 object-contain grayscale opacity-70" />
+                          </span>
+                          <span className="text-[8px] text-rose-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">Crowns Lost</span>
+                        </div>
 
+                        {/* Consolation Gold */}
+                        <div className="bg-black/50 border border-white/5 p-2 rounded-xl text-center flex flex-col items-center justify-center">
+                          <span className="text-gray-300 font-display font-bold text-sm block flex items-center gap-1">
+                            +20
+                            <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain opacity-75" />
+                          </span>
+                          <span className="text-[8px] text-gray-400 font-mono tracking-wider uppercase font-bold mt-0.5">Consolation</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Battle Action Button Area (PvE Campaign Style with large ticket price) */}
+                  <div className="pt-2 relative z-10 flex flex-col items-center">
+                    <button
+                      onClick={() => handleFindOpponent(false, true)}
+                      className="w-full max-w-lg font-display font-black tracking-widest py-4 px-8 rounded-xl transition-all duration-300 flex items-center justify-center gap-4 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase bg-gradient-to-b from-[#2f1116] via-[#1c080b] to-[#100305] border-2 border-rose-600/50 hover:border-rose-400 text-rose-200 hover:text-white shadow-[0_0_15px_rgba(225,29,72,0.2)] hover:shadow-[0_0_25px_rgba(244,63,94,0.4)]"
+                    >
+                      <Swords className="w-5 h-5 animate-pulse text-rose-400 shrink-0" />
+                      <span className="mr-0.5 text-sm sm:text-base tracking-wider">FIND OPPONENT</span>
+                      <span className="flex items-center gap-1.5 bg-black/60 border border-rose-500/40 rounded-full px-3.5 py-1 font-mono text-base font-bold text-rose-400 shadow-inner">
+                        1
+                        <img src="/icons/ticket.png" alt="Ticket" className="w-6 h-6 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(255,40,60,0.55)]" />
+                      </span>
+                    </button>
+                  </div>
+
                 </div>
               )}
 
