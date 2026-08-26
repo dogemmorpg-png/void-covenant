@@ -16,13 +16,24 @@ function getSupabase() {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') {
+  if (req.method !== 'POST' && req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { action, payload } = req.body || {};
+  let action = req.body?.action;
+  let payload = req.body?.payload;
+
+  if (req.method === 'GET') {
+    action = req.query.action || 'pvp_rollover';
+    payload = req.query.payload;
+  }
+
   if (!action) {
     return res.status(400).json({ error: 'Missing action.' });
+  }
+
+  if (req.method === 'GET' && action !== 'pvp_rollover') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   if (action === 'pvp_rollover') {
