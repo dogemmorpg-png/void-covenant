@@ -58,14 +58,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const players = (rows || []).map(r => ({
         walletAddress: r.wallet_address,
-        profile: r.data || {}
+        profile: r.data || {},
+        originalLeague: r.data?.pvpLeague || 'Bronze'
       }));
 
-      const updates: { walletAddress: string; profile: any }[] = [];
+      // Daily reset: grant 5 tickets to all players
+      players.forEach(p => {
+        p.profile.pvpTickets = 5;
+        p.profile.pvpEnergy = 5;
+      });
+
+      const updates: { walletAddress: string; profile: any }[] = [...players];
       const LEAGUES = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Void Overlord'];
 
       for (const league of LEAGUES) {
-        const leaguePlayers = players.filter(p => (p.profile.pvpLeague || 'Bronze') === league);
+        const leaguePlayers = players.filter(p => p.originalLeague === league);
         
         leaguePlayers.forEach(p => {
           if (p.profile.pvpLP === undefined) {
@@ -97,9 +104,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             modified = true;
           }
 
-          if (modified) {
-            updates.push(p);
-          }
+          // League update is applied directly to the player profile object in memory, which is already in the updates array
         }
       }
 
@@ -183,6 +188,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         pveEnergyMax: 10,
         pvpEnergy: 5,
         pvpEnergyMax: 5,
+        pvpTickets: 5,
         lastEnergyRefill: Date.now(),
         lastPveEnergyRefill: Date.now(),
         lastPvpEnergyRefill: Date.now(),
@@ -283,6 +289,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       profile.completedTasks.push(taskId);
       profile.gold = (profile.gold || 0) + 200;
       successMessage = 'Airdrop task completed (+200 Gold)';
+    } else if (action === 'buy_pvp_tickets') {
+      const ticketCost = 50;
+      const ticketReward = 5;
+      const currentShards = profile.darkShards || 0;
+      if (currentShards < ticketCost) {
+        return res.status(400).json({ error: 'Not enough Dark Shards' });
+      }
+      profile.darkShards = currentShards - ticketCost;
+      profile.pvpTickets = (profile.pvpTickets !== undefined ? profile.pvpTickets : 5) + ticketReward;
+      profile.pvpEnergy = profile.pvpTickets;
+      successMessage = 'Bought 5 Arena Tickets for 50 Shards!';
     } else {
       return res.status(400).json({ error: 'Unknown action' });
     }

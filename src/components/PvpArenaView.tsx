@@ -554,9 +554,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 bg-black/40 border border-white/5 px-3 py-1 rounded-full font-mono text-xs">
-                    <Zap className="w-3.5 h-3.5 text-cyan-400" />
-                    <span className="text-gray-400">Energy:</span>
-                    <span className="text-cyan-400 font-bold">{profile.pvpEnergy}/{profile.pvpEnergyMax}</span>
+                    <span className="text-gray-400">🎫 Tickets:</span>
+                    <span className="text-amber-400 font-bold">{profile.pvpTickets !== undefined ? profile.pvpTickets : profile.pvpEnergy}/5</span>
                   </div>
                 </div>
               )}
@@ -579,23 +578,36 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                     </div>
                     
                     <div className="flex flex-col items-center gap-2">
-                      <button
-                        disabled={profile.pvpEnergy < 1}
-                        onClick={() => handleFindOpponent(false, true)}
-                        className={`py-3 px-8 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-3 cursor-pointer border ${
-                          profile.pvpEnergy < 1
-                            ? 'bg-gray-800/20 border-gray-850 text-gray-600 cursor-not-allowed'
-                            : 'bg-gradient-to-r from-cyan-900 to-indigo-900 border-cyan-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
-                        }`}
-                      >
-                        <Search className="w-4 h-4 shrink-0" />
-                        <span className="mr-0.5">FIND OPPONENT</span>
-                        <span className="flex items-center gap-1 bg-black/50 border border-cyan-500/30 rounded-full px-2 py-0.5 font-mono text-[11px] font-bold text-emerald-450 shadow-inner">
-                          1
-                          <img src="/icons/icon_energy.webp" alt="Energy" className="w-4 h-4 object-contain brightness-110 drop-shadow-[0_0_4px_rgba(16,185,129,0.45)]" />
-                        </span>
-                      </button>
-                      
+                      {(profile.pvpTickets !== undefined ? profile.pvpTickets : profile.pvpEnergy) < 1 ? (
+                        <button
+                          onClick={async () => {
+                            if ((profile.darkShards || 0) < 50) {
+                              toast('Insufficient Dark Shards! Need 50 shards to purchase tickets.', 'warning');
+                              return;
+                            }
+                            const ok = await buyPvpTickets();
+                            if (ok) {
+                              toast('Successfully purchased 5 Arena Tickets!', 'success');
+                            } else {
+                              toast('Failed to purchase tickets. Please try again.', 'error');
+                            }
+                          }}
+                          className="py-3 px-6 rounded-xl bg-gradient-to-b from-[#3a0b12] via-[#200508] to-[#140204] border-2 border-red-600/50 hover:border-red-500 text-red-400 hover:text-white font-display font-bold tracking-widest text-xs transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-lg shadow-[0_0_15px_rgba(220,38,38,0.15)] hover:shadow-[0_0_25px_rgba(239,68,68,0.35)]"
+                        >
+                          <span>BUY 5 TICKETS (50 🧬)</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleFindOpponent(false, true)}
+                          className="py-3 px-8 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-3 cursor-pointer border bg-gradient-to-r from-cyan-900 to-indigo-900 border-cyan-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+                        >
+                          <Search className="w-4 h-4 shrink-0" />
+                          <span className="mr-0.5">FIND OPPONENT</span>
+                          <span className="flex items-center gap-1 bg-black/50 border border-cyan-500/30 rounded-full px-2 py-0.5 font-mono text-[11px] font-bold text-amber-400 shadow-inner">
+                            1 🎫
+                          </span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

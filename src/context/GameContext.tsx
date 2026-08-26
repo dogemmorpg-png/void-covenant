@@ -16,6 +16,7 @@ interface GameContextType {
   spendShards: (amount: number) => boolean;
   usePveEnergy: (amount: number) => boolean;
   usePvpEnergy: (amount: number) => boolean;
+  buyPvpTickets: () => Promise<boolean>;
   startBattleOnServer: (battleType: 'campaign' | 'pvp', stageId: string, energyCost: number, opponentPayload?: any) => Promise<boolean>;
   buyDarkShardsWithSOL: (solAmount: number) => Promise<boolean>;
   verifySolanaPayment: (signature: string, packageId: string) => Promise<{ success: boolean; message: string }>;
@@ -175,6 +176,7 @@ const createDefaultProfile = (): PlayerProfile => {
   pveEnergyMax: 10,
   pvpEnergy: 5,
   pvpEnergyMax: 5,
+  pvpTickets: 5,
   lastEnergyRefill: Date.now(),
   lastPveEnergyRefill: Date.now(),
   lastPvpEnergyRefill: Date.now(),
@@ -471,19 +473,29 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const usePvpEnergy = (amount: number): boolean => {
-    if (profileRef.current.pvpEnergy < amount) return false;
+    const currentTickets = profileRef.current.pvpTickets !== undefined ? profileRef.current.pvpTickets : (profileRef.current.pvpEnergy || 0);
+    if (currentTickets < amount) return false;
     setProfile(current => {
-      if (current.pvpEnergy < amount) return current;
-      const wasMax = current.pvpEnergy >= current.pvpEnergyMax;
+      const tickets = current.pvpTickets !== undefined ? current.pvpTickets : (current.pvpEnergy || 0);
+      if (tickets < amount) return current;
       const updated = { 
         ...current, 
-        pvpEnergy: current.pvpEnergy - amount,
-        lastPvpEnergyRefill: wasMax ? Date.now() : (current.lastPvpEnergyRefill ?? current.lastEnergyRefill)
+        pvpTickets: Math.max(0, tickets - amount),
+        pvpEnergy: Math.max(0, tickets - amount)
       };
       saveProfile(updated);
       return updated;
     });
     return true;
+  };
+
+  const buyPvpTickets = async (): Promise<boolean> => {
+    const res = await submitAction('buy_pvp_tickets', {});
+    if (res.success && res.profile) {
+      setProfile(res.profile);
+      saveProfile(res.profile);
+    }
+    return res.success;
   };
 
   // Buy Shards using SOL (Legacy alias)
@@ -922,6 +934,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         spendShards,
         usePveEnergy,
         usePvpEnergy,
+        buyPvpTickets,
         startBattleOnServer,
         buyDarkShardsWithSOL,
         verifySolanaPayment,

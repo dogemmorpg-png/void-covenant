@@ -28,21 +28,13 @@ function calculateEnergy(profile: any): any {
   
   const now = Date.now();
   const pveMax = profile.pveEnergyMax || 10;
-  const pvpMax = profile.pvpEnergyMax || 5;
   
   const lastPve = profile.lastPveEnergyRefill ?? profile.lastEnergyRefill ?? now;
-  const lastPvp = profile.lastPvpEnergyRefill ?? profile.lastEnergyRefill ?? now;
-  
   const pveRegenInterval = 20 * 60 * 1000;
-  const pvpRegenInterval = 15 * 60 * 1000;
-  
   const timePassedPve = Math.max(0, now - lastPve);
-  const timePassedPvp = Math.max(0, now - lastPvp);
   
   let currentPve = profile.pveEnergy !== undefined ? profile.pveEnergy : pveMax;
-  let currentPvp = profile.pvpEnergy !== undefined ? profile.pvpEnergy : pvpMax;
   let newLastPve = lastPve;
-  let newLastPvp = lastPvp;
   
   if (currentPve >= pveMax) {
     newLastPve = now;
@@ -53,21 +45,16 @@ function calculateEnergy(profile: any): any {
     newLastPve = now - (timePassedPve % pveRegenInterval);
   }
   
-  if (currentPvp >= pvpMax) {
-    newLastPvp = now;
-    currentPvp = pvpMax;
-  } else if (timePassedPvp >= pvpRegenInterval) {
-    const gained = Math.floor(timePassedPvp / pvpRegenInterval);
-    currentPvp = Math.min(pvpMax, currentPvp + gained);
-    newLastPvp = now - (timePassedPvp % pvpRegenInterval);
+  if (profile.pvpTickets === undefined) {
+    profile.pvpTickets = profile.pvpEnergy !== undefined ? profile.pvpEnergy : 5;
   }
   
   profile.pveEnergy = currentPve;
-  profile.pvpEnergy = currentPvp;
+  profile.pvpEnergy = profile.pvpTickets;
   profile.pveEnergyMax = pveMax;
-  profile.pvpEnergyMax = pvpMax;
+  profile.pvpEnergyMax = 5;
   profile.lastPveEnergyRefill = newLastPve;
-  profile.lastPvpEnergyRefill = newLastPvp;
+  profile.lastPvpEnergyRefill = now;
   
   return profile;
 }

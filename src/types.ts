@@ -72,6 +72,7 @@ export interface PlayerProfile {
   battlePassPoints: number; // xp towards seasonal pass
   battlePassClaimed: number[]; // list of indices of claimed tiers
   referralsCount: number;
+  pvpTickets?: number;
   completedTasks: string[]; // completed social airdrop tasks
   solanaAddress: string | null;
   solBalance: number | null;

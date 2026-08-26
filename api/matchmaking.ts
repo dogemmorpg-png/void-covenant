@@ -88,11 +88,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (spendEnergy) {
-      const currentEnergy = profileData.pvpEnergy || 0;
-      if (currentEnergy < 1) {
-        return res.status(400).json({ error: 'Not enough PvP energy' });
+      const tickets = profileData.pvpTickets !== undefined ? profileData.pvpTickets : (profileData.pvpEnergy || 0);
+      if (tickets < 1) {
+        return res.status(400).json({ error: 'Not enough Arena Tickets' });
       }
-      profileData.pvpEnergy = currentEnergy - 1;
+      profileData.pvpTickets = Math.max(0, tickets - 1);
+      profileData.pvpEnergy = profileData.pvpTickets;
     }
 
     if (spendShards) {
