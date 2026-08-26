@@ -467,7 +467,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               </h2>
             </div>
             <p className="text-xs text-gray-300 font-sans max-w-xl leading-relaxed">
-              Сражайтесь с другими игроками в дуэлях, продвигайтесь по лигам и зарабатывайте ценные награды.
+              Duel other summoners across the realm, climb the PvP leagues, and claim glorious victory rewards.
             </p>
           </div>
 
@@ -527,27 +527,29 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         {/* Left Side: Matchmaking / History */}
         <div className="lg:col-span-2 space-y-6 flex flex-col">
           
-          {/* Section Selector Tabs */}
-          <div className="flex border-b border-gray-900 gap-4 mb-2">
+          {/* Section Selector Tabs (Prominent & styled) */}
+          <div className="flex bg-black/60 p-1.5 rounded-2xl border border-white/10 gap-2 mb-2 w-full shadow-inner">
             <button
               onClick={() => setActiveTab('duels')}
-              className={`pb-2 px-1 text-sm font-display font-bold tracking-widest transition-all cursor-pointer flex items-center gap-2 ${
+              className={`flex-1 py-3 px-6 rounded-xl text-xs font-display font-black tracking-widest transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer uppercase ${
                 activeTab === 'duels'
-                  ? 'text-cyan-400 border-b-2 border-cyan-400 font-black'
-                  : 'text-gray-500 hover:text-gray-300'
+                  ? 'bg-gradient-to-r from-red-950/90 via-rose-900/70 to-red-950/90 border border-rose-500/60 text-white shadow-[0_0_20px_rgba(244,63,94,0.35)] scale-[1.01]'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent'
               }`}
             >
-              <Swords className="w-4 h-4" /> ARENA DUELS
+              <Swords className={`w-4 h-4 ${activeTab === 'duels' ? 'text-rose-400 animate-pulse' : 'text-gray-500'}`} />
+              <span>ARENA DUELS</span>
             </button>
             <button
               onClick={() => setActiveTab('history')}
-              className={`pb-2 px-1 text-sm font-display font-bold tracking-widest transition-all cursor-pointer flex items-center gap-2 ${
+              className={`flex-1 py-3 px-6 rounded-xl text-xs font-display font-black tracking-widest transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer uppercase ${
                 activeTab === 'history'
-                  ? 'text-cyan-400 border-b-2 border-cyan-400 font-black'
-                  : 'text-gray-500 hover:text-gray-300'
+                  ? 'bg-gradient-to-r from-cyan-950/90 via-blue-900/70 to-cyan-950/90 border border-cyan-500/60 text-white shadow-[0_0_20px_rgba(6,182,212,0.35)] scale-[1.01]'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent'
               }`}
             >
-              <History className="w-4 h-4" /> BATTLE HISTORY
+              <History className={`w-4 h-4 ${activeTab === 'history' ? 'text-cyan-400' : 'text-gray-500'}`} />
+              <span>BATTLE HISTORY</span>
             </button>
           </div>
 
@@ -572,31 +574,80 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               {profile.deck.length >= 10 && (
                 <div className="space-y-4">
                   <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest font-bold block border-b border-gray-900 pb-2">CHALLENGE OPPONENT</span>
- 
-                  <div className="bg-[#151a21] border border-gray-900 rounded-xl p-8 flex flex-col items-center justify-center text-center space-y-6 shadow-xl relative overflow-hidden h-[300px]">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 blur-3xl pointer-events-none" />
-                    <div className="w-16 h-16 rounded-full bg-cyan-950/40 border border-cyan-500/35 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.15)]">
-                      <Swords className="w-8 h-8 text-cyan-400" />
-                    </div>
-                    <div className="space-y-2 max-w-sm">
-                      <h3 className="font-display font-bold text-sm text-white tracking-widest uppercase">READY FOR DUEL</h3>
-                      <p className="text-[11px] text-gray-400 font-sans leading-relaxed">
-                        Find an active rival within your MMR bracket. Defeat them to secure victory points.
-                      </p>
-                    </div>
+
+                  <div className="bg-gradient-to-b from-[#181216] via-[#120c11] to-[#0a0709] border border-[#c5a880]/25 rounded-2xl p-6 sm:p-7 flex flex-col justify-between shadow-2xl relative overflow-hidden space-y-6 min-h-[380px]">
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-rose-500/10 blur-3xl pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-500/5 blur-3xl pointer-events-none" />
                     
-                    <div className="flex flex-col items-center gap-2">
+                    {/* Header with Emblem & League info */}
+                    <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left relative z-10">
+                      <div className="w-20 h-20 rounded-2xl bg-black/60 border border-rose-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.25)] shrink-0 overflow-hidden group">
+                        <img src="/icons/arena_duel_emblem.png" alt="Arena Sigil" className="w-16 h-16 object-contain group-hover:scale-110 transition-transform duration-300" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <h3 className="font-display font-black text-lg text-white tracking-widest uppercase text-shadow-gold">
+                          READY FOR RANKED DUEL
+                        </h3>
+                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                          <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider">MATCHMAKING POOL:</span>
+                          <span className={`px-2.5 py-0.5 border rounded-full text-[9px] font-display font-black uppercase tracking-widest inline-flex items-center gap-1 ${league.color} ${league.glow}`}>
+                            <img src={league.icon} alt="Crest" className="w-3 h-3 object-contain" />
+                            {league.name} Tier
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Guaranteed Victory Rewards (PvE Campaign style) */}
+                    <div className="space-y-2.5 relative z-10">
+                      <span className="text-xs font-display text-[#ebd09b] tracking-wider uppercase font-bold block">
+                        VICTORY REWARDS
+                      </span>
+                      <div className="grid grid-cols-3 gap-3">
+                        {/* Gold Reward Card */}
+                        <div className="bg-gradient-to-b from-[#1b150d] via-[#100c07] to-[#070503] border border-amber-500/25 hover:border-amber-400/50 p-3 rounded-2xl text-center shadow-md transition-all duration-300 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)] flex flex-col items-center justify-center min-h-[85px] group cursor-default">
+                          <span className="text-amber-400 font-display font-bold text-base block flex items-center gap-1.5 justify-center text-shadow-gold">
+                            +{300 + Math.floor((profile.pvpLP || 0) / 4)}
+                            <img src="/icons/icon_gold.webp" alt="Gold" className="w-6 h-6 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.45)] group-hover:scale-110 transition-transform duration-300" />
+                          </span>
+                          <span className="text-[9px] text-amber-500/80 font-mono tracking-widest uppercase font-bold mt-1.5 group-hover:text-amber-400 transition-colors">Gold</span>
+                        </div>
+                        
+                        {/* Crowns Rating Card */}
+                        <div className="bg-gradient-to-b from-[#1e1309] via-[#120b05] to-[#070402] border border-amber-400/35 hover:border-amber-300/60 p-3 rounded-2xl text-center shadow-md transition-all duration-300 hover:shadow-[0_0_20px_rgba(251,191,36,0.2)] flex flex-col items-center justify-center min-h-[85px] group cursor-default">
+                          <span className="text-amber-300 font-display font-bold text-base block flex items-center gap-1.5 justify-center text-shadow-gold">
+                            +25..35
+                            <img src="/icons/crown.png" alt="Crowns" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(251,191,36,0.5)] group-hover:scale-110 transition-transform duration-300" />
+                          </span>
+                          <span className="text-[9px] text-amber-400/80 font-mono tracking-widest uppercase font-bold mt-1.5 group-hover:text-amber-300 transition-colors">Crowns</span>
+                        </div>
+
+                        {/* Dust Reward Card */}
+                        <div className="bg-gradient-to-b from-[#0b1a1f] via-[#050f12] to-[#020709] border border-cyan-500/25 hover:border-cyan-400/50 p-3 rounded-2xl text-center shadow-md transition-all duration-300 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] flex flex-col items-center justify-center min-h-[85px] group cursor-default">
+                          <span className="text-cyan-400 font-display font-bold text-base block flex items-center gap-1.5 justify-center text-shadow-cyan">
+                            +{30 + Math.floor((profile.pvpLP || 0) / 20)}
+                            <img src="/icons/icon_dust.webp" alt="Dust" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(102,252,241,0.55)] group-hover:scale-110 transition-transform duration-300" />
+                          </span>
+                          <span className="text-[9px] text-cyan-400/80 font-mono tracking-widest uppercase font-bold mt-1.5 group-hover:text-cyan-300 transition-colors">Dust</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Battle Action Button Area (PvE Campaign Style with large ticket price) */}
+                    <div className="pt-2 relative z-10 flex flex-col items-center">
                       <button
                         onClick={() => handleFindOpponent(false, true)}
-                        className="py-3 px-8 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-3 cursor-pointer border bg-gradient-to-r from-cyan-900 to-indigo-900 border-cyan-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+                        className="w-full max-w-lg font-display font-black tracking-widest py-4 px-8 rounded-xl transition-all duration-300 flex items-center justify-center gap-4 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase bg-gradient-to-b from-[#2f1116] via-[#1c080b] to-[#100305] border-2 border-rose-600/50 hover:border-rose-400 text-rose-200 hover:text-white shadow-[0_0_15px_rgba(225,29,72,0.2)] hover:shadow-[0_0_25px_rgba(244,63,94,0.4)]"
                       >
-                        <Search className="w-4 h-4 shrink-0" />
-                        <span className="mr-0.5">FIND OPPONENT</span>
-                        <span className="flex items-center gap-1 bg-black/50 border border-cyan-500/30 rounded-full px-2.5 py-0.5 font-mono text-[11px] font-bold text-amber-400 shadow-inner">
-                          1 <img src="/icons/ticket.png" alt="Ticket" className="w-3.5 h-3.5 object-contain drop-shadow-[0_0_4px_rgba(255,40,60,0.5)]" />
+                        <Swords className="w-5 h-5 animate-pulse text-rose-400 shrink-0" />
+                        <span className="mr-0.5 text-sm sm:text-base tracking-wider">FIND OPPONENT</span>
+                        <span className="flex items-center gap-1.5 bg-black/60 border border-rose-500/40 rounded-full px-3.5 py-1 font-mono text-base font-bold text-rose-400 shadow-inner">
+                          1
+                          <img src="/icons/ticket.png" alt="Ticket" className="w-6 h-6 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(255,40,60,0.55)]" />
                         </span>
                       </button>
                     </div>
+
                   </div>
                 </div>
               )}
