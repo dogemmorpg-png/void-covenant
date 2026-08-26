@@ -564,7 +564,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   </div>
                   <div className="flex flex-col items-center gap-1.5 min-w-[100px]">
                     <div className="flex items-center gap-1.5 bg-black/40 border border-white/5 px-2.5 py-1.5 rounded-full font-mono text-xs w-full justify-center">
-                      <img src="/icons/ticket.png" alt="Ticket" className="w-5 h-3.5 object-contain" />
+                      <img src="/icons/ticket.png" alt="Ticket" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(255,40,60,0.4)]" />
                       <span className="text-gray-400">Tickets:</span>
                       <span className="text-amber-400 font-bold">{profile.pvpTickets !== undefined ? profile.pvpTickets : profile.pvpEnergy}/5</span>
                     </div>
@@ -603,7 +603,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                         <Search className="w-4 h-4 shrink-0" />
                         <span className="mr-0.5">FIND OPPONENT</span>
                         <span className="flex items-center gap-1 bg-black/50 border border-cyan-500/30 rounded-full px-2.5 py-0.5 font-mono text-[11px] font-bold text-amber-400 shadow-inner">
-                          1 <img src="/icons/ticket.png" alt="Ticket" className="w-3.5 h-3.5 object-contain" />
+                          1 <img src="/icons/ticket.png" alt="Ticket" className="w-3.5 h-3.5 object-contain drop-shadow-[0_0_4px_rgba(255,40,60,0.5)]" />
                         </span>
                       </button>
                     </div>
@@ -775,8 +775,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             </button>
  
             <div className="text-center space-y-1.5">
-              <div className="w-16 h-12 mx-auto rounded-xl bg-amber-950/20 border border-amber-500/30 flex items-center justify-center shadow-lg">
-                <img src="/icons/ticket.png" alt="Ticket" className="w-10 h-7 object-contain" />
+              <div className="w-14 h-14 mx-auto rounded-xl bg-red-950/20 border border-red-500/30 flex items-center justify-center shadow-lg">
+                <img src="/icons/ticket.png" alt="Ticket" className="w-9 h-9 object-contain drop-shadow-[0_0_8px_rgba(255,40,60,0.5)]" />
               </div>
               <h3 className="font-display font-black text-base text-white tracking-widest uppercase">
                 ARENA TICKET OFFICE
@@ -785,7 +785,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                 Exchange Dark Shards to purchase Arena Tickets.
               </p>
             </div>
- 
+
             <div className="bg-black/40 border border-white/5 rounded-xl p-3 flex items-center justify-between font-mono text-xs">
               <span className="text-gray-400">Your Shard Balance:</span>
               <span className="font-bold text-[#ebd09b] flex items-center gap-1.5">
@@ -793,7 +793,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                 <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
               </span>
             </div>
- 
+
             <div className="grid grid-cols-3 gap-3">
               {[
                 { count: 1, cost: 12, label: 'Single Pass' },
@@ -822,7 +822,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                       <span className="font-display font-black text-base text-white">
                         +{pack.count}
                       </span>
-                      <img src="/icons/ticket.png" alt="Ticket" className="w-6.5 h-4.5 object-contain" />
+                      <img src="/icons/ticket.png" alt="Ticket" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(255,40,60,0.4)]" />
                     </div>
                   </div>
  
