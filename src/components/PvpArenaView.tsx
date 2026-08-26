@@ -639,13 +639,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                       </div>
                       
                       <div className="grid grid-cols-2 gap-2">
-                        {/* Crown Loss */}
-                        <div className="bg-black/50 border border-rose-500/25 p-2 rounded-xl text-center flex flex-col items-center justify-center">
-                          <span className="text-rose-400 font-display font-black text-sm block flex items-center gap-1">
+                        {/* Crown Loss (Highlighted with glowing crimson crown) */}
+                        <div className="bg-gradient-to-b from-[#24080b] to-[#100305] border border-rose-500/40 p-2 rounded-xl text-center flex flex-col items-center justify-center shadow-md shadow-rose-950/20 group">
+                          <span className="text-rose-400 font-display font-black text-sm block flex items-center gap-1.5 text-shadow-crimson">
                             -15
-                            <img src="/icons/crown.png" alt="Crowns" className="w-4 h-4 object-contain grayscale opacity-70" />
+                            <img src="/icons/crown.png" alt="Crowns" className="w-5 h-5 object-contain brightness-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.85)] group-hover:scale-110 transition-transform" />
                           </span>
-                          <span className="text-[8px] text-rose-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">Crowns Lost</span>
+                          <span className="text-[8px] text-rose-400/90 font-mono tracking-wider uppercase font-bold mt-0.5">Crowns Lost</span>
                         </div>
 
                         {/* Consolation Gold */}
@@ -710,7 +710,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                     const lpChange = record.isDefense 
                       ? (record.defenderLPChange !== undefined ? record.defenderLPChange : record.defenderRatingChange)
                       : (record.attackerLPChange !== undefined ? record.attackerLPChange : record.attackerRatingChange);
-                    const dateStr = new Date(record.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    const dateStr = new Date(record.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                     
                     const beforeLP = record.isDefense 
                       ? (record.defenderLPBefore !== undefined ? record.defenderLPBefore : record.defenderRatingBefore) 
@@ -774,8 +774,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                               alt="Crown" 
                               className={`w-5 h-5 object-contain ${
                                 lpChange >= 0 
-                                  ? 'brightness-110 drop-shadow-[0_0_8px_rgba(251,191,36,0.85)]' 
-                                  : 'grayscale opacity-70'
+                                  ? 'brightness-115 drop-shadow-[0_0_8px_rgba(251,191,36,0.9)]' 
+                                  : 'brightness-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.85)]'
                               }`} 
                             />
                           </div>
@@ -783,7 +783,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                           <div className="bg-black/60 border border-white/10 px-2.5 py-0.5 rounded-lg font-mono text-[10px] text-gray-400 inline-flex items-center gap-1.5 shadow-inner">
                             <span>{beforeLP}</span>
                             <span className="text-gray-600">→</span>
-                            <span className={lpChange >= 0 ? 'text-amber-400 font-bold' : 'text-gray-300'}>{afterLP}</span>
+                            <span className={lpChange >= 0 ? 'text-amber-400 font-bold' : 'text-rose-400 font-bold'}>{afterLP}</span>
                           </div>
                         </div>
                       </div>
