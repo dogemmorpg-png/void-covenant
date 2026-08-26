@@ -406,8 +406,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               </div>
 
               {/* Crowns */}
-              <div className="bg-black/50 border border-gray-950 px-4 py-2 rounded-xl flex items-center gap-1.5 text-xs font-mono font-bold text-[#ebd09b]">
-                <img src="/icons/crown.png" alt="Crown" className="w-4 h-4 object-contain" />
+              <div className="bg-black/50 border border-gray-950 px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-mono font-bold text-[#ebd09b]">
+                <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain" />
                 <span>{activeOpponent.lp !== undefined ? activeOpponent.lp : (activeOpponent.rating || 0)}</span>
               </div>
 
@@ -481,8 +481,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             {/* Crowns */}
             <div className="text-center px-4 border-b sm:border-b-0 sm:border-r border-white/5 pb-2 sm:pb-0 w-full sm:w-auto">
               <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold">YOUR CROWNS</span>
-              <div className="font-mono text-2xl font-black text-amber-400 flex items-center justify-center gap-1.5 mt-0.5">
-                <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain" />
+              <div className="font-mono text-2xl font-black text-amber-400 flex items-center justify-center gap-2 mt-0.5">
+                <img src="/icons/crown.png" alt="Crown" className="w-6 h-6 object-contain" />
                 {profile.pvpLP || 0}
               </div>
             </div>
@@ -562,15 +562,15 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                       <span className="text-[10px] text-gray-500 font-mono block">Equipped items, stances, and fusions are synced.</span>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <div className="flex items-center gap-1.5 bg-black/40 border border-white/5 px-3 py-1 rounded-full font-mono text-xs">
-                      <img src="/icons/ticket.png" alt="Ticket" className="w-3.5 h-3.5 object-contain" />
+                  <div className="flex flex-col items-center gap-1.5 min-w-[100px]">
+                    <div className="flex items-center gap-1.5 bg-black/40 border border-white/5 px-2.5 py-1.5 rounded-full font-mono text-xs w-full justify-center">
+                      <img src="/icons/ticket.png" alt="Ticket" className="w-5 h-3.5 object-contain" />
                       <span className="text-gray-400">Tickets:</span>
                       <span className="text-amber-400 font-bold">{profile.pvpTickets !== undefined ? profile.pvpTickets : profile.pvpEnergy}/5</span>
                     </div>
                     <button
                       onClick={() => setIsBuyTicketsModalOpen(true)}
-                      className="text-[9px] font-display font-bold uppercase tracking-wider text-[#ebd09b] hover:text-white underline cursor-pointer hover:scale-105 active:scale-95 transition-all mr-1"
+                      className="w-full py-1 px-2.5 rounded-lg bg-gradient-to-r from-amber-600/15 to-yellow-600/15 hover:from-amber-600/35 hover:to-yellow-600/35 border border-amber-500/35 hover:border-amber-400 text-[9px] font-display font-black uppercase tracking-wider text-[#ebd09b] hover:text-white cursor-pointer transition-all shadow-[0_0_10px_rgba(245,158,11,0.05)] hover:scale-[1.03] active:scale-[0.97]"
                     >
                       + BUY TICKETS
                     </button>
@@ -742,9 +742,9 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                         </span>
                         <span className="truncate max-w-[120px]">{player.username}</span>
                       </div>
-                      <span className={`font-bold flex items-center gap-1 ${isSelf ? 'text-cyan-400' : 'text-amber-500'}`}>
+                      <span className={`font-bold flex items-center gap-1.5 ${isSelf ? 'text-cyan-400' : 'text-amber-500'}`}>
                         {player.pvpLP !== undefined ? player.pvpLP : (player.pvpRating || 0)}
-                        <img src="/icons/crown.png" alt="Crown" className="w-3.5 h-3.5 object-contain" />
+                        <img src="/icons/crown.png" alt="Crown" className="w-4.5 h-4.5 object-contain" />
                       </span>
                     </div>
                   );
@@ -775,8 +775,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             </button>
  
             <div className="text-center space-y-1.5">
-              <div className="w-12 h-12 mx-auto rounded-full bg-amber-950/20 border border-amber-500/35 flex items-center justify-center shadow-lg">
-                <img src="/icons/ticket.png" alt="Ticket" className="w-7 h-7 object-contain" />
+              <div className="w-16 h-12 mx-auto rounded-xl bg-amber-950/20 border border-amber-500/30 flex items-center justify-center shadow-lg">
+                <img src="/icons/ticket.png" alt="Ticket" className="w-10 h-7 object-contain" />
               </div>
               <h3 className="font-display font-black text-base text-white tracking-widest uppercase">
                 ARENA TICKET OFFICE
@@ -800,44 +800,59 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                 { count: 5, cost: 50, label: 'Challenger Pack', popular: true },
                 { count: 10, cost: 90, label: 'Gladiator Bundle' }
               ].map((pack) => (
-                <button
+                <div
                   key={pack.count}
-                  onClick={async () => {
-                    if ((profile.darkShards || 0) < pack.cost) {
-                      toast('Insufficient Dark Shards for this package!', 'warning');
-                      return;
-                    }
-                    const ok = await buyPvpTickets(pack.count);
-                    if (ok) {
-                      toast(`Successfully purchased ${pack.count} Tickets!`, 'success');
-                    } else {
-                      toast('Transaction failed.', 'error');
-                    }
-                  }}
-                  className={`relative p-3 py-4 rounded-xl border flex flex-col items-center justify-between text-center gap-2 cursor-pointer transition-all hover:scale-[1.03] active:scale-[0.97] ${
+                  className={`relative p-3 py-4 rounded-xl border flex flex-col items-center justify-between text-center gap-3 bg-black/45 ${
                     pack.popular 
-                      ? 'border-amber-500/50 bg-amber-950/20 shadow-md shadow-amber-500/5' 
-                      : 'border-gray-900 bg-black/30 hover:border-gray-800 text-gray-300 hover:text-white'
+                      ? 'border-amber-500/40 shadow-lg shadow-amber-500/5' 
+                      : 'border-white/5'
                   }`}
                 >
                   {pack.popular && (
-                    <span className="absolute -top-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-display font-black text-[7px] px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    <span className="absolute -top-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-display font-black text-[7px] px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-md">
                       Best Value
                     </span>
                   )}
-                  <span className="text-[9px] text-gray-500 font-mono uppercase tracking-tight block">
-                    {pack.label}
-                  </span>
-                  <div className="flex items-center justify-center gap-1">
-                    <span className="font-display font-black text-lg">
-                      +{pack.count}
+                  
+                  <div className="space-y-0.5">
+                    <span className="text-[8px] text-gray-500 font-mono uppercase tracking-tight block">
+                      {pack.label}
                     </span>
-                    <img src="/icons/ticket.png" alt="Ticket" className="w-5 h-5 object-contain" />
+                    <div className="flex items-center justify-center gap-1.5 pt-1">
+                      <span className="font-display font-black text-base text-white">
+                        +{pack.count}
+                      </span>
+                      <img src="/icons/ticket.png" alt="Ticket" className="w-6.5 h-4.5 object-contain" />
+                    </div>
                   </div>
-                  <div className="bg-black/50 border border-white/5 w-full py-1 rounded-lg flex items-center justify-center gap-1 font-mono text-[10px] font-bold text-amber-400">
-                    {pack.cost} 🧬
+ 
+                  <div className="bg-black/50 border border-white/5 w-full py-1.5 rounded-lg flex items-center justify-center gap-1 font-mono text-[9px] font-bold text-amber-400">
+                    <span>{pack.cost}</span>
+                    <img src="/icons/icon_shards.webp" alt="Shards" className="w-3 h-3 object-contain" />
                   </div>
-                </button>
+ 
+                  <button
+                    onClick={async () => {
+                      if ((profile.darkShards || 0) < pack.cost) {
+                        toast('Insufficient Dark Shards for this package!', 'warning');
+                        return;
+                      }
+                      const ok = await buyPvpTickets(pack.count);
+                      if (ok) {
+                        toast(`Successfully purchased ${pack.count} Tickets!`, 'success');
+                      } else {
+                        toast('Transaction failed.', 'error');
+                      }
+                    }}
+                    className={`w-full py-1.5 rounded-lg font-display font-black tracking-wider text-[9px] cursor-pointer transition-all hover:scale-105 active:scale-95 border ${
+                      pack.popular
+                        ? 'bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 border-amber-400 text-black'
+                        : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-700 text-gray-200 hover:text-white'
+                    }`}
+                  >
+                    BUY
+                  </button>
+                </div>
               ))}
             </div>
  
