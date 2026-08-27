@@ -2045,27 +2045,29 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
       </div>
 
-            {/* WIN POPUP MODAL */}
+      {/* VICTORY POPUP MODAL */}
       {battle.phase === 'player_won' && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-md">
-          <div className="bg-gradient-to-b from-[#11161d] via-[#090d12] to-[#040608] border-2 border-[#ebd09b]/35 rounded-3xl p-8 max-w-md w-full text-center space-y-5 shadow-2xl gothic-glow-gold relative overflow-hidden">
+        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-md animate-fade-in">
+          <div className="bg-gradient-to-b from-[#18140f] via-[#0d0a08] to-[#050403] border-2 border-amber-500/50 rounded-3xl p-7 max-w-md w-full text-center space-y-6 shadow-[0_0_50px_rgba(245,158,11,0.25)] relative overflow-hidden">
             
-            {/* Decorative corners */}
-            <div className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-[#ebd09b]/35 pointer-events-none" />
-            <div className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-[#ebd09b]/35 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 border-[#ebd09b]/35 pointer-events-none" />
-            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-[#ebd09b]/35 pointer-events-none" />
+            {/* Ambient Background Flare */}
+            <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 bg-amber-500/15 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-64 h-64 bg-yellow-500/10 blur-3xl pointer-events-none" />
 
-            <div className="w-16 h-16 bg-black/80 border-2 border-[#ebd09b]/40 rounded-full mx-auto flex items-center justify-center shadow-lg">
-              <Swords className="w-8 h-8 text-[#ebd09b] drop-shadow-[0_0_8px_rgba(235,208,155,0.75)] animate-pulse" />
+            {/* Glowing Victory Crest */}
+            <div className="relative mx-auto w-20 h-20 flex items-center justify-center">
+              <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-md animate-pulse" />
+              <div className="w-20 h-20 bg-gradient-to-b from-amber-950 via-black to-black border-2 border-amber-400 rounded-full flex items-center justify-center shadow-[0_0_25px_rgba(245,158,11,0.4)] relative z-10">
+                <Swords className="w-10 h-10 text-amber-300 drop-shadow-[0_0_10px_rgba(245,158,11,0.8)]" />
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <h3 className="font-display font-bold text-2xl text-white tracking-widest text-shadow-gold">
+            <div className="space-y-1.5 relative z-10">
+              <h3 className="font-display font-black text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-300 to-yellow-500 tracking-widest uppercase text-shadow-gold">
                 {battleType === 'pvp' ? 'ARENA TRIUMPH!' : 'COVENANT VICTORY!'}
               </h3>
               <p className="text-xs text-gray-300 font-sans leading-relaxed px-4">
-                {battleType === 'pvp' ? 'You defeated the enemy summoner and earned glory.' : 'You defeated the abyssal lord and cleansed the cursed lands.'}
+                {battleType === 'pvp' ? 'You vanquished the opposing summoner and claimed arena crowns.' : 'You defeated the abyssal lord and cleansed the cursed lands.'}
               </p>
             </div>
 
@@ -2074,36 +2076,36 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               const hpPercentage = battle.playerHeroHealth / battle.playerHeroMaxHealth;
               const earnedStars = hpPercentage === 1 ? 3 : hpPercentage >= 0.5 ? 2 : 1;
               return (
-                <div className="bg-black/50 p-4 rounded-2xl border border-gray-800/80">
-                  <span className="text-[10px] font-display text-[#ebd09b] tracking-widest block uppercase font-bold mb-3">STAGE MASTERY</span>
-                  <div className="flex justify-center gap-2 mb-4">
+                <div className="bg-black/60 p-4 rounded-2xl border border-amber-500/20 relative z-10">
+                  <span className="text-[10px] font-display text-amber-400 tracking-widest block uppercase font-bold mb-2.5">STAGE MASTERY</span>
+                  <div className="flex justify-center gap-3 mb-3">
                     {[1, 2, 3].map(s => (
                       <Star 
                         key={s} 
-                        className={`w-7 h-7 transition-all duration-500 ${s <= earnedStars ? 'text-[#ebd09b] fill-[#ebd09b] drop-shadow-[0_0_10px_rgba(235,208,155,0.8)] scale-110' : 'text-gray-800 fill-gray-900'}`} 
+                        className={`w-8 h-8 transition-all duration-500 ${s <= earnedStars ? 'text-amber-400 fill-amber-400 drop-shadow-[0_0_12px_rgba(245,158,11,0.9)] scale-110' : 'text-gray-800 fill-gray-900'}`} 
                       />
                     ))}
                   </div>
                   
-                  <div className="text-[11px] font-sans text-gray-300 space-y-2 bg-black/40 p-3.5 rounded-xl border border-white/5 text-left">
+                  <div className="text-[11px] font-sans text-gray-300 space-y-2 bg-black/50 p-3 rounded-xl border border-white/5 text-left">
                     <div className="flex justify-between items-center py-0.5">
                       <span className="flex items-center gap-1.5">
-                        <Star className={`w-3.5 h-3.5 ${earnedStars >= 1 ? 'text-[#ebd09b] fill-[#ebd09b]' : 'text-gray-700'}`} />
-                        <span className={earnedStars >= 1 ? "text-emerald-450 font-bold" : "text-gray-500"}>1 Star Challenge</span>
+                        <Star className={`w-3.5 h-3.5 ${earnedStars >= 1 ? 'text-amber-400 fill-amber-400' : 'text-gray-700'}`} />
+                        <span className={earnedStars >= 1 ? "text-emerald-400 font-bold" : "text-gray-500"}>1 Star Challenge</span>
                       </span>
-                      <span className={earnedStars >= 1 ? "text-emerald-400/90" : "text-gray-500"}>Clear Stage (Success)</span>
+                      <span className={earnedStars >= 1 ? "text-emerald-400/90" : "text-gray-500"}>Clear Stage</span>
                     </div>
-                    <div className="flex justify-between items-center border-t border-white/5 pt-2 py-0.5">
+                    <div className="flex justify-between items-center border-t border-white/5 pt-1.5 py-0.5">
                       <span className="flex items-center gap-1.5">
-                        <Star className={`w-3.5 h-3.5 ${earnedStars >= 2 ? 'text-[#ebd09b] fill-[#ebd09b]' : 'text-gray-700'}`} />
-                        <span className={earnedStars >= 2 ? "text-emerald-450 font-bold" : "text-gray-500"}>2 Star Challenge</span>
+                        <Star className={`w-3.5 h-3.5 ${earnedStars >= 2 ? 'text-amber-400 fill-amber-400' : 'text-gray-700'}`} />
+                        <span className={earnedStars >= 2 ? "text-emerald-400 font-bold" : "text-gray-500"}>2 Star Challenge</span>
                       </span>
                       <span className={earnedStars >= 2 ? "text-emerald-400/90" : "text-gray-500"}>Keep HP &gt; 50%</span>
                     </div>
-                    <div className="flex justify-between items-center border-t border-white/5 pt-2 py-0.5">
+                    <div className="flex justify-between items-center border-t border-white/5 pt-1.5 py-0.5">
                       <span className="flex items-center gap-1.5">
-                        <Star className={`w-3.5 h-3.5 ${earnedStars === 3 ? 'text-[#ebd09b] fill-[#ebd09b]' : 'text-gray-700'}`} />
-                        <span className={earnedStars === 3 ? "text-emerald-450 font-bold" : "text-gray-500"}>3 Star Challenge</span>
+                        <Star className={`w-3.5 h-3.5 ${earnedStars === 3 ? 'text-amber-400 fill-amber-400' : 'text-gray-700'}`} />
+                        <span className={earnedStars === 3 ? "text-emerald-400 font-bold" : "text-gray-500"}>3 Star Challenge</span>
                       </span>
                       <span className={earnedStars === 3 ? "text-emerald-400/90" : "text-gray-500"}>Keep HP 100%</span>
                     </div>
@@ -2112,63 +2114,63 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               );
             })()}
 
-            {/* Reward list */}
-            <div className="bg-black/50 p-4.5 rounded-2xl border border-gray-800/80 space-y-3">
-              <span className="text-[10px] font-display text-[#ebd09b] tracking-widest block uppercase font-bold">REWARD OBTAINED</span>
-              <div className="grid grid-cols-3 gap-2">
-                <div className="bg-gradient-to-b from-[#1b150d] via-[#100c07] to-[#070503] border border-amber-500/20 px-3 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[76px]">
-                  <span className="text-amber-400 font-display font-bold text-sm flex items-center gap-1 text-shadow-gold">
+            {/* Rewards Card */}
+            <div className="bg-black/60 p-4 rounded-2xl border border-amber-500/25 space-y-3 relative z-10">
+              <span className="text-[10px] font-display text-amber-400/90 tracking-widest block uppercase font-bold">REWARD OBTAINED</span>
+              <div className="grid grid-cols-3 gap-2.5">
+                <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                  <span className="text-amber-300 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
                     +{stage.goldReward}
-                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 object-contain drop-shadow-[0_0_4px_rgba(245,158,11,0.4)]" />
+                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.5)]" />
                   </span>
-                  <span className="text-[9px] text-amber-500/70 font-mono uppercase tracking-wider mt-1.5">Gold</span>
+                  <span className="text-[9px] text-amber-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Gold</span>
                 </div>
                 
-                <div className="bg-gradient-to-b from-[#0b1a1f] via-[#050f12] to-[#020709] border border-cyan-500/20 px-3 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[76px]">
-                  <span className="text-cyan-400 font-display font-bold text-sm flex items-center gap-1 text-shadow-cyan">
+                <div className="bg-gradient-to-b from-cyan-950/40 via-black to-black border border-cyan-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                  <span className="text-cyan-300 font-display font-black text-base flex items-center gap-1 text-shadow-cyan">
                     +{stage.dustReward}
-                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-5.5 h-5.5 object-contain drop-shadow-[0_0_6px_rgba(102,252,241,0.5)]" />
+                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-5.5 h-5.5 object-contain drop-shadow-[0_0_8px_rgba(102,252,241,0.6)]" />
                   </span>
-                  <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider mt-1.5">Dust</span>
+                  <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Dust</span>
                 </div>
 
                 {battleType === 'campaign' && (
-                  <div className="bg-gradient-to-b from-[#0c1a12] via-[#050f0a] to-[#020704] border border-emerald-500/20 px-3 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[76px]">
-                    <span className="text-emerald-400 font-display font-bold text-sm flex items-center gap-1 text-shadow-emerald">
+                  <div className="bg-gradient-to-b from-emerald-950/40 via-black to-black border border-emerald-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                    <span className="text-emerald-300 font-display font-black text-base flex items-center gap-1 text-shadow-emerald">
                       +50
-                      <span className="text-sm drop-shadow-[0_0_4px_rgba(52,211,153,0.5)]">✨</span>
+                      <span className="text-sm drop-shadow-[0_0_6px_rgba(52,211,153,0.6)]">✨</span>
                     </span>
-                    <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider mt-1.5">EXP</span>
+                    <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider mt-1 font-bold">EXP</span>
                   </div>
                 )}
                 
                 {battleType === 'pvp' && (
-                  <div className="bg-gradient-to-b from-[#1c140c] via-[#0f0a07] to-[#070503] border border-amber-500/20 px-3 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[76px]">
-                    <span className="text-amber-400 font-display font-bold text-sm flex items-center gap-1.5 text-shadow-gold">
+                  <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/40 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.15)]">
+                    <span className="text-amber-300 font-display font-black text-base flex items-center gap-1.5 text-shadow-gold">
                       +20
-                      <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain" />
+                      <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain brightness-110 contrast-125" />
                     </span>
-                    <span className="text-[9px] text-amber-500/70 font-mono uppercase tracking-wider mt-1.5">Crowns</span>
+                    <span className="text-[9px] text-amber-400/80 font-mono uppercase tracking-wider mt-1 font-bold">Crowns</span>
                   </div>
                 )}
 
                 {battleType === 'campaign' && stage.shardsReward > 0 && (
-                  <div className="bg-gradient-to-b from-[#1e0b0d] via-[#120507] to-[#090203] border border-red-500/20 px-3 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[76px]">
-                    <span className="text-red-500 font-display font-bold text-sm flex items-center gap-1 text-shadow-crimson">
+                  <div className="bg-gradient-to-b from-rose-950/40 via-black to-black border border-rose-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                    <span className="text-rose-400 font-display font-black text-base flex items-center gap-1 text-shadow-crimson">
                       +{stage.shardsReward}
-                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-5 h-5 object-contain drop-shadow-[0_0_4px_rgba(239,68,68,0.4)]" />
+                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.5)]" />
                     </span>
-                    <span className="text-[9px] text-red-500/70 font-mono uppercase tracking-wider mt-1.5">Shards</span>
+                    <span className="text-[9px] text-rose-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Shards</span>
                   </div>
                 )}
 
                 {battleType === 'campaign' && stage.cardReward && (
-                  <div className="bg-gradient-to-b from-[#0c1a12] via-[#050f0a] to-[#020704] border border-emerald-500/20 px-4 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center w-full col-span-3 mt-1.5">
-                    <span className="text-emerald-400 font-display font-bold text-sm flex items-center gap-1.5 text-shadow-emerald">
+                  <div className="bg-gradient-to-b from-emerald-950/40 via-black to-black border border-emerald-500/30 px-4 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center w-full col-span-3 mt-1">
+                    <span className="text-emerald-300 font-display font-black text-sm flex items-center gap-1.5 text-shadow-emerald">
                       {stage.cardReward.name}
-                      <span className="text-sm drop-shadow-[0_0_4px_rgba(52,211,153,0.5)]">🎴</span>
+                      <span className="text-sm drop-shadow-[0_0_6px_rgba(52,211,153,0.6)]">🎴</span>
                     </span>
-                    <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider mt-1">Guaranteed Card</span>
+                    <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider mt-0.5 font-bold">Guaranteed Card</span>
                   </div>
                 )}
               </div>
@@ -2176,7 +2178,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
             <button
               onClick={() => onExitBattle(true)}
-              className="w-full bg-gradient-to-b from-[#221a12] via-[#150f0a] to-[#0c0805] border-2 border-[#c5a880]/50 hover:border-[#ebd09b] text-[#ebd09b] hover:text-white font-display font-bold tracking-widest py-3.5 px-6 rounded-xl transition-all duration-300 shadow-lg text-xs hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-[0_0_15px_rgba(197,168,128,0.15)] hover:shadow-[0_0_25px_rgba(235,208,155,0.35)]"
+              className="w-full bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:to-yellow-400 text-black font-display font-black tracking-widest py-4 px-6 rounded-2xl shadow-[0_0_25px_rgba(245,158,11,0.4)] hover:shadow-[0_0_35px_rgba(245,158,11,0.7)] text-xs uppercase transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer relative z-10"
             >
               CLAIM LOOT AND EXIT
             </button>
@@ -2186,44 +2188,48 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
       {/* LOST POPUP MODAL */}
       {battle.phase === 'player_lost' && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-md">
-          <div className="bg-gradient-to-b from-[#1c080a] via-[#0e0304] to-[#050102] border-2 border-[#dd2c40]/35 rounded-3xl p-8 max-w-md w-full text-center space-y-5 shadow-2xl gothic-glow-crimson relative overflow-hidden">
+        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-md animate-fade-in">
+          <div className="bg-gradient-to-b from-[#1c080a] via-[#0e0304] to-[#050102] border-2 border-rose-600/50 rounded-3xl p-7 max-w-md w-full text-center space-y-6 shadow-[0_0_50px_rgba(225,29,72,0.25)] relative overflow-hidden">
             
-            {/* Decorative corners */}
-            <div className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-[#dd2c40]/35 pointer-events-none" />
-            <div className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-[#dd2c40]/35 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 border-[#dd2c40]/35 pointer-events-none" />
-            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-[#dd2c40]/35 pointer-events-none" />
+            {/* Ambient Background Flare */}
+            <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 bg-rose-600/15 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-64 h-64 bg-red-600/10 blur-3xl pointer-events-none" />
 
-            <div className="w-16 h-16 bg-black/85 border-2 border-[#dd2c40]/55 rounded-full mx-auto flex items-center justify-center shadow-lg">
-              <Skull className="w-8 h-8 text-[#dd2c40] drop-shadow-[0_0_8px_rgba(221,44,64,0.75)] animate-pulse" />
+            {/* Glowing Defeat Skull */}
+            <div className="relative mx-auto w-20 h-20 flex items-center justify-center">
+              <div className="absolute inset-0 bg-rose-600/20 rounded-full blur-md animate-pulse" />
+              <div className="w-20 h-20 bg-gradient-to-b from-red-950 via-black to-black border-2 border-rose-500 rounded-full flex items-center justify-center shadow-[0_0_25px_rgba(225,29,72,0.4)] relative z-10">
+                <Skull className="w-10 h-10 text-rose-500 drop-shadow-[0_0_10px_rgba(225,29,72,0.8)] animate-pulse" />
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <h3 className="font-display font-bold text-2xl text-[#dd2c40] tracking-widest text-shadow-crimson">YOU ARE DEFEATED</h3>
+            <div className="space-y-1.5 relative z-10">
+              <h3 className="font-display font-black text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-b from-rose-100 via-rose-500 to-red-600 tracking-widest uppercase text-shadow-crimson">
+                {battleType === 'pvp' ? 'DEFEATED IN DUEL' : 'YOU ARE DEFEATED'}
+              </h3>
               <p className="text-xs text-gray-300 font-sans leading-relaxed px-4">
-                {battleType === 'pvp' ? 'Your opponent was stronger in this duel. Adjust your deck and take revenge!' : 'Darkness consumed your mind. Upgrade cards and try again.'}
+                {battleType === 'pvp' ? 'Your opponent proved stronger in this clash. Refine your deck tactics and take revenge!' : 'Darkness consumed your mind. Upgrade cards and try again.'}
               </p>
             </div>
 
-            <div className="bg-black/50 p-4 rounded-2xl border border-gray-800/80 space-y-3">
-              <span className="text-[10px] font-display text-red-500/80 tracking-widest block uppercase font-bold">BATTLE CONSEQUENCES</span>
+            <div className="bg-black/60 p-4 rounded-2xl border border-rose-500/25 space-y-3 relative z-10">
+              <span className="text-[10px] font-display text-rose-400/90 tracking-widest block uppercase font-bold">BATTLE CONSEQUENCES</span>
               <div className="flex justify-center items-center gap-3">
-                <div className="bg-gradient-to-b from-[#1b150d] via-[#100c07] to-[#070503] border border-amber-500/20 px-4 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[84px]">
-                  <span className="text-amber-500 font-display font-bold text-sm flex items-center gap-1 text-shadow-gold">
+                <div className="bg-gradient-to-b from-amber-950/30 via-black to-black border border-amber-500/30 px-4 py-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[90px]">
+                  <span className="text-amber-400 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
                     +20
-                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 object-contain drop-shadow-[0_0_4px_rgba(245,158,11,0.4)]" />
+                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 object-contain drop-shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
                   </span>
-                  <span className="text-[9px] text-amber-500/70 font-mono uppercase tracking-wider mt-1.5">Gold</span>
+                  <span className="text-[9px] text-amber-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Consolation</span>
                 </div>
                 
                 {battleType === 'pvp' && (
-                  <div className="bg-gradient-to-b from-[#1e0b0d] via-[#120507] to-[#090203] border border-red-500/20 px-4 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[84px]">
-                    <span className="text-red-500 font-display font-bold text-sm flex items-center gap-1.5 text-shadow-crimson">
+                  <div className="bg-gradient-to-b from-rose-950/40 via-black to-black border border-rose-500/40 px-4 py-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[90px]">
+                    <span className="text-rose-400 font-display font-black text-base flex items-center gap-1.5 text-shadow-crimson">
                       -15
-                      <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain" />
+                      <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain brightness-110 contrast-125" />
                     </span>
-                    <span className="text-[9px] text-red-500/70 font-mono uppercase tracking-wider mt-1.5">Crowns</span>
+                    <span className="text-[9px] text-rose-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Crowns</span>
                   </div>
                 )}
               </div>
@@ -2231,7 +2237,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
             <button
               onClick={() => onExitBattle(false)}
-              className="w-full bg-gradient-to-b from-[#3a0b12] via-[#200508] to-[#140204] border-2 border-red-600/50 hover:border-red-500 text-red-400 hover:text-white font-display font-bold tracking-widest py-3.5 px-6 rounded-xl transition-all duration-300 shadow-lg text-xs hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-[0_0_15px_rgba(220,38,38,0.15)] hover:shadow-[0_0_25px_rgba(239,68,68,0.35)]"
+              className="w-full bg-gradient-to-r from-red-950 via-rose-900 to-red-950 border-2 border-rose-600/70 hover:border-rose-400 text-white font-display font-black tracking-widest py-4 px-6 rounded-2xl shadow-[0_0_20px_rgba(225,29,72,0.3)] hover:shadow-[0_0_30px_rgba(225,29,72,0.5)] text-xs uppercase transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer relative z-10"
             >
               {battleType === 'pvp' ? 'RETURN TO ARENA' : 'RETURN TO CAMPAIGN'}
             </button>

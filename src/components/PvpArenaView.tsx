@@ -468,13 +468,23 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                 </div>
               </div>
 
-              {/* Combat Stance Box */}
-              <div className="w-full bg-black/40 border border-white/5 rounded-xl p-2.5 flex items-center justify-between text-xs font-mono">
-                <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Combat Stance</span>
-                <span className="px-2.5 py-0.5 bg-cyan-950/60 border border-cyan-500/40 rounded-lg text-[11px] font-bold text-cyan-300 uppercase tracking-wide">
-                  {activeOpponent.stance === 'void_strike' ? 'Void Strike ⚡' : 
-                   activeOpponent.stance === 'blood_aura' ? 'Blood Aura 🩸' : 
-                   activeOpponent.stance === 'warlord_cry' ? "Warlord's Cry 🔊" : 'Void Strike ⚡'}
+              {/* Combat Stance / Speciality */}
+              <div className="w-full bg-gradient-to-r from-cyan-950/30 via-slate-900/60 to-cyan-950/30 border border-cyan-500/30 rounded-xl py-2 px-3 flex items-center justify-center gap-2.5 shadow-inner">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-cyan-400/80 font-bold">STANCE:</span>
+                <span className="font-display font-black text-xs uppercase tracking-wider text-cyan-200 flex items-center gap-1.5">
+                  {activeOpponent.stance === 'blood_aura' ? (
+                    <>
+                      <span className="text-rose-400 text-sm">🩸</span> Blood Aura
+                    </>
+                  ) : activeOpponent.stance === 'warlord_cry' ? (
+                    <>
+                      <span className="text-amber-400 text-sm">🔊</span> Warlord's Cry
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-cyan-400 text-sm">⚡</span> Void Strike
+                    </>
+                  )}
                 </span>
               </div>
             </div>
@@ -484,23 +494,23 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               <button
                 disabled={isMatching || (profile.darkShards || 0) < 5}
                 onClick={() => handleFindOpponent(true, false)}
-                className={`py-3 px-3 rounded-xl border font-display font-bold text-xs tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-95 ${
+                className={`py-3.5 px-3 rounded-2xl border-2 font-display font-black text-xs tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95 ${
                   (profile.darkShards || 0) < 5
                     ? 'border-zinc-850 bg-zinc-900/40 text-zinc-600 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-red-950/80 via-[#260c12] to-red-950/80 border-rose-600/50 hover:border-rose-400 text-rose-200 hover:text-white hover:scale-[1.02]'
+                    : 'bg-gradient-to-r from-red-950/90 via-[#260c12] to-red-950/90 border-rose-600/60 hover:border-rose-400 text-rose-100 hover:text-white hover:scale-[1.02]'
                 }`}
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${isMatching ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-4 h-4 shrink-0 ${isMatching ? 'animate-spin' : ''}`} />
                 <span>RE-ROLL</span>
-                <span className="flex items-center gap-1 bg-black/60 border border-rose-500/40 rounded-full px-2 py-0.5 font-mono text-[10px] font-bold text-amber-300 shadow-inner">
+                <span className="flex items-center gap-1 bg-black/70 border border-rose-500/50 rounded-full px-2.5 py-1 font-mono text-sm font-black text-[#ebd09b] shadow-inner ml-0.5">
                   5
-                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.6)]" />
                 </span>
               </button>
               
               <button
                 onClick={() => handleFight(activeOpponent)}
-                className="py-3 px-4 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border-2 bg-gradient-to-r from-emerald-950 via-emerald-800 to-teal-950 border-emerald-500/70 hover:border-emerald-400 text-white hover:scale-[1.02] active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_20px_rgba(16,185,129,0.5)]"
+                className="py-3.5 px-4 rounded-2xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border-2 bg-gradient-to-r from-emerald-950 via-emerald-800 to-teal-950 border-emerald-500/70 hover:border-emerald-400 text-white hover:scale-[1.02] active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_20px_rgba(16,185,129,0.5)]"
               >
                 <Swords className="w-4 h-4 shrink-0 text-emerald-300 animate-pulse" /> FIGHT
               </button>
