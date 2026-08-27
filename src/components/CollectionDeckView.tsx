@@ -599,8 +599,7 @@ export const CollectionDeckView: React.FC = () => {
                       <img 
                         src={getCardImageUrl(card)} 
                         alt={card.name} 
-                        decoding="async" 
-                        className="absolute inset-0 w-full h-full object-cover z-0 opacity-85 group-hover:scale-105 transition-transform duration-200 transform-gpu" 
+                        className="absolute inset-0 w-full h-full object-cover z-0 opacity-85 group-hover:scale-105 transition-transform duration-200" 
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20 z-0 pointer-events-none" />
                       
@@ -640,13 +639,12 @@ export const CollectionDeckView: React.FC = () => {
                   <div
                     key={card.id}
                     onClick={() => setSelectedCardId(card.id)}
-                    className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer overflow-hidden group border transform-gpu ${getCardTierStyles(card.tier, isSelected, true)}`}
+                    className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer overflow-hidden group border ${getCardTierStyles(card.tier, isSelected, true)}`}
                   >
                     <img 
                       src={getCardImageUrl(card)} 
                       alt={card.name} 
-                      decoding="async" 
-                      className="absolute inset-0 w-full h-full object-cover z-0 opacity-85 group-hover:scale-105 transition-transform duration-200 transform-gpu" 
+                      className="absolute inset-0 w-full h-full object-cover z-0 opacity-85 group-hover:scale-105 transition-transform duration-200" 
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 pointer-events-none" />
 

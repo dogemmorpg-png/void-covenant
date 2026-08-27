@@ -218,7 +218,7 @@ function MainAppContent() {
 
           {/* Tab content */}
           <div className="py-6">
-            {activeTab === 'campaign' && (
+            <div className={activeTab === 'campaign' ? 'block' : 'hidden'}>
               <CampaignView onStartBattle={async (stage) => {
                 const success = await startBattleOnServer('campaign', stage.id.toString(), stage.energyCost);
                 if (success) {
@@ -226,30 +226,46 @@ function MainAppContent() {
                   setActiveBattleStage(stage);
                 }
               }} />
-          )}
-          {activeTab === 'pvp' && (
-            <PvpArenaView 
-              onStartBattle={async (stage, type, opponentPayload) => {
-                const success = await startBattleOnServer('pvp', stage.id.toString(), 1, opponentPayload);
-                if (success) {
-                  setActiveBattleType(type);
-                  setActiveBattleStage(stage);
-                  return true;
-                }
-                return false;
-              }}
-              isMatching={isPvpMatching}
-              setIsMatching={setIsPvpMatching}
-              isModalOpen={isPvpModalOpen}
-              setIsModalOpen={setIsPvpModalOpen}
-            />
-          )}
-          {activeTab === 'collection' && <CollectionDeckView />}
-          {activeTab === 'hero' && <HeroInventoryView />}
-          {activeTab === 'talents' && <TalentsView />}
-          {activeTab === 'altar' && <GachaStoreView />}
-          {activeTab === 'airdrop' && <AirdropHubView />}
-        </div>
+            </div>
+
+            <div className={activeTab === 'pvp' ? 'block' : 'hidden'}>
+              <PvpArenaView 
+                onStartBattle={async (stage, type, opponentPayload) => {
+                  const success = await startBattleOnServer('pvp', stage.id.toString(), 1, opponentPayload);
+                  if (success) {
+                    setActiveBattleType(type);
+                    setActiveBattleStage(stage);
+                    return true;
+                  }
+                  return false;
+                }}
+                isMatching={isPvpMatching}
+                setIsMatching={setIsPvpMatching}
+                isModalOpen={isPvpModalOpen}
+                setIsModalOpen={setIsPvpModalOpen}
+              />
+            </div>
+
+            <div className={activeTab === 'collection' ? 'block' : 'hidden'}>
+              <CollectionDeckView />
+            </div>
+
+            <div className={activeTab === 'hero' ? 'block' : 'hidden'}>
+              <HeroInventoryView />
+            </div>
+
+            <div className={activeTab === 'talents' ? 'block' : 'hidden'}>
+              <TalentsView />
+            </div>
+
+            <div className={activeTab === 'altar' ? 'block' : 'hidden'}>
+              <GachaStoreView />
+            </div>
+
+            <div className={activeTab === 'airdrop' ? 'block' : 'hidden'}>
+              <AirdropHubView />
+            </div>
+          </div>
       </div>
 
       {/* Navigation Footer Tab Bar (Mobile responsive and desktop styled) */}
