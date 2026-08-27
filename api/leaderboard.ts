@@ -2,6 +2,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
+import { checkAndPerformPvpRollover } from './_shared/pvpRollover.js';
 
 const jwt = (jwtPkg as any).default || jwtPkg;
 
@@ -34,6 +35,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const supabase = getSupabase();
 
+    // Automatic rollover check: if midnight UTC passed, roll over leagues immediately
+    await checkAndPerformPvpRollover(supabase);
+
     const { league } = req.body || {};
     const authHeader = req.headers.authorization;
     let playerLeague = league || 'Bronze';
@@ -62,6 +66,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data: rows, error } = await supabase
       .from('profiles')
       .select('wallet_address, data')
+      .neq('wallet_address', 'system_pvp_state')
       .limit(200);
 
     if (error) {

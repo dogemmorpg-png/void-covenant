@@ -3,6 +3,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
 import { CARD_TEMPLATES } from './_shared/cards.js';
+import { checkAndPerformPvpRollover } from './_shared/pvpRollover.js';
 
 const jwt = (jwtPkg as any).default || jwtPkg;
 
@@ -52,6 +53,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const supabase = getSupabase();
+
+    // Automatic rollover check: if midnight UTC passed, roll over leagues immediately
+    await checkAndPerformPvpRollover(supabase);
 
     // 1. Fetch current player's rating and profile
     const { data: currentPlayerRow, error: currentPlayerError } = await supabase

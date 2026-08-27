@@ -6,6 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 import { PlayerProfile } from './_shared/types.js';
 import { CARD_TEMPLATES, createCardInstance, generateCampaignStage, AIRDROP_TASKS } from './_shared/cards.js';
 import { calculateEnergy, processExpGain } from './_shared/energyHelper.js';
+import { checkAndPerformPvpRollover } from './_shared/pvpRollover.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
@@ -37,96 +38,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (action === 'pvp_rollover') {
-    const cronSecret = process.env.CRON_SECRET || 'void-covenant-pvp-secret-1337';
-    const authHeader = req.headers.authorization;
-    if (authHeader !== `Bearer ${cronSecret}`) {
-      if (process.env.NODE_ENV === 'production') {
-        return res.status(401).json({ error: 'Unauthorized cron rollover trigger' });
-      }
-    }
-
     try {
       const supabase = getSupabase();
-      const { data: rows, error } = await supabase
-        .from('profiles')
-        .select('wallet_address, data');
-
-      if (error) {
-        console.error('Failed to query profiles:', error);
-        return res.status(500).json({ error: 'Database query failed' });
-      }
-
-      const players = (rows || []).map(r => ({
-        walletAddress: r.wallet_address,
-        profile: r.data || {},
-        originalLeague: r.data?.pvpLeague || 'Bronze'
-      }));
-
-      // Daily reset: grant 5 tickets to all players
-      players.forEach(p => {
-        p.profile.pvpTickets = 5;
-        p.profile.pvpEnergy = 5;
-      });
-
-      const updates: { walletAddress: string; profile: any }[] = [...players];
-      const LEAGUES = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Void Overlord'];
-
-      for (const league of LEAGUES) {
-        const leaguePlayers = players.filter(p => p.originalLeague === league);
-        
-        leaguePlayers.forEach(p => {
-          if (p.profile.pvpLP === undefined) {
-            p.profile.pvpLP = 0;
-          }
-          if (p.profile.pvpRating === undefined) {
-            p.profile.pvpRating = 100;
-          }
-        });
-
-        leaguePlayers.sort((a, b) => (b.profile.pvpLP - a.profile.pvpLP) || (b.profile.pvpRating - a.profile.pvpRating));
-        const leagueIdx = LEAGUES.indexOf(league);
-
-        for (let i = 0; i < leaguePlayers.length; i++) {
-          const p = leaguePlayers[i];
-          const rank = i + 1;
-          let modified = false;
-
-          if (rank <= 20 && leagueIdx < LEAGUES.length - 1) {
-            const nextLeague = LEAGUES[leagueIdx + 1];
-            p.profile.pvpLeague = nextLeague;
-            p.profile.pvpLP = 100;
-            modified = true;
-          }
-          else if (rank > 100 && leagueIdx > 0) {
-            const prevLeague = LEAGUES[leagueIdx - 1];
-            p.profile.pvpLeague = prevLeague;
-            p.profile.pvpLP = 100;
-            modified = true;
-          }
-
-          // League update is applied directly to the player profile object in memory, which is already in the updates array
-        }
-      }
-
-      let updatedCount = 0;
-      for (const update of updates) {
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ data: update.profile, updated_at: new Date().toISOString() })
-          .eq('wallet_address', update.walletAddress);
-
-        if (updateError) {
-          console.error(`Failed to update rollover profile for ${update.walletAddress}:`, updateError);
-        } else {
-          updatedCount++;
-        }
-      }
+      const force = req.query.force === 'true' || req.body?.force === true;
+      const result = await checkAndPerformPvpRollover(supabase, force);
 
       return res.status(200).json({
         success: true,
-        message: 'PvP daily rollover complete',
-        totalChecked: players.length,
-        totalUpdated: updatedCount
+        message: result.rolledOver ? 'PvP daily rollover complete' : `PvP rollover skipped: ${result.reason}`,
+        ...result
       });
 
     } catch (error: any) {
