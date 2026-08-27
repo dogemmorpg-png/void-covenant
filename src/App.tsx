@@ -7,13 +7,13 @@ import { ShardsShopModal } from './components/ShardsShopModal';
 import { CampaignView } from './components/CampaignView';
 import { CollectionDeckView } from './components/CollectionDeckView';
 import { GachaStoreView } from './components/GachaStoreView';
-import { AirdropHubView } from './components/AirdropHubView';
+import { BankView } from './components/BankView';
 import { BattleFieldView } from './components/BattleFieldView';
 import { PvpArenaView } from './components/PvpArenaView';
 import { HeroInventoryView } from './components/HeroInventoryView';
 import { TalentsView } from './components/TalentsView';
 import { CampaignStage } from './types';
-import { Swords, FolderGit, Sparkles, Wallet, Award, Trophy, UserCircle2 } from 'lucide-react';
+import { Swords, FolderGit, Sparkles, Landmark, Award, Trophy, UserCircle2 } from 'lucide-react';
 import { AIRDROP_TASKS } from './data/cards';
 import { LandingPage } from './components/LandingPage';
 import { RegistrationScreen } from './components/RegistrationScreen';
@@ -45,7 +45,7 @@ function MainAppContent() {
   }, [profile?.deck, profile?.collection]);
 
   // Tab states
-  const [activeTab, setActiveTab] = useState<'campaign' | 'pvp' | 'collection' | 'hero' | 'talents' | 'altar' | 'airdrop'>('campaign');
+  const [activeTab, setActiveTab] = useState<'campaign' | 'pvp' | 'collection' | 'hero' | 'talents' | 'altar' | 'bank'>('campaign');
   
   // Active Battle stage state
   const [activeBattleStage, setActiveBattleStage] = useState<CampaignStage | null>(null);
@@ -262,8 +262,8 @@ function MainAppContent() {
               <GachaStoreView />
             </div>
 
-            <div className={activeTab === 'airdrop' ? 'block' : 'hidden'}>
-              <AirdropHubView />
+            <div className={activeTab === 'bank' ? 'block' : 'hidden'}>
+              <BankView />
             </div>
           </div>
       </div>
@@ -333,19 +333,16 @@ function MainAppContent() {
             <span className="text-[10px] font-display font-bold tracking-wider">SUMMON</span>
           </button>
 
-          {/* Airdrop Web3 Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('airdrop'); }}
+          {/* Bank / Treasury Tab */}
+          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('bank'); }}
             className={`relative flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
-              activeTab === 'airdrop'
+              activeTab === 'bank'
                 ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            <Wallet className="w-5 h-5" />
-            <span className="text-[10px] font-display font-bold tracking-wider">AIRDROP</span>
-            {hasUnfinishedTasks && (
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#dd2c40] rounded-full animate-ping" />
-            )}
+            <Landmark className="w-5 h-5 text-amber-400" />
+            <span className="text-[10px] font-display font-bold tracking-wider text-amber-300">BANK</span>
           </button>
 
 

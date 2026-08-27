@@ -91,6 +91,7 @@ export interface PlayerProfile {
   username?: string;
   avatarUrl?: string;
   isRegistered?: boolean;
+  withdrawalRequests?: WithdrawalRequest[];
 }
 
 export interface WithdrawalRequest {

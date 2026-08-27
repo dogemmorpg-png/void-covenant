@@ -103,19 +103,19 @@ export const HeaderHUD: React.FC = () => {
         </button>
 
         {/* Resources Panel */}
-        <div className="flex flex-wrap xl:flex-nowrap items-center justify-center xl:justify-end gap-3 text-sm w-full">
+        <div className="flex items-center justify-center xl:justify-end gap-2 xl:gap-2.5 text-sm shrink-0 flex-nowrap">
           {/* Resources Group */}
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+          <div className="flex items-center justify-center gap-1.5 sm:gap-2 flex-nowrap shrink-0">
             {/* Gold */}
-            <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors cursor-default py-1 px-3 shadow-inner" title="Gold (For basic packs and upgrades)">
-              <img src="/icons/icon_gold.webp" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain" />
-              <span className="font-mono font-bold text-amber-400">{profile.gold}</span>
+            <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors cursor-default py-1 px-2.5 shadow-inner" title="Gold (For basic packs and upgrades)">
+              <img src="/icons/icon_gold.webp" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 object-contain" />
+              <span className="font-mono font-bold text-amber-400 text-sm">{profile.gold}</span>
             </div>
 
             {/* Dust */}
-            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors cursor-default py-1 px-3 shadow-inner" title="Dark Dust (For skill enhancement)">
-              <img src="/icons/icon_dust.webp" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-9 h-9 object-contain scale-110" />
-              <span className="font-mono font-bold text-[#66fcf1]">{profile.dust}</span>
+            <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors cursor-default py-1 px-2.5 shadow-inner" title="Dark Dust (For skill enhancement)">
+              <img src="/icons/icon_dust.webp" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 object-contain scale-110" />
+              <span className="font-mono font-bold text-[#66fcf1] text-sm">{profile.dust}</span>
             </div>
 
             {/* Shards */}
@@ -124,13 +124,13 @@ export const HeaderHUD: React.FC = () => {
                 audioSystem.playClick();
                 setIsShardsShopOpen(true);
               }}
-              className="flex items-center gap-2 bg-gradient-to-r from-[#1c080d] to-[#120508] hover:from-[#2a0c13] hover:to-[#1a070c] border border-red-500/40 hover:border-red-400/80 rounded-full py-1 pl-2.5 pr-1.5 shadow-[0_0_15px_rgba(221,44,64,0.15)] hover:shadow-[0_0_20px_rgba(221,44,64,0.35)] cursor-pointer transition-all duration-300 group" 
+              className="flex items-center gap-1.5 bg-gradient-to-r from-[#1c080d] to-[#120508] hover:from-[#2a0c13] hover:to-[#1a070c] border border-red-500/40 hover:border-red-400/80 rounded-full py-1 pl-2.5 pr-1.5 shadow-[0_0_15px_rgba(221,44,64,0.15)] hover:shadow-[0_0_20px_rgba(221,44,64,0.35)] cursor-pointer transition-all duration-300 group" 
               title="Dark Shards (Click to Open Shop)"
             >
-              <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_10px_rgba(239,68,68,0.7)] brightness-110 contrast-125 w-9 h-9 object-contain scale-110 group-hover:scale-125 transition-transform duration-300" />
+              <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_10px_rgba(239,68,68,0.7)] brightness-110 contrast-125 w-7 h-7 object-contain scale-110 group-hover:scale-125 transition-transform duration-300" />
               <span className="font-mono font-black text-rose-300 group-hover:text-white text-sm tracking-wide transition-colors ml-0.5">{profile.darkShards}</span>
-              <div className="w-6 h-6 rounded-full bg-gradient-to-b from-[#e11d48] via-[#be123c] to-[#881337] group-hover:from-[#f43f5e] group-hover:to-[#9f1239] text-white flex items-center justify-center border border-rose-300/40 shadow-[0_0_10px_rgba(225,29,72,0.6)] group-hover:shadow-[0_0_14px_rgba(244,63,94,0.9)] group-hover:scale-110 active:scale-95 transition-all duration-300 ml-1">
-                <Plus className="w-3.5 h-3.5 stroke-[3] text-white drop-shadow-sm" />
+              <div className="w-5 h-5 rounded-full bg-gradient-to-b from-[#e11d48] via-[#be123c] to-[#881337] group-hover:from-[#f43f5e] group-hover:to-[#9f1239] text-white flex items-center justify-center border border-rose-300/40 shadow-[0_0_10px_rgba(225,29,72,0.6)] group-hover:shadow-[0_0_14px_rgba(244,63,94,0.9)] group-hover:scale-110 active:scale-95 transition-all duration-300 ml-0.5">
+                <Plus className="w-3 h-3 stroke-[3] text-white drop-shadow-sm" />
               </div>
             </div>
 
@@ -140,42 +140,33 @@ export const HeaderHUD: React.FC = () => {
                 audioSystem.playClick();
                 setIsSovereignModalOpen(true);
               }}
-              className="flex items-center gap-2 bg-gradient-to-r from-[#240810] via-[#1a050c] to-[#120308] hover:from-[#350c18] hover:to-[#220710] border border-amber-500/50 hover:border-amber-400/90 rounded-full py-1 pl-2 pr-3 shadow-[0_0_15px_rgba(245,158,11,0.2)] hover:shadow-[0_0_22px_rgba(245,158,11,0.4)] cursor-pointer transition-all duration-300 group select-none"
+              className="flex items-center gap-1.5 bg-gradient-to-r from-[#240810] to-[#120308] hover:from-[#350c18] hover:to-[#220710] border border-amber-500/50 hover:border-amber-400/90 rounded-full py-1 px-2.5 shadow-[0_0_15px_rgba(245,158,11,0.2)] hover:shadow-[0_0_22px_rgba(245,158,11,0.4)] cursor-pointer transition-all duration-300 group select-none"
               title={`Blood Sovereigns: ${profile.bloodSovereigns || 0} (≈ $${((profile.bloodSovereigns || 0) * 0.01).toFixed(2)} USDT) • Click for Info`}
             >
               <img 
                 src="/icons/icon_sovereign.webp" 
                 alt="Sovereigns" 
-                className="drop-shadow-[0_0_12px_rgba(245,158,11,0.8)] brightness-110 contrast-125 w-8 h-8 object-contain group-hover:scale-115 transition-transform duration-300" 
+                className="drop-shadow-[0_0_12px_rgba(245,158,11,0.8)] brightness-110 contrast-125 w-7 h-7 object-contain group-hover:scale-115 transition-transform duration-300" 
               />
-              <div className="flex flex-col text-left">
-                <span className="font-mono font-black text-amber-300 group-hover:text-amber-100 text-xs sm:text-sm tracking-wide leading-none transition-colors">
-                  {profile.bloodSovereigns || 0}
-                </span>
-                <span className="font-mono text-[8px] text-amber-400/75 leading-tight font-bold -mb-0.5">
-                  ≈ ${((profile.bloodSovereigns || 0) * 0.01).toFixed(2)}
-                </span>
-              </div>
+              <span className="font-mono font-black text-amber-300 group-hover:text-amber-100 text-sm tracking-wide transition-colors">
+                {profile.bloodSovereigns || 0}
+              </span>
             </div>
 
             {/* PvE Energy (Main Energy) */}
-            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors cursor-default py-1 px-3 shadow-inner" title="Energy (Restores 1 per 20 mins)">
-              <img src="/icons/icon_energy.webp" alt="Energy" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain" />
-              <div className="flex flex-col">
-                <span className="font-mono text-xs font-bold text-emerald-400">
-                  Energy: {profile.pveEnergy}/{profile.pveEnergyMax}
-                </span>
-                {timeUntilRegen && (
-                  <span className="font-mono text-[8px] text-emerald-400/80 -mt-0.5 tracking-widest text-center">
-                    +1 IN {timeUntilRegen}
-                  </span>
-                )}
-              </div>
+            <div 
+              className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors cursor-default py-1 px-2.5 shadow-inner" 
+              title={timeUntilRegen ? `Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (+1 in ${timeUntilRegen})` : `Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (Full)`}
+            >
+              <img src="/icons/icon_energy.webp" alt="Energy" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 object-contain" />
+              <span className="font-mono text-sm font-bold text-emerald-400">
+                {profile.pveEnergy}/{profile.pveEnergyMax}
+              </span>
             </div>
           </div>
 
           {/* User Profile and Controls */}
-          <div className="flex items-center gap-2 sm:gap-3 xl:ml-2 xl:border-l border-white/10 xl:pl-4 mt-2 xl:mt-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 xl:ml-1 xl:border-l border-white/10 xl:pl-3 shrink-0">
             <div className="flex items-center gap-2">
               {profile.avatarUrl && (
                 <img src={profile.avatarUrl} alt="Avatar" className="w-8 h-8 rounded-full border border-white/20 object-cover shadow-[0_0_10px_rgba(255,255,255,0.1)]" />

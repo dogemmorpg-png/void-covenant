@@ -16,6 +16,7 @@ interface GameContextType {
   spendDust: (amount: number) => boolean;
   spendShards: (amount: number) => boolean;
   spendBloodSovereigns: (amount: number) => boolean;
+  requestWithdrawal: (amountSovereigns: number, targetAddress: string) => Promise<{ success: boolean; message: string }>;
   usePveEnergy: (amount: number) => boolean;
   usePvpEnergy: (amount: number) => boolean;
   buyPvpTickets: (ticketCount?: number) => Promise<boolean>;
@@ -445,6 +446,68 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return updated;
     });
     return true;
+  };
+
+  const requestWithdrawal = async (amountSovereigns: number, targetAddress: string): Promise<{ success: boolean; message: string }> => {
+    if (amountSovereigns < 100) {
+      return { success: false, message: 'Minimum withdrawal amount is 100 Blood Sovereigns ($1.00 USDT).' };
+    }
+    if (!targetAddress || targetAddress.trim().length < 24) {
+      return { success: false, message: 'Please provide a valid destination wallet address.' };
+    }
+    if ((profileRef.current.bloodSovereigns || 0) < amountSovereigns) {
+      return { success: false, message: 'Insufficient Blood Sovereigns balance!' };
+    }
+
+    const token = localStorage.getItem('void_covenant_token');
+    if (token) {
+      try {
+        const res = await fetch('/api/withdrawal', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ amountSovereigns, targetAddress })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.profile) {
+            setProfile(migrateProfileTo10Cards(data.profile));
+          }
+          return { success: true, message: data.message || 'Withdrawal request submitted successfully!' };
+        } else {
+          const err = await res.json().catch(() => ({}));
+          return { success: false, message: err.error || 'Failed to submit withdrawal request.' };
+        }
+      } catch (e: any) {
+        console.error('Withdrawal error:', e);
+      }
+    }
+
+    // Local state fallback for offline / guest / client mode
+    const newRequest: WithdrawalRequest = {
+      id: `req_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+      userId: profile.solanaAddress || 'guest_user',
+      username: profile.username || 'Voidwalker',
+      walletAddress: targetAddress.trim(),
+      amountSovereigns,
+      amountUsdt: Number((amountSovereigns * 0.01).toFixed(2)),
+      status: 'pending',
+      createdAt: Date.now()
+    };
+
+    setProfile(current => {
+      const updated = {
+        ...current,
+        bloodSovereigns: (current.bloodSovereigns || 0) - amountSovereigns,
+        withdrawalRequests: [newRequest, ...(current.withdrawalRequests || [])]
+      };
+      saveProfile(updated);
+      return updated;
+    });
+
+    return { success: true, message: `Successfully requested withdrawal of ${amountSovereigns} SOV ($${(amountSovereigns * 0.01).toFixed(2)} USDT)!` };
   };
 
   const startBattleOnServer = async (battleType: 'campaign' | 'pvp', stageId: string, energyCost: number, opponentPayload?: any): Promise<boolean> => {
@@ -1009,6 +1072,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         spendDust,
         spendShards,
         spendBloodSovereigns,
+        requestWithdrawal,
         usePveEnergy,
         usePvpEnergy,
         buyPvpTickets,
