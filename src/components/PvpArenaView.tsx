@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CampaignStage } from '../types';
-import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User } from 'lucide-react';
+import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User, Info } from 'lucide-react';
 import { renderStanceIcon } from './SkillAndStanceIcons';
 
 interface PvpArenaViewProps {
@@ -31,6 +31,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   const [viewingLeague, setViewingLeague] = useState<string>(profile.pvpLeague || 'Bronze');
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [isBuyTicketsModalOpen, setIsBuyTicketsModalOpen] = useState(false);
+  const [isLeagueRulesModalOpen, setIsLeagueRulesModalOpen] = useState(false);
   const [myOwnLeagueRank, setMyOwnLeagueRank] = useState<number | string>(1);
 
   // League calculation helper
@@ -866,7 +867,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
         {/* Right Side: Leaderboard */}
         <div className="bg-[#12151c] border border-white/10 rounded-2xl p-5 shadow-2xl flex flex-col justify-between min-h-[580px]">
-          <div className="space-y-3.5">
+          <div className="space-y-3">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2">
                 <Award className="w-4 h-4 text-amber-400" />
@@ -874,6 +875,14 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   LEADERBOARD HALL
                 </h3>
               </div>
+              <button
+                onClick={() => setIsLeagueRulesModalOpen(true)}
+                className="flex items-center gap-1 py-1 px-2 rounded-lg bg-black/40 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-amber-300 font-mono text-[9px] uppercase font-bold transition-all cursor-pointer shadow-sm active:scale-95"
+                title="View League Promotion & Demotion Rules"
+              >
+                <Info className="w-3.5 h-3.5 text-amber-400" />
+                <span>RULES</span>
+              </button>
             </div>
 
             {/* ROUND COUNTDOWN TIMER BANNER */}
@@ -890,6 +899,23 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               <div className="font-mono text-xs font-bold text-amber-300 bg-black/60 border border-white/10 px-2.5 py-1 rounded-lg shadow-inner">
                 {formatCountdown(timeRemaining)}
               </div>
+            </div>
+
+            {/* PROMOTION / DEMOTION QUICK LEGEND BAR */}
+            <div 
+              onClick={() => setIsLeagueRulesModalOpen(true)}
+              className="bg-black/50 border border-white/10 hover:border-amber-500/40 rounded-xl py-1.5 px-3 flex items-center justify-between text-[8.5px] font-mono shadow-inner cursor-pointer transition-all hover:bg-black/70 group"
+              title="Click to view full League rules"
+            >
+              <span className="flex items-center gap-1 text-emerald-400 font-black">
+                <span className="text-[9.5px]">▲</span> Top 20: Promote
+              </span>
+              <span className="text-gray-600">•</span>
+              <span className="text-gray-400 font-medium">21–100: Safe</span>
+              <span className="text-gray-600">•</span>
+              <span className="flex items-center gap-1 text-rose-400 font-black">
+                <span className="text-[9.5px]">▼</span> 101+: Demote
+              </span>
             </div>
             
             {/* LEAGUE SELECTOR/NAVIGATOR */}
@@ -950,15 +976,21 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                             : 'bg-black/40 border-white/5 text-gray-300'
                         }`}
                       >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          {/* Clean Rank Number */}
-                          <span className={`w-6 text-center font-bold font-mono text-xs shrink-0 ${
-                            rank === 1 ? 'text-amber-400 font-black' :
-                            rank === 2 ? 'text-slate-300 font-bold' :
-                            rank === 3 ? 'text-amber-600 font-bold' : 'text-gray-500'
-                          }`}>
-                            #{rank}
-                          </span>
+                        <div className="flex items-center gap-2 min-w-0">
+                          {/* Clean Rank Number with Zone Marker */}
+                          <div className="flex items-center gap-0.5 shrink-0">
+                            <span className={`w-6 text-center font-bold font-mono text-xs ${
+                              rank === 1 ? 'text-amber-400 font-black' :
+                              rank === 2 ? 'text-slate-300 font-bold' :
+                              rank === 3 ? 'text-amber-600 font-bold' : 
+                              rank <= 20 ? 'text-emerald-400 font-bold' : 'text-gray-500'
+                            }`}>
+                              #{rank}
+                            </span>
+                            {rank <= 20 && (
+                              <span className="text-[8px] text-emerald-400/80 font-black" title="Promotion Zone">▲</span>
+                            )}
+                          </div>
 
                           {/* Avatar */}
                           <div className="w-6 h-6 rounded-full bg-black/50 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
@@ -1212,6 +1244,114 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               className="w-full py-3.5 rounded-2xl border border-white/10 hover:border-white/20 bg-black/40 hover:bg-black/60 text-gray-300 hover:text-white font-display font-bold tracking-widest text-xs transition-colors cursor-pointer uppercase relative z-10"
             >
               Back to Arena
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* League Rules Modal */}
+      {isLeagueRulesModalOpen && (
+        <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-gradient-to-b from-[#1c141e] via-[#110d14] to-[#09060b] border-2 border-amber-500/50 rounded-3xl p-6 sm:p-8 max-w-lg w-full relative shadow-[0_0_60px_rgba(0,0,0,0.95)] space-y-6 overflow-hidden">
+            
+            {/* Ambient Background Flare */}
+            <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 bg-amber-500/15 blur-3xl pointer-events-none" />
+            
+            {/* Close Button */}
+            <button
+              onClick={() => setIsLeagueRulesModalOpen(false)}
+              className="absolute top-5 right-5 text-gray-400 hover:text-white font-sans text-lg font-black transition-colors cursor-pointer w-8 h-8 flex items-center justify-center bg-black/60 border border-white/10 hover:border-white/20 rounded-full z-10"
+              title="Close"
+            >
+              ✕
+            </button>
+
+            {/* Header with Glowing Trophy */}
+            <div className="text-center space-y-2 relative z-10">
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-b from-amber-950/80 via-black to-black border-2 border-amber-500/60 flex items-center justify-center shadow-[0_0_25px_rgba(245,158,11,0.35)]">
+                <Trophy className="w-9 h-9 text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.7)]" />
+              </div>
+              <h3 className="font-display font-black text-2xl text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-300 to-yellow-500 tracking-widest uppercase text-shadow-gold">
+                LEAGUE RULES & RESET
+              </h3>
+              <p className="text-xs text-gray-300 font-sans max-w-sm mx-auto leading-relaxed">
+                The Arena ladder resolves daily at <strong className="text-amber-400 font-mono">00:00 UTC</strong>. Here is how summoner ranks are promoted or demoted:
+              </p>
+            </div>
+
+            {/* 3 Zone Explanations */}
+            <div className="space-y-3 relative z-10">
+              {/* Promotion Zone */}
+              <div className="bg-gradient-to-r from-emerald-950/40 via-black/60 to-emerald-950/20 border border-emerald-500/40 rounded-2xl p-3.5 flex items-start gap-3.5 shadow-md">
+                <div className="w-9 h-9 rounded-xl bg-emerald-950/80 border border-emerald-500/60 flex items-center justify-center text-emerald-400 font-black text-base shrink-0 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
+                  ▲
+                </div>
+                <div className="space-y-0.5 text-left">
+                  <div className="flex items-center gap-2">
+                    <span className="font-display font-black text-xs text-emerald-300 uppercase tracking-wider">
+                      PROMOTION ZONE
+                    </span>
+                    <span className="text-[9px] font-mono bg-emerald-950/80 text-emerald-400 border border-emerald-500/40 px-1.5 py-0.5 rounded font-bold">
+                      Top 20 (#1–#20)
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-gray-300 font-sans leading-relaxed">
+                    Summoners in the Top 20 ascend to the next higher League tier with greater rewards and prestige.
+                  </p>
+                </div>
+              </div>
+
+              {/* Safe Zone */}
+              <div className="bg-gradient-to-r from-zinc-900/50 via-black/60 to-zinc-900/30 border border-white/10 rounded-2xl p-3.5 flex items-start gap-3.5 shadow-md">
+                <div className="w-9 h-9 rounded-xl bg-zinc-900/80 border border-white/20 flex items-center justify-center text-gray-400 font-black text-xs shrink-0">
+                  ■
+                </div>
+                <div className="space-y-0.5 text-left">
+                  <div className="flex items-center gap-2">
+                    <span className="font-display font-black text-xs text-gray-300 uppercase tracking-wider">
+                      SAFE HAVEN
+                    </span>
+                    <span className="text-[9px] font-mono bg-black/60 text-gray-400 border border-white/10 px-1.5 py-0.5 rounded font-bold">
+                      Ranks #21–#100
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-gray-300 font-sans leading-relaxed">
+                    Summoners maintain their standing and remain in the current League for the next round.
+                  </p>
+                </div>
+              </div>
+
+              {/* Demotion Zone */}
+              <div className="bg-gradient-to-r from-rose-950/40 via-black/60 to-rose-950/20 border border-rose-500/40 rounded-2xl p-3.5 flex items-start gap-3.5 shadow-md">
+                <div className="w-9 h-9 rounded-xl bg-rose-950/80 border border-rose-500/60 flex items-center justify-center text-rose-400 font-black text-base shrink-0 shadow-[0_0_10px_rgba(244,63,94,0.3)]">
+                  ▼
+                </div>
+                <div className="space-y-0.5 text-left">
+                  <div className="flex items-center gap-2">
+                    <span className="font-display font-black text-xs text-rose-300 uppercase tracking-wider">
+                      DEMOTION ZONE
+                    </span>
+                    <span className="text-[9px] font-mono bg-rose-950/80 text-rose-400 border border-rose-500/40 px-1.5 py-0.5 rounded font-bold">
+                      Ranks #101+
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-gray-300 font-sans leading-relaxed">
+                    Summoners ranked below 100 drop down to the previous lower League (excluding Bronze League).
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Note */}
+            <div className="bg-black/60 border border-white/5 rounded-xl p-3 text-center text-[10.5px] text-gray-400 font-sans relative z-10">
+              💡 <span className="text-gray-300 font-bold">Daily Refill:</span> Free tickets reset to <strong className="text-rose-400 font-mono">5/5</strong> daily at 00:00 UTC. Purchased tickets in your Reserve never expire.
+            </div>
+
+            <button
+              onClick={() => setIsLeagueRulesModalOpen(false)}
+              className="w-full py-3 rounded-2xl border border-white/10 hover:border-white/20 bg-black/40 hover:bg-black/60 text-gray-300 hover:text-white font-display font-bold tracking-widest text-xs transition-colors cursor-pointer uppercase relative z-10"
+            >
+              Got It
             </button>
           </div>
         </div>
