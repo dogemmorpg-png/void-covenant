@@ -170,7 +170,7 @@ export const GachaStoreView: React.FC = () => {
             <div className="space-y-4">
               <div className="h-44 rounded-xl bg-gradient-to-b from-amber-950/20 to-black/50 border border-amber-900/10 flex flex-col items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(197,168,128,0.1),transparent_70%)]" />
-                <img src="/packs/pack_bronze.webp" alt="Bronze Pack" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(197,168,128,0.4)]" />
+                <img src="/packs/pack_bronze.webp" alt="Bronze Pack" decoding="async" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(197,168,128,0.4)]" />
                 <span className="font-display font-black text-sm text-amber-500 mt-2 tracking-widest uppercase">BRONZE PACK</span>
               </div>
               
@@ -202,7 +202,7 @@ export const GachaStoreView: React.FC = () => {
             <div className="space-y-4">
               <div className="h-44 rounded-xl bg-gradient-to-b from-indigo-950/20 to-black/50 border border-indigo-900/10 flex flex-col items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(102,252,241,0.15),transparent_70%)]" />
-                <img src="/packs/pack_obsidian.webp" alt="Obsidian Pack" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(102,252,241,0.4)]" />
+                <img src="/packs/pack_obsidian.webp" alt="Obsidian Pack" decoding="async" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(102,252,241,0.4)]" />
                 <span className="font-display font-black text-sm text-[#66fcf1] mt-2 tracking-widest uppercase text-shadow-gold">OBSIDIAN PACK</span>
               </div>
               
@@ -234,7 +234,7 @@ export const GachaStoreView: React.FC = () => {
             <div className="space-y-4">
               <div className="h-44 rounded-xl bg-gradient-to-b from-red-950/20 to-black/50 border border-red-900/10 flex flex-col items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(221,44,64,0.15),transparent_70%)]" />
-                <img src="/packs/pack_abyssal.webp" alt="Abyssal Pack" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(221,44,64,0.4)]" />
+                <img src="/packs/pack_abyssal.webp" alt="Abyssal Pack" decoding="async" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(221,44,64,0.4)]" />
                 <span className="font-display font-black text-sm text-[#dd2c40] mt-2 tracking-widest uppercase text-shadow-crimson">ABYSSAL PACK</span>
               </div>
               
@@ -267,7 +267,7 @@ export const GachaStoreView: React.FC = () => {
           <div className="bg-[#151a21] border border-[#c5a880]/30 rounded-2xl p-5 flex flex-col justify-between hover:-translate-y-1 transition-all shadow-xl">
             <div className="space-y-4">
               <div className="h-44 rounded-xl bg-gradient-to-b from-[#4a3f35] to-black/50 border border-[#c5a880]/10 flex flex-col items-center justify-center relative overflow-hidden">
-                <img src="/packs/chest_basic.webp" alt="Basic Relics" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(197,168,128,0.4)]" />
+                <img src="/packs/chest_basic.webp" alt="Basic Relics" decoding="async" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(197,168,128,0.4)]" />
                 <span className="font-display font-black text-sm text-[#ebd09b] mt-2 tracking-widest uppercase">BASIC RELICS</span>
               </div>
               <div className="space-y-2">
@@ -296,7 +296,7 @@ export const GachaStoreView: React.FC = () => {
             <div className="space-y-4">
               <div className="h-44 rounded-xl bg-gradient-to-b from-indigo-950/20 to-black/50 border border-indigo-900/10 flex flex-col items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(102,252,241,0.15),transparent_70%)]" />
-                <img src="/packs/chest_rare.webp" alt="Rare Relics" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(102,252,241,0.4)]" />
+                <img src="/packs/chest_rare.webp" alt="Rare Relics" decoding="async" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(102,252,241,0.4)]" />
                 <span className="font-display font-black text-sm text-[#66fcf1] mt-2 tracking-widest uppercase text-shadow-gold">RARE RELICS</span>
               </div>
               <div className="space-y-2">
@@ -326,7 +326,7 @@ export const GachaStoreView: React.FC = () => {
             <div className="space-y-4">
               <div className="h-44 rounded-xl bg-gradient-to-b from-red-950/40 to-black/50 border border-red-500/20 flex flex-col items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(221,44,64,0.15),transparent_70%)]" />
-                <img src="/packs/chest_premium.webp" alt="Premium Relics" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(221,44,64,0.4)]" />
+                <img src="/packs/chest_premium.webp" alt="Premium Relics" decoding="async" className="w-32 h-32 object-contain hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(221,44,64,0.4)]" />
                 <span className="font-display font-black text-sm text-[#dd2c40] mt-2 tracking-widest uppercase text-shadow-crimson">PREMIUM RELICS</span>
               </div>
               <div className="space-y-2">

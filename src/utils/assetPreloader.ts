@@ -1,10 +1,25 @@
-﻿import { CARD_TEMPLATES } from '../data/cards';
+import { CARD_TEMPLATES } from '../data/cards';
 
 // In-memory cache to prevent duplicate requests
 const preloadedUrls = new Set<string>();
 
-// Core UI icons that are always displayed throughout the game
+// Core UI icons, avatars, shop assets, and pack covers that should be instant
 const CORE_UI_ASSETS = [
+  // Packs & Chests (Summoning Portal)
+  '/packs/pack_bronze.webp',
+  '/packs/pack_obsidian.webp',
+  '/packs/pack_abyssal.webp',
+  '/packs/chest_basic.webp',
+  '/packs/chest_rare.webp',
+  '/packs/chest_premium.webp',
+
+  // Shop Modals & Packages
+  '/shop/pouch_of_shards.png',
+  '/shop/dark_shard_chest.png',
+  '/shop/abyssal_treasury.png',
+  '/shop/void_overlord_vault.png',
+
+  // Core Badges & Icons
   '/icons/crown.png',
   '/icons/ticket.png',
   '/icons/icon_gold.webp',

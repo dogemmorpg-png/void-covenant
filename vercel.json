@@ -7,7 +7,7 @@
   ],
   "headers": [
     {
-      "source": "/(cards|avatars|icons|audio)/(.*)",
+      "source": "/(cards|avatars|icons|audio|packs|shop|mobs)/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
