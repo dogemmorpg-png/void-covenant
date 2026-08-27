@@ -23,6 +23,7 @@ export function toBattleCard(card: Card): BattleCardState {
     isDead: false,
     armor: 0,
     ward: false,
+    barrier: false,
     buffs: []
   };
 }
@@ -119,19 +120,31 @@ export function simulateCombatTurn(
              
              // Apply damage
              let actualDamage = dmg;
+             let isBarrierBlocked = false;
+             let armorAbsorbed = 0;
+             let isArmorBroken = false;
              if (!s.pierce) {
-               if (targetCard.ward) {
+               const hasBarrier = targetCard.barrier ?? targetCard.ward;
+               if (hasBarrier) {
                  actualDamage = 0;
+                 targetCard.barrier = false;
                  targetCard.ward = false;
-                 logs.push(`⚡ Void Strike's damage on ${targetCard.name} was blocked by Ward!`);
+                 isBarrierBlocked = true;
+                 logs.push(`🔮 Void Strike's damage on ${targetCard.name} was absorbed by Barrier!`);
                } else if ((targetCard.armor || 0) > 0) {
-                 if ((targetCard.armor || 0) >= actualDamage) {
+                 const initialArmor = targetCard.armor!;
+                 if (initialArmor >= actualDamage) {
                    targetCard.armor! -= actualDamage;
+                   armorAbsorbed = actualDamage;
                    actualDamage = 0;
+                   if (targetCard.armor === 0) isArmorBroken = true;
                  } else {
-                   actualDamage -= targetCard.armor!;
+                   armorAbsorbed = initialArmor;
+                   actualDamage -= initialArmor;
                    targetCard.armor = 0;
+                   isArmorBroken = true;
                  }
+                 logs.push(`🛡️ ${targetCard.name}'s Armor absorbed ${armorAbsorbed} damage!`);
                }
              } else {
                logs.push(`⚡ Void Strike Pierces through defenses!`);
@@ -140,7 +153,15 @@ export function simulateCombatTurn(
              targetCard.health -= actualDamage;
              if (actualDamage > 0) totalLeech += actualDamage;
              logs.push(`⚡ Void Strike hits ${targetCard.name} for ${actualDamage} damage!`);
-             animateSequence.push({ type: 'hero_skill', stance: 'void_strike', targetSlot: targetIdx, damage: actualDamage });
+             animateSequence.push({ 
+               type: 'hero_skill', 
+               stance: 'void_strike', 
+               targetSlot: targetIdx, 
+               damage: actualDamage,
+               barrierBlocked: isBarrierBlocked,
+               armorAbsorbed,
+               armorBroken: isArmorBroken
+             });
              if (targetCard.health <= 0) {
                targetCard.isDead = true;
                logs.push(`💀 Enemy card ${targetCard.name} has been destroyed by Void Strike!`);
@@ -192,16 +213,17 @@ export function simulateCombatTurn(
                 }
               }
             }
-            if (s.ward && !targetCard.ward) {
+            if (s.ward && !targetCard.barrier && !targetCard.ward) {
+              targetCard.barrier = true;
               targetCard.ward = true;
-              logs.push(`🩸 Blood Aura granted Ward to ${targetCard.name}!`);
+              logs.push(`🩸 Blood Aura granted Barrier to ${targetCard.name}!`);
             }
             if (s.bonusMaxHp > 0) {
               targetCard.maxHealth += s.bonusMaxHp;
               targetCard.health += s.bonusMaxHp; // also heal the amount it expanded
               logs.push(`🩸 Blood Aura expanded ${targetCard.name}'s max HP by ${s.bonusMaxHp}!`);
             }
-            animateSequence.push({ type: 'hero_skill', stance: 'blood_aura', targetSlot: targetSlot, heal: heal, ward: s.ward, bonusMaxHp: s.bonusMaxHp, cleanse: cleansed });
+            animateSequence.push({ type: 'hero_skill', stance: 'blood_aura', targetSlot: targetSlot, heal: heal, barrier: s.ward, ward: s.ward, bonusMaxHp: s.bonusMaxHp, cleanse: cleansed });
           }
         }
       }
@@ -516,20 +538,31 @@ export function simulateCombatTurn(
         
         // Calculate total damage with Hex
         let totalDamage = attackDmg + eCard.hexedAmount;
+        let isBarrierBlocked = false;
+        let armorAbsorbed = 0;
+        let isArmorBroken = false;
         
-        if (eCard.ward) {
+        const hasBarrier = eCard.barrier ?? eCard.ward;
+        if (hasBarrier) {
            totalDamage = 0;
+           eCard.barrier = false;
            eCard.ward = false;
-           logs.push(`🛡️ ${eCard.name}'s Ward blocked the attack!`);
+           isBarrierBlocked = true;
+           logs.push(`🔮 ${eCard.name}'s Barrier absorbed the attack!`);
         } else if ((eCard.armor || 0) > 0) {
-           if (eCard.armor! >= totalDamage) {
+           const initialArmor = eCard.armor!;
+           if (initialArmor >= totalDamage) {
              eCard.armor! -= totalDamage;
+             armorAbsorbed = totalDamage;
              totalDamage = 0;
+             if (eCard.armor === 0) isArmorBroken = true;
            } else {
-             totalDamage -= eCard.armor!;
+             armorAbsorbed = initialArmor;
+             totalDamage -= initialArmor;
              eCard.armor = 0;
+             isArmorBroken = true;
            }
-           logs.push(`🛡️ ${eCard.name}'s Armor mitigated the damage!`);
+           logs.push(`🛡️ ${eCard.name}'s Armor absorbed ${armorAbsorbed} damage!`);
         }
         
         eCard.health -= totalDamage;
@@ -555,7 +588,10 @@ export function simulateCombatTurn(
           slot: i,
           targetSlot: i,
           damage: totalDamage,
-          vampireHeal: (vampSkill && totalDamage > 0) ? vampSkill.value : 0
+          vampireHeal: (vampSkill && totalDamage > 0) ? vampSkill.value : 0,
+          barrierBlocked: isBarrierBlocked,
+          armorAbsorbed,
+          armorBroken: isArmorBroken
         });
 
         // Check death
@@ -596,20 +632,31 @@ export function simulateCombatTurn(
         }
         
         let totalDamage = attackDmg + activePCard.hexedAmount;
+        let isBarrierBlocked = false;
+        let armorAbsorbed = 0;
+        let isArmorBroken = false;
         
-        if (activePCard.ward) {
+        const hasBarrier = activePCard.barrier ?? activePCard.ward;
+        if (hasBarrier) {
            totalDamage = 0;
+           activePCard.barrier = false;
            activePCard.ward = false;
-           logs.push(`🛡️ ${activePCard.name}'s Ward blocked the attack!`);
+           isBarrierBlocked = true;
+           logs.push(`🔮 ${activePCard.name}'s Barrier absorbed the attack!`);
         } else if ((activePCard.armor || 0) > 0) {
-           if (activePCard.armor! >= totalDamage) {
+           const initialArmor = activePCard.armor!;
+           if (initialArmor >= totalDamage) {
              activePCard.armor! -= totalDamage;
+             armorAbsorbed = totalDamage;
              totalDamage = 0;
+             if (activePCard.armor === 0) isArmorBroken = true;
            } else {
-             totalDamage -= activePCard.armor!;
+             armorAbsorbed = initialArmor;
+             totalDamage -= initialArmor;
              activePCard.armor = 0;
+             isArmorBroken = true;
            }
-           logs.push(`🛡️ ${activePCard.name}'s Armor mitigated the damage!`);
+           logs.push(`🛡️ ${activePCard.name}'s Armor absorbed ${armorAbsorbed} damage!`);
         }
         
         activePCard.health -= totalDamage;
@@ -633,7 +680,10 @@ export function simulateCombatTurn(
           slot: i,
           targetSlot: i,
           damage: totalDamage,
-          vampireHeal: vampSkill ? vampSkill.value : 0
+          vampireHeal: vampSkill ? vampSkill.value : 0,
+          barrierBlocked: isBarrierBlocked,
+          armorAbsorbed,
+          armorBroken: isArmorBroken
         });
 
         // Death check

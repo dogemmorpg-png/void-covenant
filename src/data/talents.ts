@@ -39,7 +39,7 @@ export const TALENT_TREES: TalentNode[] = [
   {
     id: 'void_pierce', stance: 'void_strike', tier: 3, col: 0,
     name: 'Armor Piercing', icon: 'Crosshair',
-    description: () => `Void Strike damage ignores enemy Ward and Armor entirely.`,
+    description: () => `Void Strike damage ignores enemy Barrier and Armor entirely.`,
     maxLevel: 1, cost: 5, requires: ['void_dmg', 'void_chain'], requireMax: true
   },
   {
@@ -84,8 +84,8 @@ export const TALENT_TREES: TalentNode[] = [
   },
   {
     id: 'blood_ward', stance: 'blood_aura', tier: 3, col: 0,
-    name: 'Blood Ward', icon: 'ShieldPlus',
-    description: () => `The healed target also gains Ward 1 (Shields against the next hit).`,
+    name: 'Blood Barrier', icon: 'ShieldPlus',
+    description: () => `The healed target also gains Barrier (Completely blocks the next hit).`,
     maxLevel: 1, cost: 5, requires: ['blood_heal', 'blood_cleanse'], requireMax: true
   },
   {

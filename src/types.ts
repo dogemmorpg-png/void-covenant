@@ -127,7 +127,8 @@ export interface BattleCardState {
   hexedAmount: number; // active Hex stack on this card
   isDead: boolean;
   armor?: number; // incoming damage mitigation
-  ward?: boolean; // blocks the next attack entirely
+  ward?: boolean; // legacy alias for barrier
+  barrier?: boolean; // blocks the next attack entirely (renamed from ward)
   buffs?: { type: 'attack' | 'armor', amount: number, turnsRemaining: number }[];
   attackFlash?: boolean; // animation flags
   damageTakenFlash?: boolean;
