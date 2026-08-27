@@ -38,42 +38,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Automatic rollover check: if midnight UTC passed, roll over leagues immediately
     await checkAndPerformPvpRollover(supabase);
 
-    const { league } = req.body || {};
-    const authHeader = req.headers.authorization;
-    let playerLeague = league || 'Bronze';
-
-    if (!league && authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.split(' ')[1];
-      try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        const walletAddress = decoded.walletAddress;
-        if (walletAddress) {
-          const { data: profileRow } = await supabase
-            .from('profiles')
-            .select('data')
-            .eq('wallet_address', walletAddress)
-            .limit(1);
-          if (profileRow && profileRow.length > 0 && profileRow[0].data) {
-            playerLeague = profileRow[0].data.pvpLeague || 'Bronze';
-          }
-        }
-      } catch (err) {
-        // Ignore token errors and fallback to Bronze
-      }
-    }
-
-    // Fetch all profiles to build leaderboard
-    const { data: rows, error } = await supabase
-      .from('profiles')
-      .select('wallet_address, data')
-      .neq('wallet_address', 'system_pvp_state')
-      .limit(1000);
-
-    if (error) {
-      console.error('Failed to query profiles:', error);
-      return res.status(500).json({ error: 'Database query failed' });
-    }
-
     let requestingWallet: string | null = null;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
@@ -82,6 +46,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         requestingWallet = decoded.walletAddress || null;
       } catch (err) {
         // ignore token error
+      }
+    }
+
+    const { league } = req.body || {};
+    let playerLeague = league || 'Bronze';
+
+    // Fetch profiles to build leaderboard
+    const { data: rows, error } = await supabase
+      .from('profiles')
+      .select('wallet_address, data')
+      .neq('wallet_address', 'system_pvp_state')
+      .limit(500);
+
+    if (error) {
+      console.error('Failed to query profiles:', error);
+      return res.status(500).json({ error: 'Database query failed' });
+    }
+
+    if (!league && requestingWallet) {
+      const myRow = (rows || []).find(r => r.wallet_address === requestingWallet);
+      if (myRow && myRow.data?.pvpLeague) {
+        playerLeague = myRow.data.pvpLeague;
       }
     }
 

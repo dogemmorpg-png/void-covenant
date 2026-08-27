@@ -12,6 +12,9 @@ export interface RolloverResult {
   demotedCount?: number;
 }
 
+let cachedRolloverDate: string | null = null;
+let lastRolloverCheckTime = 0;
+
 /**
  * Checks if midnight UTC has passed since the last PvP round rollover,
  * and if so, automatically performs league promotions, demotions, daily ticket refills, and LP resets.
@@ -22,6 +25,13 @@ export async function checkAndPerformPvpRollover(
 ): Promise<RolloverResult> {
   try {
     const todayUtc = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
+
+    // Fast-path: In-memory cache for 60s
+    if (!force && cachedRolloverDate === todayUtc && (Date.now() - lastRolloverCheckTime < 60000)) {
+      return { rolledOver: false, reason: 'cached_already_completed', roundDate: todayUtc };
+    }
+
+    lastRolloverCheckTime = Date.now();
 
     // 1. Fetch system state
     const { data: stateRows } = await supabase
@@ -34,6 +44,7 @@ export async function checkAndPerformPvpRollover(
     const lastRolloverDate = systemState?.lastRolloverDate;
 
     if (!force && lastRolloverDate && lastRolloverDate >= todayUtc) {
+      cachedRolloverDate = todayUtc;
       return { rolledOver: false, reason: 'already_completed_today', roundDate: lastRolloverDate };
     }
 

@@ -132,8 +132,14 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
     }
   };
 
-  // Always fetch and maintain player's rank in their own league
+  // Fetch leaderboard & own league rank
   useEffect(() => {
+    fetchLeaderboard(viewingLeague);
+  }, [viewingLeague]);
+
+  // If viewing another league, also ensure own league rank is fetched
+  useEffect(() => {
+    if (viewingLeague === (profile.pvpLeague || 'Bronze')) return;
     const fetchOwnLeagueRank = async () => {
       try {
         const token = localStorage.getItem('void_covenant_token');
@@ -160,7 +166,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       }
     };
     fetchOwnLeagueRank();
-  }, [profile.pvpLeague, profile.solanaAddress, profile.pvpLP]);
+  }, [profile.pvpLeague, profile.solanaAddress, profile.pvpLP, viewingLeague]);
 
   const handleFindOpponent = async (spendShards: boolean = false, spendEnergy: boolean = false) => {
     if (profile.deck.length < 10) {
@@ -901,7 +907,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             {isLoadingLeaderboard ? (
               <div className="h-64 flex flex-col items-center justify-center space-y-2">
                 <div className="w-6 h-6 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
-                <span className="text-[10px] font-mono text-gray-500 uppercase">Consulting hall records...</span>
+                <span className="text-[10px] font-mono text-gray-500 uppercase">Loading Leaderboard...</span>
               </div>
             ) : (
               <div className="space-y-1.5 max-h-[310px] overflow-y-auto pr-1">
@@ -987,8 +993,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               </div>
             )}
 
-            {/* Pinned My Rank Row (if viewing own league) */}
-            {viewingLeague === (profile.pvpLeague || 'Bronze') && (
+            {/* Pinned My Rank Row (ONLY if viewing own league AND player is not in visible top 20 list) */}
+            {viewingLeague === (profile.pvpLeague || 'Bronze') && !leaderboard.some(p => p.walletAddress === profile.solanaAddress) && (
               <div className="pt-2 border-t border-cyan-500/30">
                 <div className="flex items-center justify-between p-2 px-3 rounded-xl border bg-cyan-950/40 border-cyan-500/50 text-xs text-cyan-300 font-bold shadow-[0_0_15px_rgba(6,182,212,0.15)]">
                   <div className="flex items-center gap-2.5 min-w-0">
