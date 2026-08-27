@@ -264,8 +264,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // ONLY merge fields that are safe for the user to change locally:
     // deck, equipped, soundOn, isRegistered, username, avatarUrl
     if (safeProfileData) {
-      if (safeProfileData.deck) currentProfile.deck = safeProfileData.deck;
-      if (safeProfileData.equipped) currentProfile.equipped = safeProfileData.equipped;
+      if (safeProfileData.deck && Array.isArray(safeProfileData.deck)) {
+        const ownedCardIds = new Set((currentProfile.collection || []).map((c: any) => c.id));
+        const validDeck = safeProfileData.deck.filter((id: any) => typeof id === 'string' && ownedCardIds.has(id)).slice(0, 10);
+        if (validDeck.length > 0) {
+          currentProfile.deck = validDeck;
+        }
+      }
+      if (safeProfileData.equipped && typeof safeProfileData.equipped === 'object') {
+        const ownedItemIds = new Set((currentProfile.equipment || []).map((e: any) => e.id));
+        const sanitizedEquipped: Record<string, string> = {};
+        for (const [slot, itemId] of Object.entries(safeProfileData.equipped)) {
+          if (typeof itemId === 'string' && ownedItemIds.has(itemId)) {
+            sanitizedEquipped[slot] = itemId;
+          }
+        }
+        currentProfile.equipped = sanitizedEquipped;
+      }
       if (safeProfileData.soundOn !== undefined) currentProfile.soundOn = safeProfileData.soundOn;
       if (safeProfileData.isRegistered !== undefined) currentProfile.isRegistered = safeProfileData.isRegistered;
       if (safeProfileData.username) {
