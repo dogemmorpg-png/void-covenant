@@ -88,12 +88,20 @@ export const HeaderHUD: React.FC = () => {
           </div>
         </div>
 
-        {/* Invite Friends Button (Middle empty space) */}
+        {/* Dark Brotherhood Referral Button */}
         <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-gradient-to-r from-amber-600/10 to-amber-900/10 hover:from-amber-600/20 hover:to-amber-900/20 border border-amber-500/40 hover:border-amber-400 rounded-full px-4 py-1.5 flex items-center gap-2 text-xs font-display font-black text-[#ebd09b] tracking-wider transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] cursor-pointer shadow-[0_0_10px_rgba(197,168,128,0.1)] hover:shadow-[0_0_15px_rgba(197,168,128,0.25)]"
+          onClick={() => {
+            audioSystem.playClick();
+            setIsModalOpen(true);
+          }}
+          className="bg-gradient-to-r from-[#221811]/95 via-[#18110b]/95 to-[#0e0906]/95 hover:from-[#382618] hover:to-[#1f150d] border border-amber-500/50 hover:border-amber-400 rounded-full px-4 py-1.5 flex items-center gap-2.5 text-xs font-display font-black text-amber-200 hover:text-white tracking-widest transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer shadow-[0_0_15px_rgba(235,208,155,0.12)] hover:shadow-[0_0_20px_rgba(235,208,155,0.3)] group"
         >
-          <span className="animate-pulse">👥</span> INVITE FRIENDS
+          <img 
+            src="/icons/referral_seal.png" 
+            alt="Brotherhood Seal" 
+            className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(235,208,155,0.7)] group-hover:rotate-12 transition-transform duration-300" 
+          />
+          <span className="text-shadow-gold uppercase tracking-wider">ALLIES PACT</span>
         </button>
 
         {/* Resources Panel */}
@@ -174,151 +182,217 @@ export const HeaderHUD: React.FC = () => {
 
       {/* Referrals & Invites Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsModalOpen(false);
+          }}
+        >
           {/* Modal content with ornate gothic border */}
-          <div className="bg-gradient-to-b from-[#1a1f26] via-[#10141a] to-[#090b0e] border-2 border-[#ebd09b]/35 rounded-2xl w-full max-w-2xl overflow-hidden shadow-[0_0_50px_rgba(235,208,155,0.15)] relative flex flex-col">
+          <div className="bg-gradient-to-b from-[#1c140e] via-[#110d0a] to-[#070504] border-2 border-amber-500/40 rounded-3xl w-full max-w-2xl overflow-hidden shadow-[0_0_70px_rgba(235,208,155,0.18)] relative flex flex-col animate-in zoom-in-95 duration-200">
             
-            {/* Glow overlay */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(235,208,155,0.03)_0%,transparent_70%)] pointer-events-none" />
-
-            {/* Corner Decorative Brackets */}
-            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#ebd09b]/60 pointer-events-none" />
-            <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#ebd09b]/60 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#ebd09b]/60 pointer-events-none" />
-            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#ebd09b]/60 pointer-events-none" />
+            {/* Top decorative gradient line */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-yellow-400 to-amber-600" />
+            <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-80 h-28 bg-amber-500/10 blur-3xl pointer-events-none" />
 
             {/* Header */}
-            <div className="border-b border-[#ebd09b]/15 p-5 flex justify-between items-center bg-black/40 relative z-10">
-              <h3 className="font-display font-black text-[#ebd09b] text-base tracking-widest flex items-center gap-2.5 text-shadow-gold">
-                <Share2 className="w-5 h-5 text-[#ebd09b]" /> DARK BROTHERHOOD ORDER
-              </h3>
+            <div className="border-b border-amber-500/20 p-5 flex justify-between items-center bg-black/40 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-black/70 border border-amber-500/50 flex items-center justify-center shadow-inner shrink-0">
+                  <img 
+                    src="/icons/referral_seal.png" 
+                    alt="Brotherhood" 
+                    className="w-8 h-8 object-contain drop-shadow-[0_0_10px_rgba(235,208,155,0.8)]" 
+                  />
+                </div>
+                <div>
+                  <h3 className="font-display font-black text-amber-200 text-base sm:text-lg tracking-widest uppercase text-shadow-gold flex items-center gap-2">
+                    DARK BROTHERHOOD PACT
+                  </h3>
+                  <p className="text-[10px] text-amber-400/70 font-mono tracking-wider">
+                    BIND ALLIES TO YOUR BANNER & CLAIM ANCIENT BOUNTIES
+                  </p>
+                </div>
+              </div>
+
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-[#ebd09b] transition-colors p-1.5 rounded-full hover:bg-[#ebd09b]/5 cursor-pointer border border-transparent hover:border-[#ebd09b]/25"
+                className="w-8 h-8 rounded-xl bg-black/50 hover:bg-amber-950/60 border border-white/10 hover:border-amber-500/40 text-gray-400 hover:text-amber-200 flex items-center justify-center transition-all cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Body */}
-            <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar relative z-10">
+            <div className="p-5 sm:p-6 space-y-5 max-h-[75vh] overflow-y-auto custom-scrollbar relative z-10">
               
-              {/* Rewards info (Ancient Scroll theme) */}
-              <div className="bg-gradient-to-br from-[#1c1712] to-[#120f0c] border border-[#ebd09b]/20 rounded-xl p-5 shadow-inner relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[url('/icons/icon_gold.webp')] bg-contain bg-no-repeat opacity-5 pointer-events-none -mr-4 -mt-4" />
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#ebd09b]/10 border border-[#ebd09b]/30 flex items-center justify-center shrink-0 shadow-lg">
-                    <Trophy className="w-5 h-5 text-[#ebd09b]" />
+              {/* 2 Visual Reward Showcase Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                
+                {/* 1. Ally Reward Card */}
+                <div className="bg-gradient-to-b from-[#251a11]/90 via-[#150f09]/95 to-black border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden group hover:border-amber-500/60 transition-all duration-300">
+                  <div className="absolute top-0 right-0 w-28 h-28 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.15),transparent_70%)] pointer-events-none" />
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-mono font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                      INITIATE GIFT
+                    </span>
+                    <span className="text-[10px] text-gray-400 font-mono">For New Ally</span>
                   </div>
-                  <div className="space-y-2">
-                    <h4 className="font-display font-black text-xs text-[#ebd09b] uppercase tracking-widest">Recruitment Bounty</h4>
-                    <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                      Expand the influence of the Dark Covenant by inviting fellow summoners. When they sign the pact using your link:
-                    </p>
-                    <div className="space-y-2 mt-3 pt-3 border-t border-[#ebd09b]/10">
-                      <div className="flex items-center gap-2 text-[11px] text-gray-300">
-                        <span className="text-[#ebd09b] text-[9px] shrink-0">◆</span>
-                        <span>
-                          They receive: <strong className="text-amber-400 font-mono">200 Gold</strong> starter bonus immediately
-                        </span>
+
+                  <div className="flex items-center gap-3.5 my-3">
+                    <div className="w-14 h-14 rounded-2xl bg-black/60 border border-amber-500/40 flex items-center justify-center shrink-0 shadow-inner">
+                      <img 
+                        src="/icons/icon_gold.webp" 
+                        alt="Gold" 
+                        className="w-10 h-10 object-contain drop-shadow-[0_0_12px_rgba(245,158,11,0.6)] group-hover:scale-110 transition-transform duration-300" 
+                      />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-mono font-black text-amber-300 leading-none flex items-center gap-1.5">
+                        +200 <span className="text-xs text-amber-400/80 font-sans font-bold uppercase">Gold</span>
                       </div>
-                      <div className="flex items-center gap-2 text-[11px] text-gray-300">
-                        <span className="text-[#ebd09b] text-[9px] shrink-0">◆</span>
-                        <span>
-                          You receive: <strong className="text-amber-400 font-mono">1,000 Gold</strong> & <strong className="text-[#66fcf1] font-mono">100 Dust</strong> once they reach <strong className="text-emerald-400">Level 10</strong>
-                        </span>
-                      </div>
+                      <p className="text-[11px] text-gray-300 font-sans mt-1 leading-tight">
+                        Instant starter bonus upon registering with your pact link.
+                      </p>
                     </div>
                   </div>
                 </div>
+
+                {/* 2. Master's Bounty Card */}
+                <div className="bg-gradient-to-b from-[#2a141c]/90 via-[#180a10]/95 to-black border border-rose-500/30 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden group hover:border-rose-500/60 transition-all duration-300">
+                  <div className="absolute top-0 right-0 w-28 h-28 bg-[radial-gradient(circle_at_top_right,rgba(244,63,94,0.15),transparent_70%)] pointer-events-none" />
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-mono font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                      MASTER BOUNTY
+                    </span>
+                    <span className="text-[10px] text-gray-400 font-mono">When Ally Reaches Lvl 10</span>
+                  </div>
+
+                  <div className="flex items-center gap-3.5 my-3">
+                    <div className="w-14 h-14 rounded-2xl bg-black/60 border border-rose-500/40 flex items-center justify-center shrink-0 shadow-inner">
+                      <Trophy className="w-8 h-8 text-amber-300 drop-shadow-[0_0_12px_rgba(245,158,11,0.6)] group-hover:scale-110 transition-transform duration-300" />
+                    </div>
+                    <div>
+                      <div className="text-lg font-mono font-black text-amber-300 leading-none flex items-center gap-2">
+                        <span>+1,000 <span className="text-xs text-amber-400/80 font-sans font-bold">Gold</span></span>
+                        <span className="text-gray-500 font-normal">&</span>
+                        <span className="text-[#66fcf1]">+100 <span className="text-xs text-[#66fcf1]/80 font-sans font-bold">Dust</span></span>
+                      </div>
+                      <p className="text-[11px] text-gray-300 font-sans mt-1 leading-tight">
+                        Awarded to you automatically when your ally reaches Level 10.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
               </div>
 
-              {/* Runic Separator */}
-              <div className="flex items-center justify-center my-4">
-                <div className="h-[1px] bg-gradient-to-r from-transparent via-[#ebd09b]/25 to-transparent w-full" />
-                <div className="w-1.5 h-1.5 rotate-45 border border-[#ebd09b] bg-black mx-3 shrink-0" />
-                <div className="h-[1px] bg-gradient-to-r from-transparent via-[#ebd09b]/25 to-transparent w-full" />
-              </div>
+              {/* Referral Link Copy Section (Ancient Sealed Parchment Plate) */}
+              <div className="bg-gradient-to-r from-[#17110c] via-[#110d09] to-[#17110c] border border-amber-500/30 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-inner">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-mono font-bold text-amber-300/80 uppercase tracking-widest flex items-center gap-1.5">
+                    <Share2 className="w-3.5 h-3.5 text-amber-400" /> Your Covenant Invitation Link
+                  </label>
+                  <span className="text-[10px] text-gray-400 font-mono">1-Click Share</span>
+                </div>
 
-              {/* Referral Link Copy Section (Dark Metal Plate theme) */}
-              <div className="space-y-2.5">
-                <label className="block text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest">
-                  Your Unique Invitation Link
-                </label>
-                <div className="bg-black/85 border border-[#ebd09b]/15 rounded-xl p-1.5 flex flex-col sm:flex-row items-center gap-2 shadow-inner">
-                  <div className="px-3 py-2 font-mono text-xs text-[#ebd09b]/80 overflow-x-auto whitespace-nowrap grow select-all w-full text-center sm:text-left scrollbar-thin">
+                <div className="bg-black/80 border border-amber-500/20 rounded-xl p-1.5 flex flex-col sm:flex-row items-center gap-2">
+                  <div className="px-3 py-2 font-mono text-xs text-amber-200/90 overflow-x-auto whitespace-nowrap grow select-all w-full text-center sm:text-left scrollbar-thin">
                     {`${window.location.origin}?ref=${profile.solanaAddress || ''}`}
                   </div>
-                  <button
-                    onClick={handleCopyLink}
-                    className="w-full sm:w-auto bg-gradient-to-b from-[#ebd09b] to-[#c5a880] hover:from-[#f3ddb3] hover:to-[#ebd09b] text-black font-display font-black px-6 py-2.5 rounded-lg text-xs tracking-wider transition-all duration-200 flex items-center justify-center gap-1.5 shadow-md active:scale-95 cursor-pointer border-t border-white/20 uppercase"
-                  >
-                    {copySuccess ? (
-                      'COPIED!'
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5" /> COPY LINK
-                      </>
-                    )}
-                  </button>
+                  
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <button
+                      onClick={() => {
+                        audioSystem.playClick();
+                        handleCopyLink();
+                      }}
+                      className="grow sm:grow-0 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-black font-display font-black px-5 py-2 rounded-lg text-xs tracking-wider transition-all duration-200 flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(245,158,11,0.3)] active:scale-95 cursor-pointer uppercase shrink-0"
+                    >
+                      {copySuccess ? (
+                        'COPIED!'
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" /> COPY LINK
+                        </>
+                      )}
+                    </button>
+
+                    <a
+                      href={`https://t.me/share/url?url=${encodeURIComponent(`${window.location.origin}?ref=${profile.solanaAddress || ''}`)}&text=${encodeURIComponent('Join me in Void Covenant! Sign the Dark Covenant and receive +200 Gold starter bonus!')}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="bg-[#229ED9]/20 hover:bg-[#229ED9]/40 border border-[#229ED9]/40 text-[#229ED9] hover:text-white px-3 py-2 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center shrink-0"
+                      title="Share to Telegram"
+                    >
+                      TELEGRAM
+                    </a>
+                  </div>
                 </div>
               </div>
 
               {/* Stats overview (Artifact look) */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gradient-to-b from-[#0f1318] to-[#07090c] border border-gray-800/80 rounded-xl p-4 text-center relative group hover:border-[#ebd09b]/25 transition-all">
-                  <span className="block text-[9px] font-mono text-gray-500 uppercase tracking-widest">Allies Recruited</span>
-                  <span className="text-2xl font-display font-black text-amber-400 text-shadow-gold mt-1.5 block flex items-center justify-center gap-1.5">
+              <div className="grid grid-cols-2 gap-3.5">
+                <div className="bg-gradient-to-b from-[#14100c] to-black border border-amber-500/20 rounded-2xl p-3.5 text-center group hover:border-amber-500/40 transition-all">
+                  <span className="block text-[9px] font-mono text-gray-400 uppercase tracking-widest">Allies Recruited</span>
+                  <span className="text-2xl font-display font-black text-amber-300 text-shadow-gold mt-1 block flex items-center justify-center gap-1.5">
                     👥 {profile.referralsCount || 0}
                   </span>
                 </div>
-                <div className="bg-gradient-to-b from-[#0f1318] to-[#07090c] border border-gray-800/80 rounded-xl p-4 text-center relative group hover:border-[#ebd09b]/25 transition-all">
-                  <span className="block text-[9px] font-mono text-gray-500 uppercase tracking-widest">Bounty Earned</span>
-                  <span className="text-2xl font-display font-black text-amber-400 text-shadow-gold mt-1 block flex items-center justify-center gap-1">
-                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-7 h-7 object-contain inline-block drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" />
+                <div className="bg-gradient-to-b from-[#14100c] to-black border border-amber-500/20 rounded-2xl p-3.5 text-center group hover:border-amber-500/40 transition-all">
+                  <span className="block text-[9px] font-mono text-gray-400 uppercase tracking-widest">Total Bounty Claimed</span>
+                  <span className="text-2xl font-display font-black text-amber-300 text-shadow-gold mt-1 block flex items-center justify-center gap-1">
+                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-6 h-6 object-contain inline-block drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" />
                     {((profile.referralsCount || 0) * 1000).toLocaleString()}
                   </span>
                 </div>
               </div>
 
-              {/* Referrals list (Immersive Card layout instead of generic table) */}
-              <div className="space-y-3.5">
-                <h4 className="font-display font-bold text-xs text-[#ebd09b] uppercase tracking-widest flex items-center gap-2">
-                  <User className="w-4 h-4 text-[#ebd09b]" /> Referred Allies List
-                </h4>
+              {/* Referrals list (Immersive Card layout) */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
+                  <h4 className="font-display font-bold text-xs text-amber-200 uppercase tracking-widest flex items-center gap-2">
+                    <User className="w-4 h-4 text-amber-400" /> Covenant Allies Ledger
+                  </h4>
+                  <span className="text-[10px] text-gray-400 font-mono">
+                    {referralsList.length} Active Records
+                  </span>
+                </div>
                 
                 {isLoadingReferrals ? (
-                  <div className="text-center py-10 border border-gray-850 bg-black/10 rounded-xl">
-                    <div className="w-6 h-6 border-2 border-[#ebd09b] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                  <div className="text-center py-8 border border-amber-500/20 bg-black/40 rounded-2xl">
+                    <div className="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
                     <span className="text-xs text-gray-400 font-mono animate-pulse">Consulting the dark ledger...</span>
                   </div>
                 ) : referralsList.length === 0 ? (
-                  <div className="text-center py-10 border border-dashed border-[#ebd09b]/15 rounded-xl bg-black/10 text-xs text-gray-500 font-sans px-4 leading-relaxed">
+                  <div className="text-center py-8 border border-dashed border-amber-500/20 rounded-2xl bg-black/30 text-xs text-gray-400 font-sans px-4 leading-relaxed">
                     No summoners have pledged their allegiance yet. <br />
-                    Share your invitation link to recruit brothers into the Order.
+                    Share your invitation link to recruit allies and earn master bounties.
                   </div>
                 ) : (
-                  <div className="space-y-2.5 max-h-[220px] overflow-y-auto pr-1 custom-scrollbar">
+                  <div className="space-y-2 max-h-[190px] overflow-y-auto pr-1 custom-scrollbar">
                     {referralsList.map((ref, idx) => (
                       <div 
                         key={idx} 
-                        className="bg-gradient-to-r from-[#14181f] to-[#0d1014] border border-gray-850/80 hover:border-[#ebd09b]/25 rounded-xl p-3 flex items-center justify-between transition-all duration-200"
+                        className="bg-gradient-to-r from-[#17120d] to-[#0c0907] border border-amber-500/20 hover:border-amber-500/40 rounded-xl p-3 flex items-center justify-between transition-all duration-200"
                       >
                         {/* Summoner Name & Join Date */}
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-gradient-to-b from-[#ebd09b]/20 to-black border border-[#ebd09b]/40 overflow-hidden shadow-inner shrink-0 flex items-center justify-center">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-b from-amber-500/20 to-black border border-amber-500/40 overflow-hidden shadow-inner shrink-0 flex items-center justify-center">
                             {ref.avatarUrl ? (
                               <img src={ref.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                             ) : (
-                              <User className="w-3.5 h-3.5 text-[#ebd09b]" />
+                              <User className="w-4 h-4 text-amber-300" />
                             )}
                           </div>
                           <div>
                             <span className="font-display font-black text-sm text-gray-200 block tracking-wide">
                               {ref.username}
                             </span>
-                            <span className="text-[9px] text-gray-500 font-mono flex items-center gap-1 mt-0.5">
-                              <Clock className="w-3 h-3" /> Joined {new Date(ref.joinedAt).toLocaleDateString()}
+                            <span className="text-[9px] text-gray-400 font-mono flex items-center gap-1 mt-0.5">
+                              <Clock className="w-3 h-3 text-amber-400/60" /> Joined {new Date(ref.joinedAt).toLocaleDateString()}
                             </span>
                           </div>
                         </div>
@@ -326,11 +400,11 @@ export const HeaderHUD: React.FC = () => {
                         {/* Level Badge */}
                         <div className="flex items-center gap-2">
                           {ref.level >= 10 ? (
-                            <span className="font-mono text-[9px] font-black text-emerald-400 bg-emerald-950/40 border border-emerald-500/35 px-2.5 py-1 rounded-md tracking-wider uppercase">
-                              LVL {ref.level} • COMPLETED
+                            <span className="font-mono text-[9px] font-black text-emerald-300 bg-emerald-950/60 border border-emerald-500/40 px-2.5 py-1 rounded-lg tracking-wider uppercase shadow-[0_0_8px_rgba(16,185,129,0.2)]">
+                              LVL {ref.level} • BOUNTY CLAIMED
                             </span>
                           ) : (
-                            <span className="font-mono text-[9px] font-black text-amber-500 bg-amber-950/20 border border-amber-500/25 px-2.5 py-1 rounded-md tracking-wider uppercase">
+                            <span className="font-mono text-[9px] font-black text-amber-300 bg-amber-950/40 border border-amber-500/30 px-2.5 py-1 rounded-lg tracking-wider uppercase">
                               LVL {ref.level}/10 • IN PROGRESS
                             </span>
                           )}
