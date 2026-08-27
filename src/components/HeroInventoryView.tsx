@@ -20,30 +20,34 @@ const SLOTS_CONFIG: SlotConfig[] = [
   { slot: 'boots', label: 'BOOTS', iconPath: '/icons/equipment/slot_boots.png' },
 ];
 
-const TIER_STYLES: Record<CardTier, { border: string; bg: string; text: string; glow: string }> = {
+const TIER_STYLES: Record<CardTier, { border: string; bg: string; text: string; glow: string; itemGlow: string }> = {
   bronze: {
     border: 'border-amber-700/60 hover:border-amber-600',
     bg: 'from-[#221609]/90 via-[#150d05]/90 to-black',
     text: 'text-amber-500',
-    glow: 'shadow-[0_0_12px_rgba(180,83,9,0.25)]'
+    glow: 'shadow-[0_0_12px_rgba(180,83,9,0.25)]',
+    itemGlow: 'drop-shadow-[0_6px_12px_rgba(0,0,0,0.85)]'
   },
   silver: {
     border: 'border-slate-300/60 hover:border-slate-200',
     bg: 'from-[#1a232c]/90 via-[#0e141a]/90 to-black',
     text: 'text-slate-300',
-    glow: 'shadow-[0_0_12px_rgba(203,213,225,0.25)]'
+    glow: 'shadow-[0_0_12px_rgba(203,213,225,0.25)]',
+    itemGlow: 'drop-shadow-[0_6px_12px_rgba(0,0,0,0.85)]'
   },
   gold: {
     border: 'border-amber-400/80 hover:border-amber-300',
     bg: 'from-[#2e2008]/90 via-[#191103]/90 to-black',
     text: 'text-amber-300',
-    glow: 'shadow-[0_0_18px_rgba(251,191,36,0.35)]'
+    glow: 'shadow-[0_0_18px_rgba(251,191,36,0.35)]',
+    itemGlow: 'drop-shadow-[0_0_12px_rgba(251,191,36,0.35)]'
   },
   legendary: {
     border: 'border-purple-500/90 hover:border-purple-400',
     bg: 'from-[#280c35]/90 via-[#15041d]/90 to-black',
     text: 'text-purple-300',
-    glow: 'shadow-[0_0_22px_rgba(168,85,247,0.45)]'
+    glow: 'shadow-[0_0_22px_rgba(168,85,247,0.45)]',
+    itemGlow: 'drop-shadow-[0_0_16px_rgba(168,85,247,0.45)]'
   }
 };
 
@@ -122,7 +126,7 @@ export const HeroInventoryView: React.FC = () => {
 
             {/* Individual Item Icon */}
             <div className="w-12 h-12 sm:w-14 sm:h-14 my-auto flex items-center justify-center relative z-10 group-hover:scale-110 transition-transform">
-              <img src={itemIcon} alt={item.name} className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(255,215,110,0.6)]" />
+              <img src={itemIcon} alt={item.name} className={`w-full h-full object-contain ${tierStyle?.itemGlow || ''}`} />
             </div>
 
             {/* Item Name & Bonus Footer */}
@@ -176,7 +180,7 @@ export const HeroInventoryView: React.FC = () => {
           <div className="flex items-center justify-between border-b border-gray-800/80 pb-4 shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-black/70 border border-purple-500/50 flex items-center justify-center shadow-inner">
-                <img src={slotCfg?.iconPath} alt={selectedSlot} className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(235,208,155,0.7)]" />
+                <img src={slotCfg?.iconPath} alt={selectedSlot} className="w-8 h-8 object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]" />
               </div>
               <div>
                 <h4 className="font-display font-black text-white text-lg sm:text-xl tracking-widest uppercase">
@@ -234,11 +238,11 @@ export const HeroInventoryView: React.FC = () => {
                       
                       {/* Large Item Artwork Showcase */}
                       <div className="w-full h-36 rounded-2xl bg-black/60 border border-white/10 flex items-center justify-center p-3 relative overflow-hidden shadow-inner">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_70%)] pointer-events-none" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.04),transparent_70%)] pointer-events-none" />
                         <img 
                           src={itemIcon} 
                           alt={item.name} 
-                          className="w-28 h-28 object-contain drop-shadow-[0_0_16px_rgba(255,215,110,0.6)] group-hover:scale-110 transition-transform duration-300" 
+                          className={`w-28 h-28 object-contain ${tierStyle.itemGlow} group-hover:scale-110 transition-transform duration-300`} 
                         />
                       </div>
 
