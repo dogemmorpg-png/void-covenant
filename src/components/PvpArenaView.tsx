@@ -1096,14 +1096,14 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             {/* Close Button */}
             <button
               onClick={() => setIsBuyTicketsModalOpen(false)}
-              className="absolute top-5 right-5 text-gray-400 hover:text-white font-sans text-lg font-black transition-colors cursor-pointer w-8 h-8 flex items-center justify-center bg-black/60 border border-white/10 hover:border-white/20 rounded-full z-10"
+              className="absolute top-5 right-5 text-gray-400 hover:text-white font-sans text-base font-black transition-all cursor-pointer w-9 h-9 flex items-center justify-center bg-black/70 hover:bg-black border border-white/10 hover:border-white/30 rounded-full z-30 shadow-lg hover:scale-105 active:scale-95"
               title="Close"
             >
               ✕
             </button>
  
             {/* Header with Glowing Ticket Emblem */}
-            <div className="text-center space-y-2 relative z-10">
+            <div className="text-center space-y-2 relative z-10 px-10">
               <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-b from-rose-950/80 via-black to-black border-2 border-rose-500/60 flex items-center justify-center shadow-[0_0_25px_rgba(244,63,94,0.35)]">
                 <img src="/icons/ticket.png" alt="Ticket" className="w-10 h-10 object-contain drop-shadow-[0_0_10px_rgba(244,63,94,0.75)]" />
               </div>
@@ -1260,14 +1260,14 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             {/* Close Button */}
             <button
               onClick={() => setIsLeagueRulesModalOpen(false)}
-              className="absolute top-5 right-5 text-gray-400 hover:text-white font-sans text-lg font-black transition-colors cursor-pointer w-8 h-8 flex items-center justify-center bg-black/60 border border-white/10 hover:border-white/20 rounded-full z-10"
+              className="absolute top-5 right-5 text-gray-400 hover:text-white font-sans text-base font-black transition-all cursor-pointer w-9 h-9 flex items-center justify-center bg-black/70 hover:bg-black border border-white/10 hover:border-white/30 rounded-full z-30 shadow-lg hover:scale-105 active:scale-95"
               title="Close"
             >
               ✕
             </button>
 
             {/* Header with Glowing Trophy */}
-            <div className="text-center space-y-2 relative z-10">
+            <div className="text-center space-y-2 relative z-10 px-10">
               <div className="w-18 h-18 mx-auto rounded-2xl bg-gradient-to-b from-amber-950/80 via-black to-black border-2 border-amber-500/60 flex items-center justify-center shadow-[0_0_25px_rgba(245,158,11,0.35)]">
                 <Trophy className="w-10 h-10 text-amber-400 drop-shadow-[0_0_12px_rgba(245,158,11,0.8)]" />
               </div>
