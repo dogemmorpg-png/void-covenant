@@ -511,7 +511,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[95px]">
               <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-bold block">CROWNS</span>
               <div className="font-mono text-xl sm:text-2xl font-black text-amber-400 flex items-center justify-center gap-1.5 mt-0.5">
-                <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain" />
+                <img src="/icons/crown.png" alt="Crown" className="w-6 h-6 object-contain brightness-110 contrast-125" />
                 {profile.pvpLP || 0}
               </div>
             </div>
