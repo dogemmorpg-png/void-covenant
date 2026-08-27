@@ -85,47 +85,26 @@ export async function checkAndPerformPvpRollover(
 
       const count = leaguePlayers.length;
 
-      // Dynamic thresholds based on pool size:
-      // Promotion threshold
-      let promoRanks = 0;
-      if (leagueIdx < PVP_LEAGUES.length - 1) {
-        if (count <= 3) {
-          promoRanks = 1;
-        } else if (count <= 10) {
-          promoRanks = Math.min(3, Math.ceil(count * 0.4)); // e.g. top 2-3
-        } else {
-          promoRanks = Math.min(20, Math.ceil(count * 0.25));
-        }
-      }
-
-      // Demotion threshold
-      let demoteFromRank = 999999;
-      if (leagueIdx > 0 && count >= 3) {
-        if (count <= 5) {
-          demoteFromRank = count; // bottom 1
-        } else if (count <= 10) {
-          demoteFromRank = count - 1; // bottom 2
-        } else {
-          demoteFromRank = count - Math.ceil(count * 0.2); // bottom 20%
-        }
-      }
-
       for (let i = 0; i < count; i++) {
         const p = leaguePlayers[i];
         const rank = i + 1;
 
-        if (rank <= promoRanks) {
+        // Top 20 players promote to next league (if not in top league)
+        if (rank <= 20 && leagueIdx < PVP_LEAGUES.length - 1) {
           const nextLeague = PVP_LEAGUES[leagueIdx + 1];
           p.profile.pvpLeague = nextLeague;
           p.profile.pvpLP = 100;
           totalPromoted++;
-        } else if (rank >= demoteFromRank) {
+        }
+        // Players below rank 100 demote to previous league (if not in Bronze)
+        else if (rank > 100 && leagueIdx > 0) {
           const prevLeague = PVP_LEAGUES[leagueIdx - 1];
           p.profile.pvpLeague = prevLeague;
           p.profile.pvpLP = 100;
           totalDemoted++;
-        } else {
-          // Stayed in same league: reset daily LP for new round
+        }
+        // Rank 21-100 (or at boundaries): retain in current league with fresh round LP
+        else {
           p.profile.pvpLP = 100;
         }
       }
