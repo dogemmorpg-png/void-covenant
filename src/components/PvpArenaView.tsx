@@ -189,7 +189,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
     }
 
     setIsMatching(true);
-    setMatchStatus(spendShards ? 'Deducting 5 Shards and finding new opponent...' : 'Spending 1 PvP Energy and finding opponent...');
+    setMatchStatus(spendShards ? 'Summoning a new challenger...' : 'Searching for an opponent...');
 
     try {
       const token = localStorage.getItem('void_covenant_token');
@@ -215,7 +215,6 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         setIsModalOpen(true);
         if (spendShards) {
           toast('Opponent re-rolled! 5 Dark Shards deducted.', 'success');
-          setRefreshCooldown(3); // 3-second cooldown on re-rolls to prevent spamming
         }
       } else {
         const data = await res.json().catch(() => ({}));
@@ -232,7 +231,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   const handleCancelMatch = async (silent: boolean = false) => {
     if (!silent) {
       setIsMatching(true);
-      setMatchStatus('Forfeiting challenger connection...');
+      setMatchStatus('Leaving matchmaking...');
     }
     try {
       const token = localStorage.getItem('void_covenant_token');
@@ -341,7 +340,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
     }
 
     setIsMatching(true);
-    setMatchStatus(`Locking signature keys against ${opponent.name || opponent.username}...`);
+    setMatchStatus('Entering the Arena...');
 
     const opponentLP = opponent.lp !== undefined ? opponent.lp : (opponent.pvpLP !== undefined ? opponent.pvpLP : (opponent.rating || opponent.pvpRating || 0));
 
@@ -371,7 +370,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
     };
 
     try {
-      setMatchStatus('Accessing local battlefield simulation channel...');
+      setMatchStatus('Entering the Arena...');
       const success = await onStartBattle(pvpStage, 'pvp', opponentPayload);
       setIsMatching(false); // Fix loading screen hang!
       if (success) {
@@ -396,73 +395,83 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       
       {/* Matchmaking Overlay */}
       {isMatching && (
-        <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-6 space-y-6 animate-fade-in">
-          <div className="w-24 h-24 rounded-full border-4 border-rose-500 border-t-transparent animate-spin flex items-center justify-center shadow-[0_0_25px_rgba(239,68,68,0.25)]">
-            <Swords className="w-10 h-10 text-rose-500 animate-pulse" />
+        <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-6 space-y-5 animate-fade-in">
+          <div className="w-20 h-20 rounded-full border-4 border-rose-500 border-t-transparent animate-spin flex items-center justify-center shadow-[0_0_30px_rgba(244,63,94,0.3)]">
+            <Swords className="w-8 h-8 text-rose-400 animate-pulse" />
           </div>
           
-          <div className="text-center space-y-2 max-w-sm">
-            <h3 className="font-display font-black text-xl text-rose-500 tracking-widest uppercase animate-pulse">WAR ENCRYPTION</h3>
-            <p className="text-sm font-mono text-cyan-400 font-bold">{matchStatus}</p>
+          <div className="text-center space-y-1.5 max-w-sm">
+            <h3 className="font-display font-black text-lg text-white tracking-widest uppercase">
+              MATCHMAKING
+            </h3>
+            <p className="text-xs font-mono text-gray-400">{matchStatus}</p>
           </div>
         </div>
       )}
 
-      {/* Opponent Modal Window (Request #2) */}
+      {/* Opponent Modal Window */}
       {isModalOpen && activeOpponent && (
-        <div className="fixed inset-0 z-[90] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-gradient-to-b from-[#151a21] via-[#0b0c10] to-[#040507] border-2 border-cyan-500/35 rounded-3xl p-7 max-w-sm w-full text-center space-y-6 shadow-2xl relative overflow-hidden gothic-glow-cyan">
+        <div className="fixed inset-0 z-[90] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-gradient-to-b from-[#1a141b] via-[#100b11] to-[#080509] border-2 border-amber-500/40 rounded-3xl p-6 max-w-sm w-full text-center space-y-5 shadow-[0_0_40px_rgba(0,0,0,0.9)] relative overflow-hidden">
             
-            {/* Decorative corners */}
-            <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-cyan-500/30 pointer-events-none" />
-            <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-cyan-500/30 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-cyan-500/30 pointer-events-none" />
-            <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-cyan-500/30 pointer-events-none" />
+            {/* Ambient Background Flare */}
+            <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-rose-500/15 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-amber-500/10 blur-3xl pointer-events-none" />
 
-            {/* Close Cross (Pre-paid loss on close) */}
+            {/* Close Button */}
             <button
               onClick={handleCancelMatch}
-              className="absolute top-4 right-4 text-gray-500 hover:text-white font-sans text-lg font-black transition-colors cursor-pointer w-6 h-6 flex items-center justify-center bg-black/40 border border-white/5 rounded-full"
+              className="absolute top-4 right-4 text-gray-500 hover:text-white font-sans text-lg font-black transition-colors cursor-pointer w-7 h-7 flex items-center justify-center bg-black/50 border border-white/10 hover:border-white/20 rounded-full z-10"
               title="Close and forfeit spent PvP energy"
             >
               ✕
             </button>
 
-            <h3 className="font-display font-black text-sm text-white tracking-widest uppercase border-b border-gray-900 pb-2.5">
-              CHALLENGER FOUND
-            </h3>
+            {/* Header Title with Swords Emblem */}
+            <div className="flex items-center justify-center gap-2 border-b border-white/10 pb-3 relative z-10">
+              <Swords className="w-4 h-4 text-rose-400" />
+              <h3 className="font-display font-black text-sm text-white tracking-widest uppercase">
+                CHALLENGER FOUND
+              </h3>
+            </div>
 
-            {/* Beautiful Opponent Card Details (Request #4) */}
-            <div className="flex flex-col items-center space-y-4">
+            {/* Opponent Identity & Portrait */}
+            <div className="flex flex-col items-center space-y-3.5 relative z-10">
               <div className="relative">
-                <img 
-                  src={activeOpponent.avatarUrl || '/avatars/knight.webp'} 
-                  alt="Avatar" 
-                  className="w-20 h-20 rounded-full border-2 border-[#ebd09b]/50 bg-black/40 object-cover shadow-[0_0_15px_rgba(235,208,155,0.15)]" 
-                />
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-cyan-950 border border-cyan-500/40 flex items-center justify-center font-mono text-[9px] font-bold text-cyan-400 shadow-md">
-                  Lvl{activeOpponent.level || 1}
+                <div className="w-24 h-24 rounded-2xl border-2 border-amber-400/60 p-0.5 bg-black/60 shadow-[0_0_20px_rgba(245,158,11,0.25)] overflow-hidden">
+                  <img 
+                    src={activeOpponent.avatarUrl || '/avatars/knight.webp'} 
+                    alt="Avatar" 
+                    className="w-full h-full rounded-xl object-cover" 
+                  />
+                </div>
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-600 to-yellow-600 border border-amber-300 text-black px-2.5 py-0.5 rounded-full font-mono text-[9px] font-black uppercase tracking-wider shadow-md">
+                  LVL {activeOpponent.level || 1}
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <h4 className="text-white font-display font-black text-lg tracking-wide leading-none">{activeOpponent.name || activeOpponent.username}</h4>
-                <span className={`px-2.5 py-0.5 border rounded-full text-[9px] font-display font-black uppercase tracking-widest leading-none inline-flex items-center gap-1 ${getLeagueDetails(activeOpponent.league || 'Bronze').color}`}>
-                  <img src={getLeagueDetails(activeOpponent.league || 'Bronze').icon} alt="Crest" className="w-3 h-3 object-contain" />
-                  {getLeagueDetails(activeOpponent.league || 'Bronze').name}
-                </span>
+              <div className="space-y-1 pt-1">
+                <h4 className="text-white font-display font-black text-xl tracking-wide leading-tight">
+                  {activeOpponent.name || activeOpponent.username}
+                </h4>
+                
+                <div className="flex items-center justify-center gap-2 pt-0.5">
+                  <span className={`px-2.5 py-0.5 border rounded-full text-[10px] font-display font-bold uppercase tracking-wider inline-flex items-center gap-1.5 ${getLeagueDetails(activeOpponent.league || 'Bronze').color}`}>
+                    <img src={getLeagueDetails(activeOpponent.league || 'Bronze').icon} alt="Crest" className="w-3.5 h-3.5 object-contain" />
+                    {getLeagueDetails(activeOpponent.league || 'Bronze').name}
+                  </span>
+
+                  <div className="bg-black/60 border border-amber-500/30 px-2.5 py-0.5 rounded-full flex items-center gap-1 text-xs font-mono font-bold text-amber-300 shadow-inner">
+                    <img src="/icons/crown.png" alt="Crown" className="w-4 h-4 object-contain brightness-110 contrast-125" />
+                    <span>{activeOpponent.lp !== undefined ? activeOpponent.lp : (activeOpponent.rating || 0)}</span>
+                  </div>
+                </div>
               </div>
 
-              {/* Crowns */}
-              <div className="bg-black/50 border border-gray-950 px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-mono font-bold text-[#ebd09b]">
-                <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain" />
-                <span>{activeOpponent.lp !== undefined ? activeOpponent.lp : (activeOpponent.rating || 0)}</span>
-              </div>
-
-              {/* Active stance skill */}
-              <div className="space-y-1">
-                <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-bold block">Active Stance</span>
-                <span className="px-3 py-1 bg-cyan-950/40 border border-cyan-500/20 rounded-lg text-xs font-mono font-bold text-cyan-300 uppercase tracking-wide inline-block shadow-sm">
+              {/* Combat Stance Box */}
+              <div className="w-full bg-black/40 border border-white/5 rounded-xl p-2.5 flex items-center justify-between text-xs font-mono">
+                <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Combat Stance</span>
+                <span className="px-2.5 py-0.5 bg-cyan-950/60 border border-cyan-500/40 rounded-lg text-[11px] font-bold text-cyan-300 uppercase tracking-wide">
                   {activeOpponent.stance === 'void_strike' ? 'Void Strike ⚡' : 
                    activeOpponent.stance === 'blood_aura' ? 'Blood Aura 🩸' : 
                    activeOpponent.stance === 'warlord_cry' ? "Warlord's Cry 🔊" : 'Void Strike ⚡'}
@@ -470,30 +479,30 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               </div>
             </div>
 
-            {/* Action buttons (Reroll / Fight) */}
-            <div className="grid grid-cols-2 gap-3.5 pt-2 border-t border-gray-900">
+            {/* Action Buttons (Re-roll & Fight) */}
+            <div className="grid grid-cols-2 gap-3 pt-1 border-t border-white/10 relative z-10">
               <button
-                disabled={refreshCooldown > 0}
+                disabled={isMatching || (profile.darkShards || 0) < 5}
                 onClick={() => handleFindOpponent(true, false)}
-                className={`py-3 px-3 rounded-xl border font-display font-bold text-[10px] tracking-wider transition-all flex items-center justify-center gap-3 cursor-pointer active:scale-95 ${
-                  refreshCooldown > 0
-                    ? 'border-gray-850 bg-gray-900/20 text-gray-600 cursor-not-allowed'
-                    : 'border-rose-950/40 bg-rose-950/10 hover:bg-rose-900/20 text-rose-300'
+                className={`py-3 px-3 rounded-xl border font-display font-bold text-xs tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-95 ${
+                  (profile.darkShards || 0) < 5
+                    ? 'border-zinc-850 bg-zinc-900/40 text-zinc-600 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-red-950/80 via-[#260c12] to-red-950/80 border-rose-600/50 hover:border-rose-400 text-rose-200 hover:text-white hover:scale-[1.02]'
                 }`}
               >
-                <RefreshCw className="w-3.5 h-3.5 shrink-0" />
-                <span className="mr-0.5">RE-ROLL</span>
-                <span className="flex items-center gap-1 bg-black/50 border border-rose-500/25 rounded-full px-2 py-0.5 font-mono text-[11px] font-bold text-[#ebd09b] shadow-inner">
+                <RefreshCw className={`w-3.5 h-3.5 ${isMatching ? 'animate-spin' : ''}`} />
+                <span>RE-ROLL</span>
+                <span className="flex items-center gap-1 bg-black/60 border border-rose-500/40 rounded-full px-2 py-0.5 font-mono text-[10px] font-bold text-amber-300 shadow-inner">
                   5
-                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain brightness-110 drop-shadow-[0_0_4px_rgba(239,68,68,0.45)]" />
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
                 </span>
               </button>
               
               <button
                 onClick={() => handleFight(activeOpponent)}
-                className="py-3 px-4 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border bg-gradient-to-r from-emerald-900 to-teal-900 border-emerald-500/50 text-white hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+                className="py-3 px-4 rounded-xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border-2 bg-gradient-to-r from-emerald-950 via-emerald-800 to-teal-950 border-emerald-500/70 hover:border-emerald-400 text-white hover:scale-[1.02] active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_20px_rgba(16,185,129,0.5)]"
               >
-                <Swords className="w-4 h-4 shrink-0" /> FIGHT
+                <Swords className="w-4 h-4 shrink-0 text-emerald-300 animate-pulse" /> FIGHT
               </button>
             </div>
 
@@ -540,7 +549,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                 </div>
                 <button
                   onClick={() => setIsBuyTicketsModalOpen(true)}
-                  className="py-1 px-2.5 rounded-lg bg-white/10 hover:bg-white/15 border border-white/15 text-white font-display font-bold text-[10px] uppercase transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                  className="py-1 px-3 rounded-lg bg-gradient-to-r from-amber-600 to-rose-600 hover:from-amber-500 hover:to-rose-500 border border-amber-400/50 text-white font-display font-black text-[10px] uppercase transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-[0_0_8px_rgba(245,158,11,0.35)]"
                   title="Buy Arena Tickets"
                 >
                   + BUY
