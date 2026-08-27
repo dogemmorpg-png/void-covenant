@@ -39,7 +39,7 @@ const CORE_UI_ASSETS = [
 ];
 
 /**
- * Preloads a single image and decodes it in memory
+ * Preloads a single image and caches it in browser memory
  */
 export const preloadImage = (url: string): Promise<boolean> => {
   if (!url || typeof url !== 'string' || preloadedUrls.has(url)) {
@@ -48,29 +48,15 @@ export const preloadImage = (url: string): Promise<boolean> => {
 
   return new Promise((resolve) => {
     const img = new Image();
+    img.onload = () => {
+      preloadedUrls.add(url);
+      resolve(true);
+    };
+    img.onerror = () => {
+      preloadedUrls.add(url);
+      resolve(false);
+    };
     img.src = url;
-    
-    // Use modern decode API if available for zero-jank GPU rasterization
-    if ('decode' in img) {
-      img.decode()
-        .then(() => {
-          preloadedUrls.add(url);
-          resolve(true);
-        })
-        .catch(() => {
-          // Fallback if decode fails
-          preloadedUrls.add(url);
-          resolve(false);
-        });
-    } else {
-      img.onload = () => {
-        preloadedUrls.add(url);
-        resolve(true);
-      };
-      img.onerror = () => {
-        resolve(false);
-      };
-    }
   });
 };
 
@@ -85,9 +71,9 @@ export const preloadHighPriority = async (urls: string[]): Promise<void> => {
 };
 
 /**
- * Preload background assets in small batches during idle frames
+ * Preload background assets in fast smooth batches
  */
-export const preloadIdleQueue = (urls: string[], batchSize = 4) => {
+export const preloadIdleQueue = (urls: string[], batchSize = 10) => {
   const pendingUrls = urls.filter(u => u && !preloadedUrls.has(u));
   if (pendingUrls.length === 0) return;
 
@@ -100,21 +86,13 @@ export const preloadIdleQueue = (urls: string[], batchSize = 4) => {
     if (batch.length > 0) {
       Promise.allSettled(batch.map(u => preloadImage(u))).then(() => {
         if (index < pendingUrls.length) {
-          scheduleNextBatch();
+          setTimeout(processNextBatch, 30);
         }
       });
     }
   };
 
-  const scheduleNextBatch = () => {
-    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(processNextBatch, { timeout: 300 });
-    } else {
-      setTimeout(processNextBatch, 80);
-    }
-  };
-
-  scheduleNextBatch();
+  setTimeout(processNextBatch, 10);
 };
 
 /**
