@@ -1048,100 +1048,155 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
  
       {/* Ticket Purchase Modal */}
       {isBuyTicketsModalOpen && (
-        <div className="fixed inset-0 z-[110] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-[#151a21] border-2 border-[#ebd09b]/35 rounded-2xl p-6 max-w-md w-full relative shadow-2xl space-y-6">
+        <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-gradient-to-b from-[#1c141e] via-[#110d14] to-[#09060b] border-2 border-amber-500/50 rounded-3xl p-6 sm:p-8 max-w-xl w-full relative shadow-[0_0_60px_rgba(0,0,0,0.95)] space-y-6 overflow-hidden">
+            
+            {/* Ambient Background Flares */}
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-rose-500/15 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-amber-500/10 blur-3xl pointer-events-none" />
+
+            {/* Close Button */}
             <button
               onClick={() => setIsBuyTicketsModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-white font-sans text-lg font-black transition-colors cursor-pointer w-6 h-6 flex items-center justify-center bg-black/40 border border-white/5 rounded-full"
+              className="absolute top-5 right-5 text-gray-400 hover:text-white font-sans text-lg font-black transition-colors cursor-pointer w-8 h-8 flex items-center justify-center bg-black/60 border border-white/10 hover:border-white/20 rounded-full z-10"
+              title="Close"
             >
               ✕
             </button>
  
-            <div className="text-center space-y-1.5">
-              <div className="w-14 h-14 mx-auto rounded-xl bg-red-950/20 border border-red-500/30 flex items-center justify-center shadow-lg">
-                <img src="/icons/ticket.png" alt="Ticket" className="w-9 h-9 object-contain drop-shadow-[0_0_8px_rgba(255,40,60,0.5)]" />
+            {/* Header with Glowing Ticket Emblem */}
+            <div className="text-center space-y-2 relative z-10">
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-b from-rose-950/80 via-black to-black border-2 border-rose-500/60 flex items-center justify-center shadow-[0_0_25px_rgba(244,63,94,0.35)]">
+                <img src="/icons/ticket.png" alt="Ticket" className="w-10 h-10 object-contain drop-shadow-[0_0_10px_rgba(244,63,94,0.75)]" />
               </div>
-              <h3 className="font-display font-black text-base text-white tracking-widest uppercase">
-                ARENA TICKET OFFICE
+              <h3 className="font-display font-black text-2xl text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-300 to-yellow-500 tracking-widest uppercase text-shadow-gold">
+                ARENA TICKET VAULT
               </h3>
-              <p className="text-[10px] text-gray-400 font-sans max-w-xs mx-auto">
-                Exchange Dark Shards to purchase Arena Tickets.
+              <p className="text-xs text-gray-300 font-sans max-w-sm mx-auto leading-relaxed">
+                Exchange Dark Shards for Arena Tickets to battle rival summoners and climb the Leagues.
               </p>
             </div>
 
-            <div className="bg-black/40 border border-white/5 rounded-xl p-3 flex items-center justify-between font-mono text-xs">
-              <span className="text-gray-400">Your Shard Balance:</span>
-              <span className="font-bold text-[#ebd09b] flex items-center gap-1.5">
-                {(profile.darkShards || 0)}
-                <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
-              </span>
+            {/* Status Bar: Current Tickets + Shards Balance */}
+            <div className="grid grid-cols-2 gap-3 bg-black/60 border border-white/10 rounded-2xl p-3.5 relative z-10 shadow-inner">
+              <div className="flex items-center justify-center gap-3 border-r border-white/10 pr-2">
+                <img src="/icons/ticket.png" alt="Ticket" className="w-6 h-6 object-contain drop-shadow-[0_0_6px_rgba(244,63,94,0.6)]" />
+                <div className="text-left">
+                  <span className="text-[9px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Your Tickets</span>
+                  <span className="font-mono text-base font-black text-rose-300">
+                    {profile.pvpTickets !== undefined ? profile.pvpTickets : profile.pvpEnergy} / 5
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center gap-3 pl-2">
+                <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.6)]" />
+                <div className="text-left">
+                  <span className="text-[9px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Shard Balance</span>
+                  <span className="font-mono text-base font-black text-amber-300">
+                    {profile.darkShards || 0}
+                  </span>
+                </div>
+              </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            {/* 3 Ticket Bundles */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 relative z-10">
               {[
-                { count: 1, cost: 12, label: 'Single Pass' },
-                { count: 5, cost: 50, label: 'Challenger Pack', popular: true },
-                { count: 10, cost: 90, label: 'Gladiator Bundle' }
-              ].map((pack) => (
-                <div
-                  key={pack.count}
-                  className={`relative p-3 py-4 rounded-xl border flex flex-col items-center justify-between text-center gap-3 bg-black/45 ${
-                    pack.popular 
-                      ? 'border-amber-500/40 shadow-lg shadow-amber-500/5' 
-                      : 'border-white/5'
-                  }`}
-                >
-                  {pack.popular && (
-                    <span className="absolute -top-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-display font-black text-[7px] px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-md">
-                      Best Value
-                    </span>
-                  )}
-                  
-                  <div className="space-y-0.5">
-                    <span className="text-[8px] text-gray-500 font-mono uppercase tracking-tight block">
-                      {pack.label}
-                    </span>
-                    <div className="flex items-center justify-center gap-1.5 pt-1">
-                      <span className="font-display font-black text-base text-white">
-                        +{pack.count}
-                      </span>
-                      <img src="/icons/ticket.png" alt="Ticket" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(255,40,60,0.4)]" />
-                    </div>
-                  </div>
- 
-                  <div className="bg-black/50 border border-white/5 w-full py-1.5 rounded-lg flex items-center justify-center gap-1 font-mono text-[9px] font-bold text-amber-400">
-                    <span>{pack.cost}</span>
-                    <img src="/icons/icon_shards.webp" alt="Shards" className="w-3 h-3 object-contain" />
-                  </div>
- 
-                  <button
-                    onClick={async () => {
-                      if ((profile.darkShards || 0) < pack.cost) {
-                        toast('Insufficient Dark Shards for this package!', 'warning');
-                        return;
-                      }
-                      const ok = await buyPvpTickets(pack.count);
-                      if (ok) {
-                        toast(`Successfully purchased ${pack.count} Tickets!`, 'success');
-                      } else {
-                        toast('Transaction failed.', 'error');
-                      }
-                    }}
-                    className={`w-full py-1.5 rounded-lg font-display font-black tracking-wider text-[9px] cursor-pointer transition-all hover:scale-105 active:scale-95 border ${
-                      pack.popular
-                        ? 'bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 border-amber-400 text-black'
-                        : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-700 text-gray-200 hover:text-white'
-                    }`}
+                { 
+                  count: 1, 
+                  cost: 12, 
+                  label: 'Single Pass', 
+                  sub: '1 Duel Entry',
+                  theme: 'border-white/10 hover:border-white/20 bg-gradient-to-b from-zinc-950 via-black to-black' 
+                },
+                { 
+                  count: 5, 
+                  cost: 50, 
+                  label: 'Gladiator Pack', 
+                  sub: '5 Duel Entries', 
+                  popular: true, 
+                  badge: 'MOST POPULAR',
+                  theme: 'border-amber-500/60 hover:border-amber-400 bg-gradient-to-b from-amber-950/30 via-black to-black shadow-[0_0_20px_rgba(245,158,11,0.15)]' 
+                },
+                { 
+                  count: 10, 
+                  cost: 90, 
+                  label: 'Warlord Bundle', 
+                  sub: '10 Duel Entries', 
+                  badge: 'SAVE 30 SHARDS',
+                  theme: 'border-purple-500/50 hover:border-purple-400 bg-gradient-to-b from-purple-950/30 via-black to-black shadow-[0_0_20px_rgba(168,85,247,0.15)]' 
+                }
+              ].map((pack) => {
+                const canAfford = (profile.darkShards || 0) >= pack.cost;
+                return (
+                  <div
+                    key={pack.count}
+                    className={`relative p-4 rounded-2xl border flex flex-col items-center justify-between text-center gap-4 transition-all duration-300 hover:scale-[1.02] ${pack.theme}`}
                   >
-                    BUY
-                  </button>
-                </div>
-              ))}
+                    {pack.badge && (
+                      <span className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full font-display font-black text-[8px] uppercase tracking-wider shadow-md whitespace-nowrap ${
+                        pack.popular 
+                          ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-black border border-amber-300' 
+                          : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white border border-purple-400'
+                      }`}>
+                        {pack.badge}
+                      </span>
+                    )}
+                    
+                    <div className="space-y-1 pt-1">
+                      <span className="text-[10px] text-gray-400 font-display font-black uppercase tracking-wider block">
+                        {pack.label}
+                      </span>
+                      <span className="text-[9px] text-gray-500 font-mono block">
+                        {pack.sub}
+                      </span>
+                      
+                      <div className="flex items-center justify-center gap-2 pt-2">
+                        <span className="font-display font-black text-2xl text-white">
+                          +{pack.count}
+                        </span>
+                        <img src="/icons/ticket.png" alt="Ticket" className="w-7 h-7 object-contain drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]" />
+                      </div>
+                    </div>
+   
+                    {/* Cost pill */}
+                    <div className="bg-black/70 border border-white/10 w-full py-2 rounded-xl flex items-center justify-center gap-2 font-mono text-sm font-black text-amber-300 shadow-inner">
+                      <span>{pack.cost}</span>
+                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.7)]" />
+                    </div>
+   
+                    <button
+                      onClick={async () => {
+                        if (!canAfford) {
+                          toast('Insufficient Dark Shards for this package!', 'warning');
+                          return;
+                        }
+                        const ok = await buyPvpTickets(pack.count);
+                        if (ok) {
+                          toast(`Successfully purchased ${pack.count} Tickets!`, 'success');
+                        } else {
+                          toast('Transaction failed.', 'error');
+                        }
+                      }}
+                      className={`w-full py-2.5 rounded-xl font-display font-black tracking-wider text-xs uppercase cursor-pointer transition-all duration-300 shadow-md ${
+                        !canAfford
+                          ? 'bg-zinc-900 border border-zinc-800 text-zinc-600 cursor-not-allowed opacity-60'
+                          : pack.popular
+                          ? 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black border border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.3)] hover:scale-105 active:scale-95'
+                          : 'bg-gradient-to-r from-zinc-800 to-zinc-900 hover:from-zinc-700 hover:to-zinc-800 border border-zinc-600 hover:border-amber-400/60 text-white hover:scale-105 active:scale-95'
+                      }`}
+                    >
+                      {canAfford ? 'BUY' : 'NEED SHARDS'}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
- 
+   
             <button
               onClick={() => setIsBuyTicketsModalOpen(false)}
-              className="w-full py-2.5 rounded-xl border border-gray-900 hover:border-gray-800 bg-black/20 hover:bg-black/40 text-gray-400 hover:text-white font-display font-bold tracking-widest text-[10px] transition-colors cursor-pointer uppercase"
+              className="w-full py-3.5 rounded-2xl border border-white/10 hover:border-white/20 bg-black/40 hover:bg-black/60 text-gray-300 hover:text-white font-display font-bold tracking-widest text-xs transition-colors cursor-pointer uppercase relative z-10"
             >
               Back to Arena
             </button>
