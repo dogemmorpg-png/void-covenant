@@ -6,7 +6,7 @@ import { useToast } from './Toast';
 import { Card, CardTier } from '../types';
 import { CARD_TEMPLATES } from '../data/cards';
 import { Swords, Star, Plus, Minus, ArrowRight, Skull, Shield, Zap, Sparkles, AlertCircle, Crown, ShieldAlert, Bug, Flame, Droplet } from 'lucide-react';
-import { assetPreloader } from '../utils/assetPreloader';
+import { assetPreloader, getCardImageUrl } from '../utils/assetPreloader';
 
 const getCardIconColor = (color: string) => {
   const colorMap: Record<string, string> = {
@@ -294,16 +294,14 @@ export const CollectionDeckView: React.FC = () => {
     return (
       <div className={`relative w-24 h-32 rounded-xl p-1.5 flex flex-col justify-between cursor-default border overflow-hidden ${getCardTierStyles(card.tier, false, true)} shadow-lg`}>
         {/* Card Image */}
-        {card.image.startsWith('/cards/') ? (
-          <>
-            <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 opacity-80" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/10 z-0 pointer-events-none" />
-          </>
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center opacity-30 z-0">
-            {renderCardIcon(card.image, `w-8 h-8 ${getCardIconColor(card.color)}`)}
-          </div>
-        )}
+        <img 
+          src={getCardImageUrl(card)} 
+          alt={card.name} 
+          decoding="async" 
+          className="absolute inset-0 w-full h-full object-cover z-0 opacity-80" 
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/10 z-0 pointer-events-none" />
+        
         {/* Mana cost */}
         <div className="absolute top-1 right-1 z-10 scale-90">
           {renderManaIcon(card.manaCost || 1, "w-3.5 h-3.5")}
@@ -423,13 +421,7 @@ export const CollectionDeckView: React.FC = () => {
                     >
                       {/* Hearthstone-style cropped card background art (increased opacity/scale) */}
                       <div className="absolute inset-y-0 right-0 w-2/3 overflow-hidden rounded-r-xl opacity-[0.55] pointer-events-none group-hover:opacity-[0.70] transition-opacity">
-                        {card.image.startsWith('/cards/') ? (
-                          <img src={card.image} alt="" decoding="async" className="w-full h-full object-cover object-right scale-110" />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-end pr-4 text-cyan-500 opacity-40">
-                            {renderCardIcon(card.image, "w-11 h-11")}
-                          </div>
-                        )}
+                        <img src={getCardImageUrl(card)} alt="" decoding="async" className="w-full h-full object-cover object-right scale-110" />
                         <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#11161d]/75 to-[#11161d]" />
                       </div>
 
@@ -604,16 +596,14 @@ export const CollectionDeckView: React.FC = () => {
                         {renderManaIcon(card.manaCost || 1, "w-[16px] h-[16px]")}
                       </div>
 
-                      {card.image.startsWith('/cards/') ? (
-                        <>
-                          <img src={card.image} alt={card.name} decoding="async" className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 group-hover:scale-105 transition-transform duration-200 transform-gpu" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20 z-0 pointer-events-none" />
-                        </>
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center opacity-40 z-0">
-                          {renderCardIcon(card.image, `w-12 h-12 ${getCardIconColor(card.color)}`)}
-                        </div>
-                      )}
+                      <img 
+                        src={getCardImageUrl(card)} 
+                        alt={card.name} 
+                        decoding="async" 
+                        className="absolute inset-0 w-full h-full object-cover z-0 opacity-85 group-hover:scale-105 transition-transform duration-200 transform-gpu" 
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20 z-0 pointer-events-none" />
+                      
                       <div className="text-center mt-2 relative z-10 drop-shadow-md">
                         <span className="text-[9px] font-display font-bold text-white block truncate leading-none">{card.name}</span>
                         <span className="text-[7px] text-purple-400 uppercase font-mono tracking-wider">{card.tier}</span>
@@ -652,14 +642,13 @@ export const CollectionDeckView: React.FC = () => {
                     onClick={() => setSelectedCardId(card.id)}
                     className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer overflow-hidden group border transform-gpu ${getCardTierStyles(card.tier, isSelected, true)}`}
                   >
-                    {card.image.startsWith('/cards/') ? (
-                      <>
-                        <img src={card.image} alt={card.name} decoding="async" className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 group-hover:scale-105 transition-transform duration-200 transform-gpu" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 pointer-events-none" />
-                      </>
-                    ) : (
-                      <div className="absolute inset-0 bg-[#0b0c10] z-0" />
-                    )}
+                    <img 
+                      src={getCardImageUrl(card)} 
+                      alt={card.name} 
+                      decoding="async" 
+                      className="absolute inset-0 w-full h-full object-cover z-0 opacity-85 group-hover:scale-105 transition-transform duration-200 transform-gpu" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 pointer-events-none" />
 
                     {/* Level & Mana Badges */}
                     <div className="absolute top-1.5 right-1.5 z-10 bg-black/70 border border-[#c5a880]/30 rounded-full w-[18px] h-[18px] flex items-center justify-center text-[8px] font-mono font-bold text-[#ebd09b]">
@@ -922,12 +911,13 @@ export const CollectionDeckView: React.FC = () => {
                 <div className="aspect-[3/4.2] w-full max-w-[240px] mx-auto bg-[#0b0c10] border border-[#c5a880]/30 rounded-2xl p-4 flex flex-col justify-between relative shadow-inner overflow-hidden group">
                   {/* Card Background Image */}
                   <div className={`absolute inset-0 opacity-10 bg-gradient-to-br z-0`} />
-                  {selectedCard.image.startsWith('/cards/') && (
-                    <>
-                      <img src={selectedCard.image} alt={selectedCard.name} className="absolute inset-0 w-full h-full object-cover z-0 opacity-90 transition-transform duration-500 group-hover:scale-105" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 pointer-events-none" />
-                    </>
-                  )}
+                  <img 
+                    src={getCardImageUrl(selectedCard)} 
+                    alt={selectedCard.name} 
+                    decoding="async" 
+                    className="absolute inset-0 w-full h-full object-cover z-0 opacity-90 transition-transform duration-500 group-hover:scale-105" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 pointer-events-none" />
 
                   {/* Top: Tier & Level */}
                   <div className="relative z-10 flex justify-between items-start">
@@ -937,15 +927,7 @@ export const CollectionDeckView: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Middle: Icon fallback if no image */}
-                  {!selectedCard.image.startsWith('/cards/') && (
-                    <div className="flex-1 flex items-center justify-center relative z-10">
-                      <div className="w-16 h-16 rounded-full bg-[#151a21]/80 border border-white/10 flex items-center justify-center text-shadow-gold backdrop-blur-sm">
-                        {renderCardIcon(selectedCard.image, `w-8 h-8 ${getCardIconColor(selectedCard.color)} animate-pulse`)}
-                      </div>
-                    </div>
-                  )}
-                  {selectedCard.image.startsWith('/cards/') && <div className="flex-1" />}
+                  <div className="flex-1" />
 
                   {/* Bottom: Name & Stats */}
                   <div className="relative z-10">

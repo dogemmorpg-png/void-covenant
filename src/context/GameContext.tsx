@@ -106,13 +106,21 @@ const migrateProfileTo10Cards = (p: PlayerProfile): PlayerProfile => {
   if (!p.collection) p.collection = [];
   if (!p.deck) p.deck = [];
   
-  // Convert image extensions to webp
+  // Convert image extensions to webp and normalize image URLs from CARD_TEMPLATES
   if (p.avatarUrl) {
     p.avatarUrl = p.avatarUrl.replace(/\.png/g, '.webp').replace(/\.jpg/g, '.webp').replace(/\.jpeg/g, '.webp');
   }
   p.collection = p.collection.map(c => {
-    if (c.image) {
+    const template = CARD_TEMPLATES.find(t => t.baseId === c.baseId);
+    if (template?.image) {
+      c.image = template.image;
+    } else if (c.image) {
       c.image = c.image.replace(/\.png/g, '.webp').replace(/\.jpg/g, '.webp').replace(/\.jpeg/g, '.webp');
+      if (!c.image.startsWith('/cards/')) {
+        c.image = `/cards/${c.baseId}.webp`;
+      }
+    } else {
+      c.image = `/cards/${c.baseId}.webp`;
     }
     return c;
   });

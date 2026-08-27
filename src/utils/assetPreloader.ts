@@ -2,6 +2,7 @@ import { CARD_TEMPLATES } from '../data/cards';
 
 // In-memory cache to prevent duplicate requests
 const preloadedUrls = new Set<string>();
+let isGlobalPreloadStarted = false;
 
 // Core UI icons, avatars, shop assets, and pack covers that should be instant
 const CORE_UI_ASSETS = [
@@ -42,57 +43,57 @@ const CORE_UI_ASSETS = [
  * Preloads a single image and caches it in browser memory
  */
 export const preloadImage = (url: string): Promise<boolean> => {
-  if (!url || typeof url !== 'string' || preloadedUrls.has(url)) {
+  if (!url || typeof url !== 'string') {
+    return Promise.resolve(true);
+  }
+  if (preloadedUrls.has(url)) {
     return Promise.resolve(true);
   }
 
+  // Mark as requested immediately to prevent any duplicate network requests
+  preloadedUrls.add(url);
+
   return new Promise((resolve) => {
     const img = new Image();
-    img.onload = () => {
-      preloadedUrls.add(url);
-      resolve(true);
-    };
-    img.onerror = () => {
-      preloadedUrls.add(url);
-      resolve(false);
-    };
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
     img.src = url;
   });
 };
 
 /**
- * Preload high-priority assets immediately in parallel
+ * Preload assets with controlled concurrency (6 parallel streams)
  */
-export const preloadHighPriority = async (urls: string[]): Promise<void> => {
-  const uniqueUrls = urls.filter(u => u && !preloadedUrls.has(u));
-  if (uniqueUrls.length === 0) return;
-  
-  await Promise.allSettled(uniqueUrls.map(u => preloadImage(u)));
+export const preloadPool = async (urls: string[], concurrency = 6): Promise<void> => {
+  const pending = urls.filter(u => u && !preloadedUrls.has(u));
+  if (pending.length === 0) return;
+
+  let index = 0;
+  const workers = Array(Math.min(concurrency, pending.length)).fill(0).map(async () => {
+    while (index < pending.length) {
+      const currentUrl = pending[index++];
+      if (currentUrl) {
+        await preloadImage(currentUrl);
+      }
+    }
+  });
+
+  await Promise.allSettled(workers);
 };
 
 /**
- * Preload background assets in fast smooth batches
+ * Helper to get reliable card image URL
  */
-export const preloadIdleQueue = (urls: string[], batchSize = 10) => {
-  const pendingUrls = urls.filter(u => u && !preloadedUrls.has(u));
-  if (pendingUrls.length === 0) return;
-
-  let index = 0;
-
-  const processNextBatch = () => {
-    const batch = pendingUrls.slice(index, index + batchSize);
-    index += batchSize;
-
-    if (batch.length > 0) {
-      Promise.allSettled(batch.map(u => preloadImage(u))).then(() => {
-        if (index < pendingUrls.length) {
-          setTimeout(processNextBatch, 30);
-        }
-      });
-    }
-  };
-
-  setTimeout(processNextBatch, 10);
+export const getCardImageUrl = (card: any): string => {
+  if (!card) return '/cards/skeleton_warrior.webp';
+  if (card.image && typeof card.image === 'string' && card.image.startsWith('/cards/')) {
+    return card.image;
+  }
+  const template = CARD_TEMPLATES.find(t => t.baseId === card.baseId);
+  if (template?.image) {
+    return template.image;
+  }
+  return `/cards/${card.baseId || 'skeleton_warrior'}.webp`;
 };
 
 /**
@@ -103,7 +104,7 @@ export const assetPreloader = {
    * Preload core UI icons and avatars instantly
    */
   preloadCoreUI: async () => {
-    await preloadHighPriority(CORE_UI_ASSETS);
+    await preloadPool(CORE_UI_ASSETS, 6);
   },
 
   /**
@@ -111,14 +112,9 @@ export const assetPreloader = {
    */
   preloadPlayerDeck: async (deckCards: any[]) => {
     if (!deckCards || deckCards.length === 0) return;
-    const urls: string[] = [];
-    for (const card of deckCards) {
-      if (card?.image && typeof card.image === 'string') {
-        urls.push(card.image);
-      }
-    }
+    const urls = deckCards.map(getCardImageUrl).filter(Boolean);
     if (urls.length > 0) {
-      await preloadHighPriority(urls);
+      await preloadPool(urls, 6);
     }
   },
 
@@ -127,30 +123,30 @@ export const assetPreloader = {
    */
   preloadBattleCreatures: async (creatures: any[]) => {
     if (!creatures || creatures.length === 0) return;
-    const urls: string[] = [];
-    for (const c of creatures) {
-      if (c?.image && typeof c.image === 'string') {
-        urls.push(c.image);
-      }
-    }
+    const urls = creatures.map(getCardImageUrl).filter(Boolean);
     if (urls.length > 0) {
-      await preloadHighPriority(urls);
+      await preloadPool(urls, 6);
     }
   },
 
   /**
-   * Preload all 99 game card images quietly in the background without lag
+   * Preload all game card images progressively in the background
    */
   preloadAllGameCardsBackground: () => {
+    if (isGlobalPreloadStarted) return;
+    isGlobalPreloadStarted = true;
+
     const cardUrls = CARD_TEMPLATES
       .map(c => c.image)
       .filter((img): img is string => typeof img === 'string' && img.startsWith('/cards/'));
     
-    preloadIdleQueue(cardUrls, 4);
+    preloadPool(cardUrls, 6);
   },
 
   /**
    * Check if an image is already preloaded in memory
    */
-  isPreloaded: (url: string) => preloadedUrls.has(url)
+  isPreloaded: (url: string) => preloadedUrls.has(url),
+
+  getCardImageUrl
 };
