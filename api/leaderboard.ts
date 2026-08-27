@@ -67,14 +67,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .from('profiles')
       .select('wallet_address, data')
       .neq('wallet_address', 'system_pvp_state')
-      .limit(200);
+      .limit(1000);
 
     if (error) {
       console.error('Failed to query profiles:', error);
       return res.status(500).json({ error: 'Database query failed' });
     }
 
-    const leaderboard = (rows || [])
+    let requestingWallet: string | null = null;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+        requestingWallet = decoded.walletAddress || null;
+      } catch (err) {
+        // ignore token error
+      }
+    }
+
+    const sorted = (rows || [])
       .filter(r => r.data && r.data.username && r.data.username.trim() !== '')
       .filter(r => (r.data.pvpLeague || 'Bronze') === playerLeague)
       .map(r => ({
@@ -85,10 +96,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         avatarUrl: r.data.avatarUrl || '/avatars/knight.webp',
         walletAddress: r.wallet_address
       }))
-      .sort((a, b) => (b.pvpLP - a.pvpLP) || (b.pvpRating - a.pvpRating))
-      .slice(0, 15);
+      .sort((a, b) => (b.pvpLP - a.pvpLP) || (b.pvpRating - a.pvpRating));
 
-    return res.status(200).json({ success: true, leaderboard });
+    let myRank: number | null = null;
+    if (requestingWallet) {
+      const myIdx = sorted.findIndex(p => p.walletAddress === requestingWallet);
+      if (myIdx !== -1) {
+        myRank = myIdx + 1;
+      }
+    }
+
+    const leaderboard = sorted.slice(0, 20);
+
+    return res.status(200).json({ success: true, leaderboard, myRank });
 
   } catch (error: any) {
     console.error('Leaderboard API error:', error);

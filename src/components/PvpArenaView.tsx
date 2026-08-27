@@ -115,9 +115,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
         // If inspecting own league, update personal league rank
         if (leagueName === (profile.pvpLeague || 'Bronze')) {
-          const myIdx = list.findIndex((p: any) => p.walletAddress === profile.solanaAddress);
-          if (myIdx !== -1) {
-            setMyOwnLeagueRank(myIdx + 1);
+          if (data.myRank !== undefined && data.myRank !== null) {
+            setMyOwnLeagueRank(data.myRank);
+          } else {
+            const myIdx = list.findIndex((p: any) => p.walletAddress === profile.solanaAddress);
+            if (myIdx !== -1) {
+              setMyOwnLeagueRank(myIdx + 1);
+            }
           }
         }
       }
@@ -141,10 +145,14 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         });
         if (res.ok) {
           const data = await res.json();
-          const list = data.leaderboard || [];
-          const myIdx = list.findIndex((p: any) => p.walletAddress === profile.solanaAddress);
-          if (myIdx !== -1) {
-            setMyOwnLeagueRank(myIdx + 1);
+          if (data.myRank !== undefined && data.myRank !== null) {
+            setMyOwnLeagueRank(data.myRank);
+          } else {
+            const list = data.leaderboard || [];
+            const myIdx = list.findIndex((p: any) => p.walletAddress === profile.solanaAddress);
+            if (myIdx !== -1) {
+              setMyOwnLeagueRank(myIdx + 1);
+            }
           }
         }
       } catch (e) {
@@ -976,6 +984,36 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                     );
                   }
                 })}
+              </div>
+            )}
+
+            {/* Pinned My Rank Row (if viewing own league) */}
+            {viewingLeague === (profile.pvpLeague || 'Bronze') && (
+              <div className="pt-2 border-t border-cyan-500/30">
+                <div className="flex items-center justify-between p-2 px-3 rounded-xl border bg-cyan-950/40 border-cyan-500/50 text-xs text-cyan-300 font-bold shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="w-6 text-center font-bold font-mono text-xs text-cyan-300">
+                      #{myOwnLeagueRank}
+                    </span>
+                    <div className="w-6 h-6 rounded-full bg-black/50 border border-cyan-400/50 overflow-hidden shrink-0 flex items-center justify-center">
+                      {profile.avatarUrl ? (
+                        <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <User className="w-3.5 h-3.5 text-cyan-300" />
+                      )}
+                    </div>
+                    <span className="truncate font-sans font-bold text-xs text-white max-w-[110px]">
+                      {profile.username || 'You'}
+                    </span>
+                    <span className="text-[8px] font-mono font-black text-cyan-300 bg-cyan-950/80 border border-cyan-500/60 px-1.5 py-0.2 rounded shrink-0">
+                      YOU
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 font-mono font-bold text-xs text-amber-300 shrink-0">
+                    <span>{profile.pvpLP || 0}</span>
+                    <img src="/icons/crown.png" alt="Crown" className="w-4 h-4 object-contain brightness-110 contrast-125" />
+                  </div>
+                </div>
               </div>
             )}
           </div>
