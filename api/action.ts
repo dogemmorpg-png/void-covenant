@@ -223,9 +223,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Not enough Dark Shards' });
       }
       profile.darkShards = currentShards - ticketCost;
-      profile.pvpTickets = (profile.pvpTickets !== undefined ? profile.pvpTickets : 5) + ticketCount;
-      profile.pvpEnergy = profile.pvpTickets;
-      successMessage = `Bought ${ticketCount} Arena Tickets for ${ticketCost} Shards!`;
+      profile.pvpBonusTickets = (profile.pvpBonusTickets || 0) + ticketCount;
+      if (profile.pvpEnergy === undefined) profile.pvpEnergy = 5;
+      profile.pvpTickets = (profile.pvpEnergy || 0) + profile.pvpBonusTickets;
+      successMessage = `Bought ${ticketCount} Arena Tickets for ${ticketCost} Shards (added to Reserve)!`;
     } else {
       return res.status(400).json({ error: 'Unknown action' });
     }

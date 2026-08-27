@@ -23,14 +23,22 @@ export function calculateEnergy(profile: PlayerProfile): PlayerProfile {
     newLastPve = now - (timePassedPve % pveRegenInterval);
   }
   
-  if (profile.pvpTickets === undefined) {
-    profile.pvpTickets = profile.pvpEnergy !== undefined ? profile.pvpEnergy : 5;
+  if (profile.pvpEnergy === undefined) {
+    profile.pvpEnergy = profile.pvpTickets !== undefined ? Math.min(5, profile.pvpTickets) : 5;
+  }
+  if (profile.pvpBonusTickets === undefined) {
+    if (profile.pvpTickets && profile.pvpTickets > 5) {
+      profile.pvpBonusTickets = profile.pvpTickets - 5;
+      profile.pvpEnergy = 5;
+    } else {
+      profile.pvpBonusTickets = 0;
+    }
   }
   
   profile.pveEnergy = currentPve;
-  profile.pvpEnergy = profile.pvpTickets;
   profile.pveEnergyMax = pveMax;
   profile.pvpEnergyMax = 5;
+  profile.pvpTickets = (profile.pvpEnergy || 0) + (profile.pvpBonusTickets || 0);
   profile.lastPveEnergyRefill = newLastPve;
   profile.lastPvpEnergyRefill = now;
   

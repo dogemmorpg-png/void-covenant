@@ -92,12 +92,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (spendEnergy) {
-      const tickets = profileData.pvpTickets !== undefined ? profileData.pvpTickets : (profileData.pvpEnergy || 0);
-      if (tickets < 1) {
+      let dailyTickets = profileData.pvpEnergy !== undefined ? profileData.pvpEnergy : 5;
+      let bonusTickets = profileData.pvpBonusTickets || 0;
+      const totalTickets = dailyTickets + bonusTickets;
+
+      if (totalTickets < 1) {
         return res.status(400).json({ error: 'Not enough Arena Tickets' });
       }
-      profileData.pvpTickets = Math.max(0, tickets - 1);
-      profileData.pvpEnergy = profileData.pvpTickets;
+
+      if (dailyTickets > 0) {
+        profileData.pvpEnergy = Math.max(0, dailyTickets - 1);
+      } else {
+        profileData.pvpBonusTickets = Math.max(0, bonusTickets - 1);
+      }
+
+      profileData.pvpTickets = (profileData.pvpEnergy || 0) + (profileData.pvpBonusTickets || 0);
     }
 
     if (spendShards) {

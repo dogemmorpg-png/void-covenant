@@ -864,11 +864,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return current;
         }
         success = true;
+        const currentBonus = current.pvpBonusTickets || 0;
+        const newBonus = currentBonus + ticketCount;
+        const dailyEnergy = current.pvpEnergy !== undefined ? current.pvpEnergy : 5;
         const updated = { 
           ...current,
           darkShards: currentShards - ticketCost,
-          pvpTickets: (current.pvpTickets !== undefined ? current.pvpTickets : 5) + ticketCount,
-          pvpEnergy: (current.pvpTickets !== undefined ? current.pvpTickets : 5) + ticketCount
+          pvpBonusTickets: newBonus,
+          pvpTickets: dailyEnergy + newBonus
         };
         msg = `Successfully purchased ${ticketCount} Arena Tickets for ${ticketCost} Shards!`;
         updatedProfile = updated;

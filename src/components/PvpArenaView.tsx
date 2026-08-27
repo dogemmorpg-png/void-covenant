@@ -176,8 +176,9 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
     }
 
     if (spendEnergy) {
-      if (profile.pvpEnergy < 1) {
-        toast('Not enough PvP Energy!', 'warning');
+      const totalTickets = (profile.pvpEnergy !== undefined ? profile.pvpEnergy : 5) + (profile.pvpBonusTickets || 0);
+      if (totalTickets < 1) {
+        toast('Not enough Arena Tickets! Purchase more in the Ticket Vault or wait for daily reset.', 'warning');
         return;
       }
     }
@@ -542,13 +543,18 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               </div>
             </div>
 
-            {/* Arena Tickets (Prominent counter + Buy button) */}
-            <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[130px] flex flex-col items-center">
+            {/* Arena Tickets (Prominent counter + Reserve badge + Buy button) */}
+            <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[145px] flex flex-col items-center">
               <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-bold block">ARENA TICKETS</span>
               <div className="flex items-center justify-center gap-2 mt-0.5">
                 <div className="font-mono text-lg sm:text-xl font-black text-rose-400 flex items-center gap-1.5">
                   <img src="/icons/ticket.png" alt="Ticket" className="w-5 h-5 object-contain" />
-                  <span>{profile.pvpTickets !== undefined ? profile.pvpTickets : profile.pvpEnergy}/5</span>
+                  <span>{profile.pvpEnergy !== undefined ? profile.pvpEnergy : 5}/5</span>
+                  {(profile.pvpBonusTickets || 0) > 0 && (
+                    <span className="text-[10px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-500/50 px-1.5 py-0.5 rounded-md shadow-sm ml-0.5" title="Purchased tickets reserve">
+                      +{profile.pvpBonusTickets}
+                    </span>
+                  )}
                 </div>
                 <button
                   onClick={() => setIsBuyTicketsModalOpen(true)}
@@ -1077,26 +1083,33 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               </p>
             </div>
 
-            {/* Status Bar: Current Tickets + Shards Balance */}
-            <div className="grid grid-cols-2 gap-3 bg-black/60 border border-white/10 rounded-2xl p-3.5 relative z-10 shadow-inner">
-              <div className="flex items-center justify-center gap-3 border-r border-white/10 pr-2">
-                <img src="/icons/ticket.png" alt="Ticket" className="w-6 h-6 object-contain drop-shadow-[0_0_6px_rgba(244,63,94,0.6)]" />
-                <div className="text-left">
-                  <span className="text-[9px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Your Tickets</span>
-                  <span className="font-mono text-base font-black text-rose-300">
-                    {profile.pvpTickets !== undefined ? profile.pvpTickets : profile.pvpEnergy} / 5
-                  </span>
-                </div>
+            {/* Status Bar: Daily Tickets + Reserve Tickets + Shards Balance */}
+            <div className="grid grid-cols-3 gap-2 bg-black/60 border border-white/10 rounded-2xl p-3 relative z-10 shadow-inner">
+              <div className="flex flex-col items-center justify-center border-r border-white/10 pr-1 text-center">
+                <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Daily Free</span>
+                <span className="font-mono text-base font-black text-rose-300 flex items-center gap-1 mt-0.5">
+                  <img src="/icons/ticket.png" alt="Ticket" className="w-4 h-4 object-contain" />
+                  {profile.pvpEnergy !== undefined ? profile.pvpEnergy : 5}/5
+                </span>
+                <span className="text-[7.5px] text-gray-500 font-mono mt-0.5">Refills 00:00 UTC</span>
               </div>
 
-              <div className="flex items-center justify-center gap-3 pl-2">
-                <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.6)]" />
-                <div className="text-left">
-                  <span className="text-[9px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Shard Balance</span>
-                  <span className="font-mono text-base font-black text-amber-300">
-                    {profile.darkShards || 0}
-                  </span>
-                </div>
+              <div className="flex flex-col items-center justify-center border-r border-white/10 px-1 text-center">
+                <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Reserve</span>
+                <span className="font-mono text-base font-black text-amber-300 flex items-center gap-1 mt-0.5">
+                  <img src="/icons/ticket.png" alt="Ticket" className="w-4 h-4 object-contain brightness-125" />
+                  +{profile.pvpBonusTickets || 0}
+                </span>
+                <span className="text-[7.5px] text-gray-500 font-mono mt-0.5">Never Expires</span>
+              </div>
+
+              <div className="flex flex-col items-center justify-center pl-1 text-center">
+                <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Your Shards</span>
+                <span className="font-mono text-base font-black text-amber-400 flex items-center gap-1 mt-0.5">
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                  {profile.darkShards || 0}
+                </span>
+                <span className="text-[7.5px] text-gray-500 font-mono mt-0.5">Currency</span>
               </div>
             </div>
 

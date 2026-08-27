@@ -73,6 +73,7 @@ export interface PlayerProfile {
   battlePassClaimed: number[]; // list of indices of claimed tiers
   referralsCount: number;
   pvpTickets?: number;
+  pvpBonusTickets?: number;
   completedTasks: string[]; // completed social airdrop tasks
   solanaAddress: string | null;
   solBalance: number | null;

@@ -65,10 +65,12 @@ export async function checkAndPerformPvpRollover(
       originalLeague: r.data?.pvpLeague || 'Bronze'
     }));
 
-    // 3. Reset daily tickets to 5 for all players
+    // 3. Reset daily tickets to 5 for all players, keeping bonus tickets intact
     players.forEach(p => {
-      p.profile.pvpTickets = 5;
       p.profile.pvpEnergy = 5;
+      p.profile.pvpEnergyMax = 5;
+      p.profile.pvpBonusTickets = p.profile.pvpBonusTickets || 0;
+      p.profile.pvpTickets = 5 + p.profile.pvpBonusTickets;
     });
 
     let totalPromoted = 0;
