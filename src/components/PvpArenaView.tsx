@@ -40,17 +40,17 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         name: 'Bronze',
         badge: '🥉',
         icon: '/icons/league_bronze.png',
-        color: 'text-amber-500 border-amber-600/40 bg-amber-950/30',
-        glow: 'shadow-[0_0_20px_rgba(217,119,6,0.3)]',
-        accent: 'text-amber-500'
+        color: 'text-amber-400 border-amber-600/30 bg-amber-950/20',
+        glow: '',
+        accent: 'text-amber-400'
       };
     } else if (name.startsWith('Silver')) {
       return {
         name: 'Silver',
         badge: '🥈',
         icon: '/icons/league_silver.png',
-        color: 'text-gray-200 border-gray-400/40 bg-gray-900/35',
-        glow: 'shadow-[0_0_20px_rgba(209,213,219,0.3)]',
+        color: 'text-gray-200 border-gray-500/30 bg-gray-900/30',
+        glow: '',
         accent: 'text-gray-300'
       };
     } else if (name.startsWith('Gold')) {
@@ -58,8 +58,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         name: 'Gold',
         badge: '🥇',
         icon: '/icons/league_gold.png',
-        color: 'text-yellow-400 border-yellow-500/50 bg-yellow-950/30',
-        glow: 'shadow-[0_0_20px_rgba(234,179,8,0.4)]',
+        color: 'text-yellow-400 border-yellow-500/30 bg-yellow-950/20',
+        glow: '',
         accent: 'text-yellow-400'
       };
     } else if (name.startsWith('Platinum')) {
@@ -67,8 +67,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         name: 'Platinum',
         badge: '🔮',
         icon: '/icons/league_platinum.png',
-        color: 'text-indigo-300 border-indigo-500/50 bg-indigo-950/30',
-        glow: 'shadow-[0_0_20px_rgba(129,140,248,0.4)]',
+        color: 'text-indigo-300 border-indigo-500/30 bg-indigo-950/20',
+        glow: '',
         accent: 'text-indigo-400'
       };
     } else if (name.startsWith('Diamond')) {
@@ -76,8 +76,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         name: 'Diamond',
         badge: '💎',
         icon: '/icons/league_diamond.png',
-        color: 'text-cyan-300 border-cyan-500/50 bg-cyan-950/30',
-        glow: 'shadow-[0_0_25px_rgba(34,211,238,0.4)]',
+        color: 'text-cyan-300 border-cyan-500/30 bg-cyan-950/20',
+        glow: '',
         accent: 'text-cyan-400'
       };
     } else {
@@ -85,8 +85,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         name: 'Void Overlord',
         badge: '👑',
         icon: '/icons/league_void_overlord.png',
-        color: 'text-rose-400 border-rose-500/50 bg-rose-950/30',
-        glow: 'shadow-[0_0_30px_rgba(244,63,94,0.5)]',
+        color: 'text-rose-400 border-rose-500/30 bg-rose-950/20',
+        glow: '',
         accent: 'text-rose-500'
       };
     }
@@ -506,27 +506,27 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
           </div>
 
           {/* Stats Bar */}
-          <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 bg-gradient-to-r from-[#17141f]/95 via-[#0e0b14]/95 to-[#17141f]/95 border-2 border-amber-500/30 rounded-2xl p-3 sm:p-3.5 w-full lg:w-auto shadow-[0_0_30px_rgba(245,158,11,0.12)]">
+          <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 bg-[#11141a] border border-white/10 rounded-2xl p-3 sm:p-3.5 w-full lg:w-auto shadow-xl">
             {/* Crowns */}
             <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[95px]">
-              <span className="text-[10px] font-mono text-amber-400/80 uppercase tracking-widest font-black block">CROWNS</span>
-              <div className="font-mono text-xl sm:text-2xl font-black text-amber-300 flex items-center justify-center gap-1.5 mt-0.5">
-                <img src="/icons/crown.png" alt="Crown" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-bold block">CROWNS</span>
+              <div className="font-mono text-xl sm:text-2xl font-black text-amber-400 flex items-center justify-center gap-1.5 mt-0.5">
+                <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain" />
                 {profile.pvpLP || 0}
               </div>
             </div>
 
             {/* Arena Tickets (Prominent counter + Buy button) */}
             <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[130px] flex flex-col items-center">
-              <span className="text-[10px] font-mono text-rose-400/80 uppercase tracking-widest font-black block">ARENA TICKETS</span>
+              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-bold block">ARENA TICKETS</span>
               <div className="flex items-center justify-center gap-2 mt-0.5">
                 <div className="font-mono text-lg sm:text-xl font-black text-rose-400 flex items-center gap-1.5">
-                  <img src="/icons/ticket.png" alt="Ticket" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]" />
+                  <img src="/icons/ticket.png" alt="Ticket" className="w-5 h-5 object-contain" />
                   <span>{profile.pvpTickets !== undefined ? profile.pvpTickets : profile.pvpEnergy}/5</span>
                 </div>
                 <button
                   onClick={() => setIsBuyTicketsModalOpen(true)}
-                  className="py-1 px-2.5 rounded-lg bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-white font-display font-black text-[10px] uppercase shadow-[0_0_8px_rgba(244,63,94,0.4)] transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                  className="py-1 px-2.5 rounded-lg bg-white/10 hover:bg-white/15 border border-white/15 text-white font-display font-bold text-[10px] uppercase transition-all hover:scale-105 active:scale-95 cursor-pointer"
                   title="Buy Arena Tickets"
                 >
                   + BUY
@@ -536,14 +536,14 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
             {/* League with Large Crest */}
             <div className="text-center px-4 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[140px] flex flex-col items-center">
-              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-black block mb-0.5">MY LEAGUE</span>
+              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-bold block mb-0.5">MY LEAGUE</span>
               <div className="flex items-center gap-2.5">
                 <img 
                   src={league.icon} 
                   alt={league.name} 
-                  className="w-10 h-10 object-contain drop-shadow-[0_0_12px_rgba(245,158,11,0.5)] transition-transform hover:scale-110" 
+                  className="w-9 h-9 object-contain transition-transform hover:scale-105" 
                 />
-                <span className={`font-display font-black text-sm sm:text-base tracking-wider uppercase ${league.accent} text-shadow-gold`}>
+                <span className={`font-display font-bold text-sm sm:text-base tracking-wider uppercase ${league.accent}`}>
                   {league.name}
                 </span>
               </div>
@@ -551,8 +551,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
             {/* Rank Position */}
             <div className="text-center px-4 min-w-[85px]">
-              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-black block">MY RANK</span>
-              <div className="font-mono text-xl sm:text-2xl font-black text-white mt-0.5 text-shadow-gold">
+              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-bold block">MY RANK</span>
+              <div className="font-mono text-xl sm:text-2xl font-black text-white mt-0.5">
                 #{myOwnLeagueRank}
               </div>
             </div>
@@ -658,13 +658,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                           <span className="text-[8px] text-cyan-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">Dust</span>
                         </div>
 
-                        {/* Crowns (Prominent golden spotlight card) */}
-                        <div className="bg-gradient-to-b from-[#2a1d08] to-[#120a02] border border-amber-400/50 hover:border-amber-300 p-2 rounded-xl text-center flex flex-col items-center justify-center shadow-[0_0_12px_rgba(245,158,11,0.15)] group">
-                          <span className="text-amber-300 font-display font-black text-sm block flex items-center gap-1.5 text-shadow-gold">
+                        {/* Crowns (Clean Card without bright yellow box/glow) */}
+                        <div className="bg-black/50 border border-amber-500/20 p-2 rounded-xl text-center flex flex-col items-center justify-center">
+                          <span className="text-amber-400 font-display font-bold text-sm block flex items-center gap-1">
                             +20
-                            <img src="/icons/crown.png" alt="Crowns" className="w-5 h-5 object-contain brightness-110 drop-shadow-[0_0_8px_rgba(251,191,36,0.85)] group-hover:scale-110 transition-transform" />
+                            <img src="/icons/crown.png" alt="Crowns" className="w-4 h-4 object-contain" />
                           </span>
-                          <span className="text-[8px] text-amber-400 font-mono tracking-wider uppercase font-bold mt-0.5">Crowns</span>
+                          <span className="text-[8px] text-amber-500/80 font-mono tracking-wider uppercase font-bold mt-0.5">Crowns</span>
                         </div>
                       </div>
                     </div>
@@ -679,11 +679,11 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                       </div>
                       
                       <div className="grid grid-cols-2 gap-2">
-                        {/* Crown Loss (Highlighted with glowing crimson crown) */}
-                        <div className="bg-gradient-to-b from-[#24080b] to-[#100305] border border-rose-500/40 p-2 rounded-xl text-center flex flex-col items-center justify-center shadow-md shadow-rose-950/20 group">
-                          <span className="text-rose-400 font-display font-black text-sm block flex items-center gap-1.5 text-shadow-crimson">
+                        {/* Crown Loss */}
+                        <div className="bg-black/50 border border-rose-500/20 p-2 rounded-xl text-center flex flex-col items-center justify-center">
+                          <span className="text-rose-400 font-display font-bold text-sm block flex items-center gap-1">
                             -15
-                            <img src="/icons/crown.png" alt="Crowns" className="w-5 h-5 object-contain brightness-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.85)] group-hover:scale-110 transition-transform" />
+                            <img src="/icons/crown.png" alt="Crowns" className="w-4 h-4 object-contain" />
                           </span>
                           <span className="text-[8px] text-rose-400/90 font-mono tracking-wider uppercase font-bold mt-0.5">Crowns Lost</span>
                         </div>
@@ -805,18 +805,14 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
                         {/* Right side: Crowns Change & Range Pill */}
                         <div className="text-right space-y-1">
-                          <div className={`font-display font-black text-base sm:text-lg flex items-center justify-end gap-1.5 ${
-                            lpChange >= 0 ? 'text-emerald-400 text-shadow-emerald' : 'text-rose-400 text-shadow-crimson'
+                          <div className={`font-display font-bold text-base sm:text-lg flex items-center justify-end gap-1.5 ${
+                            lpChange >= 0 ? 'text-emerald-400' : 'text-rose-400'
                           }`}>
                             <span>{lpChange >= 0 ? `+${lpChange}` : lpChange}</span>
                             <img 
                               src="/icons/crown.png" 
                               alt="Crown" 
-                              className={`w-5 h-5 object-contain ${
-                                lpChange >= 0 
-                                  ? 'brightness-115 drop-shadow-[0_0_8px_rgba(251,191,36,0.9)]' 
-                                  : 'brightness-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.85)]'
-                              }`} 
+                              className="w-4.5 h-4.5 object-contain"
                             />
                           </div>
 
@@ -867,8 +863,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               >
                 ◀
               </button>
-              <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-display font-black uppercase tracking-widest inline-flex items-center ${getLeagueDetails(viewingLeague).color} ${getLeagueDetails(viewingLeague).glow}`}>
-                <img src={getLeagueDetails(viewingLeague).icon} alt="Crest" className="w-3.5 h-3.5 object-contain" />
+              <div className={`flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-display font-bold uppercase tracking-wider ${getLeagueDetails(viewingLeague).color}`}>
+                <img src={getLeagueDetails(viewingLeague).icon} alt="Crest" className="w-4 h-4 object-contain" />
                 <span>{getLeagueDetails(viewingLeague).name}</span>
               </div>
               <button
