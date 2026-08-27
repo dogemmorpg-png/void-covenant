@@ -159,13 +159,17 @@ export const HeaderHUD: React.FC = () => {
               title={timeUntilRegen ? `Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (+1 in ${timeUntilRegen})` : `Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (Full)`}
             >
               <img src="/icons/icon_energy.webp" alt="Energy" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 object-contain" />
-              <div className="flex items-baseline gap-1">
-                <span className="font-mono text-sm font-bold text-emerald-400">
+              <div className="flex flex-col items-start justify-center">
+                <span className="font-mono text-sm font-bold text-emerald-400 leading-none">
                   {profile.pveEnergy}/{profile.pveEnergyMax}
                 </span>
-                {timeUntilRegen && (
-                  <span className="font-mono text-[10px] text-emerald-400/80 tracking-tight font-semibold">
-                    {timeUntilRegen}
+                {timeUntilRegen ? (
+                  <span className="font-mono text-[9px] text-emerald-300/80 leading-tight tracking-tight whitespace-nowrap mt-0.5">
+                    +1 in {timeUntilRegen}
+                  </span>
+                ) : (
+                  <span className="font-mono text-[9px] text-emerald-500/60 leading-tight tracking-tight whitespace-nowrap mt-0.5">
+                    Full
                   </span>
                 )}
               </div>
