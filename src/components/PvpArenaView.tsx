@@ -3,6 +3,7 @@ import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CampaignStage } from '../types';
 import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User } from 'lucide-react';
+import { renderStanceIcon } from './SkillAndStanceIcons';
 
 interface PvpArenaViewProps {
   onStartBattle: (stage: CampaignStage, type: 'campaign' | 'pvp', opponentPayload?: any) => Promise<boolean> | void;
@@ -469,22 +470,14 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               </div>
 
               {/* Combat Stance / Speciality */}
-              <div className="w-full bg-gradient-to-r from-cyan-950/30 via-slate-900/60 to-cyan-950/30 border border-cyan-500/30 rounded-xl py-2 px-3 flex items-center justify-center gap-2.5 shadow-inner">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-cyan-400/80 font-bold">STANCE:</span>
-                <span className="font-display font-black text-xs uppercase tracking-wider text-cyan-200 flex items-center gap-1.5">
-                  {activeOpponent.stance === 'blood_aura' ? (
-                    <>
-                      <span className="text-rose-400 text-sm">🩸</span> Blood Aura
-                    </>
-                  ) : activeOpponent.stance === 'warlord_cry' ? (
-                    <>
-                      <span className="text-amber-400 text-sm">🔊</span> Warlord's Cry
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-cyan-400 text-sm">⚡</span> Void Strike
-                    </>
-                  )}
+              <div className="w-full bg-gradient-to-r from-[#14121d] via-[#101018] to-[#14121d] border border-white/10 rounded-xl py-2 px-3 flex items-center justify-center gap-2.5 shadow-inner">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400 font-bold">STANCE:</span>
+                <span className="font-display font-black text-xs uppercase tracking-wider text-white flex items-center gap-2">
+                  {renderStanceIcon(activeOpponent.stance || 'void_strike', 'w-4.5 h-4.5')}
+                  <span>
+                    {activeOpponent.stance === 'blood_aura' ? 'Blood Aura' : 
+                     activeOpponent.stance === 'warlord_cry' ? "Warlord's Cry" : 'Void Strike'}
+                  </span>
                 </span>
               </div>
             </div>

@@ -4,6 +4,7 @@ import { Equipment, EquipmentSlot, CardTier } from '../types';
 import { getEquipmentIcon } from '../data/equipment';
 import { TalentsView } from './TalentsView';
 import { Shield, Sword, Heart, Sparkles, Coins, Hourglass, Wind, Zap, Activity, Flame, Check, RefreshCw, X } from 'lucide-react';
+import { VoidStrikeIcon, BloodAuraIcon, WarlordCryIcon } from './SkillAndStanceIcons';
 
 interface SlotConfig {
   slot: EquipmentSlot;
@@ -78,9 +79,9 @@ export const HeroInventoryView: React.FC = () => {
 
   // Stance Info
   const stanceIcons: Record<string, { label: string; icon: React.ReactNode; color: string; desc: string }> = {
-    void_strike: { label: 'Void Strike', icon: <Zap className="w-4 h-4 text-purple-400" />, color: 'text-purple-400', desc: '25% chance to deal 1 bonus damage' },
-    blood_aura: { label: 'Blood Aura', icon: <Activity className="w-4 h-4 text-red-400" />, color: 'text-red-400', desc: '25% chance to heal an ally for 1 HP' },
-    warlord_cry: { label: "Warlord's Cry", icon: <Flame className="w-4 h-4 text-amber-500" />, color: 'text-amber-500', desc: '25% chance to buff ally +1 Atk' },
+    void_strike: { label: 'Void Strike', icon: <VoidStrikeIcon sizeClass="w-5 h-5" />, color: 'text-cyan-400', desc: '25% chance to deal 1 bonus damage' },
+    blood_aura: { label: 'Blood Aura', icon: <BloodAuraIcon sizeClass="w-5 h-5" />, color: 'text-rose-400', desc: '25% chance to heal an ally for 1 HP' },
+    warlord_cry: { label: "Warlord's Cry", icon: <WarlordCryIcon sizeClass="w-5 h-5" />, color: 'text-amber-400', desc: '25% chance to buff ally +1 Atk' },
   };
   const activeStance = stanceIcons[profile.activeStance || 'void_strike'] || stanceIcons.void_strike;
 

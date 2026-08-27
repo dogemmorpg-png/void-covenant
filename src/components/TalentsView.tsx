@@ -3,12 +3,12 @@ import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { TALENT_TREES, TalentStance } from '../data/talents';
 import * as LucideIcons from 'lucide-react';
-import { Zap, Activity, Flame } from 'lucide-react';
+import { VoidStrikeIcon, BloodAuraIcon, WarlordCryIcon } from './SkillAndStanceIcons';
 
 const STANCES: { id: TalentStance; name: string; icon: React.ReactNode; color: string; desc: string; bg: string }[] = [
-  { id: 'void_strike', name: 'Void Strike', icon: <Zap className="w-6 h-6" />, color: 'text-purple-400', desc: '25% chance to deal 1 bonus damage.', bg: 'from-purple-900/20' },
-  { id: 'blood_aura', name: 'Blood Aura', icon: <Activity className="w-6 h-6" />, color: 'text-red-400', desc: '25% chance to heal an ally for 1 HP.', bg: 'from-red-900/20' },
-  { id: 'warlord_cry', name: "Warlord's Cry", icon: <Flame className="w-6 h-6" />, color: 'text-amber-500', desc: '25% chance to buff a random ally with +1 Atk.', bg: 'from-amber-900/20' },
+  { id: 'void_strike', name: 'Void Strike', icon: <VoidStrikeIcon sizeClass="w-7 h-7" />, color: 'text-cyan-400', desc: '25% chance to deal 1 bonus damage.', bg: 'from-cyan-950/40' },
+  { id: 'blood_aura', name: 'Blood Aura', icon: <BloodAuraIcon sizeClass="w-7 h-7" />, color: 'text-rose-400', desc: '25% chance to heal an ally for 1 HP.', bg: 'from-red-950/40' },
+  { id: 'warlord_cry', name: "Warlord's Cry", icon: <WarlordCryIcon sizeClass="w-7 h-7" />, color: 'text-amber-400', desc: '25% chance to buff a random ally with +1 Atk.', bg: 'from-amber-950/40' },
 ];
 
 const TREE_WIDTH = 900;
