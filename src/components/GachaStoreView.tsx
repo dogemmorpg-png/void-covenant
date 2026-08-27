@@ -9,6 +9,8 @@ import { Card, CardTier, Equipment } from '../types';
 import { getRandomEquipmentByTier, generateEquipmentInstance, getEquipmentIcon } from '../data/equipment';
 import { Gem, Coins, Sparkles, Box, Trash2, Shield, Flame, Skull, Sword } from 'lucide-react';
 
+import { assetPreloader } from '../utils/assetPreloader';
+
 export const GachaStoreView: React.FC = () => {
   const { profile, spendGold, spendShards, addCardToCollection, addEquipment, setProfile, setIsShardsShopOpen } = useGame();
   const toast = useToast();
@@ -37,6 +39,12 @@ export const GachaStoreView: React.FC = () => {
     setRevealedCards(newCards);
     setRevealedEquipment(newEquipment);
     setIsRevealed(false);
+
+    // Preload summoned cards immediately during the 1.5s portal animation
+    if (newCards && newCards.length > 0) {
+      assetPreloader.preloadBattleCreatures(newCards);
+    }
+
     setTimeout(() => setIsRevealed(true), 1500);
   };
 

@@ -4,6 +4,7 @@ import { useToast } from './Toast';
 import { generateCampaignStage } from '../data/cards';
 import { CampaignStage } from '../types';
 import { Skull, Swords, Award, ChevronLeft, ChevronRight, Crown, Star, FastForward } from 'lucide-react';
+import { assetPreloader } from '../utils/assetPreloader';
 
 interface CampaignViewProps {
   onStartBattle: (stage: CampaignStage) => void;
@@ -25,6 +26,14 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
   }, [maxFloor]);
 
   const selectedStage = generateCampaignStage(viewingFloor);
+
+  // Preload enemy creatures for the currently viewed campaign stage
+  useEffect(() => {
+    if (selectedStage?.enemyDeck) {
+      assetPreloader.preloadBattleCreatures(selectedStage.enemyDeck);
+    }
+  }, [viewingFloor]);
+
   const isBoss = viewingFloor % 10 === 0;
   const stageStars = profile.campaignStars?.[selectedStage.id.toString()] || 0;
 

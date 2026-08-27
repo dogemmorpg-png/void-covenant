@@ -25,6 +25,7 @@ import {
   Bug
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { assetPreloader } from '../utils/assetPreloader';
 
 
 
@@ -216,6 +217,15 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     getEquipmentBonus('dodge'),
     getEquipmentBonus('delayReduction')
   ));
+
+  // Preload battle creature assets immediately
+  useEffect(() => {
+    if (stage?.enemyDeck) {
+      assetPreloader.preloadBattleCreatures(stage.enemyDeck);
+    }
+    const playerDeck = profile.collection.filter(c => profile.deck.includes(c.id));
+    assetPreloader.preloadBattleCreatures(playerDeck);
+  }, [stage, profile.deck]);
 
   // Visual/Animate battle state (used to update UI step-by-step)
   const [visualState, setVisualState] = useState<BattleState>(battle);
@@ -1214,6 +1224,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                               <img 
                                 src={card.image} 
                                 alt={card.name} 
+                                decoding="async"
                                 className={`absolute inset-0 w-full h-full object-cover transition-all ${card.delay > 0 ? 'opacity-40 filter saturate-50 brightness-75' : 'opacity-85'}`} 
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
@@ -1462,6 +1473,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                               <img 
                                 src={card.image} 
                                 alt={card.name} 
+                                decoding="async"
                                 className={`absolute inset-0 w-full h-full object-cover transition-all ${card.delay > 0 ? 'opacity-40 filter saturate-50 brightness-75' : 'opacity-85'}`} 
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />

@@ -416,7 +416,7 @@ export const CollectionDeckView: React.FC = () => {
                       {/* Hearthstone-style cropped card background art (increased opacity/scale) */}
                       <div className="absolute inset-y-0 right-0 w-2/3 overflow-hidden rounded-r-xl opacity-[0.55] pointer-events-none group-hover:opacity-[0.70] transition-opacity">
                         {card.image.startsWith('/cards/') ? (
-                          <img src={card.image} alt="" className="w-full h-full object-cover object-right scale-110" />
+                          <img src={card.image} alt="" decoding="async" className="w-full h-full object-cover object-right scale-110" />
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-end pr-4 text-cyan-500 opacity-40">
                             {renderCardIcon(card.image, "w-11 h-11")}
@@ -598,7 +598,7 @@ export const CollectionDeckView: React.FC = () => {
 
                       {card.image.startsWith('/cards/') ? (
                         <>
-                          <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 group-hover:scale-110 transition-transform duration-500" />
+                          <img src={card.image} alt={card.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 group-hover:scale-110 transition-transform duration-500" />
                           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20 z-0 pointer-events-none" />
                         </>
                       ) : (
@@ -646,7 +646,7 @@ export const CollectionDeckView: React.FC = () => {
                   >
                     {card.image.startsWith('/cards/') ? (
                       <>
-                        <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 group-hover:scale-110 transition-transform duration-500" />
+                        <img src={card.image} alt={card.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 group-hover:scale-110 transition-transform duration-500" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 pointer-events-none" />
                       </>
                     ) : (

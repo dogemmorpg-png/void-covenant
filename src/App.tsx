@@ -20,6 +20,7 @@ import { RegistrationScreen } from './components/RegistrationScreen';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import bs58Pkg from 'bs58';
+import { assetPreloader } from './utils/assetPreloader';
 
 const bs58 = (bs58Pkg as any).default || bs58Pkg;
 
@@ -31,6 +32,18 @@ function MainAppContent() {
   const [isVerified, setIsVerified] = useState(false);
   const [isSigning, setIsSigning] = useState(false);
   
+  // Intelligent Background Asset Preloader (UI + Deck + Background Cards)
+  React.useEffect(() => {
+    assetPreloader.preloadCoreUI();
+
+    if (profile?.collection && profile?.deck) {
+      const activeDeckCards = profile.collection.filter(c => profile.deck.includes(c.id));
+      assetPreloader.preloadPlayerDeck(activeDeckCards);
+    }
+
+    assetPreloader.preloadAllGameCardsBackground();
+  }, [profile?.deck, profile?.collection]);
+
   // Tab states
   const [activeTab, setActiveTab] = useState<'campaign' | 'pvp' | 'collection' | 'hero' | 'talents' | 'altar' | 'airdrop'>('campaign');
   

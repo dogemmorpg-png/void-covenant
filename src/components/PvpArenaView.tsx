@@ -4,6 +4,7 @@ import { useToast } from './Toast';
 import { CampaignStage } from '../types';
 import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User, Info } from 'lucide-react';
 import { renderStanceIcon } from './SkillAndStanceIcons';
+import { assetPreloader } from '../utils/assetPreloader';
 
 interface PvpArenaViewProps {
   onStartBattle: (stage: CampaignStage, type: 'campaign' | 'pvp', opponentPayload?: any) => Promise<boolean> | void;
@@ -214,6 +215,9 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         const data = await res.json();
         if (data.profile) {
           updateProfile(data.profile);
+          if (data.profile.activePvpOpponent?.deck) {
+            assetPreloader.preloadBattleCreatures(data.profile.activePvpOpponent.deck);
+          }
         }
         setIsModalOpen(true);
         if (spendShards) {
