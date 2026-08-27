@@ -31,7 +31,7 @@ export const HeaderHUD: React.FC = () => {
       
       setIsLoadingReferrals(true);
       try {
-        const res = await fetch('/api/referrals', {
+        const res = await fetch('/api/action?action=referrals', {
           headers: {
             'Authorization': `Bearer ${token}`
           }

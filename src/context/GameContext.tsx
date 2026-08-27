@@ -515,13 +515,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     if (token) {
       try {
-        const res = await fetch('/api/battle-start', {
+        const res = await fetch('/api/battle', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ battleType, stageId, ...opponentPayload })
+          body: JSON.stringify({ isStart: true, battleType, stageId, ...opponentPayload })
         });
         
         if (res.ok) {

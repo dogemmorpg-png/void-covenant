@@ -38,8 +38,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Token missing wallet address' });
   }
 
-  const { battleType, stageId, result, stars } = req.body;
-  if (!battleType || !result) {
+  const { battleType, stageId, result, stars, isStart } = req.body;
+  if (!battleType || (!result && !isStart)) {
     return res.status(400).json({ error: 'Missing battle details.' });
   }
 
@@ -57,6 +57,50 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let oldUpdatedAt = profileRow ? profileRow.updated_at : null;
 
     if (fetchError || !profileRow) {
+      return res.status(404).json({ error: 'Profile not found' });
+    }
+
+    profile = profileRow.data;
+
+    // Handle Battle Start (deduct energy)
+    if (isStart || !result) {
+      profile = calculateEnergy(profile);
+
+      if (battleType === 'campaign') {
+        const floorNum = parseInt(stageId);
+        if (isNaN(floorNum)) return res.status(400).json({ error: 'Invalid campaign stage' });
+        
+        const stage = generateCampaignStage(floorNum);
+        if (!stage) return res.status(400).json({ error: 'Invalid campaign stage' });
+        
+        if ((profile.pveEnergy || 0) < stage.energyCost) {
+          return res.status(400).json({ error: 'Not enough PvE energy' });
+        }
+        profile.pveEnergy -= stage.energyCost;
+      } else if (battleType === 'pvp') {
+        if (!profile.activePvpOpponent) {
+          return res.status(400).json({ error: 'No active PvP opponent found. Please search first.' });
+        }
+      }
+
+      profile.lastBattleTimestamp = Date.now();
+
+      let updateQuery = supabase
+        .from('profiles')
+        .update({ data: profile, updated_at: new Date().toISOString() })
+        .eq('wallet_address', walletAddress);
+
+      if (oldUpdatedAt) {
+        updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
+      }
+
+      const { data: updateData, error: updateError } = await updateQuery.select('wallet_address');
+      if (updateError || !updateData || updateData.length === 0) {
+        return res.status(409).json({ error: 'Concurrent modification detected. Please try again.' });
+      }
+
+      return res.status(200).json({ success: true, message: 'Battle session started', profile });
+    }
       profile = {
         gold: 1000,
         dust: 250,

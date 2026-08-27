@@ -33,10 +33,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Missing action.' });
   }
 
-  if (req.method === 'GET' && action !== 'pvp_rollover') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
   if (action === 'pvp_rollover') {
     try {
       const supabase = getSupabase();
@@ -52,6 +48,54 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     } catch (error: any) {
       console.error('PvP Rollover API error:', error);
       return res.status(500).json({ error: error.message || 'Internal server error' });
+    }
+  }
+
+  if (action === 'referrals') {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing or invalid authorization header' });
+    }
+    const token = authHeader.split(' ')[1];
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (err) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+    const walletAddress = decoded.walletAddress;
+    try {
+      const supabase = getSupabase();
+      const { data: refRows, error: refError } = await supabase
+        .from('referrals')
+        .select('referred_wallet, created_at')
+        .eq('referrer_wallet', walletAddress);
+
+      if (refError || !refRows || refRows.length === 0) {
+        return res.status(200).json({ referrals: [] });
+      }
+
+      const referredWallets = refRows.map((r: any) => r.referred_wallet);
+      const { data: profileRows } = await supabase
+        .from('profiles')
+        .select('wallet_address, data')
+        .in('wallet_address', referredWallets);
+
+      const referrals = refRows.map((r: any) => {
+        const matchingProfile = profileRows?.find((p: any) => p.wallet_address === r.referred_wallet);
+        const profileData = matchingProfile?.data || {};
+        return {
+          wallet: r.referred_wallet,
+          username: profileData.username || 'Anonymous',
+          level: profileData.level || 1,
+          avatarUrl: profileData.avatarUrl || '/avatars/knight.webp',
+          joinedAt: r.created_at
+        };
+      });
+
+      return res.status(200).json({ referrals });
+    } catch (e: any) {
+      return res.status(500).json({ error: e.message });
     }
   }
 
