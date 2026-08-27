@@ -423,14 +423,14 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             {/* Close Button */}
             <button
               onClick={handleCancelMatch}
-              className="absolute top-4 right-4 text-gray-500 hover:text-white font-sans text-lg font-black transition-colors cursor-pointer w-7 h-7 flex items-center justify-center bg-black/50 border border-white/10 hover:border-white/20 rounded-full z-10"
-              title="Close and forfeit spent PvP energy"
+              className="absolute top-4 right-4 text-gray-400 hover:text-white font-sans text-base font-black transition-all cursor-pointer w-8 h-8 flex items-center justify-center bg-black/70 hover:bg-black border border-white/10 hover:border-white/30 rounded-full z-30 shadow-lg hover:scale-105 active:scale-95"
+              title="Close and cancel match"
             >
               ✕
             </button>
 
             {/* Header Title with Swords Emblem */}
-            <div className="flex items-center justify-center gap-2 border-b border-white/10 pb-3 relative z-10">
+            <div className="flex items-center justify-center gap-2 border-b border-white/10 pb-3 px-8 relative z-10">
               <Swords className="w-4 h-4 text-rose-400" />
               <h3 className="font-display font-black text-sm text-white tracking-widest uppercase">
                 CHALLENGER FOUND

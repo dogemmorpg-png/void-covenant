@@ -46,14 +46,24 @@ function calculateEnergy(profile: any): any {
     newLastPve = now - (timePassedPve % pveRegenInterval);
   }
   
-  if (profile.pvpTickets === undefined) {
-    profile.pvpTickets = profile.pvpEnergy !== undefined ? profile.pvpEnergy : 5;
+  // PVP TICKET NORMALIZATION & RESERVE MIGRATION
+  let dailyEnergy = profile.pvpEnergy !== undefined ? profile.pvpEnergy : 5;
+  let bonusTickets = profile.pvpBonusTickets !== undefined ? profile.pvpBonusTickets : 0;
+
+  if (dailyEnergy > 5) {
+    bonusTickets += (dailyEnergy - 5);
+    dailyEnergy = 5;
   }
+
+  dailyEnergy = Math.max(0, Math.min(5, dailyEnergy));
+  bonusTickets = Math.max(0, bonusTickets);
   
   profile.pveEnergy = currentPve;
-  profile.pvpEnergy = profile.pvpTickets;
   profile.pveEnergyMax = pveMax;
+  profile.pvpEnergy = dailyEnergy;
   profile.pvpEnergyMax = 5;
+  profile.pvpBonusTickets = bonusTickets;
+  profile.pvpTickets = dailyEnergy + bonusTickets;
   profile.lastPveEnergyRefill = newLastPve;
   profile.lastPvpEnergyRefill = now;
   
