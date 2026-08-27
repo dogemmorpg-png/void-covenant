@@ -218,43 +218,53 @@ export const HeroInventoryView: React.FC = () => {
                   return (
                     <div 
                       key={item.id} 
-                      className={`bg-gradient-to-b ${tierStyle.bg} border-2 ${tierStyle.border} ${tierStyle.glow} p-4 rounded-2xl flex flex-col justify-between space-y-3 transition-all duration-200 hover:scale-[1.02]`}
+                      className={`bg-gradient-to-b ${tierStyle.bg} border-2 ${tierStyle.border} ${tierStyle.glow} p-4 rounded-3xl flex flex-col justify-between space-y-3.5 transition-all duration-300 hover:scale-[1.02] group`}
                     >
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className={`text-[9px] font-display font-black uppercase tracking-widest ${tierStyle.text}`}>
-                            {item.tier}
+                      {/* Card Header: Tier & Equipped Badge */}
+                      <div className="flex items-center justify-between">
+                        <span className={`text-[10px] font-display font-black uppercase tracking-widest ${tierStyle.text}`}>
+                          {item.tier}
+                        </span>
+                        {isEquipped && (
+                          <span className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-400 text-[9px] font-mono font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-[0_0_12px_rgba(16,185,129,0.4)]">
+                            <Check className="w-3 h-3" /> EQUIPPED
                           </span>
-                          {isEquipped && (
-                            <span className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-400 text-[8px] font-mono font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-[0_0_10px_rgba(168,85,247,0.35)]">
-                              <Check className="w-2.5 h-2.5" /> EQUIPPED
-                            </span>
-                          )}
-                        </div>
-                        
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-xl bg-black/70 border border-white/10 flex items-center justify-center shrink-0">
-                            <img src={itemIcon} alt={item.name} className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(255,215,110,0.6)]" />
-                          </div>
-                          <div>
-                            <h5 className="font-display font-black text-sm text-white leading-tight">{item.name}</h5>
-                            <p className="text-xs text-emerald-400 font-mono font-bold mt-0.5">
-                              {formatBonusLabel(item.bonusType, item.bonusValue)}
-                            </p>
-                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Large Item Artwork Showcase */}
+                      <div className="w-full h-36 rounded-2xl bg-black/60 border border-white/10 flex items-center justify-center p-3 relative overflow-hidden shadow-inner">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_70%)] pointer-events-none" />
+                        <img 
+                          src={itemIcon} 
+                          alt={item.name} 
+                          className="w-28 h-28 object-contain drop-shadow-[0_0_16px_rgba(255,215,110,0.6)] group-hover:scale-110 transition-transform duration-300" 
+                        />
+                      </div>
+
+                      {/* Item Details */}
+                      <div className="text-center space-y-1.5">
+                        <h5 className="font-display font-black text-sm sm:text-base text-white leading-snug tracking-wide">
+                          {item.name}
+                        </h5>
+                        <div className="inline-flex items-center gap-1 bg-black/60 border border-emerald-500/30 px-3 py-1 rounded-full shadow-inner">
+                          <span className="text-xs text-emerald-400 font-mono font-bold">
+                            {formatBonusLabel(item.bonusType, item.bonusValue)}
+                          </span>
                         </div>
                       </div>
 
-                      <div>
+                      {/* Action Button */}
+                      <div className="pt-1">
                         {isEquipped ? (
                           <button
                             onClick={() => {
                               unequipItem(selectedSlot);
                               setSelectedSlot(null);
                             }}
-                            className="w-full bg-red-950/50 hover:bg-red-900/90 text-red-300 border border-red-500/40 hover:border-red-400 rounded-xl py-2 text-xs font-display font-bold tracking-wider uppercase transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                            className="w-full bg-red-950/60 hover:bg-red-900 text-red-300 hover:text-white border border-red-500/50 hover:border-red-400 rounded-xl py-2.5 text-xs font-display font-black tracking-widest uppercase transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
                           >
-                            <X className="w-3.5 h-3.5" /> UNEQUIP
+                            <X className="w-4 h-4" /> UNEQUIP
                           </button>
                         ) : (
                           <button
@@ -262,9 +272,9 @@ export const HeroInventoryView: React.FC = () => {
                               equipItem(selectedSlot, item.id);
                               setSelectedSlot(null);
                             }}
-                            className="w-full bg-purple-950/60 hover:bg-purple-800 text-purple-200 hover:text-white border border-purple-500/50 hover:border-purple-300 rounded-xl py-2 text-xs font-display font-black tracking-widest uppercase transition-all shadow-md shadow-purple-950/50 flex items-center justify-center gap-1.5 cursor-pointer"
+                            className="w-full bg-purple-950/70 hover:bg-purple-800 text-purple-200 hover:text-white border border-purple-500/50 hover:border-purple-300 rounded-xl py-2.5 text-xs font-display font-black tracking-widest uppercase transition-all shadow-lg shadow-purple-950/60 flex items-center justify-center gap-1.5 cursor-pointer"
                           >
-                            <RefreshCw className="w-3.5 h-3.5" /> {equippedItemId ? 'SWAP RELIC' : 'EQUIP RELIC'}
+                            <RefreshCw className="w-4 h-4" /> {equippedItemId ? 'SWAP RELIC' : 'EQUIP RELIC'}
                           </button>
                         )}
                       </div>
