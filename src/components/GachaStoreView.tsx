@@ -469,7 +469,11 @@ export const GachaStoreView: React.FC = () => {
                         <img 
                           src={getEquipmentIcon(eq)} 
                           alt={eq.name} 
-                          className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(255,215,110,0.6)]" 
+                          className={`w-full h-full object-contain ${
+                            eq.tier === 'legendary' ? 'drop-shadow-[0_0_12px_rgba(168,85,247,0.45)]' :
+                            eq.tier === 'gold' ? 'drop-shadow-[0_0_10px_rgba(234,179,8,0.35)]' :
+                            'drop-shadow-[0_4px_10px_rgba(0,0,0,0.85)]'
+                          }`} 
                         />
                       </div>
 
