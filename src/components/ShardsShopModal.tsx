@@ -287,12 +287,12 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
 
         {/* Header */}
         <div className="flex justify-between items-center border-b border-white/10 pb-3.5 shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-black/60 border border-red-500/40 flex items-center justify-center shadow-inner">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-black/70 border border-red-500/50 flex items-center justify-center shadow-inner">
               <img 
                 src="/icons/icon_shards.webp" 
                 alt="Dark Shards" 
-                className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.7)]" 
+                className="w-7 h-7 object-contain drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]" 
               />
             </div>
             <div>
@@ -388,13 +388,15 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
 
                     {/* Price & Reward Row */}
                     <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between">
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-lg sm:text-xl font-black text-white font-mono leading-none">
-                            {pkg.shardsReward}
-                          </span>
-                          <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.6)]" />
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <img 
+                          src="/icons/icon_shards.webp" 
+                          alt="Shards" 
+                          className="w-7 h-7 sm:w-8 sm:h-8 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.7)] group-hover:scale-110 transition-transform duration-300" 
+                        />
+                        <span className="text-xl sm:text-2xl font-black text-white font-mono leading-none tracking-tight">
+                          {pkg.shardsReward}
+                        </span>
                       </div>
 
                       <button
