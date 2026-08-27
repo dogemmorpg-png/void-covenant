@@ -842,9 +842,6 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   LEADERBOARD HALL
                 </h3>
               </div>
-              <span className="text-[9px] font-mono font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                TOP 20 ADVANCE
-              </span>
             </div>
 
             {/* ROUND COUNTDOWN TIMER BANNER */}
@@ -864,7 +861,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             </div>
             
             {/* LEAGUE SELECTOR/NAVIGATOR */}
-            <div className="flex items-center justify-between bg-black/40 border border-white/10 rounded-2xl p-2 px-3">
+            <div className="flex items-center justify-between bg-black/40 border border-white/10 rounded-2xl p-2.5 px-3">
               <button
                 onClick={() => cycleLeague('prev')}
                 className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-white flex items-center justify-center cursor-pointer transition-all active:scale-95"
@@ -879,14 +876,9 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   alt="Crest" 
                   className="w-8 h-8 sm:w-9 sm:h-9 object-contain transition-transform hover:scale-110" 
                 />
-                <div className="text-center">
-                  <span className={`font-display font-black text-sm uppercase tracking-wider block ${getLeagueDetails(viewingLeague).accent}`}>
-                    {getLeagueDetails(viewingLeague).name} LEAGUE
-                  </span>
-                  <span className="text-[9px] text-gray-500 font-mono tracking-tight block">
-                    {viewingLeague === (profile.pvpLeague || 'Bronze') ? '• YOUR ACTIVE LEAGUE •' : 'VIEWING ARCHIVE'}
-                  </span>
-                </div>
+                <span className={`font-display font-black text-sm sm:text-base uppercase tracking-wider block ${getLeagueDetails(viewingLeague).accent}`}>
+                  {getLeagueDetails(viewingLeague).name} LEAGUE
+                </span>
               </div>
 
               <button
@@ -927,13 +919,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          {/* Rank badge */}
-                          <span className={`w-5 text-center font-bold font-mono text-[11px] shrink-0 ${
-                            rank === 1 ? 'text-amber-300 font-black' :
-                            rank === 2 ? 'text-gray-300 font-bold' :
-                            rank === 3 ? 'text-amber-500 font-bold' : 'text-gray-500'
+                          {/* Clean Rank Number */}
+                          <span className={`w-6 text-center font-bold font-mono text-xs shrink-0 ${
+                            rank === 1 ? 'text-amber-400 font-black' :
+                            rank === 2 ? 'text-slate-300 font-bold' :
+                            rank === 3 ? 'text-amber-600 font-bold' : 'text-gray-500'
                           }`}>
-                            {rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`}
+                            #{rank}
                           </span>
 
                           {/* Avatar */}
@@ -965,21 +957,18 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                       </div>
                     );
                   } else {
-                    // Placeholder row for empty seats
+                    // Placeholder row for empty slots
                     return (
                       <div
                         key={`empty-${idx}`}
-                        className="flex items-center justify-between p-2 px-3 rounded-xl border border-dashed border-white/5 bg-black/20 text-xs opacity-45"
+                        className="flex items-center justify-between p-2 px-3 rounded-xl border border-white/5 bg-black/20 text-xs opacity-35"
                       >
                         <div className="flex items-center gap-2.5">
-                          <span className="w-5 text-center font-mono text-[10px] text-gray-600">
+                          <span className="w-6 text-center font-mono text-xs text-gray-600">
                             #{rank}
                           </span>
-                          <div className="w-6 h-6 rounded-full border border-dashed border-white/10 flex items-center justify-center">
-                            <User className="w-3 h-3 text-gray-700" />
-                          </div>
-                          <span className="font-sans text-xs text-gray-600 italic">
-                            Unclaimed Seat
+                          <span className="font-mono text-xs text-gray-600">
+                            —
                           </span>
                         </div>
                         <span className="font-mono text-xs text-gray-700 font-bold">—</span>
@@ -991,11 +980,10 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             )}
           </div>
 
-          <div className="border-t border-white/5 pt-2.5 mt-2 flex items-center justify-between text-[9px] text-gray-500 font-mono">
+          <div className="border-t border-white/5 pt-2.5 mt-2 flex items-center justify-center text-[9px] text-gray-500 font-mono">
             <span className="flex items-center gap-1">
-              <RefreshCw className="w-3 h-3 text-cyan-400/80 animate-spin-slow" /> Live Database
+              <RefreshCw className="w-3 h-3 text-cyan-400/80 animate-spin-slow" /> Real-time database updates
             </span>
-            <span className="text-gray-400">Top 20 Advance Daily</span>
           </div>
 
         </div>
