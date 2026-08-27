@@ -93,6 +93,15 @@ function generateRandomEquipment(packType: string, numEquips: number) {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // CORS setup
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
+  );
+
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
@@ -115,17 +124,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
 
-    const walletAddress = decoded.walletAddress || decoded.wallet;
+    const walletAddress = decoded.walletAddress || decoded.wallet || decoded.sub;
     const { packType } = req.body;
     let numCards = 3;
 
     const supabase = getSupabase();
 
-    const { data: profileRow, error: profileError } = await supabase
+    const { data: profileRows, error: profileError } = await supabase
       .from('profiles')
       .select('data, updated_at')
       .eq('wallet_address', walletAddress)
-      .single();
+      .limit(1);
+
+    const profileRow = profileRows && profileRows.length > 0 ? profileRows[0] : null;
 
     let profile: PlayerProfile;
     let oldUpdatedAt = profileRow ? profileRow.updated_at : null;

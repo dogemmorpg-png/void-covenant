@@ -145,6 +145,19 @@ function getSupabase() {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // CORS setup
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
+  );
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -162,7 +175,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
 
-  const walletAddress = decoded.walletAddress;
+  const walletAddress = decoded.walletAddress || decoded.wallet || decoded.sub;
   if (!walletAddress) {
     return res.status(400).json({ error: 'Token missing wallet address' });
   }

@@ -58,11 +58,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     await checkAndPerformPvpRollover(supabase);
 
     // 1. Fetch current player's rating and profile
-    const { data: currentPlayerRow, error: currentPlayerError } = await supabase
+    const { data: currentPlayerRows, error: currentPlayerError } = await supabase
       .from('profiles')
       .select('data')
       .eq('wallet_address', walletAddress)
-      .single();
+      .limit(1);
+
+    const currentPlayerRow = currentPlayerRows && currentPlayerRows.length > 0 ? currentPlayerRows[0] : null;
 
     if (currentPlayerError || !currentPlayerRow) {
       return res.status(404).json({ error: 'Player profile not found' });
