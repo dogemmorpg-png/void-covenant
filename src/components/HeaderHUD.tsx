@@ -10,6 +10,7 @@ export const HeaderHUD: React.FC = () => {
 
   const [timeUntilRegen, setTimeUntilRegen] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSovereignModalOpen, setIsSovereignModalOpen] = useState(false);
   const [referralsList, setReferralsList] = useState<any[]>([]);
   const [isLoadingReferrals, setIsLoadingReferrals] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
@@ -130,6 +131,30 @@ export const HeaderHUD: React.FC = () => {
               <span className="font-mono font-black text-rose-300 group-hover:text-white text-sm tracking-wide transition-colors ml-0.5">{profile.darkShards}</span>
               <div className="w-6 h-6 rounded-full bg-gradient-to-b from-[#e11d48] via-[#be123c] to-[#881337] group-hover:from-[#f43f5e] group-hover:to-[#9f1239] text-white flex items-center justify-center border border-rose-300/40 shadow-[0_0_10px_rgba(225,29,72,0.6)] group-hover:shadow-[0_0_14px_rgba(244,63,94,0.9)] group-hover:scale-110 active:scale-95 transition-all duration-300 ml-1">
                 <Plus className="w-3.5 h-3.5 stroke-[3] text-white drop-shadow-sm" />
+              </div>
+            </div>
+
+            {/* Blood Sovereigns (Convertible to USDT) */}
+            <div 
+              onClick={() => {
+                audioSystem.playClick();
+                setIsSovereignModalOpen(true);
+              }}
+              className="flex items-center gap-2 bg-gradient-to-r from-[#240810] via-[#1a050c] to-[#120308] hover:from-[#350c18] hover:to-[#220710] border border-amber-500/50 hover:border-amber-400/90 rounded-full py-1 pl-2 pr-3 shadow-[0_0_15px_rgba(245,158,11,0.2)] hover:shadow-[0_0_22px_rgba(245,158,11,0.4)] cursor-pointer transition-all duration-300 group select-none"
+              title={`Blood Sovereigns: ${profile.bloodSovereigns || 0} (≈ $${((profile.bloodSovereigns || 0) * 0.01).toFixed(2)} USDT) • Click for Info`}
+            >
+              <img 
+                src="/icons/icon_sovereign.webp" 
+                alt="Sovereigns" 
+                className="drop-shadow-[0_0_12px_rgba(245,158,11,0.8)] brightness-110 contrast-125 w-8 h-8 object-contain group-hover:scale-115 transition-transform duration-300" 
+              />
+              <div className="flex flex-col text-left">
+                <span className="font-mono font-black text-amber-300 group-hover:text-amber-100 text-xs sm:text-sm tracking-wide leading-none transition-colors">
+                  {profile.bloodSovereigns || 0}
+                </span>
+                <span className="font-mono text-[8px] text-amber-400/75 leading-tight font-bold -mb-0.5">
+                  ≈ ${((profile.bloodSovereigns || 0) * 0.01).toFixed(2)}
+                </span>
               </div>
             </div>
 
@@ -343,6 +368,82 @@ export const HeaderHUD: React.FC = () => {
 
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* Blood Sovereigns Info Modal */}
+      {isSovereignModalOpen && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsSovereignModalOpen(false);
+          }}
+        >
+          <div className="bg-[#141820] border-2 border-amber-500/40 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_35px_rgba(245,158,11,0.25)] relative flex flex-col animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="border-b border-white/10 p-5 flex justify-between items-center bg-gradient-to-r from-[#240810] to-[#141820]">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+                  <img src="/icons/icon_sovereign.webp" alt="Sovereign" className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]" />
+                </div>
+                <div>
+                  <h3 className="font-display font-black text-white text-base tracking-wider text-shadow-gold">
+                    BLOOD SOVEREIGNS
+                  </h3>
+                  <span className="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-widest">
+                    Convertible Currency
+                  </span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsSovereignModalOpen(false)}
+                className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-4">
+              {/* Balance Highlight Box */}
+              <div className="bg-gradient-to-b from-amber-950/30 to-black/60 border border-amber-500/30 rounded-2xl p-4 text-center">
+                <span className="text-gray-400 text-xs font-mono uppercase tracking-widest block mb-1">Your Balance</span>
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <img src="/icons/icon_sovereign.webp" alt="Sovereign" className="w-7 h-7 object-contain" />
+                  <span className="text-3xl font-mono font-black text-amber-300 text-shadow-gold">
+                    {profile.bloodSovereigns || 0}
+                  </span>
+                  <span className="text-xs font-mono font-bold text-amber-400/80 self-end mb-1">SOV</span>
+                </div>
+                <span className="inline-block bg-amber-500/15 border border-amber-500/30 rounded-full px-3 py-0.5 text-xs font-mono font-bold text-amber-300">
+                  ≈ ${((profile.bloodSovereigns || 0) * 0.01).toFixed(2)} USDT (Rate: 1 SOV = 0.01 USDT)
+                </span>
+              </div>
+
+              {/* Information */}
+              <div className="space-y-2.5 text-xs text-gray-300 font-sans leading-relaxed bg-black/40 p-4 rounded-xl border border-white/5">
+                <div className="flex items-start gap-2">
+                  <span className="text-amber-400 font-bold text-sm leading-none mt-0.5">👑</span>
+                  <p><strong className="text-white">How to Earn:</strong> Awarded to top-ranking players in high PvP Leagues at the end of each league round.</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-emerald-400 font-bold text-sm leading-none mt-0.5">💵</span>
+                  <p><strong className="text-white">USDT Exchange:</strong> 100 Blood Sovereigns can be exchanged for 1.00 USDT and withdrawn directly to your wallet.</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-cyan-400 font-bold text-sm leading-none mt-0.5">📬</span>
+                  <p><strong className="text-white">Distribution:</strong> Round results and rewards will be delivered straight to your in-game Mailbox.</p>
+                </div>
+              </div>
+
+              {/* Status Notice */}
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-center">
+                <span className="text-[11px] font-mono font-bold text-amber-300/90 tracking-wide uppercase">
+                  🏆 Season League Rollovers & Payouts Launching Soon
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       )}

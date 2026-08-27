@@ -11,9 +11,11 @@ interface GameContextType {
   addGold: (amount: number) => void;
   addDust: (amount: number) => void;
   addShards: (amount: number) => void;
+  addBloodSovereigns: (amount: number) => void;
   spendGold: (amount: number) => boolean;
   spendDust: (amount: number) => boolean;
   spendShards: (amount: number) => boolean;
+  spendBloodSovereigns: (amount: number) => boolean;
   usePveEnergy: (amount: number) => boolean;
   usePvpEnergy: (amount: number) => boolean;
   buyPvpTickets: (ticketCount?: number) => Promise<boolean>;
@@ -168,6 +170,7 @@ const migrateProfileTo10Cards = (p: PlayerProfile): PlayerProfile => {
   // Ensure league and LP fields are populated
   p.pvpLeague = p.pvpLeague || 'Bronze';
   p.pvpLP = p.pvpLP !== undefined ? p.pvpLP : 0;
+  p.bloodSovereigns = p.bloodSovereigns !== undefined ? p.bloodSovereigns : 0;
   
   return p;
 };
@@ -178,6 +181,7 @@ const createDefaultProfile = (): PlayerProfile => {
   gold: 500,
   dust: 100,
   darkShards: 0,
+  bloodSovereigns: 0,
   collection: starterDeck,
   deck: starterDeck.map(c => c.id), // All 10 starter cards
   pveEnergy: 10,
@@ -410,6 +414,33 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setProfile(current => {
       if (current.darkShards < amount) return current;
       const updated = { ...current, darkShards: current.darkShards - amount };
+      saveProfile(updated);
+      return updated;
+    });
+    return true;
+  };
+
+  const addBloodSovereigns = (amount: number) => {
+    setProfile(current => {
+      const updated = {
+        ...current,
+        bloodSovereigns: (current.bloodSovereigns || 0) + amount
+      };
+      saveProfile(updated);
+      return updated;
+    });
+  };
+
+  const spendBloodSovereigns = (amount: number): boolean => {
+    if ((profileRef.current.bloodSovereigns || 0) < amount) {
+      return false;
+    }
+    setProfile(current => {
+      if ((current.bloodSovereigns || 0) < amount) return current;
+      const updated = {
+        ...current,
+        bloodSovereigns: (current.bloodSovereigns || 0) - amount
+      };
       saveProfile(updated);
       return updated;
     });
@@ -973,9 +1004,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addGold,
         addDust,
         addShards,
+        addBloodSovereigns,
         spendGold,
         spendDust,
         spendShards,
+        spendBloodSovereigns,
         usePveEnergy,
         usePvpEnergy,
         buyPvpTickets,

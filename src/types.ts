@@ -57,6 +57,7 @@ export interface PlayerProfile {
   gold: number;
   dust: number;
   darkShards: number;
+  bloodSovereigns?: number; // Real convertible hard currency (100 = 1.00 USDT)
   pveEnergy: number;
   pveEnergyMax: number;
   pvpEnergy: number;
@@ -90,6 +91,37 @@ export interface PlayerProfile {
   username?: string;
   avatarUrl?: string;
   isRegistered?: boolean;
+}
+
+export interface WithdrawalRequest {
+  id: string;
+  userId: string;
+  username: string;
+  walletAddress: string;
+  amountSovereigns: number;
+  amountUsdt: number;
+  status: 'pending' | 'completed' | 'rejected';
+  createdAt: number;
+  processedAt?: number;
+  txHash?: string;
+}
+
+export interface MailMessage {
+  id: string;
+  title: string;
+  sender: string;
+  body: string;
+  rewards?: {
+    gold?: number;
+    dust?: number;
+    darkShards?: number;
+    bloodSovereigns?: number;
+    cards?: string[];
+    equipment?: string[];
+  };
+  isClaimed?: boolean;
+  isRead?: boolean;
+  createdAt: number;
 }
 
 export interface CampaignStage {
