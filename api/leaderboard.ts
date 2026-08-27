@@ -38,6 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Automatic rollover check: if midnight UTC passed, roll over leagues immediately
     await checkAndPerformPvpRollover(supabase);
 
+    const authHeader = req.headers.authorization;
     let requestingWallet: string | null = null;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
@@ -49,7 +50,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    const { league } = req.body || {};
+    let body = req.body;
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        body = {};
+      }
+    }
+    const { league } = body || {};
     let playerLeague = league || 'Bronze';
 
     // Fetch profiles to build leaderboard
