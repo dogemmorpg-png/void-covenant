@@ -227,6 +227,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (profile.pvpEnergy === undefined) profile.pvpEnergy = 5;
       profile.pvpTickets = (profile.pvpEnergy || 0) + profile.pvpBonusTickets;
       successMessage = `Bought ${ticketCount} Arena Tickets for ${ticketCost} Shards (added to Reserve)!`;
+    } else if (action === 'withdrawal') {
+      const { amountSovereigns, targetAddress } = payload || {};
+      const numAmount = parseInt(amountSovereigns, 10);
+
+      if (isNaN(numAmount) || numAmount < 100) {
+        return res.status(400).json({ error: 'Minimum withdrawal is 100 Blood Sovereigns ($1.00 USDT).' });
+      }
+
+      if (!targetAddress || typeof targetAddress !== 'string' || targetAddress.trim().length < 24) {
+        return res.status(400).json({ error: 'Invalid destination wallet address.' });
+      }
+
+      const currentSovereigns = profile.bloodSovereigns || 0;
+      if (currentSovereigns < numAmount) {
+        return res.status(400).json({ error: `Insufficient balance! You have ${currentSovereigns} SOV, requested ${numAmount} SOV.` });
+      }
+
+      const newRequest = {
+        id: `req_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        userId: walletAddress,
+        username: profile.username || 'Voidwalker',
+        walletAddress: targetAddress.trim(),
+        amountSovereigns: numAmount,
+        amountUsdt: Number((numAmount * 0.01).toFixed(2)),
+        status: 'pending',
+        createdAt: Date.now()
+      };
+
+      profile.bloodSovereigns = currentSovereigns - numAmount;
+      profile.withdrawalRequests = [newRequest, ...(profile.withdrawalRequests || [])];
+      successMessage = `Successfully requested withdrawal of ${numAmount} SOV ($${(numAmount * 0.01).toFixed(2)} USDT)!`;
+      responseData = { request: newRequest };
     } else {
       return res.status(400).json({ error: 'Unknown action' });
     }

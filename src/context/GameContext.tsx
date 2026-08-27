@@ -462,13 +462,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const token = localStorage.getItem('void_covenant_token');
     if (token) {
       try {
-        const res = await fetch('/api/withdrawal', {
+        const res = await fetch('/api/action', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ amountSovereigns, targetAddress })
+          body: JSON.stringify({ action: 'withdrawal', payload: { amountSovereigns, targetAddress } })
         });
         if (res.ok) {
           const data = await res.json();
