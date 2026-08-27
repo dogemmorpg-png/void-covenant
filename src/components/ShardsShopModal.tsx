@@ -166,7 +166,6 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
           // Credit directly on client
           const updated = { ...profile };
           if (pkg.shardsReward > 0) updated.darkShards = (updated.darkShards || 0) + pkg.shardsReward;
-          if (pkg.dustBonus > 0) updated.dust = (updated.dust || 0) + pkg.dustBonus;
           if ((pkg as any).isBattlePass) updated.hasPremiumBp = true;
           updated.processedTransactions = [...(updated.processedTransactions || []), signature];
           saveProfile(updated);
@@ -186,7 +185,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       setPaymentState(prev => ({
         ...prev,
         status: 'success',
-        message: `Success! +${pkg.shardsReward} Dark Shards${pkg.dustBonus ? ` & +${pkg.dustBonus} Dust` : ''} added to your account!`
+        message: `Success! +${pkg.shardsReward} Dark Shards added to your account!`
       }));
 
       toast(`Payment confirmed! +${pkg.shardsReward} Dark Shards added!`, 'success');
@@ -396,24 +395,15 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                           </span>
                           <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.6)]" />
                         </div>
-                        {pkg.dustBonus > 0 && (
-                          <span className="text-[9px] text-[#66fcf1] font-mono font-bold mt-0.5 flex items-center gap-0.5">
-                            <Sparkles className="w-2.5 h-2.5" /> +{pkg.dustBonus} Dust
-                          </span>
-                        )}
                       </div>
 
                       <button
                         onClick={() => handlePurchasePackage(pkg)}
                         disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
-                        className={`font-mono text-xs font-black py-2 px-3.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-md flex items-center gap-1.5 ${
-                          isPopular 
-                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-[0_0_15px_rgba(168,85,247,0.35)] hover:scale-105' 
-                            : 'bg-[#221727] hover:bg-[#34223d] text-rose-200 border border-red-500/30 hover:border-red-400 hover:scale-105'
-                        }`}
+                        className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-mono text-xs font-black py-2 px-3.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_15px_rgba(168,85,247,0.35)] hover:scale-105 flex items-center gap-1.5 active:scale-95"
                       >
                         <span>{pkg.solCost}</span>
-                        <span className="text-[10px] text-purple-300 font-bold">SOL</span>
+                        <span className="text-[10px] text-purple-200 font-bold">SOL</span>
                       </button>
                     </div>
                   </div>

@@ -17,9 +17,9 @@ function getSupabase() {
 
 const PACKAGES: Record<string, { solCost: number; shards: number; dust: number; isBp?: boolean }> = {
   shards_micro: { solCost: 0.05, shards: 25, dust: 0 },
-  shards_pouch: { solCost: 0.15, shards: 85, dust: 100 },
-  shards_vault: { solCost: 0.40, shards: 250, dust: 350 },
-  shards_overlord: { solCost: 1.00, shards: 700, dust: 1000 },
+  shards_pouch: { solCost: 0.15, shards: 85, dust: 0 },
+  shards_vault: { solCost: 0.40, shards: 250, dust: 0 },
+  shards_overlord: { solCost: 1.00, shards: 700, dust: 0 },
   premium_bp_sol: { solCost: 0.25, shards: 0, dust: 0, isBp: true }
 };
 

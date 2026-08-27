@@ -38,7 +38,7 @@ export const SOLANA_PACKAGES: SolanaPackage[] = [
     solCost: 0.05,
     shardsReward: 25,
     dustBonus: 0,
-    description: 'Quick top-up for 1 booster pack.',
+    description: '',
     image: '/shop/pouch_of_shards.png'
   },
   {
@@ -46,8 +46,8 @@ export const SOLANA_PACKAGES: SolanaPackage[] = [
     name: 'Dark Shard Chest',
     solCost: 0.15,
     shardsReward: 85,
-    dustBonus: 100,
-    description: 'Enough for an Obsidian pack + 15 shards.',
+    dustBonus: 0,
+    description: '',
     popular: true,
     badge: 'POPULAR',
     image: '/shop/dark_shard_chest.png'
@@ -57,8 +57,8 @@ export const SOLANA_PACKAGES: SolanaPackage[] = [
     name: 'Abyssal Treasury',
     solCost: 0.40,
     shardsReward: 250,
-    dustBonus: 350,
-    description: 'Supreme horde. Guaranteed to summon high-tier lords.',
+    dustBonus: 0,
+    description: '',
     badge: 'BEST VALUE',
     image: '/shop/abyssal_treasury.png'
   },
@@ -67,8 +67,8 @@ export const SOLANA_PACKAGES: SolanaPackage[] = [
     name: 'Lord of the Void Vault',
     solCost: 1.00,
     shardsReward: 700,
-    dustBonus: 1000,
-    description: 'Massive hoard of Dark Shards + 1,000 Dark Dust bonus.',
+    dustBonus: 0,
+    description: '',
     badge: 'SUPREME',
     image: '/shop/void_overlord_vault.png'
   }
