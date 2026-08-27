@@ -110,70 +110,63 @@ const renderSkillIcon = (type: string, sizeClass: string = "w-4 h-4") => {
 
 const BarrierDome: React.FC = () => (
   <div className="absolute inset-0 z-25 pointer-events-none rounded-xl overflow-hidden">
-    {/* Outer Glowing Energy Field */}
-    <div className="absolute -inset-1 rounded-2xl border-2 border-cyan-400/80 shadow-[0_0_20px_rgba(6,182,212,0.8),inset_0_0_15px_rgba(168,85,247,0.5)] animate-pulse" />
+    {/* Ethereal Glowing Golden Divine Shield Frame */}
+    <div className="absolute inset-0 rounded-xl border-2 border-amber-400/85 shadow-[0_0_16px_rgba(251,191,36,0.65),inset_0_0_12px_rgba(251,191,36,0.3)] animate-pulse" />
     
-    {/* Hexagonal Mesh Overlay with Shimmer */}
-    <div 
-      className="absolute inset-0 opacity-40 mix-blend-screen bg-[radial-gradient(circle_at_50%_50%,rgba(6,182,212,0.6)_0%,rgba(147,51,234,0.3)_60%,transparent_100%)]" 
-    />
-    
-    {/* Rotating Rune Ring at Center */}
-    <div className="absolute inset-0 flex items-center justify-center">
-      <div className="w-16 h-16 rounded-full border border-dashed border-cyan-300/60 animate-spin" style={{ animationDuration: '8s' }} />
-      <div className="absolute w-12 h-12 rounded-full border border-purple-400/40 animate-ping" style={{ animationDuration: '3s' }} />
-    </div>
+    {/* Soft Radiant Light Sweep Overlay */}
+    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-amber-200/15 to-transparent pointer-events-none" />
 
-    {/* Top Barrier Crest Badge */}
-    <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-cyan-950 via-purple-950 to-cyan-950 border border-cyan-400/80 rounded-full px-2 py-0.5 flex items-center gap-1 shadow-[0_0_10px_rgba(6,182,212,0.8)] z-30">
-      <span className="text-[9px]">🔮</span>
-      <span className="text-[7.5px] font-mono font-black text-cyan-300 tracking-wider uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">БАРЬЕР</span>
+    {/* Radiant Ornate Shield Corners */}
+    <div className="absolute top-1 left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-amber-300 shadow-[0_0_6px_rgba(251,191,36,1)]" />
+    <div className="absolute top-1 right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-amber-300 shadow-[0_0_6px_rgba(251,191,36,1)]" />
+    <div className="absolute bottom-1 left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-amber-300 shadow-[0_0_6px_rgba(251,191,36,1)]" />
+    <div className="absolute bottom-1 right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-amber-300 shadow-[0_0_6px_rgba(251,191,36,1)]" />
+
+    {/* Elegant Glowing Divine Crest at Top Center */}
+    <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center">
+      <div className="w-5 h-5 rounded-full bg-gradient-to-b from-amber-900 to-black border border-amber-300/90 flex items-center justify-center shadow-[0_0_10px_rgba(251,191,36,0.9)]">
+        <svg className="w-3.5 h-3.5 text-amber-300 filter drop-shadow-[0_0_3px_rgba(251,191,36,0.9)]" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L4 5V11C4 16.55 7.4 21.74 12 23C16.6 21.74 20 16.55 20 11V5L12 2Z" />
+        </svg>
+      </div>
     </div>
   </div>
 );
 
 const BarrierShatterOverlay: React.FC = () => (
   <motion.div
-    initial={{ opacity: 1, scale: 0.9 }}
+    initial={{ opacity: 1, scale: 0.95 }}
     animate={{ opacity: 0, scale: 1.35 }}
     exit={{ opacity: 0 }}
-    transition={{ duration: 0.65, ease: "easeOut" }}
-    className="absolute -inset-4 z-40 flex items-center justify-center pointer-events-none"
+    transition={{ duration: 0.6, ease: "easeOut" }}
+    className="absolute -inset-2 z-40 flex items-center justify-center pointer-events-none rounded-xl overflow-visible"
   >
-    {/* Expanding Shockwave Ring */}
-    <div className="absolute inset-0 rounded-2xl border-4 border-cyan-300 shadow-[0_0_30px_rgba(6,182,212,1)]" />
-    <div className="absolute inset-2 rounded-2xl border-2 border-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.9)]" />
+    {/* Golden Shockwave Expanding */}
+    <div className="absolute inset-0 rounded-xl border-2 border-amber-300 shadow-[0_0_30px_rgba(251,191,36,1)]" />
     
-    {/* Radiant Crystal Shatter Shards */}
-    <svg className="w-full h-full filter drop-shadow-[0_0_8px_rgba(6,182,212,1)] animate-spin" style={{ animationDuration: '0.6s' }} viewBox="0 0 100 100" fill="none">
-      <polygon points="50,15 55,30 45,30" fill="#67e8f9" />
-      <polygon points="85,50 70,55 70,45" fill="#a855f7" />
-      <polygon points="50,85 45,70 55,70" fill="#67e8f9" />
-      <polygon points="15,50 30,45 30,55" fill="#c084fc" />
-      <polygon points="75,25 65,35 60,25" fill="#38bdf8" />
-      <polygon points="25,75 35,65 25,60" fill="#e879f9" />
-      <polygon points="75,75 65,65 75,60" fill="#a855f7" />
-      <polygon points="25,25 35,35 25,40" fill="#67e8f9" />
+    {/* Radial Divine Shards */}
+    <svg className="w-full h-full filter drop-shadow-[0_0_10px_rgba(251,191,36,1)] animate-spin" style={{ animationDuration: '0.6s' }} viewBox="0 0 100 100" fill="none">
+      <polygon points="50,15 54,28 46,28" fill="#fde68a" />
+      <polygon points="85,50 72,54 72,46" fill="#f59e0b" />
+      <polygon points="50,85 46,72 54,72" fill="#fde68a" />
+      <polygon points="15,50 28,46 28,54" fill="#fbbf24" />
+      <polygon points="75,25 66,33 62,25" fill="#f59e0b" />
+      <polygon points="25,75 34,67 25,63" fill="#fde68a" />
+      <polygon points="75,75 66,67 74,62" fill="#fbbf24" />
+      <polygon points="25,25 34,33 25,37" fill="#f59e0b" />
     </svg>
-    <span className="absolute bg-black/90 border border-cyan-400 text-cyan-300 font-mono font-black text-[9px] px-2 py-0.5 rounded shadow-lg tracking-widest uppercase">
-      БАРЬЕР СЛОМАН
-    </span>
   </motion.div>
 );
 
 const ArmorBadge: React.FC<{ armor: number }> = ({ armor }) => (
-  <div className="absolute -top-3 -left-3 z-25 flex items-center justify-center group" title={`Броня: ${armor} (Поглощает входящий урон)`}>
-    <div className="relative w-8 h-8 rounded-lg bg-gradient-to-b from-slate-200 via-slate-500 to-slate-800 border-2 border-slate-300 shadow-[0_0_10px_rgba(203,213,225,0.8),inset_0_1px_2px_rgba(255,255,255,0.9)] flex items-center justify-center">
-      <svg className="w-5 h-5 filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2L4 5V11C4 16.55 7.4 21.74 12 23C16.6 21.74 20 16.55 20 11V5L12 2Z" fill="#334155" stroke="#f1f5f9" strokeWidth="1.5" />
-      </svg>
-      <span 
-        className="absolute text-white font-mono font-black text-[11px] leading-none z-10" 
-        style={{ textShadow: '1px 1px 2px #000, -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000, 0 0 4px #000' }}
-      >
-        {armor}
-      </span>
-    </div>
+  <div className="absolute -top-3.5 -left-3.5 w-9 h-9 z-20 flex items-center justify-center pointer-events-none" title={`Armor: ${armor}`}>
+    <img src="/icons/gothic_armor.webp" alt="ARM" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+    <span 
+      className="relative text-[#38bdf8] text-[15px] font-black font-mono leading-none select-none z-10" 
+      style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}
+    >
+      {armor}
+    </span>
   </div>
 );
 
@@ -194,13 +187,10 @@ const ArmorBreakOverlay: React.FC = () => (
     initial={{ opacity: 1, scale: 0.9 }}
     animate={{ opacity: 0, scale: 1.3 }}
     exit={{ opacity: 0 }}
-    transition={{ duration: 0.6 }}
-    className="absolute inset-0 z-35 flex flex-col items-center justify-center pointer-events-none rounded-xl overflow-hidden bg-red-950/40 border-2 border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.8)]"
+    transition={{ duration: 0.55 }}
+    className="absolute inset-0 z-35 flex items-center justify-center pointer-events-none rounded-xl overflow-hidden bg-cyan-950/40 border-2 border-cyan-400 shadow-[0_0_20px_rgba(56,189,248,0.8)]"
   >
-    <span className="text-2xl animate-bounce">🛡️💥</span>
-    <span className="text-[8.5px] font-mono font-black text-amber-300 tracking-wider uppercase bg-black/80 px-1.5 py-0.5 rounded border border-amber-500/50 mt-1">
-      БРОНЯ ПРОБИТА
-    </span>
+    <div className="w-12 h-12 rounded-full border-2 border-dashed border-cyan-300 shadow-[0_0_20px_rgba(56,189,248,1)] animate-ping" />
   </motion.div>
 );
 
@@ -541,19 +531,19 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 defenderCard.ward = false;
                 setBarrierShatterSlot({ side: defSide, slot: step.targetSlot });
                 setTimeout(() => setBarrierShatterSlot(null), 850 / speedMultiplier);
-                addFloatingText('🔮 БАРЬЕР ПОГЛОТИЛ УРОН!', { side: defSide, slot: step.targetSlot }, 'text-cyan-300 font-black text-xs scale-125 text-shadow-glow');
+                addFloatingText('✨ BARRIER BLOCKED!', { side: defSide, slot: step.targetSlot }, 'text-amber-300 font-black text-xs scale-125 text-shadow-glow');
               } else {
                 if (step.armorAbsorbed > 0) {
                   defenderCard.armor = Math.max(0, (defenderCard.armor || 0) - step.armorAbsorbed);
                   setArmorSparkSlot({ side: defSide, slot: step.targetSlot });
                   setTimeout(() => setArmorSparkSlot(null), 500 / speedMultiplier);
-                  addFloatingText(`🛡️ -${step.armorAbsorbed} БРОНЯ`, { side: defSide, slot: step.targetSlot }, 'text-slate-300 font-black text-xs');
+                  addFloatingText(`🛡️ -${step.armorAbsorbed} ARMOR`, { side: defSide, slot: step.targetSlot }, 'text-cyan-300 font-black text-xs');
                 }
                 if (step.armorBroken) {
                   defenderCard.armor = 0;
                   setArmorBreakSlot({ side: defSide, slot: step.targetSlot });
                   setTimeout(() => setArmorBreakSlot(null), 850 / speedMultiplier);
-                  addFloatingText('💥 БРОНЯ ПРОБИТА!', { side: defSide, slot: step.targetSlot }, 'text-amber-400 font-black text-xs scale-110');
+                  addFloatingText('💥 ARMOR BROKEN!', { side: defSide, slot: step.targetSlot }, 'text-red-400 font-black text-xs scale-110');
                 }
                 if (step.damage > 0) {
                   defenderCard.health = Math.max(0, defenderCard.health - step.damage);
@@ -621,19 +611,19 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   target.ward = false;
                   setBarrierShatterSlot({ side: targetSide, slot: step.targetSlot });
                   setTimeout(() => setBarrierShatterSlot(null), 850 / speedMultiplier);
-                  addFloatingText('🔮 БАРЬЕР ПОГЛОТИЛ УРОН!', { side: targetSide, slot: step.targetSlot }, 'text-cyan-300 font-black text-xs scale-125');
+                  addFloatingText('✨ BARRIER BLOCKED!', { side: targetSide, slot: step.targetSlot }, 'text-amber-300 font-black text-xs scale-125 text-shadow-glow');
                 } else {
                   if (step.armorAbsorbed > 0) {
                     target.armor = Math.max(0, (target.armor || 0) - step.armorAbsorbed);
                     setArmorSparkSlot({ side: targetSide, slot: step.targetSlot });
                     setTimeout(() => setArmorSparkSlot(null), 500 / speedMultiplier);
-                    addFloatingText(`🛡️ -${step.armorAbsorbed} БРОНЯ`, { side: targetSide, slot: step.targetSlot }, 'text-slate-300 font-bold text-xs');
+                    addFloatingText(`🛡️ -${step.armorAbsorbed} ARMOR`, { side: targetSide, slot: step.targetSlot }, 'text-cyan-300 font-black text-xs');
                   }
                   if (step.armorBroken) {
                     target.armor = 0;
                     setArmorBreakSlot({ side: targetSide, slot: step.targetSlot });
                     setTimeout(() => setArmorBreakSlot(null), 850 / speedMultiplier);
-                    addFloatingText('💥 БРОНЯ ПРОБИТА!', { side: targetSide, slot: step.targetSlot }, 'text-amber-400 font-black text-xs');
+                    addFloatingText('💥 ARMOR BROKEN!', { side: targetSide, slot: step.targetSlot }, 'text-red-400 font-black text-xs');
                   }
                   target.health = Math.max(0, target.health - step.damage);
                   if (step.damage > 0) {
@@ -2089,12 +2079,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                 <div className="bg-black/45 p-1.5 rounded-lg border border-gray-800/60 grid grid-cols-2 gap-1 text-center font-mono text-[9px] mt-1.5">
                   <div className="bg-slate-900/50 p-1 rounded border border-slate-700/40">
-                    <span className="text-slate-400 text-[7px] block font-bold uppercase">БРОНЯ (ARMOR)</span>
-                    <span className="text-slate-200 font-bold">🛡️ {hoveredCard.armor || 0}</span>
+                    <span className="text-slate-400 text-[7px] block font-bold uppercase tracking-wider">ARMOR</span>
+                    <span className="text-cyan-300 font-bold">🛡️ {hoveredCard.armor || 0}</span>
                   </div>
-                  <div className="bg-cyan-950/50 p-1 rounded border border-cyan-700/40">
-                    <span className="text-cyan-400 text-[7px] block font-bold uppercase">БАРЬЕР (BARRIER)</span>
-                    <span className="text-cyan-300 font-bold">{(hoveredCard.barrier ?? hoveredCard.ward) ? '🔮 АКТИВЕН' : 'НЕТ'}</span>
+                  <div className="bg-amber-950/40 p-1 rounded border border-amber-700/40">
+                    <span className="text-amber-400 text-[7px] block font-bold uppercase tracking-wider">BARRIER</span>
+                    <span className="text-amber-300 font-bold">{(hoveredCard.barrier ?? hoveredCard.ward) ? '✨ ACTIVE' : 'NONE'}</span>
                   </div>
                 </div>
               </div>
