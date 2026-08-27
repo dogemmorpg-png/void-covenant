@@ -566,7 +566,7 @@ export const CollectionDeckView: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[350px] overflow-y-auto pr-1">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[350px] overflow-y-auto pr-1 [contain:content]">
                 {(fuseCardId1
                   ? profile.collection.filter(c => {
                       const card1 = profile.collection.find(x => x.id === fuseCardId1);
@@ -589,7 +589,7 @@ export const CollectionDeckView: React.FC = () => {
                     <div
                       key={card.id}
                       onClick={() => handleCardClickInFusion(card.id)}
-                      className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer border overflow-hidden group ${getCardTierStyles(card.tier, isSelected, true)}`}
+                      className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer border overflow-hidden group [contain:paint] transform-gpu ${getCardTierStyles(card.tier, isSelected, true)}`}
                     >
                       {/* Mana Badge */}
                       <div className="absolute top-1.5 right-1.5 z-10">
@@ -598,7 +598,7 @@ export const CollectionDeckView: React.FC = () => {
 
                       {card.image.startsWith('/cards/') ? (
                         <>
-                          <img src={card.image} alt={card.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 group-hover:scale-110 transition-transform duration-500" />
+                          <img src={card.image} alt={card.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 group-hover:scale-105 transition-transform duration-200 transform-gpu" />
                           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20 z-0 pointer-events-none" />
                         </>
                       ) : (
@@ -633,7 +633,7 @@ export const CollectionDeckView: React.FC = () => {
             </div>
           ) : (
             /* Normal grid mode */
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[350px] overflow-y-auto pr-1">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[350px] overflow-y-auto pr-1 [contain:content]">
               {filteredCollection.map(card => {
                 const isSelected = selectedCardId === card.id;
                 const isInDeck = profile.deck.includes(card.id);
@@ -642,11 +642,11 @@ export const CollectionDeckView: React.FC = () => {
                   <div
                     key={card.id}
                     onClick={() => setSelectedCardId(card.id)}
-                    className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer overflow-hidden group border ${getCardTierStyles(card.tier, isSelected, true)}`}
+                    className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer overflow-hidden group border [contain:paint] transform-gpu ${getCardTierStyles(card.tier, isSelected, true)}`}
                   >
                     {card.image.startsWith('/cards/') ? (
                       <>
-                        <img src={card.image} alt={card.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 group-hover:scale-110 transition-transform duration-500" />
+                        <img src={card.image} alt={card.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 group-hover:scale-105 transition-transform duration-200 transform-gpu" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 pointer-events-none" />
                       </>
                     ) : (
