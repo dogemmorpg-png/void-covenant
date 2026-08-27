@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CampaignStage } from '../types';
-import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown, Timer } from 'lucide-react';
+import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User } from 'lucide-react';
 
 interface PvpArenaViewProps {
   onStartBattle: (stage: CampaignStage, type: 'campaign' | 'pvp', opponentPayload?: any) => Promise<boolean> | void;
@@ -833,92 +833,169 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         </div>
 
         {/* Right Side: Leaderboard */}
-        <div className="bg-[#151a21] border border-[#c5a880]/15 rounded-2xl p-5 shadow-xl flex flex-col justify-between h-[540px]">
+        <div className="bg-[#12151c] border border-white/10 rounded-2xl p-5 shadow-2xl flex flex-col justify-between min-h-[580px]">
           <div className="space-y-3.5">
-            <h3 className="font-display font-bold text-sm text-white tracking-widest border-b border-gray-900 pb-3 flex items-center gap-2">
-              <Award className="w-4 h-4 text-[#ebd09b]" /> LEADERBOARD HALL
-            </h3>
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4 text-amber-400" />
+                <h3 className="font-display font-bold text-sm text-white tracking-widest uppercase">
+                  LEADERBOARD HALL
+                </h3>
+              </div>
+              <span className="text-[9px] font-mono font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                TOP 20 ADVANCE
+              </span>
+            </div>
 
             {/* ROUND COUNTDOWN TIMER BANNER */}
-            <div className="bg-gradient-to-r from-amber-950/40 via-red-950/25 to-black/50 border border-amber-500/35 rounded-xl p-3 flex items-center justify-between shadow-[0_0_15px_rgba(245,158,11,0.08)]">
+            <div className="bg-gradient-to-r from-amber-950/30 via-[#16120e] to-black/40 border border-white/10 rounded-xl p-2.5 flex items-center justify-between shadow-inner">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shadow-inner">
-                  <Timer className="w-4 h-4 text-amber-400 animate-pulse" />
+                <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
+                  <Timer className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
                 </div>
                 <div>
-                  <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest block font-bold">ROUND ENDS IN</span>
-                  <span className="text-[10px] text-amber-400/90 font-sans font-medium">Daily Reset: 00:00 UTC</span>
+                  <span className="text-[9px] font-mono text-gray-400 uppercase tracking-wider block font-bold">ROUND RESET</span>
+                  <span className="text-[10px] text-amber-400/80 font-sans font-medium">Daily at 00:00 UTC</span>
                 </div>
               </div>
-              <div className="font-mono text-xs sm:text-sm font-black text-amber-300 bg-black/70 border border-amber-500/40 px-2.5 py-1.5 rounded-lg shadow-inner tracking-wider">
+              <div className="font-mono text-xs font-bold text-amber-300 bg-black/60 border border-white/10 px-2.5 py-1 rounded-lg shadow-inner">
                 {formatCountdown(timeRemaining)}
               </div>
             </div>
             
             {/* LEAGUE SELECTOR/NAVIGATOR */}
-            <div className="flex items-center justify-between bg-black/30 border border-white/5 rounded-xl p-2">
+            <div className="flex items-center justify-between bg-black/40 border border-white/10 rounded-2xl p-2 px-3">
               <button
                 onClick={() => cycleLeague('prev')}
-                className="w-8 h-8 rounded-lg bg-black/30 border border-white/5 text-gray-400 hover:text-white flex items-center justify-center cursor-pointer transition-colors active:scale-95 text-[10px]"
+                className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-white flex items-center justify-center cursor-pointer transition-all active:scale-95"
+                title="Previous League"
               >
-                ◀
+                <ChevronLeft className="w-4 h-4" />
               </button>
-              <div className={`flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-display font-bold uppercase tracking-wider ${getLeagueDetails(viewingLeague).color}`}>
-                <img src={getLeagueDetails(viewingLeague).icon} alt="Crest" className="w-4 h-4 object-contain" />
-                <span>{getLeagueDetails(viewingLeague).name}</span>
+
+              <div className="flex items-center gap-3">
+                <img 
+                  src={getLeagueDetails(viewingLeague).icon} 
+                  alt="Crest" 
+                  className="w-8 h-8 sm:w-9 sm:h-9 object-contain transition-transform hover:scale-110" 
+                />
+                <div className="text-center">
+                  <span className={`font-display font-black text-sm uppercase tracking-wider block ${getLeagueDetails(viewingLeague).accent}`}>
+                    {getLeagueDetails(viewingLeague).name} LEAGUE
+                  </span>
+                  <span className="text-[9px] text-gray-500 font-mono tracking-tight block">
+                    {viewingLeague === (profile.pvpLeague || 'Bronze') ? '• YOUR ACTIVE LEAGUE •' : 'VIEWING ARCHIVE'}
+                  </span>
+                </div>
               </div>
+
               <button
                 onClick={() => cycleLeague('next')}
-                className="w-8 h-8 rounded-lg bg-black/30 border border-white/5 text-gray-400 hover:text-white flex items-center justify-center cursor-pointer transition-colors active:scale-95 text-[10px]"
+                className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-white flex items-center justify-center cursor-pointer transition-all active:scale-95"
+                title="Next League"
               >
-                ▶
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
 
             {isLoadingLeaderboard ? (
               <div className="h-64 flex flex-col items-center justify-center space-y-2">
-                <div className="w-6 h-6 rounded-full border border-cyan-500 border-t-transparent animate-spin" />
-                <span className="text-[9px] font-mono text-gray-500 uppercase">Updating table...</span>
+                <div className="w-6 h-6 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
+                <span className="text-[10px] font-mono text-gray-500 uppercase">Consulting hall records...</span>
               </div>
             ) : (
-              <div className="space-y-1.5 max-h-[300px] overflow-y-auto pr-1">
-                {leaderboard.map((player, idx) => {
+              <div className="space-y-1.5 max-h-[310px] overflow-y-auto pr-1">
+                {Array.from({ length: Math.max(10, leaderboard.length) }).map((_, idx) => {
                   const rank = idx + 1;
-                  const isSelf = player.walletAddress === (profile.solanaAddress || '');
-                  return (
-                    <div
-                      key={player.walletAddress + idx}
-                      className={`flex items-center justify-between p-2.5 rounded-lg border text-xs font-mono transition-all ${
-                        isSelf
-                          ? 'bg-cyan-950/20 border-cyan-500/40 text-cyan-400 font-bold shadow-[0_0_10px_rgba(34,211,238,0.05)]'
-                          : 'bg-black/35 border-gray-950 text-gray-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className={`w-5 text-center font-bold font-mono text-[10px] ${
-                          rank === 1 ? 'text-yellow-400' :
-                          rank === 2 ? 'text-gray-400' :
-                          rank === 3 ? 'text-amber-600' : 'text-gray-600'
-                        }`}>
-                          #{rank}
-                        </span>
-                        <span className="truncate max-w-[120px]">{player.username}</span>
+                  const player = leaderboard[idx];
+                  const isSelf = player && player.walletAddress === (profile.solanaAddress || '');
+
+                  if (player) {
+                    return (
+                      <div
+                        key={player.walletAddress + idx}
+                        className={`flex items-center justify-between p-2 px-3 rounded-xl border text-xs transition-all ${
+                          isSelf
+                            ? 'bg-cyan-950/30 border-cyan-500/50 text-cyan-300 font-bold shadow-[0_0_12px_rgba(6,182,212,0.15)]'
+                            : rank === 1
+                            ? 'bg-amber-950/20 border-amber-500/30 text-gray-200'
+                            : rank === 2
+                            ? 'bg-slate-900/30 border-slate-700/30 text-gray-200'
+                            : rank === 3
+                            ? 'bg-amber-950/10 border-amber-700/20 text-gray-200'
+                            : 'bg-black/40 border-white/5 text-gray-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          {/* Rank badge */}
+                          <span className={`w-5 text-center font-bold font-mono text-[11px] shrink-0 ${
+                            rank === 1 ? 'text-amber-300 font-black' :
+                            rank === 2 ? 'text-gray-300 font-bold' :
+                            rank === 3 ? 'text-amber-500 font-bold' : 'text-gray-500'
+                          }`}>
+                            {rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`}
+                          </span>
+
+                          {/* Avatar */}
+                          <div className="w-6 h-6 rounded-full bg-black/50 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
+                            {player.avatarUrl ? (
+                              <img src={player.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                            ) : (
+                              <User className="w-3.5 h-3.5 text-gray-500" />
+                            )}
+                          </div>
+
+                          {/* Username */}
+                          <span className="truncate font-sans font-bold text-xs text-white max-w-[110px]">
+                            {player.username}
+                          </span>
+
+                          {isSelf && (
+                            <span className="text-[8px] font-mono font-black text-cyan-300 bg-cyan-950/60 border border-cyan-500/40 px-1.5 py-0.2 rounded shrink-0">
+                              YOU
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Crowns Score */}
+                        <div className="flex items-center gap-1.5 font-mono font-bold text-xs text-amber-300 shrink-0">
+                          <span>{player.pvpLP !== undefined ? player.pvpLP : (player.pvpRating || 0)}</span>
+                          <img src="/icons/crown.png" alt="Crown" className="w-4 h-4 object-contain brightness-110 contrast-125" />
+                        </div>
                       </div>
-                      <span className={`font-bold flex items-center gap-1.5 ${isSelf ? 'text-cyan-400' : 'text-amber-500'}`}>
-                        {player.pvpLP !== undefined ? player.pvpLP : (player.pvpRating || 0)}
-                        <img src="/icons/crown.png" alt="Crown" className="w-4.5 h-4.5 object-contain" />
-                      </span>
-                    </div>
-                  );
+                    );
+                  } else {
+                    // Placeholder row for empty seats
+                    return (
+                      <div
+                        key={`empty-${idx}`}
+                        className="flex items-center justify-between p-2 px-3 rounded-xl border border-dashed border-white/5 bg-black/20 text-xs opacity-45"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <span className="w-5 text-center font-mono text-[10px] text-gray-600">
+                            #{rank}
+                          </span>
+                          <div className="w-6 h-6 rounded-full border border-dashed border-white/10 flex items-center justify-center">
+                            <User className="w-3 h-3 text-gray-700" />
+                          </div>
+                          <span className="font-sans text-xs text-gray-600 italic">
+                            Unclaimed Seat
+                          </span>
+                        </div>
+                        <span className="font-mono text-xs text-gray-700 font-bold">—</span>
+                      </div>
+                    );
+                  }
                 })}
               </div>
             )}
           </div>
 
-          <div className="border-t border-gray-900 pt-3 mt-4 text-center">
-            <span className="text-[9px] text-gray-500 font-mono flex items-center justify-center gap-1">
-              <RefreshCw className="w-3 h-3 text-cyan-500 animate-spin-slow" /> Real-time database updates
+          <div className="border-t border-white/5 pt-2.5 mt-2 flex items-center justify-between text-[9px] text-gray-500 font-mono">
+            <span className="flex items-center gap-1">
+              <RefreshCw className="w-3 h-3 text-cyan-400/80 animate-spin-slow" /> Live Database
             </span>
+            <span className="text-gray-400">Top 20 Advance Daily</span>
           </div>
 
         </div>
