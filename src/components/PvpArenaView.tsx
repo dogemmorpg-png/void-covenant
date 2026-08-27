@@ -30,8 +30,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   const [viewingLeague, setViewingLeague] = useState<string>(profile.pvpLeague || 'Bronze');
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [isBuyTicketsModalOpen, setIsBuyTicketsModalOpen] = useState(false);
-
-
+  const [myOwnLeagueRank, setMyOwnLeagueRank] = useState<number | string>(1);
 
   // League calculation helper
   const getLeagueDetails = (leagueName: string) => {
@@ -41,44 +40,44 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         name: 'Bronze',
         badge: '🥉',
         icon: '/icons/league_bronze.png',
-        color: 'text-amber-600 border-amber-800 bg-amber-950/20',
-        glow: 'shadow-[0_0_15px_rgba(180,83,9,0.15)]',
-        accent: 'text-amber-700'
+        color: 'text-amber-500 border-amber-600/40 bg-amber-950/30',
+        glow: 'shadow-[0_0_20px_rgba(217,119,6,0.3)]',
+        accent: 'text-amber-500'
       };
     } else if (name.startsWith('Silver')) {
       return {
         name: 'Silver',
         badge: '🥈',
         icon: '/icons/league_silver.png',
-        color: 'text-gray-300 border-gray-600 bg-gray-900/25',
-        glow: 'shadow-[0_0_15px_rgba(209,213,219,0.15)]',
-        accent: 'text-gray-400'
+        color: 'text-gray-200 border-gray-400/40 bg-gray-900/35',
+        glow: 'shadow-[0_0_20px_rgba(209,213,219,0.3)]',
+        accent: 'text-gray-300'
       };
     } else if (name.startsWith('Gold')) {
       return {
         name: 'Gold',
         badge: '🥇',
         icon: '/icons/league_gold.png',
-        color: 'text-amber-400 border-amber-500/40 bg-amber-500/5',
-        glow: 'shadow-[0_0_15px_rgba(245,158,11,0.2)]',
-        accent: 'text-amber-500'
+        color: 'text-yellow-400 border-yellow-500/50 bg-yellow-950/30',
+        glow: 'shadow-[0_0_20px_rgba(234,179,8,0.4)]',
+        accent: 'text-yellow-400'
       };
     } else if (name.startsWith('Platinum')) {
       return {
         name: 'Platinum',
         badge: '🔮',
         icon: '/icons/league_platinum.png',
-        color: 'text-indigo-400 border-indigo-500/40 bg-indigo-500/5',
-        glow: 'shadow-[0_0_15px_rgba(129,140,248,0.25)]',
-        accent: 'text-indigo-500'
+        color: 'text-indigo-300 border-indigo-500/50 bg-indigo-950/30',
+        glow: 'shadow-[0_0_20px_rgba(129,140,248,0.4)]',
+        accent: 'text-indigo-400'
       };
     } else if (name.startsWith('Diamond')) {
       return {
         name: 'Diamond',
         badge: '💎',
         icon: '/icons/league_diamond.png',
-        color: 'text-cyan-400 border-cyan-500/40 bg-cyan-500/5',
-        glow: 'shadow-[0_0_20px_rgba(34,211,238,0.3)]',
+        color: 'text-cyan-300 border-cyan-500/50 bg-cyan-950/30',
+        glow: 'shadow-[0_0_25px_rgba(34,211,238,0.4)]',
         accent: 'text-cyan-400'
       };
     } else {
@@ -86,8 +85,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         name: 'Void Overlord',
         badge: '👑',
         icon: '/icons/league_void_overlord.png',
-        color: 'text-rose-500 border-rose-500/40 bg-rose-500/5',
-        glow: 'shadow-[0_0_25px_rgba(244,63,94,0.4)]',
+        color: 'text-rose-400 border-rose-500/50 bg-rose-950/30',
+        glow: 'shadow-[0_0_30px_rgba(244,63,94,0.5)]',
         accent: 'text-rose-500'
       };
     }
@@ -111,7 +110,16 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       });
       if (res.ok) {
         const data = await res.json();
-        setLeaderboard(data.leaderboard || []);
+        const list = data.leaderboard || [];
+        setLeaderboard(list);
+
+        // If inspecting own league, update personal league rank
+        if (leagueName === (profile.pvpLeague || 'Bronze')) {
+          const myIdx = list.findIndex((p: any) => p.walletAddress === profile.solanaAddress);
+          if (myIdx !== -1) {
+            setMyOwnLeagueRank(myIdx + 1);
+          }
+        }
       }
     } catch (err) {
       console.error('Leaderboard fetch error:', err);
@@ -119,6 +127,32 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       setIsLoadingLeaderboard(false);
     }
   };
+
+  // Always fetch and maintain player's rank in their own league
+  useEffect(() => {
+    const fetchOwnLeagueRank = async () => {
+      try {
+        const token = localStorage.getItem('void_covenant_token');
+        if (!token) return;
+        const res = await fetch('/api/leaderboard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ league: profile.pvpLeague || 'Bronze' })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const list = data.leaderboard || [];
+          const myIdx = list.findIndex((p: any) => p.walletAddress === profile.solanaAddress);
+          if (myIdx !== -1) {
+            setMyOwnLeagueRank(myIdx + 1);
+          }
+        }
+      } catch (e) {
+        console.warn('Error fetching own league rank:', e);
+      }
+    };
+    fetchOwnLeagueRank();
+  }, [profile.pvpLeague, profile.solanaAddress, profile.pvpLP]);
 
   const handleFindOpponent = async (spendShards: boolean = false, spendEnergy: boolean = false) => {
     if (profile.deck.length < 10) {
@@ -472,27 +506,27 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
           </div>
 
           {/* Stats Bar */}
-          <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 bg-black/50 border border-[#c5a880]/20 rounded-xl p-3.5 w-full lg:w-auto shadow-lg">
+          <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 bg-gradient-to-r from-[#17141f]/95 via-[#0e0b14]/95 to-[#17141f]/95 border-2 border-amber-500/30 rounded-2xl p-3 sm:p-3.5 w-full lg:w-auto shadow-[0_0_30px_rgba(245,158,11,0.12)]">
             {/* Crowns */}
             <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[95px]">
-              <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest font-bold block">CROWNS</span>
-              <div className="font-mono text-xl font-black text-amber-400 flex items-center justify-center gap-1.5 mt-0.5">
-                <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain" />
+              <span className="text-[10px] font-mono text-amber-400/80 uppercase tracking-widest font-black block">CROWNS</span>
+              <div className="font-mono text-xl sm:text-2xl font-black text-amber-300 flex items-center justify-center gap-1.5 mt-0.5">
+                <img src="/icons/crown.png" alt="Crown" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
                 {profile.pvpLP || 0}
               </div>
             </div>
 
             {/* Arena Tickets (Prominent counter + Buy button) */}
-            <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[125px] flex flex-col items-center">
-              <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest font-bold block">ARENA TICKETS</span>
+            <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[130px] flex flex-col items-center">
+              <span className="text-[10px] font-mono text-rose-400/80 uppercase tracking-widest font-black block">ARENA TICKETS</span>
               <div className="flex items-center justify-center gap-2 mt-0.5">
-                <div className="font-mono text-lg font-black text-rose-400 flex items-center gap-1.5">
-                  <img src="/icons/ticket.png" alt="Ticket" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(255,40,60,0.6)]" />
+                <div className="font-mono text-lg sm:text-xl font-black text-rose-400 flex items-center gap-1.5">
+                  <img src="/icons/ticket.png" alt="Ticket" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]" />
                   <span>{profile.pvpTickets !== undefined ? profile.pvpTickets : profile.pvpEnergy}/5</span>
                 </div>
                 <button
                   onClick={() => setIsBuyTicketsModalOpen(true)}
-                  className="py-0.5 px-2 rounded-md bg-gradient-to-r from-amber-600/30 to-rose-600/30 hover:from-amber-600/60 hover:to-rose-600/60 border border-amber-400/40 hover:border-amber-300 text-[9px] font-display font-black uppercase text-[#ebd09b] hover:text-white cursor-pointer transition-all hover:scale-105 active:scale-95 shadow-sm"
+                  className="py-1 px-2.5 rounded-lg bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-white font-display font-black text-[10px] uppercase shadow-[0_0_8px_rgba(244,63,94,0.4)] transition-all hover:scale-105 active:scale-95 cursor-pointer"
                   title="Buy Arena Tickets"
                 >
                   + BUY
@@ -500,20 +534,26 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               </div>
             </div>
 
-            {/* League */}
-            <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[100px]">
-              <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest font-bold block mb-1">LEAGUE</span>
-              <span className={`px-2.5 py-0.5 border rounded-full text-[9px] font-display font-black uppercase tracking-widest inline-flex items-center gap-1 ${league.color} ${league.glow}`}>
-                <img src={league.icon} alt="Crest" className="w-3.5 h-3.5 object-contain" />
-                {league.name}
-              </span>
+            {/* League with Large Crest */}
+            <div className="text-center px-4 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[140px] flex flex-col items-center">
+              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-black block mb-0.5">MY LEAGUE</span>
+              <div className="flex items-center gap-2.5">
+                <img 
+                  src={league.icon} 
+                  alt={league.name} 
+                  className="w-10 h-10 object-contain drop-shadow-[0_0_12px_rgba(245,158,11,0.5)] transition-transform hover:scale-110" 
+                />
+                <span className={`font-display font-black text-sm sm:text-base tracking-wider uppercase ${league.accent} text-shadow-gold`}>
+                  {league.name}
+                </span>
+              </div>
             </div>
 
             {/* Rank Position */}
-            <div className="text-center px-3 min-w-[80px]">
-              <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest font-bold block">RANK</span>
-              <div className="font-mono text-lg font-black text-white mt-0.5">
-                #{playerRank}
+            <div className="text-center px-4 min-w-[85px]">
+              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-black block">MY RANK</span>
+              <div className="font-mono text-xl sm:text-2xl font-black text-white mt-0.5 text-shadow-gold">
+                #{myOwnLeagueRank}
               </div>
             </div>
           </div>
