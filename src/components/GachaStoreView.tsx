@@ -6,7 +6,7 @@ import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CARD_TEMPLATES, createCardInstance } from '../data/cards';
 import { Card, CardTier, Equipment } from '../types';
-import { getRandomEquipmentByTier, generateEquipmentInstance } from '../data/equipment';
+import { getRandomEquipmentByTier, generateEquipmentInstance, getEquipmentIcon } from '../data/equipment';
 import { Gem, Coins, Sparkles, Box, Trash2, Shield, Flame, Skull, Sword } from 'lucide-react';
 
 export const GachaStoreView: React.FC = () => {
@@ -451,27 +451,33 @@ export const GachaStoreView: React.FC = () => {
                       initial={{ opacity: 0, y: 50, scale: 0.8 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       transition={{ delay: idx * 0.2, type: 'spring' }}
-                      className={`relative w-48 h-64 rounded-2xl flex flex-col items-center justify-center border-2 shadow-2xl overflow-hidden p-4 ${
-                        eq.tier === 'legendary' ? 'bg-gradient-to-br from-red-950 to-orange-900 border-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.4)]' :
-                        eq.tier === 'gold' ? 'bg-gradient-to-br from-yellow-900/80 to-amber-900/50 border-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.3)]' :
-                        eq.tier === 'silver' ? 'bg-gradient-to-br from-slate-800 to-slate-900 border-slate-400' :
-                        'bg-gradient-to-br from-stone-800 to-stone-900 border-stone-600'
+                      className={`relative w-48 h-64 rounded-2xl flex flex-col items-center justify-between border-2 shadow-2xl overflow-hidden p-4 ${
+                        eq.tier === 'legendary' ? 'bg-gradient-to-br from-purple-950 via-[#180424] to-black border-purple-500 shadow-[0_0_30px_rgba(168,85,247,0.5)]' :
+                        eq.tier === 'gold' ? 'bg-gradient-to-br from-yellow-950 via-[#1f1404] to-black border-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.35)]' :
+                        eq.tier === 'silver' ? 'bg-gradient-to-br from-slate-900 via-[#101720] to-black border-slate-400' :
+                        'bg-gradient-to-br from-stone-900 via-[#191410] to-black border-amber-700/60'
                       }`}
                     >
-                      <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-bold tracking-widest uppercase border border-white/20">
-                        {eq.tier}
+                      <div className="w-full flex items-center justify-between z-10">
+                        <span className="text-[10px] font-mono uppercase text-gray-400">{eq.slot}</span>
+                        <span className="px-2 py-0.5 rounded bg-black/80 text-[10px] font-display font-black tracking-widest uppercase border border-white/20 text-white">
+                          {eq.tier}
+                        </span>
                       </div>
-                      <div className="w-16 h-16 rounded-full bg-black/50 border border-white/20 flex items-center justify-center mb-4">
-                        {eq.slot === 'weapon' && <div className="w-8 h-8 text-gray-300" />}
-                        {eq.slot === 'armor' && <Shield className="w-8 h-8 text-gray-300" />}
-                        {eq.slot === 'helmet' && <Skull className="w-8 h-8 text-gray-300" />}
-                        {(eq.slot === 'ring' || eq.slot === 'amulet') && <Gem className="w-8 h-8 text-gray-300" />}
-                        {eq.slot === 'boots' && <Flame className="w-8 h-8 text-gray-300" />}
+
+                      <div className="w-20 h-20 rounded-2xl bg-black/60 border border-white/15 flex items-center justify-center p-2 my-auto shadow-inner">
+                        <img 
+                          src={getEquipmentIcon(eq)} 
+                          alt={eq.name} 
+                          className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(255,215,110,0.6)]" 
+                        />
                       </div>
-                      <h4 className="font-display font-bold text-center text-sm text-white mb-2">{eq.name}</h4>
-                      <p className="text-xs text-center text-gray-400 font-mono capitalize">{eq.slot}</p>
-                      <div className="mt-auto bg-black/60 w-full py-2 rounded text-center text-[10px] font-mono border border-white/10">
-                        <span className="text-emerald-400">+{eq.bonusValue} {eq.bonusType}</span>
+
+                      <div className="w-full text-center space-y-1 z-10">
+                        <h4 className="font-display font-bold text-center text-sm text-white leading-tight">{eq.name}</h4>
+                        <div className="bg-black/60 w-full py-1.5 rounded-xl text-center text-xs font-mono border border-white/10">
+                          <span className="text-emerald-400 font-bold">+{eq.bonusValue} {eq.bonusType}</span>
+                        </div>
                       </div>
                     </motion.div>
                   ))}

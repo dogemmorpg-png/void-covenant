@@ -9,6 +9,7 @@ export interface Equipment {
   name: string;
   bonusType: 'maxHealth' | 'dodge' | 'goldBonus' | 'delayReduction';
   bonusValue: number;
+  icon?: string;
 }
 
 export type SkillType = 'hex' | 'vampirism' | 'plague' | 'sacrifice';

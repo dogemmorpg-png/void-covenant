@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { Equipment, EquipmentSlot, CardTier } from '../types';
+import { getEquipmentIcon } from '../data/equipment';
 import { TalentsView } from './TalentsView';
 import { Shield, Sword, Heart, Sparkles, Coins, Hourglass, Wind, Zap, Activity, Flame, Check, RefreshCw, X } from 'lucide-react';
 
@@ -94,10 +95,11 @@ export const HeroInventoryView: React.FC = () => {
     }
   };
 
-  const renderSlotBox = (slot: EquipmentSlot, label: string, iconPath: string) => {
+  const renderSlotBox = (slot: EquipmentSlot, label: string, defaultIconPath: string) => {
     const item = profile.equipment?.find(e => e.id === profile.equipped?.[slot]) || null;
     const isSelected = selectedSlot === slot;
     const tierStyle = item ? TIER_STYLES[item.tier] : null;
+    const itemIcon = item ? getEquipmentIcon(item, slot) : defaultIconPath;
 
     return (
       <div
@@ -118,9 +120,9 @@ export const HeroInventoryView: React.FC = () => {
               <span className="text-[7px] text-gray-400 uppercase tracking-widest">{label}</span>
             </div>
 
-            {/* Custom Glowing Slot Icon */}
-            <div className="w-10 h-10 sm:w-11 sm:h-11 my-auto flex items-center justify-center relative z-10 group-hover:scale-110 transition-transform">
-              <img src={iconPath} alt={label} className="w-full h-full object-contain drop-shadow-[0_0_6px_rgba(255,215,110,0.6)]" />
+            {/* Individual Item Icon */}
+            <div className="w-12 h-12 sm:w-14 sm:h-14 my-auto flex items-center justify-center relative z-10 group-hover:scale-110 transition-transform">
+              <img src={itemIcon} alt={item.name} className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(255,215,110,0.6)]" />
             </div>
 
             {/* Item Name & Bonus Footer */}
@@ -140,9 +142,9 @@ export const HeroInventoryView: React.FC = () => {
               {label}
             </div>
 
-            {/* Faded Slot Icon */}
+            {/* Faded Placeholder Icon */}
             <div className="w-10 h-10 sm:w-12 sm:h-12 my-auto flex items-center justify-center opacity-40 group-hover:opacity-80 transition-opacity">
-              <img src={iconPath} alt={label} className="w-full h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300" />
+              <img src={defaultIconPath} alt={label} className="w-full h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300" />
             </div>
 
             {/* Prompt */}
@@ -211,6 +213,7 @@ export const HeroInventoryView: React.FC = () => {
                 {inventoryItems.map(item => {
                   const isEquipped = equippedItemId === item.id;
                   const tierStyle = TIER_STYLES[item.tier];
+                  const itemIcon = getEquipmentIcon(item, selectedSlot);
 
                   return (
                     <div 
@@ -223,15 +226,15 @@ export const HeroInventoryView: React.FC = () => {
                             {item.tier}
                           </span>
                           {isEquipped && (
-                            <span className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-400 text-[8px] font-mono font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.35)]">
+                            <span className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-400 text-[8px] font-mono font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-[0_0_10px_rgba(168,85,247,0.35)]">
                               <Check className="w-2.5 h-2.5" /> EQUIPPED
                             </span>
                           )}
                         </div>
                         
                         <div className="flex items-center gap-3">
-                          <div className="w-11 h-11 rounded-xl bg-black/70 border border-white/10 flex items-center justify-center shrink-0">
-                            <img src={slotCfg?.iconPath} alt={item.name} className="w-8 h-8 object-contain drop-shadow-[0_0_6px_rgba(255,215,110,0.5)]" />
+                          <div className="w-12 h-12 rounded-xl bg-black/70 border border-white/10 flex items-center justify-center shrink-0">
+                            <img src={itemIcon} alt={item.name} className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(255,215,110,0.6)]" />
                           </div>
                           <div>
                             <h5 className="font-display font-black text-sm text-white leading-tight">{item.name}</h5>
