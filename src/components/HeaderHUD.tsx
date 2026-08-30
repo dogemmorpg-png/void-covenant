@@ -96,10 +96,19 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
             </div>
 
             {/* Dust */}
-            <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors cursor-default py-1 px-2.5 shadow-inner" title="Dark Dust (For skill enhancement)">
-              <img src="/icons/icon_dust.webp" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 object-contain scale-110" />
-              <span className="font-mono font-bold text-[#66fcf1] text-sm">{profile.dust}</span>
-            </div>
+            <div 
+              className="flex items-center gap-1.5 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-400/50 rounded-full py-1 px-2.5 shadow-inner transition-all duration-300 group cursor-default"
+              title={`Void Dust: ${profile.dust}`}
+            >
+              <img 
+                src="/icons/icon_dust.webp" 
+                alt="Dust" 
+                className="drop-shadow-[0_0_12px_rgba(6,182,212,0.7)] brightness-110 contrast-125 w-8 h-8 object-contain scale-135 group-hover:scale-145 transition-transform duration-300" 
+              />
+              <span className="font-mono font-black text-cyan-300 group-hover:text-cyan-200 text-sm tracking-wide transition-colors">
+                {profile.dust}
+              </span>
+            </div> 
 
             {/* Shards */}
             <div 

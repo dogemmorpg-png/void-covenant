@@ -230,7 +230,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                 {/* Dust Pill */}
                 <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-cyan-500/20 hover:border-cyan-400/50 hover:bg-cyan-500/[0.06] transition-all cursor-default group">
                   <div className="flex items-center gap-1.5">
-                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(102,252,241,0.5)] scale-110 group-hover:scale-120 transition-transform" />
+                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-8 h-8 object-contain drop-shadow-[0_0_10px_rgba(102,252,241,0.6)] scale-135 group-hover:scale-145 transition-transform" />
                     <span className="font-mono font-black text-[#66fcf1] text-base leading-none">+{selectedStage.dustReward}</span>
                   </div>
                   <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider font-semibold mt-1">Dust</span>

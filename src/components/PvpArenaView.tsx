@@ -690,7 +690,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                         <div className="bg-black/50 border border-cyan-500/20 p-2 rounded-xl text-center flex flex-col items-center justify-center">
                           <span className="text-cyan-400 font-display font-bold text-sm block flex items-center gap-1 text-shadow-cyan">
                             +{30 + Math.floor((profile.pvpLP || 0) / 20)}
-                            <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 object-contain drop-shadow-[0_0_4px_rgba(6,182,212,0.5)]" />
+                            <img src="/icons/icon_dust.webp" alt="Dust" className="w-5.5 h-5.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.6)] scale-135" />
                           </span>
                           <span className="text-[8px] text-cyan-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">Dust</span>
                         </div>

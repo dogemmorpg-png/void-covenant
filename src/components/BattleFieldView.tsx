@@ -2329,7 +2329,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 <div className="bg-gradient-to-b from-cyan-950/40 via-black to-black border border-cyan-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
                   <span className="text-cyan-300 font-display font-black text-base flex items-center gap-1 text-shadow-cyan">
                     +{stage.dustReward}
-                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-5.5 h-5.5 object-contain drop-shadow-[0_0_8px_rgba(102,252,241,0.6)]" />
+                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-7 h-7 object-contain drop-shadow-[0_0_8px_rgba(102,252,241,0.6)] scale-125" />
                   </span>
                   <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Dust</span>
                 </div>
@@ -2338,7 +2338,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   <div className="bg-gradient-to-b from-emerald-950/40 via-black to-black border border-emerald-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
                     <span className="text-emerald-300 font-display font-black text-base flex items-center gap-1 text-shadow-emerald">
                       +50
-                      <span className="text-sm drop-shadow-[0_0_6px_rgba(52,211,153,0.6)]">✨</span>
+                      <img src="/icons/icon_exp.webp" alt="EXP" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
                     </span>
                     <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider mt-1 font-bold">EXP</span>
                   </div>
