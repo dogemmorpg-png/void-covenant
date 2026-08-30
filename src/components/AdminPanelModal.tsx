@@ -86,8 +86,11 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
     setIsLoading(true);
     try {
       const res = await fetchAdminOverview();
-      if (res.success && res.overview) {
-        setOverview(res.overview);
+      const ov = res.overview || res.data?.overview;
+      if (ov) {
+        setOverview(ov);
+      } else if (!res.success) {
+        console.error('Failed to load overview:', res.message || res.error);
       }
     } catch (e: any) {
       console.error('Failed to load admin overview:', e);
@@ -101,8 +104,11 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
     setIsLoading(true);
     try {
       const res = await fetchAdminWithdrawals();
-      if (res.success && res.requests) {
-        setWithdrawals(res.requests);
+      const reqs = res.requests || res.data?.requests;
+      if (reqs) {
+        setWithdrawals(reqs);
+      } else if (!res.success) {
+        console.error('Failed to load withdrawals:', res.message || res.error);
       }
     } catch (e: any) {
       console.error('Failed to load withdrawals:', e);

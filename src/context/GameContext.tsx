@@ -1035,7 +1035,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (res.ok) {
           const data = await res.json();
           if (data.profile) setProfile(migrateProfileTo10Cards(data.profile));
-          return { success: true, message: data.message, data };
+          return { success: true, message: data.message, data, ...data };
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          return { success: false, message: errData.error || 'Server request failed', error: errData.error };
         }
       } catch (err: any) {
         console.warn('Action API error, using local fallback:', err);
