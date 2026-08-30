@@ -187,6 +187,50 @@ function MainAppContent() {
     );
   }
 
+  if (profile.isBanned) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#180508] via-[#0d0204] to-black flex items-center justify-center p-4 relative z-50">
+        <div className="max-w-md w-full bg-black/80 border-2 border-red-600/60 rounded-3xl p-8 text-center space-y-6 shadow-[0_0_50px_rgba(220,38,38,0.4)] animate-in fade-in zoom-in-95">
+          <div className="w-20 h-20 mx-auto rounded-full bg-red-950/80 border-2 border-red-500/80 flex items-center justify-center shadow-[0_0_25px_rgba(220,38,38,0.6)]">
+            <span className="text-4xl">🚫</span>
+          </div>
+          <div>
+            <h2 className="font-display font-black text-2xl text-red-500 tracking-wider uppercase text-shadow-red">
+              EXILED FROM THE VOID
+            </h2>
+            <p className="font-mono text-xs text-gray-400 mt-2">
+              Your account has been suspended by the High Council of Administration.
+            </p>
+          </div>
+
+          <div className="bg-red-950/40 border border-red-500/40 p-4 rounded-2xl text-left space-y-2">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-red-400 font-bold block">
+              Reason for Ban:
+            </span>
+            <p className="text-xs text-red-200 font-sans leading-relaxed whitespace-pre-line font-bold">
+              {profile.banReason || 'Violation of Void Covenant terms of service and gameplay rules.'}
+            </p>
+            {profile.bannedAt && (
+              <span className="text-[9px] font-mono text-gray-500 block pt-1">
+                Date of Exile: {new Date(profile.bannedAt).toLocaleString()}
+              </span>
+            )}
+          </div>
+
+          <button
+            onClick={() => {
+              disconnectSolanaWallet();
+              window.location.reload();
+            }}
+            className="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-display font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer"
+          >
+            Disconnect Wallet
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!profile.isRegistered) {
     return (
       <RegistrationScreen 

@@ -200,6 +200,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let successMessage = '';
     let responseData: any = {};
 
+    if (profile?.isBanned && !action.startsWith('admin_')) {
+      return res.status(403).json({
+        error: 'ACCOUNT_BANNED',
+        message: profile.banReason || 'Your account has been exiled from the Void by administration.',
+        isBanned: true
+      });
+    }
+
     // --- ADMIN ACTION DISPATCHER ---
     if (action.startsWith('admin_')) {
       const isAdmin = 
@@ -546,6 +554,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (updates.pvpLeague !== undefined) targetData.pvpLeague = updates.pvpLeague;
         if (updates.pvpLP !== undefined) targetData.pvpLP = Number(updates.pvpLP);
         if (updates.role !== undefined) targetData.role = updates.role;
+        if (updates.isBanned !== undefined) {
+          targetData.isBanned = Boolean(updates.isBanned);
+          if (targetData.isBanned) {
+            targetData.banReason = updates.banReason ? String(updates.banReason) : 'Violation of Void Covenant terms & rules';
+            targetData.bannedAt = Date.now();
+            targetData.bannedBy = profile?.username || 'Admin';
+          } else {
+            targetData.banReason = null;
+            targetData.bannedAt = null;
+            targetData.bannedBy = null;
+          }
+        }
 
         const { error: saveErr } = await supabase
           .from('profiles')

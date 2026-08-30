@@ -128,6 +128,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
   const [editSovereigns, setEditSovereigns] = useState<number>(0);
   const [editLeague, setEditLeague] = useState<string>('Bronze');
   const [editLP, setEditLP] = useState<number>(0);
+  const [editIsBanned, setEditIsBanned] = useState<boolean>(false);
+  const [editBanReason, setEditBanReason] = useState<string>('');
   const [isModifyingPlayer, setIsModifyingPlayer] = useState(false);
   const [playerModifyFeedback, setPlayerModifyFeedback] = useState<string | null>(null);
 
@@ -310,6 +312,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
     setEditSovereigns(p.bloodSovereigns || 0);
     setEditLeague(getNormalizedLeague(p.pvpLeague || p.league || 'Bronze'));
     setEditLP(p.pvpLP !== undefined ? p.pvpLP : 0);
+    setEditIsBanned(Boolean(p.isBanned));
+    setEditBanReason(p.banReason || '');
     setPlayerModifyFeedback(null);
   };
 
@@ -324,11 +328,13 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
         darkShards: editShards,
         bloodSovereigns: editSovereigns,
         pvpLeague: editLeague,
-        pvpLP: editLP
+        pvpLP: editLP,
+        isBanned: editIsBanned,
+        banReason: editIsBanned ? (editBanReason.trim() || 'Violating game rules') : null
       });
 
       if (res.success) {
-        setPlayerModifyFeedback('✅ Player resources & league updated in database!');
+        setPlayerModifyFeedback('✅ Player profile & permissions updated in database!');
         setSelectedPlayer({
           ...selectedPlayer,
           profile: res.profile
@@ -340,6 +346,40 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
       }
     } catch (e: any) {
       setPlayerModifyFeedback(`❌ ${e.message || 'Error updating player'}`);
+    } finally {
+      setIsModifyingPlayer(false);
+    }
+  };
+
+  const handleQuickBanToggle = async () => {
+    if (!selectedPlayer) return;
+    const willBan = !editIsBanned;
+    const reason = willBan 
+      ? (editBanReason.trim() || 'Account suspended by administration')
+      : '';
+    
+    if (willBan && !window.confirm(`Are you sure you want to BAN and EXILE player "${selectedPlayer.profile?.username || selectedPlayer.walletAddress}" from the game?`)) {
+      return;
+    }
+
+    setIsModifyingPlayer(true);
+    try {
+      const res = await modifyAdminPlayer(selectedPlayer.walletAddress, {
+        isBanned: willBan,
+        banReason: willBan ? reason : null
+      });
+      if (res.success) {
+        setEditIsBanned(willBan);
+        setEditBanReason(willBan ? reason : '');
+        setPlayerModifyFeedback(willBan ? '🚫 Player has been EXILED and blocked from the game!' : '✅ Player has been PARDONED and unbanned!');
+        setSelectedPlayer({
+          ...selectedPlayer,
+          profile: res.profile
+        });
+        setAllPlayers(prev => prev.map(pl => pl.walletAddress === selectedPlayer.walletAddress ? { ...pl, profile: res.profile } : pl));
+      }
+    } catch (e: any) {
+      setPlayerModifyFeedback(`❌ ${e.message || 'Action failed'}`);
     } finally {
       setIsModifyingPlayer(false);
     }
@@ -1011,17 +1051,19 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
                     {/* League Filter Pills */}
                     <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 select-none">
-                      {['all', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Void Overlord'].map(l => (
+                      {['all', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Void Overlord', 'Banned'].map(l => (
                         <button
                           key={l}
                           onClick={() => setPlayerLeagueFilter(l)}
                           className={`px-3 py-1.5 rounded-xl font-display font-bold text-[11px] uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
                             playerLeagueFilter === l
-                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/60 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
+                              ? l === 'Banned'
+                                ? 'bg-red-600/30 text-red-300 border border-red-500/80 shadow-[0_0_12px_rgba(220,38,38,0.35)]'
+                                : 'bg-amber-500/20 text-amber-300 border border-amber-500/60 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
                               : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white'
                           }`}
                         >
-                          {l === 'all' ? 'All Leagues' : l}
+                          {l === 'all' ? 'All Leagues' : l === 'Banned' ? '🚫 Banned' : l}
                         </button>
                       ))}
                     </div>
@@ -1049,8 +1091,14 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                     <div className="px-6 py-3 border-b border-white/10 bg-white/[0.02] flex items-center justify-between">
                       <span className="text-[11px] font-mono uppercase tracking-widest text-gray-400 font-bold">
                         Registered Players Directory ({allPlayers.filter(p => {
-                          const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
-                          if (playerLeagueFilter !== 'all' && l.toLowerCase() !== getNormalizedLeague(playerLeagueFilter).toLowerCase()) return false;
+                          const isBanned = Boolean(p.profile?.isBanned);
+                          if (playerLeagueFilter === 'Banned') {
+                            if (!isBanned) return false;
+                          } else if (playerLeagueFilter !== 'all') {
+                            if (isBanned) return false;
+                            const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
+                            if (l.toLowerCase() !== getNormalizedLeague(playerLeagueFilter).toLowerCase()) return false;
+                          }
                           if (searchQuery.trim()) {
                             const s = searchQuery.trim().toLowerCase();
                             const w = (p.walletAddress || '').toLowerCase();
@@ -1084,8 +1132,14 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                         </thead>
                         <tbody className="divide-y divide-white/5">
                           {allPlayers.filter(p => {
-                            const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
-                            if (playerLeagueFilter !== 'all' && l.toLowerCase() !== getNormalizedLeague(playerLeagueFilter).toLowerCase()) return false;
+                            const isBanned = Boolean(p.profile?.isBanned);
+                            if (playerLeagueFilter === 'Banned') {
+                              if (!isBanned) return false;
+                            } else if (playerLeagueFilter !== 'all') {
+                              if (isBanned) return false;
+                              const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
+                              if (l.toLowerCase() !== getNormalizedLeague(playerLeagueFilter).toLowerCase()) return false;
+                            }
                             if (searchQuery.trim()) {
                               const s = searchQuery.trim().toLowerCase();
                               const w = (p.walletAddress || '').toLowerCase();
@@ -1102,8 +1156,14 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           ) : (
                             allPlayers
                               .filter(p => {
-                                const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
-                                if (playerLeagueFilter !== 'all' && l.toLowerCase() !== getNormalizedLeague(playerLeagueFilter).toLowerCase()) return false;
+                                const isBanned = Boolean(p.profile?.isBanned);
+                                if (playerLeagueFilter === 'Banned') {
+                                  if (!isBanned) return false;
+                                } else if (playerLeagueFilter !== 'all') {
+                                  if (isBanned) return false;
+                                  const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
+                                  if (l.toLowerCase() !== getNormalizedLeague(playerLeagueFilter).toLowerCase()) return false;
+                                }
                                 if (searchQuery.trim()) {
                                   const s = searchQuery.trim().toLowerCase();
                                   const w = (p.walletAddress || '').toLowerCase();
@@ -1126,19 +1186,20 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                               .map((p) => {
                                 const prof = p.profile || {};
                                 const isUserAdmin = prof.username?.toLowerCase() === 'adminus' || prof.role === 'admin';
+                                const isPlayerBanned = Boolean(prof.isBanned);
                                 const lastAct = prof.lastLogin || (p.updatedAt ? new Date(p.updatedAt).getTime() : 0);
                                 const leagueStyle = getLeagueBadgeStyle(prof.pvpLeague || prof.league);
 
                                 return (
-                                  <tr key={p.walletAddress} className="hover:bg-white/[0.02] transition-colors">
+                                  <tr key={p.walletAddress} className={`transition-colors ${isPlayerBanned ? 'bg-red-950/15 hover:bg-red-950/25 border-l-2 border-red-600' : 'hover:bg-white/[0.02]'}`}>
                                     {/* Player */}
                                     <td className="p-4">
                                       <div className="flex items-center gap-3">
                                         <div className="relative">
                                           {prof.avatarUrl ? (
-                                            <img src={prof.avatarUrl} alt="Avatar" className="w-10 h-10 rounded-full border border-white/20 object-cover shadow-sm" />
+                                            <img src={prof.avatarUrl} alt="Avatar" className={`w-10 h-10 rounded-full border object-cover shadow-sm ${isPlayerBanned ? 'border-red-500/80 grayscale' : 'border-white/20'}`} />
                                           ) : (
-                                            <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-display font-black text-amber-300">
+                                            <div className={`w-10 h-10 rounded-full border flex items-center justify-center font-display font-black ${isPlayerBanned ? 'bg-red-950/50 border-red-500 text-red-300' : 'bg-white/5 border-white/10 text-amber-300'}`}>
                                               {(prof.username || 'V')[0].toUpperCase()}
                                             </div>
                                           )}
@@ -1150,10 +1211,15 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                                         </div>
 
                                         <div>
-                                          <div className="flex items-center gap-2">
-                                            <span className="font-display font-bold text-white text-sm">
+                                          <div className="flex items-center gap-2 flex-wrap">
+                                            <span className={`font-display font-bold text-sm ${isPlayerBanned ? 'text-red-300 line-through' : 'text-white'}`}>
                                               {prof.username || 'Voidwalker'}
                                             </span>
+                                            {isPlayerBanned && (
+                                              <span className="px-1.5 py-0.2 rounded bg-red-600 text-white font-mono text-[9px] font-black tracking-wider shadow-[0_0_8px_rgba(220,38,38,0.8)]">
+                                                🚫 BANNED
+                                              </span>
+                                            )}
                                             {isUserAdmin && (
                                               <span className="px-1.5 py-0.2 rounded bg-red-950/80 border border-red-500/60 text-red-400 font-mono text-[9px] font-bold">
                                                 ADMIN
@@ -1267,14 +1333,23 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                   <div className="flex items-start justify-between border-b border-white/10 pb-4">
                     <div className="flex items-center gap-4">
                       {selectedPlayer.profile?.avatarUrl ? (
-                        <img src={selectedPlayer.profile.avatarUrl} alt="Avatar" className="w-14 h-14 rounded-full border-2 border-amber-500/50 object-cover shadow-[0_0_15px_rgba(245,158,11,0.3)]" />
+                        <img src={selectedPlayer.profile.avatarUrl} alt="Avatar" className={`w-14 h-14 rounded-full border-2 object-cover ${editIsBanned ? 'border-red-600 grayscale' : 'border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.3)]'}`} />
                       ) : (
-                        <div className="w-14 h-14 rounded-full bg-white/5 border-2 border-amber-500/50 flex items-center justify-center font-display font-black text-amber-300 text-xl">
+                        <div className={`w-14 h-14 rounded-full border-2 flex items-center justify-center font-display font-black text-xl ${editIsBanned ? 'border-red-600 bg-red-950/40 text-red-400' : 'border-amber-500/50 bg-white/5 text-amber-300'}`}>
                           {(selectedPlayer.profile?.username || 'V')[0].toUpperCase()}
                         </div>
                       )}
                       <div>
-                        <h3 className="font-display font-black text-xl text-white tracking-wide">{selectedPlayer.profile?.username || 'Voidwalker'}</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className={`font-display font-black text-xl tracking-wide ${editIsBanned ? 'text-red-400' : 'text-white'}`}>
+                            {selectedPlayer.profile?.username || 'Voidwalker'}
+                          </h3>
+                          {editIsBanned && (
+                            <span className="px-2 py-0.5 rounded bg-red-600 text-white font-mono text-[10px] font-black uppercase">
+                              🚫 EXILED / BANNED
+                            </span>
+                          )}
+                        </div>
                         <p className="font-mono text-xs text-gray-400 break-all mt-0.5">{selectedPlayer.walletAddress}</p>
                         <div className="flex items-center gap-3 mt-2 text-xs font-mono text-gray-300">
                           <span>Level: <strong className="text-amber-400">{selectedPlayer.profile?.level || 1}</strong></span>
@@ -1299,6 +1374,62 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                       {playerModifyFeedback}
                     </div>
                   )}
+
+                  {/* BAN & ACCOUNT SANCTION CONTROL PANEL */}
+                  <div className={`p-4 rounded-2xl border transition-all ${editIsBanned ? 'bg-red-950/40 border-red-600/60 shadow-[0_0_20px_rgba(220,38,38,0.2)]' : 'bg-white/5 border-white/10'}`}>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
+                      <div>
+                        <h4 className="font-display font-black text-xs tracking-wider uppercase flex items-center gap-1.5 text-red-400">
+                          <ShieldAlert className="w-4 h-4" />
+                          ACCOUNT STATUS & ACCESS CONTROL
+                        </h4>
+                        <p className="text-[10px] font-mono text-gray-400 mt-0.5">
+                          Banned players are immediately disconnected and blocked from all game modes, syncs, battles, and market actions.
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleQuickBanToggle}
+                        disabled={isModifyingPlayer}
+                        className={`px-4 py-2 rounded-xl font-display font-black text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md ${
+                          editIsBanned
+                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_12px_rgba(16,185,129,0.4)]'
+                            : 'bg-red-600 hover:bg-red-500 text-white shadow-[0_0_12px_rgba(220,38,38,0.4)]'
+                        }`}
+                      >
+                        {editIsBanned ? '✅ PARDON & UNBAN PLAYER' : '🚫 EXILE & BAN PLAYER'}
+                      </button>
+                    </div>
+
+                    {editIsBanned && (
+                      <div className="space-y-2 pt-2 border-t border-red-500/20">
+                        <label className="text-[10px] font-mono text-red-300 uppercase font-bold block">
+                          Reason for Exile / Ban (Visible to Player):
+                        </label>
+                        <input
+                          type="text"
+                          value={editBanReason}
+                          onChange={(e) => setEditBanReason(e.target.value)}
+                          placeholder="e.g. Exploiting bug, automated bots, unfair trade..."
+                          className="w-full bg-black/70 border border-red-500/50 rounded-xl px-3 py-2 text-xs font-mono text-red-200 placeholder-red-400/40 focus:outline-none focus:border-red-400"
+                        />
+                        <div className="flex items-center gap-2 flex-wrap pt-1">
+                          <span className="text-[10px] font-mono text-gray-400">Quick reasons:</span>
+                          {['Exploiting game mechanics', 'Automated botting / scripts', 'Abusive behavior', 'Multi-account abuse'].map(r => (
+                            <button
+                              key={r}
+                              type="button"
+                              onClick={() => setEditBanReason(r)}
+                              className="px-2 py-0.5 rounded bg-red-950/80 border border-red-800 text-[10px] font-mono text-red-300 hover:border-red-500 transition-colors"
+                            >
+                              {r}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Resource Modification Controls */}
                   <div className="space-y-4">

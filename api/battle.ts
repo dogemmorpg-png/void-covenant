@@ -1,4 +1,4 @@
-﻿// @ts-nocheck
+// @ts-nocheck
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
 const jwt = (jwtPkg as any).default || jwtPkg;
@@ -73,6 +73,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const profileRow = profileRows[0];
     let profile: PlayerProfile = profileRow.data;
     let oldUpdatedAt = profileRow.updated_at;
+
+    if (profile?.isBanned) {
+      return res.status(403).json({ error: 'ACCOUNT_BANNED', message: profile.banReason || 'Account is exiled.' });
+    }
 
     // Handle BATTLE START (deduct energy & lock battle session)
     if (isStart || !result) {

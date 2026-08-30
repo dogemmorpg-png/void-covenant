@@ -272,6 +272,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       currentProfile = migrateProfileCards(profileRow.data);
     }
 
+    if (currentProfile?.isBanned) {
+      return res.status(200).json({
+        profile: currentProfile,
+        isBanned: true,
+        banReason: currentProfile.banReason || 'Your account has been exiled from the Void by administration.',
+        bannedAt: currentProfile.bannedAt
+      });
+    }
+
     currentProfile = calculateEnergy(currentProfile);
 
     // ONLY merge fields that are safe for the user to change locally:
