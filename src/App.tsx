@@ -37,7 +37,7 @@ function MainAppContent() {
     assetPreloader.preloadCoreUI();
 
     if (profile?.collection && profile?.deck) {
-      const activeDeckCards = profile.collection.filter(c => profile.deck.includes(c.id));
+      const activeDeckCards = (profile.collection || []).filter(c => (profile.deck || []).includes(c.id));
       assetPreloader.preloadPlayerDeck(activeDeckCards);
     }
 
@@ -60,8 +60,8 @@ function MainAppContent() {
   };
 
   const hasUnfinishedTasks = AIRDROP_TASKS.some(task => 
-    !profile.completedTasks.includes(task.id) && 
-    !(task.id === 'wallet_connect' && profile.TONWalletAddress)
+    !(profile?.completedTasks || []).includes(task.id) && 
+    !(task.id === 'wallet_connect' && profile?.TONWalletAddress)
   );
 
   const wasConnectedRef = React.useRef(false);

@@ -297,9 +297,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   };
 
   const [battle, setBattle] = useState<BattleState>(() => initializeBattle(
-    profile.collection.filter(c => profile.deck.includes(c.id)),
+    (profile?.collection || []).filter(c => (profile?.deck || []).includes(c.id)),
     stage,
-    profile.heroMaxHealth + getEquipmentBonus('maxHealth'),
+    (profile?.heroMaxHealth || 30) + getEquipmentBonus('maxHealth'),
     getEquipmentBonus('dodge'),
     getEquipmentBonus('delayReduction')
   ));
@@ -309,9 +309,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     if (stage?.enemyDeck) {
       assetPreloader.preloadBattleCreatures(stage.enemyDeck);
     }
-    const playerDeck = profile.collection.filter(c => profile.deck.includes(c.id));
+    const playerDeck = (profile?.collection || []).filter(c => (profile?.deck || []).includes(c.id));
     assetPreloader.preloadBattleCreatures(playerDeck);
-  }, [stage, profile.deck]);
+  }, [stage, profile?.deck]);
 
   // Visual/Animate battle state (used to update UI step-by-step)
   const [visualState, setVisualState] = useState<BattleState>(battle);

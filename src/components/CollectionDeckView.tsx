@@ -633,7 +633,7 @@ export const CollectionDeckView: React.FC = () => {
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[350px] overflow-y-auto pr-1">
               {filteredCollection.map(card => {
                 const isSelected = selectedCardId === card.id;
-                const isInDeck = profile.deck.includes(card.id);
+                const isInDeck = (profile?.deck || []).includes(card.id);
                 
                 return (
                   <div
