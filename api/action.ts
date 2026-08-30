@@ -244,7 +244,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           'Gold': 0,
           'Platinum': 0,
           'Diamond': 0,
-          'Grandmaster': 0
+          'Void Overlord': 0
         };
 
         allProfiles?.forEach((p: any) => {
@@ -258,11 +258,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           if (lastActive >= oneDayAgo) active24h++;
           if (lastActive >= sevenDaysAgo) active7d++;
 
-          const league = d.pvpLeague || 'Bronze';
-          if (leagueDistribution[league] !== undefined) {
-            leagueDistribution[league]++;
+          const rawLeague = d.pvpLeague || d.league || 'Bronze';
+          const normLeague = (/overlord|grandmaster|void/i.test(rawLeague)) ? 'Void Overlord' : rawLeague;
+          if (leagueDistribution[normLeague] !== undefined) {
+            leagueDistribution[normLeague]++;
           } else {
-            leagueDistribution[league] = 1;
+            leagueDistribution[normLeague] = 1;
           }
 
           const reqs = d.withdrawalRequests || [];
@@ -463,7 +464,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               p.wallet_address?.toLowerCase() === targetValue?.toLowerCase() ||
               d.username?.toLowerCase() === targetValue?.toLowerCase();
           } else if (targetType === 'league') {
-            shouldSend = (d.pvpLeague || 'Bronze').toLowerCase() === targetValue?.toLowerCase();
+            const rawL = (d.pvpLeague || d.league || 'Bronze').toLowerCase();
+            const targetL = (targetValue || '').toLowerCase();
+            const isTargetOverlord = /overlord|grandmaster|void/i.test(targetL);
+            const isUserOverlord = /overlord|grandmaster|void/i.test(rawL);
+            shouldSend = (isTargetOverlord && isUserOverlord) || rawL === targetL;
           }
 
           if (shouldSend) {

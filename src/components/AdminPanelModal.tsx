@@ -28,6 +28,55 @@ interface AdminPanelModalProps {
   onClose: () => void;
 }
 
+export const getNormalizedLeague = (leagueRaw: any): string => {
+  if (!leagueRaw || typeof leagueRaw !== 'string') return 'Bronze';
+  const l = leagueRaw.trim();
+  if (!l) return 'Bronze';
+  if (/overlord|void|grandmaster|gm/i.test(l)) return 'Void Overlord';
+  if (/diamond/i.test(l)) return 'Diamond';
+  if (/platinum/i.test(l)) return 'Platinum';
+  if (/gold/i.test(l)) return 'Gold';
+  if (/silver/i.test(l)) return 'Silver';
+  if (/bronze/i.test(l)) return 'Bronze';
+  return l;
+};
+
+export const getLeagueBadgeStyle = (leagueRaw: any) => {
+  const norm = getNormalizedLeague(leagueRaw);
+  switch (norm) {
+    case 'Void Overlord':
+      return {
+        badge: '👑 VOID OVERLORD',
+        className: 'bg-gradient-to-r from-red-950/90 via-purple-950/90 to-red-950/90 border border-red-500/70 text-red-300 shadow-[0_0_15px_rgba(220,38,38,0.5)]'
+      };
+    case 'Diamond':
+      return {
+        badge: '💎 DIAMOND',
+        className: 'bg-cyan-950/70 border border-cyan-400/60 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.35)]'
+      };
+    case 'Platinum':
+      return {
+        badge: '🔮 PLATINUM',
+        className: 'bg-indigo-950/70 border border-indigo-400/60 text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.35)]'
+      };
+    case 'Gold':
+      return {
+        badge: '🥇 GOLD',
+        className: 'bg-yellow-950/70 border border-yellow-500/60 text-yellow-300 shadow-[0_0_10px_rgba(234,179,8,0.35)]'
+      };
+    case 'Silver':
+      return {
+        badge: '🥈 SILVER',
+        className: 'bg-gray-800/70 border border-gray-400/60 text-gray-200 shadow-sm'
+      };
+    default:
+      return {
+        badge: '🥉 BRONZE',
+        className: 'bg-amber-950/50 border border-amber-600/50 text-amber-300'
+      };
+  }
+};
+
 export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClose }) => {
   const { 
     fetchAdminOverview, 
@@ -77,6 +126,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
   const [editDust, setEditDust] = useState<number>(0);
   const [editShards, setEditShards] = useState<number>(0);
   const [editSovereigns, setEditSovereigns] = useState<number>(0);
+  const [editLeague, setEditLeague] = useState<string>('Bronze');
+  const [editLP, setEditLP] = useState<number>(0);
   const [isModifyingPlayer, setIsModifyingPlayer] = useState(false);
   const [playerModifyFeedback, setPlayerModifyFeedback] = useState<string | null>(null);
 
@@ -257,6 +308,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
     setEditDust(p.dust || 0);
     setEditShards(p.darkShards || 0);
     setEditSovereigns(p.bloodSovereigns || 0);
+    setEditLeague(getNormalizedLeague(p.pvpLeague || p.league || 'Bronze'));
+    setEditLP(p.pvpLP !== undefined ? p.pvpLP : 0);
     setPlayerModifyFeedback(null);
   };
 
@@ -269,15 +322,19 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
         gold: editGold,
         dust: editDust,
         darkShards: editShards,
-        bloodSovereigns: editSovereigns
+        bloodSovereigns: editSovereigns,
+        pvpLeague: editLeague,
+        pvpLP: editLP
       });
 
       if (res.success) {
-        setPlayerModifyFeedback('✅ Player resources updated in database!');
+        setPlayerModifyFeedback('✅ Player resources & league updated in database!');
         setSelectedPlayer({
           ...selectedPlayer,
           profile: res.profile
         });
+        // Also update in allPlayers list
+        setAllPlayers(prev => prev.map(pl => pl.walletAddress === selectedPlayer.walletAddress ? { ...pl, profile: res.profile } : pl));
       } else {
         setPlayerModifyFeedback(`❌ ${res.message || 'Update failed'}`);
       }
@@ -551,7 +608,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                 </h3>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                  {['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Grandmaster'].map(league => {
+                  {['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Void Overlord'].map(league => {
                     const count = overview?.leagueDistribution?.[league] || 0;
                     const total = overview?.totalPlayers || 1;
                     const pct = Math.round((count / total) * 100);
@@ -581,30 +638,30 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
             <div className="space-y-4">
               {/* Filter and Search Bar */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-2 bg-black/50 p-1 rounded-2xl border border-white/10 w-full sm:w-auto">
+                <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
                   {(['all', 'pending', 'completed', 'rejected'] as const).map(f => (
                     <button
                       key={f}
                       onClick={() => setWithdrawalFilter(f)}
-                      className={`px-3 py-1.5 rounded-xl font-display font-bold text-xs uppercase tracking-wider transition-all cursor-pointer ${
+                      className={`px-3.5 py-1.5 rounded-xl font-display font-bold text-xs uppercase tracking-wider transition-all cursor-pointer ${
                         withdrawalFilter === f
-                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                          : 'text-gray-400 hover:text-white'
+                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/60 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+                          : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white'
                       }`}
                     >
-                      {f}
+                      {f} ({withdrawals.filter(r => f === 'all' ? true : r.status === f).length})
                     </button>
                   ))}
                 </div>
 
                 <div className="relative w-full sm:w-72">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
                     type="text"
                     value={withdrawalSearch}
                     onChange={(e) => setWithdrawalSearch(e.target.value)}
-                    placeholder="Search by wallet / username..."
-                    className="w-full bg-black/60 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs font-mono text-white placeholder-gray-500 focus:outline-none focus:border-amber-500/60"
+                    placeholder="Search by wallet, name, ID..."
+                    className="w-full bg-black/60 border border-white/10 rounded-xl pl-9 pr-3 py-1.5 text-xs font-mono text-white placeholder-gray-500 focus:outline-none focus:border-amber-500"
                   />
                 </div>
               </div>
@@ -615,10 +672,10 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                   <table className="w-full text-left text-xs font-mono">
                     <thead className="bg-white/5 border-b border-white/10 text-gray-400 uppercase text-[10px] tracking-wider">
                       <tr>
-                        <th className="p-4">Request / Date</th>
-                        <th className="p-4">Player</th>
-                        <th className="p-4">Destination Solana Wallet</th>
+                        <th className="p-4">Request / Player</th>
                         <th className="p-4">Amount</th>
+                        <th className="p-4">Destination Wallet</th>
+                        <th className="p-4">Created Date</th>
                         <th className="p-4">Status</th>
                         <th className="p-4 text-right">Actions</th>
                       </tr>
@@ -627,108 +684,104 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                       {filteredWithdrawals.length === 0 ? (
                         <tr>
                           <td colSpan={6} className="p-8 text-center text-gray-500 font-mono">
-                            No withdrawal requests found matching your filter.
+                            No withdrawal requests found for the selected filter.
                           </td>
                         </tr>
                       ) : (
-                        filteredWithdrawals.map((r: any) => {
-                          const isPending = r.status === 'pending';
-                          const isCompleted = r.status === 'completed';
-                          const isRejected = r.status === 'rejected';
+                        filteredWithdrawals.map(r => (
+                          <tr key={r.id} className="hover:bg-white/[0.02] transition-colors">
+                            <td className="p-4">
+                              <div className="flex flex-col">
+                                <span className="font-bold text-white text-xs">{r.username || r.userProfileName || 'Voidwalker'}</span>
+                                <span className="text-[10px] text-gray-500 font-mono">ID: {r.id}</span>
+                              </div>
+                            </td>
 
-                          return (
-                            <tr key={r.id} className="hover:bg-white/[0.02] transition-colors">
-                              <td className="p-4">
-                                <span className="font-bold text-white block">{r.id}</span>
-                                <span className="text-[10px] text-gray-500">
-                                  {r.createdAt ? new Date(r.createdAt).toLocaleString() : 'N/A'}
+                            <td className="p-4">
+                              <div className="flex flex-col">
+                                <span className="font-bold text-emerald-400 text-sm">${r.amountUsdt} USDT</span>
+                                <span className="text-[10px] text-amber-300 font-mono">({r.amountSovereigns} SOV)</span>
+                              </div>
+                            </td>
+
+                            <td className="p-4">
+                              <div className="flex items-center gap-2">
+                                <span className="text-gray-300 font-mono text-xs">{r.walletAddress?.slice(0, 6)}...{r.walletAddress?.slice(-6)}</span>
+                                <button
+                                  onClick={() => handleCopy(r.walletAddress)}
+                                  className="p-1 text-gray-500 hover:text-white rounded transition-colors"
+                                  title="Copy Solana Address"
+                                >
+                                  {copiedAddress === r.walletAddress ? (
+                                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                  ) : (
+                                    <Copy className="w-3.5 h-3.5" />
+                                  )}
+                                </button>
+                                <a
+                                  href={`https://solscan.io/account/${r.walletAddress}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="p-1 text-gray-500 hover:text-cyan-400 rounded transition-colors"
+                                  title="View on Solscan"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                </a>
+                              </div>
+                            </td>
+
+                            <td className="p-4 text-gray-400">
+                              {new Date(r.createdAt || Date.now()).toLocaleString()}
+                            </td>
+
+                            <td className="p-4">
+                              {r.status === 'pending' && (
+                                <span className="px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/50 text-amber-300 font-bold text-[10px] uppercase">
+                                  ⏳ Pending
                                 </span>
-                              </td>
+                              )}
+                              {r.status === 'completed' && (
+                                <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 font-bold text-[10px] uppercase">
+                                  ✅ Paid
+                                </span>
+                              )}
+                              {r.status === 'rejected' && (
+                                <span className="px-2.5 py-1 rounded-full bg-red-500/20 border border-red-500/50 text-red-400 font-bold text-[10px] uppercase">
+                                  ❌ Declined
+                                </span>
+                              )}
+                            </td>
 
-                              <td className="p-4">
-                                <span className="font-bold text-amber-200 block">{r.username || r.userProfileName || 'Voidwalker'}</span>
-                                <span className="text-[10px] text-gray-500">{r.userWallet?.slice(0, 4)}...{r.userWallet?.slice(-4)}</span>
-                              </td>
-
-                              <td className="p-4">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-mono text-gray-300">
-                                    {r.walletAddress?.slice(0, 6)}...{r.walletAddress?.slice(-6)}
-                                  </span>
+                            <td className="p-4 text-right">
+                              {r.status === 'pending' ? (
+                                <div className="flex items-center justify-end gap-2">
                                   <button
-                                    onClick={() => handleCopy(r.walletAddress)}
-                                    className="p-1 text-gray-400 hover:text-white rounded bg-white/5 hover:bg-white/10 transition-colors"
-                                    title="Copy Solana Address"
+                                    onClick={() => {
+                                      setSelectedReq({ ...r, actionType: 'approve' });
+                                      setTxidInput('');
+                                      setActionFeedback(null);
+                                    }}
+                                    className="px-3 py-1 bg-emerald-600/80 hover:bg-emerald-500 text-white font-display font-bold text-[10px] uppercase tracking-wider rounded-lg transition-all cursor-pointer"
                                   >
-                                    {copiedAddress === r.walletAddress ? (
-                                      <Check className="w-3 h-3 text-emerald-400" />
-                                    ) : (
-                                      <Copy className="w-3 h-3" />
-                                    )}
+                                    Approve & Pay
                                   </button>
-                                  <a
-                                    href={`https://solscan.io/account/${r.walletAddress}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="p-1 text-gray-400 hover:text-cyan-400 rounded bg-white/5 hover:bg-white/10 transition-colors"
-                                    title="View on Solscan"
+                                  <button
+                                    onClick={() => {
+                                      setSelectedReq({ ...r, actionType: 'reject' });
+                                      setRejectReasonInput('');
+                                      setActionFeedback(null);
+                                    }}
+                                    className="px-3 py-1 bg-red-600/80 hover:bg-red-500 text-white font-display font-bold text-[10px] uppercase tracking-wider rounded-lg transition-all cursor-pointer"
                                   >
-                                    <ExternalLink className="w-3 h-3" />
-                                  </a>
+                                    Decline
+                                  </button>
                                 </div>
-                              </td>
-
-                              <td className="p-4">
-                                <div className="flex items-baseline gap-1.5">
-                                  <span className="font-black text-amber-300 text-sm">{r.amountSovereigns} SOV</span>
-                                  <span className="text-[10px] text-emerald-400 font-bold">(${r.amountUsdt || (r.amountSovereigns * 0.01).toFixed(2)} USDT)</span>
-                                </div>
-                              </td>
-
-                              <td className="p-4">
-                                {isPending && (
-                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-bold text-[10px] uppercase">
-                                    <Clock className="w-3 h-3 animate-spin" /> Pending
-                                  </span>
-                                )}
-                                {isCompleted && (
-                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-[10px] uppercase">
-                                    <CheckCircle2 className="w-3 h-3" /> Completed
-                                  </span>
-                                )}
-                                {isRejected && (
-                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-400 font-bold text-[10px] uppercase">
-                                    <XCircle className="w-3 h-3" /> Rejected
-                                  </span>
-                                )}
-                              </td>
-
-                              <td className="p-4 text-right">
-                                {isPending && (
-                                  <div className="flex items-center justify-end gap-2">
-                                    <button
-                                      onClick={() => setSelectedReq({ ...r, actionType: 'approve' })}
-                                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-black font-display font-black text-[11px] rounded-lg transition-transform hover:scale-105 cursor-pointer shadow-[0_0_10px_rgba(16,185,129,0.3)]"
-                                    >
-                                      APPROVE
-                                    </button>
-                                    <button
-                                      onClick={() => setSelectedReq({ ...r, actionType: 'reject' })}
-                                      className="px-3 py-1.5 bg-rose-600/30 hover:bg-rose-600 border border-rose-500/40 text-rose-300 hover:text-white font-display font-bold text-[11px] rounded-lg transition-transform hover:scale-105 cursor-pointer"
-                                    >
-                                      REJECT
-                                    </button>
-                                  </div>
-                                )}
-                                {isCompleted && r.txid && (
-                                  <span className="text-[10px] text-gray-400 block font-mono" title={r.txid}>
-                                    TX: {r.txid.slice(0, 8)}...
-                                  </span>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })
+                              ) : (
+                                <span className="text-[10px] text-gray-500 font-mono">Processed</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))
                       )}
                     </tbody>
                   </table>
@@ -794,7 +847,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                       <option value="Gold">Gold League</option>
                       <option value="Platinum">Platinum League</option>
                       <option value="Diamond">Diamond League</option>
-                      <option value="Grandmaster">Grandmaster (Void Overlords)</option>
+                      <option value="Void Overlord">Void Overlord League (Grandmaster)</option>
                     </select>
                   )}
 
@@ -958,7 +1011,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
                     {/* League Filter Pills */}
                     <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 select-none">
-                      {['all', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Grandmaster'].map(l => (
+                      {['all', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Void Overlord'].map(l => (
                         <button
                           key={l}
                           onClick={() => setPlayerLeagueFilter(l)}
@@ -996,8 +1049,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                     <div className="px-6 py-3 border-b border-white/10 bg-white/[0.02] flex items-center justify-between">
                       <span className="text-[11px] font-mono uppercase tracking-widest text-gray-400 font-bold">
                         Registered Players Directory ({allPlayers.filter(p => {
-                          const l = p.profile?.pvpLeague || 'Bronze';
-                          if (playerLeagueFilter !== 'all' && l.toLowerCase() !== playerLeagueFilter.toLowerCase()) return false;
+                          const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
+                          if (playerLeagueFilter !== 'all' && l.toLowerCase() !== getNormalizedLeague(playerLeagueFilter).toLowerCase()) return false;
                           if (searchQuery.trim()) {
                             const s = searchQuery.trim().toLowerCase();
                             const w = (p.walletAddress || '').toLowerCase();
@@ -1031,8 +1084,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                         </thead>
                         <tbody className="divide-y divide-white/5">
                           {allPlayers.filter(p => {
-                            const l = p.profile?.pvpLeague || 'Bronze';
-                            if (playerLeagueFilter !== 'all' && l.toLowerCase() !== playerLeagueFilter.toLowerCase()) return false;
+                            const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
+                            if (playerLeagueFilter !== 'all' && l.toLowerCase() !== getNormalizedLeague(playerLeagueFilter).toLowerCase()) return false;
                             if (searchQuery.trim()) {
                               const s = searchQuery.trim().toLowerCase();
                               const w = (p.walletAddress || '').toLowerCase();
@@ -1049,8 +1102,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           ) : (
                             allPlayers
                               .filter(p => {
-                                const l = p.profile?.pvpLeague || 'Bronze';
-                                if (playerLeagueFilter !== 'all' && l.toLowerCase() !== playerLeagueFilter.toLowerCase()) return false;
+                                const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
+                                if (playerLeagueFilter !== 'all' && l.toLowerCase() !== getNormalizedLeague(playerLeagueFilter).toLowerCase()) return false;
                                 if (searchQuery.trim()) {
                                   const s = searchQuery.trim().toLowerCase();
                                   const w = (p.walletAddress || '').toLowerCase();
@@ -1074,6 +1127,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                                 const prof = p.profile || {};
                                 const isUserAdmin = prof.username?.toLowerCase() === 'adminus' || prof.role === 'admin';
                                 const lastAct = prof.lastLogin || (p.updatedAt ? new Date(p.updatedAt).getTime() : 0);
+                                const leagueStyle = getLeagueBadgeStyle(prof.pvpLeague || prof.league);
 
                                 return (
                                   <tr key={p.walletAddress} className="hover:bg-white/[0.02] transition-colors">
@@ -1151,8 +1205,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                                     {/* PvP League */}
                                     <td className="p-4">
                                       <div className="flex items-center gap-1.5">
-                                        <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white font-display font-bold text-xs uppercase">
-                                          {prof.pvpLeague || 'Bronze'}
+                                        <span className={`px-2.5 py-1 rounded-lg font-display font-bold text-[11px] uppercase tracking-wider ${leagueStyle.className}`}>
+                                          {leagueStyle.badge}
                                         </span>
                                         <span className="text-[10px] text-cyan-400 font-mono font-bold">
                                           {prof.pvpLP || 0} LP
@@ -1212,8 +1266,12 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                 <div className="bg-black/50 border border-white/10 rounded-3xl p-6 space-y-6 max-w-3xl mx-auto shadow-2xl">
                   <div className="flex items-start justify-between border-b border-white/10 pb-4">
                     <div className="flex items-center gap-4">
-                      {selectedPlayer.profile?.avatarUrl && (
+                      {selectedPlayer.profile?.avatarUrl ? (
                         <img src={selectedPlayer.profile.avatarUrl} alt="Avatar" className="w-14 h-14 rounded-full border-2 border-amber-500/50 object-cover shadow-[0_0_15px_rgba(245,158,11,0.3)]" />
+                      ) : (
+                        <div className="w-14 h-14 rounded-full bg-white/5 border-2 border-amber-500/50 flex items-center justify-center font-display font-black text-amber-300 text-xl">
+                          {(selectedPlayer.profile?.username || 'V')[0].toUpperCase()}
+                        </div>
                       )}
                       <div>
                         <h3 className="font-display font-black text-xl text-white tracking-wide">{selectedPlayer.profile?.username || 'Voidwalker'}</h3>
@@ -1221,7 +1279,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                         <div className="flex items-center gap-3 mt-2 text-xs font-mono text-gray-300">
                           <span>Level: <strong className="text-amber-400">{selectedPlayer.profile?.level || 1}</strong></span>
                           <span>•</span>
-                          <span>League: <strong className="text-emerald-400">{selectedPlayer.profile?.pvpLeague || 'Bronze'}</strong></span>
+                          <span>League: <strong className="text-emerald-400">{getNormalizedLeague(selectedPlayer.profile?.pvpLeague || selectedPlayer.profile?.league)}</strong></span>
                           <span>•</span>
                           <span>LP: <strong className="text-cyan-400">{selectedPlayer.profile?.pvpLP || 0}</strong></span>
                         </div>
@@ -1286,6 +1344,35 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           value={editSovereigns}
                           onChange={(e) => setEditSovereigns(parseInt(e.target.value, 10) || 0)}
                           className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-sm font-mono font-bold text-amber-200"
+                        />
+                      </div>
+                    </div>
+
+                    {/* PvP League & LP Adjustments */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-white/10 pt-4">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-mono text-purple-400 uppercase font-bold">PvP League Tier</label>
+                        <select
+                          value={editLeague}
+                          onChange={(e) => setEditLeague(e.target.value)}
+                          className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-sm font-mono font-bold text-purple-300"
+                        >
+                          <option value="Bronze">🥉 Bronze League</option>
+                          <option value="Silver">🥈 Silver League</option>
+                          <option value="Gold">🥇 Gold League</option>
+                          <option value="Platinum">🔮 Platinum League</option>
+                          <option value="Diamond">💎 Diamond League</option>
+                          <option value="Void Overlord">👑 Void Overlord League</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-mono text-cyan-400 uppercase font-bold">League Points (LP)</label>
+                        <input
+                          type="number"
+                          value={editLP}
+                          onChange={(e) => setEditLP(parseInt(e.target.value, 10) || 0)}
+                          className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-sm font-mono font-bold text-cyan-300"
                         />
                       </div>
                     </div>
