@@ -116,6 +116,26 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
         <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#ebd09b]/35 pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#ebd09b]/35 pointer-events-none" />
 
+        {/* Subtle, elegant Energy HUD pill in top-right corner */}
+        <div 
+          className="absolute top-5 right-6 flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full py-1 px-3 shadow-inner cursor-default select-none transition-colors z-20"
+          title={timeUntilRegen ? `Abyss Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (+1 in ${timeUntilRegen})` : `Abyss Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (Full)`}
+        >
+          <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+          <span className="font-mono text-xs font-bold text-emerald-400">
+            {profile.pveEnergy || 0}/{profile.pveEnergyMax || 10}
+          </span>
+          {timeUntilRegen ? (
+            <span className="font-mono text-[10px] text-emerald-300/80 font-semibold">
+              ({timeUntilRegen})
+            </span>
+          ) : (
+            <span className="font-mono text-[9px] text-emerald-500/70 font-semibold uppercase">
+              Full
+            </span>
+          )}
+        </div>
+
         <div className="relative z-10 flex flex-col justify-between h-full space-y-4">
           
           {/* Row 1: Title & Description Centered */}
@@ -260,20 +280,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
           )}
 
           {/* Action Buttons Area */}
-          <div className="pt-4 border-t border-gray-800/80 flex flex-col items-center gap-3">
-            {/* Energy Reserve & Recovery Bar */}
-            <div className="flex items-center justify-between w-full max-w-xl px-4 py-2 bg-gradient-to-r from-[#061810]/80 via-black/60 to-[#061810]/80 border border-emerald-500/30 rounded-2xl shadow-inner select-none">
-              <div className="flex items-center gap-2.5">
-                <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
-                <span className="font-mono text-xs text-gray-300 font-medium">
-                  Abyss Energy: <span className="text-emerald-400 font-bold text-sm">{profile.pveEnergy || 0}</span><span className="text-gray-500 text-xs">/{profile.pveEnergyMax || 10}</span>
-                </span>
-              </div>
-              <span className="font-mono text-[11px] text-emerald-300/90 font-semibold">
-                {timeUntilRegen ? `+1 in ${timeUntilRegen}` : '⚡ Full Energy'}
-              </span>
-            </div>
-
+          <div className="pt-4 border-t border-gray-800/80 flex flex-col items-center">
             <div className="flex w-full max-w-xl gap-5">
               <button
                 onClick={handleStart}
