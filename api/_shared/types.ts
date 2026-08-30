@@ -87,8 +87,27 @@ export interface PlayerProfile {
   activeStance?: string; // slot -> equipment id
   isPremiumBP?: boolean;
   username?: string;
-  avatarUrl?: string;
   isRegistered?: boolean;
+  withdrawalRequests?: any[];
+  mailMessages?: MailMessage[];
+}
+
+export interface MailMessage {
+  id: string;
+  title: string;
+  sender: string;
+  body: string;
+  rewards?: {
+    gold?: number;
+    dust?: number;
+    darkShards?: number;
+    bloodSovereigns?: number;
+    cards?: string[];
+    equipment?: string[];
+  };
+  isClaimed?: boolean;
+  isRead?: boolean;
+  createdAt: number;
 }
 
 export interface CampaignStage {

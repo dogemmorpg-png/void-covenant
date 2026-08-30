@@ -101,6 +101,7 @@ export async function checkAndPerformPvpRollover(
       for (let i = 0; i < count; i++) {
         const p = leaguePlayers[i];
         const rank = i + 1;
+        let promoStatus = '';
 
         // Top 20 players promote to next league (if not in top league)
         if (rank <= 20 && leagueIdx < PVP_LEAGUES.length - 1) {
@@ -108,6 +109,7 @@ export async function checkAndPerformPvpRollover(
           p.profile.pvpLeague = nextLeague;
           p.profile.pvpLP = 100;
           totalPromoted++;
+          promoStatus = `⚔️ PROMOTION! You have ascended to the ${nextLeague} League!`;
         }
         // Players below rank 100 demote to previous league (if not in Bronze)
         else if (rank > 100 && leagueIdx > 0) {
@@ -115,11 +117,60 @@ export async function checkAndPerformPvpRollover(
           p.profile.pvpLeague = prevLeague;
           p.profile.pvpLP = 100;
           totalDemoted++;
+          promoStatus = `🔻 DEMOTION: You have fallen to the ${prevLeague} League. Reclaim your honor!`;
         }
         // Rank 21-100 (or at boundaries): retain in current league with fresh round LP
         else {
           p.profile.pvpLP = 100;
+          promoStatus = `🛡️ RETAINED: You maintain your standing in the ${leagueName} League.`;
         }
+
+        // Calculate Rewards based on League & Rank
+        let goldReward = 100;
+        let dustReward = 10;
+        let darkShardsReward = 0;
+        let sovereignsReward = 0;
+
+        if (leagueName === 'Void Overlord') {
+          if (rank === 1) { sovereignsReward = 500; goldReward = 5000; dustReward = 500; darkShardsReward = 100; }
+          else if (rank <= 3) { sovereignsReward = 300; goldReward = 3000; dustReward = 300; darkShardsReward = 50; }
+          else if (rank <= 10) { sovereignsReward = 150; goldReward = 2000; dustReward = 200; darkShardsReward = 30; }
+          else if (rank <= 20) { sovereignsReward = 80; goldReward = 1000; dustReward = 100; darkShardsReward = 20; }
+          else { sovereignsReward = 30; goldReward = 600; dustReward = 60; }
+        } else if (leagueName === 'Diamond') {
+          if (rank <= 3) { sovereignsReward = 100; goldReward = 2500; dustReward = 250; darkShardsReward = 30; }
+          else if (rank <= 10) { sovereignsReward = 50; goldReward = 1500; dustReward = 150; darkShardsReward = 20; }
+          else if (rank <= 20) { sovereignsReward = 20; goldReward = 800; dustReward = 80; }
+          else { goldReward = 500; dustReward = 50; }
+        } else if (leagueName === 'Platinum') {
+          if (rank <= 10) { sovereignsReward = 10; goldReward = 1000; dustReward = 100; }
+          else { goldReward = 400; dustReward = 40; }
+        } else if (leagueName === 'Gold') {
+          goldReward = 300; dustReward = 30;
+        } else if (leagueName === 'Silver') {
+          goldReward = 200; dustReward = 20;
+        } else {
+          goldReward = 100; dustReward = 10;
+        }
+
+        // Generate Mail Message for Player Inbox
+        const mailMessage = {
+          id: `mail_pvp_${todayUtc}_${p.walletAddress.slice(-4)}_${rank}`,
+          title: `PvP Season Report: ${leagueName} (Rank #${rank})`,
+          sender: 'Council of the Void',
+          body: `Greetings, Lord ${p.profile.username || 'Voidwalker'}.\n\nThe PvP Arena round for ${todayUtc} has concluded.\nYou finished at Rank #${rank} in the ${leagueName} League.\n\n${promoStatus}\n\nYour imperial tributes and rewards have been attached to this decree.`,
+          rewards: {
+            gold: goldReward,
+            dust: dustReward,
+            darkShards: darkShardsReward > 0 ? darkShardsReward : undefined,
+            bloodSovereigns: sovereignsReward > 0 ? sovereignsReward : undefined
+          },
+          isClaimed: false,
+          isRead: false,
+          createdAt: Date.now()
+        };
+
+        p.profile.mailMessages = [mailMessage, ...(p.profile.mailMessages || [])].slice(0, 50);
       }
     }
 

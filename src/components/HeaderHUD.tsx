@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { LogOut, Copy, X, Trophy, User, Clock, Plus, UserPlus, Send } from 'lucide-react';
+import { LogOut, Copy, X, Trophy, User, Clock, Plus, UserPlus, Send, Mail } from 'lucide-react';
 import { audioSystem } from '../utils/AudioSystem';
+import { MailboxModal } from './MailboxModal';
 
 export const HeaderHUD: React.FC = () => {
   const { profile, logoutPlayer, isShardsShopOpen, setIsShardsShopOpen } = useGame();
   const { disconnect } = useWallet();
 
-  const [timeUntilRegen, setTimeUntilRegen] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMailboxOpen, setIsMailboxOpen] = useState(false);
   const [isSovereignModalOpen, setIsSovereignModalOpen] = useState(false);
   const [referralsList, setReferralsList] = useState<any[]>([]);
   const [isLoadingReferrals, setIsLoadingReferrals] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+
+  const unreadMailCount = (profile.mailMessages || []).filter(m => !m.isRead || (m.rewards && !m.isClaimed)).length;
 
   const handleCopyLink = () => {
     const link = `${window.location.origin}?ref=${profile.solanaAddress || ''}`;
@@ -153,31 +156,27 @@ export const HeaderHUD: React.FC = () => {
               </span>
             </div>
 
-            {/* PvE Energy (Main Energy) */}
-            <div 
-              className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors cursor-default py-1 px-2.5 shadow-inner" 
-              title={timeUntilRegen ? `Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (+1 in ${timeUntilRegen})` : `Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (Full)`}
-            >
-              <img src="/icons/icon_energy.webp" alt="Energy" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 object-contain" />
-              <div className="flex flex-col items-start justify-center">
-                <span className="font-mono text-sm font-bold text-emerald-400 leading-none">
-                  {profile.pveEnergy}/{profile.pveEnergyMax}
-                </span>
-                {timeUntilRegen ? (
-                  <span className="font-mono text-[9px] text-emerald-300/80 leading-tight tracking-tight whitespace-nowrap mt-0.5">
-                    +1 in {timeUntilRegen}
-                  </span>
-                ) : (
-                  <span className="font-mono text-[9px] text-emerald-500/60 leading-tight tracking-tight whitespace-nowrap mt-0.5">
-                    Full
-                  </span>
-                )}
-              </div>
-            </div>
           </div>
 
           {/* User Profile and Controls */}
           <div className="flex items-center gap-2 sm:gap-2.5 xl:ml-1 xl:border-l border-white/10 xl:pl-3 shrink-0">
+            {/* Mailbox Button */}
+            <button
+              onClick={() => {
+                audioSystem.playClick();
+                setIsMailboxOpen(true);
+              }}
+              className="relative flex items-center justify-center bg-white/5 hover:bg-amber-500/10 border border-white/10 hover:border-amber-400/50 rounded-full p-2 text-gray-300 hover:text-amber-300 transition-all duration-300 cursor-pointer shadow-inner group hover:scale-105 active:scale-95"
+              title="Void Mailbox (Decrees & Rewards)"
+            >
+              <Mail className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              {unreadMailCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-gradient-to-r from-red-600 to-rose-600 border border-white/60 text-white font-mono text-[9px] font-black flex items-center justify-center shadow-[0_0_10px_rgba(225,29,72,0.9)] animate-pulse">
+                  {unreadMailCount}
+                </span>
+              )}
+            </button>
+
             <div className="flex items-center gap-2">
               {profile.avatarUrl && (
                 <img src={profile.avatarUrl} alt="Avatar" className="w-8 h-8 rounded-full border border-white/20 object-cover shadow-[0_0_10px_rgba(255,255,255,0.1)]" />
@@ -194,7 +193,7 @@ export const HeaderHUD: React.FC = () => {
                   logoutPlayer();
                 }
               }}
-              className="bg-black/40 hover:bg-red-950/40 border border-white/10 hover:border-red-500/40 rounded-full p-2 text-gray-400 hover:text-red-400 transition-all flex items-center justify-center ml-1"
+              className="bg-black/40 hover:bg-red-950/40 border border-white/10 hover:border-red-500/40 rounded-full p-2 text-gray-400 hover:text-red-400 transition-all flex items-center justify-center ml-0.5 cursor-pointer"
               title="Log Out"
             >
               <LogOut className="w-4 h-4" />
@@ -449,6 +448,9 @@ export const HeaderHUD: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Void Mailbox Modal */}
+      <MailboxModal isOpen={isMailboxOpen} onClose={() => setIsMailboxOpen(false)} />
     </div>
   );
 };

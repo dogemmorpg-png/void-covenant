@@ -41,6 +41,9 @@ interface GameContextType {
   logoutPlayer: () => void;
   resetProfile: () => void;
   updateProfile: (updates: Partial<PlayerProfile>) => void;
+  markMailAsRead: (mailId: string) => Promise<void>;
+  claimMailReward: (mailId: string) => Promise<{ success: boolean; message: string }>;
+  claimAllMailRewards: () => Promise<{ success: boolean; message: string }>;
   isShardsShopOpen: boolean;
   setIsShardsShopOpen: (open: boolean) => void;
 }
@@ -172,6 +175,7 @@ const migrateProfileTo10Cards = (p: PlayerProfile): PlayerProfile => {
   p.pvpLeague = p.pvpLeague || 'Bronze';
   p.pvpLP = p.pvpLP !== undefined ? p.pvpLP : 0;
   p.bloodSovereigns = p.bloodSovereigns !== undefined ? p.bloodSovereigns : 0;
+  p.mailMessages = p.mailMessages || [];
   
   return p;
 };
@@ -211,7 +215,8 @@ const createDefaultProfile = (): PlayerProfile => {
   solBalance: null,
   isPremiumBP: false,
   username: '',
-  isRegistered: false
+  isRegistered: false,
+  mailMessages: []
   };
 };
 
@@ -508,6 +513,109 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return { success: true, message: `Successfully requested withdrawal of ${amountSovereigns} SOV ($${(amountSovereigns * 0.01).toFixed(2)} USDT)!` };
+  };
+
+  const markMailAsRead = async (mailId: string): Promise<void> => {
+    setProfile(current => {
+      const updatedMessages = (current.mailMessages || []).map(m => m.id === mailId ? { ...m, isRead: true } : m);
+      const updated = { ...current, mailMessages: updatedMessages };
+      saveProfile(updated);
+      return updated;
+    });
+
+    const token = localStorage.getItem('void_covenant_token');
+    if (token) {
+      submitAction('read_mail', { mailId }).catch(() => {});
+    }
+  };
+
+  const claimMailReward = async (mailId: string): Promise<{ success: boolean; message: string }> => {
+    const token = localStorage.getItem('void_covenant_token');
+    if (token) {
+      try {
+        const res = await submitAction('claim_mail', { mailId });
+        return { success: res.success, message: res.message || 'Reward claimed successfully!' };
+      } catch (e: any) {
+        return { success: false, message: e.message || 'Failed to claim reward' };
+      }
+    }
+
+    // Local fallback for offline / demo mode
+    let messageResult = 'Reward claimed!';
+    setProfile(current => {
+      const targetMail = (current.mailMessages || []).find(m => m.id === mailId);
+      if (!targetMail || targetMail.isClaimed) return current;
+
+      let newGold = current.gold || 0;
+      let newDust = current.dust || 0;
+      let newShards = current.darkShards || 0;
+      let newSovereigns = current.bloodSovereigns || 0;
+
+      if (targetMail.rewards) {
+        if (targetMail.rewards.gold) newGold += targetMail.rewards.gold;
+        if (targetMail.rewards.dust) newDust += targetMail.rewards.dust;
+        if (targetMail.rewards.darkShards) newShards += targetMail.rewards.darkShards;
+        if (targetMail.rewards.bloodSovereigns) newSovereigns += targetMail.rewards.bloodSovereigns;
+      }
+
+      const updatedMessages = (current.mailMessages || []).map(m => m.id === mailId ? { ...m, isClaimed: true, isRead: true } : m);
+      const updated = {
+        ...current,
+        gold: newGold,
+        dust: newDust,
+        darkShards: newShards,
+        bloodSovereigns: newSovereigns,
+        mailMessages: updatedMessages
+      };
+      saveProfile(updated);
+      return updated;
+    });
+
+    return { success: true, message: messageResult };
+  };
+
+  const claimAllMailRewards = async (): Promise<{ success: boolean; message: string }> => {
+    const token = localStorage.getItem('void_covenant_token');
+    if (token) {
+      try {
+        const res = await submitAction('claim_all_mail', {});
+        return { success: res.success, message: res.message || 'All rewards claimed!' };
+      } catch (e: any) {
+        return { success: false, message: e.message || 'Failed to claim all rewards' };
+      }
+    }
+
+    // Local fallback
+    setProfile(current => {
+      let newGold = current.gold || 0;
+      let newDust = current.dust || 0;
+      let newShards = current.darkShards || 0;
+      let newSovereigns = current.bloodSovereigns || 0;
+
+      const updatedMessages = (current.mailMessages || []).map(m => {
+        if (m.rewards && !m.isClaimed) {
+          if (m.rewards.gold) newGold += m.rewards.gold;
+          if (m.rewards.dust) newDust += m.rewards.dust;
+          if (m.rewards.darkShards) newShards += m.rewards.darkShards;
+          if (m.rewards.bloodSovereigns) newSovereigns += m.rewards.bloodSovereigns;
+          return { ...m, isClaimed: true, isRead: true };
+        }
+        return m;
+      });
+
+      const updated = {
+        ...current,
+        gold: newGold,
+        dust: newDust,
+        darkShards: newShards,
+        bloodSovereigns: newSovereigns,
+        mailMessages: updatedMessages
+      };
+      saveProfile(updated);
+      return updated;
+    });
+
+    return { success: true, message: 'All pending mail rewards claimed!' };
   };
 
   const startBattleOnServer = async (battleType: 'campaign' | 'pvp', stageId: string, energyCost: number, opponentPayload?: any): Promise<boolean> => {
@@ -1096,6 +1204,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logoutPlayer,
         resetProfile,
         updateProfile,
+        markMailAsRead,
+        claimMailReward,
+        claimAllMailRewards,
         isShardsShopOpen,
         setIsShardsShopOpen
       }}

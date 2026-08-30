@@ -316,6 +316,67 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       profile.withdrawalRequests = [newRequest, ...(profile.withdrawalRequests || [])];
       successMessage = `Successfully requested withdrawal of ${numAmount} SOV ($${(numAmount * 0.01).toFixed(2)} USDT)!`;
       responseData = { request: newRequest };
+    } else if (action === 'read_mail') {
+      const { mailId } = payload || {};
+      if (!mailId) return res.status(400).json({ error: 'Missing mailId' });
+      profile.mailMessages = (profile.mailMessages || []).map((m: any) => {
+        if (m.id === mailId) {
+          return { ...m, isRead: true };
+        }
+        return m;
+      });
+      successMessage = 'Mail marked as read';
+    } else if (action === 'claim_mail') {
+      const { mailId } = payload || {};
+      if (!mailId) return res.status(400).json({ error: 'Missing mailId' });
+      const mail = (profile.mailMessages || []).find((m: any) => m.id === mailId);
+      if (!mail) return res.status(404).json({ error: 'Mail not found' });
+      if (mail.isClaimed) return res.status(400).json({ error: 'Reward already claimed' });
+
+      if (mail.rewards) {
+        if (mail.rewards.gold) profile.gold = (profile.gold || 0) + mail.rewards.gold;
+        if (mail.rewards.dust) profile.dust = (profile.dust || 0) + mail.rewards.dust;
+        if (mail.rewards.darkShards) profile.darkShards = (profile.darkShards || 0) + mail.rewards.darkShards;
+        if (mail.rewards.bloodSovereigns) profile.bloodSovereigns = (profile.bloodSovereigns || 0) + mail.rewards.bloodSovereigns;
+      }
+
+      profile.mailMessages = profile.mailMessages.map((m: any) => {
+        if (m.id === mailId) {
+          return { ...m, isClaimed: true, isRead: true };
+        }
+        return m;
+      });
+      successMessage = 'Tributes and rewards claimed successfully!';
+    } else if (action === 'claim_all_mail') {
+      let claimedCount = 0;
+      let totalGold = 0;
+      let totalDust = 0;
+      let totalShards = 0;
+      let totalSovereigns = 0;
+
+      profile.mailMessages = (profile.mailMessages || []).map((m: any) => {
+        if (m.rewards && !m.isClaimed) {
+          claimedCount++;
+          if (m.rewards.gold) totalGold += m.rewards.gold;
+          if (m.rewards.dust) totalDust += m.rewards.dust;
+          if (m.rewards.darkShards) totalShards += m.rewards.darkShards;
+          if (m.rewards.bloodSovereigns) totalSovereigns += m.rewards.bloodSovereigns;
+          return { ...m, isClaimed: true, isRead: true };
+        }
+        return m;
+      });
+
+      if (claimedCount === 0) {
+        return res.status(400).json({ error: 'No unclaimed rewards found' });
+      }
+
+      profile.gold = (profile.gold || 0) + totalGold;
+      profile.dust = (profile.dust || 0) + totalDust;
+      profile.darkShards = (profile.darkShards || 0) + totalShards;
+      profile.bloodSovereigns = (profile.bloodSovereigns || 0) + totalSovereigns;
+
+      successMessage = `Claimed all rewards from ${claimedCount} letter(s)!`;
+      responseData = { claimedCount, totalGold, totalDust, totalShards, totalSovereigns };
     } else {
       return res.status(400).json({ error: 'Unknown action' });
     }

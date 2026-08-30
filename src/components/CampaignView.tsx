@@ -34,6 +34,26 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
     }
   }, [viewingFloor]);
 
+  const [timeUntilRegen, setTimeUntilRegen] = useState<string>('');
+  useEffect(() => {
+    const pveRegenTime = 1200000;
+    const updateTimer = () => {
+      if ((profile.pveEnergy || 0) >= (profile.pveEnergyMax || 10)) {
+        setTimeUntilRegen('');
+        return;
+      }
+      const lastPve = profile.lastPveEnergyRefill ?? profile.lastEnergyRefill ?? Date.now();
+      const timePassed = Date.now() - lastPve;
+      const timeLeft = Math.max(0, pveRegenTime - (timePassed % pveRegenTime));
+      const minutes = Math.floor(timeLeft / 60000);
+      const seconds = Math.floor((timeLeft % 60000) / 1000);
+      setTimeUntilRegen(`${minutes}:${seconds.toString().padStart(2, '0')}`);
+    };
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [profile.pveEnergy, profile.pveEnergyMax, profile.lastPveEnergyRefill, profile.lastEnergyRefill]);
+
   const isBoss = viewingFloor % 10 === 0;
   const stageStars = profile.campaignStars?.[selectedStage.id.toString()] || 0;
 
@@ -98,14 +118,40 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
 
         <div className="relative z-10 flex flex-col justify-between h-full space-y-4">
           
-          {/* Row 1: Title & Description Centered */}
-          <div className="text-center border-b border-gray-800/80 pb-4">
+          {/* Row 1: Title & Description Centered with Energy Status */}
+          <div className="relative text-center border-b border-gray-800/80 pb-4">
+            {/* Desktop / Tablet PvE Energy Badge */}
+            <div className="absolute right-0 top-0 hidden sm:flex items-center gap-2.5 bg-black/60 border border-emerald-500/30 rounded-full py-1.5 px-3.5 shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:border-emerald-500/50 transition-all cursor-default" title={timeUntilRegen ? `Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (+1 in ${timeUntilRegen})` : `Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (Full)`}>
+              <img src="/icons/icon_energy.webp" alt="Energy" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+              <div className="flex flex-col items-start leading-none">
+                <span className="font-mono text-xs font-bold text-emerald-400">
+                  {profile.pveEnergy || 0}/{profile.pveEnergyMax || 10}
+                </span>
+                <span className="font-mono text-[9px] text-emerald-300/80 tracking-tight mt-0.5 whitespace-nowrap">
+                  {timeUntilRegen ? `+1 in ${timeUntilRegen}` : 'Full Energy'}
+                </span>
+              </div>
+            </div>
+
             <h2 className="font-display font-black text-2xl md:text-3xl text-white tracking-widest text-shadow-gold">
               THE ENDLESS ABYSS
             </h2>
             <p className="text-xs text-gray-400 mt-1.5 max-w-xl mx-auto font-sans leading-relaxed">
               Descend into the infinite depths. Defeat the dark entities to claim ancient resources.
             </p>
+
+            {/* Mobile PvE Energy Badge */}
+            <div className="flex sm:hidden justify-center mt-2.5">
+              <div className="flex items-center gap-2 bg-black/60 border border-emerald-500/30 rounded-full py-1 px-3 shadow-inner">
+                <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 object-contain" />
+                <span className="font-mono text-xs font-bold text-emerald-400">
+                  {profile.pveEnergy || 0}/{profile.pveEnergyMax || 10}
+                </span>
+                <span className="font-mono text-[9px] text-emerald-300/80 font-semibold">
+                  {timeUntilRegen ? `(+1 in ${timeUntilRegen})` : '(Full)'}
+                </span>
+              </div>
+            </div>
           </div>
 
           {/* Row 2: Large Centered Floor Selector */}
