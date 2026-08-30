@@ -116,36 +116,33 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
         <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#ebd09b]/35 pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#ebd09b]/35 pointer-events-none" />
 
-        {/* Subtle, elegant Energy HUD pill in top-right corner */}
-        <div 
-          className="absolute top-5 right-6 flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full py-1 px-3 shadow-inner cursor-default select-none transition-colors z-20"
-          title={timeUntilRegen ? `Abyss Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (+1 in ${timeUntilRegen})` : `Abyss Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (Full)`}
-        >
-          <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-          <span className="font-mono text-xs font-bold text-emerald-400">
-            {profile.pveEnergy || 0}/{profile.pveEnergyMax || 10}
-          </span>
-          {timeUntilRegen ? (
-            <span className="font-mono text-[10px] text-emerald-300/80 font-semibold">
-              ({timeUntilRegen})
-            </span>
-          ) : (
-            <span className="font-mono text-[9px] text-emerald-500/70 font-semibold uppercase">
-              Full
-            </span>
-          )}
-        </div>
-
         <div className="relative z-10 flex flex-col justify-between h-full space-y-4">
           
-          {/* Row 1: Title & Description Centered */}
-          <div className="text-center border-b border-gray-800/80 pb-4">
+          {/* Row 1: Title & Description Centered with Prominent Energy Badge */}
+          <div className="text-center border-b border-gray-800/80 pb-4 flex flex-col items-center">
             <h2 className="font-display font-black text-2xl md:text-3xl text-white tracking-widest text-shadow-gold">
               THE ENDLESS ABYSS
             </h2>
             <p className="text-xs text-gray-400 mt-1.5 max-w-xl mx-auto font-sans leading-relaxed">
               Descend into the infinite depths. Defeat the dark entities to claim ancient resources.
             </p>
+
+            {/* Prominent Centered Energy Badge */}
+            <div className="mt-3.5 inline-flex items-center gap-2.5 bg-gradient-to-r from-[#061c12] via-black to-[#061c12] border border-emerald-500/50 hover:border-emerald-400/80 rounded-full px-4 py-1.5 shadow-[0_0_18px_rgba(16,185,129,0.25)] select-none transition-all cursor-default">
+              <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.9)]" />
+              <div className="flex items-baseline gap-1.5 leading-none">
+                <span className="font-display font-bold text-xs text-gray-300 tracking-wider">ENERGY:</span>
+                <span className="font-mono text-sm font-black text-emerald-400">
+                  {profile.pveEnergy || 0}
+                </span>
+                <span className="font-mono text-xs font-bold text-emerald-500/70">
+                  / {profile.pveEnergyMax || 10}
+                </span>
+              </div>
+              <span className="font-mono text-[11px] text-emerald-300/90 font-bold border-l border-emerald-500/30 pl-2">
+                {timeUntilRegen ? `+1 in ${timeUntilRegen}` : 'Full Energy'}
+              </span>
+            </div>
           </div>
 
           {/* Row 2: Large Centered Floor Selector */}
