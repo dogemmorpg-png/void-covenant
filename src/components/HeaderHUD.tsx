@@ -138,30 +138,29 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
           </div>
 
           {/* User Profile and Controls */}
-          <div className="flex items-center gap-2 sm:gap-2.5 xl:ml-1 xl:border-l border-white/10 xl:pl-3 shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 xl:ml-1 xl:border-l border-white/10 xl:pl-3 shrink-0">
             {/* Mailbox Button */}
             <button
               onClick={() => {
                 setIsMailboxOpen(true);
               }}
-              className={`relative flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-300 cursor-pointer shadow-[0_0_15px_rgba(245,158,11,0.15)] hover:scale-105 active:scale-95 ${
+              className={`relative w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-300 cursor-pointer hover:scale-110 active:scale-95 ${
                 unreadMailCount > 0
-                  ? 'bg-gradient-to-r from-[#2e0d16] via-[#1a070c] to-[#120408] border-amber-500/70 hover:border-amber-400 text-amber-300 shadow-[0_0_18px_rgba(245,158,11,0.35)]'
-                  : 'bg-white/5 hover:bg-white/10 border-white/15 hover:border-amber-400/50 text-gray-300 hover:text-white'
+                  ? 'bg-gradient-to-br from-[#2e0d16] via-[#1a070c] to-[#0d0205] border-amber-500 hover:border-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.45)]'
+                  : 'bg-white/5 hover:bg-white/10 border-white/15 hover:border-amber-400/60 shadow-inner'
               }`}
               title="Void Mailbox (Decrees & Rewards)"
             >
-              <div className="relative flex items-center justify-center">
-                <Mail className={`w-4 h-4 ${unreadMailCount > 0 ? 'text-amber-300 animate-pulse' : 'text-gray-300'}`} />
-                {unreadMailCount > 0 && (
-                  <span className="absolute -top-2.5 -right-3 min-w-[17px] h-[17px] px-1 rounded-full bg-gradient-to-r from-red-600 to-rose-600 border border-white/90 text-white font-mono text-[9px] font-black flex items-center justify-center shadow-[0_0_10px_rgba(225,29,72,0.9)] animate-bounce">
-                    {unreadMailCount}
-                  </span>
-                )}
-              </div>
-              <span className="font-display font-bold text-xs tracking-wider text-amber-200/90">
-                MAIL
-              </span>
+              <Mail className={`w-5 h-5 transition-transform duration-200 ${
+                unreadMailCount > 0 
+                  ? 'text-amber-300 drop-shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse' 
+                  : 'text-gray-300 hover:text-amber-200'
+              }`} />
+              {unreadMailCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-gradient-to-r from-red-600 to-rose-600 border border-white text-white font-mono text-[9px] font-black flex items-center justify-center shadow-[0_0_10px_rgba(225,29,72,0.95)] animate-bounce">
+                  {unreadMailCount}
+                </span>
+              )}
             </button>
 
             <div className="flex items-center gap-2">
