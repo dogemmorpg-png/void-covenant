@@ -214,71 +214,47 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
             </div>
 
             {/* Guaranteed Rewards */}
-            <div className="space-y-3 flex flex-col justify-between">
-              <div className="space-y-3">
-                <span className="text-xs font-display text-[#ebd09b] tracking-wider uppercase font-bold block">Rewards</span>
-                <div className="grid grid-cols-3 gap-3">
-                  {/* Gold Reward Card */}
-                  <div className="bg-gradient-to-b from-[#1c150c] via-[#100b06] to-[#080503] border border-amber-500/30 hover:border-amber-400/60 p-3 rounded-2xl text-center shadow-md transition-all duration-300 hover:shadow-[0_0_20px_rgba(245,158,11,0.25)] hover:scale-[1.03] flex flex-col items-center justify-center min-h-[105px] group cursor-default select-none">
-                    <img 
-                      src="/icons/icon_gold.webp" 
-                      alt="Gold" 
-                      className="w-9 h-9 object-contain drop-shadow-[0_0_10px_rgba(245,158,11,0.5)] group-hover:scale-115 transition-transform duration-300 mb-1" 
-                    />
-                    <span className="text-amber-300 font-mono font-black text-base tracking-wide text-shadow-gold">
-                      +{selectedStage.goldReward}
-                    </span>
-                    <span className="text-[10px] text-amber-500/80 font-mono tracking-widest uppercase font-bold mt-0.5 group-hover:text-amber-300 transition-colors">
-                      Gold
-                    </span>
+            <div className="space-y-3">
+              <span className="text-[10px] font-mono text-[#ebd09b]/80 tracking-widest uppercase font-bold block">VICTORY REWARDS</span>
+              <div className="bg-black/50 border border-gray-800/60 rounded-2xl p-4 flex items-center justify-around gap-2 shadow-inner min-h-[110px]">
+                
+                {/* Gold Pill */}
+                <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-amber-500/20 hover:border-amber-400/50 hover:bg-amber-500/[0.06] transition-all cursor-default group">
+                  <div className="flex items-center gap-1.5">
+                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] group-hover:scale-110 transition-transform" />
+                    <span className="font-mono font-black text-amber-300 text-base leading-none">+{selectedStage.goldReward}</span>
                   </div>
-                  
-                  {/* Dust Reward Card */}
-                  <div className="bg-gradient-to-b from-[#0b1b20] via-[#050f14] to-[#02070a] border border-cyan-500/30 hover:border-cyan-400/60 p-3 rounded-2xl text-center shadow-md transition-all duration-300 hover:shadow-[0_0_20px_rgba(6,182,212,0.25)] hover:scale-[1.03] flex flex-col items-center justify-center min-h-[105px] group cursor-default select-none">
-                    <img 
-                      src="/icons/icon_dust.webp" 
-                      alt="Dust" 
-                      className="w-9 h-9 object-contain drop-shadow-[0_0_10px_rgba(102,252,241,0.6)] group-hover:scale-115 transition-transform duration-300 mb-1 scale-105" 
-                    />
-                    <span className="text-[#66fcf1] font-mono font-black text-base tracking-wide text-shadow-cyan">
-                      +{selectedStage.dustReward}
-                    </span>
-                    <span className="text-[10px] text-cyan-400/80 font-mono tracking-widest uppercase font-bold mt-0.5 group-hover:text-cyan-300 transition-colors">
-                      Dust
-                    </span>
-                  </div>
-
-                  {/* Shards or EXP Reward Card */}
-                  {selectedStage.shardsReward > 0 ? (
-                    <div className="bg-gradient-to-b from-[#220c10] via-[#140508] to-[#090204] border border-red-500/30 hover:border-red-400/60 p-3 rounded-2xl text-center shadow-md transition-all duration-300 hover:shadow-[0_0_20px_rgba(239,68,68,0.25)] hover:scale-[1.03] flex flex-col items-center justify-center min-h-[105px] group cursor-default select-none">
-                      <img 
-                        src="/icons/icon_shards.webp" 
-                        alt="Shards" 
-                        className="w-9 h-9 object-contain drop-shadow-[0_0_10px_rgba(239,68,68,0.6)] group-hover:scale-115 transition-transform duration-300 mb-1 scale-105" 
-                      />
-                      <span className="text-rose-400 font-mono font-black text-base tracking-wide text-shadow-crimson">
-                        +{selectedStage.shardsReward}
-                      </span>
-                      <span className="text-[10px] text-red-400/80 font-mono tracking-widest uppercase font-bold mt-0.5 group-hover:text-rose-300 transition-colors">
-                        Shards
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="bg-gradient-to-b from-[#0a1e14] via-[#04100a] to-[#020704] border border-emerald-500/30 hover:border-emerald-400/60 p-3 rounded-2xl text-center shadow-md transition-all duration-300 hover:shadow-[0_0_20px_rgba(16,185,129,0.25)] hover:scale-[1.03] flex flex-col items-center justify-center min-h-[105px] group cursor-default select-none">
-                      <img 
-                        src="/icons/icon_exp.webp" 
-                        alt="EXP" 
-                        className="w-9 h-9 object-contain drop-shadow-[0_0_10px_rgba(16,185,129,0.7)] group-hover:scale-115 transition-transform duration-300 mb-1 rounded-xl border border-emerald-500/40" 
-                      />
-                      <span className="text-emerald-400 font-mono font-black text-base tracking-wide text-shadow-emerald">
-                        +50
-                      </span>
-                      <span className="text-[10px] text-emerald-400/80 font-mono tracking-widest uppercase font-bold mt-0.5 group-hover:text-emerald-300 transition-colors">
-                        Hero EXP
-                      </span>
-                    </div>
-                  )}
+                  <span className="text-[9px] text-amber-500/70 font-mono uppercase tracking-wider font-semibold mt-1">Gold</span>
                 </div>
+
+                {/* Dust Pill */}
+                <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-cyan-500/20 hover:border-cyan-400/50 hover:bg-cyan-500/[0.06] transition-all cursor-default group">
+                  <div className="flex items-center gap-1.5">
+                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(102,252,241,0.5)] scale-110 group-hover:scale-120 transition-transform" />
+                    <span className="font-mono font-black text-[#66fcf1] text-base leading-none">+{selectedStage.dustReward}</span>
+                  </div>
+                  <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider font-semibold mt-1">Dust</span>
+                </div>
+
+                {/* Shards or EXP Pill */}
+                {selectedStage.shardsReward > 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-red-500/20 hover:border-red-400/50 hover:bg-red-500/[0.06] transition-all cursor-default group">
+                    <div className="flex items-center gap-1.5">
+                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.5)] scale-110 group-hover:scale-120 transition-transform" />
+                      <span className="font-mono font-black text-rose-400 text-base leading-none">+{selectedStage.shardsReward}</span>
+                    </div>
+                    <span className="text-[9px] text-red-400/70 font-mono uppercase tracking-wider font-semibold mt-1">Shards</span>
+                  </div>
+                ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-emerald-500/20 hover:border-emerald-400/50 hover:bg-emerald-500/[0.06] transition-all cursor-default group">
+                    <div className="flex items-center gap-1.5">
+                      <img src="/icons/icon_exp.webp" alt="EXP" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.7)] group-hover:scale-110 transition-transform" />
+                      <span className="font-mono font-black text-emerald-400 text-base leading-none">+50</span>
+                    </div>
+                    <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider font-semibold mt-1">Hero EXP</span>
+                  </div>
+                )}
+
               </div>
             </div>
 
