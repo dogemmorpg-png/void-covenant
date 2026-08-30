@@ -205,7 +205,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const baseDust = 30 + Math.floor((profile.pvpLP || 0) / 20);
         goldReward = Math.floor(baseGold * goldMultiplier);
         dustReward = baseDust;
-        expReward = Math.floor(80 * expMultiplier);
+        expReward = 0; // EXP is strictly exclusive to PvE Campaign
 
         const gain = Math.round(32 * (1 - expected));
         attackerRatingChange = Math.max(10, Math.min(32, gain));
@@ -216,7 +216,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       } else {
         goldReward = Math.floor(50 * goldMultiplier);
         dustReward = 5;
-        expReward = Math.floor(20 * expMultiplier);
+        expReward = 0; // EXP is strictly exclusive to PvE Campaign
 
         const loss = Math.round(32 * expected);
         attackerRatingChange = -Math.max(5, Math.min(25, loss));
