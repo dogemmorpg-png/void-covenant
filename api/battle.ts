@@ -201,7 +201,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       let defenderLPChange = 0;
 
       if (result === 'win') {
-        goldReward = Math.floor(20 * goldMultiplier);
+        const baseGold = 300 + Math.floor((profile.pvpLP || 0) / 4);
+        const baseDust = 30 + Math.floor((profile.pvpLP || 0) / 20);
+        goldReward = Math.floor(baseGold * goldMultiplier);
+        dustReward = baseDust;
         expReward = Math.floor(80 * expMultiplier);
 
         const gain = Math.round(32 * (1 - expected));
@@ -211,7 +214,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         attackerLPChange = 20;
         defenderLPChange = -15;
       } else {
-        goldReward = Math.floor(20 * goldMultiplier);
+        goldReward = Math.floor(50 * goldMultiplier);
+        dustReward = 5;
+        expReward = Math.floor(20 * expMultiplier);
 
         const loss = Math.round(32 * expected);
         attackerRatingChange = -Math.max(5, Math.min(25, loss));
