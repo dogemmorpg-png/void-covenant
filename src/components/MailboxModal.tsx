@@ -96,7 +96,6 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
                   </span>
                 )}
               </div>
-              <p className="text-[11px] text-gray-400 font-mono tracking-tight">League reports, seasonal rewards & official decrees</p>
             </div>
           </div>
 
