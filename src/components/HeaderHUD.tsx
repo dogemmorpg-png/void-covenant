@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { LogOut, Copy, X, Trophy, User, Clock, Plus, UserPlus, Send, Mail } from 'lucide-react';
+import { LogOut, Copy, X, Trophy, User, Clock, Plus, UserPlus, Send, Mail, ShieldAlert } from 'lucide-react';
 import { audioSystem } from '../utils/AudioSystem';
 import { MailboxModal } from './MailboxModal';
+import { AdminPanelModal } from './AdminPanelModal';
 
 interface HeaderHUDProps {
   onNavigateTab?: (tab: string) => void;
@@ -15,10 +16,12 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMailboxOpen, setIsMailboxOpen] = useState(false);
+  const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
   const [referralsList, setReferralsList] = useState<any[]>([]);
   const [isLoadingReferrals, setIsLoadingReferrals] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
+  const isAdmin = profile.username?.toLowerCase() === 'adminus' || profile.role === 'admin';
   const unreadMailCount = (profile.mailMessages || []).filter(m => !m.isRead || (m.rewards && !m.isClaimed)).length;
 
   const handleCopyLink = () => {
@@ -180,6 +183,20 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                 {profile.username || 'Voidwalker'}
               </span>
             </div>
+
+            {isAdmin && (
+              <button
+                onClick={() => {
+                  audioSystem.playClick();
+                  setIsAdminPanelOpen(true);
+                }}
+                className="px-3 py-1 rounded-full bg-gradient-to-r from-red-950 via-red-900 to-black border border-red-500/80 hover:border-red-400 text-red-400 hover:text-white font-mono text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(220,38,38,0.5)] hover:scale-105 active:scale-95 transition-all cursor-pointer animate-pulse hover:animate-none"
+                title="Open Master Admin Command Panel"
+              >
+                <ShieldAlert className="w-3.5 h-3.5 text-red-400" />
+                <span>ADMIN</span>
+              </button>
+            )}
             
             <button
               onClick={() => {
@@ -370,6 +387,9 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
 
       {/* Void Mailbox Modal */}
       <MailboxModal isOpen={isMailboxOpen} onClose={() => setIsMailboxOpen(false)} />
+
+      {/* Master Admin Panel Modal */}
+      <AdminPanelModal isOpen={isAdminPanelOpen} onClose={() => setIsAdminPanelOpen(false)} />
     </div>
   );
 };

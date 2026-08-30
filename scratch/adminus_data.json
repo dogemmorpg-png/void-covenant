@@ -1,0 +1,2996 @@
+{
+  "exp": 150,
+  "deck": [
+    "azrael_angel_of_death_1786660813264_spi1s",
+    "pestilence_incarnate_1786700697103_ls8q3",
+    "lich_king_1786660813264_rius2",
+    "doom_bringer_1786661126125_8b6p9",
+    "death_knight_champion_1786700697103_ul6hv",
+    "fallen_angel_1786660813264_onqs4",
+    "plague_behemoth_1786661126125_jb7i3",
+    "soul_devourer_1786661126125_yoeb6",
+    "hell_rider_1786660827438_tplon",
+    "dracula_the_first_1787466569161_vqnqe"
+  ],
+  "dust": 3879,
+  "gold": 22383,
+  "level": 100,
+  "pvpLP": 40,
+  "talents": {
+    "war_atk": 1,
+    "war_base": 1,
+    "war_armor": 1,
+    "blood_base": 20,
+    "blood_heal": 10,
+    "blood_ward": 1,
+    "blood_shield": 3,
+    "blood_cleanse": 10,
+    "blood_overflow": 3,
+    "blood_ultimate": 1
+  },
+  "equipped": {
+    "helmet": "eq_1787466654304_fyevkvu",
+    "weapon": "eq_1786701950942_kwuy663"
+  },
+  "username": "Adminus",
+  "avatarUrl": "/avatars/rogue.webp",
+  "equipment": [
+    {
+      "id": "eq_1786660836491_ac8q4q4",
+      "name": "Silver Signet",
+      "slot": "ring",
+      "tier": "silver",
+      "bonusType": "goldBonus",
+      "bonusValue": 3
+    },
+    {
+      "id": "eq_1786661099044_6xriwck",
+      "name": "Steel Longsword",
+      "slot": "weapon",
+      "tier": "silver",
+      "bonusType": "maxHealth",
+      "bonusValue": 3
+    },
+    {
+      "id": "eq_1786701950942_kwuy663",
+      "name": "Abyssal Blade",
+      "slot": "weapon",
+      "tier": "gold",
+      "bonusType": "maxHealth",
+      "bonusValue": 7
+    },
+    {
+      "id": "eq_1787466650025_ecrvcu4",
+      "name": "Silver Signet",
+      "slot": "ring",
+      "tier": "silver",
+      "bonusType": "goldBonus",
+      "bonusValue": 3
+    },
+    {
+      "id": "eq_1787466654304_fyevkvu",
+      "name": "Knight's Visor",
+      "slot": "helmet",
+      "tier": "silver",
+      "bonusType": "maxHealth",
+      "bonusValue": 3
+    },
+    {
+      "id": "eq_1787517782295_izdjtbf",
+      "name": "Rusted Iron Sword",
+      "slot": "weapon",
+      "tier": "bronze",
+      "bonusType": "maxHealth",
+      "bonusValue": 1
+    }
+  ],
+  "pveEnergy": 10,
+  "pvpEnergy": 4,
+  "pvpLeague": "Bronze",
+  "pvpRating": 181,
+  "collection": [
+    {
+      "id": "c_starter_3",
+      "xp": 0,
+      "name": "Plague Rat",
+      "tier": "bronze",
+      "color": "emerald",
+      "delay": 1,
+      "image": "/cards/plague_rat.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 1,
+      "baseId": "plague_rat",
+      "health": 6,
+      "skills": [
+        {
+          "type": "plague",
+          "value": 1,
+          "description": "Plague: deals 1 damage to random enemies at end of turn."
+        }
+      ],
+      "maxHealth": 6
+    },
+    {
+      "id": "c_starter_4",
+      "xp": 0,
+      "name": "Cursed Witch",
+      "tier": "bronze",
+      "color": "purple",
+      "delay": 2,
+      "image": "/cards/cursed_witch.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "cursed_witch",
+      "health": 10,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 2,
+          "description": "Hex: increases enemy incoming damage by 2."
+        }
+      ],
+      "maxHealth": 10
+    },
+    {
+      "id": "c_starter_5",
+      "xp": 0,
+      "name": "Dark Acolyte",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 2,
+      "image": "/cards/dark_acolyte.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "dark_acolyte",
+      "health": 12,
+      "skills": [
+        {
+          "type": "sacrifice",
+          "value": 4,
+          "description": "Sacrifice: destroys an ally, granting the hero +4 HP."
+        }
+      ],
+      "maxHealth": 12
+    },
+    {
+      "id": "hell_rider_1786660827438_tplon",
+      "xp": 0,
+      "name": "Hell Rider",
+      "tier": "silver",
+      "color": "amber",
+      "delay": 2,
+      "image": "/cards/hell_rider.webp",
+      "level": 2,
+      "maxXp": 100,
+      "attack": 3,
+      "baseId": "hell_rider",
+      "health": 21,
+      "skills": [
+        {
+          "type": "plague",
+          "value": 2,
+          "description": "Plague: deals 2 damage to random enemies at end of turn."
+        }
+      ],
+      "maxHealth": 21
+    },
+    {
+      "id": "dullahan_1786660827438_c38l6",
+      "xp": 0,
+      "name": "Dullahan",
+      "tier": "silver",
+      "color": "slate",
+      "delay": 2,
+      "image": "/cards/dullahan.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 6,
+      "baseId": "dullahan",
+      "health": 16,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 3,
+          "description": "Vampirism: heals self for 3 HP on attack."
+        }
+      ],
+      "maxHealth": 16
+    },
+    {
+      "id": "skeleton_warrior_1786660827438_zp0bu",
+      "xp": 0,
+      "name": "Skeleton Warrior",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 1,
+      "image": "/cards/skeleton_warrior.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "skeleton_warrior",
+      "health": 8,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 2,
+          "description": "Vampirism: heals self for 2 HP on attack."
+        }
+      ],
+      "maxHealth": 8
+    },
+    {
+      "id": "c_starter_1",
+      "xp": 0,
+      "name": "Skeleton Warrior",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 1,
+      "image": "/cards/skeleton_warrior.webp",
+      "level": 2,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "skeleton_warrior",
+      "health": 9,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 2,
+          "description": "Vampirism: heals self for 2 HP on attack."
+        }
+      ],
+      "maxHealth": 9
+    },
+    {
+      "id": "plague_behemoth_1786661126125_jb7i3",
+      "xp": 0,
+      "name": "Plague Behemoth",
+      "tier": "gold",
+      "color": "emerald",
+      "delay": 4,
+      "image": "/cards/plague_behemoth.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 5,
+      "baseId": "plague_behemoth",
+      "health": 35,
+      "skills": [
+        {
+          "type": "plague",
+          "value": 5,
+          "description": "Plague: deals 5 damage to random enemies at end of turn."
+        }
+      ],
+      "maxHealth": 35
+    },
+    {
+      "id": "soul_devourer_1786661126125_yoeb6",
+      "xp": 0,
+      "name": "Soul Devourer",
+      "tier": "gold",
+      "color": "violet",
+      "delay": 3,
+      "image": "/cards/soul_devourer.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 6,
+      "baseId": "soul_devourer",
+      "health": 28,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 4,
+          "description": "Hex: increases enemy incoming damage by 4."
+        },
+        {
+          "type": "sacrifice",
+          "value": 8,
+          "description": "Sacrifice: destroys an ally, granting the hero +8 HP."
+        }
+      ],
+      "maxHealth": 28
+    },
+    {
+      "id": "lich_king_1786660813264_rius2",
+      "xp": 0,
+      "name": "Lich King",
+      "tier": "gold",
+      "color": "cyan",
+      "delay": 3,
+      "image": "/cards/lich_king.webp",
+      "level": 3,
+      "maxXp": 100,
+      "attack": 9,
+      "baseId": "lich_king",
+      "health": 32,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 9,
+          "description": "Hex: increases enemy incoming damage by 9."
+        },
+        {
+          "type": "vampirism",
+          "value": 6,
+          "description": "Vampirism: heals self for 6 HP on attack."
+        }
+      ],
+      "maxHealth": 32
+    },
+    {
+      "id": "death_knight_champion_1786700697103_ul6hv",
+      "xp": 0,
+      "name": "Death Knight Champion",
+      "tier": "gold",
+      "color": "slate",
+      "delay": 3,
+      "image": "/cards/death_knight_champion.webp",
+      "level": 2,
+      "maxXp": 100,
+      "attack": 9,
+      "baseId": "death_knight_champion",
+      "health": 37,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 4,
+          "description": "Vampirism: heals self for 4 HP on attack."
+        },
+        {
+          "type": "hex",
+          "value": 2,
+          "description": "Hex: increases enemy incoming damage by 2."
+        }
+      ],
+      "maxHealth": 37
+    },
+    {
+      "id": "bone_golem_1786700697103_em5fg",
+      "xp": 0,
+      "name": "Bone Golem",
+      "tier": "silver",
+      "color": "slate",
+      "delay": 3,
+      "image": "/cards/bone_golem.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "bone_golem",
+      "health": 24,
+      "skills": [
+        {
+          "type": "sacrifice",
+          "value": 5,
+          "description": "Sacrifice: destroys an ally, granting the hero +5 HP."
+        }
+      ],
+      "maxHealth": 24
+    },
+    {
+      "id": "abyss_reaper_1786700697103_zkqia",
+      "xp": 0,
+      "name": "Abyss Reaper",
+      "tier": "silver",
+      "color": "violet",
+      "delay": 2,
+      "image": "/cards/abyss_reaper.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "abyss_reaper",
+      "health": 14,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 3,
+          "description": "Hex: increases enemy incoming damage by 3."
+        },
+        {
+          "type": "vampirism",
+          "value": 3,
+          "description": "Vampirism: heals self for 3 HP on attack."
+        }
+      ],
+      "maxHealth": 14
+    },
+    {
+      "id": "pestilence_incarnate_1786700697103_ls8q3",
+      "xp": 0,
+      "name": "Pestilence Incarnate",
+      "tier": "legendary",
+      "color": "emerald",
+      "delay": 4,
+      "image": "/cards/pestilence_incarnate.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 6,
+      "baseId": "pestilence_incarnate",
+      "health": 50,
+      "skills": [
+        {
+          "type": "plague",
+          "value": 8,
+          "description": "Plague: deals 8 damage to random enemies at end of turn."
+        },
+        {
+          "type": "vampirism",
+          "value": 5,
+          "description": "Vampirism: heals self for 5 HP on attack."
+        }
+      ],
+      "maxHealth": 50
+    },
+    {
+      "id": "vampire_knight_1786701809429_fi21p",
+      "xp": 0,
+      "name": "Vampire Knight",
+      "tier": "silver",
+      "color": "crimson",
+      "delay": 2,
+      "image": "/cards/vampire_knight.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 5,
+      "baseId": "vampire_knight",
+      "health": 15,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 4,
+          "description": "Vampirism: heals self for 4 HP on attack."
+        }
+      ],
+      "maxHealth": 15
+    },
+    {
+      "id": "plague_behemoth_1786701809429_r1fus",
+      "xp": 0,
+      "name": "Plague Behemoth",
+      "tier": "gold",
+      "color": "emerald",
+      "delay": 4,
+      "image": "/cards/plague_behemoth.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 5,
+      "baseId": "plague_behemoth",
+      "health": 35,
+      "skills": [
+        {
+          "type": "plague",
+          "value": 5,
+          "description": "Plague: deals 5 damage to random enemies at end of turn."
+        }
+      ],
+      "maxHealth": 35
+    },
+    {
+      "id": "azrael_angel_of_death_1786660813264_spi1s",
+      "xp": 0,
+      "name": "Azrael, Angel of Death",
+      "tier": "legendary",
+      "color": "slate",
+      "delay": 4,
+      "image": "/cards/azrael_angel_of_death.webp",
+      "level": 2,
+      "maxXp": 50,
+      "attack": 17,
+      "baseId": "azrael_angel_of_death",
+      "health": 35,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 5,
+          "description": "Hex: increases enemy incoming damage by 5."
+        },
+        {
+          "type": "sacrifice",
+          "value": 15,
+          "description": "Sacrifice: destroys an ally, granting the hero +15 HP."
+        }
+      ],
+      "maxHealth": 35
+    },
+    {
+      "id": "fallen_angel_1786660813264_onqs4",
+      "xp": 0,
+      "name": "Fallen Angel",
+      "tier": "gold",
+      "color": "rose",
+      "delay": 3,
+      "image": "/cards/fallen_angel.webp",
+      "level": 2,
+      "maxXp": 50,
+      "attack": 7,
+      "baseId": "fallen_angel",
+      "health": 30,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 5,
+          "description": "Vampirism: heals self for 5 HP on attack."
+        },
+        {
+          "type": "hex",
+          "value": 4,
+          "description": "Hex: increases enemy incoming damage by 4."
+        }
+      ],
+      "maxHealth": 30
+    },
+    {
+      "id": "void_walker_1786985342320_0gm6o",
+      "xp": 0,
+      "name": "Void Walker",
+      "tier": "silver",
+      "color": "purple",
+      "delay": 2,
+      "image": "/cards/void_walker.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 5,
+      "baseId": "void_walker",
+      "health": 14,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 5,
+          "description": "Hex: increases enemy incoming damage by 5."
+        }
+      ],
+      "maxHealth": 14
+    },
+    {
+      "id": "bone_golem_1786701809429_fsdxa",
+      "xp": 0,
+      "name": "Bone Golem",
+      "tier": "silver",
+      "color": "slate",
+      "delay": 3,
+      "image": "/cards/bone_golem.webp",
+      "level": 2,
+      "maxXp": 50,
+      "attack": 5,
+      "baseId": "bone_golem",
+      "health": 28,
+      "skills": [
+        {
+          "type": "sacrifice",
+          "value": 5,
+          "description": "Sacrifice: destroys an ally, granting the hero +5 HP."
+        }
+      ],
+      "maxHealth": 28
+    },
+    {
+      "id": "abyssal_dragon_1787149932021_6hcql",
+      "xp": 0,
+      "name": "Abyssal Dragon",
+      "tier": "gold",
+      "color": "purple",
+      "delay": 4,
+      "image": "/cards/abyssal_dragon.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 9,
+      "baseId": "abyssal_dragon",
+      "health": 30,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 5,
+          "description": "Hex: increases enemy incoming damage by 5."
+        }
+      ],
+      "manaCost": 3,
+      "maxHealth": 30
+    },
+    {
+      "id": "goblin_thief_1787309751800_ld7a5",
+      "xp": 0,
+      "name": "Goblin Thief",
+      "tier": "bronze",
+      "color": "amber",
+      "delay": 1,
+      "image": "/cards/goblin_thief.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "goblin_thief",
+      "health": 7,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 1,
+          "description": "Hex: increases enemy incoming damage by 1."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 7
+    },
+    {
+      "id": "carrion_crow_1787309751800_y4f56",
+      "xp": 0,
+      "name": "Carrion Crow",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 1,
+      "image": "/cards/carrion_crow.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 1,
+      "baseId": "carrion_crow",
+      "health": 4,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 2,
+          "description": "Vampirism: heals self for 2 HP on attack."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 4
+    },
+    {
+      "id": "blood_thrall_1787309751800_9pahl",
+      "xp": 0,
+      "name": "Blood Thrall",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 2,
+      "image": "/cards/blood_thrall.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "blood_thrall",
+      "health": 10,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 2,
+          "description": "Vampirism: heals self for 2 HP on attack."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 10
+    },
+    {
+      "id": "blood_imp_1787309768942_204jx",
+      "xp": 0,
+      "name": "Blood Imp",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 1,
+      "image": "/cards/blood_imp.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "blood_imp",
+      "health": 7,
+      "skills": [
+        {
+          "type": "sacrifice",
+          "value": 2,
+          "description": "Sacrifice: destroys an ally, granting the hero +2 HP."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 7
+    },
+    {
+      "id": "mud_golem_1787309768942_grwjz",
+      "xp": 0,
+      "name": "Mud Golem",
+      "tier": "bronze",
+      "color": "amber",
+      "delay": 3,
+      "image": "/cards/mud_golem.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 1,
+      "baseId": "mud_golem",
+      "health": 18,
+      "skills": [
+        {
+          "type": "sacrifice",
+          "value": 5,
+          "description": "Sacrifice: destroys an ally, granting the hero +5 HP."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 18
+    },
+    {
+      "id": "swamp_zombie_1787309768942_8xty9",
+      "xp": 0,
+      "name": "Swamp Zombie",
+      "tier": "bronze",
+      "color": "emerald",
+      "delay": 2,
+      "image": "/cards/swamp_zombie.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "swamp_zombie",
+      "health": 14,
+      "skills": [
+        {
+          "type": "plague",
+          "value": 1,
+          "description": "Plague: deals 1 damage to random enemies at end of turn."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 14
+    },
+    {
+      "id": "blood_thrall_1787309789642_0ova1",
+      "xp": 0,
+      "name": "Blood Thrall",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 2,
+      "image": "/cards/blood_thrall.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "blood_thrall",
+      "health": 10,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 2,
+          "description": "Vampirism: heals self for 2 HP on attack."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 10
+    },
+    {
+      "id": "zombie_footsoldier_1787309789642_2lxqt",
+      "xp": 0,
+      "name": "Spitfire Toad",
+      "tier": "bronze",
+      "color": "emerald",
+      "delay": 2,
+      "image": "/cards/spitfire_toad.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "spitfire_toad",
+      "health": 14,
+      "skills": [],
+      "manaCost": 2,
+      "maxHealth": 14,
+      "description": "A bloated swamp toad covered in pustules, spitting toxic acid."
+    },
+    {
+      "id": "skeleton_guard_1787309789642_pzo34",
+      "xp": 0,
+      "name": "Skeleton Guard",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 2,
+      "image": "/cards/skeleton_guard.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 1,
+      "baseId": "skeleton_guard",
+      "health": 15,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 1,
+          "description": "Vampirism: heals self for 1 HP on attack."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 15
+    },
+    {
+      "id": "swamp_beast_1787309803517_3moyv",
+      "xp": 0,
+      "name": "Chasm Worm",
+      "tier": "bronze",
+      "color": "emerald",
+      "delay": 3,
+      "image": "/cards/chasm_worm.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 5,
+      "baseId": "chasm_worm",
+      "health": 18,
+      "skills": [],
+      "manaCost": 2,
+      "maxHealth": 18,
+      "description": "A giant subterranean worm with rings of teeth emerging from a rocky fissure."
+    },
+    {
+      "id": "vampire_bat_1787309803517_x12u6",
+      "xp": 0,
+      "name": "Vampire Bat",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 1,
+      "image": "/cards/vampire_bat.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "vampire_bat",
+      "health": 5,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 3,
+          "description": "Vampirism: heals self for 3 HP on attack."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 5
+    },
+    {
+      "id": "blood_guard_1787309803517_w711q",
+      "xp": 0,
+      "name": "Petrified Basilisk",
+      "tier": "bronze",
+      "color": "amber",
+      "delay": 2,
+      "image": "/cards/petrified_basilisk.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "petrified_basilisk",
+      "health": 15,
+      "skills": [],
+      "manaCost": 2,
+      "maxHealth": 15,
+      "description": "A lizard-like beast half-turned to stone, possessing immense physical weight."
+    },
+    {
+      "id": "vampire_bat_1787309825579_1ss6w",
+      "xp": 0,
+      "name": "Vampire Bat",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 1,
+      "image": "/cards/vampire_bat.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "vampire_bat",
+      "health": 5,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 3,
+          "description": "Vampirism: heals self for 3 HP on attack."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 5
+    },
+    {
+      "id": "cave_bat_1787309825579_497li",
+      "xp": 0,
+      "name": "Gothic Harpy",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 1,
+      "image": "/cards/gothic_harpy.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "gothic_harpy",
+      "health": 8,
+      "skills": [],
+      "manaCost": 1,
+      "maxHealth": 8,
+      "description": "A half-woman, half-bird monster with black feathers perched on a cathedral belfry."
+    },
+    {
+      "id": "blood_thrall_1787309825579_43zhm",
+      "xp": 0,
+      "name": "Blood Thrall",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 2,
+      "image": "/cards/blood_thrall.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "blood_thrall",
+      "health": 10,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 2,
+          "description": "Vampirism: heals self for 2 HP on attack."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 10
+    },
+    {
+      "id": "lost_soul_1787309847309_691ik",
+      "xp": 0,
+      "name": "Lost Soul",
+      "tier": "bronze",
+      "color": "cyan",
+      "delay": 2,
+      "image": "/cards/lost_soul.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 1,
+      "baseId": "lost_soul",
+      "health": 8,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 3,
+          "description": "Hex: increases enemy incoming damage by 3."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 8
+    },
+    {
+      "id": "skeleton_guard_1787309847309_x41vw",
+      "xp": 0,
+      "name": "Skeleton Guard",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 2,
+      "image": "/cards/skeleton_guard.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 1,
+      "baseId": "skeleton_guard",
+      "health": 15,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 1,
+          "description": "Vampirism: heals self for 1 HP on attack."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 15
+    },
+    {
+      "id": "zombie_footsoldier_1787309847309_akh8y",
+      "xp": 0,
+      "name": "Spitfire Toad",
+      "tier": "bronze",
+      "color": "emerald",
+      "delay": 2,
+      "image": "/cards/spitfire_toad.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "spitfire_toad",
+      "health": 14,
+      "skills": [],
+      "manaCost": 2,
+      "maxHealth": 14,
+      "description": "A bloated swamp toad covered in pustules, spitting toxic acid."
+    },
+    {
+      "id": "grave_ghoul_1787309864923_xzyqb",
+      "xp": 0,
+      "name": "Grave Ghoul",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 1,
+      "image": "/cards/grave_ghoul.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "grave_ghoul",
+      "health": 9,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 1,
+          "description": "Vampirism: heals self for 1 HP on attack."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 9
+    },
+    {
+      "id": "cursed_witch_1787309864923_olqzx",
+      "xp": 0,
+      "name": "Cursed Witch",
+      "tier": "bronze",
+      "color": "purple",
+      "delay": 2,
+      "image": "/cards/cursed_witch.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "cursed_witch",
+      "health": 10,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 2,
+          "description": "Hex: increases enemy incoming damage by 2."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 10
+    },
+    {
+      "id": "cultist_brute_1787309864923_i9zpq",
+      "xp": 0,
+      "name": "Cultist Brute",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 3,
+      "image": "/cards/cultist_brute.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "cultist_brute",
+      "health": 12,
+      "skills": [
+        {
+          "type": "sacrifice",
+          "value": 3,
+          "description": "Sacrifice: destroys an ally, granting the hero +3 HP."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 12
+    },
+    {
+      "id": "grave_hound_1787309879367_bx2hq",
+      "xp": 0,
+      "name": "Grave Digger",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 1,
+      "image": "/cards/grave_digger.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "grave_digger",
+      "health": 8,
+      "skills": [],
+      "manaCost": 1,
+      "maxHealth": 8,
+      "description": "A creepy mortal undertaker carrying a lantern and a dirt-caked shovel."
+    },
+    {
+      "id": "vampire_bat_1787309879367_p402j",
+      "xp": 0,
+      "name": "Vampire Bat",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 1,
+      "image": "/cards/vampire_bat.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "vampire_bat",
+      "health": 5,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 3,
+          "description": "Vampirism: heals self for 3 HP on attack."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 5
+    },
+    {
+      "id": "shadow_wisp_1787309879367_f93oi",
+      "xp": 0,
+      "name": "Shadow Wisp",
+      "tier": "bronze",
+      "color": "violet",
+      "delay": 1,
+      "image": "/cards/shadow_wisp.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "shadow_wisp",
+      "health": 3,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 2,
+          "description": "Hex: increases enemy incoming damage by 2."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 3
+    },
+    {
+      "id": "stone_gargoyle_1787309897649_to8uk",
+      "xp": 0,
+      "name": "Crypt Wisp",
+      "tier": "bronze",
+      "color": "cyan",
+      "delay": 1,
+      "image": "/cards/crypt_wisp.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "crypt_wisp",
+      "health": 10,
+      "skills": [],
+      "manaCost": 1,
+      "maxHealth": 10,
+      "description": "A floating sphere of cold, blue graveyard fire that lights up ancient tombstones."
+    },
+    {
+      "id": "swamp_zombie_1787309897649_sk9n2",
+      "xp": 0,
+      "name": "Swamp Zombie",
+      "tier": "bronze",
+      "color": "emerald",
+      "delay": 2,
+      "image": "/cards/swamp_zombie.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "swamp_zombie",
+      "health": 14,
+      "skills": [
+        {
+          "type": "plague",
+          "value": 1,
+          "description": "Plague: deals 1 damage to random enemies at end of turn."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 14
+    },
+    {
+      "id": "dullahan_1787309897649_izrqm",
+      "xp": 0,
+      "name": "Dullahan",
+      "tier": "silver",
+      "color": "slate",
+      "delay": 2,
+      "image": "/cards/dullahan.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 6,
+      "baseId": "dullahan",
+      "health": 16,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 3,
+          "description": "Vampirism: heals self for 3 HP on attack."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 16
+    },
+    {
+      "id": "grave_hound_1787309919037_zj8px",
+      "xp": 0,
+      "name": "Grave Digger",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 1,
+      "image": "/cards/grave_digger.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "grave_digger",
+      "health": 8,
+      "skills": [],
+      "manaCost": 1,
+      "maxHealth": 8,
+      "description": "A creepy mortal undertaker carrying a lantern and a dirt-caked shovel."
+    },
+    {
+      "id": "shade_1787309919037_oelt4",
+      "xp": 0,
+      "name": "Shade",
+      "tier": "bronze",
+      "color": "violet",
+      "delay": 1,
+      "image": "/cards/shade.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "shade",
+      "health": 5,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 2,
+          "description": "Hex: increases enemy incoming damage by 2."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 5
+    },
+    {
+      "id": "carrion_crow_1787309919037_ddmqm",
+      "xp": 0,
+      "name": "Carrion Crow",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 1,
+      "image": "/cards/carrion_crow.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 1,
+      "baseId": "carrion_crow",
+      "health": 4,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 2,
+          "description": "Vampirism: heals self for 2 HP on attack."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 4
+    },
+    {
+      "id": "swamp_beast_1787309931544_s3us1",
+      "xp": 0,
+      "name": "Chasm Worm",
+      "tier": "bronze",
+      "color": "emerald",
+      "delay": 3,
+      "image": "/cards/chasm_worm.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 5,
+      "baseId": "chasm_worm",
+      "health": 18,
+      "skills": [],
+      "manaCost": 2,
+      "maxHealth": 18,
+      "description": "A giant subterranean worm with rings of teeth emerging from a rocky fissure."
+    },
+    {
+      "id": "lost_soul_1787309931544_gt39n",
+      "xp": 0,
+      "name": "Lost Soul",
+      "tier": "bronze",
+      "color": "cyan",
+      "delay": 2,
+      "image": "/cards/lost_soul.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 1,
+      "baseId": "lost_soul",
+      "health": 8,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 3,
+          "description": "Hex: increases enemy incoming damage by 3."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 8
+    },
+    {
+      "id": "rot_hound_1787309931544_dxo31",
+      "xp": 0,
+      "name": "Rot Hound",
+      "tier": "bronze",
+      "color": "emerald",
+      "delay": 2,
+      "image": "/cards/rot_hound.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "rot_hound",
+      "health": 8,
+      "skills": [
+        {
+          "type": "plague",
+          "value": 2,
+          "description": "Plague: deals 2 damage to random enemies at end of turn."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 8
+    },
+    {
+      "id": "cursed_witch_1787387777170_4wgja",
+      "xp": 0,
+      "name": "Cursed Witch",
+      "tier": "bronze",
+      "color": "purple",
+      "delay": 2,
+      "image": "/cards/cursed_witch.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "cursed_witch",
+      "health": 10,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 2,
+          "description": "Hex: increases enemy incoming damage by 2."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 10
+    },
+    {
+      "id": "bone_archer_1787387777170_jrpx4",
+      "xp": 0,
+      "name": "Bone Archer",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 2,
+      "image": "/cards/bone_archer.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "bone_archer",
+      "health": 6,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 1,
+          "description": "Hex: increases enemy incoming damage by 1."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 6
+    },
+    {
+      "id": "possessed_cleaver_1787387777170_5yzc0",
+      "xp": 0,
+      "name": "Possessed Cleaver",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 1,
+      "image": "/cards/possessed_cleaver.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "possessed_cleaver",
+      "health": 6,
+      "skills": [],
+      "manaCost": 1,
+      "maxHealth": 6
+    },
+    {
+      "id": "shade_1787387805686_p36rq",
+      "xp": 0,
+      "name": "Shade",
+      "tier": "bronze",
+      "color": "violet",
+      "delay": 1,
+      "image": "/cards/shade.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "shade",
+      "health": 5,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 2,
+          "description": "Hex: increases enemy incoming damage by 2."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 5
+    },
+    {
+      "id": "mud_golem_1787387805687_6ba7n",
+      "xp": 0,
+      "name": "Mud Golem",
+      "tier": "bronze",
+      "color": "amber",
+      "delay": 3,
+      "image": "/cards/mud_golem.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 1,
+      "baseId": "mud_golem",
+      "health": 18,
+      "skills": [
+        {
+          "type": "sacrifice",
+          "value": 5,
+          "description": "Sacrifice: destroys an ally, granting the hero +5 HP."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 18
+    },
+    {
+      "id": "bone_archer_1787387805687_mn0lm",
+      "xp": 0,
+      "name": "Bone Archer",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 2,
+      "image": "/cards/bone_archer.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "bone_archer",
+      "health": 6,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 1,
+          "description": "Hex: increases enemy incoming damage by 1."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 6
+    },
+    {
+      "id": "vampire_bat_1787387811309_iw0au",
+      "xp": 0,
+      "name": "Vampire Bat",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 1,
+      "image": "/cards/vampire_bat.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "vampire_bat",
+      "health": 5,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 3,
+          "description": "Vampirism: heals self for 3 HP on attack."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 5
+    },
+    {
+      "id": "skeleton_warrior_1787387811309_tkopv",
+      "xp": 0,
+      "name": "Skeleton Warrior",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 1,
+      "image": "/cards/skeleton_warrior.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "skeleton_warrior",
+      "health": 8,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 2,
+          "description": "Vampirism: heals self for 2 HP on attack."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 8
+    },
+    {
+      "id": "petrified_basilisk_1787387811309_u52ry",
+      "xp": 0,
+      "name": "Petrified Basilisk",
+      "tier": "bronze",
+      "color": "amber",
+      "delay": 2,
+      "image": "/cards/petrified_basilisk.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "petrified_basilisk",
+      "health": 15,
+      "skills": [],
+      "manaCost": 2,
+      "maxHealth": 15
+    },
+    {
+      "id": "gothic_harpy_1787387819077_udrox",
+      "xp": 0,
+      "name": "Gothic Harpy",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 1,
+      "image": "/cards/gothic_harpy.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "gothic_harpy",
+      "health": 8,
+      "skills": [],
+      "manaCost": 1,
+      "maxHealth": 8
+    },
+    {
+      "id": "grave_ghoul_1787387819077_tadev",
+      "xp": 0,
+      "name": "Grave Ghoul",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 1,
+      "image": "/cards/grave_ghoul.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "grave_ghoul",
+      "health": 9,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 1,
+          "description": "Vampirism: heals self for 1 HP on attack."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 9
+    },
+    {
+      "id": "stitched_chimera_1787387819077_deqkw",
+      "xp": 0,
+      "name": "Stitched Chimera",
+      "tier": "silver",
+      "color": "crimson",
+      "delay": 3,
+      "image": "/cards/stitched_chimera.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 6,
+      "baseId": "stitched_chimera",
+      "health": 24,
+      "skills": [],
+      "manaCost": 2,
+      "maxHealth": 24
+    },
+    {
+      "id": "shadow_wisp_1787466524942_dk8f2",
+      "xp": 0,
+      "name": "Shadow Wisp",
+      "tier": "bronze",
+      "color": "violet",
+      "delay": 1,
+      "image": "/cards/shadow_wisp.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "shadow_wisp",
+      "health": 3,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 2,
+          "description": "Hex: increases enemy incoming damage by 2."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 3
+    },
+    {
+      "id": "shade_1787466524942_ww3x2",
+      "xp": 0,
+      "name": "Shade",
+      "tier": "bronze",
+      "color": "violet",
+      "delay": 1,
+      "image": "/cards/shade.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "shade",
+      "health": 5,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 2,
+          "description": "Hex: increases enemy incoming damage by 2."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 5
+    },
+    {
+      "id": "plague_beetle_1787466524942_hc5oi",
+      "xp": 0,
+      "name": "Possessed Cleaver",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 1,
+      "image": "/cards/possessed_cleaver.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "possessed_cleaver",
+      "health": 6,
+      "skills": [],
+      "manaCost": 1,
+      "maxHealth": 6,
+      "description": "A floating, blood-stained iron executioner axe bound by spectral chains."
+    },
+    {
+      "id": "blood_imp_1787466533164_azcpz",
+      "xp": 0,
+      "name": "Blood Imp",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 1,
+      "image": "/cards/blood_imp.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "blood_imp",
+      "health": 7,
+      "skills": [
+        {
+          "type": "sacrifice",
+          "value": 2,
+          "description": "Sacrifice: destroys an ally, granting the hero +2 HP."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 7
+    },
+    {
+      "id": "covenant_zealot_1787466533164_ayu6g",
+      "xp": 0,
+      "name": "Covenant Zealot",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 2,
+      "image": "/cards/covenant_zealot.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "covenant_zealot",
+      "health": 8,
+      "skills": [
+        {
+          "type": "sacrifice",
+          "value": 4,
+          "description": "Sacrifice: destroys an ally, granting the hero +4 HP."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 8
+    },
+    {
+      "id": "grave_ghoul_1787466533164_h4t1r",
+      "xp": 0,
+      "name": "Grave Ghoul",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 1,
+      "image": "/cards/grave_ghoul.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "grave_ghoul",
+      "health": 9,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 1,
+          "description": "Vampirism: heals self for 1 HP on attack."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 9
+    },
+    {
+      "id": "lost_soul_1787466543854_38p5t",
+      "xp": 0,
+      "name": "Lost Soul",
+      "tier": "bronze",
+      "color": "cyan",
+      "delay": 2,
+      "image": "/cards/lost_soul.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 1,
+      "baseId": "lost_soul",
+      "health": 8,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 3,
+          "description": "Hex: increases enemy incoming damage by 3."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 8
+    },
+    {
+      "id": "skeleton_warrior_1787466543854_59tsf",
+      "xp": 0,
+      "name": "Skeleton Warrior",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 1,
+      "image": "/cards/skeleton_warrior.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "skeleton_warrior",
+      "health": 8,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 2,
+          "description": "Vampirism: heals self for 2 HP on attack."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 8
+    },
+    {
+      "id": "bone_golem_1787466549115_lbjpe",
+      "xp": 0,
+      "name": "Bone Golem",
+      "tier": "silver",
+      "color": "slate",
+      "delay": 3,
+      "image": "/cards/bone_golem.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "bone_golem",
+      "health": 24,
+      "skills": [
+        {
+          "type": "sacrifice",
+          "value": 5,
+          "description": "Sacrifice: destroys an ally, granting the hero +5 HP."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 24
+    },
+    {
+      "id": "petrified_basilisk_1787466549115_h9mca",
+      "xp": 0,
+      "name": "Petrified Basilisk",
+      "tier": "bronze",
+      "color": "amber",
+      "delay": 2,
+      "image": "/cards/petrified_basilisk.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "petrified_basilisk",
+      "health": 15,
+      "skills": [],
+      "manaCost": 2,
+      "maxHealth": 15
+    },
+    {
+      "id": "petrified_basilisk_1787466549115_c0jou",
+      "xp": 0,
+      "name": "Petrified Basilisk",
+      "tier": "bronze",
+      "color": "amber",
+      "delay": 2,
+      "image": "/cards/petrified_basilisk.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "petrified_basilisk",
+      "health": 15,
+      "skills": [],
+      "manaCost": 2,
+      "maxHealth": 15
+    },
+    {
+      "id": "petrified_basilisk_1787466556487_d3el3",
+      "xp": 0,
+      "name": "Petrified Basilisk",
+      "tier": "bronze",
+      "color": "amber",
+      "delay": 2,
+      "image": "/cards/petrified_basilisk.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "petrified_basilisk",
+      "health": 15,
+      "skills": [],
+      "manaCost": 2,
+      "maxHealth": 15
+    },
+    {
+      "id": "plague_doctor_1787466556488_juofg",
+      "xp": 0,
+      "name": "Plague Doctor",
+      "tier": "silver",
+      "color": "emerald",
+      "delay": 2,
+      "image": "/cards/plague_doctor.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "plague_doctor",
+      "health": 16,
+      "skills": [
+        {
+          "type": "plague",
+          "value": 3,
+          "description": "Plague: deals 3 damage to random enemies at end of turn."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 16
+    },
+    {
+      "id": "soul_devourer_1787466556488_j9dfv",
+      "xp": 0,
+      "name": "Soul Devourer",
+      "tier": "gold",
+      "color": "violet",
+      "delay": 3,
+      "image": "/cards/soul_devourer.webp",
+      "level": 2,
+      "maxXp": 100,
+      "attack": 7,
+      "baseId": "soul_devourer",
+      "health": 32,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 4,
+          "description": "Hex: increases enemy incoming damage by 4."
+        },
+        {
+          "type": "sacrifice",
+          "value": 8,
+          "description": "Sacrifice: destroys an ally, granting the hero +8 HP."
+        }
+      ],
+      "manaCost": 3,
+      "maxHealth": 32
+    },
+    {
+      "id": "plague_doctor_1787466556488_l5d9x",
+      "xp": 0,
+      "name": "Plague Doctor",
+      "tier": "silver",
+      "color": "emerald",
+      "delay": 2,
+      "image": "/cards/plague_doctor.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "plague_doctor",
+      "health": 16,
+      "skills": [
+        {
+          "type": "plague",
+          "value": 3,
+          "description": "Plague: deals 3 damage to random enemies at end of turn."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 16
+    },
+    {
+      "id": "spectral_stalker_1787466556488_ed6vj",
+      "xp": 0,
+      "name": "Tomb Weaver",
+      "tier": "silver",
+      "color": "amber",
+      "delay": 2,
+      "image": "/cards/tomb_weaver.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 5,
+      "baseId": "tomb_weaver",
+      "health": 18,
+      "skills": [],
+      "manaCost": 2,
+      "maxHealth": 18,
+      "description": "A giant arachnid that weaves sticky, dark webbing around stone sarcophagi."
+    },
+    {
+      "id": "belfry_colossus_1787466569161_p8g9r",
+      "xp": 0,
+      "name": "Belfry Colossus",
+      "tier": "gold",
+      "color": "slate",
+      "delay": 3,
+      "image": "/cards/belfry_colossus.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 8,
+      "baseId": "belfry_colossus",
+      "health": 35,
+      "skills": [],
+      "manaCost": 3,
+      "maxHealth": 35
+    },
+    {
+      "id": "dracula_the_first_1787466569161_vqnqe",
+      "xp": 0,
+      "name": "Dracula, The First",
+      "tier": "legendary",
+      "color": "crimson",
+      "delay": 2,
+      "image": "/cards/dracula_the_first.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 10,
+      "baseId": "dracula_the_first",
+      "health": 38,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 10,
+          "description": "Vampirism: heals self for 10 HP on attack."
+        }
+      ],
+      "manaCost": 4,
+      "maxHealth": 38
+    },
+    {
+      "id": "void_reaver_1787466569161_ossst",
+      "xp": 0,
+      "name": "Void Reaver",
+      "tier": "gold",
+      "color": "violet",
+      "delay": 2,
+      "image": "/cards/void_reaver.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 6,
+      "baseId": "void_reaver",
+      "health": 26,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 3,
+          "description": "Hex: increases enemy incoming damage by 3."
+        }
+      ],
+      "manaCost": 3,
+      "maxHealth": 26
+    },
+    {
+      "id": "soul_devourer_1787466569161_c223l",
+      "xp": 0,
+      "name": "Soul Devourer",
+      "tier": "gold",
+      "color": "violet",
+      "delay": 3,
+      "image": "/cards/soul_devourer.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 6,
+      "baseId": "soul_devourer",
+      "health": 28,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 4,
+          "description": "Hex: increases enemy incoming damage by 4."
+        },
+        {
+          "type": "sacrifice",
+          "value": 8,
+          "description": "Sacrifice: destroys an ally, granting the hero +8 HP."
+        }
+      ],
+      "manaCost": 3,
+      "maxHealth": 28
+    },
+    {
+      "id": "spider_queen_1787467071521_hyy6k",
+      "xp": 0,
+      "name": "Spider Queen",
+      "tier": "gold",
+      "color": "emerald",
+      "delay": 3,
+      "image": "/cards/spider_queen.webp",
+      "level": 2,
+      "maxXp": 100,
+      "attack": 7,
+      "baseId": "spider_queen",
+      "health": 29,
+      "skills": [
+        {
+          "type": "plague",
+          "value": 4,
+          "description": "Plague: deals 4 damage to random enemies at end of turn."
+        },
+        {
+          "type": "hex",
+          "value": 3,
+          "description": "Hex: increases enemy incoming damage by 3."
+        }
+      ],
+      "manaCost": 3,
+      "maxHealth": 29
+    },
+    {
+      "id": "stitched_chimera_1787467071521_fph3s",
+      "xp": 0,
+      "name": "Stitched Chimera",
+      "tier": "silver",
+      "color": "crimson",
+      "delay": 3,
+      "image": "/cards/stitched_chimera.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 6,
+      "baseId": "stitched_chimera",
+      "health": 24,
+      "skills": [],
+      "manaCost": 2,
+      "maxHealth": 24
+    },
+    {
+      "id": "abyssal_monstrosity_1787467071521_zphnw",
+      "xp": 0,
+      "name": "Abyssal Monstrosity",
+      "tier": "gold",
+      "color": "slate",
+      "delay": 3,
+      "image": "/cards/abyssal_monstrosity.webp",
+      "level": 2,
+      "maxXp": 100,
+      "attack": 8,
+      "baseId": "abyssal_monstrosity",
+      "health": 37,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 4,
+          "description": "Vampirism: heals self for 4 HP on attack."
+        }
+      ],
+      "manaCost": 3,
+      "maxHealth": 37
+    },
+    {
+      "id": "covenant_initiate_1787467078817_xvafr",
+      "xp": 0,
+      "name": "Covenant Initiate",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 2,
+      "image": "/cards/covenant_initiate.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 3,
+      "baseId": "covenant_initiate",
+      "health": 10,
+      "skills": [
+        {
+          "type": "sacrifice",
+          "value": 3,
+          "description": "Sacrifice: destroys an ally, granting the hero +3 HP."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 10
+    },
+    {
+      "id": "phantom_assassin_1787467078817_7ttqe",
+      "xp": 0,
+      "name": "Phantom Assassin",
+      "tier": "silver",
+      "color": "violet",
+      "delay": 1,
+      "image": "/cards/phantom_assassin.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 7,
+      "baseId": "phantom_assassin",
+      "health": 8,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 2,
+          "description": "Hex: increases enemy incoming damage by 2."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 8
+    },
+    {
+      "id": "blood_imp_1787467078817_vukv9",
+      "xp": 0,
+      "name": "Blood Imp",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 1,
+      "image": "/cards/blood_imp.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "blood_imp",
+      "health": 7,
+      "skills": [
+        {
+          "type": "sacrifice",
+          "value": 2,
+          "description": "Sacrifice: destroys an ally, granting the hero +2 HP."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 7
+    },
+    {
+      "id": "flesh_abomination_1787467121393_uru7s",
+      "xp": 0,
+      "name": "Flesh Abomination",
+      "tier": "silver",
+      "color": "emerald",
+      "delay": 3,
+      "image": "/cards/flesh_abomination.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 5,
+      "baseId": "flesh_abomination",
+      "health": 20,
+      "skills": [
+        {
+          "type": "plague",
+          "value": 2,
+          "description": "Plague: deals 2 damage to random enemies at end of turn."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 20
+    },
+    {
+      "id": "abyssal_leviathan_1787467121393_7sbmk",
+      "xp": 0,
+      "name": "Abyssal Leviathan",
+      "tier": "gold",
+      "color": "violet",
+      "delay": 4,
+      "image": "/cards/abyssal_leviathan.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 10,
+      "baseId": "abyssal_leviathan",
+      "health": 42,
+      "skills": [],
+      "manaCost": 3,
+      "maxHealth": 42
+    },
+    {
+      "id": "abyssal_leviathan_1787467121394_q1ye2",
+      "xp": 0,
+      "name": "Abyssal Leviathan",
+      "tier": "gold",
+      "color": "violet",
+      "delay": 4,
+      "image": "/cards/abyssal_leviathan.webp",
+      "level": 2,
+      "maxXp": 100,
+      "attack": 12,
+      "baseId": "abyssal_leviathan",
+      "health": 48,
+      "skills": [],
+      "manaCost": 3,
+      "maxHealth": 48
+    },
+    {
+      "id": "rotting_golem_1787501289342_fn54m",
+      "xp": 0,
+      "name": "Rotting Golem",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 2,
+      "image": "/cards/rotting_golem.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "rotting_golem",
+      "health": 14,
+      "skills": [
+        {
+          "type": "plague",
+          "value": 1,
+          "description": "Plague: deals 1 damage to random enemies at end of turn."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 14
+    },
+    {
+      "id": "skeleton_guard_1787501289342_4rl2e",
+      "xp": 0,
+      "name": "Skeleton Guard",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 2,
+      "image": "/cards/skeleton_guard.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 1,
+      "baseId": "skeleton_guard",
+      "health": 15,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 1,
+          "description": "Vampirism: heals self for 1 HP on attack."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 15
+    },
+    {
+      "id": "shadow_wisp_1787501289342_ehxp4",
+      "xp": 0,
+      "name": "Shadow Wisp",
+      "tier": "bronze",
+      "color": "violet",
+      "delay": 1,
+      "image": "/cards/shadow_wisp.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "shadow_wisp",
+      "health": 3,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 2,
+          "description": "Hex: increases enemy incoming damage by 2."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 3
+    },
+    {
+      "id": "skeleton_warrior_1787501295377_rrtdx",
+      "xp": 0,
+      "name": "Skeleton Warrior",
+      "tier": "bronze",
+      "color": "slate",
+      "delay": 1,
+      "image": "/cards/skeleton_warrior.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "skeleton_warrior",
+      "health": 8,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 2,
+          "description": "Vampirism: heals self for 2 HP on attack."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 8
+    },
+    {
+      "id": "shadow_stalker_1787501295377_1xbng",
+      "xp": 0,
+      "name": "Shadow Stalker",
+      "tier": "silver",
+      "color": "purple",
+      "delay": 2,
+      "image": "/cards/shadow_stalker.webp",
+      "level": 2,
+      "maxXp": 100,
+      "attack": 5,
+      "baseId": "shadow_stalker",
+      "health": 18,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 2,
+          "description": "Hex: increases enemy incoming damage by 2."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 18
+    },
+    {
+      "id": "fallen_inquisitor_1787501295377_80u5w",
+      "xp": 0,
+      "name": "Fallen Inquisitor",
+      "tier": "silver",
+      "color": "violet",
+      "delay": 2,
+      "image": "/cards/fallen_inquisitor.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 5,
+      "baseId": "fallen_inquisitor",
+      "health": 20,
+      "skills": [],
+      "manaCost": 2,
+      "maxHealth": 20
+    },
+    {
+      "id": "mud_golem_1787501301396_smk22",
+      "xp": 0,
+      "name": "Mud Golem",
+      "tier": "bronze",
+      "color": "amber",
+      "delay": 3,
+      "image": "/cards/mud_golem.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 1,
+      "baseId": "mud_golem",
+      "health": 18,
+      "skills": [
+        {
+          "type": "sacrifice",
+          "value": 5,
+          "description": "Sacrifice: destroys an ally, granting the hero +5 HP."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 18
+    },
+    {
+      "id": "graveyard_ghoul_1787501301396_ug9ba",
+      "xp": 0,
+      "name": "Graveyard Ghoul",
+      "tier": "bronze",
+      "color": "emerald",
+      "delay": 2,
+      "image": "/cards/graveyard_ghoul.webp",
+      "level": 2,
+      "maxXp": 100,
+      "attack": 3,
+      "baseId": "graveyard_ghoul",
+      "health": 10,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 2,
+          "description": "Vampirism: heals self for 2 HP on attack."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 10
+    },
+    {
+      "id": "spitfire_toad_1787501301396_avd97",
+      "xp": 0,
+      "name": "Spitfire Toad",
+      "tier": "bronze",
+      "color": "emerald",
+      "delay": 2,
+      "image": "/cards/spitfire_toad.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "spitfire_toad",
+      "health": 14,
+      "skills": [],
+      "manaCost": 2,
+      "maxHealth": 14
+    },
+    {
+      "id": "banshee_screamer_1787501307525_vwopy",
+      "xp": 0,
+      "name": "Banshee Screamer",
+      "tier": "silver",
+      "color": "purple",
+      "delay": 2,
+      "image": "/cards/banshee_screamer.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "banshee_screamer",
+      "health": 15,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 2,
+          "description": "Hex: increases enemy incoming damage by 2."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 15
+    },
+    {
+      "id": "void_walker_1787501307525_ob2p0",
+      "xp": 0,
+      "name": "Void Walker",
+      "tier": "silver",
+      "color": "purple",
+      "delay": 2,
+      "image": "/cards/void_walker.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 5,
+      "baseId": "void_walker",
+      "health": 14,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 5,
+          "description": "Hex: increases enemy incoming damage by 5."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 14
+    },
+    {
+      "id": "plague_beetle_1787501312629_1t24v",
+      "xp": 0,
+      "name": "Possessed Cleaver",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 1,
+      "image": "/cards/possessed_cleaver.webp",
+      "level": 2,
+      "maxXp": 100,
+      "attack": 5,
+      "baseId": "possessed_cleaver",
+      "health": 7,
+      "skills": [],
+      "manaCost": 1,
+      "maxHealth": 7,
+      "description": "A floating, blood-stained iron executioner axe bound by spectral chains."
+    },
+    {
+      "id": "crypt_bat_1787501312629_rff9b",
+      "xp": 0,
+      "name": "Crypt Bat",
+      "tier": "bronze",
+      "color": "rose",
+      "delay": 1,
+      "image": "/cards/crypt_bat.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "crypt_bat",
+      "health": 6,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 1,
+          "description": "Vampirism: heals self for 1 HP on attack."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 6
+    },
+    {
+      "id": "rot_hound_1787501312629_ptfni",
+      "xp": 0,
+      "name": "Rot Hound",
+      "tier": "bronze",
+      "color": "emerald",
+      "delay": 2,
+      "image": "/cards/rot_hound.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "rot_hound",
+      "health": 8,
+      "skills": [
+        {
+          "type": "plague",
+          "value": 2,
+          "description": "Plague: deals 2 damage to random enemies at end of turn."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 8
+    },
+    {
+      "id": "blood_fiend_1787501359071_qbhzr",
+      "xp": 0,
+      "name": "Blood Fiend",
+      "tier": "silver",
+      "color": "rose",
+      "delay": 2,
+      "image": "/cards/blood_fiend.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "blood_fiend",
+      "health": 18,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 3,
+          "description": "Vampirism: heals self for 3 HP on attack."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 18
+    },
+    {
+      "id": "belfry_colossus_1787501359071_ehvpz",
+      "xp": 0,
+      "name": "Belfry Colossus",
+      "tier": "gold",
+      "color": "slate",
+      "delay": 3,
+      "image": "/cards/belfry_colossus.webp",
+      "level": 2,
+      "maxXp": 100,
+      "attack": 9,
+      "baseId": "belfry_colossus",
+      "health": 40,
+      "skills": [],
+      "manaCost": 3,
+      "maxHealth": 40
+    },
+    {
+      "id": "doom_bringer_1786661126125_8b6p9",
+      "xp": 0,
+      "name": "Doom Bringer",
+      "tier": "gold",
+      "color": "amber",
+      "delay": 2,
+      "image": "/cards/doom_bringer.webp",
+      "level": 3,
+      "maxXp": 100,
+      "attack": 14,
+      "baseId": "doom_bringer",
+      "health": 24,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 6,
+          "description": "Vampirism: heals self for 6 HP on attack."
+        }
+      ],
+      "maxHealth": 24
+    },
+    {
+      "id": "spore_carrier_1787517788632_1wnqz",
+      "xp": 0,
+      "name": "Spore Carrier",
+      "tier": "bronze",
+      "color": "emerald",
+      "delay": 2,
+      "image": "/cards/spore_carrier.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 1,
+      "baseId": "spore_carrier",
+      "health": 10,
+      "skills": [
+        {
+          "type": "plague",
+          "value": 2,
+          "description": "Plague: deals 2 damage to random enemies at end of turn."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 10
+    },
+    {
+      "id": "spectral_stalker_1787517788632_giims",
+      "xp": 0,
+      "name": "Tomb Weaver",
+      "tier": "silver",
+      "color": "amber",
+      "delay": 2,
+      "image": "/cards/tomb_weaver.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 5,
+      "baseId": "tomb_weaver",
+      "health": 18,
+      "skills": [],
+      "manaCost": 2,
+      "maxHealth": 18,
+      "description": "A giant arachnid that weaves sticky, dark webbing around stone sarcophagi."
+    },
+    {
+      "id": "abyssal_dragon_1786705876936_o3mbo",
+      "xp": 0,
+      "name": "Abyssal Dragon",
+      "tier": "gold",
+      "color": "purple",
+      "delay": 4,
+      "image": "/cards/abyssal_dragon.webp",
+      "level": 2,
+      "maxXp": 50,
+      "attack": 10,
+      "baseId": "abyssal_dragon",
+      "health": 35,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 5,
+          "description": "Hex: increases enemy incoming damage by 5."
+        }
+      ],
+      "maxHealth": 35
+    },
+    {
+      "id": "blood_imp_1787517788632_p1zy0",
+      "xp": 0,
+      "name": "Blood Imp",
+      "tier": "bronze",
+      "color": "crimson",
+      "delay": 1,
+      "image": "/cards/blood_imp.webp",
+      "level": 2,
+      "maxXp": 50,
+      "attack": 2,
+      "baseId": "blood_imp",
+      "health": 8,
+      "skills": [
+        {
+          "type": "sacrifice",
+          "value": 2,
+          "description": "Sacrifice: destroys an ally, granting the hero +2 HP."
+        }
+      ],
+      "manaCost": 1,
+      "maxHealth": 8
+    },
+    {
+      "id": "banshee_1786662099439_ulr3u",
+      "xp": 0,
+      "name": "Banshee",
+      "tier": "silver",
+      "color": "cyan",
+      "delay": 2,
+      "image": "/cards/banshee.webp",
+      "level": 3,
+      "maxXp": 100,
+      "attack": 8,
+      "baseId": "banshee",
+      "health": 14,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 6,
+          "description": "Hex: increases enemy incoming damage by 6."
+        }
+      ],
+      "maxHealth": 14
+    },
+    {
+      "id": "bone_golem_1787580801228_2a8i1",
+      "xp": 0,
+      "name": "Bone Golem",
+      "tier": "silver",
+      "color": "slate",
+      "delay": 3,
+      "image": "/cards/bone_golem.webp",
+      "level": 2,
+      "maxXp": 100,
+      "attack": 5,
+      "baseId": "bone_golem",
+      "health": 28,
+      "skills": [
+        {
+          "type": "sacrifice",
+          "value": 5,
+          "description": "Sacrifice: destroys an ally, granting the hero +5 HP."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 28
+    },
+    {
+      "id": "dark_templar_1787580801228_ftqjy",
+      "xp": 0,
+      "name": "Dark Templar",
+      "tier": "silver",
+      "color": "purple",
+      "delay": 2,
+      "image": "/cards/dark_templar.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 4,
+      "baseId": "dark_templar",
+      "health": 18,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 2,
+          "description": "Vampirism: heals self for 2 HP on attack."
+        },
+        {
+          "type": "sacrifice",
+          "value": 3,
+          "description": "Sacrifice: destroys an ally, granting the hero +3 HP."
+        }
+      ],
+      "manaCost": 2,
+      "maxHealth": 18
+    },
+    {
+      "id": "fallen_angel_1787580801228_xawh6",
+      "xp": 0,
+      "name": "Fallen Angel",
+      "tier": "gold",
+      "color": "rose",
+      "delay": 3,
+      "image": "/cards/fallen_angel.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 6,
+      "baseId": "fallen_angel",
+      "health": 26,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 5,
+          "description": "Vampirism: heals self for 5 HP on attack."
+        },
+        {
+          "type": "hex",
+          "value": 4,
+          "description": "Hex: increases enemy incoming damage by 4."
+        }
+      ],
+      "manaCost": 3,
+      "maxHealth": 26
+    },
+    {
+      "id": "soul_devourer_1787585054176_7i2hh",
+      "xp": 0,
+      "name": "Soul Devourer",
+      "tier": "gold",
+      "color": "violet",
+      "delay": 3,
+      "image": "/cards/soul_devourer.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 6,
+      "baseId": "soul_devourer",
+      "health": 28,
+      "skills": [
+        {
+          "type": "hex",
+          "value": 4,
+          "description": "Hex: increases enemy incoming damage by 4."
+        },
+        {
+          "type": "sacrifice",
+          "value": 8,
+          "description": "Sacrifice: destroys an ally, granting the hero +8 HP."
+        }
+      ],
+      "manaCost": 3,
+      "maxHealth": 28
+    },
+    {
+      "id": "pharaoh_of_the_void_1787585054176_ai18v",
+      "xp": 0,
+      "name": "Pharaoh of the Void",
+      "tier": "gold",
+      "color": "amber",
+      "delay": 2,
+      "image": "/cards/pharaoh_of_the_void.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 7,
+      "baseId": "pharaoh_of_the_void",
+      "health": 34,
+      "skills": [],
+      "manaCost": 3,
+      "maxHealth": 34
+    },
+    {
+      "id": "death_knight_champion_1787585054176_k1680",
+      "xp": 0,
+      "name": "Death Knight Champion",
+      "tier": "gold",
+      "color": "slate",
+      "delay": 3,
+      "image": "/cards/death_knight_champion.webp",
+      "level": 1,
+      "maxXp": 50,
+      "attack": 8,
+      "baseId": "death_knight_champion",
+      "health": 32,
+      "skills": [
+        {
+          "type": "vampirism",
+          "value": 4,
+          "description": "Vampirism: heals self for 4 HP on attack."
+        },
+        {
+          "type": "hex",
+          "value": 2,
+          "description": "Hex: increases enemy incoming damage by 2."
+        }
+      ],
+      "manaCost": 3,
+      "maxHealth": 32
+    }
+  ],
+  "darkShards": 0,
+  "pvpHistory": [
+    {
+      "id": "pvp_1787697253471_592",
+      "winner": "attacker",
+      "isDefense": false,
+      "timestamp": 1787697253471,
+      "attackerName": "Adminus",
+      "defenderName": "Камси",
+      "attackerWallet": "BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr",
+      "defenderWallet": "2iszdbJS66grF1ZyHKXyqY9WV7N4XFyv3h1Rr17oX2GH",
+      "attackerLPBefore": 20,
+      "attackerLPChange": 20,
+      "defenderLPBefore": 0,
+      "defenderLPChange": -15,
+      "attackerRatingBefore": 169,
+      "attackerRatingChange": 12,
+      "defenderRatingBefore": 76,
+      "defenderRatingChange": -12
+    },
+    {
+      "id": "pvp_1787697056459_442",
+      "winner": "attacker",
+      "isDefense": false,
+      "timestamp": 1787697056459,
+      "attackerName": "Adminus",
+      "defenderName": "Камси",
+      "attackerWallet": "BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr",
+      "defenderWallet": "2iszdbJS66grF1ZyHKXyqY9WV7N4XFyv3h1Rr17oX2GH",
+      "attackerLPBefore": 0,
+      "attackerLPChange": 20,
+      "defenderLPBefore": 0,
+      "defenderLPChange": -15,
+      "attackerRatingBefore": 156,
+      "attackerRatingChange": 13,
+      "defenderRatingBefore": 89,
+      "defenderRatingChange": -13
+    },
+    {
+      "id": "pvp_1787694562343_559",
+      "winner": "attacker",
+      "isDefense": false,
+      "timestamp": 1787694562343,
+      "attackerName": "Adminus",
+      "defenderName": "Камси",
+      "attackerWallet": "BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr",
+      "defenderWallet": "2iszdbJS66grF1ZyHKXyqY9WV7N4XFyv3h1Rr17oX2GH",
+      "attackerRatingBefore": 142,
+      "attackerRatingChange": 14,
+      "defenderRatingBefore": 103,
+      "defenderRatingChange": -14
+    },
+    {
+      "id": "pvp_1787691638576_326",
+      "winner": "attacker",
+      "isDefense": false,
+      "timestamp": 1787691638576,
+      "attackerName": "Adminus",
+      "defenderName": "Susik",
+      "attackerWallet": "BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr",
+      "defenderWallet": "4kWjXDLnCrZsqFGZnmtWrzHMVQiC6YkjsGVWLTVHDg8F",
+      "attackerRatingBefore": 128,
+      "attackerRatingChange": 14,
+      "defenderRatingBefore": 85,
+      "defenderRatingChange": -14
+    },
+    {
+      "id": "pvp_1787685863054_785",
+      "winner": "attacker",
+      "isDefense": false,
+      "timestamp": 1787685863054,
+      "attackerName": "Adminus",
+      "defenderName": "Susik",
+      "attackerWallet": "BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr",
+      "defenderWallet": "4kWjXDLnCrZsqFGZnmtWrzHMVQiC6YkjsGVWLTVHDg8F",
+      "attackerRatingBefore": 113,
+      "attackerRatingChange": 15,
+      "defenderRatingBefore": 100,
+      "defenderRatingChange": -15
+    },
+    {
+      "id": "pvp_1787685678467_80",
+      "winner": "defender",
+      "isDefense": false,
+      "timestamp": 1787685678467,
+      "attackerName": "Adminus",
+      "defenderName": "Камси",
+      "attackerWallet": "BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr",
+      "defenderWallet": "2iszdbJS66grF1ZyHKXyqY9WV7N4XFyv3h1Rr17oX2GH",
+      "attackerRatingBefore": 131,
+      "attackerRatingChange": -18,
+      "defenderRatingBefore": 85,
+      "defenderRatingChange": 18
+    },
+    {
+      "id": "pvp_1787589266946_727",
+      "winner": "attacker",
+      "isDefense": false,
+      "timestamp": 1787589266947,
+      "attackerName": "Adminus",
+      "defenderName": "Камси",
+      "attackerWallet": "BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr",
+      "defenderWallet": "2iszdbJS66grF1ZyHKXyqY9WV7N4XFyv3h1Rr17oX2GH",
+      "attackerRatingBefore": 116,
+      "attackerRatingChange": 15,
+      "defenderRatingBefore": 100,
+      "defenderRatingChange": -15
+    },
+    {
+      "id": "pvp_1787589145271_214",
+      "winner": "attacker",
+      "isDefense": false,
+      "timestamp": 1787589145271,
+      "attackerName": "Adminus",
+      "defenderName": "Demon",
+      "attackerWallet": "BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr",
+      "defenderWallet": "GKJFapXX8evVQT6WQ4YyfAk1v5g9GgvoANjaJoipB82V",
+      "attackerRatingBefore": 100,
+      "attackerRatingChange": 16,
+      "defenderRatingBefore": 100,
+      "defenderRatingChange": -16
+    }
+  ],
+  "solBalance": 12.5,
+  "isPremiumBP": false,
+  "pveProgress": 22,
+  "activeStance": "blood_aura",
+  "isRegistered": true,
+  "pveEnergyMax": 10,
+  "pvpEnergyMax": 5,
+  "campaignStars": {
+    "1": 3,
+    "2": 3,
+    "3": 3,
+    "4": 3,
+    "5": 2,
+    "6": 2,
+    "7": 3,
+    "8": 3,
+    "9": 3,
+    "10": 2,
+    "11": 3,
+    "12": 2,
+    "13": 3,
+    "14": 2,
+    "15": 3,
+    "16": 3,
+    "17": 3,
+    "18": 3,
+    "19": 3,
+    "20": 3,
+    "21": 3
+  },
+  "heroMaxHealth": 228,
+  "solanaAddress": "BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr",
+  "completedTasks": [
+    "refer_friend"
+  ],
+  "lastBattleTime": 1787697252891,
+  "referralsCount": 4,
+  "battlePassPoints": 2770,
+  "lastEnergyRefill": 1786659472532,
+  "battlePassClaimed": [
+    0,
+    8
+  ],
+  "lastBattleTimestamp": 1787697198865,
+  "lastPveEnergyRefill": 1787745431386,
+  "lastPvpEnergyRefill": 1787744779967,
+  "processedTransactions": [
+    "2wTnWjWSfqfnKKcxXvbiM2XMSqyz3n3s7253JrwAoNdCBZxCeUsZq5B9XJfsZKkwsMunNhjxiaKofyNwUxzGXDuM",
+    "5fsYHB6rEt5rX48GvpoeEMUMyJsLRE2izeGaYMn68YQ8g47TpYoRBftcEQaSJitS4UN3UU1K8DbBknH6wQ7UR1vF",
+    "2zzXoJKimm4EYMog7AA5VSKGcpMFZrdrcz8Q3g8iLgWfG6qmtycBtnMpmh7LXScuCsiaWvEfXx1ddCv7P1ZLDkkp",
+    "4tcpmCjjqH5BwbDBUTFUwVYKYEG6i81RemE1mJy5fzSfKes4rtme3z7PVRYFfYUkEHUHiKLS9CZ8tVhk1wv4dtLa",
+    "4NrMsYakYHFsjPP1atbogCBjMqr95H9BErV1QoB8HaGEWxA6fXRt1StYmBvoSgfswSF2ocibJM8QzfdUDqiyYJoy",
+    "ay3NGn4iqu1fB7VTY2rLQgTu2AwF55cPeSeVJNcA6ddv4pf7BraUeS6k8WQjek1XDarJzUH3yVwW5dznbTAHBQa",
+    "4AVhVt6GZAzKtkPGRLwRUjjTw4kDNiKru5QR7rcxDVkkaY8wTVEcbPnQCfJdvHacAZhNgbEyBXQohiggMY8YnZig",
+    "HJ3vCUiJX5wfrdJTY8yX3FLFjJ3DkLUc5HV2kfXxfSZq7yAKs1SDbGSWXqg7x9hSAbsMmPY48sjoNG3ieVzK6SF",
+    "4F2qYk6zRco5AvnM8z7Ht8U6jCmPDTPs2W7tJrNEyJDHBGWnHdBGYvmCvB3SXmgfq3ruXdUa1EGhDbv58GyiNBCJ",
+    "2Gho5sA7fHPTiR6gB6dFRob8KrAxyZo13oxr87oMw493vJnEehMhDwtaNcJPJ69SVWyyWSmuTJ9ZeB4riZPqBEZb",
+    "5YSbS2tggVcR1kvHdn5CmtWG8Z1CJpopygCp3RvxFxgFo1xe6KycMgYdGsAE37RGy7ptXG7FaHLKgr2f8ncMDYc6"
+  ]
+}

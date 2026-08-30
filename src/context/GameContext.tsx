@@ -44,6 +44,13 @@ interface GameContextType {
   markMailAsRead: (mailId: string) => Promise<void>;
   claimMailReward: (mailId: string) => Promise<{ success: boolean; message: string }>;
   claimAllMailRewards: () => Promise<{ success: boolean; message: string }>;
+  fetchAdminOverview: () => Promise<{ success: boolean; overview?: any; error?: string }>;
+  fetchAdminWithdrawals: () => Promise<{ success: boolean; requests?: any[]; error?: string }>;
+  processAdminWithdrawal: (requestId: string, userWallet: string, decision: 'approve' | 'reject', txid?: string, reason?: string) => Promise<{ success: boolean; message: string }>;
+  broadcastAdminMail: (targetType: string, targetValue: string, title: string, content: string, rewards?: any) => Promise<{ success: boolean; message: string; sentCount?: number }>;
+  searchAdminPlayer: (query: string) => Promise<{ success: boolean; matches?: any[]; error?: string }>;
+  modifyAdminPlayer: (targetWallet: string, updates: any) => Promise<{ success: boolean; message: string; profile?: any }>;
+  triggerAdminRollover: () => Promise<{ success: boolean; message: string }>;
   isShardsShopOpen: boolean;
   setIsShardsShopOpen: (open: boolean) => void;
 }
@@ -1165,6 +1172,35 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  // Admin Methods
+  const fetchAdminOverview = async () => {
+    return submitAction('admin_get_overview', {});
+  };
+
+  const fetchAdminWithdrawals = async () => {
+    return submitAction('admin_get_withdrawals', {});
+  };
+
+  const processAdminWithdrawal = async (requestId: string, userWallet: string, decision: 'approve' | 'reject', txid?: string, reason?: string) => {
+    return submitAction('admin_process_withdrawal', { requestId, userWallet, decision, txid, reason });
+  };
+
+  const broadcastAdminMail = async (targetType: string, targetValue: string, title: string, content: string, rewards?: any) => {
+    return submitAction('admin_broadcast_mail', { targetType, targetValue, title, content, rewards });
+  };
+
+  const searchAdminPlayer = async (query: string) => {
+    return submitAction('admin_search_player', { query });
+  };
+
+  const modifyAdminPlayer = async (targetWallet: string, updates: any) => {
+    return submitAction('admin_modify_player', { targetWallet, updates });
+  };
+
+  const triggerAdminRollover = async () => {
+    return submitAction('admin_trigger_rollover', {});
+  };
+
   return (
     <GameContext.Provider
       value={{
@@ -1207,6 +1243,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         markMailAsRead,
         claimMailReward,
         claimAllMailRewards,
+        fetchAdminOverview,
+        fetchAdminWithdrawals,
+        processAdminWithdrawal,
+        broadcastAdminMail,
+        searchAdminPlayer,
+        modifyAdminPlayer,
+        triggerAdminRollover,
         isShardsShopOpen,
         setIsShardsShopOpen
       }}

@@ -200,6 +200,362 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let successMessage = '';
     let responseData: any = {};
 
+    // --- ADMIN ACTION DISPATCHER ---
+    if (action.startsWith('admin_')) {
+      const isAdmin = 
+        profile?.username?.toLowerCase() === 'adminus' || 
+        profile?.role === 'admin' || 
+        decoded?.role === 'admin' ||
+        walletAddress === 'adminus';
+
+      if (!isAdmin) {
+        return res.status(403).json({ error: 'Forbidden: Admin privileges required.' });
+      }
+
+      if (action === 'admin_get_overview') {
+        const { data: allProfiles, error: fetchErr } = await supabase
+          .from('profiles')
+          .select('wallet_address, data, updated_at');
+
+        if (fetchErr) {
+          return res.status(500).json({ error: 'Failed to fetch profiles overview', details: fetchErr });
+        }
+
+        const now = Date.now();
+        const oneDayAgo = now - 24 * 60 * 60 * 1000;
+        const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+
+        let totalGold = 0;
+        let totalDust = 0;
+        let totalShards = 0;
+        let totalSovereigns = 0;
+        let active24h = 0;
+        let active7d = 0;
+        let pendingWithdrawalsCount = 0;
+        let pendingWithdrawalsUsdt = 0;
+        let completedWithdrawalsCount = 0;
+        let completedWithdrawalsUsdt = 0;
+
+        const leagueDistribution: Record<string, number> = {
+          'Bronze': 0,
+          'Silver': 0,
+          'Gold': 0,
+          'Platinum': 0,
+          'Diamond': 0,
+          'Grandmaster': 0
+        };
+
+        allProfiles?.forEach((p: any) => {
+          const d = p.data || {};
+          totalGold += d.gold || 0;
+          totalDust += d.dust || 0;
+          totalShards += d.darkShards || 0;
+          totalSovereigns += d.bloodSovereigns || 0;
+
+          const lastActive = d.lastLogin || (p.updated_at ? new Date(p.updated_at).getTime() : 0);
+          if (lastActive >= oneDayAgo) active24h++;
+          if (lastActive >= sevenDaysAgo) active7d++;
+
+          const league = d.pvpLeague || 'Bronze';
+          if (leagueDistribution[league] !== undefined) {
+            leagueDistribution[league]++;
+          } else {
+            leagueDistribution[league] = 1;
+          }
+
+          const reqs = d.withdrawalRequests || [];
+          reqs.forEach((r: any) => {
+            if (r.status === 'pending') {
+              pendingWithdrawalsCount++;
+              pendingWithdrawalsUsdt += (r.amountUsdt || (r.amountSovereigns * 0.01) || 0);
+            } else if (r.status === 'completed') {
+              completedWithdrawalsCount++;
+              completedWithdrawalsUsdt += (r.amountUsdt || (r.amountSovereigns * 0.01) || 0);
+            }
+          });
+        });
+
+        return res.status(200).json({
+          success: true,
+          overview: {
+            totalPlayers: allProfiles?.length || 0,
+            active24h,
+            active7d,
+            totalGold,
+            totalDust,
+            totalShards,
+            totalSovereigns,
+            usdtObligations: Number((totalSovereigns * 0.01).toFixed(2)),
+            pendingWithdrawalsCount,
+            pendingWithdrawalsUsdt: Number(pendingWithdrawalsUsdt.toFixed(2)),
+            completedWithdrawalsCount,
+            completedWithdrawalsUsdt: Number(completedWithdrawalsUsdt.toFixed(2)),
+            leagueDistribution
+          }
+        });
+      }
+
+      if (action === 'admin_get_withdrawals') {
+        const { data: allProfiles, error: fetchErr } = await supabase
+          .from('profiles')
+          .select('wallet_address, data');
+
+        if (fetchErr) {
+          return res.status(500).json({ error: 'Failed to fetch withdrawals', details: fetchErr });
+        }
+
+        const requests: any[] = [];
+        allProfiles?.forEach((p: any) => {
+          const reqs = p.data?.withdrawalRequests || [];
+          reqs.forEach((r: any) => {
+            requests.push({
+              ...r,
+              userWallet: p.wallet_address,
+              userProfileName: p.data?.username || 'Voidwalker'
+            });
+          });
+        });
+
+        requests.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+        return res.status(200).json({
+          success: true,
+          requests
+        });
+      }
+
+      if (action === 'admin_process_withdrawal') {
+        const { requestId, userWallet, decision, txid, reason } = payload || {};
+        if (!requestId || !userWallet || !decision) {
+          return res.status(400).json({ error: 'Missing required parameters: requestId, userWallet, decision' });
+        }
+
+        const { data: targetRows, error: findErr } = await supabase
+          .from('profiles')
+          .select('data, updated_at')
+          .eq('wallet_address', userWallet)
+          .limit(1);
+
+        if (findErr || !targetRows || targetRows.length === 0) {
+          return res.status(404).json({ error: 'Target player not found' });
+        }
+
+        const targetData = targetRows[0].data;
+        const targetReqs = targetData.withdrawalRequests || [];
+        const reqIndex = targetReqs.findIndex((r: any) => r.id === requestId);
+
+        if (reqIndex === -1) {
+          return res.status(404).json({ error: 'Withdrawal request not found on player profile' });
+        }
+
+        const currentReq = targetReqs[reqIndex];
+        if (currentReq.status !== 'pending') {
+          return res.status(400).json({ error: `Request is already ${currentReq.status}` });
+        }
+
+        if (decision === 'approve') {
+          targetReqs[reqIndex] = {
+            ...currentReq,
+            status: 'completed',
+            processedAt: Date.now(),
+            txid: txid || 'Confirmed Manual Payout'
+          };
+
+          const notificationMail = {
+            id: `mail_payout_${Date.now()}`,
+            title: 'USDT Withdrawal Confirmed',
+            sender: 'Void Royal Treasury',
+            content: `Your withdrawal of ${currentReq.amountSovereigns} Blood Sovereigns ($${currentReq.amountUsdt} USDT) has been processed and sent to your wallet ${currentReq.walletAddress}.\n\nTransaction ID (TXID):\n${txid || 'Confirmed Manual Transfer'}`,
+            date: Date.now(),
+            isRead: false,
+            type: 'system',
+            txid: txid || ''
+          };
+
+          targetData.mailMessages = [notificationMail, ...(targetData.mailMessages || [])];
+        } else if (decision === 'reject') {
+          targetReqs[reqIndex] = {
+            ...currentReq,
+            status: 'rejected',
+            processedAt: Date.now(),
+            rejectionReason: reason || 'Declined by administration'
+          };
+
+          // Refund Blood Sovereigns
+          targetData.bloodSovereigns = (targetData.bloodSovereigns || 0) + (currentReq.amountSovereigns || 0);
+
+          const refundMail = {
+            id: `mail_reject_${Date.now()}`,
+            title: 'Withdrawal Request Declined & Refunded',
+            sender: 'Void Royal Treasury',
+            content: `Your withdrawal request of ${currentReq.amountSovereigns} Blood Sovereigns ($${currentReq.amountUsdt} USDT) was declined.\n\nReason: ${reason || 'Security review or invalid address'}.\n\nYour ${currentReq.amountSovereigns} Blood Sovereigns have been refunded to your vault balance.`,
+            date: Date.now(),
+            isRead: false,
+            type: 'system'
+          };
+
+          targetData.mailMessages = [refundMail, ...(targetData.mailMessages || [])];
+        } else {
+          return res.status(400).json({ error: 'Invalid decision: must be approve or reject' });
+        }
+
+        targetData.withdrawalRequests = targetReqs;
+
+        const { error: saveErr } = await supabase
+          .from('profiles')
+          .update({ data: targetData, updated_at: new Date().toISOString() })
+          .eq('wallet_address', userWallet);
+
+        if (saveErr) {
+          return res.status(500).json({ error: 'Failed to update target player withdrawal status', details: saveErr });
+        }
+
+        return res.status(200).json({
+          success: true,
+          message: `Withdrawal request #${requestId} successfully ${decision}d!`
+        });
+      }
+
+      if (action === 'admin_broadcast_mail') {
+        const { targetType, targetValue, title, content, rewards } = payload || {};
+        if (!title || !content) {
+          return res.status(400).json({ error: 'Title and content are required' });
+        }
+
+        const newMailTemplate = {
+          id: `decree_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+          title,
+          sender: 'High Void Command',
+          content,
+          date: Date.now(),
+          isRead: false,
+          isClaimed: false,
+          type: rewards && Object.values(rewards).some((v: any) => v > 0) ? 'reward' : 'announcement',
+          rewards: rewards || null
+        };
+
+        const { data: allProfiles, error: fetchErr } = await supabase
+          .from('profiles')
+          .select('wallet_address, data');
+
+        if (fetchErr || !allProfiles) {
+          return res.status(500).json({ error: 'Failed to fetch profiles for broadcast' });
+        }
+
+        let sentCount = 0;
+        for (const p of allProfiles) {
+          const d = p.data || {};
+          let shouldSend = false;
+
+          if (targetType === 'all') {
+            shouldSend = true;
+          } else if (targetType === 'player') {
+            shouldSend = 
+              p.wallet_address?.toLowerCase() === targetValue?.toLowerCase() ||
+              d.username?.toLowerCase() === targetValue?.toLowerCase();
+          } else if (targetType === 'league') {
+            shouldSend = (d.pvpLeague || 'Bronze').toLowerCase() === targetValue?.toLowerCase();
+          }
+
+          if (shouldSend) {
+            const userMail = { ...newMailTemplate, id: `mail_${p.wallet_address.slice(0, 6)}_${Date.now()}` };
+            d.mailMessages = [userMail, ...(d.mailMessages || [])];
+            await supabase
+              .from('profiles')
+              .update({ data: d, updated_at: new Date().toISOString() })
+              .eq('wallet_address', p.wallet_address);
+            sentCount++;
+          }
+        }
+
+        return res.status(200).json({
+          success: true,
+          sentCount,
+          message: `Decree delivered to ${sentCount} player(s)!`
+        });
+      }
+
+      if (action === 'admin_search_player') {
+        const query = (payload?.query || '').trim().toLowerCase();
+        if (!query) return res.status(400).json({ error: 'Missing search query' });
+
+        const { data: allProfiles } = await supabase
+          .from('profiles')
+          .select('wallet_address, data, updated_at');
+
+        const matches = (allProfiles || [])
+          .filter(p => {
+            const w = p.wallet_address?.toLowerCase() || '';
+            const u = p.data?.username?.toLowerCase() || '';
+            return w.includes(query) || u.includes(query);
+          })
+          .slice(0, 20)
+          .map(p => ({
+            walletAddress: p.wallet_address,
+            updatedAt: p.updated_at,
+            profile: p.data
+          }));
+
+        return res.status(200).json({ success: true, matches });
+      }
+
+      if (action === 'admin_modify_player') {
+        const { targetWallet, updates } = payload || {};
+        if (!targetWallet || !updates) {
+          return res.status(400).json({ error: 'Missing targetWallet or updates' });
+        }
+
+        const { data: targetRows, error: findErr } = await supabase
+          .from('profiles')
+          .select('data')
+          .eq('wallet_address', targetWallet)
+          .limit(1);
+
+        if (findErr || !targetRows || targetRows.length === 0) {
+          return res.status(404).json({ error: 'Target player not found' });
+        }
+
+        const targetData = targetRows[0].data;
+
+        if (updates.gold !== undefined) targetData.gold = Number(updates.gold);
+        if (updates.dust !== undefined) targetData.dust = Number(updates.dust);
+        if (updates.darkShards !== undefined) targetData.darkShards = Number(updates.darkShards);
+        if (updates.bloodSovereigns !== undefined) targetData.bloodSovereigns = Number(updates.bloodSovereigns);
+        if (updates.pveEnergy !== undefined) targetData.pveEnergy = Number(updates.pveEnergy);
+        if (updates.pvpTickets !== undefined) targetData.pvpTickets = Number(updates.pvpTickets);
+        if (updates.pvpLeague !== undefined) targetData.pvpLeague = updates.pvpLeague;
+        if (updates.pvpLP !== undefined) targetData.pvpLP = Number(updates.pvpLP);
+        if (updates.role !== undefined) targetData.role = updates.role;
+
+        const { error: saveErr } = await supabase
+          .from('profiles')
+          .update({ data: targetData, updated_at: new Date().toISOString() })
+          .eq('wallet_address', targetWallet);
+
+        if (saveErr) {
+          return res.status(500).json({ error: 'Failed to update player', details: saveErr });
+        }
+
+        return res.status(200).json({
+          success: true,
+          message: `Player ${targetWallet} updated successfully!`,
+          profile: targetData
+        });
+      }
+
+      if (action === 'admin_trigger_rollover') {
+        const rolloverResult = await checkAndPerformPvpRollover(supabase, true);
+        return res.status(200).json({
+          success: true,
+          message: 'PvP Season Rollover executed manually by Admin',
+          ...rolloverResult
+        });
+      }
+
+      return res.status(400).json({ error: 'Unknown admin action' });
+    }
+    // --- END ADMIN ACTION DISPATCHER ---
+
     if (action === 'sweep_stage') {
       const floorNum = parseInt(payload.floorNum);
       if (isNaN(floorNum)) return res.status(400).json({ error: 'Invalid floor number' });
