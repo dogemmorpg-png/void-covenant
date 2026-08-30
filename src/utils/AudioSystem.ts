@@ -13,6 +13,8 @@ class AudioEngine {
   public playPlace() {}
   public playDeath() {}
   public playMagic() {}
+  public playVictory() {}
+  public playClaim() {}
 }
 
 export const audioSystem = new AudioEngine();

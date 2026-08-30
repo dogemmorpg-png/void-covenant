@@ -37,7 +37,11 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
     if (isClaiming) return;
     setIsClaiming(true);
     try {
-      audioSystem.playVictory();
+      if (typeof audioSystem?.playVictory === 'function') {
+        audioSystem.playVictory();
+      } else if (typeof audioSystem?.playClick === 'function') {
+        audioSystem.playClick();
+      }
       const res = await claimMailReward(mailId);
       if (res.success) {
         toast(res.message, 'success');
@@ -55,7 +59,11 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
     if (isClaiming || unclaimedCount === 0) return;
     setIsClaiming(true);
     try {
-      audioSystem.playVictory();
+      if (typeof audioSystem?.playVictory === 'function') {
+        audioSystem.playVictory();
+      } else if (typeof audioSystem?.playClick === 'function') {
+        audioSystem.playClick();
+      }
       const res = await claimAllMailRewards();
       if (res.success) {
         toast(res.message, 'success');
