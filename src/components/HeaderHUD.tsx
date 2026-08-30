@@ -53,29 +53,6 @@ export const HeaderHUD: React.FC = () => {
     fetchReferrals();
   }, [isModalOpen]);
 
-  useEffect(() => {
-    const pveRegenTime = 1200000;
-    
-    const updateTimer = () => {
-      if (profile.pveEnergy >= profile.pveEnergyMax) {
-        setTimeUntilRegen('');
-        return;
-      }
-      
-      const lastPve = profile.lastPveEnergyRefill ?? profile.lastEnergyRefill;
-      const timePassed = Date.now() - lastPve;
-      const timeLeft = Math.max(0, pveRegenTime - (timePassed % pveRegenTime));
-      
-      const minutes = Math.floor(timeLeft / 60000);
-      const seconds = Math.floor((timeLeft % 60000) / 1000);
-      setTimeUntilRegen(`${minutes}:${seconds.toString().padStart(2, '0')}`);
-    };
-    
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
-    return () => clearInterval(interval);
-  }, [profile.pveEnergy, profile.pveEnergyMax, profile.lastPveEnergyRefill, profile.lastEnergyRefill]);
-
   return (
     <div className="sticky top-4 z-50 px-4 w-full flex justify-center">
       <div className="glass-panel rounded-3xl lg:rounded-full w-full max-w-[1200px] px-6 py-2 flex flex-col xl:flex-row items-center justify-between gap-4 shadow-neon-blue">
