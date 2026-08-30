@@ -120,15 +120,22 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
           
           {/* Row 1: Title & Description Centered with Energy Status */}
           <div className="relative text-center border-b border-gray-800/80 pb-4">
-            {/* Desktop / Tablet PvE Energy Badge */}
-            <div className="absolute right-0 top-0 hidden sm:flex items-center gap-2.5 bg-black/60 border border-emerald-500/30 rounded-full py-1.5 px-3.5 shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:border-emerald-500/50 transition-all cursor-default" title={timeUntilRegen ? `Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (+1 in ${timeUntilRegen})` : `Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (Full)`}>
-              <img src="/icons/icon_energy.webp" alt="Energy" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-              <div className="flex flex-col items-start leading-none">
-                <span className="font-mono text-xs font-bold text-emerald-400">
-                  {profile.pveEnergy || 0}/{profile.pveEnergyMax || 10}
-                </span>
-                <span className="font-mono text-[9px] text-emerald-300/80 tracking-tight mt-0.5 whitespace-nowrap">
-                  {timeUntilRegen ? `+1 in ${timeUntilRegen}` : 'Full Energy'}
+            {/* Desktop / Tablet PvE Energy Capsule */}
+            <div className="absolute right-0 top-0 hidden sm:flex items-center gap-3 bg-gradient-to-r from-[#061c13] via-[#03100b] to-[#010805] border border-emerald-500/50 hover:border-emerald-400 rounded-2xl py-2 px-4 shadow-[0_0_25px_rgba(16,185,129,0.3)] transition-all cursor-default select-none group" title={timeUntilRegen ? `PvE Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (+1 in ${timeUntilRegen})` : `PvE Energy: ${profile.pveEnergy}/${profile.pveEnergyMax} (Full)`}>
+              <div className="w-10 h-10 rounded-xl bg-emerald-950/80 border border-emerald-500/60 flex items-center justify-center shadow-[0_0_12px_rgba(16,185,129,0.5)] group-hover:scale-105 transition-transform">
+                <img src="/icons/icon_energy.webp" alt="Energy" className="w-7 h-7 object-contain drop-shadow-[0_0_10px_rgba(16,185,129,0.9)]" />
+              </div>
+              <div className="flex flex-col items-start leading-none text-left">
+                <div className="flex items-baseline gap-1">
+                  <span className="font-mono text-xl font-black text-emerald-400 tracking-tight">
+                    {profile.pveEnergy || 0}
+                  </span>
+                  <span className="font-mono text-xs font-bold text-emerald-500/70">
+                    / {profile.pveEnergyMax || 10}
+                  </span>
+                </div>
+                <span className="font-mono text-[10px] text-emerald-300 font-bold uppercase tracking-wide mt-1">
+                  {timeUntilRegen ? `+1 in ${timeUntilRegen}` : '⚡ Full Energy'}
                 </span>
               </div>
             </div>
@@ -140,14 +147,14 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
               Descend into the infinite depths. Defeat the dark entities to claim ancient resources.
             </p>
 
-            {/* Mobile PvE Energy Badge */}
-            <div className="flex sm:hidden justify-center mt-2.5">
-              <div className="flex items-center gap-2 bg-black/60 border border-emerald-500/30 rounded-full py-1 px-3 shadow-inner">
-                <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 object-contain" />
-                <span className="font-mono text-xs font-bold text-emerald-400">
-                  {profile.pveEnergy || 0}/{profile.pveEnergyMax || 10}
+            {/* Mobile PvE Energy Capsule */}
+            <div className="flex sm:hidden justify-center mt-3">
+              <div className="flex items-center gap-3 bg-gradient-to-r from-[#061c13] via-[#03100b] to-[#010805] border border-emerald-500/50 rounded-2xl py-1.5 px-4 shadow-[0_0_20px_rgba(16,185,129,0.25)]">
+                <img src="/icons/icon_energy.webp" alt="Energy" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                <span className="font-mono text-base font-black text-emerald-400">
+                  {profile.pveEnergy || 0} / {profile.pveEnergyMax || 10}
                 </span>
-                <span className="font-mono text-[9px] text-emerald-300/80 font-semibold">
+                <span className="font-mono text-xs text-emerald-300 font-bold ml-1">
                   {timeUntilRegen ? `(+1 in ${timeUntilRegen})` : '(Full)'}
                 </span>
               </div>

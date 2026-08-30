@@ -214,7 +214,7 @@ function MainAppContent() {
       <div className="min-h-screen flex flex-col justify-between relative z-10">
         <div>
           {/* Top bar resource hud and wallet */}
-           {!isPvpMatching && !isPvpModalOpen && <HeaderHUD />}
+           {!isPvpMatching && !isPvpModalOpen && <HeaderHUD onNavigateTab={setActiveTab} />}
 
           {/* Tab content */}
           <div className="py-6">

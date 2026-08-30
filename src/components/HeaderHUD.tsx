@@ -5,13 +5,16 @@ import { LogOut, Copy, X, Trophy, User, Clock, Plus, UserPlus, Send, Mail } from
 import { audioSystem } from '../utils/AudioSystem';
 import { MailboxModal } from './MailboxModal';
 
-export const HeaderHUD: React.FC = () => {
+interface HeaderHUDProps {
+  onNavigateTab?: (tab: string) => void;
+}
+
+export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
   const { profile, logoutPlayer, isShardsShopOpen, setIsShardsShopOpen } = useGame();
   const { disconnect } = useWallet();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMailboxOpen, setIsMailboxOpen] = useState(false);
-  const [isSovereignModalOpen, setIsSovereignModalOpen] = useState(false);
   const [referralsList, setReferralsList] = useState<any[]>([]);
   const [isLoadingReferrals, setIsLoadingReferrals] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
@@ -117,11 +120,10 @@ export const HeaderHUD: React.FC = () => {
             {/* Blood Sovereigns (Convertible to USDT) */}
             <div 
               onClick={() => {
-                audioSystem.playClick();
-                setIsSovereignModalOpen(true);
+                if (onNavigateTab) onNavigateTab('bank');
               }}
-              className="flex items-center gap-1.5 bg-gradient-to-r from-[#240810] to-[#120308] hover:from-[#350c18] hover:to-[#220710] border border-amber-500/50 hover:border-amber-400/90 rounded-full py-1 px-2.5 shadow-[0_0_15px_rgba(245,158,11,0.2)] hover:shadow-[0_0_22px_rgba(245,158,11,0.4)] cursor-pointer transition-all duration-300 group select-none"
-              title={`Blood Sovereigns: ${profile.bloodSovereigns || 0} (≈ $${((profile.bloodSovereigns || 0) * 0.01).toFixed(2)} USDT) • Click for Info`}
+              className="flex items-center gap-1.5 bg-gradient-to-r from-[#240810] to-[#120308] hover:from-[#350c18] hover:to-[#220710] border border-amber-500/50 hover:border-amber-400/90 rounded-full py-1 px-2.5 shadow-[0_0_15px_rgba(245,158,11,0.2)] hover:shadow-[0_0_22px_rgba(245,158,11,0.4)] cursor-pointer transition-all duration-300 group select-none hover:scale-105"
+              title={`Blood Sovereigns: ${profile.bloodSovereigns || 0} (≈ $${((profile.bloodSovereigns || 0) * 0.01).toFixed(2)} USDT) • Click to Open Bank`}
             >
               <img 
                 src="/icons/icon_sovereign.webp" 
@@ -140,18 +142,26 @@ export const HeaderHUD: React.FC = () => {
             {/* Mailbox Button */}
             <button
               onClick={() => {
-                audioSystem.playClick();
                 setIsMailboxOpen(true);
               }}
-              className="relative flex items-center justify-center bg-white/5 hover:bg-amber-500/10 border border-white/10 hover:border-amber-400/50 rounded-full p-2 text-gray-300 hover:text-amber-300 transition-all duration-300 cursor-pointer shadow-inner group hover:scale-105 active:scale-95"
+              className={`relative flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-300 cursor-pointer shadow-[0_0_15px_rgba(245,158,11,0.15)] hover:scale-105 active:scale-95 ${
+                unreadMailCount > 0
+                  ? 'bg-gradient-to-r from-[#2e0d16] via-[#1a070c] to-[#120408] border-amber-500/70 hover:border-amber-400 text-amber-300 shadow-[0_0_18px_rgba(245,158,11,0.35)]'
+                  : 'bg-white/5 hover:bg-white/10 border-white/15 hover:border-amber-400/50 text-gray-300 hover:text-white'
+              }`}
               title="Void Mailbox (Decrees & Rewards)"
             >
-              <Mail className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              {unreadMailCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-gradient-to-r from-red-600 to-rose-600 border border-white/60 text-white font-mono text-[9px] font-black flex items-center justify-center shadow-[0_0_10px_rgba(225,29,72,0.9)] animate-pulse">
-                  {unreadMailCount}
-                </span>
-              )}
+              <div className="relative flex items-center justify-center">
+                <Mail className={`w-4 h-4 ${unreadMailCount > 0 ? 'text-amber-300 animate-pulse' : 'text-gray-300'}`} />
+                {unreadMailCount > 0 && (
+                  <span className="absolute -top-2.5 -right-3 min-w-[17px] h-[17px] px-1 rounded-full bg-gradient-to-r from-red-600 to-rose-600 border border-white/90 text-white font-mono text-[9px] font-black flex items-center justify-center shadow-[0_0_10px_rgba(225,29,72,0.9)] animate-bounce">
+                    {unreadMailCount}
+                  </span>
+                )}
+              </div>
+              <span className="font-display font-bold text-xs tracking-wider text-amber-200/90">
+                MAIL
+              </span>
             </button>
 
             <div className="flex items-center gap-2">
@@ -346,82 +356,6 @@ export const HeaderHUD: React.FC = () => {
 
             </div>
 
-          </div>
-        </div>
-      )}
-
-      {/* Blood Sovereigns Info Modal */}
-      {isSovereignModalOpen && (
-        <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setIsSovereignModalOpen(false);
-          }}
-        >
-          <div className="bg-[#141820] border-2 border-amber-500/40 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_35px_rgba(245,158,11,0.25)] relative flex flex-col animate-in zoom-in-95 duration-200">
-            {/* Header */}
-            <div className="border-b border-white/10 p-5 flex justify-between items-center bg-gradient-to-r from-[#240810] to-[#141820]">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center shadow-[0_0_12px_rgba(245,158,11,0.3)]">
-                  <img src="/icons/icon_sovereign.webp" alt="Sovereign" className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]" />
-                </div>
-                <div>
-                  <h3 className="font-display font-black text-white text-base tracking-wider text-shadow-gold">
-                    BLOOD SOVEREIGNS
-                  </h3>
-                  <span className="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-widest">
-                    Convertible Currency
-                  </span>
-                </div>
-              </div>
-              <button 
-                onClick={() => setIsSovereignModalOpen(false)}
-                className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Content */}
-            <div className="p-6 space-y-4">
-              {/* Balance Highlight Box */}
-              <div className="bg-gradient-to-b from-amber-950/30 to-black/60 border border-amber-500/30 rounded-2xl p-4 text-center">
-                <span className="text-gray-400 text-xs font-mono uppercase tracking-widest block mb-1">Your Balance</span>
-                <div className="flex items-center justify-center gap-2 mb-1">
-                  <img src="/icons/icon_sovereign.webp" alt="Sovereign" className="w-7 h-7 object-contain" />
-                  <span className="text-3xl font-mono font-black text-amber-300 text-shadow-gold">
-                    {profile.bloodSovereigns || 0}
-                  </span>
-                  <span className="text-xs font-mono font-bold text-amber-400/80 self-end mb-1">SOV</span>
-                </div>
-                <span className="inline-block bg-amber-500/15 border border-amber-500/30 rounded-full px-3 py-0.5 text-xs font-mono font-bold text-amber-300">
-                  ≈ ${((profile.bloodSovereigns || 0) * 0.01).toFixed(2)} USDT (Rate: 1 SOV = 0.01 USDT)
-                </span>
-              </div>
-
-              {/* Information */}
-              <div className="space-y-2.5 text-xs text-gray-300 font-sans leading-relaxed bg-black/40 p-4 rounded-xl border border-white/5">
-                <div className="flex items-start gap-2">
-                  <span className="text-amber-400 font-bold text-sm leading-none mt-0.5">👑</span>
-                  <p><strong className="text-white">How to Earn:</strong> Awarded to top-ranking players in high PvP Leagues at the end of each league round.</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold text-sm leading-none mt-0.5">💵</span>
-                  <p><strong className="text-white">USDT Exchange:</strong> 100 Blood Sovereigns can be exchanged for 1.00 USDT and withdrawn directly to your wallet.</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-cyan-400 font-bold text-sm leading-none mt-0.5">📬</span>
-                  <p><strong className="text-white">Distribution:</strong> Round results and rewards will be delivered straight to your in-game Mailbox.</p>
-                </div>
-              </div>
-
-              {/* Status Notice */}
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-center">
-                <span className="text-[11px] font-mono font-bold text-amber-300/90 tracking-wide uppercase">
-                  🏆 Season League Rollovers & Payouts Launching Soon
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       )}
