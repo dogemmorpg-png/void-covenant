@@ -2317,7 +2317,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             {/* Rewards Card */}
             <div className="bg-black/60 p-4 rounded-2xl border border-amber-500/25 space-y-3 relative z-10">
               <span className="text-[10px] font-display text-amber-400/90 tracking-widest block uppercase font-bold">REWARD OBTAINED</span>
-              <div className="grid grid-cols-3 gap-2.5">
+              <div className={`grid gap-2.5 ${battleType === 'pvp' ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
+                {/* Gold */}
                 <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
                   <span className="text-amber-300 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
                     +{stage.goldReward}
@@ -2326,6 +2327,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   <span className="text-[9px] text-amber-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Gold</span>
                 </div>
                 
+                {/* Dust */}
                 <div className="bg-gradient-to-b from-cyan-950/40 via-black to-black border border-cyan-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
                   <span className="text-cyan-300 font-display font-black text-base flex items-center gap-1 text-shadow-cyan">
                     +{stage.dustReward}
@@ -2334,23 +2336,23 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Dust</span>
                 </div>
 
-                {battleType === 'campaign' && (
-                  <div className="bg-gradient-to-b from-emerald-950/40 via-black to-black border border-emerald-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
-                    <span className="text-emerald-300 font-display font-black text-base flex items-center gap-1 text-shadow-emerald">
-                      +50
-                      <img src="/icons/icon_exp.webp" alt="EXP" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
-                    </span>
-                    <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider mt-1 font-bold">EXP</span>
-                  </div>
-                )}
+                {/* EXP (Awarded in both PvE and PvP) */}
+                <div className="bg-gradient-to-b from-emerald-950/40 via-black to-black border border-emerald-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                  <span className="text-emerald-300 font-display font-black text-base flex items-center gap-1 text-shadow-emerald">
+                    +{battleType === 'pvp' ? 80 : 50}
+                    <img src="/icons/icon_exp.webp" alt="EXP" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
+                  </span>
+                  <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider mt-1 font-bold">EXP</span>
+                </div>
                 
+                {/* Crowns (PvP Only) */}
                 {battleType === 'pvp' && (
                   <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/40 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.15)]">
                     <span className="text-amber-300 font-display font-black text-base flex items-center gap-1.5 text-shadow-gold">
                       +20
                       <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain brightness-110 contrast-125" />
                     </span>
-                    <span className="text-[9px] text-amber-400/80 font-mono uppercase tracking-wider mt-1 font-bold">Crowns</span>
+                    <span className="text-[9px] text-amber-400/80 font-mono uppercase tracking-wider mt-1 font-bold">Crowns (LP)</span>
                   </div>
                 )}
 
