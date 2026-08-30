@@ -21,7 +21,10 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
   const [isLoadingReferrals, setIsLoadingReferrals] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
-  const isAdmin = profile.username?.toLowerCase() === 'adminus' || profile.role === 'admin';
+  const isAdmin = 
+    profile.username?.toLowerCase() === 'adminus' || 
+    profile.role === 'admin' ||
+    profile.solanaAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr';
   const unreadMailCount = (profile.mailMessages || []).filter(m => !m.isRead || (m.rewards && !m.isClaimed)).length;
 
   const handleCopyLink = () => {

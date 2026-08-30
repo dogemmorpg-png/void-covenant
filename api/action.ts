@@ -206,7 +206,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         profile?.username?.toLowerCase() === 'adminus' || 
         profile?.role === 'admin' || 
         decoded?.role === 'admin' ||
-        walletAddress === 'adminus';
+        walletAddress === 'adminus' ||
+        walletAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr' ||
+        profile?.solanaAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr';
 
       if (!isAdmin) {
         return res.status(403).json({ error: 'Forbidden: Admin privileges required.' });
