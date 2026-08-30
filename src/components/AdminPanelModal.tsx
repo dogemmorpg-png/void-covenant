@@ -68,6 +68,9 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
   // Player Inspector State
   const [searchQuery, setSearchQuery] = useState('');
+  const [allPlayers, setAllPlayers] = useState<any[]>([]);
+  const [playerLeagueFilter, setPlayerLeagueFilter] = useState<string>('all');
+  const [playerSortBy, setPlayerSortBy] = useState<'active' | 'level' | 'sovereigns' | 'gold' | 'lp'>('active');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
   const [editGold, setEditGold] = useState<number>(0);
@@ -117,10 +120,26 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
     }
   };
 
+  // Load All Players
+  const loadAllPlayers = async (query = '') => {
+    setIsLoading(true);
+    try {
+      const res = await searchAdminPlayer(query);
+      const list = res.matches || res.players || res.data?.matches || res.data?.players || [];
+      setAllPlayers(list);
+      setSearchResults(list);
+    } catch (e: any) {
+      console.error('Failed to load all players:', e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
       if (activeTab === 'overview') loadOverview();
       if (activeTab === 'withdrawals') loadWithdrawals();
+      if (activeTab === 'players') loadAllPlayers(searchQuery);
     }
   }, [isOpen, activeTab]);
 
@@ -228,21 +247,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
   const handleSearchPlayer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchQuery.trim()) return;
-    setIsLoading(true);
-    try {
-      const res = await searchAdminPlayer(searchQuery.trim());
-      if (res.success && res.matches) {
-        setSearchResults(res.matches);
-        if (res.matches.length === 1) {
-          selectPlayerForEdit(res.matches[0]);
-        }
-      }
-    } catch (e: any) {
-      console.error('Player search error:', e);
-    } finally {
-      setIsLoading(false);
-    }
+    loadAllPlayers(searchQuery.trim());
   };
 
   const selectPlayerForEdit = (match: any) => {
@@ -921,59 +926,290 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
           {/* TAB 4: PLAYER INSPECTOR */}
           {activeTab === 'players' && (
             <div className="space-y-6">
-              {/* Search Header */}
-              <form onSubmit={handleSearchPlayer} className="flex gap-3 max-w-2xl mx-auto">
-                <div className="relative flex-1">
-                  <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search player by username or Solana wallet address..."
-                    className="w-full bg-black/60 border border-white/15 rounded-2xl pl-12 pr-4 py-3.5 text-sm font-mono text-white placeholder-gray-500 focus:outline-none focus:border-amber-500/60 shadow-inner"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="px-6 py-3.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-black font-display font-black text-xs uppercase tracking-wider rounded-2xl shadow-[0_0_15px_rgba(245,158,11,0.3)] cursor-pointer disabled:opacity-50"
-                >
-                  SEARCH
-                </button>
-              </form>
+              
+              {!selectedPlayer ? (
+                <div className="space-y-4">
+                  {/* Search, Filter, and Sort Controls */}
+                  <div className="flex flex-col lg:flex-row items-center justify-between gap-3 bg-black/40 p-4 rounded-3xl border border-white/10">
+                    
+                    {/* Search Input */}
+                    <form onSubmit={handleSearchPlayer} className="relative w-full lg:w-80">
+                      <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search by username or wallet..."
+                        className="w-full bg-black/60 border border-white/15 rounded-2xl pl-10 pr-10 py-2.5 text-xs font-mono text-white placeholder-gray-500 focus:outline-none focus:border-amber-500/60"
+                      />
+                      {searchQuery && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSearchQuery('');
+                            loadAllPlayers('');
+                          }}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </form>
 
-              {/* Search Results List */}
-              {searchResults.length > 0 && !selectedPlayer && (
-                <div className="bg-black/50 border border-white/10 rounded-3xl p-4 space-y-2 max-w-3xl mx-auto">
-                  <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest block px-2">Matches Found ({searchResults.length})</span>
-                  <div className="divide-y divide-white/5">
-                    {searchResults.map((match) => (
-                      <div 
-                        key={match.walletAddress}
-                        onClick={() => selectPlayerForEdit(match)}
-                        className="p-3 hover:bg-white/5 rounded-2xl flex items-center justify-between cursor-pointer transition-colors"
+                    {/* League Filter Pills */}
+                    <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 select-none">
+                      {['all', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Grandmaster'].map(l => (
+                        <button
+                          key={l}
+                          onClick={() => setPlayerLeagueFilter(l)}
+                          className={`px-3 py-1.5 rounded-xl font-display font-bold text-[11px] uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+                            playerLeagueFilter === l
+                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/60 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
+                              : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white'
+                          }`}
+                        >
+                          {l === 'all' ? 'All Leagues' : l}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Sorting Selector */}
+                    <div className="flex items-center gap-2 w-full lg:w-auto">
+                      <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest whitespace-nowrap">Sort by:</span>
+                      <select
+                        value={playerSortBy}
+                        onChange={(e) => setPlayerSortBy(e.target.value as any)}
+                        className="bg-black/70 border border-white/15 rounded-xl px-3 py-2 text-xs font-mono text-amber-300 font-bold focus:outline-none focus:border-amber-500"
                       >
-                        <div className="flex items-center gap-3">
-                          {match.profile?.avatarUrl && (
-                            <img src={match.profile.avatarUrl} alt="Avatar" className="w-10 h-10 rounded-full border border-white/20 object-cover" />
+                        <option value="active">Last Active</option>
+                        <option value="level">Highest Level</option>
+                        <option value="sovereigns">Most Sovereigns</option>
+                        <option value="gold">Most Gold</option>
+                        <option value="lp">Highest PvP LP</option>
+                      </select>
+                    </div>
+
+                  </div>
+
+                  {/* Players Directory Table */}
+                  <div className="bg-black/50 border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
+                    <div className="px-6 py-3 border-b border-white/10 bg-white/[0.02] flex items-center justify-between">
+                      <span className="text-[11px] font-mono uppercase tracking-widest text-gray-400 font-bold">
+                        Registered Players Directory ({allPlayers.filter(p => {
+                          const l = p.profile?.pvpLeague || 'Bronze';
+                          if (playerLeagueFilter !== 'all' && l.toLowerCase() !== playerLeagueFilter.toLowerCase()) return false;
+                          if (searchQuery.trim()) {
+                            const s = searchQuery.trim().toLowerCase();
+                            const w = (p.walletAddress || '').toLowerCase();
+                            const u = (p.profile?.username || '').toLowerCase();
+                            return w.includes(s) || u.includes(s);
+                          }
+                          return true;
+                        }).length})
+                      </span>
+                      <button
+                        onClick={() => loadAllPlayers(searchQuery)}
+                        disabled={isLoading}
+                        className="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      >
+                        <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
+                        <span>Refresh List</span>
+                      </button>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs font-mono">
+                        <thead className="bg-white/5 border-b border-white/10 text-gray-400 uppercase text-[10px] tracking-wider">
+                          <tr>
+                            <th className="p-4">Player / Account</th>
+                            <th className="p-4">Level & Progress</th>
+                            <th className="p-4">PvP League</th>
+                            <th className="p-4">Vault Balances</th>
+                            <th className="p-4">Last Activity</th>
+                            <th className="p-4 text-right">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                          {allPlayers.filter(p => {
+                            const l = p.profile?.pvpLeague || 'Bronze';
+                            if (playerLeagueFilter !== 'all' && l.toLowerCase() !== playerLeagueFilter.toLowerCase()) return false;
+                            if (searchQuery.trim()) {
+                              const s = searchQuery.trim().toLowerCase();
+                              const w = (p.walletAddress || '').toLowerCase();
+                              const u = (p.profile?.username || '').toLowerCase();
+                              return w.includes(s) || u.includes(s);
+                            }
+                            return true;
+                          }).length === 0 ? (
+                            <tr>
+                              <td colSpan={6} className="p-8 text-center text-gray-500 font-mono">
+                                No players found matching your criteria.
+                              </td>
+                            </tr>
+                          ) : (
+                            allPlayers
+                              .filter(p => {
+                                const l = p.profile?.pvpLeague || 'Bronze';
+                                if (playerLeagueFilter !== 'all' && l.toLowerCase() !== playerLeagueFilter.toLowerCase()) return false;
+                                if (searchQuery.trim()) {
+                                  const s = searchQuery.trim().toLowerCase();
+                                  const w = (p.walletAddress || '').toLowerCase();
+                                  const u = (p.profile?.username || '').toLowerCase();
+                                  return w.includes(s) || u.includes(s);
+                                }
+                                return true;
+                              })
+                              .sort((a, b) => {
+                                const pa = a.profile || {};
+                                const pb = b.profile || {};
+                                if (playerSortBy === 'level') return (pb.level || 1) - (pa.level || 1);
+                                if (playerSortBy === 'sovereigns') return (pb.bloodSovereigns || 0) - (pa.bloodSovereigns || 0);
+                                if (playerSortBy === 'gold') return (pb.gold || 0) - (pa.gold || 0);
+                                if (playerSortBy === 'lp') return (pb.pvpLP || 0) - (pa.pvpLP || 0);
+                                const timeA = pa.lastLogin || (a.updatedAt ? new Date(a.updatedAt).getTime() : 0);
+                                const timeB = pb.lastLogin || (b.updatedAt ? new Date(b.updatedAt).getTime() : 0);
+                                return timeB - timeA;
+                              })
+                              .map((p) => {
+                                const prof = p.profile || {};
+                                const isUserAdmin = prof.username?.toLowerCase() === 'adminus' || prof.role === 'admin';
+                                const lastAct = prof.lastLogin || (p.updatedAt ? new Date(p.updatedAt).getTime() : 0);
+
+                                return (
+                                  <tr key={p.walletAddress} className="hover:bg-white/[0.02] transition-colors">
+                                    {/* Player */}
+                                    <td className="p-4">
+                                      <div className="flex items-center gap-3">
+                                        <div className="relative">
+                                          {prof.avatarUrl ? (
+                                            <img src={prof.avatarUrl} alt="Avatar" className="w-10 h-10 rounded-full border border-white/20 object-cover shadow-sm" />
+                                          ) : (
+                                            <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-display font-black text-amber-300">
+                                              {(prof.username || 'V')[0].toUpperCase()}
+                                            </div>
+                                          )}
+                                          {isUserAdmin && (
+                                            <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-red-600 rounded-full flex items-center justify-center text-[8px] font-black text-white" title="Administrator">
+                                              ★
+                                            </span>
+                                          )}
+                                        </div>
+
+                                        <div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-display font-bold text-white text-sm">
+                                              {prof.username || 'Voidwalker'}
+                                            </span>
+                                            {isUserAdmin && (
+                                              <span className="px-1.5 py-0.2 rounded bg-red-950/80 border border-red-500/60 text-red-400 font-mono text-[9px] font-bold">
+                                                ADMIN
+                                              </span>
+                                            )}
+                                          </div>
+                                          
+                                          <div className="flex items-center gap-1.5 mt-0.5">
+                                            <span className="text-[10px] text-gray-500 font-mono">
+                                              {p.walletAddress?.slice(0, 6)}...{p.walletAddress?.slice(-6)}
+                                            </span>
+                                            <button
+                                              onClick={() => handleCopy(p.walletAddress)}
+                                              className="p-0.5 text-gray-500 hover:text-white rounded"
+                                              title="Copy Address"
+                                            >
+                                              {copiedAddress === p.walletAddress ? (
+                                                <Check className="w-3 h-3 text-emerald-400" />
+                                              ) : (
+                                                <Copy className="w-3 h-3" />
+                                              )}
+                                            </button>
+                                            <a
+                                              href={`https://solscan.io/account/${p.walletAddress}`}
+                                              target="_blank"
+                                              rel="noreferrer"
+                                              className="p-0.5 text-gray-500 hover:text-cyan-400 rounded"
+                                              title="View on Solscan"
+                                            >
+                                              <ExternalLink className="w-3 h-3" />
+                                            </a>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </td>
+
+                                    {/* Level & Progress */}
+                                    <td className="p-4">
+                                      <div className="flex flex-col gap-0.5">
+                                        <span className="font-mono font-bold text-amber-300 text-xs">
+                                          LVL {prof.level || 1}
+                                        </span>
+                                        <span className="text-[10px] text-gray-500">
+                                          EXP: {prof.exp || 0}
+                                        </span>
+                                      </div>
+                                    </td>
+
+                                    {/* PvP League */}
+                                    <td className="p-4">
+                                      <div className="flex items-center gap-1.5">
+                                        <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white font-display font-bold text-xs uppercase">
+                                          {prof.pvpLeague || 'Bronze'}
+                                        </span>
+                                        <span className="text-[10px] text-cyan-400 font-mono font-bold">
+                                          {prof.pvpLP || 0} LP
+                                        </span>
+                                      </div>
+                                    </td>
+
+                                    {/* Vault Balances */}
+                                    <td className="p-4">
+                                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs font-mono">
+                                        <div className="flex items-center gap-1">
+                                          <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain" />
+                                          <span className="text-amber-400 font-bold">{(prof.gold || 0).toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 object-contain" />
+                                          <span className="text-[#66fcf1] font-bold">{(prof.dust || 0).toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                                          <span className="text-rose-400 font-bold">{(prof.darkShards || 0).toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 object-contain" />
+                                          <span className="text-amber-300 font-black">{(prof.bloodSovereigns || 0).toLocaleString()}</span>
+                                        </div>
+                                      </div>
+                                    </td>
+
+                                    {/* Last Activity */}
+                                    <td className="p-4">
+                                      <span className="text-[10px] text-gray-400 block font-mono">
+                                        {lastAct > 0 ? new Date(lastAct).toLocaleString() : 'N/A'}
+                                      </span>
+                                    </td>
+
+                                    {/* Actions */}
+                                    <td className="p-4 text-right">
+                                      <button
+                                        onClick={() => selectPlayerForEdit(p)}
+                                        className="px-3.5 py-1.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-black font-display font-black text-[11px] uppercase tracking-wider rounded-xl transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-[0_0_10px_rgba(245,158,11,0.25)]"
+                                      >
+                                        INSPECT
+                                      </button>
+                                    </td>
+                                  </tr>
+                                );
+                              })
                           )}
-                          <div>
-                            <span className="font-display font-bold text-white text-sm block">{match.profile?.username || 'Voidwalker'}</span>
-                            <span className="font-mono text-xs text-gray-400">{match.walletAddress}</span>
-                          </div>
-                        </div>
-                        <div className="text-right font-mono text-xs text-amber-300 font-bold">
-                          {match.profile?.pvpLeague || 'Bronze'} • {match.profile?.gold || 0} Gold
-                        </div>
-                      </div>
-                    ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
-              )}
-
-              {/* Selected Player Detailed Editor */}
-              {selectedPlayer && (
-                <div className="bg-black/50 border border-white/10 rounded-3xl p-6 space-y-6 max-w-3xl mx-auto">
+              ) : (
+                /* Selected Player Detailed Editor */
+                <div className="bg-black/50 border border-white/10 rounded-3xl p-6 space-y-6 max-w-3xl mx-auto shadow-2xl">
                   <div className="flex items-start justify-between border-b border-white/10 pb-4">
                     <div className="flex items-center gap-4">
                       {selectedPlayer.profile?.avatarUrl && (
@@ -994,9 +1230,9 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
                     <button
                       onClick={() => setSelectedPlayer(null)}
-                      className="text-xs font-mono text-gray-400 hover:text-white underline cursor-pointer"
+                      className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-display font-bold text-xs rounded-xl cursor-pointer transition-all"
                     >
-                      Back to Search
+                      ← Back to Player List
                     </button>
                   </div>
 
@@ -1066,6 +1302,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                   </div>
                 </div>
               )}
+
             </div>
           )}
 

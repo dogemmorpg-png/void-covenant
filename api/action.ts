@@ -484,28 +484,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      if (action === 'admin_search_player') {
+      if (action === 'admin_search_player' || action === 'admin_get_players') {
         const query = (payload?.query || '').trim().toLowerCase();
-        if (!query) return res.status(400).json({ error: 'Missing search query' });
 
-        const { data: allProfiles } = await supabase
+        const { data: allProfiles, error: fetchErr } = await supabase
           .from('profiles')
           .select('wallet_address, data, updated_at');
 
-        const matches = (allProfiles || [])
-          .filter(p => {
+        if (fetchErr) {
+          return res.status(500).json({ error: 'Failed to fetch players', details: fetchErr });
+        }
+
+        let filtered = (allProfiles || []);
+        if (query) {
+          filtered = filtered.filter(p => {
             const w = p.wallet_address?.toLowerCase() || '';
             const u = p.data?.username?.toLowerCase() || '';
             return w.includes(query) || u.includes(query);
-          })
-          .slice(0, 20)
+          });
+        }
+
+        const matches = filtered
           .map(p => ({
             walletAddress: p.wallet_address,
             updatedAt: p.updated_at,
             profile: p.data
           }));
 
-        return res.status(200).json({ success: true, matches });
+        return res.status(200).json({ success: true, matches, players: matches });
       }
 
       if (action === 'admin_modify_player') {
