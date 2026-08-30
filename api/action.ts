@@ -367,7 +367,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             id: `mail_payout_${Date.now()}`,
             title: 'USDT Withdrawal Confirmed',
             sender: 'Void Royal Treasury',
+            body: `Your withdrawal of ${currentReq.amountSovereigns} Blood Sovereigns ($${currentReq.amountUsdt} USDT) has been processed and sent to your wallet ${currentReq.walletAddress}.\n\nTransaction ID (TXID):\n${txid || 'Confirmed Manual Transfer'}`,
             content: `Your withdrawal of ${currentReq.amountSovereigns} Blood Sovereigns ($${currentReq.amountUsdt} USDT) has been processed and sent to your wallet ${currentReq.walletAddress}.\n\nTransaction ID (TXID):\n${txid || 'Confirmed Manual Transfer'}`,
+            createdAt: Date.now(),
             date: Date.now(),
             isRead: false,
             type: 'system',
@@ -390,7 +392,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             id: `mail_reject_${Date.now()}`,
             title: 'Withdrawal Request Declined & Refunded',
             sender: 'Void Royal Treasury',
+            body: `Your withdrawal request of ${currentReq.amountSovereigns} Blood Sovereigns ($${currentReq.amountUsdt} USDT) was declined.\n\nReason: ${reason || 'Security review or invalid address'}.\n\nYour ${currentReq.amountSovereigns} Blood Sovereigns have been refunded to your vault balance.`,
             content: `Your withdrawal request of ${currentReq.amountSovereigns} Blood Sovereigns ($${currentReq.amountUsdt} USDT) was declined.\n\nReason: ${reason || 'Security review or invalid address'}.\n\nYour ${currentReq.amountSovereigns} Blood Sovereigns have been refunded to your vault balance.`,
+            createdAt: Date.now(),
             date: Date.now(),
             isRead: false,
             type: 'system'
@@ -419,8 +423,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       if (action === 'admin_broadcast_mail') {
-        const { targetType, targetValue, title, content, rewards } = payload || {};
-        if (!title || !content) {
+        const { targetType, targetValue, title, content, body, rewards } = payload || {};
+        const mailContent = content || body || '';
+        if (!title || !mailContent) {
           return res.status(400).json({ error: 'Title and content are required' });
         }
 
@@ -428,7 +433,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           id: `decree_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
           title,
           sender: 'High Void Command',
-          content,
+          body: mailContent,
+          content: mailContent,
+          createdAt: Date.now(),
           date: Date.now(),
           isRead: false,
           isClaimed: false,

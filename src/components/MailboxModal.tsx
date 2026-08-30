@@ -65,8 +65,25 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
     }
   };
 
-  const formatDate = (timestamp: number) => {
-    const d = new Date(timestamp);
+  const getMailTimestamp = (mail: any): number => {
+    if (!mail) return Date.now();
+    const raw = mail.createdAt ?? mail.date ?? mail.timestamp;
+    if (typeof raw === 'number' && !isNaN(raw)) return raw;
+    if (typeof raw === 'string') {
+      const parsed = new Date(raw).getTime();
+      if (!isNaN(parsed)) return parsed;
+    }
+    return Date.now();
+  };
+
+  const getMailBody = (mail: any): string => {
+    if (!mail) return '';
+    return mail.body || mail.content || mail.message || '';
+  };
+
+  const formatDate = (rawTime: any) => {
+    const ts = typeof rawTime === 'number' ? rawTime : getMailTimestamp({ createdAt: rawTime });
+    const d = new Date(ts);
     return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
   };
 
@@ -144,6 +161,9 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
                   (mail.rewards.cards && mail.rewards.cards.length > 0)
                 );
 
+                const mailTimestamp = getMailTimestamp(mail);
+                const mailBody = getMailBody(mail);
+
                 return (
                   <div
                     key={mail.id}
@@ -178,14 +198,14 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
                           {mail.sender || 'Council of the Void'}
                         </span>
                         <span className="font-mono text-[9px] text-gray-500 whitespace-nowrap">
-                          {new Date(mail.createdAt).toLocaleDateString()}
+                          {new Date(mailTimestamp).toLocaleDateString()}
                         </span>
                       </div>
                       <h4 className={`text-sm font-bold truncate ${mail.isRead ? 'text-gray-300' : 'text-white font-extrabold'}`}>
                         {mail.title}
                       </h4>
                       <p className="text-xs text-gray-400 truncate mt-0.5">
-                        {mail.body}
+                        {mailBody}
                       </p>
                     </div>
 
@@ -213,7 +233,7 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
                     </span>
                     <span className="flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5 text-gray-500" />
-                      {formatDate(selectedMail.createdAt)}
+                      {formatDate(getMailTimestamp(selectedMail))}
                     </span>
                   </div>
                   <h3 className="font-display font-black text-xl text-white text-shadow-gold">
@@ -223,7 +243,7 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
 
                 {/* Letter Body */}
                 <div className="text-sm text-gray-300 leading-relaxed font-sans whitespace-pre-line bg-black/30 p-4 rounded-2xl border border-white/5 shadow-inner">
-                  {selectedMail.body}
+                  {getMailBody(selectedMail)}
                 </div>
 
                 {/* Attached Rewards Section */}
