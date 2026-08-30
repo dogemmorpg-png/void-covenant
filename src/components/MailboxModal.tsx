@@ -3,7 +3,6 @@ import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { MailMessage } from '../types';
 import { Mail, MailOpen, Gift, Check, Trash2, X, Sparkles, AlertCircle, Clock, ChevronRight } from 'lucide-react';
-import { audioSystem } from '../utils/AudioSystem';
 
 interface MailboxModalProps {
   isOpen: boolean;
@@ -26,7 +25,6 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
   const unclaimedCount = messages.filter(m => m.rewards && !m.isClaimed).length;
 
   const handleSelectMail = (mail: MailMessage) => {
-    audioSystem.playClick();
     setSelectedMailId(mail.id);
     if (!mail.isRead) {
       markMailAsRead(mail.id);
@@ -37,11 +35,6 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
     if (isClaiming) return;
     setIsClaiming(true);
     try {
-      if (typeof audioSystem?.playVictory === 'function') {
-        audioSystem.playVictory();
-      } else if (typeof audioSystem?.playClick === 'function') {
-        audioSystem.playClick();
-      }
       const res = await claimMailReward(mailId);
       if (res.success) {
         toast(res.message, 'success');
@@ -59,11 +52,6 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
     if (isClaiming || unclaimedCount === 0) return;
     setIsClaiming(true);
     try {
-      if (typeof audioSystem?.playVictory === 'function') {
-        audioSystem.playVictory();
-      } else if (typeof audioSystem?.playClick === 'function') {
-        audioSystem.playClick();
-      }
       const res = await claimAllMailRewards();
       if (res.success) {
         toast(res.message, 'success');
@@ -126,7 +114,6 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
 
             <button
               onClick={() => {
-                audioSystem.playClick();
                 onClose();
               }}
               className="p-2 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
