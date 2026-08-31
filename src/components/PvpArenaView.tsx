@@ -78,7 +78,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       return {
         name: 'Emerald',
         badge: '❇️',
-        icon: '/icons/league_emerald.png',
+        icon: '/icons/league_emerald_crest.png',
         color: 'text-emerald-400 border-emerald-500/30 bg-emerald-950/20',
         glow: 'shadow-[0_0_15px_rgba(16,185,129,0.3)]',
         accent: 'text-emerald-400'
@@ -87,7 +87,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       return {
         name: 'Ruby',
         badge: '🩸',
-        icon: '/icons/league_ruby.png',
+        icon: '/icons/league_ruby_crest.png',
         color: 'text-red-400 border-red-500/30 bg-red-950/20',
         glow: 'shadow-[0_0_15px_rgba(239,68,68,0.3)]',
         accent: 'text-red-400'
@@ -105,7 +105,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       return {
         name: 'Master',
         badge: '⚔️',
-        icon: '/icons/league_master.png',
+        icon: '/icons/league_master_crest.png',
         color: 'text-purple-300 border-purple-500/40 bg-purple-950/30',
         glow: 'shadow-[0_0_18px_rgba(168,85,247,0.35)]',
         accent: 'text-purple-400'
@@ -114,7 +114,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       return {
         name: 'Grandmaster',
         badge: '⚜️',
-        icon: '/icons/league_grandmaster.png',
+        icon: '/icons/league_grandmaster_crest.png',
         color: 'text-amber-200 border-amber-400/40 bg-gradient-to-r from-purple-950/40 to-amber-950/40',
         glow: 'shadow-[0_0_20px_rgba(245,158,11,0.35)]',
         accent: 'text-amber-300'
