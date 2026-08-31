@@ -1,7 +1,18 @@
 // @ts-nocheck
 import { SupabaseClient } from '@supabase/supabase-js';
 
-export const PVP_LEAGUES = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Void Overlord'];
+export const PVP_LEAGUES = [
+  'Bronze',
+  'Silver',
+  'Gold',
+  'Platinum',
+  'Emerald',
+  'Ruby',
+  'Diamond',
+  'Master',
+  'Grandmaster',
+  'Void Overlord'
+];
 
 export interface RolloverResult {
   rolledOver: boolean;
@@ -137,18 +148,28 @@ export async function checkAndPerformPvpRollover(
           else if (rank <= 10) { sovereignsReward = 150; goldReward = 2000; dustReward = 200; darkShardsReward = 30; }
           else if (rank <= 20) { sovereignsReward = 80; goldReward = 1000; dustReward = 100; darkShardsReward = 20; }
           else { sovereignsReward = 30; goldReward = 600; dustReward = 60; }
+        } else if (leagueName === 'Grandmaster') {
+          if (rank <= 5) { sovereignsReward = 60; goldReward = 2000; dustReward = 200; darkShardsReward = 25; }
+          else if (rank <= 20) { sovereignsReward = 30; goldReward = 1200; dustReward = 120; darkShardsReward = 15; }
+          else { sovereignsReward = 15; goldReward = 700; dustReward = 70; }
+        } else if (leagueName === 'Master') {
+          if (rank <= 10) { sovereignsReward = 25; goldReward = 1500; dustReward = 150; darkShardsReward = 15; }
+          else { sovereignsReward = 10; goldReward = 600; dustReward = 60; }
         } else if (leagueName === 'Diamond') {
-          if (rank <= 3) { sovereignsReward = 100; goldReward = 2500; dustReward = 250; darkShardsReward = 30; }
-          else if (rank <= 10) { sovereignsReward = 50; goldReward = 1500; dustReward = 150; darkShardsReward = 20; }
-          else if (rank <= 20) { sovereignsReward = 20; goldReward = 800; dustReward = 80; }
-          else { goldReward = 500; dustReward = 50; }
+          if (rank <= 10) { sovereignsReward = 15; goldReward = 1000; dustReward = 100; darkShardsReward = 10; }
+          else { sovereignsReward = 5; goldReward = 500; dustReward = 50; }
+        } else if (leagueName === 'Ruby') {
+          if (rank <= 10) { sovereignsReward = 8; goldReward = 800; dustReward = 80; }
+          else { sovereignsReward = 2; goldReward = 450; dustReward = 45; }
+        } else if (leagueName === 'Emerald') {
+          if (rank <= 10) { sovereignsReward = 4; goldReward = 600; dustReward = 60; }
+          else { sovereignsReward = 1; goldReward = 350; dustReward = 35; }
         } else if (leagueName === 'Platinum') {
-          if (rank <= 10) { sovereignsReward = 10; goldReward = 1000; dustReward = 100; }
-          else { goldReward = 400; dustReward = 40; }
-        } else if (leagueName === 'Gold') {
           goldReward = 300; dustReward = 30;
+        } else if (leagueName === 'Gold') {
+          goldReward = 225; dustReward = 25;
         } else if (leagueName === 'Silver') {
-          goldReward = 200; dustReward = 20;
+          goldReward = 150; dustReward = 15;
         } else {
           goldReward = 100; dustReward = 10;
         }

@@ -32,8 +32,12 @@ export const getNormalizedLeague = (leagueRaw: any): string => {
   if (!leagueRaw || typeof leagueRaw !== 'string') return 'Bronze';
   const l = leagueRaw.trim();
   if (!l) return 'Bronze';
-  if (/overlord|void|grandmaster|gm/i.test(l)) return 'Void Overlord';
+  if (/overlord|void/i.test(l)) return 'Void Overlord';
+  if (/grandmaster|gm/i.test(l)) return 'Grandmaster';
+  if (/master/i.test(l)) return 'Master';
   if (/diamond/i.test(l)) return 'Diamond';
+  if (/ruby/i.test(l)) return 'Ruby';
+  if (/emerald/i.test(l)) return 'Emerald';
   if (/platinum/i.test(l)) return 'Platinum';
   if (/gold/i.test(l)) return 'Gold';
   if (/silver/i.test(l)) return 'Silver';
@@ -49,10 +53,30 @@ export const getLeagueBadgeStyle = (leagueRaw: any) => {
         badge: '👑 VOID OVERLORD',
         className: 'bg-gradient-to-r from-red-950/90 via-purple-950/90 to-red-950/90 border border-red-500/70 text-red-300 shadow-[0_0_15px_rgba(220,38,38,0.5)]'
       };
+    case 'Grandmaster':
+      return {
+        badge: '⚜️ GRANDMASTER',
+        className: 'bg-gradient-to-r from-purple-950/80 via-amber-950/80 to-purple-950/80 border border-amber-400/60 text-amber-200 shadow-[0_0_12px_rgba(245,158,11,0.4)]'
+      };
+    case 'Master':
+      return {
+        badge: '⚔️ MASTER',
+        className: 'bg-purple-950/70 border border-purple-400/60 text-purple-300 shadow-[0_0_10px_rgba(168,85,247,0.35)]'
+      };
     case 'Diamond':
       return {
         badge: '💎 DIAMOND',
         className: 'bg-cyan-950/70 border border-cyan-400/60 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.35)]'
+      };
+    case 'Ruby':
+      return {
+        badge: '🩸 RUBY',
+        className: 'bg-red-950/70 border border-red-500/60 text-red-300 shadow-[0_0_10px_rgba(239,68,68,0.35)]'
+      };
+    case 'Emerald':
+      return {
+        badge: '❇️ EMERALD',
+        className: 'bg-emerald-950/70 border border-emerald-500/60 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.35)]'
       };
     case 'Platinum':
       return {
@@ -647,15 +671,15 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                   PVP LEAGUE POPULATION DISTRIBUTION
                 </h3>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                  {['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Void Overlord'].map(league => {
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                  {['Bronze', 'Silver', 'Gold', 'Platinum', 'Emerald', 'Ruby', 'Diamond', 'Master', 'Grandmaster', 'Void Overlord'].map(league => {
                     const count = overview?.leagueDistribution?.[league] || 0;
                     const total = overview?.totalPlayers || 1;
                     const pct = Math.round((count / total) * 100);
 
                     return (
                       <div key={league} className="bg-white/5 border border-white/10 p-3 rounded-2xl text-center space-y-1">
-                        <span className="font-display font-bold text-xs text-amber-200/90 tracking-wide uppercase block">
+                        <span className="font-display font-bold text-xs text-amber-200/90 tracking-wide uppercase block truncate">
                           {league}
                         </span>
                         <span className="font-mono font-black text-xl text-white block">
@@ -886,8 +910,12 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                       <option value="Silver">Silver League</option>
                       <option value="Gold">Gold League</option>
                       <option value="Platinum">Platinum League</option>
+                      <option value="Emerald">Emerald League</option>
+                      <option value="Ruby">Ruby League</option>
                       <option value="Diamond">Diamond League</option>
-                      <option value="Void Overlord">Void Overlord League (Grandmaster)</option>
+                      <option value="Master">Master League</option>
+                      <option value="Grandmaster">Grandmaster League</option>
+                      <option value="Void Overlord">Void Overlord League</option>
                     </select>
                   )}
 
@@ -1051,7 +1079,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
                     {/* League Filter Pills */}
                     <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 select-none">
-                      {['all', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Void Overlord', 'Banned'].map(l => (
+                      {['all', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Emerald', 'Ruby', 'Diamond', 'Master', 'Grandmaster', 'Void Overlord', 'Banned'].map(l => (
                         <button
                           key={l}
                           onClick={() => setPlayerLeagueFilter(l)}
@@ -1492,7 +1520,11 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           <option value="Silver">🥈 Silver League</option>
                           <option value="Gold">🥇 Gold League</option>
                           <option value="Platinum">🔮 Platinum League</option>
+                          <option value="Emerald">❇️ Emerald League</option>
+                          <option value="Ruby">🩸 Ruby League</option>
                           <option value="Diamond">💎 Diamond League</option>
+                          <option value="Master">⚔️ Master League</option>
+                          <option value="Grandmaster">⚜️ Grandmaster League</option>
                           <option value="Void Overlord">👑 Void Overlord League</option>
                         </select>
                       </div>

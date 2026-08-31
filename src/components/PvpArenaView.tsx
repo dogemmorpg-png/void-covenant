@@ -74,22 +74,58 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         glow: '',
         accent: 'text-indigo-400'
       };
+    } else if (name.startsWith('Emerald')) {
+      return {
+        name: 'Emerald',
+        badge: '❇️',
+        icon: '/icons/league_emerald.png',
+        color: 'text-emerald-400 border-emerald-500/30 bg-emerald-950/20',
+        glow: 'shadow-[0_0_15px_rgba(16,185,129,0.3)]',
+        accent: 'text-emerald-400'
+      };
+    } else if (name.startsWith('Ruby')) {
+      return {
+        name: 'Ruby',
+        badge: '🩸',
+        icon: '/icons/league_ruby.png',
+        color: 'text-red-400 border-red-500/30 bg-red-950/20',
+        glow: 'shadow-[0_0_15px_rgba(239,68,68,0.3)]',
+        accent: 'text-red-400'
+      };
     } else if (name.startsWith('Diamond')) {
       return {
         name: 'Diamond',
         badge: '💎',
         icon: '/icons/league_diamond.png',
         color: 'text-cyan-300 border-cyan-500/30 bg-cyan-950/20',
-        glow: '',
+        glow: 'shadow-[0_0_15px_rgba(6,182,212,0.3)]',
         accent: 'text-cyan-400'
+      };
+    } else if (name.startsWith('Master')) {
+      return {
+        name: 'Master',
+        badge: '⚔️',
+        icon: '/icons/league_master.png',
+        color: 'text-purple-300 border-purple-500/40 bg-purple-950/30',
+        glow: 'shadow-[0_0_18px_rgba(168,85,247,0.35)]',
+        accent: 'text-purple-400'
+      };
+    } else if (name.startsWith('Grandmaster')) {
+      return {
+        name: 'Grandmaster',
+        badge: '⚜️',
+        icon: '/icons/league_grandmaster.png',
+        color: 'text-amber-200 border-amber-400/40 bg-gradient-to-r from-purple-950/40 to-amber-950/40',
+        glow: 'shadow-[0_0_20px_rgba(245,158,11,0.35)]',
+        accent: 'text-amber-300'
       };
     } else {
       return {
         name: 'Void Overlord',
         badge: '👑',
         icon: '/icons/league_void_overlord.png',
-        color: 'text-rose-400 border-rose-500/30 bg-rose-950/20',
-        glow: '',
+        color: 'text-rose-400 border-rose-500/40 bg-rose-950/30',
+        glow: 'shadow-[0_0_25px_rgba(244,63,94,0.4)]',
         accent: 'text-rose-500'
       };
     }
@@ -329,7 +365,18 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   }, []);
 
   const cycleLeague = (dir: 'prev' | 'next') => {
-    const LEAGUES = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Void Overlord'];
+    const LEAGUES = [
+      'Bronze',
+      'Silver',
+      'Gold',
+      'Platinum',
+      'Emerald',
+      'Ruby',
+      'Diamond',
+      'Master',
+      'Grandmaster',
+      'Void Overlord'
+    ];
     const idx = LEAGUES.indexOf(viewingLeague);
     if (dir === 'prev') {
       const prevIdx = idx > 0 ? idx - 1 : LEAGUES.length - 1;

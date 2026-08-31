@@ -251,7 +251,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           'Silver': 0,
           'Gold': 0,
           'Platinum': 0,
+          'Emerald': 0,
+          'Ruby': 0,
           'Diamond': 0,
+          'Master': 0,
+          'Grandmaster': 0,
           'Void Overlord': 0
         };
 
@@ -267,7 +271,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           if (lastActive >= sevenDaysAgo) active7d++;
 
           const rawLeague = d.pvpLeague || d.league || 'Bronze';
-          const normLeague = (/overlord|grandmaster|void/i.test(rawLeague)) ? 'Void Overlord' : rawLeague;
+          let normLeague = 'Bronze';
+          if (/overlord|void/i.test(rawLeague)) normLeague = 'Void Overlord';
+          else if (/grandmaster|gm/i.test(rawLeague)) normLeague = 'Grandmaster';
+          else if (/master/i.test(rawLeague)) normLeague = 'Master';
+          else if (/diamond/i.test(rawLeague)) normLeague = 'Diamond';
+          else if (/ruby/i.test(rawLeague)) normLeague = 'Ruby';
+          else if (/emerald/i.test(rawLeague)) normLeague = 'Emerald';
+          else if (/platinum/i.test(rawLeague)) normLeague = 'Platinum';
+          else if (/gold/i.test(rawLeague)) normLeague = 'Gold';
+          else if (/silver/i.test(rawLeague)) normLeague = 'Silver';
+          else normLeague = 'Bronze';
+
           if (leagueDistribution[normLeague] !== undefined) {
             leagueDistribution[normLeague]++;
           } else {
@@ -472,11 +487,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               p.wallet_address?.toLowerCase() === targetValue?.toLowerCase() ||
               d.username?.toLowerCase() === targetValue?.toLowerCase();
           } else if (targetType === 'league') {
-            const rawL = (d.pvpLeague || d.league || 'Bronze').toLowerCase();
-            const targetL = (targetValue || '').toLowerCase();
-            const isTargetOverlord = /overlord|grandmaster|void/i.test(targetL);
-            const isUserOverlord = /overlord|grandmaster|void/i.test(rawL);
-            shouldSend = (isTargetOverlord && isUserOverlord) || rawL === targetL;
+            const rawL = (d.pvpLeague || d.league || 'Bronze').trim().toLowerCase();
+            const targetL = (targetValue || '').trim().toLowerCase();
+            shouldSend = rawL === targetL;
           }
 
           if (shouldSend) {
