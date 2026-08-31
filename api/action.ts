@@ -596,6 +596,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
+      if (action === 'admin_delete_player') {
+        const { targetWallet } = payload || {};
+        if (!targetWallet) {
+          return res.status(400).json({ error: 'Missing targetWallet' });
+        }
+
+        const { error: delErr } = await supabase
+          .from('profiles')
+          .delete()
+          .eq('wallet_address', targetWallet);
+
+        if (delErr) {
+          return res.status(500).json({ error: 'Failed to delete player profile', details: delErr });
+        }
+
+        return res.status(200).json({ success: true, message: `Player ${targetWallet} deleted successfully.` });
+      }
+
       if (action === 'admin_trigger_rollover') {
         const rolloverResult = await checkAndPerformPvpRollover(supabase, true);
         return res.status(200).json({

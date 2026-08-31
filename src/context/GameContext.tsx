@@ -48,9 +48,10 @@ interface GameContextType {
   fetchAdminWithdrawals: () => Promise<{ success: boolean; requests?: any[]; error?: string }>;
   processAdminWithdrawal: (requestId: string, userWallet: string, decision: 'approve' | 'reject', txid?: string, reason?: string) => Promise<{ success: boolean; message: string }>;
   broadcastAdminMail: (targetType: string, targetValue: string, title: string, content: string, rewards?: any) => Promise<{ success: boolean; message: string; sentCount?: number }>;
-  searchAdminPlayer: (query: string) => Promise<{ success: boolean; matches?: any[]; error?: string }>;
+  searchAdminPlayer: (query: string) => Promise<{ success: boolean; message: string; matches?: any[]; players?: any[] }>;
   modifyAdminPlayer: (targetWallet: string, updates: any) => Promise<{ success: boolean; message: string; profile?: any }>;
-  triggerAdminRollover: () => Promise<{ success: boolean; message: string }>;
+  deleteAdminPlayer: (targetWallet: string) => Promise<{ success: boolean; message: string }>;
+  triggerAdminRollover: () => Promise<{ success: boolean; message: string; rolloverResult?: any }>;
   isShardsShopOpen: boolean;
   setIsShardsShopOpen: (open: boolean) => void;
 }
@@ -1200,6 +1201,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return submitAction('admin_modify_player', { targetWallet, updates });
   };
 
+  const deleteAdminPlayer = async (targetWallet: string) => {
+    return submitAction('admin_delete_player', { targetWallet });
+  };
+
   const triggerAdminRollover = async () => {
     return submitAction('admin_trigger_rollover', {});
   };
@@ -1252,6 +1257,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         broadcastAdminMail,
         searchAdminPlayer,
         modifyAdminPlayer,
+        deleteAdminPlayer,
         triggerAdminRollover,
         isShardsShopOpen,
         setIsShardsShopOpen

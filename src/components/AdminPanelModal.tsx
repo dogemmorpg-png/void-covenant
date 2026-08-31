@@ -109,6 +109,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
     broadcastAdminMail, 
     searchAdminPlayer, 
     modifyAdminPlayer, 
+    deleteAdminPlayer,
     triggerAdminRollover 
   } = useGame();
 
@@ -404,6 +405,32 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
       }
     } catch (e: any) {
       setPlayerModifyFeedback(`❌ ${e.message || 'Action failed'}`);
+    } finally {
+      setIsModifyingPlayer(false);
+    }
+  };
+
+  const handleDeletePlayer = async () => {
+    if (!selectedPlayer) return;
+    const name = selectedPlayer.profile?.username || selectedPlayer.walletAddress;
+    if (!window.confirm(`⚠️ PERMANENT DELETION\n\nAre you sure you want to permanently delete player "${name}" (${selectedPlayer.walletAddress}) from the database? This action cannot be undone.`)) {
+      return;
+    }
+
+    setIsModifyingPlayer(true);
+    try {
+      const res = await deleteAdminPlayer(selectedPlayer.walletAddress);
+      if (res.success) {
+        setPlayerModifyFeedback('✅ Player account deleted permanently.');
+        setTimeout(() => {
+          setSelectedPlayer(null);
+          loadAllPlayers('');
+        }, 1000);
+      } else {
+        setPlayerModifyFeedback(`❌ ${res.message || 'Delete failed'}`);
+      }
+    } catch (e: any) {
+      setPlayerModifyFeedback(`❌ ${e.message || 'Error deleting player'}`);
     } finally {
       setIsModifyingPlayer(false);
     }
@@ -1540,7 +1567,15 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                       </div>
                     </div>
 
-                    <div className="pt-2 flex justify-end">
+                    <div className="pt-2 flex items-center justify-between gap-3 border-t border-white/10 mt-2">
+                      <button
+                        onClick={handleDeletePlayer}
+                        disabled={isModifyingPlayer}
+                        className="px-4 py-2.5 bg-red-950/70 hover:bg-red-900 border border-red-500/50 hover:border-red-400 text-red-300 hover:text-white font-display font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md disabled:opacity-50"
+                      >
+                        🗑️ DELETE ACCOUNT
+                      </button>
+
                       <button
                         onClick={handleSavePlayerModifications}
                         disabled={isModifyingPlayer}
