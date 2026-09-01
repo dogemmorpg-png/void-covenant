@@ -805,6 +805,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (profile.pvpEnergy === undefined) profile.pvpEnergy = 5;
       profile.pvpTickets = (profile.pvpEnergy || 0) + profile.pvpBonusTickets;
       successMessage = `Bought ${ticketCount} Arena Tickets for ${ticketCost} Shards (added to Reserve)!`;
+    } else if (action === 'buy_pve_energy') {
+      const energyCount = payload?.energyCount || 10;
+      let shardCost = 25;
+      if (energyCount === 3) shardCost = 10;
+      else if (energyCount === 25) shardCost = 50;
+      else if (energyCount !== 10) {
+        return res.status(400).json({ error: 'Invalid energy package' });
+      }
+
+      const currentShards = profile.darkShards || 0;
+      if (currentShards < shardCost) {
+        return res.status(400).json({ error: 'Not enough Dark Shards' });
+      }
+
+      profile.darkShards = currentShards - shardCost;
+      profile.pveEnergy = (profile.pveEnergy || 0) + energyCount;
+      if (profile.pveEnergyMax === undefined) profile.pveEnergyMax = 10;
+      successMessage = `Restored +${energyCount} PvE Energy for ${shardCost} Shards!`;
+      responseData = { energyCount, shardCost, newEnergy: profile.pveEnergy };
     } else if (action === 'withdrawal') {
       const { amountSovereigns, targetAddress } = payload || {};
       const numAmount = parseInt(amountSovereigns, 10);

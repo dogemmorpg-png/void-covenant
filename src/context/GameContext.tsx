@@ -21,6 +21,7 @@ interface GameContextType {
   usePveEnergy: (amount: number) => boolean;
   usePvpEnergy: (amount: number) => boolean;
   buyPvpTickets: (ticketCount?: number) => Promise<boolean>;
+  buyPveEnergy: (energyCount?: number) => Promise<boolean>;
   startBattleOnServer: (battleType: 'campaign' | 'pvp', stageId: string, energyCost: number, opponentPayload?: any) => Promise<boolean>;
   buyDarkShardsWithSOL: (solAmount: number) => Promise<boolean>;
   verifySolanaPayment: (signature: string, packageId: string) => Promise<{ success: boolean; message: string }>;
@@ -723,6 +724,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return res.success;
   };
 
+  const buyPveEnergy = async (energyCount: number = 10): Promise<boolean> => {
+    const res = await submitAction('buy_pve_energy', { energyCount });
+    if (res.success && res.profile) {
+      setProfile(res.profile);
+      saveProfile(res.profile);
+    }
+    return res.success;
+  };
+
   // Buy Shards using SOL (Legacy alias)
   const buyDarkShardsWithSOL = async (solAmount: number): Promise<boolean> => {
     const res = await submitAction('buy_shards', { solAmount });
@@ -1272,6 +1282,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         usePveEnergy,
         usePvpEnergy,
         buyPvpTickets,
+        buyPveEnergy,
         startBattleOnServer,
         buyDarkShardsWithSOL,
         verifySolanaPayment,

@@ -16,7 +16,6 @@ export function calculateEnergy(profile: PlayerProfile): PlayerProfile {
   
   if (currentPve >= pveMax) {
     newLastPve = now;
-    currentPve = pveMax;
   } else if (timePassedPve >= pveRegenInterval) {
     const gained = Math.floor(timePassedPve / pveRegenInterval);
     currentPve = Math.min(pveMax, currentPve + gained);

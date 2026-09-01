@@ -3,7 +3,7 @@ import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { generateCampaignStage } from '../data/cards';
 import { CampaignStage } from '../types';
-import { Skull, Swords, Award, ChevronLeft, ChevronRight, Crown, Star, FastForward } from 'lucide-react';
+import { Skull, Swords, Award, ChevronLeft, ChevronRight, Crown, Star, FastForward, Plus, X } from 'lucide-react';
 import { assetPreloader } from '../utils/assetPreloader';
 
 interface CampaignViewProps {
@@ -11,9 +11,11 @@ interface CampaignViewProps {
 }
 
 export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => {
-  const { profile, submitAction } = useGame();
+  const { profile, submitAction, buyPveEnergy, setIsShardsShopOpen } = useGame();
   const toast = useToast();
   const [isSweeping, setIsSweeping] = useState(false);
+  const [isBuyEnergyModalOpen, setIsBuyEnergyModalOpen] = useState(false);
+  const [isPurchasingEnergy, setIsPurchasingEnergy] = useState(false);
   
   const maxFloor = profile.pveProgress || 1;
   const [viewingFloor, setViewingFloor] = useState<number>(maxFloor);
@@ -63,7 +65,8 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
       return;
     }
     if ((profile.pveEnergy || 0) < selectedStage.energyCost) {
-      toast('Not enough PvE energy! Wait for recovery.', 'warning');
+      toast('Not enough PvE energy! Opening Energy Vault...', 'warning');
+      setIsBuyEnergyModalOpen(true);
       return;
     }
     onStartBattle(selectedStage);
@@ -72,7 +75,8 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
   const handleSweep = async () => {
     if (isSweeping) return;
     if ((profile.pveEnergy || 0) < selectedStage.energyCost) {
-      toast('Not enough PvE energy for a sweep!', 'warning');
+      toast('Not enough PvE energy for a sweep! Opening Energy Vault...', 'warning');
+      setIsBuyEnergyModalOpen(true);
       return;
     }
     setIsSweeping(true);
@@ -127,9 +131,13 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
               Descend into the infinite depths. Defeat the dark entities to claim ancient resources.
             </p>
 
-            {/* Prominent Centered Energy Badge */}
-            <div className="mt-3.5 inline-flex items-center gap-2.5 bg-gradient-to-r from-[#061c12] via-black to-[#061c12] border border-emerald-500/50 hover:border-emerald-400/80 rounded-full px-4 py-1.5 shadow-[0_0_18px_rgba(16,185,129,0.25)] select-none transition-all cursor-default">
-              <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.9)]" />
+            {/* Prominent Centered Energy Badge with + Button */}
+            <div 
+              onClick={() => setIsBuyEnergyModalOpen(true)}
+              className="mt-3.5 inline-flex items-center gap-2.5 bg-gradient-to-r from-[#061c12] via-black to-[#061c12] border border-emerald-500/50 hover:border-emerald-400 rounded-full py-1 pl-3 pr-1.5 shadow-[0_0_18px_rgba(16,185,129,0.25)] hover:shadow-[0_0_24px_rgba(16,185,129,0.4)] select-none transition-all cursor-pointer group hover:scale-105 active:scale-95"
+              title="Click to Refill Energy with Dark Shards"
+            >
+              <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.9)] group-hover:scale-110 transition-transform" />
               <div className="flex items-baseline gap-1.5 leading-none">
                 <span className="font-display font-bold text-xs text-gray-300 tracking-wider">ENERGY:</span>
                 <span className="font-mono text-sm font-black text-emerald-400">
@@ -139,9 +147,12 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                   / {profile.pveEnergyMax || 10}
                 </span>
               </div>
-              <span className="font-mono text-[11px] text-emerald-300/90 font-bold border-l border-emerald-500/30 pl-2">
+              <span className="font-mono text-[11px] text-emerald-300/90 font-bold border-l border-emerald-500/30 pl-2 pr-1">
                 {timeUntilRegen ? `+1 in ${timeUntilRegen}` : 'Full Energy'}
               </span>
+              <div className="w-5 h-5 rounded-full bg-gradient-to-b from-emerald-500 to-emerald-700 group-hover:from-emerald-400 group-hover:to-emerald-600 text-black flex items-center justify-center border border-emerald-300/50 shadow-[0_0_10px_rgba(16,185,129,0.6)] group-hover:scale-110 active:scale-95 transition-all">
+                <Plus className="w-3.5 h-3.5 stroke-[3] text-black" />
+              </div>
             </div>
           </div>
 
@@ -316,6 +327,195 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
         </div>
 
       </div>
+
+      {/* Abyssal Energy Vault Modal */}
+      {isBuyEnergyModalOpen && (
+        <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-gradient-to-b from-[#0f1f17] via-[#09140f] to-[#040906] border-2 border-emerald-500/50 rounded-3xl p-6 sm:p-8 max-w-xl w-full relative shadow-[0_0_60px_rgba(0,0,0,0.95)] space-y-6 overflow-hidden">
+            
+            {/* Ambient Background Flares */}
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-emerald-500/15 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-teal-500/10 blur-3xl pointer-events-none" />
+
+            {/* Close Button */}
+            <button
+              onClick={() => setIsBuyEnergyModalOpen(false)}
+              className="absolute top-5 right-5 text-gray-400 hover:text-white font-sans text-base font-black transition-all cursor-pointer w-9 h-9 flex items-center justify-center bg-black/70 hover:bg-black border border-white/10 hover:border-white/30 rounded-full z-30 shadow-lg hover:scale-105 active:scale-95"
+              title="Close"
+            >
+              ✕
+            </button>
+
+            {/* Header with Glowing Energy Emblem */}
+            <div className="text-center space-y-2 relative z-10 px-10">
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-b from-emerald-950/80 via-black to-black border-2 border-emerald-500/60 flex items-center justify-center shadow-[0_0_25px_rgba(16,185,129,0.35)]">
+                <img src="/icons/icon_energy.webp" alt="Energy" className="w-10 h-10 object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.85)]" />
+              </div>
+              <h3 className="font-display font-black text-2xl text-transparent bg-clip-text bg-gradient-to-b from-emerald-100 via-emerald-300 to-teal-400 tracking-widest uppercase text-shadow-gold">
+                ABYSSAL ENERGY VAULT
+              </h3>
+              <p className="text-xs text-gray-300 font-sans max-w-sm mx-auto leading-relaxed">
+                Exchange Dark Shards for PvE Energy to descend deeper into the Endless Abyss.
+              </p>
+            </div>
+
+            {/* Status Bar: Current Energy + Regen Timer + Shards Balance */}
+            <div className="grid grid-cols-3 gap-2 bg-black/60 border border-white/10 rounded-2xl p-3 relative z-10 shadow-inner">
+              <div className="flex flex-col items-center justify-center border-r border-white/10 pr-1 text-center">
+                <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Current Energy</span>
+                <span className="font-mono text-base font-black text-emerald-400 flex items-center gap-1 mt-0.5">
+                  <img src="/icons/icon_energy.webp" alt="Energy" className="w-4 h-4 object-contain" />
+                  {profile.pveEnergy || 0}/{profile.pveEnergyMax || 10}
+                </span>
+                <span className="text-[7.5px] text-gray-500 font-mono mt-0.5">
+                  {timeUntilRegen ? `+1 in ${timeUntilRegen}` : 'Full'}
+                </span>
+              </div>
+
+              <div className="flex flex-col items-center justify-center border-r border-white/10 px-1 text-center">
+                <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Passive Regen</span>
+                <span className="font-mono text-base font-black text-teal-300 flex items-center gap-1 mt-0.5">
+                  +1 / 20m
+                </span>
+                <span className="text-[7.5px] text-gray-500 font-mono mt-0.5">Automatic</span>
+              </div>
+
+              <div className="flex flex-col items-center justify-center pl-1 text-center">
+                <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Your Shards</span>
+                <span className="font-mono text-base font-black text-rose-300 flex items-center gap-1 mt-0.5">
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                  {profile.darkShards || 0}
+                </span>
+                <span className="text-[7.5px] text-gray-500 font-mono mt-0.5">Currency</span>
+              </div>
+            </div>
+
+            {/* 3 Energy Packages */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 relative z-10">
+              {[
+                { 
+                  count: 3, 
+                  cost: 10, 
+                  label: 'Minor Vial', 
+                  sub: '+3 Abyss Energy',
+                  theme: 'border-white/10 hover:border-emerald-500/40 bg-gradient-to-b from-zinc-950 via-black to-black' 
+                },
+                { 
+                  count: 10, 
+                  cost: 25, 
+                  label: 'Abyssal Flask', 
+                  sub: '+10 Full Refill', 
+                  popular: true, 
+                  badge: 'MOST POPULAR',
+                  theme: 'border-emerald-500/60 hover:border-emerald-400 bg-gradient-to-b from-emerald-950/30 via-black to-black shadow-[0_0_20px_rgba(16,185,129,0.15)]' 
+                },
+                { 
+                  count: 25, 
+                  cost: 50, 
+                  label: 'Grand Elixir', 
+                  sub: '+25 Big Reserve', 
+                  badge: 'SAVE 25 SHARDS',
+                  theme: 'border-amber-500/60 hover:border-amber-400 bg-gradient-to-b from-amber-950/30 via-black to-black shadow-[0_0_20px_rgba(245,158,11,0.15)]' 
+                }
+              ].map((pkg) => {
+                const canAfford = (profile.darkShards || 0) >= pkg.cost;
+
+                return (
+                  <div 
+                    key={pkg.count}
+                    className={`relative rounded-2xl border p-4 flex flex-col items-center justify-between text-center transition-all duration-300 ${pkg.theme}`}
+                  >
+                    {/* Popular / Value Badge */}
+                    {pkg.badge && (
+                      <div className={`absolute -top-2.5 px-2 py-0.5 rounded-full text-[8.5px] font-mono font-black tracking-wider uppercase border shadow-md ${
+                        pkg.popular 
+                          ? 'bg-emerald-500 text-black border-emerald-300 shadow-emerald-500/40' 
+                          : 'bg-amber-500 text-black border-amber-300 shadow-amber-500/40'
+                      }`}>
+                        {pkg.badge}
+                      </div>
+                    )}
+
+                    {/* Top: Icon + Count */}
+                    <div className="space-y-1.5 mt-1">
+                      <div className="w-12 h-12 mx-auto rounded-xl bg-black/60 border border-white/10 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
+                        <img src="/icons/icon_energy.webp" alt="Energy" className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                      </div>
+                      <div className="font-display font-black text-xl text-white">
+                        +{pkg.count}
+                      </div>
+                      <div className="font-display font-bold text-xs text-gray-300 uppercase tracking-wide">
+                        {pkg.label}
+                      </div>
+                      <div className="text-[10px] text-gray-400 font-sans">
+                        {pkg.sub}
+                      </div>
+                    </div>
+
+                    {/* Bottom: Price Button */}
+                    <div className="w-full mt-4">
+                      <button
+                        onClick={async () => {
+                          if (isPurchasingEnergy) return;
+                          if (!canAfford) {
+                            toast(`Not enough Dark Shards! Need ${pkg.cost} Shards.`, 'warning');
+                            setIsShardsShopOpen(true);
+                            return;
+                          }
+                          setIsPurchasingEnergy(true);
+                          try {
+                            const success = await buyPveEnergy(pkg.count);
+                            if (success) {
+                              toast(`Successfully restored +${pkg.count} PvE Energy!`, 'success');
+                            } else {
+                              toast('Failed to purchase energy. Please try again.', 'error');
+                            }
+                          } finally {
+                            setIsPurchasingEnergy(false);
+                          }
+                        }}
+                        disabled={isPurchasingEnergy}
+                        className={`w-full py-2.5 rounded-xl font-display font-black tracking-wider text-xs transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-md ${
+                          canAfford
+                            ? pkg.popular
+                              ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black shadow-emerald-500/20 hover:scale-105 active:scale-95'
+                              : 'bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:scale-105 active:scale-95'
+                            : 'bg-red-950/30 text-red-400/80 border border-red-500/30 hover:bg-red-950/50'
+                        }`}
+                      >
+                        {isPurchasingEnergy ? (
+                          <span>Brewing...</span>
+                        ) : (
+                          <>
+                            <span>{pkg.cost}</span>
+                            <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Note */}
+            <div className="bg-black/70 border border-white/10 rounded-2xl p-3 text-center text-xs text-gray-300 font-sans leading-relaxed relative z-10 shadow-inner flex items-center justify-center gap-2">
+              <span className="text-emerald-400 text-sm">💡</span>
+              <span>
+                <strong className="text-emerald-300">Overflow Protected:</strong> Energy purchased with Dark Shards is added on top of your limit and never expires.
+              </span>
+            </div>
+
+            {/* Back Button */}
+            <button
+              onClick={() => setIsBuyEnergyModalOpen(false)}
+              className="w-full py-3 rounded-2xl border border-white/10 hover:border-white/20 bg-black/40 hover:bg-black/60 text-gray-300 hover:text-white font-display font-bold tracking-widest text-xs transition-colors cursor-pointer uppercase relative z-10"
+            >
+              Back to Abyss
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );
