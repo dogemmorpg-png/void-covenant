@@ -1161,11 +1161,6 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                         <h4 className="font-display font-black text-xl sm:text-2xl text-white tracking-widest uppercase">
                           {currentTier.name} LEAGUE
                         </h4>
-                        {isMyLeague && (
-                          <span className="font-mono text-[10px] font-black uppercase bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 px-2.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.4)]">
-                            ⭐ Your Active League
-                          </span>
-                        )}
                       </div>
                     </div>
 
@@ -1215,7 +1210,11 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                                 {/* Blood Sovereigns */}
                                 {bracket.sovereigns !== undefined && bracket.sovereigns > 0 && (
                                   <div className="bg-gradient-to-b from-amber-950/60 via-black to-black border border-amber-400/60 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-[0_0_12px_rgba(245,158,11,0.25)]">
-                                    <Crown className="w-4 h-4 text-amber-400" />
+                                    <img 
+                                      src="/icons/icon_sovereign.webp" 
+                                      alt="SOV" 
+                                      className="w-5 h-5 sm:w-5.5 sm:h-5.5 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.6)] brightness-110 shrink-0" 
+                                    />
                                     <span className="font-display font-black text-xs sm:text-sm text-amber-300">
                                       +{bracket.sovereigns}
                                     </span>
@@ -1226,7 +1225,11 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                                 {/* Dark Shards */}
                                 {bracket.darkShards !== undefined && bracket.darkShards > 0 && (
                                   <div className="bg-gradient-to-b from-rose-950/60 via-black to-black border border-rose-500/40 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-[0_0_10px_rgba(239,68,68,0.2)]">
-                                    <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                                    <img 
+                                      src="/icons/icon_shards.webp" 
+                                      alt="Shards" 
+                                      className="w-5.5 h-5.5 sm:w-6 sm:h-6 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.7)] brightness-115 scale-110 shrink-0" 
+                                    />
                                     <span className="font-display font-black text-xs sm:text-sm text-rose-400">
                                       +{bracket.darkShards}
                                     </span>
@@ -1236,7 +1239,11 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
                                 {/* Gold */}
                                 <div className="bg-gradient-to-b from-yellow-950/40 via-black to-black border border-yellow-500/30 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner">
-                                  <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain" />
+                                  <img 
+                                    src="/icons/icon_gold.webp" 
+                                    alt="Gold" 
+                                    className="w-5 h-5 sm:w-5.5 sm:h-5.5 object-contain drop-shadow-[0_0_8px_rgba(234,179,8,0.5)] brightness-110 shrink-0" 
+                                  />
                                   <span className="font-display font-black text-xs sm:text-sm text-amber-300">
                                     +{bracket.gold}
                                   </span>
@@ -1245,7 +1252,11 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
                                 {/* Void Dust */}
                                 <div className="bg-gradient-to-b from-cyan-950/40 via-black to-black border border-cyan-500/30 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner">
-                                  <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 object-contain" />
+                                  <img 
+                                    src="/icons/icon_dust.webp" 
+                                    alt="Dust" 
+                                    className="w-5.5 h-5.5 sm:w-6 sm:h-6 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.7)] brightness-115 scale-120 shrink-0" 
+                                  />
                                   <span className="font-display font-black text-xs sm:text-sm text-[#66fcf1]">
                                     +{bracket.dust}
                                   </span>
