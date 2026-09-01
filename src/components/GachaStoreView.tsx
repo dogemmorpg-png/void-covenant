@@ -7,6 +7,7 @@ import { useToast } from './Toast';
 import { CARD_TEMPLATES, createCardInstance } from '../data/cards';
 import { Card, CardTier, Equipment } from '../types';
 import { getRandomEquipmentByTier, generateEquipmentInstance, getEquipmentIcon } from '../data/equipment';
+import { Gem, Coins, Sparkles, Box, Trash2, Shield, Flame, Skull, Sword } from 'lucide-react';
 import { assetPreloader, getCardImageUrl } from '../utils/assetPreloader';
 
 const renderManaIcon = (cost: number, sizeClass: string = "w-5 h-5") => {
