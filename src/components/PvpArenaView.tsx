@@ -32,7 +32,7 @@ const LEAGUE_QUICK_RULES: Record<string, { promo: string; safe: string; demo: st
 };
 
 const LEAGUE_TABLE_DATA = [
-  { name: 'Void Overlord', icon: '/icons/league_void_overlord.png', capacity: '10 Seats (Pinnacle)', color: 'text-rose-400', promo: '', safe: 'Ranks #1 – #7', demo: 'Ranks #8 – #10' },
+  { name: 'Void Overlord', icon: '/icons/league_void_overlord.png', capacity: '10 Seats', color: 'text-rose-400', promo: '', safe: 'Ranks #1 – #7', demo: 'Ranks #8 – #10' },
   { name: 'Grandmaster', icon: '/icons/league_grandmaster_crest.png', capacity: '30 Seats', color: 'text-amber-300', promo: 'Top 3 (#1–#3)', safe: 'Ranks #4 – #20', demo: 'Ranks #21 – #30' },
   { name: 'Master', icon: '/icons/league_master_crest.png', capacity: '50 Seats', color: 'text-purple-300', promo: 'Top 7 (#1–#7)', safe: 'Ranks #8 – #30', demo: 'Ranks #31 – #50' },
   { name: 'Diamond', icon: '/icons/league_diamond.png', capacity: '150 Seats', color: 'text-cyan-300', promo: 'Top 15 (#1–#15)', safe: 'Ranks #16 – #80', demo: 'Ranks #81 – #150' },
@@ -1620,7 +1620,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                 LEAGUE HIERARCHY & RESET RULES
               </h3>
               <p className="text-xs text-gray-300 font-sans max-w-lg mx-auto leading-relaxed">
-                The Arena ladder resolves daily at <strong className="text-amber-400 font-mono">00:00 UTC</strong>. Fixed elite capacities with high turnover ensure non-stop competitive pressure:
+                The Arena ladder resets daily at <strong className="text-amber-400 font-mono">00:00 UTC</strong>. Battle for top standings, ascend through the leagues, and claim your daily tributes:
               </p>
             </div>
 
