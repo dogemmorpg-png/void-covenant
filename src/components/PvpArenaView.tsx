@@ -18,6 +18,32 @@ interface PvpArenaViewProps {
   setIsModalOpen: (val: boolean) => void;
 }
 
+const LEAGUE_QUICK_RULES: Record<string, { promo: string; safe: string; demo: string }> = {
+  'Void Overlord': { promo: '10 Seats', safe: '1–7: Safe', demo: '8–10: Demote' },
+  'Grandmaster': { promo: 'Top 3: Promote', safe: '4–20: Safe', demo: '21–30: Demote' },
+  'Master': { promo: 'Top 7: Promote', safe: '8–30: Safe', demo: '31–50: Demote' },
+  'Diamond': { promo: 'Top 15: Promote', safe: '16–80: Safe', demo: '81–150: Demote' },
+  'Ruby': { promo: 'Top 20: Promote', safe: '21–100: Safe', demo: '101+: Demote' },
+  'Emerald': { promo: 'Top 25: Promote', safe: '26–100: Safe', demo: '101+: Demote' },
+  'Platinum': { promo: 'Top 30: Promote', safe: '31–100: Safe', demo: '101+: Demote' },
+  'Gold': { promo: 'Top 40: Promote', safe: '41–120: Safe', demo: '121+: Demote' },
+  'Silver': { promo: 'Top 50: Promote', safe: '51–150: Safe', demo: '151+: Demote' },
+  'Bronze': { promo: 'Top 60: Promote', safe: '61+: Safe', demo: 'No Demote' }
+};
+
+const LEAGUE_TABLE_DATA = [
+  { name: 'Void Overlord', icon: '/icons/league_void_overlord.png', capacity: '10 Seats (Pinnacle)', color: 'text-rose-400', promo: '', safe: 'Ranks #1 – #7', demo: 'Ranks #8 – #10' },
+  { name: 'Grandmaster', icon: '/icons/league_grandmaster_crest.png', capacity: '30 Seats', color: 'text-amber-300', promo: 'Top 3 (#1–#3)', safe: 'Ranks #4 – #20', demo: 'Ranks #21 – #30' },
+  { name: 'Master', icon: '/icons/league_master_crest.png', capacity: '50 Seats', color: 'text-purple-300', promo: 'Top 7 (#1–#7)', safe: 'Ranks #8 – #30', demo: 'Ranks #31 – #50' },
+  { name: 'Diamond', icon: '/icons/league_diamond.png', capacity: '150 Seats', color: 'text-cyan-300', promo: 'Top 15 (#1–#15)', safe: 'Ranks #16 – #80', demo: 'Ranks #81 – #150' },
+  { name: 'Ruby', icon: '/icons/league_ruby_crest.png', capacity: '~250 Seats', color: 'text-red-400', promo: 'Top 20 (#1–#20)', safe: 'Ranks #21 – #100', demo: 'Ranks #101+' },
+  { name: 'Emerald', icon: '/icons/league_emerald_crest.png', capacity: '~350 Seats', color: 'text-emerald-400', promo: 'Top 25 (#1–#25)', safe: 'Ranks #26 – #100', demo: 'Ranks #101+' },
+  { name: 'Platinum', icon: '/icons/league_platinum.png', capacity: '~500 Seats', color: 'text-indigo-300', promo: 'Top 30 (#1–#30)', safe: 'Ranks #31 – #100', demo: 'Ranks #101+' },
+  { name: 'Gold', icon: '/icons/league_gold.png', capacity: 'Open Tier', color: 'text-yellow-400', promo: 'Top 40 (#1–#40)', safe: 'Ranks #41 – #120', demo: 'Ranks #121+' },
+  { name: 'Silver', icon: '/icons/league_silver.png', capacity: 'Open Tier', color: 'text-gray-300', promo: 'Top 50 (#1–#50)', safe: 'Ranks #51 – #150', demo: 'Ranks #151+' },
+  { name: 'Bronze', icon: '/icons/league_bronze.png', capacity: 'Open Tier', color: 'text-amber-400', promo: 'Top 60 (#1–#60)', safe: 'Ranks #61+', demo: '' }
+];
+
 export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ 
   onStartBattle, 
   isMatching, 
@@ -1212,24 +1238,27 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
             {/* PROMOTION / DEMOTION QUICK LEGEND BAR */}
             {(() => {
-              const currentTierData = (leagueRewardsConfig || ALL_LEAGUE_REWARDS).find(l => l.name === viewingLeague) || ALL_LEAGUE_REWARDS.find(l => l.name === viewingLeague);
-              const promoZone = currentTierData?.promotionZone;
+              const rules = LEAGUE_QUICK_RULES[viewingLeague] || { promo: 'Promote', safe: 'Safe', demo: 'Demote' };
+              const isOverlord = viewingLeague === 'Void Overlord';
+              const isBronze = viewingLeague === 'Bronze';
+
               return (
                 <div 
                   onClick={() => setIsLeagueRulesModalOpen(true)}
-                  className="bg-black/60 border border-white/10 hover:border-amber-500/40 rounded-xl py-2 px-3.5 flex items-center justify-center text-xs font-mono shadow-inner cursor-pointer transition-all hover:bg-black/80 group"
-                  title="Click to view full League rules"
+                  className="bg-black/70 border border-white/10 hover:border-amber-500/40 rounded-xl py-2 px-3 flex items-center justify-between text-xs font-mono shadow-inner cursor-pointer transition-all hover:bg-black/90 group"
+                  title="Click to view full League rules table"
                 >
-                  {promoZone ? (
-                    <span className="text-gray-200 font-bold text-[11px] truncate w-full text-center flex items-center justify-center gap-1.5">
-                      <span className="text-amber-400">📜</span>
-                      <span>{promoZone}</span>
-                    </span>
-                  ) : (
-                    <span className="text-gray-300 font-medium text-[11px]">
-                      Click to view league promotion & demotion rules
-                    </span>
-                  )}
+                  <span className={`flex items-center gap-1 font-bold ${isOverlord ? 'text-amber-300' : 'text-emerald-400'}`}>
+                    <span className="text-xs leading-none">{isOverlord ? '👑' : '▲'}</span>
+                    <span>{rules.promo}</span>
+                  </span>
+                  <span className="text-gray-600 font-bold">•</span>
+                  <span className="text-gray-300 font-medium">{rules.safe}</span>
+                  <span className="text-gray-600 font-bold">•</span>
+                  <span className={`flex items-center gap-1 font-bold ${isBronze ? 'text-gray-500' : 'text-rose-400'}`}>
+                    <span className="text-xs leading-none">{isBronze ? '🛡️' : '▼'}</span>
+                    <span>{rules.demo}</span>
+                  </span>
                 </div>
               );
             })()}
@@ -1567,8 +1596,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
       {/* League Rules Modal */}
       {isLeagueRulesModalOpen && (
-        <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-gradient-to-b from-[#1c141e] via-[#110d14] to-[#09060b] border-2 border-amber-500/50 rounded-3xl p-6 sm:p-8 max-w-xl w-full relative shadow-[0_0_60px_rgba(0,0,0,0.95)] space-y-6 overflow-hidden">
+        <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fade-in">
+          <div className="bg-gradient-to-b from-[#1c141e] via-[#110d14] to-[#09060b] border-2 border-amber-500/50 rounded-3xl p-5 sm:p-7 max-w-2xl sm:max-w-3xl w-full relative shadow-[0_0_60px_rgba(0,0,0,0.95)] space-y-4 sm:space-y-5 overflow-hidden">
             
             {/* Ambient Background Flare */}
             <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-72 h-72 bg-amber-500/15 blur-3xl pointer-events-none" />
@@ -1576,62 +1605,131 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             {/* Close Button */}
             <button
               onClick={() => setIsLeagueRulesModalOpen(false)}
-              className="absolute top-5 right-5 text-gray-400 hover:text-white font-sans text-base font-black transition-all cursor-pointer w-9 h-9 flex items-center justify-center bg-black/70 hover:bg-black border border-white/10 hover:border-white/30 rounded-full z-30 shadow-lg hover:scale-105 active:scale-95"
+              className="absolute top-4 right-4 text-gray-400 hover:text-white font-sans text-base font-black transition-all cursor-pointer w-8 h-8 flex items-center justify-center bg-black/70 hover:bg-black border border-white/10 hover:border-white/30 rounded-full z-30 shadow-lg hover:scale-105 active:scale-95"
               title="Close"
             >
               ✕
             </button>
 
             {/* Header with Glowing Trophy */}
-            <div className="text-center space-y-2 relative z-10 px-10">
-              <div className="w-18 h-18 mx-auto rounded-2xl bg-gradient-to-b from-amber-950/80 via-black to-black border-2 border-amber-500/60 flex items-center justify-center shadow-[0_0_25px_rgba(245,158,11,0.35)]">
-                <Trophy className="w-10 h-10 text-amber-400 drop-shadow-[0_0_12px_rgba(245,158,11,0.8)]" />
+            <div className="text-center space-y-1 relative z-10 px-6 sm:px-8">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto rounded-2xl bg-gradient-to-b from-amber-950/80 via-black to-black border-2 border-amber-500/60 flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.35)]">
+                <Trophy className="w-6 h-6 sm:w-7 sm:h-7 text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.8)]" />
               </div>
-              <h3 className="font-display font-black text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-300 to-yellow-500 tracking-widest uppercase text-shadow-gold">
-                LEAGUE RULES & RESET
+              <h3 className="font-display font-black text-xl sm:text-2xl text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-300 to-yellow-500 tracking-widest uppercase text-shadow-gold">
+                LEAGUE HIERARCHY & RESET RULES
               </h3>
-              <p className="text-xs sm:text-sm text-gray-200 font-sans max-w-md mx-auto leading-relaxed">
-                The Arena ladder resolves daily at <strong className="text-amber-400 font-mono text-sm">00:00 UTC</strong>. The hierarchy follows a strict pyramid model with fixed elite seats and high turnover:
+              <p className="text-xs text-gray-300 font-sans max-w-lg mx-auto leading-relaxed">
+                The Arena ladder resolves daily at <strong className="text-amber-400 font-mono">00:00 UTC</strong>. Fixed elite capacities with high turnover ensure non-stop competitive pressure:
               </p>
             </div>
 
-            {/* League Specific Summary Table */}
-            <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1 relative z-10 text-xs">
-              {(leagueRewardsConfig || ALL_LEAGUE_REWARDS).map((tier) => {
-                const isViewing = tier.name === viewingLeague;
-                return (
-                  <div 
-                    key={tier.name}
-                    className={`p-2.5 rounded-xl border flex items-center justify-between gap-3 ${
-                      isViewing 
-                        ? 'bg-amber-950/40 border-amber-400/60 shadow-[0_0_12px_rgba(245,158,11,0.2)]' 
-                        : 'bg-black/50 border-white/10'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <img src={tier.icon} alt={tier.name} className="w-6 h-6 object-contain shrink-0" />
-                      <div className="truncate">
-                        <span className={`font-display font-black uppercase tracking-wider block text-xs ${isViewing ? 'text-amber-300 font-bold' : 'text-white'}`}>
-                          {tier.name} {tier.capacity ? `(${tier.capacity} Seats)` : ''}
+            {/* TABLE GRID */}
+            <div className="border border-white/15 rounded-2xl overflow-hidden bg-black/60 shadow-2xl relative z-10">
+              {/* Table Header */}
+              <div className="grid grid-cols-12 bg-gradient-to-r from-amber-950/40 via-black/80 to-amber-950/40 border-b border-white/15 py-2.5 px-3 sm:px-4 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-gray-400">
+                <div className="col-span-5 sm:col-span-4 flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5 text-amber-400" />
+                  <span>LEAGUE TIER</span>
+                </div>
+                <div className="col-span-3 sm:col-span-3 text-center text-emerald-400 flex items-center justify-center gap-1">
+                  <span>▲</span>
+                  <span>PROMOTION</span>
+                </div>
+                <div className="col-span-2 sm:col-span-3 text-center text-gray-300 flex items-center justify-center gap-1">
+                  <span>🛡️</span>
+                  <span>SAFE HAVEN</span>
+                </div>
+                <div className="col-span-2 sm:col-span-2 text-right sm:text-center text-rose-400 flex items-center justify-end sm:justify-center gap-1">
+                  <span>▼</span>
+                  <span>DEMOTION</span>
+                </div>
+              </div>
+
+              {/* Table Rows */}
+              <div className="divide-y divide-white/5 max-h-[310px] overflow-y-auto pr-0.5">
+                {LEAGUE_TABLE_DATA.map((row) => {
+                  const isViewing = row.name === viewingLeague;
+                  const isMyLeague = row.name === (profile.pvpLeague || 'Bronze');
+
+                  return (
+                    <div 
+                      key={row.name}
+                      className={`grid grid-cols-12 items-center py-2 px-3 sm:px-4 transition-colors ${
+                        isViewing 
+                          ? 'bg-amber-950/30 font-medium' 
+                          : 'hover:bg-white/[0.03]'
+                      }`}
+                    >
+                      {/* League Name & Capacity */}
+                      <div className="col-span-5 sm:col-span-4 flex items-center gap-2 min-w-0 pr-1">
+                        <img src={row.icon} alt={row.name} className="w-6 h-6 object-contain shrink-0" />
+                        <div className="min-w-0 truncate">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className={`font-display font-black text-xs uppercase tracking-wide truncate ${row.color}`}>
+                              {row.name}
+                            </span>
+                            {isMyLeague && (
+                              <span className="text-[8px] font-mono font-bold px-1 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40">
+                                YOU
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[9px] font-mono text-gray-400 block">
+                            {row.capacity}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Promotion Zone */}
+                      <div className="col-span-3 sm:col-span-3 text-center">
+                        {row.promo ? (
+                          <span className="inline-block text-[10px] sm:text-xs font-mono font-black text-emerald-300 bg-emerald-950/70 border border-emerald-500/40 px-2 py-0.5 rounded-md shadow-sm">
+                            {row.promo}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] sm:text-xs font-mono text-amber-400/80 font-bold italic">
+                            Crown Apex 👑
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Safe Haven */}
+                      <div className="col-span-2 sm:col-span-3 text-center">
+                        <span className="inline-block text-[10px] sm:text-xs font-mono font-medium text-gray-300 bg-black/60 border border-white/10 px-2 py-0.5 rounded-md">
+                          {row.safe}
                         </span>
                       </div>
+
+                      {/* Demotion Zone */}
+                      <div className="col-span-2 sm:col-span-2 text-right sm:text-center">
+                        {row.demo ? (
+                          <span className="inline-block text-[10px] sm:text-xs font-mono font-black text-rose-300 bg-rose-950/70 border border-rose-500/40 px-2 py-0.5 rounded-md shadow-sm">
+                            {row.demo}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] sm:text-xs font-mono text-gray-500 italic">
+                            No Demote
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-[11px] font-mono text-right text-gray-300 shrink-0 font-medium">
-                      {tier.promotionZone || 'Standard Zone'}
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
 
             {/* Note */}
-            <div className="bg-black/70 border border-white/10 rounded-2xl p-3.5 text-center text-xs sm:text-sm text-gray-200 font-sans leading-relaxed relative z-10 shadow-inner">
-              💡 <span className="text-amber-300 font-bold">Daily Refill:</span> Free tickets reset to <strong className="text-rose-400 font-mono">5/5</strong> daily at 00:00 UTC. Unclaimed decrees arrive in your <strong>Mailbox</strong>.
+            <div className="bg-black/70 border border-white/10 rounded-2xl p-2.5 sm:p-3 text-center text-xs text-gray-300 font-sans leading-relaxed relative z-10 shadow-inner flex items-center justify-center gap-2">
+              <span className="text-amber-400 text-sm shrink-0">💡</span>
+              <span>
+                <strong className="text-amber-300">Daily 00:00 UTC:</strong> 5 Free Tickets refill • LP resets to 100 • Daily tributes delivered to <strong>Mailbox</strong>.
+              </span>
             </div>
 
             <button
               onClick={() => setIsLeagueRulesModalOpen(false)}
-              className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-display font-black tracking-widest text-xs sm:text-sm transition-all duration-300 cursor-pointer uppercase relative z-10 shadow-[0_0_20px_rgba(245,158,11,0.25)] hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-display font-black tracking-widest text-xs sm:text-sm transition-all duration-300 cursor-pointer uppercase relative z-10 shadow-[0_0_20px_rgba(245,158,11,0.25)] hover:scale-[1.01] active:scale-[0.99]"
             >
               Understood
             </button>
