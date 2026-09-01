@@ -1145,42 +1145,27 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                 const isMyLeague = (profile.pvpLeague || 'Bronze').toLowerCase() === currentTier.name.toLowerCase();
 
                 return (
-                  <div className={`bg-gradient-to-b ${currentTier.bgGradient} border-2 ${currentTier.border} rounded-3xl p-5 sm:p-7 space-y-6 shadow-2xl relative overflow-hidden`}>
+                  <div className={`bg-gradient-to-b ${currentTier.bgGradient} border-2 ${currentTier.border} rounded-3xl p-5 sm:p-7 space-y-5 shadow-2xl relative overflow-hidden`}>
                     
                     {/* Ambient Glow */}
                     <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 blur-3xl pointer-events-none" />
 
                     {/* League Card Header */}
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-5 relative z-10">
-                      <div className="flex items-center gap-4">
-                        <img 
-                          src={currentTier.icon} 
-                          alt={currentTier.name} 
-                          className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-transform hover:scale-105" 
-                        />
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2.5 flex-wrap">
-                            <h4 className="font-display font-black text-xl sm:text-2xl text-white tracking-widest uppercase">
-                              {currentTier.name} LEAGUE
-                            </h4>
-                            {isMyLeague && (
-                              <span className="font-mono text-[10px] font-black uppercase bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 px-2.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.4)]">
-                                ⭐ Your Active League
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-xs text-gray-300 font-sans max-w-md">
-                            {currentTier.summary}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Promotion Zone Rule Badge */}
-                      <div className="bg-black/60 border border-white/15 rounded-2xl p-3 text-center sm:text-right shrink-0 w-full sm:w-auto">
-                        <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest block font-bold">LADDER RESOLUTION</span>
-                        <span className="font-display font-bold text-xs text-emerald-400 mt-0.5 block">
-                          {currentTier.promotionZone}
-                        </span>
+                    <div className="flex items-center gap-4 border-b border-white/10 pb-4 relative z-10">
+                      <img 
+                        src={currentTier.icon} 
+                        alt={currentTier.name} 
+                        className="w-14 h-14 sm:w-16 sm:h-16 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-transform hover:scale-105" 
+                      />
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <h4 className="font-display font-black text-xl sm:text-2xl text-white tracking-widest uppercase">
+                          {currentTier.name} LEAGUE
+                        </h4>
+                        {isMyLeague && (
+                          <span className="font-mono text-[10px] font-black uppercase bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 px-2.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.4)]">
+                            ⭐ Your Active League
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -1188,7 +1173,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                     <div className="space-y-3 relative z-10">
                       <div className="flex items-center justify-between text-[10px] font-mono text-gray-400 uppercase tracking-widest px-2 font-bold">
                         <span>Rank Standing</span>
-                        <span>Daily Decreed Rewards (Attached to Mail)</span>
+                        <span>Daily Rewards</span>
                       </div>
 
                       <div className="space-y-2.5">
@@ -1211,16 +1196,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                                     <span className="font-display font-black text-sm sm:text-base text-white tracking-wide">
                                       {bracket.rankLabel}
                                     </span>
-                                    <span className="text-[10px] font-mono font-bold bg-white/5 border border-white/10 px-2 py-0.5 rounded-md text-gray-300">
-                                      {bracket.rankBadge}
-                                    </span>
                                     {bracket.isPromotion && (
-                                      <span className="text-[9px] font-mono font-black uppercase text-emerald-400 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded">
+                                      <span className="text-[9px] font-mono font-black uppercase text-emerald-400 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded font-bold">
                                         ▲ PROMOTES
                                       </span>
                                     )}
                                     {bracket.isDemotion && (
-                                      <span className="text-[9px] font-mono font-black uppercase text-rose-400 bg-rose-950/60 border border-rose-500/40 px-2 py-0.5 rounded">
+                                      <span className="text-[9px] font-mono font-black uppercase text-rose-400 bg-rose-950/60 border border-rose-500/40 px-2 py-0.5 rounded font-bold">
                                         ▼ DEMOTES
                                       </span>
                                     )}
@@ -1274,23 +1256,6 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                           );
                         })}
                       </div>
-                    </div>
-
-                    {/* Quick navigation to other leagues */}
-                    <div className="flex items-center justify-between border-t border-white/10 pt-4 relative z-10">
-                      <button
-                        onClick={() => cycleRewardLeague('prev')}
-                        className="text-xs font-mono text-gray-400 hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
-                      >
-                        ← Previous League
-                      </button>
-
-                      <button
-                        onClick={() => cycleRewardLeague('next')}
-                        className="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer transition-colors font-bold"
-                      >
-                        Next League →
-                      </button>
                     </div>
 
                   </div>
