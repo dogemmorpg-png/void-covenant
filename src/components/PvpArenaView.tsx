@@ -225,7 +225,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   isModalOpen,
   setIsModalOpen
 }) => {
-  const { profile, updateProfile, buyPvpTickets } = useGame();
+  const { profile, updateProfile, buyPvpTickets, leagueRewardsConfig } = useGame();
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState<'duels' | 'rewards' | 'history'>('duels');
@@ -1140,7 +1140,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
               {/* Detailed Breakdown for Selected League */}
               {(() => {
-                const currentTier = ALL_LEAGUE_REWARDS.find(t => t.name.toLowerCase() === selectedRewardLeague.toLowerCase()) || ALL_LEAGUE_REWARDS[0];
+                const rewardsList = leagueRewardsConfig && leagueRewardsConfig.length > 0 ? leagueRewardsConfig : ALL_LEAGUE_REWARDS;
+                const currentTier = rewardsList.find((t: any) => t.name.toLowerCase() === selectedRewardLeague.toLowerCase()) || rewardsList[0];
                 const isMyLeague = (profile.pvpLeague || 'Bronze').toLowerCase() === currentTier.name.toLowerCase();
 
                 return (

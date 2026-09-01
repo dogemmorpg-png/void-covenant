@@ -3,6 +3,7 @@ import { Card, PlayerProfile, CampaignStage, BattlePassTier, CardTemplate, CardT
 import { getStarterDeck, CARD_TEMPLATES, createCardInstance, BATTLE_PASS_TIERS, AIRDROP_TASKS } from '../data/cards';
 import { supabase } from '../utils/supabaseClient';
 import { calculateEnergy } from '../utils/energyHelper';
+import { ALL_LEAGUE_REWARDS } from '../components/PvpArenaView';
 
 interface GameContextType {
   profile: PlayerProfile;
@@ -43,15 +44,21 @@ interface GameContextType {
   updateProfile: (updates: Partial<PlayerProfile>) => void;
   markMailAsRead: (mailId: string) => Promise<void>;
   claimMailReward: (mailId: string) => Promise<{ success: boolean; message: string }>;
-  claimAllMailRewards: () => Promise<{ success: boolean; message: string }>;
-  fetchAdminOverview: () => Promise<{ success: boolean; overview?: any; error?: string }>;
-  fetchAdminWithdrawals: () => Promise<{ success: boolean; requests?: any[]; error?: string }>;
+  claimAllMailRewards: () => Promise<{ success: boolean; message: string; totalGold?: number; totalDust?: number; totalSovereigns?: number }>;
+  fetchAdminOverview: () => Promise<{ success: boolean; message: string; [key: string]: any }>;
+  fetchAdminWithdrawals: () => Promise<{ success: boolean; message: string; requests?: any[] }>;
   processAdminWithdrawal: (requestId: string, userWallet: string, decision: 'approve' | 'reject', txid?: string, reason?: string) => Promise<{ success: boolean; message: string }>;
   broadcastAdminMail: (targetType: string, targetValue: string, title: string, content: string, rewards?: any) => Promise<{ success: boolean; message: string; sentCount?: number }>;
   searchAdminPlayer: (query: string) => Promise<{ success: boolean; message: string; matches?: any[]; players?: any[] }>;
   modifyAdminPlayer: (targetWallet: string, updates: any) => Promise<{ success: boolean; message: string; profile?: any }>;
   deleteAdminPlayer: (targetWallet: string) => Promise<{ success: boolean; message: string }>;
   triggerAdminRollover: () => Promise<{ success: boolean; message: string; rolloverResult?: any }>;
+  leagueRewardsConfig: any[];
+  setLeagueRewardsConfig: (config: any[]) => void;
+  fetchLeagueRewardsConfig: () => Promise<void>;
+  fetchAdminLeagueRewards: () => Promise<{ success: boolean; isCustom?: boolean; config?: any[]; defaultConfig?: any[]; message?: string }>;
+  saveAdminLeagueRewards: (config: any[]) => Promise<{ success: boolean; message: string; config?: any[] }>;
+  resetAdminLeagueRewards: () => Promise<{ success: boolean; message: string; config?: any[] }>;
   isShardsShopOpen: boolean;
   setIsShardsShopOpen: (open: boolean) => void;
 }
@@ -1209,6 +1216,43 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return submitAction('admin_trigger_rollover', {});
   };
 
+  const [leagueRewardsConfig, setLeagueRewardsConfig] = useState<any[]>(ALL_LEAGUE_REWARDS);
+
+  const fetchLeagueRewardsConfig = useCallback(async () => {
+    try {
+      const res = await submitAction('get_league_rewards', {});
+      if (res.success && res.config && Array.isArray(res.config)) {
+        setLeagueRewardsConfig(res.config);
+      }
+    } catch (e) {
+      console.warn('Failed to fetch league rewards config:', e);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLeagueRewardsConfig();
+  }, [fetchLeagueRewardsConfig]);
+
+  const fetchAdminLeagueRewards = async () => {
+    return submitAction('admin_get_league_rewards', {});
+  };
+
+  const saveAdminLeagueRewards = async (config: any[]) => {
+    const res = await submitAction('admin_save_league_rewards', { config });
+    if (res.success && config) {
+      setLeagueRewardsConfig(config);
+    }
+    return res;
+  };
+
+  const resetAdminLeagueRewards = async () => {
+    const res = await submitAction('admin_reset_league_rewards', {});
+    if (res.success && res.config) {
+      setLeagueRewardsConfig(res.config);
+    }
+    return res;
+  };
+
   return (
     <GameContext.Provider
       value={{
@@ -1259,6 +1303,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         modifyAdminPlayer,
         deleteAdminPlayer,
         triggerAdminRollover,
+        leagueRewardsConfig,
+        setLeagueRewardsConfig,
+        fetchLeagueRewardsConfig,
+        fetchAdminLeagueRewards,
+        saveAdminLeagueRewards,
+        resetAdminLeagueRewards,
         isShardsShopOpen,
         setIsShardsShopOpen
       }}

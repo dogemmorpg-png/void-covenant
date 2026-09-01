@@ -20,7 +20,8 @@ import {
   Crown, 
   Zap, 
   TrendingUp, 
-  Landmark 
+  Landmark,
+  Trophy 
 } from 'lucide-react';
 
 interface AdminPanelModalProps {
@@ -110,10 +111,14 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
     searchAdminPlayer, 
     modifyAdminPlayer, 
     deleteAdminPlayer,
-    triggerAdminRollover 
+    triggerAdminRollover,
+    fetchAdminLeagueRewards,
+    saveAdminLeagueRewards,
+    resetAdminLeagueRewards,
+    leagueRewardsConfig
   } = useGame();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'withdrawals' | 'broadcast' | 'players' | 'maintenance'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'withdrawals' | 'broadcast' | 'players' | 'rewards' | 'maintenance'>('overview');
   const [isLoading, setIsLoading] = useState(false);
   const [overview, setOverview] = useState<any>(null);
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
@@ -157,6 +162,13 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
   const [editBanReason, setEditBanReason] = useState<string>('');
   const [isModifyingPlayer, setIsModifyingPlayer] = useState(false);
   const [playerModifyFeedback, setPlayerModifyFeedback] = useState<string | null>(null);
+
+  // League Rewards Editor State
+  const [leagueRewardsState, setLeagueRewardsState] = useState<any[]>([]);
+  const [selectedAdminLeague, setSelectedAdminLeague] = useState<string>('Void Overlord');
+  const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
+  const [isSavingRewards, setIsSavingRewards] = useState<boolean>(false);
+  const [rewardsFeedback, setRewardsFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Rollover Trigger State
   const [isTriggeringRollover, setIsTriggeringRollover] = useState(false);
@@ -213,11 +225,82 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
     }
   };
 
+  // Load League Rewards
+  const loadLeagueRewards = async () => {
+    setIsLoadingRewards(true);
+    setRewardsFeedback(null);
+    try {
+      const res = await fetchAdminLeagueRewards();
+      if (res.success && res.config) {
+        setLeagueRewardsState(JSON.parse(JSON.stringify(res.config)));
+      } else if (leagueRewardsConfig && leagueRewardsConfig.length > 0) {
+        setLeagueRewardsState(JSON.parse(JSON.stringify(leagueRewardsConfig)));
+      }
+    } catch (e: any) {
+      console.error('Failed to load league rewards:', e);
+      if (leagueRewardsConfig && leagueRewardsConfig.length > 0) {
+        setLeagueRewardsState(JSON.parse(JSON.stringify(leagueRewardsConfig)));
+      }
+    } finally {
+      setIsLoadingRewards(false);
+    }
+  };
+
+  const handleSaveLeagueRewards = async () => {
+    setIsSavingRewards(true);
+    setRewardsFeedback(null);
+    try {
+      const res = await saveAdminLeagueRewards(leagueRewardsState);
+      if (res.success) {
+        setRewardsFeedback({ type: 'success', message: '✅ All league rewards saved and updated successfully!' });
+      } else {
+        setRewardsFeedback({ type: 'error', message: res.message || 'Failed to save league rewards' });
+      }
+    } catch (e: any) {
+      setRewardsFeedback({ type: 'error', message: e.message || 'Error saving league rewards' });
+    } finally {
+      setIsSavingRewards(false);
+    }
+  };
+
+  const handleResetLeagueRewards = async () => {
+    if (!window.confirm('Are you sure you want to reset all 10 leagues rewards back to default values?')) {
+      return;
+    }
+    setIsSavingRewards(true);
+    setRewardsFeedback(null);
+    try {
+      const res = await resetAdminLeagueRewards();
+      if (res.success && res.config) {
+        setLeagueRewardsState(JSON.parse(JSON.stringify(res.config)));
+        setRewardsFeedback({ type: 'success', message: '🔄 League rewards have been reset to default values!' });
+      } else {
+        setRewardsFeedback({ type: 'error', message: res.message || 'Failed to reset league rewards' });
+      }
+    } catch (e: any) {
+      setRewardsFeedback({ type: 'error', message: e.message || 'Error resetting league rewards' });
+    } finally {
+      setIsSavingRewards(false);
+    }
+  };
+
+  const handleBracketValueChange = (leagueName: string, bracketIndex: number, field: 'sovereigns' | 'gold' | 'dust', value: number) => {
+    setLeagueRewardsState(prev => {
+      const cloned = JSON.parse(JSON.stringify(prev));
+      const leagueObj = cloned.find((l: any) => l.name.toLowerCase() === leagueName.toLowerCase());
+      if (leagueObj && leagueObj.brackets && leagueObj.brackets[bracketIndex]) {
+        leagueObj.brackets[bracketIndex][field] = Math.max(0, value);
+      }
+      return cloned;
+    });
+  };
+
   useEffect(() => {
     if (isOpen) {
       if (activeTab === 'overview') loadOverview();
       if (activeTab === 'withdrawals') loadWithdrawals();
       if (activeTab === 'players') loadAllPlayers(searchQuery);
+      if (activeTab === 'rewards') loadLeagueRewards();
     }
   }, [isOpen, activeTab]);
 
@@ -572,6 +655,18 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
           >
             <Users className="w-4 h-4" />
             <span>PLAYER INSPECTOR</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('rewards')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer ${
+              activeTab === 'rewards'
+                ? 'bg-gradient-to-r from-red-900/60 to-amber-900/40 text-amber-300 border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Trophy className="w-4 h-4" />
+            <span>LEAGUE REWARDS</span>
           </button>
 
           <button
@@ -1591,7 +1686,251 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
             </div>
           )}
 
-          {/* TAB 5: MAINTENANCE */}
+          {/* TAB 5: LEAGUE REWARDS CONFIGURATOR */}
+          {activeTab === 'rewards' && (
+            <div className="space-y-6">
+              
+              {/* Header & Quick Action Buttons */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-black/60 border border-white/10 rounded-2xl p-4 sm:p-5 shadow-xl">
+                <div className="space-y-1">
+                  <h3 className="font-display font-black text-lg text-white tracking-wider flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-amber-400" />
+                    <span>PVP LEAGUE REWARDS CONFIGURATOR</span>
+                  </h3>
+                  <p className="text-xs text-gray-400 font-sans leading-relaxed max-w-2xl">
+                    Adjust daily decreed tribute amounts for all 10 competitive leagues. Changes take effect immediately in the Arena UI and will be dispatched during the 00:00 UTC daily rollover.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+                  <button
+                    onClick={handleResetLeagueRewards}
+                    disabled={isSavingRewards || isLoadingRewards}
+                    className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-gray-300 hover:text-white font-display font-bold text-xs uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5 active:scale-95"
+                    title="Reset all rewards to system default values"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isSavingRewards ? 'animate-spin' : ''}`} />
+                    <span>RESET DEFAULTS</span>
+                  </button>
+
+                  <button
+                    onClick={handleSaveLeagueRewards}
+                    disabled={isSavingRewards || isLoadingRewards}
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-black font-display font-black text-xs uppercase tracking-wider transition-all cursor-pointer shadow-[0_0_20px_rgba(245,158,11,0.4)] disabled:opacity-50 flex items-center gap-1.5 active:scale-95"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>{isSavingRewards ? 'SAVING...' : 'SAVE ALL REWARDS'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Feedback banner */}
+              {rewardsFeedback && (
+                <div className={`p-4 rounded-2xl font-mono text-xs font-bold text-center border animate-in fade-in duration-200 ${
+                  rewardsFeedback.type === 'success'
+                    ? 'bg-emerald-950/60 border-emerald-500/50 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                    : 'bg-rose-950/60 border-rose-500/50 text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.2)]'
+                }`}>
+                  {rewardsFeedback.message}
+                </div>
+              )}
+
+              {/* League Selector Chips (10 Leagues) */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                {(leagueRewardsState && leagueRewardsState.length > 0 ? leagueRewardsState : ALL_LEAGUE_REWARDS).map((l: any) => {
+                  const isSelected = selectedAdminLeague.toLowerCase() === l.name.toLowerCase();
+                  const badgeStyle = getLeagueBadgeStyle(l.name);
+                  
+                  return (
+                    <button
+                      key={l.name}
+                      onClick={() => setSelectedAdminLeague(l.name)}
+                      className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center gap-2.5 relative ${
+                        isSelected 
+                          ? `${badgeStyle.className} ring-2 ring-amber-400 scale-[1.02] font-black` 
+                          : 'bg-black/40 hover:bg-white/5 border-white/10 hover:border-white/20 text-gray-400 hover:text-white font-bold'
+                      }`}
+                    >
+                      <img src={l.icon || '/icons/league_bronze.png'} alt={l.name} className="w-7 h-7 object-contain shrink-0" />
+                      <div className="text-left min-w-0 flex-1">
+                        <span className="text-xs font-display uppercase tracking-wider block truncate text-white">
+                          {l.name}
+                        </span>
+                        <span className="text-[9px] font-mono text-gray-400 block truncate">
+                          {l.brackets?.length || 0} Brackets
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Selected League Editable Brackets Card */}
+              {(() => {
+                const currentList = leagueRewardsState && leagueRewardsState.length > 0 ? leagueRewardsState : ALL_LEAGUE_REWARDS;
+                const currentLeague = currentList.find((l: any) => l.name.toLowerCase() === selectedAdminLeague.toLowerCase()) || currentList[0];
+                const badgeStyle = getLeagueBadgeStyle(currentLeague.name);
+
+                return (
+                  <div className="bg-gradient-to-b from-[#160d14] via-[#10090f] to-black border-2 border-white/10 rounded-3xl p-5 sm:p-7 space-y-6 shadow-2xl relative overflow-hidden">
+                    
+                    {/* Header */}
+                    <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                      <div className="flex items-center gap-3.5">
+                        <img 
+                          src={currentLeague.icon || '/icons/league_bronze.png'} 
+                          alt={currentLeague.name} 
+                          className="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" 
+                        />
+                        <div>
+                          <div className="flex items-center gap-2.5">
+                            <h4 className="font-display font-black text-lg sm:text-xl text-white tracking-widest uppercase">
+                              {currentLeague.name} LEAGUE
+                            </h4>
+                            <span className={`px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider border ${badgeStyle.className}`}>
+                              {badgeStyle.badge}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-400 font-mono mt-0.5">
+                            Edit individual bracket tributes below. Values will sync to all players.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="hidden sm:block text-right font-mono text-xs text-gray-400">
+                        <span>Tier Index: </span>
+                        <span className="text-white font-bold">{currentLeague.tierIndex ?? '—'}</span>
+                      </div>
+                    </div>
+
+                    {/* Table of Brackets */}
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-12 gap-3 text-[10px] font-mono text-gray-400 uppercase tracking-widest px-3 font-bold">
+                        <div className="col-span-12 sm:col-span-4">Rank Bracket</div>
+                        <div className="col-span-4 sm:col-span-2 text-center sm:text-left">👑 Sovereigns</div>
+                        <div className="col-span-4 sm:col-span-3 text-center sm:text-left">🪙 Gold</div>
+                        <div className="col-span-4 sm:col-span-3 text-center sm:text-left">🌌 Void Dust</div>
+                      </div>
+
+                      <div className="space-y-3">
+                        {currentLeague.brackets?.map((bracket: any, bIdx: number) => {
+                          return (
+                            <div 
+                              key={bIdx}
+                              className={`p-3.5 sm:p-4 rounded-2xl border transition-all grid grid-cols-12 gap-3 items-center ${
+                                bracket.isPromotion 
+                                  ? 'bg-gradient-to-r from-emerald-950/30 via-black/60 to-black/60 border-emerald-500/30 shadow-sm'
+                                  : bracket.isDemotion
+                                  ? 'bg-gradient-to-r from-rose-950/30 via-black/60 to-black/60 border-rose-500/30'
+                                  : 'bg-black/50 border-white/10 hover:border-white/20'
+                              }`}
+                            >
+                              {/* Left: Rank Label & Status */}
+                              <div className="col-span-12 sm:col-span-4 space-y-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-display font-black text-sm text-white tracking-wide">
+                                    {bracket.rankLabel}
+                                  </span>
+                                  {bracket.isPromotion && (
+                                    <span className="text-[9px] font-mono font-black uppercase text-emerald-400 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded font-bold">
+                                      ▲ PROMOTES
+                                    </span>
+                                  )}
+                                  {bracket.isDemotion && (
+                                    <span className="text-[9px] font-mono font-black uppercase text-rose-400 bg-rose-950/60 border border-rose-500/40 px-2 py-0.5 rounded font-bold">
+                                      ▼ DEMOTES
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Sovereigns Input */}
+                              <div className="col-span-4 sm:col-span-2">
+                                <label className="text-[9px] font-mono text-gray-500 block sm:hidden mb-1 uppercase">Sovereigns</label>
+                                <div className="relative">
+                                  <img 
+                                    src="/icons/icon_sovereign.webp" 
+                                    alt="SOV" 
+                                    className="w-4 h-4 object-contain absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" 
+                                  />
+                                  <input 
+                                    type="number"
+                                    min={0}
+                                    value={bracket.sovereigns ?? 0}
+                                    onChange={(e) => handleBracketValueChange(currentLeague.name, bIdx, 'sovereigns', parseInt(e.target.value) || 0)}
+                                    className="w-full bg-black/60 border border-amber-500/40 hover:border-amber-400 focus:border-amber-300 rounded-xl pl-8 pr-2.5 py-2 font-mono font-black text-xs sm:text-sm text-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-400/50 shadow-inner"
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Gold Input */}
+                              <div className="col-span-4 sm:col-span-3">
+                                <label className="text-[9px] font-mono text-gray-500 block sm:hidden mb-1 uppercase">Gold</label>
+                                <div className="relative">
+                                  <img 
+                                    src="/icons/icon_gold.webp" 
+                                    alt="Gold" 
+                                    className="w-4 h-4 object-contain absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" 
+                                  />
+                                  <input 
+                                    type="number"
+                                    min={0}
+                                    value={bracket.gold ?? 0}
+                                    onChange={(e) => handleBracketValueChange(currentLeague.name, bIdx, 'gold', parseInt(e.target.value) || 0)}
+                                    className="w-full bg-black/60 border border-yellow-500/40 hover:border-yellow-400 focus:border-yellow-300 rounded-xl pl-8 pr-2.5 py-2 font-mono font-black text-xs sm:text-sm text-amber-300 focus:outline-none focus:ring-1 focus:ring-yellow-400/50 shadow-inner"
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Dust Input */}
+                              <div className="col-span-4 sm:col-span-3">
+                                <label className="text-[9px] font-mono text-gray-500 block sm:hidden mb-1 uppercase">Dust</label>
+                                <div className="relative">
+                                  <img 
+                                    src="/icons/icon_dust.webp" 
+                                    alt="Dust" 
+                                    className="w-4 h-4 object-contain absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" 
+                                  />
+                                  <input 
+                                    type="number"
+                                    min={0}
+                                    value={bracket.dust ?? 0}
+                                    onChange={(e) => handleBracketValueChange(currentLeague.name, bIdx, 'dust', parseInt(e.target.value) || 0)}
+                                    className="w-full bg-black/60 border border-cyan-500/40 hover:border-cyan-400 focus:border-cyan-300 rounded-xl pl-8 pr-2.5 py-2 font-mono font-black text-xs sm:text-sm text-[#66fcf1] focus:outline-none focus:ring-1 focus:ring-cyan-400/50 shadow-inner"
+                                  />
+                                </div>
+                              </div>
+
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Bottom Save Reminder */}
+                    <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                      <span className="text-xs font-mono text-gray-400">
+                        Click "Save All Rewards" to apply all modified values.
+                      </span>
+
+                      <button
+                        onClick={handleSaveLeagueRewards}
+                        disabled={isSavingRewards || isLoadingRewards}
+                        className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-black font-display font-black text-xs uppercase tracking-wider transition-all cursor-pointer shadow-[0_0_20px_rgba(245,158,11,0.4)] disabled:opacity-50 flex items-center gap-1.5 active:scale-95"
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>{isSavingRewards ? 'SAVING...' : 'SAVE ALL REWARDS'}</span>
+                      </button>
+                    </div>
+
+                  </div>
+                );
+              })()}
+
+            </div>
+          )}
+
+          {/* TAB 6: MAINTENANCE */}
           {activeTab === 'maintenance' && (
             <div className="max-w-2xl mx-auto space-y-6">
               <div className="bg-black/50 border border-white/10 rounded-3xl p-6 space-y-4">

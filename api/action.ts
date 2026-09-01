@@ -6,7 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 import { PlayerProfile } from './_shared/types.js';
 import { CARD_TEMPLATES, createCardInstance, generateCampaignStage, AIRDROP_TASKS } from './_shared/cards.js';
 import { calculateEnergy, processExpGain } from './_shared/energyHelper.js';
-import { checkAndPerformPvpRollover } from './_shared/pvpRollover.js';
+import { checkAndPerformPvpRollover, DEFAULT_LEAGUE_REWARDS } from './_shared/pvpRollover.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
@@ -623,9 +623,103 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
+      if (action === 'admin_get_league_rewards') {
+        const { data: configRows } = await supabase
+          .from('profiles')
+          .select('data')
+          .eq('wallet_address', '__SYSTEM_CONFIG_LEAGUE_REWARDS__')
+          .limit(1);
+
+        const customConfig = configRows && configRows.length > 0 && configRows[0].data?.config 
+          ? configRows[0].data.config 
+          : null;
+
+        return res.status(200).json({
+          success: true,
+          isCustom: !!customConfig,
+          config: customConfig || DEFAULT_LEAGUE_REWARDS,
+          defaultConfig: DEFAULT_LEAGUE_REWARDS
+        });
+      }
+
+      if (action === 'admin_save_league_rewards') {
+        const { config } = payload || {};
+        if (!config || !Array.isArray(config)) {
+          return res.status(400).json({ error: 'Invalid rewards configuration format: expected an array of leagues.' });
+        }
+
+        const dataToSave = {
+          config,
+          updatedAt: Date.now(),
+          updatedBy: walletAddress
+        };
+
+        const { data: existingRow } = await supabase
+          .from('profiles')
+          .select('wallet_address')
+          .eq('wallet_address', '__SYSTEM_CONFIG_LEAGUE_REWARDS__')
+          .limit(1);
+
+        if (existingRow && existingRow.length > 0) {
+          const { error: updateErr } = await supabase
+            .from('profiles')
+            .update({ data: dataToSave, updated_at: new Date().toISOString() })
+            .eq('wallet_address', '__SYSTEM_CONFIG_LEAGUE_REWARDS__');
+
+          if (updateErr) {
+            return res.status(500).json({ error: 'Failed to update league rewards', details: updateErr });
+          }
+        } else {
+          const { error: insertErr } = await supabase
+            .from('profiles')
+            .insert({ wallet_address: '__SYSTEM_CONFIG_LEAGUE_REWARDS__', data: dataToSave });
+
+          if (insertErr) {
+            return res.status(500).json({ error: 'Failed to insert league rewards config', details: insertErr });
+          }
+        }
+
+        return res.status(200).json({
+          success: true,
+          message: 'League rewards configuration saved successfully!',
+          config
+        });
+      }
+
+      if (action === 'admin_reset_league_rewards') {
+        await supabase
+          .from('profiles')
+          .delete()
+          .eq('wallet_address', '__SYSTEM_CONFIG_LEAGUE_REWARDS__');
+
+        return res.status(200).json({
+          success: true,
+          message: 'League rewards reset to default values.',
+          config: DEFAULT_LEAGUE_REWARDS
+        });
+      }
+
       return res.status(400).json({ error: 'Unknown admin action' });
     }
     // --- END ADMIN ACTION DISPATCHER ---
+
+    if (action === 'get_league_rewards') {
+      const { data: configRows } = await supabase
+        .from('profiles')
+        .select('data')
+        .eq('wallet_address', '__SYSTEM_CONFIG_LEAGUE_REWARDS__')
+        .limit(1);
+
+      const customConfig = configRows && configRows.length > 0 && configRows[0].data?.config 
+        ? configRows[0].data.config 
+        : null;
+
+      return res.status(200).json({
+        success: true,
+        isCustom: !!customConfig,
+        config: customConfig || DEFAULT_LEAGUE_REWARDS
+      });
+    }
 
     if (action === 'sweep_stage') {
       const floorNum = parseInt(payload.floorNum);
