@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
+import { ALL_LEAGUE_REWARDS } from '../data/leagueRewards';
 import { 
   ShieldAlert, 
   X, 
