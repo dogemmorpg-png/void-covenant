@@ -34,10 +34,12 @@ export const DEFAULT_LEAGUE_REWARDS = [
     icon: '/icons/league_grandmaster_crest.png',
     tierIndex: 8,
     brackets: [
-      { rankLabel: 'Ranks #1 – #5', sovereigns: 75, gold: 2500, dust: 250, isPromotion: true },
-      { rankLabel: 'Ranks #6 – #20', sovereigns: 40, gold: 1500, dust: 150, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', sovereigns: 20, gold: 850, dust: 85, isSafe: true },
-      { rankLabel: 'Ranks #101+', sovereigns: 20, gold: 850, dust: 85, isDemotion: true }
+      { rankLabel: 'Rank #1', sovereigns: 150, gold: 3500, dust: 350, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 90, gold: 2800, dust: 280, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 50, gold: 2000, dust: 200, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 30, gold: 1200, dust: 120, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 15, gold: 700, dust: 70, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 10, gold: 500, dust: 50, isDemotion: true }
     ]
   },
   {
@@ -46,10 +48,12 @@ export const DEFAULT_LEAGUE_REWARDS = [
     icon: '/icons/league_master_crest.png',
     tierIndex: 7,
     brackets: [
-      { rankLabel: 'Ranks #1 – #10', sovereigns: 30, gold: 1800, dust: 180, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', sovereigns: 15, gold: 750, dust: 75, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', sovereigns: 15, gold: 750, dust: 75, isSafe: true },
-      { rankLabel: 'Ranks #101+', sovereigns: 15, gold: 750, dust: 75, isDemotion: true }
+      { rankLabel: 'Rank #1', sovereigns: 60, gold: 2400, dust: 240, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 40, gold: 1800, dust: 180, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 25, gold: 1300, dust: 130, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 15, gold: 900, dust: 90, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 8, gold: 550, dust: 55, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 5, gold: 400, dust: 40, isDemotion: true }
     ]
   },
   {
@@ -58,10 +62,12 @@ export const DEFAULT_LEAGUE_REWARDS = [
     icon: '/icons/league_diamond.png',
     tierIndex: 6,
     brackets: [
-      { rankLabel: 'Ranks #1 – #10', sovereigns: 20, gold: 1200, dust: 120, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', sovereigns: 8, gold: 600, dust: 60, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', sovereigns: 8, gold: 600, dust: 60, isSafe: true },
-      { rankLabel: 'Ranks #101+', sovereigns: 8, gold: 600, dust: 60, isDemotion: true }
+      { rankLabel: 'Rank #1', sovereigns: 35, gold: 1600, dust: 160, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 22, gold: 1200, dust: 120, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 14, gold: 900, dust: 90, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 8, gold: 650, dust: 65, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 4, gold: 450, dust: 45, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 2, gold: 300, dust: 30, isDemotion: true }
     ]
   },
   {
@@ -70,10 +76,12 @@ export const DEFAULT_LEAGUE_REWARDS = [
     icon: '/icons/league_ruby_crest.png',
     tierIndex: 5,
     brackets: [
-      { rankLabel: 'Ranks #1 – #10', sovereigns: 10, gold: 900, dust: 90, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', sovereigns: 3, gold: 500, dust: 50, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', sovereigns: 3, gold: 500, dust: 50, isSafe: true },
-      { rankLabel: 'Ranks #101+', sovereigns: 3, gold: 500, dust: 50, isDemotion: true }
+      { rankLabel: 'Rank #1', sovereigns: 20, gold: 1200, dust: 120, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 12, gold: 900, dust: 90, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 7, gold: 700, dust: 70, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 4, gold: 500, dust: 50, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 2, gold: 350, dust: 35, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 1, gold: 250, dust: 25, isDemotion: true }
     ]
   },
   {
@@ -82,10 +90,12 @@ export const DEFAULT_LEAGUE_REWARDS = [
     icon: '/icons/league_emerald_crest.png',
     tierIndex: 4,
     brackets: [
-      { rankLabel: 'Ranks #1 – #10', sovereigns: 5, gold: 700, dust: 70, isPromotion: true },
+      { rankLabel: 'Rank #1', sovereigns: 10, gold: 900, dust: 90, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 6, gold: 700, dust: 70, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 4, gold: 550, dust: 55, isPromotion: true },
       { rankLabel: 'Ranks #11 – #20', sovereigns: 2, gold: 400, dust: 40, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', sovereigns: 2, gold: 400, dust: 40, isSafe: true },
-      { rankLabel: 'Ranks #101+', sovereigns: 2, gold: 400, dust: 40, isDemotion: true }
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 1, gold: 280, dust: 28, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 0, gold: 200, dust: 20, isDemotion: true }
     ]
   },
   {
@@ -94,9 +104,12 @@ export const DEFAULT_LEAGUE_REWARDS = [
     icon: '/icons/league_platinum.png',
     tierIndex: 3,
     brackets: [
-      { rankLabel: 'Ranks #1 – #20', gold: 350, dust: 35, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', gold: 350, dust: 35, isSafe: true },
-      { rankLabel: 'Ranks #101+', gold: 350, dust: 35, isDemotion: true }
+      { rankLabel: 'Rank #1', sovereigns: 5, gold: 700, dust: 70, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 3, gold: 550, dust: 55, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 2, gold: 420, dust: 42, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 1, gold: 320, dust: 32, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 0, gold: 220, dust: 22, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 0, gold: 150, dust: 15, isDemotion: true }
     ]
   },
   {
@@ -105,9 +118,12 @@ export const DEFAULT_LEAGUE_REWARDS = [
     icon: '/icons/league_gold.png',
     tierIndex: 2,
     brackets: [
-      { rankLabel: 'Ranks #1 – #20', gold: 250, dust: 25, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', gold: 250, dust: 25, isSafe: true },
-      { rankLabel: 'Ranks #101+', gold: 250, dust: 25, isDemotion: true }
+      { rankLabel: 'Rank #1', sovereigns: 3, gold: 500, dust: 50, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 2, gold: 400, dust: 40, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 1, gold: 300, dust: 30, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 0, gold: 220, dust: 22, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 0, gold: 160, dust: 16, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 0, gold: 120, dust: 12, isDemotion: true }
     ]
   },
   {
@@ -116,9 +132,12 @@ export const DEFAULT_LEAGUE_REWARDS = [
     icon: '/icons/league_silver.png',
     tierIndex: 1,
     brackets: [
-      { rankLabel: 'Ranks #1 – #20', gold: 175, dust: 20, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', gold: 175, dust: 20, isSafe: true },
-      { rankLabel: 'Ranks #101+', gold: 175, dust: 20, isDemotion: true }
+      { rankLabel: 'Rank #1', sovereigns: 2, gold: 350, dust: 35, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 1, gold: 280, dust: 28, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 0, gold: 220, dust: 22, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 0, gold: 170, dust: 17, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 0, gold: 120, dust: 12, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 0, gold: 90, dust: 10, isDemotion: true }
     ]
   },
   {
@@ -127,8 +146,11 @@ export const DEFAULT_LEAGUE_REWARDS = [
     icon: '/icons/league_bronze.png',
     tierIndex: 0,
     brackets: [
-      { rankLabel: 'Ranks #1 – #20', gold: 120, dust: 15, isPromotion: true },
-      { rankLabel: 'Ranks #21+', gold: 120, dust: 15, isSafe: true }
+      { rankLabel: 'Rank #1', sovereigns: 1, gold: 250, dust: 25, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 0, gold: 200, dust: 20, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 0, gold: 160, dust: 16, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 0, gold: 130, dust: 13, isPromotion: true },
+      { rankLabel: 'Ranks #21+', sovereigns: 0, gold: 90, dust: 10, isSafe: true }
     ]
   }
 ];
@@ -142,8 +164,8 @@ export function calculateLeagueRewards(customConfig: any, leagueName: string, ra
   }
 
   for (const b of leagueData.brackets) {
-    const label = b.rankLabel || '';
-    if (label.includes('#1 Sovereign') || label === 'Rank #1') {
+    const label = (b.rankLabel || '').trim();
+    if (label.includes('#1 Sovereign') || label === 'Rank #1' || label.startsWith('Rank #1 ')) {
       if (rank === 1) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
     } else if (label.includes('#2 – #3') || label.includes('#2 - #3')) {
       if (rank >= 2 && rank <= 3) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };

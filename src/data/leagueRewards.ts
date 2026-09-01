@@ -36,11 +36,11 @@ export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
     summary: 'The apex of realm domination. Highest tributes in Blood Sovereigns.',
     promotionZone: 'Crown Pinnacle (No Demotions)',
     brackets: [
-      { rankLabel: 'Rank #1 Sovereign', rankBadge: '🥇 Supreme Champion', sovereigns: 600, gold: 7500, dust: 750 },
-      { rankLabel: 'Ranks #2 – #3', rankBadge: '🥈 High Council', sovereigns: 350, gold: 4500, dust: 450 },
-      { rankLabel: 'Ranks #4 – #10', rankBadge: '🥉 Void Lords', sovereigns: 180, gold: 3000, dust: 300 },
-      { rankLabel: 'Ranks #11 – #20', rankBadge: '⚔️ Overlord Guard', sovereigns: 100, gold: 1500, dust: 150 },
-      { rankLabel: 'Ranks #21+', rankBadge: '🛡️ Overlords Safe', sovereigns: 40, gold: 800, dust: 80, isSafe: true }
+      { rankLabel: 'Rank #1 Sovereign', sovereigns: 600, gold: 7500, dust: 750 },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 350, gold: 4500, dust: 450 },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 180, gold: 3000, dust: 300 },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 100, gold: 1500, dust: 150 },
+      { rankLabel: 'Ranks #21+', sovereigns: 40, gold: 800, dust: 80, isSafe: true }
     ]
   },
   {
@@ -55,10 +55,12 @@ export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
     summary: 'Imperial Grandmasters. Top 20 summoners ascend to the Void Overlord throne.',
     promotionZone: 'Top 20 Ascend to Void Overlord',
     brackets: [
-      { rankLabel: 'Ranks #1 – #5', rankBadge: '👑 Grand Sovereign', sovereigns: 75, gold: 2500, dust: 250, isPromotion: true },
-      { rankLabel: 'Ranks #6 – #20', rankBadge: '⚔️ Imperial Master', sovereigns: 40, gold: 1500, dust: 150, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Grandmaster Haven', sovereigns: 20, gold: 850, dust: 85, isSafe: true },
-      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', sovereigns: 20, gold: 850, dust: 85, isDemotion: true }
+      { rankLabel: 'Rank #1', sovereigns: 150, gold: 3500, dust: 350, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 90, gold: 2800, dust: 280, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 50, gold: 2000, dust: 200, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 30, gold: 1200, dust: 120, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 15, gold: 700, dust: 70, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 10, gold: 500, dust: 50, isDemotion: true }
     ]
   },
   {
@@ -73,10 +75,12 @@ export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
     summary: 'Elite Master summoners wielding runic blades and void power.',
     promotionZone: 'Top 20 Ascend to Grandmaster',
     brackets: [
-      { rankLabel: 'Ranks #1 – #10', rankBadge: '⚔️ Master Warlord', sovereigns: 30, gold: 1800, dust: 180, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', rankBadge: '▲ Master Vanguard', sovereigns: 15, gold: 750, dust: 75, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Master Safe Zone', sovereigns: 15, gold: 750, dust: 75, isSafe: true },
-      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', sovereigns: 15, gold: 750, dust: 75, isDemotion: true }
+      { rankLabel: 'Rank #1', sovereigns: 60, gold: 2400, dust: 240, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 40, gold: 1800, dust: 180, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 25, gold: 1300, dust: 130, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 15, gold: 900, dust: 90, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 8, gold: 550, dust: 55, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 5, gold: 400, dust: 40, isDemotion: true }
     ]
   },
   {
@@ -91,10 +95,12 @@ export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
     summary: 'Crystal Diamond tier summoners of proven battle prowess.',
     promotionZone: 'Top 20 Ascend to Master',
     brackets: [
-      { rankLabel: 'Ranks #1 – #10', rankBadge: '💎 Diamond Paragon', sovereigns: 20, gold: 1200, dust: 120, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', rankBadge: '▲ Diamond Vanguard', sovereigns: 8, gold: 600, dust: 60, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Diamond Haven', sovereigns: 8, gold: 600, dust: 60, isSafe: true },
-      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', sovereigns: 8, gold: 600, dust: 60, isDemotion: true }
+      { rankLabel: 'Rank #1', sovereigns: 35, gold: 1600, dust: 160, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 22, gold: 1200, dust: 120, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 14, gold: 900, dust: 90, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 8, gold: 650, dust: 65, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 4, gold: 450, dust: 45, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 2, gold: 300, dust: 30, isDemotion: true }
     ]
   },
   {
@@ -109,10 +115,12 @@ export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
     summary: 'Crimson blood league. Introduction of daily Blood Sovereigns tributes.',
     promotionZone: 'Top 20 Ascend to Diamond',
     brackets: [
-      { rankLabel: 'Ranks #1 – #10', rankBadge: '🩸 Crimson Lord', sovereigns: 10, gold: 900, dust: 90, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', rankBadge: '▲ Ruby Vanguard', sovereigns: 3, gold: 500, dust: 50, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Ruby Safe Zone', sovereigns: 3, gold: 500, dust: 50, isSafe: true },
-      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', sovereigns: 3, gold: 500, dust: 50, isDemotion: true }
+      { rankLabel: 'Rank #1', sovereigns: 20, gold: 1200, dust: 120, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 12, gold: 900, dust: 90, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 7, gold: 700, dust: 70, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 4, gold: 500, dust: 50, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 2, gold: 350, dust: 35, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 1, gold: 250, dust: 25, isDemotion: true }
     ]
   },
   {
@@ -127,10 +135,12 @@ export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
     summary: 'Jade and emerald enchanted league with daily Blood Sovereigns rewards.',
     promotionZone: 'Top 20 Ascend to Ruby',
     brackets: [
-      { rankLabel: 'Ranks #1 – #10', rankBadge: '❇️ Emerald Champion', sovereigns: 5, gold: 700, dust: 70, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', rankBadge: '▲ Emerald Vanguard', sovereigns: 2, gold: 400, dust: 40, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Emerald Haven', sovereigns: 2, gold: 400, dust: 40, isSafe: true },
-      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', sovereigns: 2, gold: 400, dust: 40, isDemotion: true }
+      { rankLabel: 'Rank #1', sovereigns: 10, gold: 900, dust: 90, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 6, gold: 700, dust: 70, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 4, gold: 550, dust: 55, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 2, gold: 400, dust: 40, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 1, gold: 280, dust: 28, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 0, gold: 200, dust: 20, isDemotion: true }
     ]
   },
   {
@@ -145,9 +155,12 @@ export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
     summary: 'Seasoned summoners competing for ascension into the jewel leagues.',
     promotionZone: 'Top 20 Ascend to Emerald',
     brackets: [
-      { rankLabel: 'Ranks #1 – #20', rankBadge: '▲ Platinum Vanguard', gold: 350, dust: 35, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Platinum Safe Zone', gold: 350, dust: 35, isSafe: true },
-      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', gold: 350, dust: 35, isDemotion: true }
+      { rankLabel: 'Rank #1', sovereigns: 5, gold: 700, dust: 70, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 3, gold: 550, dust: 55, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 2, gold: 420, dust: 42, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 1, gold: 320, dust: 32, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 0, gold: 220, dust: 22, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 0, gold: 150, dust: 15, isDemotion: true }
     ]
   },
   {
@@ -162,9 +175,12 @@ export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
     summary: 'Veteran warriors striving for glory in the golden halls.',
     promotionZone: 'Top 20 Ascend to Platinum',
     brackets: [
-      { rankLabel: 'Ranks #1 – #20', rankBadge: '▲ Gold Vanguard', gold: 250, dust: 25, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Gold Safe Zone', gold: 250, dust: 25, isSafe: true },
-      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', gold: 250, dust: 25, isDemotion: true }
+      { rankLabel: 'Rank #1', sovereigns: 3, gold: 500, dust: 50, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 2, gold: 400, dust: 40, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 1, gold: 300, dust: 30, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 0, gold: 220, dust: 22, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 0, gold: 160, dust: 16, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 0, gold: 120, dust: 12, isDemotion: true }
     ]
   },
   {
@@ -179,9 +195,12 @@ export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
     summary: 'Proven summoners advancing through the competitive ranks.',
     promotionZone: 'Top 20 Ascend to Gold',
     brackets: [
-      { rankLabel: 'Ranks #1 – #20', rankBadge: '▲ Silver Vanguard', gold: 175, dust: 20, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Silver Safe Zone', gold: 175, dust: 20, isSafe: true },
-      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', gold: 175, dust: 20, isDemotion: true }
+      { rankLabel: 'Rank #1', sovereigns: 2, gold: 350, dust: 35, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 1, gold: 280, dust: 28, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 0, gold: 220, dust: 22, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 0, gold: 170, dust: 17, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 0, gold: 120, dust: 12, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 0, gold: 90, dust: 10, isDemotion: true }
     ]
   },
   {
@@ -196,8 +215,11 @@ export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
     summary: 'Starting proving grounds for all aspiring summoners.',
     promotionZone: 'Top 20 Ascend to Silver (No Demotion)',
     brackets: [
-      { rankLabel: 'Ranks #1 – #20', rankBadge: '▲ Bronze Vanguard', gold: 120, dust: 15, isPromotion: true },
-      { rankLabel: 'Ranks #21+', rankBadge: '🛡️ Novice Arena', gold: 120, dust: 15, isSafe: true }
+      { rankLabel: 'Rank #1', sovereigns: 1, gold: 250, dust: 25, isPromotion: true },
+      { rankLabel: 'Ranks #2 – #3', sovereigns: 0, gold: 200, dust: 20, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 0, gold: 160, dust: 16, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 0, gold: 130, dust: 13, isPromotion: true },
+      { rankLabel: 'Ranks #21+', sovereigns: 0, gold: 90, dust: 10, isSafe: true }
     ]
   }
 ];
