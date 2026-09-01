@@ -21,7 +21,7 @@ export const DEFAULT_LEAGUE_REWARDS = [
     icon: '/icons/league_void_overlord.png',
     tierIndex: 9,
     brackets: [
-      { rankLabel: 'Rank #1 Sovereign', sovereigns: 600, gold: 7500, dust: 750 },
+      { rankLabel: 'Rank #1', sovereigns: 600, gold: 7500, dust: 750 },
       { rankLabel: 'Rank #2', sovereigns: 400, gold: 5000, dust: 500 },
       { rankLabel: 'Rank #3', sovereigns: 300, gold: 4000, dust: 400 },
       { rankLabel: 'Ranks #4 – #10', sovereigns: 180, gold: 3000, dust: 300 },
