@@ -1589,7 +1589,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   cost: 90, 
                   label: 'Warlord Bundle', 
                   sub: '10 Duel Entries', 
-                  image: '/icons/arena_ticket_bundle.webp',
+                  image: '/icons/arena_ticket_deck_v2.webp',
                   badge: 'SAVE 30 SHARDS',
                   theme: 'border-purple-500/50 hover:border-purple-400 bg-gradient-to-b from-purple-950/30 via-black to-black shadow-[0_0_20px_rgba(168,85,247,0.15)]' 
                 }
