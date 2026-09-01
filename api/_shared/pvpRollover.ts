@@ -14,20 +14,32 @@ export const PVP_LEAGUES = [
   'Void Overlord'
 ];
 
+export const LEAGUE_PROMOTION_CONFIG: Record<string, { promoteTop: number; demoteRankAbove: number; capacity?: number }> = {
+  'Void Overlord': { promoteTop: 0, demoteRankAbove: 7, capacity: 10 },
+  'Grandmaster': { promoteTop: 3, demoteRankAbove: 20, capacity: 30 },
+  'Master': { promoteTop: 7, demoteRankAbove: 30, capacity: 50 },
+  'Diamond': { promoteTop: 15, demoteRankAbove: 80, capacity: 150 },
+  'Ruby': { promoteTop: 20, demoteRankAbove: 100, capacity: 250 },
+  'Emerald': { promoteTop: 25, demoteRankAbove: 100, capacity: 350 },
+  'Platinum': { promoteTop: 30, demoteRankAbove: 100, capacity: 500 },
+  'Gold': { promoteTop: 40, demoteRankAbove: 120 },
+  'Silver': { promoteTop: 50, demoteRankAbove: 150 },
+  'Bronze': { promoteTop: 60, demoteRankAbove: 999999 }
+};
+
 export const DEFAULT_LEAGUE_REWARDS = [
   {
     name: 'Void Overlord',
     badge: '👑',
     icon: '/icons/league_void_overlord.png',
     tierIndex: 9,
+    capacity: 10,
     brackets: [
       { rankLabel: 'Rank #1', sovereigns: 600, gold: 7500, dust: 750 },
       { rankLabel: 'Rank #2', sovereigns: 400, gold: 5000, dust: 500 },
       { rankLabel: 'Rank #3', sovereigns: 300, gold: 4000, dust: 400 },
-      { rankLabel: 'Ranks #4 – #10', sovereigns: 180, gold: 3000, dust: 300 },
-      { rankLabel: 'Ranks #11 – #20', sovereigns: 100, gold: 1500, dust: 150 },
-      { rankLabel: 'Ranks #21 – #100', sovereigns: 40, gold: 800, dust: 80, isSafe: true },
-      { rankLabel: 'Ranks #101+', sovereigns: 25, gold: 500, dust: 50, isDemotion: true }
+      { rankLabel: 'Ranks #4 – #7', sovereigns: 180, gold: 3000, dust: 300, isSafe: true },
+      { rankLabel: 'Ranks #8 – #10', sovereigns: 100, gold: 1500, dust: 150, isDemotion: true }
     ]
   },
   {
@@ -35,14 +47,14 @@ export const DEFAULT_LEAGUE_REWARDS = [
     badge: '⚜️',
     icon: '/icons/league_grandmaster_crest.png',
     tierIndex: 8,
+    capacity: 30,
     brackets: [
       { rankLabel: 'Rank #1', sovereigns: 150, gold: 3500, dust: 350, isPromotion: true },
       { rankLabel: 'Rank #2', sovereigns: 100, gold: 3000, dust: 300, isPromotion: true },
       { rankLabel: 'Rank #3', sovereigns: 75, gold: 2500, dust: 250, isPromotion: true },
-      { rankLabel: 'Ranks #4 – #10', sovereigns: 50, gold: 2000, dust: 200, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', sovereigns: 30, gold: 1200, dust: 120, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', sovereigns: 15, gold: 700, dust: 70, isSafe: true },
-      { rankLabel: 'Ranks #101+', sovereigns: 10, gold: 500, dust: 50, isDemotion: true }
+      { rankLabel: 'Ranks #4 – #10', sovereigns: 50, gold: 2000, dust: 200 },
+      { rankLabel: 'Ranks #11 – #20', sovereigns: 30, gold: 1200, dust: 120, isSafe: true },
+      { rankLabel: 'Ranks #21 – #30', sovereigns: 15, gold: 700, dust: 70, isDemotion: true }
     ]
   },
   {
@@ -50,14 +62,15 @@ export const DEFAULT_LEAGUE_REWARDS = [
     badge: '⚔️',
     icon: '/icons/league_master_crest.png',
     tierIndex: 7,
+    capacity: 50,
     brackets: [
       { rankLabel: 'Rank #1', sovereigns: 60, gold: 2400, dust: 240, isPromotion: true },
       { rankLabel: 'Rank #2', sovereigns: 45, gold: 2000, dust: 200, isPromotion: true },
       { rankLabel: 'Rank #3', sovereigns: 35, gold: 1600, dust: 160, isPromotion: true },
-      { rankLabel: 'Ranks #4 – #10', sovereigns: 25, gold: 1300, dust: 130, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', sovereigns: 15, gold: 900, dust: 90, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', sovereigns: 8, gold: 550, dust: 55, isSafe: true },
-      { rankLabel: 'Ranks #101+', sovereigns: 5, gold: 400, dust: 40, isDemotion: true }
+      { rankLabel: 'Ranks #4 – #7', sovereigns: 25, gold: 1300, dust: 130, isPromotion: true },
+      { rankLabel: 'Ranks #8 – #20', sovereigns: 15, gold: 900, dust: 90 },
+      { rankLabel: 'Ranks #21 – #30', sovereigns: 8, gold: 550, dust: 55, isSafe: true },
+      { rankLabel: 'Ranks #31 – #50', sovereigns: 5, gold: 400, dust: 40, isDemotion: true }
     ]
   },
   {
@@ -65,14 +78,15 @@ export const DEFAULT_LEAGUE_REWARDS = [
     badge: '💎',
     icon: '/icons/league_diamond.png',
     tierIndex: 6,
+    capacity: 150,
     brackets: [
       { rankLabel: 'Rank #1', sovereigns: 35, gold: 1600, dust: 160, isPromotion: true },
       { rankLabel: 'Rank #2', sovereigns: 25, gold: 1300, dust: 130, isPromotion: true },
       { rankLabel: 'Rank #3', sovereigns: 18, gold: 1100, dust: 110, isPromotion: true },
-      { rankLabel: 'Ranks #4 – #10', sovereigns: 14, gold: 900, dust: 90, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', sovereigns: 8, gold: 650, dust: 65, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', sovereigns: 4, gold: 450, dust: 45, isSafe: true },
-      { rankLabel: 'Ranks #101+', sovereigns: 2, gold: 300, dust: 30, isDemotion: true }
+      { rankLabel: 'Ranks #4 – #15', sovereigns: 14, gold: 900, dust: 90, isPromotion: true },
+      { rankLabel: 'Ranks #16 – #50', sovereigns: 8, gold: 650, dust: 65 },
+      { rankLabel: 'Ranks #51 – #80', sovereigns: 4, gold: 450, dust: 45, isSafe: true },
+      { rankLabel: 'Ranks #81 – #150', sovereigns: 2, gold: 300, dust: 30, isDemotion: true }
     ]
   },
   {
@@ -84,9 +98,9 @@ export const DEFAULT_LEAGUE_REWARDS = [
       { rankLabel: 'Rank #1', sovereigns: 20, gold: 1200, dust: 120, isPromotion: true },
       { rankLabel: 'Rank #2', sovereigns: 14, gold: 1000, dust: 100, isPromotion: true },
       { rankLabel: 'Rank #3', sovereigns: 10, gold: 800, dust: 80, isPromotion: true },
-      { rankLabel: 'Ranks #4 – #10', sovereigns: 7, gold: 700, dust: 70, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', sovereigns: 4, gold: 500, dust: 50, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', sovereigns: 2, gold: 350, dust: 35, isSafe: true },
+      { rankLabel: 'Ranks #4 – #20', sovereigns: 7, gold: 700, dust: 70, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #50', sovereigns: 4, gold: 500, dust: 50 },
+      { rankLabel: 'Ranks #51 – #100', sovereigns: 2, gold: 350, dust: 35, isSafe: true },
       { rankLabel: 'Ranks #101+', sovereigns: 1, gold: 250, dust: 25, isDemotion: true }
     ]
   },
@@ -99,9 +113,9 @@ export const DEFAULT_LEAGUE_REWARDS = [
       { rankLabel: 'Rank #1', sovereigns: 10, gold: 900, dust: 90, isPromotion: true },
       { rankLabel: 'Rank #2', sovereigns: 7, gold: 750, dust: 75, isPromotion: true },
       { rankLabel: 'Rank #3', sovereigns: 5, gold: 650, dust: 65, isPromotion: true },
-      { rankLabel: 'Ranks #4 – #10', sovereigns: 4, gold: 550, dust: 55, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', sovereigns: 2, gold: 400, dust: 40, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', sovereigns: 1, gold: 280, dust: 28, isSafe: true },
+      { rankLabel: 'Ranks #4 – #25', sovereigns: 4, gold: 550, dust: 55, isPromotion: true },
+      { rankLabel: 'Ranks #26 – #50', sovereigns: 2, gold: 400, dust: 40 },
+      { rankLabel: 'Ranks #51 – #100', sovereigns: 1, gold: 280, dust: 28, isSafe: true },
       { rankLabel: 'Ranks #101+', sovereigns: 0, gold: 200, dust: 20, isDemotion: true }
     ]
   },
@@ -114,9 +128,9 @@ export const DEFAULT_LEAGUE_REWARDS = [
       { rankLabel: 'Rank #1', sovereigns: 5, gold: 700, dust: 70, isPromotion: true },
       { rankLabel: 'Rank #2', sovereigns: 3, gold: 600, dust: 60, isPromotion: true },
       { rankLabel: 'Rank #3', sovereigns: 2, gold: 500, dust: 50, isPromotion: true },
-      { rankLabel: 'Ranks #4 – #10', sovereigns: 2, gold: 420, dust: 42, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', sovereigns: 1, gold: 320, dust: 32, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', sovereigns: 0, gold: 220, dust: 22, isSafe: true },
+      { rankLabel: 'Ranks #4 – #30', sovereigns: 2, gold: 420, dust: 42, isPromotion: true },
+      { rankLabel: 'Ranks #31 – #60', sovereigns: 1, gold: 320, dust: 32 },
+      { rankLabel: 'Ranks #61 – #100', sovereigns: 0, gold: 220, dust: 22, isSafe: true },
       { rankLabel: 'Ranks #101+', sovereigns: 0, gold: 150, dust: 15, isDemotion: true }
     ]
   },
@@ -129,10 +143,10 @@ export const DEFAULT_LEAGUE_REWARDS = [
       { rankLabel: 'Rank #1', sovereigns: 3, gold: 500, dust: 50, isPromotion: true },
       { rankLabel: 'Rank #2', sovereigns: 2, gold: 420, dust: 42, isPromotion: true },
       { rankLabel: 'Rank #3', sovereigns: 2, gold: 360, dust: 36, isPromotion: true },
-      { rankLabel: 'Ranks #4 – #10', sovereigns: 1, gold: 300, dust: 30, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', sovereigns: 0, gold: 220, dust: 22, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', sovereigns: 0, gold: 160, dust: 16, isSafe: true },
-      { rankLabel: 'Ranks #101+', sovereigns: 0, gold: 120, dust: 12, isDemotion: true }
+      { rankLabel: 'Ranks #4 – #40', sovereigns: 1, gold: 300, dust: 30, isPromotion: true },
+      { rankLabel: 'Ranks #41 – #80', sovereigns: 0, gold: 220, dust: 22 },
+      { rankLabel: 'Ranks #81 – #120', sovereigns: 0, gold: 160, dust: 16, isSafe: true },
+      { rankLabel: 'Ranks #121+', sovereigns: 0, gold: 120, dust: 12, isDemotion: true }
     ]
   },
   {
@@ -144,10 +158,10 @@ export const DEFAULT_LEAGUE_REWARDS = [
       { rankLabel: 'Rank #1', sovereigns: 2, gold: 350, dust: 35, isPromotion: true },
       { rankLabel: 'Rank #2', sovereigns: 1, gold: 300, dust: 30, isPromotion: true },
       { rankLabel: 'Rank #3', sovereigns: 1, gold: 250, dust: 25, isPromotion: true },
-      { rankLabel: 'Ranks #4 – #10', sovereigns: 0, gold: 220, dust: 22, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', sovereigns: 0, gold: 170, dust: 17, isPromotion: true },
-      { rankLabel: 'Ranks #21 – #100', sovereigns: 0, gold: 120, dust: 12, isSafe: true },
-      { rankLabel: 'Ranks #101+', sovereigns: 0, gold: 90, dust: 10, isDemotion: true }
+      { rankLabel: 'Ranks #4 – #50', sovereigns: 0, gold: 220, dust: 22, isPromotion: true },
+      { rankLabel: 'Ranks #51 – #100', sovereigns: 0, gold: 170, dust: 17 },
+      { rankLabel: 'Ranks #101 – #150', sovereigns: 0, gold: 120, dust: 12, isSafe: true },
+      { rankLabel: 'Ranks #151+', sovereigns: 0, gold: 90, dust: 10, isDemotion: true }
     ]
   },
   {
@@ -159,9 +173,8 @@ export const DEFAULT_LEAGUE_REWARDS = [
       { rankLabel: 'Rank #1', sovereigns: 1, gold: 250, dust: 25, isPromotion: true },
       { rankLabel: 'Rank #2', sovereigns: 0, gold: 220, dust: 22, isPromotion: true },
       { rankLabel: 'Rank #3', sovereigns: 0, gold: 190, dust: 19, isPromotion: true },
-      { rankLabel: 'Ranks #4 – #10', sovereigns: 0, gold: 160, dust: 16, isPromotion: true },
-      { rankLabel: 'Ranks #11 – #20', sovereigns: 0, gold: 130, dust: 13, isPromotion: true },
-      { rankLabel: 'Ranks #21+', sovereigns: 0, gold: 90, dust: 10, isSafe: true }
+      { rankLabel: 'Ranks #4 – #60', sovereigns: 0, gold: 160, dust: 16, isPromotion: true },
+      { rankLabel: 'Ranks #61+', sovereigns: 0, gold: 90, dust: 10, isSafe: true }
     ]
   }
 ];
@@ -184,22 +197,56 @@ export function calculateLeagueRewards(customConfig: any, leagueName: string, ra
       if (rank === 3) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
     } else if (label.includes('#2 – #3') || label.includes('#2 - #3')) {
       if (rank >= 2 && rank <= 3) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#4 – #7') || label.includes('#4 - #7')) {
+      if (rank >= 4 && rank <= 7) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#8 – #10') || label.includes('#8 - #10')) {
+      if (rank >= 8 && rank <= 10) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
     } else if (label.includes('#4 – #10') || label.includes('#4 - #10')) {
       if (rank >= 4 && rank <= 10) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
-    } else if (label.includes('#1 – #5') || label.includes('#1 - #5')) {
-      if (rank >= 1 && rank <= 5) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
-    } else if (label.includes('#6 – #20') || label.includes('#6 - #20')) {
-      if (rank >= 6 && rank <= 20) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
-    } else if (label.includes('#1 – #10') || label.includes('#1 - #10')) {
-      if (rank >= 1 && rank <= 10) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#4 – #15') || label.includes('#4 - #15')) {
+      if (rank >= 4 && rank <= 15) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#4 – #20') || label.includes('#4 - #20')) {
+      if (rank >= 4 && rank <= 20) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#4 – #25') || label.includes('#4 - #25')) {
+      if (rank >= 4 && rank <= 25) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#4 – #30') || label.includes('#4 - #30')) {
+      if (rank >= 4 && rank <= 30) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#4 – #40') || label.includes('#4 - #40')) {
+      if (rank >= 4 && rank <= 40) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#4 – #50') || label.includes('#4 - #50')) {
+      if (rank >= 4 && rank <= 50) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#4 – #60') || label.includes('#4 - #60')) {
+      if (rank >= 4 && rank <= 60) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
     } else if (label.includes('#11 – #20') || label.includes('#11 - #20')) {
       if (rank >= 11 && rank <= 20) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
-    } else if (label.includes('#1 – #20') || label.includes('#1 - #20')) {
-      if (rank >= 1 && rank <= 20) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
-    } else if (label.includes('#21 – #100') || label.includes('#21 - #100')) {
-      if (rank >= 21 && rank <= 100) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
-    } else if (label.includes('#101+') || label.includes('#21+')) {
-      if (rank >= 21) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#21 – #30') || label.includes('#21 - #30')) {
+      if (rank >= 21 && rank <= 30) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#31 – #50') || label.includes('#31 - #50')) {
+      if (rank >= 31 && rank <= 50) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#16 – #50') || label.includes('#16 - #50')) {
+      if (rank >= 16 && rank <= 50) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#51 – #80') || label.includes('#51 - #80')) {
+      if (rank >= 51 && rank <= 80) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#81 – #150') || label.includes('#81 - #150')) {
+      if (rank >= 81 && rank <= 150) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#21 – #50') || label.includes('#21 - #50')) {
+      if (rank >= 21 && rank <= 50) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#51 – #100') || label.includes('#51 - #100')) {
+      if (rank >= 51 && rank <= 100) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#26 – #50') || label.includes('#26 - #50')) {
+      if (rank >= 26 && rank <= 50) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#31 – #60') || label.includes('#31 - #60')) {
+      if (rank >= 31 && rank <= 60) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#61 – #100') || label.includes('#61 - #100')) {
+      if (rank >= 61 && rank <= 100) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#41 – #80') || label.includes('#41 - #80')) {
+      if (rank >= 41 && rank <= 80) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#81 – #120') || label.includes('#81 - #120')) {
+      if (rank >= 81 && rank <= 120) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#101 – #150') || label.includes('#101 - #150')) {
+      if (rank >= 101 && rank <= 150) return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
+    } else if (label.includes('#121+') || label.includes('#151+') || label.includes('#101+') || label.includes('#61+')) {
+      return { gold: Number(b.gold) || 0, dust: Number(b.dust) || 0, sovereigns: Number(b.sovereigns) || 0 };
     }
   }
 
@@ -317,29 +364,32 @@ export async function checkAndPerformPvpRollover(
       leaguePlayers.sort((a, b) => (b.profile.pvpLP - a.profile.pvpLP) || (b.profile.pvpRating - a.profile.pvpRating));
 
       const count = leaguePlayers.length;
+      const promoConfig = LEAGUE_PROMOTION_CONFIG[leagueName] || { promoteTop: 20, demoteRankAbove: 100 };
+      const promoteTop = promoConfig.promoteTop;
+      const demoteRankAbove = promoConfig.demoteRankAbove;
 
       for (let i = 0; i < count; i++) {
         const p = leaguePlayers[i];
         const rank = i + 1;
         let promoStatus = '';
 
-        // Top 20 players promote to next league (if not in top league)
-        if (rank <= 20 && leagueIdx < PVP_LEAGUES.length - 1) {
+        // Top players promote to next league (if not in top league)
+        if (promoteTop > 0 && rank <= promoteTop && leagueIdx < PVP_LEAGUES.length - 1) {
           const nextLeague = PVP_LEAGUES[leagueIdx + 1];
           p.profile.pvpLeague = nextLeague;
           p.profile.pvpLP = 100;
           totalPromoted++;
-          promoStatus = `⚔️ PROMOTION! You have ascended to the ${nextLeague} League!`;
+          promoStatus = `⚔️ PROMOTION! You placed at Rank #${rank} (Top ${promoteTop}) and ascended to the ${nextLeague} League!`;
         }
-        // Players below rank 100 demote to previous league (if not in Bronze)
-        else if (rank > 100 && leagueIdx > 0) {
+        // Players below demote threshold demote to previous league (if not in Bronze)
+        else if (rank > demoteRankAbove && leagueIdx > 0) {
           const prevLeague = PVP_LEAGUES[leagueIdx - 1];
           p.profile.pvpLeague = prevLeague;
           p.profile.pvpLP = 100;
           totalDemoted++;
-          promoStatus = `🔻 DEMOTION: You have fallen to the ${prevLeague} League. Reclaim your honor!`;
+          promoStatus = `🔻 DEMOTION: You placed at Rank #${rank} (below safe Rank #${demoteRankAbove}) and have fallen to the ${prevLeague} League. Reclaim your honor!`;
         }
-        // Rank 21-100 (or at boundaries): retain in current league with fresh round LP
+        // Retain in current league with fresh round LP
         else {
           p.profile.pvpLP = 100;
           promoStatus = `🛡️ RETAINED: You maintain your standing in the ${leagueName} League.`;

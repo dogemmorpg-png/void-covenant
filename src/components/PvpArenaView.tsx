@@ -1211,21 +1211,28 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             </div>
 
             {/* PROMOTION / DEMOTION QUICK LEGEND BAR */}
-            <div 
-              onClick={() => setIsLeagueRulesModalOpen(true)}
-              className="bg-black/60 border border-white/10 hover:border-amber-500/40 rounded-xl py-2 px-3.5 flex items-center justify-between text-xs font-mono shadow-inner cursor-pointer transition-all hover:bg-black/80 group"
-              title="Click to view full League rules"
-            >
-              <span className="flex items-center gap-1 text-emerald-400 font-bold">
-                <span className="text-sm leading-none">▲</span> Top 20: Promote
-              </span>
-              <span className="text-gray-600 font-bold">•</span>
-              <span className="text-gray-300 font-medium">21–100: Safe</span>
-              <span className="text-gray-600 font-bold">•</span>
-              <span className="flex items-center gap-1 text-rose-400 font-bold">
-                <span className="text-sm leading-none">▼</span> 101+: Demote
-              </span>
-            </div>
+            {(() => {
+              const currentTierData = (leagueRewardsConfig || ALL_LEAGUE_REWARDS).find(l => l.name === viewingLeague) || ALL_LEAGUE_REWARDS.find(l => l.name === viewingLeague);
+              const promoZone = currentTierData?.promotionZone;
+              return (
+                <div 
+                  onClick={() => setIsLeagueRulesModalOpen(true)}
+                  className="bg-black/60 border border-white/10 hover:border-amber-500/40 rounded-xl py-2 px-3.5 flex items-center justify-center text-xs font-mono shadow-inner cursor-pointer transition-all hover:bg-black/80 group"
+                  title="Click to view full League rules"
+                >
+                  {promoZone ? (
+                    <span className="text-gray-200 font-bold text-[11px] truncate w-full text-center flex items-center justify-center gap-1.5">
+                      <span className="text-amber-400">📜</span>
+                      <span>{promoZone}</span>
+                    </span>
+                  ) : (
+                    <span className="text-gray-300 font-medium text-[11px]">
+                      Click to view league promotion & demotion rules
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
             
             {/* LEAGUE SELECTOR/NAVIGATOR */}
             <div className="flex items-center justify-between bg-black/40 border border-white/10 rounded-2xl p-2.5 px-3">
@@ -1584,76 +1591,42 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                 LEAGUE RULES & RESET
               </h3>
               <p className="text-xs sm:text-sm text-gray-200 font-sans max-w-md mx-auto leading-relaxed">
-                The Arena ladder resolves daily at <strong className="text-amber-400 font-mono text-sm">00:00 UTC</strong>. Here is how summoner ranks are promoted or demoted:
+                The Arena ladder resolves daily at <strong className="text-amber-400 font-mono text-sm">00:00 UTC</strong>. The hierarchy follows a strict pyramid model with fixed elite seats and high turnover:
               </p>
             </div>
 
-            {/* 3 Zone Explanations */}
-            <div className="space-y-3.5 relative z-10">
-              {/* Promotion Zone */}
-              <div className="bg-gradient-to-r from-emerald-950/50 via-black/70 to-emerald-950/30 border border-emerald-500/50 rounded-2xl p-4 flex items-start gap-4 shadow-lg shadow-emerald-950/20">
-                <div className="w-11 h-11 rounded-xl bg-emerald-950/90 border border-emerald-500/70 flex items-center justify-center text-emerald-300 font-black text-xl shrink-0 shadow-[0_0_12px_rgba(16,185,129,0.4)]">
-                  ▲
-                </div>
-                <div className="space-y-1 text-left flex-1">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="font-display font-black text-sm sm:text-base text-emerald-300 uppercase tracking-wider">
-                      PROMOTION ZONE
-                    </span>
-                    <span className="text-xs font-mono bg-emerald-950/90 text-emerald-300 border border-emerald-500/50 px-2.5 py-0.5 rounded-md font-black shadow-sm">
-                      Top 20 (#1 – #20)
-                    </span>
+            {/* League Specific Summary Table */}
+            <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1 relative z-10 text-xs">
+              {(leagueRewardsConfig || ALL_LEAGUE_REWARDS).map((tier) => {
+                const isViewing = tier.name === viewingLeague;
+                return (
+                  <div 
+                    key={tier.name}
+                    className={`p-2.5 rounded-xl border flex items-center justify-between gap-3 ${
+                      isViewing 
+                        ? 'bg-amber-950/40 border-amber-400/60 shadow-[0_0_12px_rgba(245,158,11,0.2)]' 
+                        : 'bg-black/50 border-white/10'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <img src={tier.icon} alt={tier.name} className="w-6 h-6 object-contain shrink-0" />
+                      <div className="truncate">
+                        <span className={`font-display font-black uppercase tracking-wider block text-xs ${isViewing ? 'text-amber-300 font-bold' : 'text-white'}`}>
+                          {tier.name} {tier.capacity ? `(${tier.capacity} Seats)` : ''}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-[11px] font-mono text-right text-gray-300 shrink-0 font-medium">
+                      {tier.promotionZone || 'Standard Zone'}
+                    </div>
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-200 font-sans leading-relaxed">
-                    Summoners finishing in the Top 20 ascend to the next higher League tier with greater battle rewards and glory.
-                  </p>
-                </div>
-              </div>
-
-              {/* Safe Zone */}
-              <div className="bg-gradient-to-r from-zinc-900/60 via-black/70 to-zinc-900/40 border border-white/15 rounded-2xl p-4 flex items-start gap-4 shadow-md">
-                <div className="w-11 h-11 rounded-xl bg-zinc-900/90 border border-white/20 flex items-center justify-center text-gray-300 font-black text-base shrink-0">
-                  ■
-                </div>
-                <div className="space-y-1 text-left flex-1">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="font-display font-black text-sm sm:text-base text-gray-200 uppercase tracking-wider">
-                      SAFE HAVEN
-                    </span>
-                    <span className="text-xs font-mono bg-black/80 text-gray-300 border border-white/15 px-2.5 py-0.5 rounded-md font-bold">
-                      Ranks #21 – #100
-                    </span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-gray-200 font-sans leading-relaxed">
-                    Summoners safely maintain their standing and remain in the current League tier for the upcoming round.
-                  </p>
-                </div>
-              </div>
-
-              {/* Demotion Zone */}
-              <div className="bg-gradient-to-r from-rose-950/50 via-black/70 to-rose-950/30 border border-rose-500/50 rounded-2xl p-4 flex items-start gap-4 shadow-lg shadow-rose-950/20">
-                <div className="w-11 h-11 rounded-xl bg-rose-950/90 border border-rose-500/70 flex items-center justify-center text-rose-300 font-black text-xl shrink-0 shadow-[0_0_12px_rgba(244,63,94,0.4)]">
-                  ▼
-                </div>
-                <div className="space-y-1 text-left flex-1">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="font-display font-black text-sm sm:text-base text-rose-300 uppercase tracking-wider">
-                      DEMOTION ZONE
-                    </span>
-                    <span className="text-xs font-mono bg-rose-950/90 text-rose-300 border border-rose-500/50 px-2.5 py-0.5 rounded-md font-black shadow-sm">
-                      Ranks #101+
-                    </span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-gray-200 font-sans leading-relaxed">
-                    Summoners ranked below 100 drop down to the previous lower League (excluding Bronze League).
-                  </p>
-                </div>
-              </div>
+                );
+              })}
             </div>
 
             {/* Note */}
             <div className="bg-black/70 border border-white/10 rounded-2xl p-3.5 text-center text-xs sm:text-sm text-gray-200 font-sans leading-relaxed relative z-10 shadow-inner">
-              💡 <span className="text-amber-300 font-bold">Daily Refill:</span> Free tickets reset to <strong className="text-rose-400 font-mono">5/5</strong> daily at 00:00 UTC. Purchased tickets in your Reserve never expire.
+              💡 <span className="text-amber-300 font-bold">Daily Refill:</span> Free tickets reset to <strong className="text-rose-400 font-mono">5/5</strong> daily at 00:00 UTC. Unclaimed decrees arrive in your <strong>Mailbox</strong>.
             </div>
 
             <button
