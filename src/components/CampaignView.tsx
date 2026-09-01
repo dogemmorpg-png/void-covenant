@@ -382,8 +382,8 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
 
               <div className="flex flex-col items-center justify-center pl-1 text-center">
                 <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Your Shards</span>
-                <span className="font-mono text-base font-black text-rose-300 flex items-center gap-1 mt-0.5">
-                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                <span className="font-mono text-base font-black text-rose-300 flex items-center gap-1.5 mt-0.5">
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
                   {profile.darkShards || 0}
                 </span>
                 <span className="text-[7.5px] text-gray-500 font-mono mt-0.5">Currency</span>
@@ -478,7 +478,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                           }
                         }}
                         disabled={isPurchasingEnergy}
-                        className={`w-full py-2.5 rounded-xl font-display font-black tracking-wider text-xs transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-md ${
+                        className={`w-full py-3 rounded-xl font-mono font-black text-base transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 shadow-md ${
                           canAfford
                             ? pkg.popular
                               ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black shadow-emerald-500/20 hover:scale-105 active:scale-95'
@@ -487,11 +487,11 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                         }`}
                       >
                         {isPurchasingEnergy ? (
-                          <span>Brewing...</span>
+                          <span className="text-xs font-sans">Brewing...</span>
                         ) : (
                           <>
-                            <span>{pkg.cost}</span>
-                            <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                            <span className="tracking-wide text-base">{pkg.cost}</span>
+                            <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.9)]" />
                           </>
                         )}
                       </button>
