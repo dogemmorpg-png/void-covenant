@@ -7,9 +7,29 @@ import { useToast } from './Toast';
 import { CARD_TEMPLATES, createCardInstance } from '../data/cards';
 import { Card, CardTier, Equipment } from '../types';
 import { getRandomEquipmentByTier, generateEquipmentInstance, getEquipmentIcon } from '../data/equipment';
-import { Gem, Coins, Sparkles, Box, Trash2, Shield, Flame, Skull, Sword } from 'lucide-react';
+import { assetPreloader, getCardImageUrl } from '../utils/assetPreloader';
 
-import { assetPreloader } from '../utils/assetPreloader';
+const renderManaIcon = (cost: number, sizeClass: string = "w-5 h-5") => {
+  return (
+    <div className={`relative ${sizeClass} shrink-0 flex items-center justify-center`}>
+      <svg className="absolute inset-0 w-full h-full filter drop-shadow-[0_0_5px_rgba(6,182,212,0.85)]" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L4 7v10l8 5 8-5V7l-8-5z" fill="url(#manaCrystalGradGacha)" stroke="#66fcf1" strokeWidth="1.5" />
+        <path d="M12 2L4 7l8 5 8-5-8-5z" fill="#66fcf1" opacity="0.35" />
+        <path d="M4 7v10l8 5V12L4 7z" fill="#00d2ff" opacity="0.55" />
+        <path d="M20 7v10l8 5V12L20 7z" fill="#005299" opacity="0.75" />
+        <defs>
+          <radialGradient id="manaCrystalGradGacha" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#00f0ff" />
+            <stop offset="100%" stopColor="#0033aa" />
+          </radialGradient>
+        </defs>
+      </svg>
+      <span className="relative text-white text-[10px] md:text-[11px] font-black font-mono leading-none z-10 drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.95)]">
+        {cost}
+      </span>
+    </div>
+  );
+};
 
 export const GachaStoreView: React.FC = () => {
   const { profile, spendGold, spendShards, addCardToCollection, addEquipment, setProfile, setIsShardsShopOpen } = useGame();
@@ -396,19 +416,22 @@ export const GachaStoreView: React.FC = () => {
                         <div
                           className={`w-48 aspect-[3/4.2] rounded-2xl p-4 flex flex-col justify-between relative shadow-2xl transition-all overflow-hidden border ${getCardTierStyles(card.tier, false, true)}`}
                         >
-                          {card.image.startsWith('/cards/') && (
-                            <>
-                              <img src={card.image} alt={card.name} className="absolute inset-0 w-full h-full object-cover z-0 opacity-90" />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 pointer-events-none" />
-                            </>
-                          )}
+                          <img 
+                            src={getCardImageUrl(card)} 
+                            alt={card.name} 
+                            className="absolute inset-0 w-full h-full object-cover z-0 opacity-90" 
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 pointer-events-none" />
 
                           <div className="relative z-10 flex justify-between items-start">
-                            <div className="text-center bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded border border-[#c5a880]/20">
-                              <span className="text-[8px] text-[#ebd09b] uppercase font-mono tracking-wider">{card.tier}</span>
+                            <div className="text-center bg-black/70 backdrop-blur-sm px-2.5 py-0.5 rounded-lg border border-[#c5a880]/30 shadow-md">
+                              <span className="text-[9px] text-[#ebd09b] uppercase font-mono font-bold tracking-wider">{card.tier}</span>
                             </div>
-                            <div className="bg-black border border-[#c5a880]/40 rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-mono font-bold text-[#ebd09b]">
-                              {card.level}
+                            <div className="flex items-center gap-1.5">
+                              {renderManaIcon(card.manaCost || 1, "w-6 h-6")}
+                              <div className="bg-black/80 border border-[#c5a880]/50 rounded-full w-6 h-6 flex items-center justify-center text-[10px] font-mono font-black text-[#ebd09b] shadow">
+                                L{card.level}
+                              </div>
                             </div>
                           </div>
 
