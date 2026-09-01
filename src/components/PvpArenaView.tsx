@@ -962,7 +962,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   />
                   <div className="text-center sm:text-left">
                     <span className={`font-display font-black text-base sm:text-lg uppercase tracking-wider block ${getLeagueDetails(selectedRewardLeague).accent}`}>
-                      {getLeagueDetails(selectedRewardLeague).name} LEAGUE
+                      {selectedRewardLeague === 'More Leagues Soon' ? 'MORE LEAGUES SOON' : `${getLeagueDetails(selectedRewardLeague).name} LEAGUE`}
                     </span>
                     {(profile.pvpLeague || 'Bronze').toLowerCase() === selectedRewardLeague.toLowerCase() && (
                       <span className="text-[10px] font-mono font-bold text-emerald-400 flex items-center justify-center sm:justify-start gap-1">
@@ -983,20 +983,17 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
               {/* Detailed Breakdown for Selected League */}
               {selectedRewardLeague === 'More Leagues Soon' ? (
-                <div className="bg-gradient-to-b from-purple-950/40 via-indigo-950/30 to-black border-2 border-purple-500/40 rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl relative overflow-hidden text-center animate-fade-in">
+                <div className="bg-gradient-to-b from-purple-950/40 via-indigo-950/30 to-black border-2 border-purple-500/40 rounded-3xl p-6 sm:p-8 space-y-4 shadow-2xl relative overflow-hidden text-center animate-fade-in">
                   <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/15 blur-3xl pointer-events-none" />
-                  <div className="w-18 h-18 mx-auto rounded-3xl bg-gradient-to-b from-purple-900/80 via-black to-black border-2 border-purple-400/60 flex items-center justify-center shadow-[0_0_30px_rgba(168,85,247,0.4)] animate-pulse">
-                    <Sparkles className="w-9 h-9 text-purple-300" />
+                  <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-b from-purple-900/80 via-black to-black border-2 border-purple-400/60 flex items-center justify-center shadow-[0_0_25px_rgba(168,85,247,0.4)] animate-pulse">
+                    <Sparkles className="w-8 h-8 text-purple-300" />
                   </div>
-                  <div className="space-y-2 max-w-md mx-auto relative z-10">
-                    <span className="text-xs font-mono uppercase tracking-widest text-purple-300 font-bold bg-purple-950/90 border border-purple-500/50 px-3 py-1 rounded-full inline-block">
-                      Upcoming Tiers & Realms
-                    </span>
+                  <div className="space-y-1.5 max-w-md mx-auto relative z-10">
                     <h3 className="font-display font-black text-xl sm:text-2xl text-white tracking-wider uppercase">
                       More Leagues Coming Soon
                     </h3>
                     <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
-                      New ascended tiers above Void Overlord and higher daily tributes in Blood Sovereigns are currently being forged by the Council of the Void.
+                      Higher leagues and new reward tiers will be available in future expansions.
                     </p>
                   </div>
                 </div>
@@ -1273,6 +1270,21 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
             {/* PROMOTION / DEMOTION QUICK LEGEND BAR */}
             {(() => {
+              if (viewingLeague === 'More Leagues Soon') {
+                return (
+                  <div 
+                    onClick={() => setIsLeagueRulesModalOpen(true)}
+                    className="bg-black/70 border border-purple-500/30 hover:border-purple-400/50 rounded-xl py-2 px-3 flex items-center justify-center text-xs font-mono shadow-inner cursor-pointer transition-all hover:bg-black/90 group"
+                    title="Click to view full League rules table"
+                  >
+                    <span className="text-purple-300 font-bold text-[11px] flex items-center gap-1.5">
+                      <span>🔒</span>
+                      <span>New higher leagues in development</span>
+                    </span>
+                  </div>
+                );
+              }
+
               const rules = LEAGUE_QUICK_RULES[viewingLeague] || { promo: 'Promote', safe: 'Safe', demo: 'Demote' };
               const isOverlord = viewingLeague === 'Void Overlord';
               const isBronze = viewingLeague === 'Bronze';
@@ -1315,7 +1327,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   className="w-8 h-8 sm:w-9 sm:h-9 object-contain transition-transform hover:scale-110" 
                 />
                 <span className={`font-display font-black text-sm sm:text-base uppercase tracking-wider block ${getLeagueDetails(viewingLeague).accent}`}>
-                  {getLeagueDetails(viewingLeague).name} LEAGUE
+                  {viewingLeague === 'More Leagues Soon' ? 'MORE LEAGUES SOON' : `${getLeagueDetails(viewingLeague).name} LEAGUE`}
                 </span>
               </div>
 
@@ -1333,15 +1345,12 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                 <div className="w-14 h-14 rounded-2xl bg-purple-950/70 border-2 border-purple-400/60 flex items-center justify-center shadow-[0_0_25px_rgba(168,85,247,0.4)] animate-pulse">
                   <Sparkles className="w-7 h-7 text-purple-300" />
                 </div>
-                <div className="space-y-1.5 max-w-xs">
-                  <span className="text-[9px] font-mono uppercase tracking-widest text-purple-300 font-black bg-purple-950/90 border border-purple-500/50 px-2.5 py-0.5 rounded-full inline-block">
-                    Expansion Tiers
-                  </span>
+                <div className="space-y-1 max-w-xs">
                   <h4 className="font-display font-black text-sm text-white uppercase tracking-wider">
-                    More Leagues Soon
+                    More Leagues Coming Soon
                   </h4>
                   <p className="text-[11px] text-gray-400 font-sans leading-relaxed">
-                    Ascended celestial leagues above Void Overlord are currently being forged. Stay tuned for future realm expansions!
+                    Higher leagues and new reward tiers will be available in future expansions.
                   </p>
                 </div>
               </div>
