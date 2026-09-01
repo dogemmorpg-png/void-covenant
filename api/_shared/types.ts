@@ -90,6 +90,19 @@ export interface PlayerProfile {
   isRegistered?: boolean;
   withdrawalRequests?: any[];
   mailMessages?: MailMessage[];
+  shardTransactions?: ShardTransaction[];
+}
+
+export interface ShardTransaction {
+  id: string;
+  timestamp: string; // ISO 8601
+  action: 'BUY_PVE_ENERGY' | 'BUY_ARENA_TICKETS' | 'SUMMON_GACHA' | 'FUSION_TIER_ASCENSION' | 'PURCHASE_EQUIPMENT' | 'ADMIN_ADJUSTMENT' | 'MAIL_CLAIM' | 'SHOP_PURCHASE';
+  shardsChange: number; // e.g. -50 or +100
+  shardsBefore: number;
+  shardsAfter: number;
+  description: string;
+  details?: Record<string, any>;
+  status: 'SUCCESS' | 'FAILED';
 }
 
 export interface MailMessage {

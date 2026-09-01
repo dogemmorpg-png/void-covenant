@@ -7,6 +7,7 @@ import { PlayerProfile } from './_shared/types.js';
 import { CARD_TEMPLATES, createCardInstance, generateCampaignStage, AIRDROP_TASKS } from './_shared/cards.js';
 import { calculateEnergy, processExpGain } from './_shared/energyHelper.js';
 import { checkAndPerformPvpRollover, DEFAULT_LEAGUE_REWARDS } from './_shared/pvpRollover.js';
+import { recordShardTransaction } from './_shared/shardLogger.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
@@ -772,7 +773,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       const shardsBought = Math.round(solAmount * 50);
       profile.solBalance = Number((profile.solBalance - solAmount).toFixed(4));
-      profile.darkShards = (profile.darkShards || 0) + shardsBought;
+      profile = recordShardTransaction(
+        profile,
+        'SHOP_PURCHASE',
+        shardsBought,
+        `Purchased ${shardsBought} Dark Shards with ${solAmount} SOL`,
+        { solAmount, shardsBought }
+      );
       successMessage = `Bought ${shardsBought} Dark Shards`;
       
     } else if (action === 'airdrop_task') {
@@ -800,7 +807,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (currentShards < ticketCost) {
         return res.status(400).json({ error: 'Not enough Dark Shards' });
       }
-      profile.darkShards = currentShards - ticketCost;
+      profile = recordShardTransaction(
+        profile,
+        'BUY_ARENA_TICKETS',
+        -ticketCost,
+        `Purchased ${ticketCount} Arena Tickets for ${ticketCost} Shards`,
+        { ticketCount, ticketCost }
+      );
       profile.pvpBonusTickets = (profile.pvpBonusTickets || 0) + ticketCount;
       if (profile.pvpEnergy === undefined) profile.pvpEnergy = 5;
       profile.pvpTickets = (profile.pvpEnergy || 0) + profile.pvpBonusTickets;
@@ -819,7 +832,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Not enough Dark Shards' });
       }
 
-      profile.darkShards = currentShards - shardCost;
+      profile = recordShardTransaction(
+        profile,
+        'BUY_PVE_ENERGY',
+        -shardCost,
+        `Restored +${energyCount} PvE Energy for ${shardCost} Shards`,
+        { energyCount, shardCost }
+      );
       profile.pveEnergy = (profile.pveEnergy || 0) + energyCount;
       if (profile.pveEnergyMax === undefined) profile.pveEnergyMax = 10;
       successMessage = `Restored +${energyCount} PvE Energy for ${shardCost} Shards!`;
@@ -876,7 +895,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (mail.rewards) {
         if (mail.rewards.gold) profile.gold = (profile.gold || 0) + mail.rewards.gold;
         if (mail.rewards.dust) profile.dust = (profile.dust || 0) + mail.rewards.dust;
-        if (mail.rewards.darkShards) profile.darkShards = (profile.darkShards || 0) + mail.rewards.darkShards;
+        if (mail.rewards.darkShards) {
+          profile = recordShardTransaction(
+            profile,
+            'MAIL_CLAIM',
+            mail.rewards.darkShards,
+            `Claimed tribute from mail: ${mail.title}`,
+            { mailId: mail.id }
+          );
+        }
         if (mail.rewards.bloodSovereigns) profile.bloodSovereigns = (profile.bloodSovereigns || 0) + mail.rewards.bloodSovereigns;
       }
 
@@ -912,7 +939,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       profile.gold = (profile.gold || 0) + totalGold;
       profile.dust = (profile.dust || 0) + totalDust;
-      profile.darkShards = (profile.darkShards || 0) + totalShards;
+      if (totalShards > 0) {
+        profile = recordShardTransaction(
+          profile,
+          'MAIL_CLAIM',
+          totalShards,
+          `Claimed all rewards from ${claimedCount} letters`,
+          { claimedLettersCount: claimedCount }
+        );
+      }
       profile.bloodSovereigns = (profile.bloodSovereigns || 0) + totalSovereigns;
 
       successMessage = `Claimed all rewards from ${claimedCount} letter(s)!`;

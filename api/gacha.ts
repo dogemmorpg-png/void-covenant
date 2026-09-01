@@ -7,6 +7,7 @@ import { CARD_TEMPLATES, createCardInstance } from './_shared/cards.js';
 import { getRandomEquipmentByTier, generateEquipmentInstance } from './_shared/equipment.js';
 import { PlayerProfile, CardTier } from './_shared/types.js';
 import { calculateEnergy } from './_shared/energyHelper.js';
+import { recordShardTransaction } from './_shared/shardLogger.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
@@ -205,7 +206,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (goldCost > 0) profile.gold -= goldCost;
-    if (shardCost > 0) profile.darkShards -= shardCost;
+    if (shardCost > 0) {
+      profile = recordShardTransaction(
+        profile,
+        isEquipment ? 'PURCHASE_EQUIPMENT' : 'SUMMON_GACHA',
+        -shardCost,
+        isEquipment ? `Summoned ${packType} equipment pack` : `Summoned ${packType} booster pack (${numCards} cards)`,
+        { packType, numCards, isEquipment }
+      );
+    }
 
     let newItems: any[] = [];
     if (isEquipment) {

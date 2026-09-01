@@ -6,6 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 import { CARD_TEMPLATES, getEvolutionBonusSkill, getCardManaCost } from './_shared/cards.js';
 import { Card, CardTier, PlayerProfile } from './_shared/types.js';
 import { calculateEnergy } from './_shared/energyHelper.js';
+import { recordShardTransaction } from './_shared/shardLogger.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
@@ -236,7 +237,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     profile.gold = (profile.gold || 0) - goldCost;
     profile.dust = (profile.dust || 0) - dustCost;
     if (shardsCost > 0) {
-      profile.darkShards = (profile.darkShards || 0) - shardsCost;
+      profile = recordShardTransaction(
+        profile,
+        'FUSION_TIER_ASCENSION',
+        -shardsCost,
+        `Tier evolution ritual: ${card1.name} (L5 ${card1.tier} ➔ L1 ${fusedCard.tier})`,
+        { card1Id: card1.id, card2Id: card2.id, evolvedCardId: fusedCard.id, targetTier: fusedCard.tier }
+      );
     }
     profile.collection = profile.collection.filter((c: Card) => c.id !== card1.id && c.id !== card2.id);
     profile.collection.push(fusedCard);

@@ -4,6 +4,7 @@ import { getStarterDeck, CARD_TEMPLATES, createCardInstance, getCardManaCost, ge
 import { supabase } from '../utils/supabaseClient';
 import { calculateEnergy } from '../utils/energyHelper';
 import { ALL_LEAGUE_REWARDS } from '../data/leagueRewards';
+import { recordShardTransaction } from '../utils/shardLogger';
 
 interface GameContextType {
   profile: PlayerProfile;
@@ -387,9 +388,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const addShards = (amount: number) => {
+  const addShards = (amount: number, description: string = 'Added Dark Shards') => {
     setProfile(current => {
-      const updated = { ...current, darkShards: current.darkShards + amount };
+      const updated = recordShardTransaction(
+        current,
+        'ADMIN_ADJUSTMENT',
+        amount,
+        description,
+        { amount }
+      );
       saveProfile(updated);
       return updated;
     });
@@ -417,14 +424,20 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  const spendShards = (amount: number): boolean => {
+  const spendShards = (amount: number, description: string = 'Spent Dark Shards'): boolean => {
     if (profileRef.current.darkShards < amount) {
       setIsShardsShopOpen(true);
       return false;
     }
     setProfile(current => {
       if (current.darkShards < amount) return current;
-      const updated = { ...current, darkShards: current.darkShards - amount };
+      const updated = recordShardTransaction(
+        current,
+        'SHOP_PURCHASE',
+        -amount,
+        description,
+        { amount }
+      );
       saveProfile(updated);
       return updated;
     });
@@ -1035,14 +1048,23 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
 
-      const updated = {
+      let updated = {
         ...current,
         gold: (current.gold || 0) - goldCost,
         dust: (current.dust || 0) - dustCost,
-        darkShards: (current.darkShards || 0) - shardsCost,
         collection: newCollection,
         deck: updatedDeck
       };
+
+      if (shardsCost > 0) {
+        updated = recordShardTransaction(
+          updated,
+          'FUSION_TIER_ASCENSION',
+          -shardsCost,
+          `Tier evolution ritual: ${card1.name} (L5 ${card1.tier} ➔ L1 ${newCard?.tier})`,
+          { card1Id, card2Id, newCardId: newCard?.id, targetTier: newCard?.tier }
+        );
+      }
 
       saveProfile(updated);
       return updated;
@@ -1182,9 +1204,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const currentBonus = current.pvpBonusTickets || 0;
         const newBonus = currentBonus + ticketCount;
         const dailyEnergy = current.pvpEnergy !== undefined ? current.pvpEnergy : 5;
-        const updated = { 
-          ...current,
-          darkShards: currentShards - ticketCost,
+        let updated = recordShardTransaction(
+          current,
+          'BUY_ARENA_TICKETS',
+          -ticketCost,
+          `Purchased ${ticketCount} Arena Tickets for ${ticketCost} Shards`,
+          { ticketCount, ticketCost }
+        );
+        updated = { 
+          ...updated,
           pvpBonusTickets: newBonus,
           pvpTickets: dailyEnergy + newBonus
         };
