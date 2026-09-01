@@ -336,14 +336,24 @@ export const CollectionDeckView: React.FC = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/10 z-0 pointer-events-none" />
         
-        {/* Mana cost */}
-        <div className="absolute top-1 right-1 z-10 scale-90">
-          {renderManaIcon(getCardManaCost(card), "w-3.5 h-3.5")}
+        {/* Mana and Level Badges */}
+        <div className="absolute top-1 right-1 z-10 flex items-center gap-1">
+          {renderManaIcon(getCardManaCost(card), "w-4 h-4")}
+          <div className="bg-black/80 border border-[#c5a880]/40 rounded-full w-[17px] h-[17px] flex items-center justify-center text-[8px] font-mono font-bold text-[#ebd09b] shadow">
+            L{card.level}
+          </div>
         </div>
 
         <div className="text-center mt-1 relative z-10 drop-shadow-md">
           <span className="text-[8px] font-display font-bold text-white block truncate leading-none max-w-[76px] mx-auto">{card.name}</span>
-          <span className="text-[7px] text-purple-400 font-mono font-bold tracking-wider">L{card.level}</span>
+          <span className={`text-[7px] uppercase font-mono font-bold tracking-wider ${
+            card.tier === 'bronze' ? 'text-amber-400' :
+            card.tier === 'silver' ? 'text-slate-300' :
+            card.tier === 'gold' ? 'text-[#ebd09b]' :
+            'text-purple-400'
+          }`}>
+            {card.tier}
+          </span>
         </div>
 
         <div className="flex justify-between items-center text-[8px] font-mono font-bold pt-1 border-t border-white/10 relative z-10 drop-shadow-md">
@@ -628,21 +638,31 @@ export const CollectionDeckView: React.FC = () => {
                       onClick={() => handleCardClickInFusion(card.id)}
                       className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer border overflow-hidden group transform-gpu ${getCardTierStyles(card.tier, isSelected, true)}`}
                     >
-                      {/* Mana Badge */}
-                      <div className="absolute top-1.5 right-1.5 z-10">
-                        {renderManaIcon(getCardManaCost(card), "w-[16px] h-[16px]")}
-                      </div>
-
                       <img 
                         src={getCardImageUrl(card)} 
                         alt={card.name} 
                         className="absolute inset-0 w-full h-full object-cover z-0 opacity-85 group-hover:scale-105 transition-transform duration-200" 
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20 z-0 pointer-events-none" />
+
+                      {/* Level & Mana Badges */}
+                      <div className="absolute top-1.5 right-1.5 z-10 bg-black/80 border border-[#c5a880]/40 rounded-full w-[18px] h-[18px] flex items-center justify-center text-[8px] font-mono font-bold text-[#ebd09b] shadow">
+                        L{card.level}
+                      </div>
+                      <div className="absolute top-1.5 right-[26px] z-10">
+                        {renderManaIcon(getCardManaCost(card), "w-[18px] h-[18px]")}
+                      </div>
                       
                       <div className="text-center mt-2 relative z-10 drop-shadow-md">
                         <span className="text-[9px] font-display font-bold text-white block truncate leading-none">{card.name}</span>
-                        <span className="text-[7px] text-purple-400 uppercase font-mono tracking-wider">{card.tier}</span>
+                        <span className={`text-[7px] uppercase font-mono font-bold tracking-wider ${
+                          card.tier === 'bronze' ? 'text-amber-400' :
+                          card.tier === 'silver' ? 'text-slate-300' :
+                          card.tier === 'gold' ? 'text-[#ebd09b]' :
+                          'text-purple-400'
+                        }`}>
+                          {card.tier}
+                        </span>
                       </div>
                       <div className="flex justify-between items-center text-[9px] font-mono font-bold pt-1.5 border-t border-white/10">
                         <span className="text-red-400">⚔️{card.attack}</span>
@@ -722,7 +742,12 @@ export const CollectionDeckView: React.FC = () => {
                       <span className="text-[10px] font-display font-bold text-white block truncate leading-none text-shadow-gold drop-shadow-md">
                         {card.name}
                       </span>
-                      <span className="text-[7px] text-[#ebd09b] uppercase font-mono tracking-wider drop-shadow-md">{card.tier}</span>
+                      <span className={`text-[7px] uppercase font-mono font-bold tracking-wider drop-shadow-md ${
+                        card.tier === 'bronze' ? 'text-amber-400' :
+                        card.tier === 'silver' ? 'text-slate-300' :
+                        card.tier === 'gold' ? 'text-[#ebd09b]' :
+                        'text-purple-400'
+                      }`}>{card.tier}</span>
                     </div>
 
                     <div className="relative z-10 mt-auto">
