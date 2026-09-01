@@ -4,6 +4,7 @@ import * as jwtPkg from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
 import { CARD_TEMPLATES, createCardInstance } from './_shared/cards.js';
 import { checkAndPerformPvpRollover } from './_shared/pvpRollover.js';
+import { calculateEnergy } from './_shared/energyHelper.js';
 
 const jwt = (jwtPkg as any).default || jwtPkg;
 
@@ -22,52 +23,6 @@ function generateStarterDeck() {
   }
   
   return { collection, deck };
-}
-
-function calculateEnergy(profile: any): any {
-  if (!profile) return profile;
-  
-  const now = Date.now();
-  const pveMax = profile.pveEnergyMax || 10;
-  
-  const lastPve = profile.lastPveEnergyRefill ?? profile.lastEnergyRefill ?? now;
-  const pveRegenInterval = 20 * 60 * 1000;
-  const timePassedPve = Math.max(0, now - lastPve);
-  
-  let currentPve = profile.pveEnergy !== undefined ? profile.pveEnergy : pveMax;
-  let newLastPve = lastPve;
-  
-  if (currentPve >= pveMax) {
-    newLastPve = now;
-    currentPve = pveMax;
-  } else if (timePassedPve >= pveRegenInterval) {
-    const gained = Math.floor(timePassedPve / pveRegenInterval);
-    currentPve = Math.min(pveMax, currentPve + gained);
-    newLastPve = now - (timePassedPve % pveRegenInterval);
-  }
-  
-  // PVP TICKET NORMALIZATION & RESERVE MIGRATION
-  let dailyEnergy = profile.pvpEnergy !== undefined ? profile.pvpEnergy : 5;
-  let bonusTickets = profile.pvpBonusTickets !== undefined ? profile.pvpBonusTickets : 0;
-
-  if (dailyEnergy > 5) {
-    bonusTickets += (dailyEnergy - 5);
-    dailyEnergy = 5;
-  }
-
-  dailyEnergy = Math.max(0, Math.min(5, dailyEnergy));
-  bonusTickets = Math.max(0, bonusTickets);
-  
-  profile.pveEnergy = currentPve;
-  profile.pveEnergyMax = pveMax;
-  profile.pvpEnergy = dailyEnergy;
-  profile.pvpEnergyMax = 5;
-  profile.pvpBonusTickets = bonusTickets;
-  profile.pvpTickets = dailyEnergy + bonusTickets;
-  profile.lastPveEnergyRefill = newLastPve;
-  profile.lastPvpEnergyRefill = now;
-  
-  return profile;
 }
 
 const LEGACY_CARD_MAPPINGS: Record<string, string> = {
