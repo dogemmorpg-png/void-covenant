@@ -398,6 +398,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                   cost: 10, 
                   label: 'Minor Vial', 
                   sub: '+3 Abyss Energy',
+                  image: '/icons/energy_vial_small.webp',
                   theme: 'border-white/10 hover:border-emerald-500/40 bg-gradient-to-b from-zinc-950 via-black to-black' 
                 },
                 { 
@@ -405,6 +406,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                   cost: 25, 
                   label: 'Abyssal Flask', 
                   sub: '+10 Full Refill', 
+                  image: '/icons/energy_flask_medium.webp',
                   popular: true, 
                   badge: 'MOST POPULAR',
                   theme: 'border-emerald-500/60 hover:border-emerald-400 bg-gradient-to-b from-emerald-950/30 via-black to-black shadow-[0_0_20px_rgba(16,185,129,0.15)]' 
@@ -414,6 +416,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                   cost: 50, 
                   label: 'Grand Elixir', 
                   sub: '+25 Big Reserve', 
+                  image: '/icons/energy_elixir_large.webp',
                   badge: 'SAVE 25 SHARDS',
                   theme: 'border-amber-500/60 hover:border-amber-400 bg-gradient-to-b from-amber-950/30 via-black to-black shadow-[0_0_20px_rgba(245,158,11,0.15)]' 
                 }
@@ -437,9 +440,9 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                     )}
 
                     {/* Top: Icon + Count */}
-                    <div className="space-y-1.5 mt-1">
-                      <div className="w-12 h-12 mx-auto rounded-xl bg-black/60 border border-white/10 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
-                        <img src="/icons/icon_energy.webp" alt="Energy" className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                    <div className="space-y-1.5 mt-1 flex flex-col items-center">
+                      <div className="w-16 h-16 rounded-2xl bg-black/70 border border-white/10 p-1 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform overflow-hidden">
+                        <img src={pkg.image} alt={pkg.label} className="w-full h-full object-contain rounded-xl drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
                       </div>
                       <div className="font-display font-black text-xl text-white">
                         +{pkg.count}
