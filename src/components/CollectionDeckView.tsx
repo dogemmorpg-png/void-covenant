@@ -7,6 +7,7 @@ import { Card, CardTier } from '../types';
 import { CARD_TEMPLATES } from '../data/cards';
 import { Swords, Star, Plus, Minus, ArrowRight, Skull, Shield, Zap, Sparkles, AlertCircle, Crown, ShieldAlert, Bug, Flame, Droplet } from 'lucide-react';
 import { assetPreloader, getCardImageUrl } from '../utils/assetPreloader';
+import { SanctuaryEmblem, FusionAltarEmblem, BaseCardSlotEmblem, SacrificeSlotEmblem } from './CardsViewCustomIcons';
 
 const getCardIconColor = (color: string) => {
   const colorMap: Record<string, string> = {
@@ -288,11 +289,11 @@ export const CollectionDeckView: React.FC = () => {
       return (
         <div className="w-24 h-32 border-2 border-dashed border-purple-900/40 bg-black/35 rounded-xl flex flex-col items-center justify-center text-center p-2 text-purple-400/50 shadow-inner group">
           {isBase ? (
-            <Sparkles className="w-5 h-5 text-purple-400/70 mb-1.5 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)] animate-pulse" />
+            <BaseCardSlotEmblem className="w-8 h-10 mb-1" />
           ) : (
-            <Flame className="w-5 h-5 text-rose-400/70 mb-1.5 drop-shadow-[0_0_8px_rgba(244,63,94,0.5)] animate-pulse" />
+            <SacrificeSlotEmblem className="w-8 h-10 mb-1" />
           )}
-          <span className="text-[9px] font-mono uppercase tracking-wider font-bold text-gray-400">{label}</span>
+          <span className="text-[9px] font-mono uppercase tracking-wider font-bold text-gray-400 mt-1">{label}</span>
         </div>
       );
     }
@@ -353,7 +354,7 @@ export const CollectionDeckView: React.FC = () => {
               : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'
           }`}
         >
-          <Skull className="w-4 h-4 text-[#ebd09b] shrink-0" />
+          <SanctuaryEmblem className="w-4 h-4 shrink-0" />
           <span>CREATURE SANCTUARY</span>
         </button>
         <button
@@ -369,7 +370,7 @@ export const CollectionDeckView: React.FC = () => {
               : 'border-transparent text-gray-400 hover:text-purple-400 hover:bg-purple-950/10'
           }`}
         >
-          <Sparkles className="w-4 h-4 text-purple-400 shrink-0" />
+          <FusionAltarEmblem className="w-4 h-4 shrink-0" />
           <span>FUSION ALTAR</span>
         </button>
       </div>
@@ -491,8 +492,9 @@ export const CollectionDeckView: React.FC = () => {
         <div className="bg-[#151a21] border border-[#c5a880]/25 rounded-2xl p-5 shadow-xl">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 pb-4 border-b border-white/10">
             <div>
-              <h3 className="font-display font-black text-white text-base tracking-widest text-shadow-gold">
-                💀 CREATURE SANCTUARY ({profile.collection.length})
+              <h3 className="font-display font-black text-white text-base tracking-widest text-shadow-gold flex items-center gap-2">
+                <SanctuaryEmblem className="w-4 h-4 shrink-0" />
+                <span>CREATURE SANCTUARY ({profile.collection.length})</span>
               </h3>
               <p className="text-[10px] text-gray-400 font-sans">All your dark entities are stored here.</p>
             </div>
@@ -895,7 +897,7 @@ export const CollectionDeckView: React.FC = () => {
                   })()}
                   className="w-full bg-gradient-to-r from-purple-900 to-[#4e0707] hover:from-purple-600 hover:to-red-700 disabled:opacity-40 disabled:cursor-not-allowed border border-purple-500/50 text-white font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-lg text-xs flex items-center justify-center gap-2 cursor-pointer active:scale-98"
                 >
-                  <Sparkles className="w-4 h-4 text-purple-300 animate-pulse shrink-0" />
+                  <FusionAltarEmblem className="w-4 h-4 shrink-0 animate-pulse" />
                   <span>PERFORM FUSION RITUAL</span>
                 </button>
                 <button
