@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CampaignStage } from '../types';
-import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User, Info, Gift, Sparkles, CheckCircle2, Coins } from 'lucide-react';
+import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User, Info, Gift, Sparkles, CheckCircle2, Coins, Lock } from 'lucide-react';
 import { renderStanceIcon } from './SkillAndStanceIcons';
 import { assetPreloader } from '../utils/assetPreloader';
 
@@ -163,8 +163,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
     } else {
       return {
         name: 'More Leagues Soon',
-        badge: '✨',
-        icon: '/icons/icon_dust.webp',
+        badge: '🔒',
+        icon: '',
         color: 'text-purple-300 border-purple-500/40 bg-purple-950/30',
         glow: 'shadow-[0_0_25px_rgba(168,85,247,0.4)]',
         accent: 'text-purple-300'
@@ -955,11 +955,17 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                 </button>
 
                 <div className="flex items-center gap-3.5">
-                  <img 
-                    src={getLeagueDetails(selectedRewardLeague).icon} 
-                    alt="Crest" 
-                    className="w-10 h-10 sm:w-11 sm:h-11 object-contain transition-transform hover:scale-110 drop-shadow-md" 
-                  />
+                  {selectedRewardLeague === 'More Leagues Soon' ? (
+                    <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-purple-950/80 border border-purple-500/50 flex items-center justify-center shadow-[0_0_12px_rgba(168,85,247,0.35)] shrink-0">
+                      <Lock className="w-5 h-5 text-purple-300" />
+                    </div>
+                  ) : (
+                    <img 
+                      src={getLeagueDetails(selectedRewardLeague).icon} 
+                      alt="Crest" 
+                      className="w-10 h-10 sm:w-11 sm:h-11 object-contain transition-transform hover:scale-110 drop-shadow-md" 
+                    />
+                  )}
                   <div className="text-center sm:text-left">
                     <span className={`font-display font-black text-base sm:text-lg uppercase tracking-wider block ${getLeagueDetails(selectedRewardLeague).accent}`}>
                       {selectedRewardLeague === 'More Leagues Soon' ? 'MORE LEAGUES SOON' : `${getLeagueDetails(selectedRewardLeague).name} LEAGUE`}
@@ -985,8 +991,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               {selectedRewardLeague === 'More Leagues Soon' ? (
                 <div className="bg-gradient-to-b from-purple-950/40 via-indigo-950/30 to-black border-2 border-purple-500/40 rounded-3xl p-6 sm:p-8 space-y-4 shadow-2xl relative overflow-hidden text-center animate-fade-in">
                   <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/15 blur-3xl pointer-events-none" />
-                  <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-b from-purple-900/80 via-black to-black border-2 border-purple-400/60 flex items-center justify-center shadow-[0_0_25px_rgba(168,85,247,0.4)] animate-pulse">
-                    <Sparkles className="w-8 h-8 text-purple-300" />
+                  <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-b from-purple-900/80 via-black to-black border-2 border-purple-400/60 flex items-center justify-center shadow-[0_0_25px_rgba(168,85,247,0.4)]">
+                    <Lock className="w-8 h-8 text-purple-300" />
                   </div>
                   <div className="space-y-1.5 max-w-md mx-auto relative z-10">
                     <h3 className="font-display font-black text-xl sm:text-2xl text-white tracking-wider uppercase">
@@ -1321,11 +1327,17 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               </button>
 
               <div className="flex items-center gap-3">
-                <img 
-                  src={getLeagueDetails(viewingLeague).icon} 
-                  alt="Crest" 
-                  className="w-8 h-8 sm:w-9 sm:h-9 object-contain transition-transform hover:scale-110" 
-                />
+                {viewingLeague === 'More Leagues Soon' ? (
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-purple-950/80 border border-purple-500/50 flex items-center justify-center shadow-[0_0_12px_rgba(168,85,247,0.35)] shrink-0">
+                    <Lock className="w-4 h-4 text-purple-300" />
+                  </div>
+                ) : (
+                  <img 
+                    src={getLeagueDetails(viewingLeague).icon} 
+                    alt="Crest" 
+                    className="w-8 h-8 sm:w-9 sm:h-9 object-contain transition-transform hover:scale-110" 
+                  />
+                )}
                 <span className={`font-display font-black text-sm sm:text-base uppercase tracking-wider block ${getLeagueDetails(viewingLeague).accent}`}>
                   {viewingLeague === 'More Leagues Soon' ? 'MORE LEAGUES SOON' : `${getLeagueDetails(viewingLeague).name} LEAGUE`}
                 </span>
@@ -1342,8 +1354,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
             {viewingLeague === 'More Leagues Soon' ? (
               <div className="h-[310px] flex flex-col items-center justify-center text-center space-y-3 p-5 bg-gradient-to-b from-purple-950/30 via-black to-black border border-purple-500/30 rounded-2xl shadow-inner animate-fade-in">
-                <div className="w-14 h-14 rounded-2xl bg-purple-950/70 border-2 border-purple-400/60 flex items-center justify-center shadow-[0_0_25px_rgba(168,85,247,0.4)] animate-pulse">
-                  <Sparkles className="w-7 h-7 text-purple-300" />
+                <div className="w-14 h-14 rounded-2xl bg-purple-950/70 border-2 border-purple-400/60 flex items-center justify-center shadow-[0_0_25px_rgba(168,85,247,0.4)]">
+                  <Lock className="w-7 h-7 text-purple-300" />
                 </div>
                 <div className="space-y-1 max-w-xs">
                   <h4 className="font-display font-black text-sm text-white uppercase tracking-wider">
