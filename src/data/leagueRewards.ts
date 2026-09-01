@@ -41,7 +41,8 @@ export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
       { rankLabel: 'Rank #3', sovereigns: 300, gold: 4000, dust: 400 },
       { rankLabel: 'Ranks #4 – #10', sovereigns: 180, gold: 3000, dust: 300 },
       { rankLabel: 'Ranks #11 – #20', sovereigns: 100, gold: 1500, dust: 150 },
-      { rankLabel: 'Ranks #21+', sovereigns: 40, gold: 800, dust: 80, isSafe: true }
+      { rankLabel: 'Ranks #21 – #100', sovereigns: 40, gold: 800, dust: 80, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 25, gold: 500, dust: 50, isDemotion: true }
     ]
   },
   {
