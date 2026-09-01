@@ -8,7 +8,6 @@ import { CARD_TEMPLATES, getCardManaCost, getEvolutionBonusSkill } from '../data
 import { Swords, Star, Plus, Minus, ArrowRight, Skull, Shield, Zap, Sparkles, AlertCircle, Crown, ShieldAlert, Bug, Flame, Droplet } from 'lucide-react';
 import { assetPreloader, getCardImageUrl } from '../utils/assetPreloader';
 import { SanctuaryEmblem, FusionAltarEmblem, BaseCardSlotEmblem, SacrificeSlotEmblem } from './CardsViewCustomIcons';
-import { HoloCardPreview } from './HoloCardPreview';
 
 const getCardIconColor = (color: string) => {
   const colorMap: Record<string, string> = {
@@ -1002,14 +1001,50 @@ export const CollectionDeckView: React.FC = () => {
                   <span className="text-xs font-mono font-bold text-[#c5a880] uppercase tracking-widest">Level {selectedCard.level} / 5</span>
                 </div>
 
-                {/* High Fidelity Interactive 3D Holo Foil Card Illustration */}
-                <HoloCardPreview
-                  card={selectedCard}
-                  getCardImageUrl={getCardImageUrl}
-                  getTierBadgeStyles={getTierBadgeStyles}
-                  getCardManaCost={getCardManaCost}
-                  renderManaIcon={renderManaIcon}
-                />
+                {/* High Fidelity Visual Card Illustration Representation */}
+                <div className="aspect-[3/4.2] w-full max-w-[240px] mx-auto bg-[#0b0c10] border border-[#c5a880]/30 rounded-2xl p-4 flex flex-col justify-between relative shadow-inner overflow-hidden group">
+                  {/* Card Background Image */}
+                  <div className={`absolute inset-0 opacity-10 bg-gradient-to-br z-0`} />
+                  <img 
+                    src={getCardImageUrl(selectedCard)} 
+                    alt={selectedCard.name} 
+                    decoding="async" 
+                    className="absolute inset-0 w-full h-full object-cover z-0 opacity-90 transition-transform duration-500 group-hover:scale-105" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 pointer-events-none" />
+
+                  {/* Top: Tier & Mana/Level Badges */}
+                  <div className="relative z-10 flex justify-between items-start">
+                    <span className={getTierBadgeStyles(selectedCard.tier)}>{selectedCard.tier}</span>
+                    <div className="flex items-center gap-1.5">
+                      {renderManaIcon(getCardManaCost(selectedCard), "w-6 h-6")}
+                      <div className="bg-black/80 border border-[#c5a880]/50 rounded-full w-6 h-6 flex items-center justify-center text-[10px] font-mono font-black text-[#ebd09b] shadow">
+                        L{selectedCard.level}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex-1" />
+
+                  {/* Bottom: Name & Stats */}
+                  <div className="relative z-10">
+                    <h3 className="font-display font-black text-xl text-white tracking-widest text-shadow-gold mb-2 text-center drop-shadow-md">{selectedCard.name}</h3>
+                    <div className="grid grid-cols-3 gap-1 font-mono text-[10px] font-bold text-center border-t border-white/10/60 pt-2 bg-black/40 backdrop-blur-sm rounded-lg p-1.5">
+                      <div className="bg-red-950/40 p-1 rounded">
+                        <span className="text-red-400 block text-[8px] opacity-80">ATK</span>
+                        <span className="text-red-400 text-sm">⚔️{selectedCard.attack}</span>
+                      </div>
+                      <div className="bg-emerald-950/40 p-1 rounded">
+                        <span className="text-emerald-400 block text-[8px] opacity-80">HP</span>
+                        <span className="text-emerald-400 text-sm">❤️{selectedCard.health}</span>
+                      </div>
+                      <div className="bg-blue-950/40 p-1 rounded">
+                        <span className="text-blue-400 block text-[8px] opacity-80">DELAY</span>
+                        <span className="text-blue-400 text-sm">⏳{selectedCard.delay}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Skills descriptions */}
                 <div className="space-y-2">
