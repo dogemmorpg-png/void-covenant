@@ -273,11 +273,13 @@ export const CollectionDeckView: React.FC = () => {
 
   // Get color styles based on tier
   const getTierBadgeStyles = (tier: CardTier) => {
+    const base = "px-2.5 py-0.5 rounded-lg border font-mono text-[9px] uppercase font-bold tracking-wider backdrop-blur-sm shadow-md";
     switch (tier) {
-      case 'bronze': return 'bg-amber-900/40 text-amber-500 border-amber-900/50';
-      case 'silver': return 'bg-slate-700/40 text-slate-300 border-slate-700/50';
-      case 'gold': return 'bg-[#c5a880]/20 text-[#ebd09b] border-[#c5a880]/30';
-      case 'legendary': return 'bg-purple-950/40 text-purple-400 border-purple-500/30 gothic-glow-purple animate-pulse';
+      case 'bronze': return `${base} bg-amber-950/70 text-amber-400 border-amber-800/60 shadow-[0_0_10px_rgba(245,158,11,0.2)]`;
+      case 'silver': return `${base} bg-slate-900/80 text-slate-300 border-slate-600/60 shadow-[0_0_10px_rgba(148,163,184,0.2)]`;
+      case 'gold': return `${base} bg-[#c5a880]/30 text-[#ebd09b] border-[#c5a880]/50 shadow-[0_0_10px_rgba(235,208,155,0.3)]`;
+      case 'legendary': return `${base} bg-purple-950/70 text-purple-300 border-purple-500/60 shadow-[0_0_12px_rgba(168,85,247,0.4)] animate-pulse`;
+      default: return `${base} bg-black/60 text-gray-400 border-gray-700`;
     }
   };
 
@@ -927,11 +929,14 @@ export const CollectionDeckView: React.FC = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 pointer-events-none" />
 
-                  {/* Top: Tier & Level */}
+                  {/* Top: Tier & Mana/Level Badges */}
                   <div className="relative z-10 flex justify-between items-start">
                     <span className={getTierBadgeStyles(selectedCard.tier)}>{selectedCard.tier}</span>
-                    <div className="bg-black/70 border border-[#c5a880]/40 rounded-full px-2 py-0.5 text-[9px] font-mono font-bold text-[#ebd09b] shadow">
-                      L{selectedCard.level}
+                    <div className="flex items-center gap-1.5">
+                      {renderManaIcon(selectedCard.manaCost || 1, "w-6 h-6")}
+                      <div className="bg-black/80 border border-[#c5a880]/50 rounded-full w-6 h-6 flex items-center justify-center text-[10px] font-mono font-black text-[#ebd09b] shadow">
+                        L{selectedCard.level}
+                      </div>
                     </div>
                   </div>
 
