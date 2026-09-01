@@ -1571,6 +1571,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   cost: 12, 
                   label: 'Single Pass', 
                   sub: '1 Duel Entry',
+                  image: '/icons/arena_ticket_single.webp',
                   theme: 'border-white/10 hover:border-white/20 bg-gradient-to-b from-zinc-950 via-black to-black' 
                 },
                 { 
@@ -1578,6 +1579,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   cost: 50, 
                   label: 'Gladiator Pack', 
                   sub: '5 Duel Entries', 
+                  image: '/icons/arena_ticket_stack.webp',
                   popular: true, 
                   badge: 'MOST POPULAR',
                   theme: 'border-amber-500/60 hover:border-amber-400 bg-gradient-to-b from-amber-950/30 via-black to-black shadow-[0_0_20px_rgba(245,158,11,0.15)]' 
@@ -1587,6 +1589,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   cost: 90, 
                   label: 'Warlord Bundle', 
                   sub: '10 Duel Entries', 
+                  image: '/icons/arena_ticket_bundle.webp',
                   badge: 'SAVE 30 SHARDS',
                   theme: 'border-purple-500/50 hover:border-purple-400 bg-gradient-to-b from-purple-950/30 via-black to-black shadow-[0_0_20px_rgba(168,85,247,0.15)]' 
                 }
@@ -1595,7 +1598,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                 return (
                   <div
                     key={pack.count}
-                    className={`relative p-4 rounded-2xl border flex flex-col items-center justify-between text-center gap-4 transition-all duration-300 hover:scale-[1.02] ${pack.theme}`}
+                    className={`relative p-4 rounded-2xl border flex flex-col items-center justify-between text-center gap-3 transition-all duration-300 hover:scale-[1.02] ${pack.theme}`}
                   >
                     {pack.badge && (
                       <span className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full font-display font-black text-[8px] uppercase tracking-wider shadow-md whitespace-nowrap ${
@@ -1607,19 +1610,18 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                       </span>
                     )}
                     
-                    <div className="space-y-1 pt-1">
-                      <span className="text-[10px] text-gray-400 font-display font-black uppercase tracking-wider block">
+                    <div className="space-y-1.5 pt-1 flex flex-col items-center">
+                      <div className="w-16 h-16 rounded-2xl bg-black/70 border border-white/10 p-1 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform overflow-hidden">
+                        <img src={pack.image} alt={pack.label} className="w-full h-full object-contain rounded-xl drop-shadow-[0_0_10px_rgba(244,63,94,0.75)]" />
+                      </div>
+                      <div className="font-display font-black text-xl text-white">
+                        +{pack.count}
+                      </div>
+                      <div className="font-display font-bold text-xs text-gray-300 uppercase tracking-wide">
                         {pack.label}
-                      </span>
-                      <span className="text-[9px] text-gray-500 font-mono block">
+                      </div>
+                      <div className="text-[10px] text-gray-400 font-sans">
                         {pack.sub}
-                      </span>
-                      
-                      <div className="flex items-center justify-center gap-2 pt-2">
-                        <span className="font-display font-black text-2xl text-white">
-                          +{pack.count}
-                        </span>
-                        <img src="/icons/ticket.png" alt="Ticket" className="w-7 h-7 object-contain drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]" />
                       </div>
                     </div>
    
