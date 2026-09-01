@@ -28,7 +28,8 @@ const LEAGUE_QUICK_RULES: Record<string, { promo: string; safe: string; demo: st
   'Platinum': { promo: 'Top 30: Promote', safe: '31–100: Safe', demo: '101+: Demote' },
   'Gold': { promo: 'Top 40: Promote', safe: '41–120: Safe', demo: '121+: Demote' },
   'Silver': { promo: 'Top 50: Promote', safe: '51–150: Safe', demo: '151+: Demote' },
-  'Bronze': { promo: 'Top 60: Promote', safe: '61+: Safe', demo: 'No Demote' }
+  'Bronze': { promo: 'Top 60: Promote', safe: '61+: Safe', demo: 'No Demote' },
+  'More Leagues Soon': { promo: '✨ Expansion', safe: 'Higher Realms', demo: 'Coming Soon' }
 };
 
 const LEAGUE_TABLE_DATA = [
@@ -150,7 +151,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         glow: 'shadow-[0_0_20px_rgba(245,158,11,0.35)]',
         accent: 'text-amber-300'
       };
-    } else {
+    } else if (name.startsWith('Void Overlord')) {
       return {
         name: 'Void Overlord',
         badge: '👑',
@@ -159,12 +160,26 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         glow: 'shadow-[0_0_25px_rgba(244,63,94,0.4)]',
         accent: 'text-rose-500'
       };
+    } else {
+      return {
+        name: 'More Leagues Soon',
+        badge: '✨',
+        icon: '/icons/icon_dust.webp',
+        color: 'text-purple-300 border-purple-500/40 bg-purple-950/30',
+        glow: 'shadow-[0_0_25px_rgba(168,85,247,0.4)]',
+        accent: 'text-purple-300'
+      };
     }
   };
 
   const league = getLeagueDetails(profile.pvpLeague || 'Bronze');
 
   const fetchLeaderboard = async (leagueName: string = profile.pvpLeague || 'Bronze', silent: boolean = false) => {
+    if (leagueName === 'More Leagues Soon') {
+      setIsLoadingLeaderboard(false);
+      setLeaderboard([]);
+      return;
+    }
     if (!silent) setIsLoadingLeaderboard(true);
     try {
       const token = localStorage.getItem('void_covenant_token');
@@ -406,7 +421,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       'Diamond',
       'Master',
       'Grandmaster',
-      'Void Overlord'
+      'Void Overlord',
+      'More Leagues Soon'
     ];
     const idx = LEAGUES.indexOf(viewingLeague);
     if (dir === 'prev') {
@@ -429,7 +445,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       'Diamond',
       'Master',
       'Grandmaster',
-      'Void Overlord'
+      'Void Overlord',
+      'More Leagues Soon'
     ];
     const idx = LEAGUES.indexOf(selectedRewardLeague);
     if (dir === 'prev') {
@@ -965,7 +982,25 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               </div>
 
               {/* Detailed Breakdown for Selected League */}
-              {(() => {
+              {selectedRewardLeague === 'More Leagues Soon' ? (
+                <div className="bg-gradient-to-b from-purple-950/40 via-indigo-950/30 to-black border-2 border-purple-500/40 rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl relative overflow-hidden text-center animate-fade-in">
+                  <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/15 blur-3xl pointer-events-none" />
+                  <div className="w-18 h-18 mx-auto rounded-3xl bg-gradient-to-b from-purple-900/80 via-black to-black border-2 border-purple-400/60 flex items-center justify-center shadow-[0_0_30px_rgba(168,85,247,0.4)] animate-pulse">
+                    <Sparkles className="w-9 h-9 text-purple-300" />
+                  </div>
+                  <div className="space-y-2 max-w-md mx-auto relative z-10">
+                    <span className="text-xs font-mono uppercase tracking-widest text-purple-300 font-bold bg-purple-950/90 border border-purple-500/50 px-3 py-1 rounded-full inline-block">
+                      Upcoming Tiers & Realms
+                    </span>
+                    <h3 className="font-display font-black text-xl sm:text-2xl text-white tracking-wider uppercase">
+                      More Leagues Coming Soon
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
+                      New ascended tiers above Void Overlord and higher daily tributes in Blood Sovereigns are currently being forged by the Council of the Void.
+                    </p>
+                  </div>
+                </div>
+              ) : (() => {
                 const rewardsList = leagueRewardsConfig && leagueRewardsConfig.length > 0 ? leagueRewardsConfig : ALL_LEAGUE_REWARDS;
                 const currentTier = rewardsList.find((t: any) => t.name.toLowerCase() === selectedRewardLeague.toLowerCase()) || rewardsList[0];
                 const isMyLeague = (profile.pvpLeague || 'Bronze').toLowerCase() === currentTier.name.toLowerCase();
@@ -1293,7 +1328,24 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               </button>
             </div>
 
-            {isLoadingLeaderboard ? (
+            {viewingLeague === 'More Leagues Soon' ? (
+              <div className="h-[310px] flex flex-col items-center justify-center text-center space-y-3 p-5 bg-gradient-to-b from-purple-950/30 via-black to-black border border-purple-500/30 rounded-2xl shadow-inner animate-fade-in">
+                <div className="w-14 h-14 rounded-2xl bg-purple-950/70 border-2 border-purple-400/60 flex items-center justify-center shadow-[0_0_25px_rgba(168,85,247,0.4)] animate-pulse">
+                  <Sparkles className="w-7 h-7 text-purple-300" />
+                </div>
+                <div className="space-y-1.5 max-w-xs">
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-purple-300 font-black bg-purple-950/90 border border-purple-500/50 px-2.5 py-0.5 rounded-full inline-block">
+                    Expansion Tiers
+                  </span>
+                  <h4 className="font-display font-black text-sm text-white uppercase tracking-wider">
+                    More Leagues Soon
+                  </h4>
+                  <p className="text-[11px] text-gray-400 font-sans leading-relaxed">
+                    Ascended celestial leagues above Void Overlord are currently being forged. Stay tuned for future realm expansions!
+                  </p>
+                </div>
+              </div>
+            ) : isLoadingLeaderboard ? (
               <div className="h-64 flex flex-col items-center justify-center space-y-2">
                 <div className="w-6 h-6 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
                 <span className="text-[10px] font-mono text-gray-500 uppercase">Loading Leaderboard...</span>
