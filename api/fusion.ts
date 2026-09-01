@@ -146,14 +146,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const isLevelUpgrade = card1.level < 5;
     
-    const goldCost = isLevelUpgrade ? card1.level * 150 : 500;
-    const dustCost = isLevelUpgrade ? card1.level * 20 : 100;
+    let goldCost = isLevelUpgrade ? card1.level * 150 : 500;
+    let dustCost = isLevelUpgrade ? card1.level * 20 : 100;
+    let shardsCost = 0;
+
+    if (!isLevelUpgrade) {
+      if (card1.tier === 'bronze') {
+        goldCost = 500;
+        dustCost = 100;
+        shardsCost = 5;
+      } else if (card1.tier === 'silver') {
+        goldCost = 1000;
+        dustCost = 200;
+        shardsCost = 15;
+      } else if (card1.tier === 'gold') {
+        goldCost = 2000;
+        dustCost = 400;
+        shardsCost = 30;
+      }
+    }
     
-    if (profile.gold < goldCost) {
+    if ((profile.gold || 0) < goldCost) {
       return res.status(400).json({ error: `Not enough gold. Required: ${goldCost}` });
     }
-    if (profile.dust < dustCost) {
+    if ((profile.dust || 0) < dustCost) {
       return res.status(400).json({ error: `Not enough dust. Required: ${dustCost}` });
+    }
+    if (shardsCost > 0 && (profile.darkShards || 0) < shardsCost) {
+      return res.status(400).json({ error: `Not enough Dark Shards. Required: ${shardsCost}` });
     }
 
     if (!isLevelUpgrade && card1.tier === 'legendary') {
@@ -226,8 +246,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Execute transaction locally
-    profile.gold -= goldCost;
-    profile.dust -= dustCost;
+    profile.gold = (profile.gold || 0) - goldCost;
+    profile.dust = (profile.dust || 0) - dustCost;
+    if (shardsCost > 0) {
+      profile.darkShards = (profile.darkShards || 0) - shardsCost;
+    }
     profile.collection = profile.collection.filter((c: Card) => c.id !== card1.id && c.id !== card2.id);
     profile.collection.push(fusedCard);
 

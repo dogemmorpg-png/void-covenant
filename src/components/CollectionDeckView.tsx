@@ -239,6 +239,32 @@ export const CollectionDeckView: React.FC = () => {
     }
   };
 
+  const getFusionCosts = (card: Card | null | undefined) => {
+    if (!card) return { goldCost: 0, dustCost: 0, shardsCost: 0, isLevelUpgrade: true };
+    const isLevelUpgrade = card.level < 5;
+    if (isLevelUpgrade) {
+      return {
+        goldCost: card.level * 150,
+        dustCost: card.level * 20,
+        shardsCost: 0,
+        isLevelUpgrade: true
+      };
+    }
+    let goldCost = 500;
+    let dustCost = 100;
+    let shardsCost = 5;
+    if (card.tier === 'silver') {
+      goldCost = 1000;
+      dustCost = 200;
+      shardsCost = 15;
+    } else if (card.tier === 'gold') {
+      goldCost = 2000;
+      dustCost = 400;
+      shardsCost = 30;
+    }
+    return { goldCost, dustCost, shardsCost, isLevelUpgrade: false };
+  };
+
   // Execute fusion
   const executeFusionRitual = () => {
     if (!fuseCardId1 || !fuseCardId2) return;
@@ -835,6 +861,10 @@ export const CollectionDeckView: React.FC = () => {
                             <span>Turn Delay:</span>
                             <span className="text-blue-400 font-bold">⏳ {nextDelay} turns (Reduced!)</span>
                           </li>
+                          <li className="flex justify-between">
+                            <span>Dark Shards:</span>
+                            <span className="text-purple-300 font-bold font-mono">💎 {getFusionCosts(c1).shardsCost} Shards</span>
+                          </li>
                           <li className="text-[10px] text-purple-300 border-t border-purple-950 pt-1.5 mt-1">
                             <img src="/icons/icon_dust.webp" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> <span className="font-sans">Unlocks new improved skills of tier {nextT}!</span>
                           </li>
@@ -851,10 +881,33 @@ export const CollectionDeckView: React.FC = () => {
                 {/* Costs */}
                 {fuseCardId1 ? (() => {
                   const c1 = profile.collection.find(c => c.id === fuseCardId1)!;
-                  const isLevelUpgrade = c1.level < 5;
-                  const goldCost = isLevelUpgrade ? c1.level * 150 : 500;
-                  const dustCost = isLevelUpgrade ? c1.level * 20 : 100;
+                  const { goldCost, dustCost, shardsCost } = getFusionCosts(c1);
                   
+                  if (shardsCost > 0) {
+                    return (
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="bg-black/45 border border-purple-950 p-2 rounded-lg">
+                          <span className="text-[9px] text-gray-500 block font-mono">Gold</span>
+                          <span className={`font-mono text-xs font-bold ${profile.gold >= goldCost ? 'text-amber-500' : 'text-red-500'}`}>
+                            {goldCost} / {profile.gold}<img src="/icons/icon_gold.webp" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-5 h-5 inline-block align-text-bottom ml-1" />
+                          </span>
+                        </div>
+                        <div className="bg-black/45 border border-purple-950 p-2 rounded-lg">
+                          <span className="text-[9px] text-gray-500 block font-mono">Dust</span>
+                          <span className={`font-mono text-xs font-bold ${profile.dust >= dustCost ? 'text-[#66fcf1]' : 'text-red-500'}`}>
+                            {dustCost} / {profile.dust}<img src="/icons/icon_dust.webp" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-5 h-5 inline-block align-text-bottom ml-1" />
+                          </span>
+                        </div>
+                        <div className="bg-black/45 border border-purple-950 p-2 rounded-lg">
+                          <span className="text-[9px] text-gray-500 block font-mono">Shards</span>
+                          <span className={`font-mono text-xs font-bold ${(profile.darkShards || 0) >= shardsCost ? 'text-purple-400' : 'text-red-500'}`}>
+                            {shardsCost} / {profile.darkShards || 0}<img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(168,85,247,0.6)] brightness-110 contrast-125 w-5 h-5 inline-block align-text-bottom ml-1" />
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
+
                   return (
                     <div className="grid grid-cols-2 gap-3 text-center">
                       <div className="bg-black/45 border border-purple-950 p-2 rounded-lg">
@@ -892,10 +945,8 @@ export const CollectionDeckView: React.FC = () => {
                     if (!fuseCardId1 || !fuseCardId2) return true;
                     const c1 = profile.collection.find(c => c.id === fuseCardId1);
                     if (!c1) return true;
-                    const isLevelUpgrade = c1.level < 5;
-                    const goldCost = isLevelUpgrade ? c1.level * 150 : 500;
-                    const dustCost = isLevelUpgrade ? c1.level * 20 : 100;
-                    return profile.gold < goldCost || profile.dust < dustCost;
+                    const { goldCost, dustCost, shardsCost } = getFusionCosts(c1);
+                    return profile.gold < goldCost || profile.dust < dustCost || (shardsCost > 0 && (profile.darkShards || 0) < shardsCost);
                   })()}
                   className="w-full bg-gradient-to-r from-purple-900 to-[#4e0707] hover:from-purple-600 hover:to-red-700 disabled:opacity-40 disabled:cursor-not-allowed border border-purple-500/50 text-white font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-lg text-xs flex items-center justify-center gap-2 cursor-pointer active:scale-98"
                 >
@@ -1005,9 +1056,7 @@ export const CollectionDeckView: React.FC = () => {
       {/* Fusion Confirm Modal */}
       {fusionConfirmData && (() => {
         const c1 = fusionConfirmData.card1;
-        const isLevelUpgrade = c1.level < 5;
-        const goldCost = isLevelUpgrade ? c1.level * 150 : 500;
-        const dustCost = isLevelUpgrade ? c1.level * 20 : 100;
+        const { goldCost, dustCost, shardsCost, isLevelUpgrade } = getFusionCosts(c1);
         return (
           <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
             <div className="bg-[#151a21] border border-purple-500/50 rounded-2xl p-6 max-w-sm w-full shadow-[0_0_50px_rgba(168,85,247,0.15)] relative overflow-hidden">
@@ -1020,26 +1069,32 @@ export const CollectionDeckView: React.FC = () => {
                 <p className="text-gray-300 font-sans text-sm mb-6 leading-relaxed">
                   {isLevelUpgrade 
                     ? `Fuse two copies of ${c1.name} L${c1.level} to create a powerful L${c1.level + 1} creature?`
-                    : `Sacrifice both L5 ${c1.name} cards to create a new higher tier entity?`
+                    : `Sacrifice both L5 ${c1.name} cards to evolve into a new higher tier entity?`
                   }
                 </p>
 
-                <div className="flex justify-center gap-6 mb-6 bg-black/40 py-3 rounded-xl border border-white/5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-amber-500 font-bold font-mono">{goldCost}</span>
+                <div className="flex justify-center gap-4 mb-6 bg-black/40 py-3 px-2 rounded-xl border border-white/5">
+                  <div className="flex items-center gap-1.5">
+                    <span className={`font-bold font-mono text-xs ${profile.gold >= goldCost ? 'text-amber-500' : 'text-red-500'}`}>{goldCost}</span>
                     <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[#66fcf1] font-bold font-mono">{dustCost}</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`font-bold font-mono text-xs ${profile.dust >= dustCost ? 'text-[#66fcf1]' : 'text-red-500'}`}>{dustCost}</span>
                     <img src="/icons/icon_dust.webp" alt="Dust" className="w-5 h-5 drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125" />
                   </div>
+                  {shardsCost > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      <span className={`font-bold font-mono text-xs ${(profile.darkShards || 0) >= shardsCost ? 'text-purple-400' : 'text-red-500'}`}>{shardsCost}</span>
+                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-5 h-5 drop-shadow-[0_0_12px_rgba(168,85,247,0.6)] brightness-110 contrast-125" />
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex gap-3">
-                  <button onClick={() => setFusionConfirmData(null)} className="flex-1 bg-[#0b0c10] hover:bg-gray-800 border border-gray-700/50 text-gray-400 font-mono text-xs py-3 rounded-xl transition-all">
+                  <button onClick={() => setFusionConfirmData(null)} className="flex-1 bg-[#0b0c10] hover:bg-gray-800 border border-gray-700/50 text-gray-400 font-mono text-xs py-3 rounded-xl transition-all cursor-pointer">
                     CANCEL
                   </button>
-                  <button onClick={confirmFusionRitual} className="flex-1 bg-gradient-to-r from-purple-900 to-[#4e0707] hover:from-purple-600 hover:to-red-700 border border-purple-500/50 text-white font-display font-black tracking-widest py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                  <button onClick={confirmFusionRitual} className="flex-1 bg-gradient-to-r from-purple-900 to-[#4e0707] hover:from-purple-600 hover:to-red-700 border border-purple-500/50 text-white font-display font-black tracking-widest py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(168,85,247,0.4)] cursor-pointer active:scale-98">
                     CONFIRM
                   </button>
                 </div>
