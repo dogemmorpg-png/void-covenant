@@ -1079,16 +1079,71 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                 </div>
               </div>
 
-              {/* 10-League Selector Ribbon / Horizontal Pills */}
-              <div className="space-y-2">
+              {/* League Switcher Console: Stepper + Dropdown + 10-Tier Grid */}
+              <div className="bg-black/60 border border-white/10 rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-xl">
+                
                 <div className="flex items-center justify-between px-1">
-                  <span className="text-[11px] font-mono uppercase tracking-widest text-gray-400 font-bold flex items-center gap-1.5">
-                    <span>SELECT LEAGUE TIER</span>
+                  <span className="text-[11px] font-mono uppercase tracking-widest text-amber-300 font-bold flex items-center gap-1.5">
+                    <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                    <span>SELECT LEAGUE TO VIEW TRIBUTES</span>
                   </span>
-                  <span className="text-[10px] font-mono text-amber-400/80">10 Competitive Tiers</span>
+                  <span className="text-[10px] font-mono text-gray-400">10 Competitive Tiers</span>
                 </div>
 
-                <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin select-none">
+                {/* Top: Stepper & Dropdown Quick Selector */}
+                <div className="flex items-center justify-between gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
+                  <button
+                    onClick={() => {
+                      const idx = ALL_LEAGUE_REWARDS.findIndex(t => t.name.toLowerCase() === selectedRewardLeague.toLowerCase());
+                      const nextIdx = idx < ALL_LEAGUE_REWARDS.length - 1 ? idx + 1 : ALL_LEAGUE_REWARDS.length - 1;
+                      setSelectedRewardLeague(ALL_LEAGUE_REWARDS[nextIdx].name);
+                    }}
+                    disabled={selectedRewardLeague.toLowerCase() === 'bronze'}
+                    className="flex-1 sm:flex-initial px-3 sm:px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-display font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span className="hidden sm:inline">Lower Tier</span>
+                    <span className="sm:hidden">Prev</span>
+                  </button>
+
+                  {/* Center Dropdown */}
+                  <div className="w-full sm:flex-1 min-w-[200px] relative order-first sm:order-none">
+                    <select
+                      value={selectedRewardLeague}
+                      onChange={(e) => setSelectedRewardLeague(e.target.value)}
+                      className="w-full bg-[#151a21] border-2 border-amber-500/50 hover:border-amber-400 text-white font-display font-black text-xs sm:text-sm uppercase tracking-wider rounded-xl px-4 py-2.5 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)] text-center"
+                    >
+                      {ALL_LEAGUE_REWARDS.map((lt) => {
+                        const isMyLeague = (profile.pvpLeague || 'Bronze').toLowerCase() === lt.name.toLowerCase();
+                        return (
+                          <option key={lt.name} value={lt.name} className="bg-[#12151c] text-white py-1 font-bold">
+                            {lt.badge} Tier {lt.tierIndex + 1}: {lt.name} League {isMyLeague ? '⭐ (Your League)' : ''}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-amber-400 text-xs">
+                      ▼
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      const idx = ALL_LEAGUE_REWARDS.findIndex(t => t.name.toLowerCase() === selectedRewardLeague.toLowerCase());
+                      const prevIdx = idx > 0 ? idx - 1 : 0;
+                      setSelectedRewardLeague(ALL_LEAGUE_REWARDS[prevIdx].name);
+                    }}
+                    disabled={selectedRewardLeague.toLowerCase() === 'void overlord'}
+                    className="flex-1 sm:flex-initial px-3 sm:px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-amber-300 hover:text-white font-display font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    <span className="hidden sm:inline">Higher Tier</span>
+                    <span className="sm:hidden">Next</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Compact Grid Matrix of all 10 Leagues (Single-click access to all tiers) */}
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
                   {ALL_LEAGUE_REWARDS.map(lt => {
                     const isSelected = selectedRewardLeague.toLowerCase() === lt.name.toLowerCase();
                     const isPlayerLeague = (profile.pvpLeague || 'Bronze').toLowerCase() === lt.name.toLowerCase();
@@ -1097,23 +1152,27 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                       <button
                         key={lt.name}
                         onClick={() => setSelectedRewardLeague(lt.name)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-2xl border transition-all cursor-pointer shrink-0 ${
+                        className={`p-2 sm:p-2.5 rounded-xl border transition-all cursor-pointer flex items-center gap-2 relative ${
                           isSelected
-                            ? `${lt.accent} border-2 shadow-[0_0_20px_rgba(245,158,11,0.3)] scale-[1.03]`
-                            : 'bg-black/40 hover:bg-black/60 border-white/10 hover:border-white/25 text-gray-400 hover:text-white'
+                            ? `${lt.accent} border-2 shadow-[0_0_15px_rgba(245,158,11,0.35)] scale-[1.02] font-black`
+                            : 'bg-black/40 hover:bg-white/5 border-white/10 hover:border-white/20 text-gray-400 hover:text-white font-bold'
                         }`}
                       >
-                        <img src={lt.icon} alt={lt.name} className="w-5 h-5 object-contain" />
-                        <span className="font-display font-black text-xs uppercase tracking-wider">
-                          {lt.name}
-                        </span>
+                        <img src={lt.icon} alt={lt.name} className="w-6 h-6 object-contain shrink-0" />
+                        <div className="text-left min-w-0 flex-1">
+                          <span className="text-[9px] font-mono text-gray-400 block truncate leading-none">T{lt.tierIndex + 1}</span>
+                          <span className="text-xs font-display uppercase tracking-wider block truncate mt-0.5">
+                            {lt.name}
+                          </span>
+                        </div>
                         {isPlayerLeague && (
-                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Your Current League" />
+                          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.8)]" title="Your Current League" />
                         )}
                       </button>
                     );
                   })}
                 </div>
+
               </div>
 
               {/* Detailed Breakdown for Selected League */}
