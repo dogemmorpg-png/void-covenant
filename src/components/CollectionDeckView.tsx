@@ -284,10 +284,15 @@ export const CollectionDeckView: React.FC = () => {
   const renderAltarCardSlot = (cardId: string | null, label: string, onClear: () => void) => {
     const card = profile.collection.find(c => c.id === cardId);
     if (!card) {
+      const isBase = label.toLowerCase().includes('base');
       return (
-        <div className="w-24 h-32 border-2 border-dashed border-purple-900/40 bg-black/35 rounded-xl flex flex-col items-center justify-center text-center p-2 text-purple-400/50 shadow-inner">
-          <span className="text-xl mb-1 animate-pulse">🧬</span>
-          <span className="text-[9px] font-mono uppercase tracking-wider font-bold">{label}</span>
+        <div className="w-24 h-32 border-2 border-dashed border-purple-900/40 bg-black/35 rounded-xl flex flex-col items-center justify-center text-center p-2 text-purple-400/50 shadow-inner group">
+          {isBase ? (
+            <Sparkles className="w-5 h-5 text-purple-400/70 mb-1.5 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)] animate-pulse" />
+          ) : (
+            <Flame className="w-5 h-5 text-rose-400/70 mb-1.5 drop-shadow-[0_0_8px_rgba(244,63,94,0.5)] animate-pulse" />
+          )}
+          <span className="text-[9px] font-mono uppercase tracking-wider font-bold text-gray-400">{label}</span>
         </div>
       );
     }
@@ -348,7 +353,8 @@ export const CollectionDeckView: React.FC = () => {
               : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'
           }`}
         >
-          💀 CREATURE SANCTUARY
+          <Skull className="w-4 h-4 text-[#ebd09b] shrink-0" />
+          <span>CREATURE SANCTUARY</span>
         </button>
         <button
           onClick={() => {
@@ -363,7 +369,8 @@ export const CollectionDeckView: React.FC = () => {
               : 'border-transparent text-gray-400 hover:text-purple-400 hover:bg-purple-950/10'
           }`}
         >
-          🧬 FUSION ALTAR
+          <Sparkles className="w-4 h-4 text-purple-400 shrink-0" />
+          <span>FUSION ALTAR</span>
         </button>
       </div>
 
@@ -886,9 +893,10 @@ export const CollectionDeckView: React.FC = () => {
                     const dustCost = isLevelUpgrade ? c1.level * 20 : 100;
                     return profile.gold < goldCost || profile.dust < dustCost;
                   })()}
-                  className="w-full bg-gradient-to-r from-purple-900 to-[#4e0707] hover:from-purple-600 hover:to-red-700 disabled:opacity-40 disabled:cursor-not-allowed border border-purple-500/50 text-white font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-lg text-xs"
+                  className="w-full bg-gradient-to-r from-purple-900 to-[#4e0707] hover:from-purple-600 hover:to-red-700 disabled:opacity-40 disabled:cursor-not-allowed border border-purple-500/50 text-white font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-lg text-xs flex items-center justify-center gap-2 cursor-pointer active:scale-98"
                 >
-                  🕯️ PERFORM FUSION RITUAL
+                  <Sparkles className="w-4 h-4 text-purple-300 animate-pulse shrink-0" />
+                  <span>PERFORM FUSION RITUAL</span>
                 </button>
                 <button
                   onClick={() => setIsFusingMode(false)}
