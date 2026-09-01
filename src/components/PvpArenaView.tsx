@@ -2,9 +2,214 @@ import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CampaignStage } from '../types';
-import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User, Info } from 'lucide-react';
+import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User, Info, Gift, Sparkles, CheckCircle2, Coins } from 'lucide-react';
 import { renderStanceIcon } from './SkillAndStanceIcons';
 import { assetPreloader } from '../utils/assetPreloader';
+
+export interface LeagueRewardBracket {
+  rankLabel: string;
+  rankBadge: string;
+  sovereigns?: number;
+  gold: number;
+  dust: number;
+  darkShards?: number;
+  isPromotion?: boolean;
+  isSafe?: boolean;
+  isDemotion?: boolean;
+}
+
+export interface LeagueTierRewards {
+  name: string;
+  badge: string;
+  icon: string;
+  tierIndex: number;
+  color: string;
+  accent: string;
+  border: string;
+  bgGradient: string;
+  summary: string;
+  promotionZone: string;
+  brackets: LeagueRewardBracket[];
+}
+
+export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
+  {
+    name: 'Void Overlord',
+    badge: '👑',
+    icon: '/icons/league_void_overlord.png',
+    tierIndex: 9,
+    color: 'text-rose-400',
+    accent: 'text-rose-400 border-rose-500/40 bg-rose-950/30',
+    border: 'border-rose-500/50',
+    bgGradient: 'from-red-950/40 via-purple-950/30 to-black',
+    summary: 'The apex of realm domination. Highest tributes in Blood Sovereigns & Dark Shards.',
+    promotionZone: 'Crown Pinnacle (No Demotions)',
+    brackets: [
+      { rankLabel: 'Rank #1 Sovereign', rankBadge: '🥇 Supreme Champion', sovereigns: 500, gold: 5000, dust: 500, darkShards: 100 },
+      { rankLabel: 'Ranks #2 – #3', rankBadge: '🥈 High Council', sovereigns: 300, gold: 3000, dust: 300, darkShards: 50 },
+      { rankLabel: 'Ranks #4 – #10', rankBadge: '🥉 Void Lords', sovereigns: 150, gold: 2000, dust: 200, darkShards: 30 },
+      { rankLabel: 'Ranks #11 – #20', rankBadge: '⚔️ Overlord Guard', sovereigns: 80, gold: 1000, dust: 100, darkShards: 20 },
+      { rankLabel: 'Ranks #21+', rankBadge: '🛡️ Overlords Safe', sovereigns: 30, gold: 600, dust: 60, isSafe: true }
+    ]
+  },
+  {
+    name: 'Grandmaster',
+    badge: '⚜️',
+    icon: '/icons/league_grandmaster_crest.png',
+    tierIndex: 8,
+    color: 'text-amber-300',
+    accent: 'text-amber-200 border-amber-400/40 bg-gradient-to-r from-purple-950/40 to-amber-950/40',
+    border: 'border-amber-400/50',
+    bgGradient: 'from-purple-950/40 via-amber-950/30 to-black',
+    summary: 'Imperial Grandmasters. Top 20 summoners ascend to the Void Overlord throne.',
+    promotionZone: 'Top 20 Ascend to Void Overlord',
+    brackets: [
+      { rankLabel: 'Ranks #1 – #5', rankBadge: '👑 Grand Sovereign', sovereigns: 60, gold: 2000, dust: 200, darkShards: 25, isPromotion: true },
+      { rankLabel: 'Ranks #6 – #20', rankBadge: '⚔️ Imperial Master', sovereigns: 30, gold: 1200, dust: 120, darkShards: 15, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Grandmaster Haven', sovereigns: 15, gold: 700, dust: 70, isSafe: true },
+      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', sovereigns: 15, gold: 700, dust: 70, isDemotion: true }
+    ]
+  },
+  {
+    name: 'Master',
+    badge: '⚔️',
+    icon: '/icons/league_master_crest.png',
+    tierIndex: 7,
+    color: 'text-purple-300',
+    accent: 'text-purple-300 border-purple-500/40 bg-purple-950/30',
+    border: 'border-purple-500/50',
+    bgGradient: 'from-purple-950/40 via-indigo-950/30 to-black',
+    summary: 'Elite Master summoners wielding runic blades and void power.',
+    promotionZone: 'Top 20 Ascend to Grandmaster',
+    brackets: [
+      { rankLabel: 'Ranks #1 – #10', rankBadge: '⚔️ Master Warlord', sovereigns: 25, gold: 1500, dust: 150, darkShards: 15, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', rankBadge: '▲ Master Vanguard', sovereigns: 10, gold: 600, dust: 60, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Master Safe Zone', sovereigns: 10, gold: 600, dust: 60, isSafe: true },
+      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', sovereigns: 10, gold: 600, dust: 60, isDemotion: true }
+    ]
+  },
+  {
+    name: 'Diamond',
+    badge: '💎',
+    icon: '/icons/league_diamond.png',
+    tierIndex: 6,
+    color: 'text-cyan-300',
+    accent: 'text-cyan-300 border-cyan-500/30 bg-cyan-950/20',
+    border: 'border-cyan-500/50',
+    bgGradient: 'from-cyan-950/40 via-blue-950/30 to-black',
+    summary: 'Crystal Diamond tier summoners of proven battle prowess.',
+    promotionZone: 'Top 20 Ascend to Master',
+    brackets: [
+      { rankLabel: 'Ranks #1 – #10', rankBadge: '💎 Diamond Paragon', sovereigns: 15, gold: 1000, dust: 100, darkShards: 10, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', rankBadge: '▲ Diamond Vanguard', sovereigns: 5, gold: 500, dust: 50, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Diamond Haven', sovereigns: 5, gold: 500, dust: 50, isSafe: true },
+      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', sovereigns: 5, gold: 500, dust: 50, isDemotion: true }
+    ]
+  },
+  {
+    name: 'Ruby',
+    badge: '🩸',
+    icon: '/icons/league_ruby_crest.png',
+    tierIndex: 5,
+    color: 'text-red-400',
+    accent: 'text-red-400 border-red-500/30 bg-red-950/20',
+    border: 'border-red-500/50',
+    bgGradient: 'from-red-950/40 via-rose-950/30 to-black',
+    summary: 'Crimson blood league. Introduction of daily Blood Sovereigns tributes.',
+    promotionZone: 'Top 20 Ascend to Diamond',
+    brackets: [
+      { rankLabel: 'Ranks #1 – #10', rankBadge: '🩸 Crimson Lord', sovereigns: 8, gold: 800, dust: 80, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', rankBadge: '▲ Ruby Vanguard', sovereigns: 2, gold: 450, dust: 45, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Ruby Safe Zone', sovereigns: 2, gold: 450, dust: 45, isSafe: true },
+      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', sovereigns: 2, gold: 450, dust: 45, isDemotion: true }
+    ]
+  },
+  {
+    name: 'Emerald',
+    badge: '❇️',
+    icon: '/icons/league_emerald_crest.png',
+    tierIndex: 4,
+    color: 'text-emerald-400',
+    accent: 'text-emerald-400 border-emerald-500/30 bg-emerald-950/20',
+    border: 'border-emerald-500/50',
+    bgGradient: 'from-emerald-950/40 via-teal-950/30 to-black',
+    summary: 'Jade and emerald enchanted league with daily Blood Sovereigns rewards.',
+    promotionZone: 'Top 20 Ascend to Ruby',
+    brackets: [
+      { rankLabel: 'Ranks #1 – #10', rankBadge: '❇️ Emerald Champion', sovereigns: 4, gold: 600, dust: 60, isPromotion: true },
+      { rankLabel: 'Ranks #11 – #20', rankBadge: '▲ Emerald Vanguard', sovereigns: 1, gold: 350, dust: 35, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Emerald Haven', sovereigns: 1, gold: 350, dust: 35, isSafe: true },
+      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', sovereigns: 1, gold: 350, dust: 35, isDemotion: true }
+    ]
+  },
+  {
+    name: 'Platinum',
+    badge: '🔮',
+    icon: '/icons/league_platinum.png',
+    tierIndex: 3,
+    color: 'text-indigo-300',
+    accent: 'text-indigo-300 border-indigo-500/30 bg-indigo-950/20',
+    border: 'border-indigo-500/40',
+    bgGradient: 'from-indigo-950/40 via-blue-950/30 to-black',
+    summary: 'Seasoned summoners competing for ascension into the jewel leagues.',
+    promotionZone: 'Top 20 Ascend to Emerald',
+    brackets: [
+      { rankLabel: 'Ranks #1 – #20', rankBadge: '▲ Platinum Vanguard', gold: 300, dust: 30, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Platinum Safe Zone', gold: 300, dust: 30, isSafe: true },
+      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', gold: 300, dust: 30, isDemotion: true }
+    ]
+  },
+  {
+    name: 'Gold',
+    badge: '🥇',
+    icon: '/icons/league_gold.png',
+    tierIndex: 2,
+    color: 'text-yellow-400',
+    accent: 'text-yellow-400 border-yellow-500/30 bg-yellow-950/20',
+    border: 'border-yellow-500/40',
+    bgGradient: 'from-yellow-950/40 via-amber-950/30 to-black',
+    summary: 'Veteran warriors striving for glory in the golden halls.',
+    promotionZone: 'Top 20 Ascend to Platinum',
+    brackets: [
+      { rankLabel: 'Ranks #1 – #20', rankBadge: '▲ Gold Vanguard', gold: 225, dust: 25, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Gold Safe Zone', gold: 225, dust: 25, isSafe: true },
+      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', gold: 225, dust: 25, isDemotion: true }
+    ]
+  },
+  {
+    name: 'Silver',
+    badge: '🥈',
+    icon: '/icons/league_silver.png',
+    tierIndex: 1,
+    color: 'text-gray-200',
+    accent: 'text-gray-200 border-gray-500/30 bg-gray-900/30',
+    border: 'border-gray-500/40',
+    bgGradient: 'from-gray-900/40 via-slate-950/30 to-black',
+    summary: 'Proven summoners advancing through the competitive ranks.',
+    promotionZone: 'Top 20 Ascend to Gold',
+    brackets: [
+      { rankLabel: 'Ranks #1 – #20', rankBadge: '▲ Silver Vanguard', gold: 150, dust: 15, isPromotion: true },
+      { rankLabel: 'Ranks #21 – #100', rankBadge: '🛡️ Silver Safe Zone', gold: 150, dust: 15, isSafe: true },
+      { rankLabel: 'Ranks #101+', rankBadge: '🔻 Demotion Zone', gold: 150, dust: 15, isDemotion: true }
+    ]
+  },
+  {
+    name: 'Bronze',
+    badge: '🥉',
+    icon: '/icons/league_bronze.png',
+    tierIndex: 0,
+    color: 'text-amber-400',
+    accent: 'text-amber-400 border-amber-600/30 bg-amber-950/20',
+    border: 'border-amber-600/40',
+    bgGradient: 'from-amber-950/40 via-yellow-950/20 to-black',
+    summary: 'Starting proving grounds for all aspiring summoners.',
+    promotionZone: 'Top 20 Ascend to Silver (No Demotion)',
+    brackets: [
+      { rankLabel: 'Ranks #1 – #20', rankBadge: '▲ Bronze Vanguard', gold: 100, dust: 10, isPromotion: true },
+      { rankLabel: 'Ranks #21+', rankBadge: '🛡️ Novice Arena', gold: 100, dust: 10, isSafe: true }
+    ]
+  }
+];
 
 interface PvpArenaViewProps {
   onStartBattle: (stage: CampaignStage, type: 'campaign' | 'pvp', opponentPayload?: any) => Promise<boolean> | void;
@@ -24,7 +229,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   const { profile, updateProfile, buyPvpTickets } = useGame();
   const toast = useToast();
 
-  const [activeTab, setActiveTab] = useState<'duels' | 'history'>('duels');
+  const [activeTab, setActiveTab] = useState<'duels' | 'rewards' | 'history'>('duels');
+  const [selectedRewardLeague, setSelectedRewardLeague] = useState<string>(profile.pvpLeague || 'Void Overlord');
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true);
   const [matchStatus, setMatchStatus] = useState('');
@@ -655,25 +861,36 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
           <div className="flex bg-black/60 p-1.5 rounded-2xl border border-white/10 gap-2 mb-2 w-full shadow-inner">
             <button
               onClick={() => setActiveTab('duels')}
-              className={`flex-1 py-3 px-6 rounded-xl text-xs font-display font-black tracking-widest transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer uppercase ${
+              className={`flex-1 py-3 px-2 sm:px-4 rounded-xl text-[11px] sm:text-xs font-display font-black tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer uppercase ${
                 activeTab === 'duels'
                   ? 'bg-gradient-to-r from-red-950/90 via-rose-900/70 to-red-950/90 border border-rose-500/60 text-white shadow-[0_0_20px_rgba(244,63,94,0.35)] scale-[1.01]'
                   : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent'
               }`}
             >
               <Swords className={`w-4 h-4 ${activeTab === 'duels' ? 'text-rose-400 animate-pulse' : 'text-gray-500'}`} />
-              <span>ARENA DUELS</span>
+              <span>DUELS</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('rewards')}
+              className={`flex-1 py-3 px-2 sm:px-4 rounded-xl text-[11px] sm:text-xs font-display font-black tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer uppercase ${
+                activeTab === 'rewards'
+                  ? 'bg-gradient-to-r from-amber-950/90 via-yellow-900/70 to-amber-950/90 border border-amber-500/60 text-white shadow-[0_0_20px_rgba(245,158,11,0.35)] scale-[1.01]'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent'
+              }`}
+            >
+              <Trophy className={`w-4 h-4 ${activeTab === 'rewards' ? 'text-amber-400 animate-pulse' : 'text-gray-500'}`} />
+              <span>LEAGUE REWARDS</span>
             </button>
             <button
               onClick={() => setActiveTab('history')}
-              className={`flex-1 py-3 px-6 rounded-xl text-xs font-display font-black tracking-widest transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer uppercase ${
+              className={`flex-1 py-3 px-2 sm:px-4 rounded-xl text-[11px] sm:text-xs font-display font-black tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer uppercase ${
                 activeTab === 'history'
                   ? 'bg-gradient-to-r from-cyan-950/90 via-blue-900/70 to-cyan-950/90 border border-cyan-500/60 text-white shadow-[0_0_20px_rgba(6,182,212,0.35)] scale-[1.01]'
                   : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent'
               }`}
             >
               <History className={`w-4 h-4 ${activeTab === 'history' ? 'text-cyan-400' : 'text-gray-500'}`} />
-              <span>BATTLE HISTORY</span>
+              <span>HISTORY</span>
             </button>
           </div>
 
@@ -801,6 +1018,272 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
                 </div>
               )}
+
+            </div>
+          )}
+
+          {/* LEAGUE REWARDS TAB CONTENT */}
+          {activeTab === 'rewards' && (
+            <div className="space-y-6 flex-1 animate-fade-in">
+              
+              {/* Header Banner */}
+              <div className="bg-gradient-to-b from-[#1c140f] via-[#120d09] to-[#0a0705] border border-amber-500/30 rounded-2xl p-5 sm:p-6 shadow-2xl relative overflow-hidden space-y-4">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 blur-3xl pointer-events-none" />
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="w-5 h-5 text-amber-400" />
+                      <h3 className="font-display font-black text-lg text-white tracking-widest uppercase">
+                        DAILY LEAGUE TRIBUTES
+                      </h3>
+                    </div>
+                    <p className="text-xs text-gray-300 font-sans leading-relaxed max-w-xl">
+                      Each day at <strong className="text-amber-400 font-mono">00:00 UTC</strong>, the realm decrees daily rewards based on your final season standing. Rewards are attached to official decrees in your <strong>Mailbox</strong>.
+                    </p>
+                  </div>
+
+                  {/* Reset Timer Pill */}
+                  <div className="flex items-center gap-2 bg-black/60 border border-amber-500/30 px-3.5 py-2 rounded-xl shrink-0 shadow-inner">
+                    <Timer className="w-4 h-4 text-amber-400 animate-pulse" />
+                    <div>
+                      <span className="text-[9px] font-mono text-gray-400 uppercase tracking-wider block font-bold">NEXT DECREE IN</span>
+                      <span className="font-mono text-xs font-bold text-amber-300">{formatCountdown(timeRemaining)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Player Current Standing Highlight */}
+                <div className="bg-black/50 border border-white/10 rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3 relative z-10">
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={league.icon} 
+                      alt={league.name} 
+                      className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]" 
+                    />
+                    <div>
+                      <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block">YOUR CURRENT STANDING</span>
+                      <span className="font-display font-black text-sm text-white">
+                        <span className={league.accent}>{league.name} League</span> • Rank #{myOwnLeagueRank} ({profile.pvpLP || 0} Crowns)
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => setSelectedRewardLeague(profile.pvpLeague || 'Bronze')}
+                    className="text-xs font-mono font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 px-3 py-1.5 rounded-lg transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
+                  >
+                    View My League Rewards →
+                  </button>
+                </div>
+              </div>
+
+              {/* 10-League Selector Ribbon / Horizontal Pills */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-[11px] font-mono uppercase tracking-widest text-gray-400 font-bold flex items-center gap-1.5">
+                    <span>SELECT LEAGUE TIER</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-amber-400/80">10 Competitive Tiers</span>
+                </div>
+
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin select-none">
+                  {ALL_LEAGUE_REWARDS.map(lt => {
+                    const isSelected = selectedRewardLeague.toLowerCase() === lt.name.toLowerCase();
+                    const isPlayerLeague = (profile.pvpLeague || 'Bronze').toLowerCase() === lt.name.toLowerCase();
+
+                    return (
+                      <button
+                        key={lt.name}
+                        onClick={() => setSelectedRewardLeague(lt.name)}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-2xl border transition-all cursor-pointer shrink-0 ${
+                          isSelected
+                            ? `${lt.accent} border-2 shadow-[0_0_20px_rgba(245,158,11,0.3)] scale-[1.03]`
+                            : 'bg-black/40 hover:bg-black/60 border-white/10 hover:border-white/25 text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        <img src={lt.icon} alt={lt.name} className="w-5 h-5 object-contain" />
+                        <span className="font-display font-black text-xs uppercase tracking-wider">
+                          {lt.name}
+                        </span>
+                        {isPlayerLeague && (
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Your Current League" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Detailed Breakdown for Selected League */}
+              {(() => {
+                const currentTier = ALL_LEAGUE_REWARDS.find(t => t.name.toLowerCase() === selectedRewardLeague.toLowerCase()) || ALL_LEAGUE_REWARDS[0];
+                const isMyLeague = (profile.pvpLeague || 'Bronze').toLowerCase() === currentTier.name.toLowerCase();
+
+                return (
+                  <div className={`bg-gradient-to-b ${currentTier.bgGradient} border-2 ${currentTier.border} rounded-3xl p-5 sm:p-7 space-y-6 shadow-2xl relative overflow-hidden`}>
+                    
+                    {/* Ambient Glow */}
+                    <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 blur-3xl pointer-events-none" />
+
+                    {/* League Card Header */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-5 relative z-10">
+                      <div className="flex items-center gap-4">
+                        <img 
+                          src={currentTier.icon} 
+                          alt={currentTier.name} 
+                          className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-transform hover:scale-105" 
+                        />
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2.5 flex-wrap">
+                            <h4 className="font-display font-black text-xl sm:text-2xl text-white tracking-widest uppercase">
+                              {currentTier.name} LEAGUE
+                            </h4>
+                            <span className="font-display font-bold text-xs bg-black/60 border border-white/15 px-2.5 py-0.5 rounded-full text-amber-300">
+                              Tier {currentTier.tierIndex + 1}/10
+                            </span>
+                            {isMyLeague && (
+                              <span className="font-mono text-[10px] font-black uppercase bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 px-2.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.4)]">
+                                ⭐ Your Active League
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-300 font-sans max-w-md">
+                            {currentTier.summary}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Promotion Zone Rule Badge */}
+                      <div className="bg-black/60 border border-white/15 rounded-2xl p-3 text-center sm:text-right shrink-0 w-full sm:w-auto">
+                        <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest block font-bold">LADDER RESOLUTION</span>
+                        <span className="font-display font-bold text-xs text-emerald-400 mt-0.5 block">
+                          {currentTier.promotionZone}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Rank Brackets Table / Grid */}
+                    <div className="space-y-3 relative z-10">
+                      <div className="flex items-center justify-between text-[10px] font-mono text-gray-400 uppercase tracking-widest px-2 font-bold">
+                        <span>Rank Standing</span>
+                        <span>Daily Decreed Rewards (Attached to Mail)</span>
+                      </div>
+
+                      <div className="space-y-2.5">
+                        {currentTier.brackets.map((bracket, bIdx) => {
+                          return (
+                            <div 
+                              key={bIdx}
+                              className={`p-3.5 sm:p-4 rounded-2xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-3 ${
+                                bracket.isPromotion 
+                                  ? 'bg-gradient-to-r from-emerald-950/30 via-black/60 to-black/60 border-emerald-500/40 shadow-sm'
+                                  : bracket.isDemotion
+                                  ? 'bg-gradient-to-r from-rose-950/30 via-black/60 to-black/60 border-rose-500/30'
+                                  : 'bg-black/50 border-white/10 hover:border-white/20'
+                              }`}
+                            >
+                              {/* Left: Rank Label & Status Badge */}
+                              <div className="flex items-center gap-3">
+                                <div className="space-y-0.5">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="font-display font-black text-sm sm:text-base text-white tracking-wide">
+                                      {bracket.rankLabel}
+                                    </span>
+                                    <span className="text-[10px] font-mono font-bold bg-white/5 border border-white/10 px-2 py-0.5 rounded-md text-gray-300">
+                                      {bracket.rankBadge}
+                                    </span>
+                                    {bracket.isPromotion && (
+                                      <span className="text-[9px] font-mono font-black uppercase text-emerald-400 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded">
+                                        ▲ PROMOTES
+                                      </span>
+                                    )}
+                                    {bracket.isDemotion && (
+                                      <span className="text-[9px] font-mono font-black uppercase text-rose-400 bg-rose-950/60 border border-rose-500/40 px-2 py-0.5 rounded">
+                                        ▼ DEMOTES
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Right: Reward Badges */}
+                              <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
+                                {/* Blood Sovereigns */}
+                                {bracket.sovereigns !== undefined && bracket.sovereigns > 0 && (
+                                  <div className="bg-gradient-to-b from-amber-950/60 via-black to-black border border-amber-400/60 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-[0_0_12px_rgba(245,158,11,0.25)]">
+                                    <Crown className="w-4 h-4 text-amber-400" />
+                                    <span className="font-display font-black text-xs sm:text-sm text-amber-300">
+                                      +{bracket.sovereigns}
+                                    </span>
+                                    <span className="text-[9px] font-mono uppercase text-amber-400/80 font-bold hidden sm:inline">SOV</span>
+                                  </div>
+                                )}
+
+                                {/* Dark Shards */}
+                                {bracket.darkShards !== undefined && bracket.darkShards > 0 && (
+                                  <div className="bg-gradient-to-b from-rose-950/60 via-black to-black border border-rose-500/40 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-[0_0_10px_rgba(239,68,68,0.2)]">
+                                    <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                                    <span className="font-display font-black text-xs sm:text-sm text-rose-400">
+                                      +{bracket.darkShards}
+                                    </span>
+                                    <span className="text-[9px] font-mono uppercase text-rose-400/80 font-bold hidden sm:inline">Shards</span>
+                                  </div>
+                                )}
+
+                                {/* Gold */}
+                                <div className="bg-gradient-to-b from-yellow-950/40 via-black to-black border border-yellow-500/30 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner">
+                                  <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain" />
+                                  <span className="font-display font-black text-xs sm:text-sm text-amber-300">
+                                    +{bracket.gold}
+                                  </span>
+                                  <span className="text-[9px] font-mono uppercase text-amber-400/70 font-bold hidden sm:inline">Gold</span>
+                                </div>
+
+                                {/* Void Dust */}
+                                <div className="bg-gradient-to-b from-cyan-950/40 via-black to-black border border-cyan-500/30 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner">
+                                  <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 object-contain" />
+                                  <span className="font-display font-black text-xs sm:text-sm text-[#66fcf1]">
+                                    +{bracket.dust}
+                                  </span>
+                                  <span className="text-[9px] font-mono uppercase text-cyan-400/70 font-bold hidden sm:inline">Dust</span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Quick navigation to other tiers */}
+                    <div className="flex items-center justify-between border-t border-white/10 pt-4 relative z-10">
+                      <button
+                        onClick={() => {
+                          const idx = ALL_LEAGUE_REWARDS.findIndex(t => t.name.toLowerCase() === currentTier.name.toLowerCase());
+                          const nextIdx = idx < ALL_LEAGUE_REWARDS.length - 1 ? idx + 1 : 0;
+                          setSelectedRewardLeague(ALL_LEAGUE_REWARDS[nextIdx].name);
+                        }}
+                        className="text-xs font-mono text-gray-400 hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
+                      >
+                        ← Next Lower Tier
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          const idx = ALL_LEAGUE_REWARDS.findIndex(t => t.name.toLowerCase() === currentTier.name.toLowerCase());
+                          const prevIdx = idx > 0 ? idx - 1 : ALL_LEAGUE_REWARDS.length - 1;
+                          setSelectedRewardLeague(ALL_LEAGUE_REWARDS[prevIdx].name);
+                        }}
+                        className="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer transition-colors font-bold"
+                      >
+                        Next Higher Tier →
+                      </button>
+                    </div>
+
+                  </div>
+                );
+              })()}
 
             </div>
           )}
