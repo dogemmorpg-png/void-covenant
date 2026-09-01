@@ -1307,6 +1307,34 @@ export const CARD_TEMPLATES: CardTemplate[] = [
   }
 ];
 
+// Helper to get true mana cost for any card instance or template
+export function getCardManaCost(card: Partial<Card> | Partial<CardTemplate> | null | undefined): number {
+  if (!card) return 1;
+  const template = CARD_TEMPLATES.find(t => t.baseId === (card as any).baseId || t.name === (card as any).name);
+  if (template && typeof template.manaCost === 'number' && template.manaCost > 0) {
+    return template.manaCost;
+  }
+  const tier = (card.tier || template?.tier || 'bronze').toLowerCase();
+  const delay = card.delay ?? template?.delay ?? 1;
+
+  if (typeof card.manaCost === 'number' && card.manaCost > 0) {
+    // If the tier is silver/gold/legendary and manaCost is 1, it's a corrupted default value, recalculate:
+    if (card.manaCost === 1) {
+      if (tier === 'silver') return 2;
+      if (tier === 'gold') return 3;
+      if (tier === 'legendary') return 4;
+      if (delay > 1) return 2;
+    }
+    return card.manaCost;
+  }
+
+  if (tier === 'legendary') return 4;
+  if (tier === 'gold') return 3;
+  if (tier === 'silver') return 2;
+  if (delay > 1) return 2;
+  return 1;
+}
+
 // Helper to create a unique card instance from template
 export function createCardInstance(template: CardTemplate, level: number = 1): Card {
   const levelMultiplier = 1 + (level - 1) * 0.15; // +15% stats per level
@@ -1327,14 +1355,7 @@ export function createCardInstance(template: CardTemplate, level: number = 1): C
     };
   });
 
-  let manaCost = template.manaCost;
-  if (!manaCost) {
-    if (template.tier === 'silver') manaCost = 2;
-    else if (template.tier === 'gold') manaCost = 3;
-    else if (template.tier === 'legendary') manaCost = 4;
-    else if (template.delay > 1) manaCost = 2;
-    else manaCost = 1;
-  }
+  const manaCost = getCardManaCost({ ...template, tier: template.tier, delay: template.delay });
 
   return {
     id: `${template.baseId}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,

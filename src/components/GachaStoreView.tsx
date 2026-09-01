@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import { audioSystem } from '../utils/AudioSystem';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
-import { CARD_TEMPLATES, createCardInstance } from '../data/cards';
+import { CARD_TEMPLATES, createCardInstance, getCardManaCost } from '../data/cards';
 import { Card, CardTier, Equipment } from '../types';
 import { getRandomEquipmentByTier, generateEquipmentInstance, getEquipmentIcon } from '../data/equipment';
 import { Gem, Coins, Sparkles, Box, Trash2, Shield, Flame, Skull, Sword } from 'lucide-react';
@@ -429,7 +429,7 @@ export const GachaStoreView: React.FC = () => {
                               <span className="text-[9px] text-[#ebd09b] uppercase font-mono font-bold tracking-wider">{card.tier}</span>
                             </div>
                             <div className="flex items-center gap-1.5">
-                              {renderManaIcon(card.manaCost || 1, "w-6 h-6")}
+                              {renderManaIcon(getCardManaCost(card), "w-6 h-6")}
                               <div className="bg-black/80 border border-[#c5a880]/50 rounded-full w-6 h-6 flex items-center justify-center text-[10px] font-mono font-black text-[#ebd09b] shadow">
                                 L{card.level}
                               </div>

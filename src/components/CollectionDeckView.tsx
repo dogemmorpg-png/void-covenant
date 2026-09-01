@@ -4,7 +4,7 @@ import { audioSystem } from '../utils/AudioSystem';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { Card, CardTier } from '../types';
-import { CARD_TEMPLATES } from '../data/cards';
+import { CARD_TEMPLATES, getCardManaCost } from '../data/cards';
 import { Swords, Star, Plus, Minus, ArrowRight, Skull, Shield, Zap, Sparkles, AlertCircle, Crown, ShieldAlert, Bug, Flame, Droplet } from 'lucide-react';
 import { assetPreloader, getCardImageUrl } from '../utils/assetPreloader';
 import { SanctuaryEmblem, FusionAltarEmblem, BaseCardSlotEmblem, SacrificeSlotEmblem } from './CardsViewCustomIcons';
@@ -312,7 +312,7 @@ export const CollectionDeckView: React.FC = () => {
         
         {/* Mana cost */}
         <div className="absolute top-1 right-1 z-10 scale-90">
-          {renderManaIcon(card.manaCost || 1, "w-3.5 h-3.5")}
+          {renderManaIcon(getCardManaCost(card), "w-3.5 h-3.5")}
         </div>
 
         <div className="text-center mt-1 relative z-10 drop-shadow-md">
@@ -437,7 +437,7 @@ export const CollectionDeckView: React.FC = () => {
 
                       <div className="flex items-center gap-2.5 z-10 min-w-0">
                         {/* Mana Badge (larger) */}
-                        {renderManaIcon(card.manaCost || 1, "w-6 h-6")}
+                        {renderManaIcon(getCardManaCost(card), "w-6 h-6")}
 
                         {/* Name & Tier info (larger text) */}
                         <div className="flex flex-col min-w-0">
@@ -604,7 +604,7 @@ export const CollectionDeckView: React.FC = () => {
                     >
                       {/* Mana Badge */}
                       <div className="absolute top-1.5 right-1.5 z-10">
-                        {renderManaIcon(card.manaCost || 1, "w-[16px] h-[16px]")}
+                        {renderManaIcon(getCardManaCost(card), "w-[16px] h-[16px]")}
                       </div>
 
                       <img 
@@ -664,7 +664,7 @@ export const CollectionDeckView: React.FC = () => {
                       L{card.level}
                     </div>
                     <div className="absolute top-1.5 right-[26px] z-10">
-                      {renderManaIcon(card.manaCost || 1, "w-[18px] h-[18px]")}
+                      {renderManaIcon(getCardManaCost(card), "w-[18px] h-[18px]")}
                     </div>
 
                     {/* Quick add/remove toggle button */}
@@ -933,7 +933,7 @@ export const CollectionDeckView: React.FC = () => {
                   <div className="relative z-10 flex justify-between items-start">
                     <span className={getTierBadgeStyles(selectedCard.tier)}>{selectedCard.tier}</span>
                     <div className="flex items-center gap-1.5">
-                      {renderManaIcon(selectedCard.manaCost || 1, "w-6 h-6")}
+                      {renderManaIcon(getCardManaCost(selectedCard), "w-6 h-6")}
                       <div className="bg-black/80 border border-[#c5a880]/50 rounded-full w-6 h-6 flex items-center justify-center text-[10px] font-mono font-black text-[#ebd09b] shadow">
                         L{selectedCard.level}
                       </div>

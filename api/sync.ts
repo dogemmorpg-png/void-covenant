@@ -2,7 +2,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
-import { CARD_TEMPLATES, createCardInstance } from './_shared/cards.js';
+import { CARD_TEMPLATES, createCardInstance, getCardManaCost } from './_shared/cards.js';
 import { checkAndPerformPvpRollover } from './_shared/pvpRollover.js';
 import { calculateEnergy } from './_shared/energyHelper.js';
 
@@ -83,11 +83,11 @@ function migrateProfileCards(profile: any): any {
           image: template.image,
           color: template.color,
           description: template.description,
-          manaCost
+          manaCost: getCardManaCost({ ...template, tier: template.tier, delay: template.delay })
         };
       }
     }
-    return card;
+    return { ...card, manaCost: getCardManaCost(card) };
   });
 
   return profile;

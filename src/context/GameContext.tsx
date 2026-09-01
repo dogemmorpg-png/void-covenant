@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { Card, PlayerProfile, CampaignStage, BattlePassTier, CardTemplate, CardTier, Equipment, EquipmentSlot } from '../types';
-import { getStarterDeck, CARD_TEMPLATES, createCardInstance, BATTLE_PASS_TIERS, AIRDROP_TASKS } from '../data/cards';
+import { getStarterDeck, CARD_TEMPLATES, createCardInstance, getCardManaCost, BATTLE_PASS_TIERS, AIRDROP_TASKS } from '../data/cards';
 import { supabase } from '../utils/supabaseClient';
 import { calculateEnergy } from '../utils/energyHelper';
 import { ALL_LEAGUE_REWARDS } from '../data/leagueRewards';
@@ -155,20 +155,9 @@ const migrateProfileTo10Cards = (p: PlayerProfile): PlayerProfile => {
   p.collection = p.collection.filter(c => validBaseIds.has(c.baseId));
   p.deck = p.deck.filter(cardId => p.collection.some(c => c.id === cardId));
   
-  // Ensure all cards in collection have a manaCost
+  // Ensure all cards in collection have exact accurate manaCost
   p.collection = p.collection.map(c => {
-    if (c.manaCost === undefined || c.manaCost === null) {
-      const template = CARD_TEMPLATES.find(t => t.baseId === c.baseId);
-      let manaCost = 1;
-      if (template) {
-        if (template.tier === 'silver') manaCost = 2;
-        else if (template.tier === 'gold') manaCost = 3;
-        else if (template.tier === 'legendary') manaCost = 4;
-        else if (template.delay > 1) manaCost = 2;
-      }
-      return { ...c, manaCost };
-    }
-    return c;
+    return { ...c, manaCost: getCardManaCost(c) };
   });
 
   // Ensure collection has at least 10 cards
