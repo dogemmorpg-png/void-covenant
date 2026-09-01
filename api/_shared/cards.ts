@@ -1336,24 +1336,17 @@ export function getCardManaCost(card: Partial<Card> | Partial<CardTemplate> | nu
   return 1;
 }
 
-// Smart tier evolution skill picker avoiding duplicates
+// Smart tier evolution skill picker avoiding duplicates among canonical skills
 export function getEvolutionBonusSkill(existingSkills: CardSkill[], nextTier: CardTier): CardSkill | null {
   const existingTypes = new Set((existingSkills || []).map(s => s.type));
 
   if (nextTier === 'silver') {
-    // Silver priority: vampirism -> shield -> plague -> hex
+    // Silver priority: vampirism -> plague -> hex -> sacrifice
     if (!existingTypes.has('vampirism')) {
       return {
         type: 'vampirism',
         value: 2,
         description: 'Silver Vampirism: heals self for 2 HP on attack.'
-      };
-    }
-    if (!existingTypes.has('shield')) {
-      return {
-        type: 'shield',
-        value: 1,
-        description: 'Silver Ward: enters battle protected with 1 Barrier charge.'
       };
     }
     if (!existingTypes.has('plague')) {
@@ -1370,8 +1363,15 @@ export function getEvolutionBonusSkill(existingSkills: CardSkill[], nextTier: Ca
         description: 'Silver Hex: +2 to enemy incoming damage.'
       };
     }
+    if (!existingTypes.has('sacrifice')) {
+      return {
+        type: 'sacrifice',
+        value: 2,
+        description: 'Silver Sacrifice: destroys an ally on play, healing Hero for 2 HP and boosting self stats.'
+      };
+    }
   } else if (nextTier === 'gold') {
-    // Gold priority: plague -> hex -> shield -> vampirism
+    // Gold priority: plague -> hex -> vampirism -> sacrifice
     if (!existingTypes.has('plague')) {
       return {
         type: 'plague',
@@ -1386,18 +1386,18 @@ export function getEvolutionBonusSkill(existingSkills: CardSkill[], nextTier: Ca
         description: 'Golden Hex: +2 to enemy incoming damage.'
       };
     }
-    if (!existingTypes.has('shield')) {
-      return {
-        type: 'shield',
-        value: 1,
-        description: 'Golden Ward: enters battle protected with 1 Barrier charge.'
-      };
-    }
     if (!existingTypes.has('vampirism')) {
       return {
         type: 'vampirism',
         value: 3,
         description: 'Golden Vampirism: heals self for 3 HP on attack.'
+      };
+    }
+    if (!existingTypes.has('sacrifice')) {
+      return {
+        type: 'sacrifice',
+        value: 3,
+        description: 'Golden Sacrifice: destroys an ally on play, healing Hero for 3 HP and boosting self stats.'
       };
     }
   } else if (nextTier === 'legendary') {
@@ -1427,7 +1427,7 @@ export function getEvolutionBonusSkill(existingSkills: CardSkill[], nextTier: Ca
       return {
         type: 'sacrifice',
         value: 4,
-        description: 'Legendary Sacrament: sacrifices ally on play, healing Hero for 4 HP.'
+        description: 'Legendary Sacrifice: destroys an ally on play, healing Hero for 4 HP and boosting self stats.'
       };
     }
   }
