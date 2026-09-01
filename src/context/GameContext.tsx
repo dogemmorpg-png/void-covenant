@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { Card, PlayerProfile, CampaignStage, BattlePassTier, CardTemplate, CardTier, Equipment, EquipmentSlot } from '../types';
-import { getStarterDeck, CARD_TEMPLATES, createCardInstance, getCardManaCost, BATTLE_PASS_TIERS, AIRDROP_TASKS } from '../data/cards';
+import { getStarterDeck, CARD_TEMPLATES, createCardInstance, getCardManaCost, getEvolutionBonusSkill, BATTLE_PASS_TIERS, AIRDROP_TASKS } from '../data/cards';
 import { supabase } from '../utils/supabaseClient';
 import { calculateEnergy } from '../utils/energyHelper';
 import { ALL_LEAGUE_REWARDS } from '../data/leagueRewards';
@@ -933,9 +933,94 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return current;
       }
 
-      const curLevel = card1.level || 1;
-      const nextLevel = curLevel + 1;
-      newCard = createCardInstance(template, nextLevel);
+      const isLevelUpgrade = card1.level < 5;
+      
+      let goldCost = isLevelUpgrade ? card1.level * 150 : 500;
+      let dustCost = isLevelUpgrade ? card1.level * 20 : 100;
+      let shardsCost = 0;
+
+      if (!isLevelUpgrade) {
+        if (card1.tier === 'bronze') {
+          goldCost = 500;
+          dustCost = 100;
+          shardsCost = 5;
+        } else if (card1.tier === 'silver') {
+          goldCost = 1000;
+          dustCost = 200;
+          shardsCost = 15;
+        } else if (card1.tier === 'gold') {
+          goldCost = 2000;
+          dustCost = 400;
+          shardsCost = 30;
+        }
+      }
+
+      if ((current.gold || 0) < goldCost) {
+        errorMsg = `Not enough gold. Required: ${goldCost}`;
+        return current;
+      }
+      if ((current.dust || 0) < dustCost) {
+        errorMsg = `Not enough dust. Required: ${dustCost}`;
+        return current;
+      }
+      if (shardsCost > 0 && (current.darkShards || 0) < shardsCost) {
+        errorMsg = `Not enough Dark Shards. Required: ${shardsCost}`;
+        return current;
+      }
+
+      if (!isLevelUpgrade && card1.tier === 'legendary') {
+        errorMsg = 'Card is already at Legendary tier and cannot evolve further.';
+        return current;
+      }
+
+      if (isLevelUpgrade) {
+        const nextLevel = card1.level + 1;
+        newCard = {
+          ...card1,
+          id: card1.id,
+          level: nextLevel,
+          attack: Math.round(card1.attack * 1.15),
+          health: Math.round(card1.health * 1.15),
+          maxHealth: Math.round(card1.health * 1.15)
+        };
+        const template = CARD_TEMPLATES.find(t => t.baseId === card1.baseId);
+        if (template) {
+          newCard.skills = card1.skills.map(skill => {
+            const skillTemplate = template.skills.find(s => s.type === skill.type);
+            const baseValue = skillTemplate ? skillTemplate.value : skill.value;
+            const scaleFactor = 1 + Math.floor((nextLevel - 1) / 2) * 0.5;
+            const newValue = Math.round(baseValue * scaleFactor);
+            return {
+              ...skill,
+              value: newValue,
+              description: skill.description.replace(/\d+/, String(newValue))
+            };
+          });
+        }
+      } else {
+        let nextTier: CardTier = 'silver';
+        if (card1.tier === 'bronze') nextTier = 'silver';
+        else if (card1.tier === 'silver') nextTier = 'gold';
+        else if (card1.tier === 'gold') nextTier = 'legendary';
+
+        newCard = {
+          ...card1,
+          id: card1.id,
+          tier: nextTier,
+          level: 1,
+          attack: Math.round(card1.attack * 1.25),
+          health: Math.round(card1.health * 1.25),
+          maxHealth: Math.round(card1.health * 1.25),
+          delay: Math.max(1, card1.delay - 1),
+          manaCost: getCardManaCost({ ...card1, tier: nextTier, delay: Math.max(1, card1.delay - 1) }),
+          skills: [...(card1.skills || [])]
+        };
+
+        const bonusSkill = getEvolutionBonusSkill(card1.skills || [], nextTier);
+        if (bonusSkill) {
+          newCard.skills.push(bonusSkill);
+        }
+      }
 
       // Remove fused source cards and add new evolved card
       const filteredCollection = current.collection.filter(c => c.id !== cardId1 && c.id !== cardId2);
@@ -952,6 +1037,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const updated = {
         ...current,
+        gold: (current.gold || 0) - goldCost,
+        dust: (current.dust || 0) - dustCost,
+        darkShards: (current.darkShards || 0) - shardsCost,
         collection: newCollection,
         deck: updatedDeck
       };
@@ -961,7 +1049,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (errorMsg) return { success: false, message: errorMsg };
-    return { success: true, message: `Fusion successful! Evolved to level ${newCard?.level || 2}!`, newCard };
+    return { success: true, message: `Fusion successful!`, newCard };
   };
 
   const submitBattleResult = async (battleType: 'campaign' | 'pvp', stageId: string, result: 'win' | 'loss', stars?: number) => {

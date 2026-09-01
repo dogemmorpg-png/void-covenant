@@ -4,7 +4,7 @@ import { audioSystem } from '../utils/AudioSystem';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { Card, CardTier } from '../types';
-import { CARD_TEMPLATES, getCardManaCost } from '../data/cards';
+import { CARD_TEMPLATES, getCardManaCost, getEvolutionBonusSkill } from '../data/cards';
 import { Swords, Star, Plus, Minus, ArrowRight, Skull, Shield, Zap, Sparkles, AlertCircle, Crown, ShieldAlert, Bug, Flame, Droplet } from 'lucide-react';
 import { assetPreloader, getCardImageUrl } from '../utils/assetPreloader';
 import { SanctuaryEmblem, FusionAltarEmblem, BaseCardSlotEmblem, SacrificeSlotEmblem } from './CardsViewCustomIcons';
@@ -855,14 +855,15 @@ export const CollectionDeckView: React.FC = () => {
                         </ul>
                       );
                     } else {
-                      let nextT = 'silver';
+                      let nextT: CardTier = 'silver';
                       if (c1.tier === 'bronze') nextT = 'silver';
                       else if (c1.tier === 'silver') nextT = 'gold';
                       else if (c1.tier === 'gold') nextT = 'legendary';
 
-                      const nextAttack = Math.round(c1.attack * 1.15);
-                      const nextHealth = Math.round(c1.health * 1.15);
+                      const nextAttack = Math.round(c1.attack * 1.25);
+                      const nextHealth = Math.round(c1.health * 1.25);
                       const nextDelay = Math.max(1, c1.delay - 1);
+                      const bonusSkill = getEvolutionBonusSkill(c1.skills || [], nextT);
 
                       return (
                         <ul className="space-y-1.5 text-gray-300">
@@ -876,11 +877,11 @@ export const CollectionDeckView: React.FC = () => {
                           </li>
                           <li className="flex justify-between">
                             <span>Attack:</span>
-                            <span className="text-red-400 font-bold">⚔️ {nextAttack} (+15% dmg!)</span>
+                            <span className="text-red-400 font-bold">⚔️ {c1.attack} ➔ {nextAttack} (+25%)</span>
                           </li>
                           <li className="flex justify-between">
                             <span>Health:</span>
-                            <span className="text-emerald-400 font-bold">❤️ {nextHealth}</span>
+                            <span className="text-emerald-400 font-bold">❤️ {c1.health} ➔ {nextHealth} (+25%)</span>
                           </li>
                           <li className="flex justify-between">
                             <span>Turn Delay:</span>
@@ -890,8 +891,15 @@ export const CollectionDeckView: React.FC = () => {
                             <span>Dark Shards:</span>
                             <span className="text-purple-300 font-bold font-mono">💎 {getFusionCosts(c1).shardsCost} Shards</span>
                           </li>
+                          {bonusSkill && (
+                            <li className="flex justify-between">
+                              <span>New Skill:</span>
+                              <span className="text-cyan-300 font-bold capitalize">{bonusSkill.type}</span>
+                            </li>
+                          )}
                           <li className="text-[10px] text-purple-300 border-t border-purple-950 pt-1.5 mt-1">
-                            <img src="/icons/icon_dust.webp" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> <span className="font-sans">Unlocks new improved skills of tier {nextT}!</span>
+                            <img src="/icons/icon_dust.webp" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> 
+                            <span className="font-sans">{bonusSkill ? bonusSkill.description : `Unlocks new improved skills of tier ${nextT}!`}</span>
                           </li>
                         </ul>
                       );

@@ -3,7 +3,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
 const jwt = (jwtPkg as any).default || jwtPkg;
 import { createClient } from '@supabase/supabase-js';
-import { CARD_TEMPLATES } from './_shared/cards.js';
+import { CARD_TEMPLATES, getEvolutionBonusSkill, getCardManaCost } from './_shared/cards.js';
 import { Card, CardTier, PlayerProfile } from './_shared/types.js';
 import { calculateEnergy } from './_shared/energyHelper.js';
 
@@ -221,27 +221,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         attack: Math.round(card1.attack * 1.25),
         health: Math.round(card1.health * 1.25),
         maxHealth: Math.round(card1.health * 1.25),
-        delay: Math.max(1, card1.delay - 1)
+        delay: Math.max(1, card1.delay - 1),
+        manaCost: getCardManaCost({ ...card1, tier: nextTier, delay: Math.max(1, card1.delay - 1) }),
+        skills: [...(card1.skills || [])]
       };
       
-      if (nextTier === 'silver') {
-        fusedCard.skills.push({
-          type: 'vampirism',
-          value: 2,
-          description: 'Silver Vampirism: heals self for 2 HP.'
-        });
-      } else if (nextTier === 'gold') {
-        fusedCard.skills.push({
-          type: 'plague',
-          value: 1,
-          description: 'Golden Plague: deals 1 DMG to a random enemy.'
-        });
-      } else if (nextTier === 'legendary') {
-        fusedCard.skills.push({
-          type: 'hex',
-          value: 3,
-          description: 'Legendary Hex: +3 to enemy incoming damage.'
-        });
+      const bonusSkill = getEvolutionBonusSkill(card1.skills || [], nextTier);
+      if (bonusSkill) {
+        fusedCard.skills.push(bonusSkill);
       }
     }
 

@@ -1335,6 +1335,104 @@ export function getCardManaCost(card: Partial<Card> | Partial<CardTemplate> | nu
   return 1;
 }
 
+// Smart tier evolution skill picker avoiding duplicates
+export function getEvolutionBonusSkill(existingSkills: CardSkill[], nextTier: CardTier): CardSkill | null {
+  const existingTypes = new Set((existingSkills || []).map(s => s.type));
+
+  if (nextTier === 'silver') {
+    // Silver priority: vampirism -> shield -> plague -> hex
+    if (!existingTypes.has('vampirism')) {
+      return {
+        type: 'vampirism',
+        value: 2,
+        description: 'Silver Vampirism: heals self for 2 HP on attack.'
+      };
+    }
+    if (!existingTypes.has('shield')) {
+      return {
+        type: 'shield',
+        value: 1,
+        description: 'Silver Ward: enters battle protected with 1 Barrier charge.'
+      };
+    }
+    if (!existingTypes.has('plague')) {
+      return {
+        type: 'plague',
+        value: 1,
+        description: 'Silver Plague: deals 1 damage to a random enemy.'
+      };
+    }
+    if (!existingTypes.has('hex')) {
+      return {
+        type: 'hex',
+        value: 2,
+        description: 'Silver Hex: +2 to enemy incoming damage.'
+      };
+    }
+  } else if (nextTier === 'gold') {
+    // Gold priority: plague -> hex -> shield -> vampirism
+    if (!existingTypes.has('plague')) {
+      return {
+        type: 'plague',
+        value: 2,
+        description: 'Golden Plague: deals 2 damage to a random enemy.'
+      };
+    }
+    if (!existingTypes.has('hex')) {
+      return {
+        type: 'hex',
+        value: 2,
+        description: 'Golden Hex: +2 to enemy incoming damage.'
+      };
+    }
+    if (!existingTypes.has('shield')) {
+      return {
+        type: 'shield',
+        value: 1,
+        description: 'Golden Ward: enters battle protected with 1 Barrier charge.'
+      };
+    }
+    if (!existingTypes.has('vampirism')) {
+      return {
+        type: 'vampirism',
+        value: 3,
+        description: 'Golden Vampirism: heals self for 3 HP on attack.'
+      };
+    }
+  } else if (nextTier === 'legendary') {
+    // Legendary priority: hex -> plague -> vampirism -> sacrifice
+    if (!existingTypes.has('hex')) {
+      return {
+        type: 'hex',
+        value: 3,
+        description: 'Legendary Hex: +3 to enemy incoming damage.'
+      };
+    }
+    if (!existingTypes.has('plague')) {
+      return {
+        type: 'plague',
+        value: 3,
+        description: 'Legendary Plague: deals 3 damage to a random enemy.'
+      };
+    }
+    if (!existingTypes.has('vampirism')) {
+      return {
+        type: 'vampirism',
+        value: 4,
+        description: 'Legendary Vampirism: heals self for 4 HP on attack.'
+      };
+    }
+    if (!existingTypes.has('sacrifice')) {
+      return {
+        type: 'sacrifice',
+        value: 4,
+        description: 'Legendary Sacrament: sacrifices ally on play, healing Hero for 4 HP.'
+      };
+    }
+  }
+  return null;
+}
+
 // Helper to create a unique card instance from template
 export function createCardInstance(template: CardTemplate, level: number = 1): Card {
   const levelMultiplier = 1 + (level - 1) * 0.15; // +15% stats per level
