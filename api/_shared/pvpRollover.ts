@@ -137,41 +137,41 @@ export async function checkAndPerformPvpRollover(
         }
 
         // Calculate Rewards based on League & Rank
-        let goldReward = 100;
-        let dustReward = 10;
-        let darkShardsReward = 0;
+        // Calculate Rewards based on League & Rank (No dark shards - rebalanced to Sovereigns, Gold & Dust)
+        let goldReward = 120;
+        let dustReward = 15;
         let sovereignsReward = 0;
 
         if (leagueName === 'Void Overlord') {
-          if (rank === 1) { sovereignsReward = 500; goldReward = 5000; dustReward = 500; darkShardsReward = 100; }
-          else if (rank <= 3) { sovereignsReward = 300; goldReward = 3000; dustReward = 300; darkShardsReward = 50; }
-          else if (rank <= 10) { sovereignsReward = 150; goldReward = 2000; dustReward = 200; darkShardsReward = 30; }
-          else if (rank <= 20) { sovereignsReward = 80; goldReward = 1000; dustReward = 100; darkShardsReward = 20; }
-          else { sovereignsReward = 30; goldReward = 600; dustReward = 60; }
+          if (rank === 1) { sovereignsReward = 600; goldReward = 7500; dustReward = 750; }
+          else if (rank <= 3) { sovereignsReward = 350; goldReward = 4500; dustReward = 450; }
+          else if (rank <= 10) { sovereignsReward = 180; goldReward = 3000; dustReward = 300; }
+          else if (rank <= 20) { sovereignsReward = 100; goldReward = 1500; dustReward = 150; }
+          else { sovereignsReward = 40; goldReward = 800; dustReward = 80; }
         } else if (leagueName === 'Grandmaster') {
-          if (rank <= 5) { sovereignsReward = 60; goldReward = 2000; dustReward = 200; darkShardsReward = 25; }
-          else if (rank <= 20) { sovereignsReward = 30; goldReward = 1200; dustReward = 120; darkShardsReward = 15; }
-          else { sovereignsReward = 15; goldReward = 700; dustReward = 70; }
+          if (rank <= 5) { sovereignsReward = 75; goldReward = 2500; dustReward = 250; }
+          else if (rank <= 20) { sovereignsReward = 40; goldReward = 1500; dustReward = 150; }
+          else { sovereignsReward = 20; goldReward = 850; dustReward = 85; }
         } else if (leagueName === 'Master') {
-          if (rank <= 10) { sovereignsReward = 25; goldReward = 1500; dustReward = 150; darkShardsReward = 15; }
-          else { sovereignsReward = 10; goldReward = 600; dustReward = 60; }
+          if (rank <= 10) { sovereignsReward = 30; goldReward = 1800; dustReward = 180; }
+          else { sovereignsReward = 15; goldReward = 750; dustReward = 75; }
         } else if (leagueName === 'Diamond') {
-          if (rank <= 10) { sovereignsReward = 15; goldReward = 1000; dustReward = 100; darkShardsReward = 10; }
-          else { sovereignsReward = 5; goldReward = 500; dustReward = 50; }
+          if (rank <= 10) { sovereignsReward = 20; goldReward = 1200; dustReward = 120; }
+          else { sovereignsReward = 8; goldReward = 600; dustReward = 60; }
         } else if (leagueName === 'Ruby') {
-          if (rank <= 10) { sovereignsReward = 8; goldReward = 800; dustReward = 80; }
-          else { sovereignsReward = 2; goldReward = 450; dustReward = 45; }
+          if (rank <= 10) { sovereignsReward = 10; goldReward = 900; dustReward = 90; }
+          else { sovereignsReward = 3; goldReward = 500; dustReward = 50; }
         } else if (leagueName === 'Emerald') {
-          if (rank <= 10) { sovereignsReward = 4; goldReward = 600; dustReward = 60; }
-          else { sovereignsReward = 1; goldReward = 350; dustReward = 35; }
+          if (rank <= 10) { sovereignsReward = 5; goldReward = 700; dustReward = 70; }
+          else { sovereignsReward = 2; goldReward = 400; dustReward = 40; }
         } else if (leagueName === 'Platinum') {
-          goldReward = 300; dustReward = 30;
+          goldReward = 350; dustReward = 35;
         } else if (leagueName === 'Gold') {
-          goldReward = 225; dustReward = 25;
+          goldReward = 250; dustReward = 25;
         } else if (leagueName === 'Silver') {
-          goldReward = 150; dustReward = 15;
+          goldReward = 175; dustReward = 20;
         } else {
-          goldReward = 100; dustReward = 10;
+          goldReward = 120; dustReward = 15;
         }
 
         // Generate Mail Message for Player Inbox
@@ -183,7 +183,6 @@ export async function checkAndPerformPvpRollover(
           rewards: {
             gold: goldReward,
             dust: dustReward,
-            darkShards: darkShardsReward > 0 ? darkShardsReward : undefined,
             bloodSovereigns: sovereignsReward > 0 ? sovereignsReward : undefined
           },
           isClaimed: false,
