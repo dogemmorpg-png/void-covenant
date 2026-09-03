@@ -318,6 +318,18 @@ export const CollectionDeckView: React.FC = () => {
     }
   };
 
+  // Get text color based on tier
+  const getDeckTierTextColor = (tier: string) => {
+    switch (tier?.toLowerCase()) {
+      case 'bronze': return 'text-amber-500 font-bold';
+      case 'silver': return 'text-slate-300 font-bold';
+      case 'gold': return 'text-yellow-400 font-bold';
+      case 'legendary': return 'text-purple-400 font-bold';
+      case 'divine': return 'text-rose-500 font-black drop-shadow-[0_0_6px_rgba(244,63,94,0.9)]';
+      default: return 'text-gray-400';
+    }
+  };
+
   // Render a large card slot thumbnail in the Altar
   const renderAltarCardSlot = (cardId: string | null, label: string, onClear: () => void) => {
     const card = profile.collection.find(c => c.id === cardId);
@@ -428,113 +440,117 @@ export const CollectionDeckView: React.FC = () => {
       {/* LEFT PANEL: Collection & Deck (7 Cols) */}
       <div className="lg:col-span-7 space-y-6">
         
-        {/* Active Combat Deck banner */}
-        <div className="bg-[#151a21] border border-[#c5a880]/25 rounded-2xl p-5 shadow-xl">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="font-display font-black text-white text-base tracking-widest text-shadow-gold flex items-center gap-2">
-                ⚔️ COMBAT DECK ({profile.deck.length}/10)
-              </h3>
-              <p className="text-[10px] text-gray-400 font-sans mt-0.5">Cards that will fight in the campaign and arena.</p>
+        {/* Active Combat Deck banner (hidden in Fusion Altar mode) */}
+        {!isFusingMode && (
+          <div className="bg-[#151a21] border border-[#c5a880]/25 rounded-2xl p-5 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-display font-black text-white text-base tracking-widest text-shadow-gold flex items-center gap-2">
+                  ⚔️ COMBAT DECK ({profile.deck.length}/10)
+                </h3>
+                <p className="text-[10px] text-gray-400 font-sans mt-0.5">Cards that will fight in the campaign and arena.</p>
+              </div>
+              {profile.deck.length < 10 && (
+                <span className="text-[10px] bg-[#4e0707] text-[#dd2c40] font-mono font-bold py-1 px-2.5 rounded-full border border-[#dd2c40]/30 animate-pulse">
+                  NOT ENOUGH CARDS! ADD UP TO 10
+                </span>
+              )}
             </div>
-            {profile.deck.length < 10 && (
-              <span className="text-[10px] bg-[#4e0707] text-[#dd2c40] font-mono font-bold py-1 px-2.5 rounded-full border border-[#dd2c40]/30 animate-pulse">
-                NOT ENOUGH CARDS! ADD UP TO 10
-              </span>
-            )}
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {(() => {
-              const deckCards = profile.deck
-                .map(id => profile.collection.find(c => c.id === id))
-                .filter((c): c is Card => !!c)
-                .sort((a, b) => {
-                  const tierDiff = (tierWeight[b.tier as keyof typeof tierWeight] || 0) - (tierWeight[a.tier as keyof typeof tierWeight] || 0);
-                  if (tierDiff !== 0) return tierDiff;
-                  return b.level - a.level || a.name.localeCompare(b.name);
-                });
-              const paddedDeck = [...deckCards, ...Array(10 - deckCards.length).fill(null)];
-              
-              // Rearrange into column-major order to flow top-to-bottom then left-to-right
-              const columnMajorDeck: (Card | null)[] = [];
-              for (let r = 0; r < 5; r++) {
-                columnMajorDeck.push(paddedDeck[r]);     // Left column item
-                columnMajorDeck.push(paddedDeck[r + 5]); // Right column item
-              }
-
-              return columnMajorDeck.map((card, idx) => {
-                if (card) {
-                  const borderGlow = selectedCardId === card.id ? 'border-[#66fcf1] ring-1 ring-[#66fcf1]/30 bg-[#16202b]/95' : 'border-gray-800/80 hover:border-gray-700 bg-[#11161d]/90 hover:bg-[#151d27]/95';
-                  return (
-                    <div
-                      key={card.id}
-                      onClick={() => {
-                        setSelectedCardId(card.id);
-                        setIsFusingMode(false);
-                      }}
-                      className={`relative flex items-center justify-between p-2.5 rounded-xl border cursor-pointer transition-all duration-350 overflow-hidden group ${borderGlow} h-[52px]`}
-                    >
-                      {/* Hearthstone-style cropped card background art (increased opacity/scale) */}
-                      <div className="absolute inset-y-0 right-0 w-2/3 overflow-hidden rounded-r-xl opacity-[0.55] pointer-events-none group-hover:opacity-[0.70] transition-opacity">
-                        <img src={getCardImageUrl(card)} alt="" decoding="async" className="w-full h-full object-cover object-right scale-110" />
-                        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#11161d]/75 to-[#11161d]" />
-                      </div>
-
-                      <div className="flex items-center gap-2.5 z-10 min-w-0">
-                        {/* Mana Badge (larger) */}
-                        {renderManaIcon(getCardManaCost(card), "w-6 h-6")}
-
-                        {/* Name & Tier info (larger text) */}
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-xs md:text-[13px] font-display font-black text-white leading-none tracking-wide truncate group-hover:text-cyan-200 transition-colors">
-                            {card.name}
-                          </span>
-                          <span className="text-[9px] text-gray-400 font-mono leading-none mt-1 uppercase font-bold tracking-wider">
-                            L{card.level} • {card.tier}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Stats & Actions (larger text) */}
-                      <div className="flex items-center gap-3 z-10 shrink-0">
-                        <div className="flex items-center gap-2 font-mono text-[11.5px] font-black">
-                          <span className="text-red-400 filter drop-shadow">⚔️{card.attack}</span>
-                          <span className="text-emerald-400 filter drop-shadow">❤️{card.health}</span>
-                          <span className="text-blue-400 filter drop-shadow" title="Delay">⏳{card.delay}</span>
-                        </div>
-
-                        {/* Remove Button (bright and distinct) */}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleToggleDeck(card.id);
-                          }}
-                          className="bg-[#4e0707] hover:bg-[#880d1e] border border-[#dd2c40]/60 rounded-lg p-1.5 text-white transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center"
-                          title="Remove from deck"
-                        >
-                          <Minus className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                } else {
-                  return (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between px-3 rounded-xl border border-dashed border-white/5 bg-black/10 text-gray-600 h-[52px]"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Swords className="w-4 h-4 opacity-25" />
-                        <span className="text-[9px] font-mono tracking-wider font-bold opacity-35">EMPTY SLOT</span>
-                      </div>
-                    </div>
-                  );
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {(() => {
+                const deckCards = profile.deck
+                  .map(id => profile.collection.find(c => c.id === id))
+                  .filter((c): c is Card => !!c)
+                  .sort((a, b) => {
+                    const tierDiff = (tierWeight[b.tier as keyof typeof tierWeight] || 0) - (tierWeight[a.tier as keyof typeof tierWeight] || 0);
+                    if (tierDiff !== 0) return tierDiff;
+                    return b.level - a.level || a.name.localeCompare(b.name);
+                  });
+                const paddedDeck = [...deckCards, ...Array(10 - deckCards.length).fill(null)];
+                
+                // Rearrange into column-major order to flow top-to-bottom then left-to-right
+                const columnMajorDeck: (Card | null)[] = [];
+                for (let r = 0; r < 5; r++) {
+                  columnMajorDeck.push(paddedDeck[r]);     // Left column item
+                  columnMajorDeck.push(paddedDeck[r + 5]); // Right column item
                 }
-              });
-            })()}
+
+                return columnMajorDeck.map((card, idx) => {
+                  if (card) {
+                    const borderGlow = selectedCardId === card.id ? 'border-[#66fcf1] ring-1 ring-[#66fcf1]/30 bg-[#16202b]/95' : 'border-gray-800/80 hover:border-gray-700 bg-[#11161d]/90 hover:bg-[#151d27]/95';
+                    return (
+                      <div
+                        key={card.id}
+                        onClick={() => {
+                          setSelectedCardId(card.id);
+                          setIsFusingMode(false);
+                        }}
+                        className={`relative flex items-center justify-between p-2.5 rounded-xl border cursor-pointer transition-all duration-350 overflow-hidden group ${borderGlow} h-[52px]`}
+                      >
+                        {/* Hearthstone-style cropped card background art (increased opacity/scale) */}
+                        <div className="absolute inset-y-0 right-0 w-2/3 overflow-hidden rounded-r-xl opacity-[0.55] pointer-events-none group-hover:opacity-[0.70] transition-opacity">
+                          <img src={getCardImageUrl(card)} alt="" decoding="async" className="w-full h-full object-cover object-right scale-110" />
+                          <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#11161d]/75 to-[#11161d]" />
+                        </div>
+
+                        <div className="flex items-center gap-2.5 z-10 min-w-0">
+                          {/* Mana Badge (larger) */}
+                          {renderManaIcon(getCardManaCost(card), "w-6 h-6")}
+
+                          {/* Name & Tier info (larger text) */}
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-xs md:text-[13px] font-display font-black text-white leading-none tracking-wide truncate group-hover:text-cyan-200 transition-colors">
+                              {card.name}
+                            </span>
+                            <div className="flex items-center gap-1 mt-1 text-[9px] font-mono leading-none uppercase font-bold tracking-wider">
+                              <span className="text-gray-400">L{card.level}</span>
+                              <span className="text-gray-600">•</span>
+                              <span className={getDeckTierTextColor(card.tier)}>{card.tier}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Stats & Actions (larger text) */}
+                        <div className="flex items-center gap-3 z-10 shrink-0">
+                          <div className="flex items-center gap-2 font-mono text-[11.5px] font-black">
+                            <span className="text-red-400 filter drop-shadow">⚔️{card.attack}</span>
+                            <span className="text-emerald-400 filter drop-shadow">❤️{card.health}</span>
+                            <span className="text-blue-400 filter drop-shadow" title="Delay">⏳{card.delay}</span>
+                          </div>
+
+                          {/* Remove Button (bright and distinct) */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleDeck(card.id);
+                            }}
+                            className="bg-[#4e0707] hover:bg-[#880d1e] border border-[#dd2c40]/60 rounded-lg p-1.5 text-white transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center"
+                            title="Remove from deck"
+                          >
+                            <Minus className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between px-3 rounded-xl border border-dashed border-white/5 bg-black/10 text-gray-600 h-[52px]"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Swords className="w-4 h-4 opacity-25" />
+                          <span className="text-[9px] font-mono tracking-wider font-bold opacity-35">EMPTY SLOT</span>
+                        </div>
+                      </div>
+                    );
+                  }
+                });
+              })()}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Collection Section */}
         <div className="bg-[#151a21] border border-[#c5a880]/25 rounded-2xl p-5 shadow-xl">
@@ -753,12 +769,9 @@ export const CollectionDeckView: React.FC = () => {
                       <span className="text-[10px] font-display font-bold text-white block truncate leading-none text-shadow-gold drop-shadow-md">
                         {card.name}
                       </span>
-                      <span className={`text-[7px] uppercase font-mono font-bold tracking-wider drop-shadow-md ${
-                        card.tier === 'bronze' ? 'text-amber-400' :
-                        card.tier === 'silver' ? 'text-slate-300' :
-                        card.tier === 'gold' ? 'text-[#ebd09b]' :
-                        'text-purple-400'
-                      }`}>{card.tier}</span>
+                      <span className={`text-[7px] uppercase font-mono font-bold tracking-wider drop-shadow-md ${getDeckTierTextColor(card.tier)}`}>
+                        {card.tier}
+                      </span>
                     </div>
 
                     <div className="relative z-10 mt-auto">
