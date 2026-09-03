@@ -248,7 +248,7 @@ export const GachaStoreView: React.FC = () => {
         </div>
       </div>
 
-      {activeTab === 'cards' ? (
+      {activeTab === 'cards' && (
         /* Packs Grid */
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           
@@ -348,7 +348,9 @@ export const GachaStoreView: React.FC = () => {
             </div>
           </div>
         </div>
-      ) : (
+      )}
+
+      {activeTab === 'equipment' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {/* Basic Equipment Pack */}
           <div className="bg-[#151a21] border border-[#c5a880]/30 rounded-2xl p-5 flex flex-col justify-between hover:-translate-y-1 transition-all shadow-xl">
