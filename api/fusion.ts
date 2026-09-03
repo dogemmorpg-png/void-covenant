@@ -151,6 +151,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let dustCost = isLevelUpgrade ? card1.level * 20 : 100;
     let shardsCost = 0;
 
+    if (isLevelUpgrade && card1.tier === 'divine') {
+      goldCost = card1.level * 250;
+      dustCost = card1.level * 40;
+      shardsCost = card1.level * 5;
+    }
+
     if (!isLevelUpgrade) {
       if (card1.tier === 'bronze') {
         goldCost = 500;
@@ -177,8 +183,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: `Not enough Dark Shards. Required: ${shardsCost}` });
     }
 
-    if (!isLevelUpgrade && card1.tier === 'legendary') {
-      return res.status(400).json({ error: 'Card is already at the highest tier (Legendary) and cannot be fused.' });
+    if (!isLevelUpgrade && (card1.tier === 'legendary' || card1.tier === 'divine')) {
+      return res.status(400).json({ error: 'Card has reached the limit of tier ascension and cannot evolve into another tier.' });
     }
 
     let fusedCard: Card;

@@ -1304,6 +1304,54 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     image: '/cards/mephistopheles.webp',
     color: 'violet',
     description: 'A cunning archdevil who seals soul bargains in crimson ink.'
+  },
+  {
+    baseId: 'aurelius_the_demiurge',
+    name: 'Aurelius, The Demiurge',
+    tier: 'divine',
+    attack: 30,
+    health: 90,
+    delay: 2,
+    manaCost: 3,
+    skills: [
+      { type: 'vampirism', value: 12, description: 'Divine Vampirism: heals self for 12 HP on attack.' },
+      { type: 'hex', value: 8, description: 'Divine Hex: increases enemy incoming damage by 8.' }
+    ],
+    image: '/cards/aurelius_the_demiurge.webp',
+    color: 'amber',
+    description: 'The celestial architect of primordial light, wielding creation and wrath in equal measure.'
+  },
+  {
+    baseId: 'nyx_primordial_void',
+    name: 'Nyx, Primordial Void',
+    tier: 'divine',
+    attack: 26,
+    health: 100,
+    delay: 3,
+    manaCost: 3,
+    skills: [
+      { type: 'plague', value: 8, description: 'Divine Plague: deals 8 damage to random enemies at end of turn.' },
+      { type: 'vampirism', value: 10, description: 'Divine Vampirism: heals self for 10 HP on attack.' }
+    ],
+    image: '/cards/nyx_primordial_void.webp',
+    color: 'purple',
+    description: 'The ancient sovereign of the cosmic dark, suffocating foes under an eternal canopy of decay.'
+  },
+  {
+    baseId: 'seraph_of_apocalypse',
+    name: 'Seraph of Apocalypse',
+    tier: 'divine',
+    attack: 34,
+    health: 75,
+    delay: 2,
+    manaCost: 2,
+    skills: [
+      { type: 'sacrifice', value: 20, description: 'Divine Sacrifice: destroys an ally on play, healing the hero for 20 HP and empowering self.' },
+      { type: 'hex', value: 10, description: 'Divine Hex: increases enemy incoming damage by 10.' }
+    ],
+    image: '/cards/seraph_of_apocalypse.webp',
+    color: 'crimson',
+    description: 'A six-winged harbinger of the end times whose blinding descent heralds absolute ruin.'
   }
 ];
 
@@ -1323,11 +1371,13 @@ export function getCardManaCost(card: Partial<Card> | Partial<CardTemplate> | nu
       if (tier === 'silver') return 2;
       if (tier === 'gold') return 3;
       if (tier === 'legendary') return 4;
+      if (tier === 'divine') return 3;
       if (delay > 1) return 2;
     }
     return card.manaCost;
   }
 
+  if (tier === 'divine') return 3;
   if (tier === 'legendary') return 4;
   if (tier === 'gold') return 3;
   if (tier === 'silver') return 2;

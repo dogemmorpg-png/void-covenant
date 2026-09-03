@@ -152,14 +152,14 @@ export const CollectionDeckView: React.FC = () => {
   }, [profile?.collection]);
 
   // Filtered & sorted collection
-  const tierWeight = { legendary: 4, gold: 3, silver: 2, bronze: 1 };
+  const tierWeight = { divine: 5, legendary: 4, gold: 3, silver: 2, bronze: 1 };
   const filteredCollection = profile.collection
     .filter(card => {
       if (tierFilter !== 'all' && card.tier !== tierFilter) return false;
       
       if (showFusableOnly) {
-        // Cannot fuse L5 Legendary
-        if (card.level === 5 && card.tier === 'legendary') return false;
+        // Cannot fuse L5 Legendary (cannot ascend) or L5 Divine (max level)
+        if (card.level === 5 && (card.tier === 'legendary' || card.tier === 'divine')) return false;
         
         // Must have at least one identical clone
         const hasDuplicate = profile.collection.some(c => 
@@ -197,6 +197,10 @@ export const CollectionDeckView: React.FC = () => {
       toast('Level 5 legendary cards have already reached the absolute limit of power!', 'warning');
       return;
     }
+    if (card.level === 5 && card.tier === 'divine') {
+      toast('Level 5 divine cards have already attained maximum godhood!', 'warning');
+      return;
+    }
     setIsFusingMode(true);
     setFuseCardId1(card.id);
     setFuseCardId2(null);
@@ -208,6 +212,10 @@ export const CollectionDeckView: React.FC = () => {
       const card = profile.collection.find(c => c.id === cardId);
       if (card && card.level === 5 && card.tier === 'legendary') {
         toast('Level 5 legendary cards have already reached the absolute limit of power!', 'warning');
+        return;
+      }
+      if (card && card.level === 5 && card.tier === 'divine') {
+        toast('Level 5 divine cards have already attained maximum godhood!', 'warning');
         return;
       }
       setFuseCardId1(cardId);
@@ -305,6 +313,7 @@ export const CollectionDeckView: React.FC = () => {
       case 'silver': return `${base} bg-slate-900/80 text-slate-300 border-slate-600/60 shadow-[0_0_10px_rgba(148,163,184,0.2)]`;
       case 'gold': return `${base} bg-[#c5a880]/30 text-[#ebd09b] border-[#c5a880]/50 shadow-[0_0_10px_rgba(235,208,155,0.3)]`;
       case 'legendary': return `${base} bg-purple-950/70 text-purple-300 border-purple-500/60 shadow-[0_0_12px_rgba(168,85,247,0.4)] animate-pulse`;
+      case 'divine': return `${base} bg-gradient-to-r from-amber-950 via-[#261704] to-amber-900 text-amber-300 border-amber-400 shadow-[0_0_14px_rgba(251,191,36,0.6)] ring-1 ring-amber-400/50 animate-pulse`;
       default: return `${base} bg-black/60 text-gray-400 border-gray-700`;
     }
   };
@@ -568,10 +577,11 @@ export const CollectionDeckView: React.FC = () => {
                 className="bg-[#0b0c10] border border-[#c5a880]/30 rounded-lg py-1 px-2.5 text-xs text-[#ebd09b] font-mono outline-none"
               >
                 <option value="all">All tiers</option>
-                <option value="bronze">Bronze</option>
-                <option value="silver">Silver</option>
-                <option value="gold">Gold</option>
+                <option value="divine">Divine</option>
                 <option value="legendary">Legendary</option>
+                <option value="gold">Gold</option>
+                <option value="silver">Silver</option>
+                <option value="bronze">Bronze</option>
               </select>
 
               <select
@@ -621,7 +631,7 @@ export const CollectionDeckView: React.FC = () => {
                       return c.baseId === card1.baseId && c.id !== fuseCardId1 && c.level === card1.level && c.tier === card1.tier;
                     })
                   : filteredCollection.filter(card => {
-                      if (card.level === 5 && card.tier === 'legendary') return false;
+                      if (card.level === 5 && (card.tier === 'legendary' || card.tier === 'divine')) return false;
                       const hasDuplicate = profile.collection.some(c => 
                         c.id !== card.id && 
                         c.baseId === card.baseId && 

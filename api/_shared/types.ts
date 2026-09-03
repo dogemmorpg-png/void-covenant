@@ -1,5 +1,5 @@
 // @ts-nocheck
-export type CardTier = 'bronze' | 'silver' | 'gold' | 'legendary';
+export type CardTier = 'bronze' | 'silver' | 'gold' | 'legendary' | 'divine';
 
 export type EquipmentSlot = 'weapon' | 'armor' | 'helmet' | 'ring' | 'amulet' | 'boots';
 
