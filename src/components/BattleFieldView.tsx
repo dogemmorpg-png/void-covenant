@@ -2450,39 +2450,39 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         </div>
       )}
 
-      {/* DETAILED HELP MODAL (ZERO-SCROLL COMPACT AAA TACTICS GUIDE) */}
+      {/* DETAILED HELP MODAL (FULL RICH TEXT - EXPANDED ZERO-SCROLL AAA GUIDE) */}
       <AnimatePresence>
         {showHelpModal && (
-          <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-2 sm:p-4 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-2.5 sm:p-4 backdrop-blur-md">
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 8 }}
-              className="bg-[#12161f] border border-[#ebd09b]/50 rounded-2xl max-w-xl md:max-w-2xl w-full shadow-[0_0_60px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col"
+              className="bg-[#12161f] border border-[#ebd09b]/50 rounded-2xl max-w-2xl sm:max-w-3xl w-full shadow-[0_0_60px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col"
             >
               {/* Modal Header */}
-              <div className="flex justify-between items-center px-4 sm:px-5 py-3 bg-gradient-to-r from-black/85 via-[#1a1f2c] to-black/85 border-b border-[#ebd09b]/25">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#ebd09b]/25 to-purple-950/70 border border-[#ebd09b]/50 flex items-center justify-center shadow-md">
-                    <Swords className="w-4 h-4 text-[#ebd09b]" />
+              <div className="flex justify-between items-center px-4 sm:px-6 py-3 bg-gradient-to-r from-black/85 via-[#1a1f2c] to-black/85 border-b border-[#ebd09b]/25">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-[#ebd09b]/25 to-purple-950/70 border border-[#ebd09b]/50 flex items-center justify-center shadow-md">
+                    <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-[#ebd09b]" />
                   </div>
                   <div>
                     <h3 className="font-display font-black text-sm sm:text-base text-[#ebd09b] tracking-wider uppercase leading-tight">
                       Combat Tactics Guide
                     </h3>
-                    <span className="text-[10px] font-mono text-gray-400 block -mt-0.5">Void Covenant Battlefield Codex</span>
+                    <span className="text-[10px] sm:text-xs font-mono text-gray-400 block -mt-0.5">Rules & Codex of Void Covenant</span>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowHelpModal(false)}
-                  className="text-gray-400 hover:text-white font-mono font-bold text-xs bg-black/50 hover:bg-black/80 border border-gray-700 hover:border-gray-400 rounded-lg p-1.5 transition-all cursor-pointer"
+                  className="text-gray-400 hover:text-white font-mono font-bold text-xs bg-black/50 hover:bg-black/80 border border-gray-700 hover:border-gray-400 rounded-lg p-1.5 sm:px-2.5 sm:py-1.5 transition-all cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Navigation Tabs */}
-              <div className="grid grid-cols-3 gap-1.5 p-2 bg-black/70 border-b border-gray-800 text-center font-display text-[11px] sm:text-xs font-bold">
+              <div className="grid grid-cols-3 gap-1.5 p-2 sm:p-2.5 bg-black/70 border-b border-gray-800 text-center font-display text-[11px] sm:text-xs font-bold">
                 <button
                   onClick={() => setHelpTab('basics')}
                   className={`py-2 px-1.5 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
@@ -2518,52 +2518,52 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 </button>
               </div>
 
-              {/* Zero-Scroll Body Content */}
-              <div className="p-3 sm:p-4 text-xs text-gray-300">
+              {/* Full Rich Body Content */}
+              <div className="p-3 sm:p-4 text-xs sm:text-[13px] text-gray-300">
                 {helpTab === 'basics' && (
                   <motion.div initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} className="space-y-2.5">
                     {/* 5-Slot Linear Line */}
-                    <div className="p-2.5 sm:p-3 rounded-xl bg-black/45 border border-white/10 space-y-1.5">
+                    <div className="p-3 rounded-xl bg-black/45 border border-white/10 space-y-1.5">
                       <div className="flex items-center justify-between">
-                        <span className="font-display font-bold text-xs sm:text-sm text-white flex items-center gap-1.5">
-                          <span className="w-5 h-5 rounded-full bg-amber-950/80 border border-amber-500/40 text-amber-400 font-mono text-[10px] font-bold flex items-center justify-center">1</span>
-                          5-Slot Linear Line of Battle
-                        </span>
-                        <span className="text-[10px] font-mono text-amber-300/80">Strict Line-of-Sight</span>
+                        <h4 className="font-display font-bold text-xs sm:text-sm text-white flex items-center gap-1.5">
+                          🗡️ Combat System (Linear Duels)
+                        </h4>
+                        <span className="text-[10px] font-mono text-amber-300/80">5-Slot Board</span>
                       </div>
-                      <div className="grid grid-cols-2 gap-2 font-mono text-[11px]">
-                        <div className="p-2 rounded-lg bg-purple-950/30 border border-purple-800/40 text-center">
-                          <span className="text-purple-300 font-bold block">⚔️ Enemy in Lane</span>
-                          <span className="text-gray-400 text-[10px]">Cards duel strictly opposite</span>
+                      <p className="text-gray-300 text-xs sm:text-[13px] leading-relaxed">
+                        Combat is 1v1 on a linear 5-slot board. Cards attack <strong className="text-white">strictly opposite themselves</strong>. If the slot opposite is empty, all damage goes directly to enemy hero (Lord). Goal is to bring enemy health to zero.
+                      </p>
+                      <div className="grid grid-cols-2 gap-2 pt-0.5 font-mono text-xs">
+                        <div className="p-1.5 sm:p-2 rounded-lg bg-purple-950/30 border border-purple-800/40 text-center">
+                          <span className="text-purple-300 font-bold block text-[11px] sm:text-xs">⚔️ Creature Clash</span>
+                          <span className="text-gray-400 text-[10px] sm:text-[11px]">Slot occupied ➔ cards duel each other</span>
                         </div>
-                        <div className="p-2 rounded-lg bg-red-950/30 border border-red-800/40 text-center">
-                          <span className="text-red-300 font-bold block">🎯 Empty Lane</span>
-                          <span className="text-gray-400 text-[10px]">Full DMG strikes Enemy Lord!</span>
+                        <div className="p-1.5 sm:p-2 rounded-lg bg-red-950/30 border border-red-800/40 text-center">
+                          <span className="text-red-300 font-bold block text-[11px] sm:text-xs">🎯 Direct Damage</span>
+                          <span className="text-gray-400 text-[10px] sm:text-[11px]">Slot empty ➔ full damage hits Enemy Lord!</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Delay & Mana Row */}
+                    {/* Delay & Mana in 2 columns */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       {/* Turn Delay */}
-                      <div className="p-2.5 sm:p-3 rounded-xl bg-black/45 border border-white/10 space-y-1.5">
-                        <span className="font-display font-bold text-xs text-white flex items-center gap-1.5">
-                          <span className="w-5 h-5 rounded-full bg-blue-950/80 border border-blue-500/40 text-blue-300 font-mono text-[10px] font-bold flex items-center justify-center">2</span>
-                          Turn Delay (⏳)
-                        </span>
-                        <p className="text-gray-300 text-[11px] leading-snug">
-                          Cards have a timer (<strong className="text-blue-300">Delay 1-3</strong>). Each turn it drops by 1. Reaching <strong className="text-emerald-300">0</strong> activates card to strike every turn!
+                      <div className="p-3 rounded-xl bg-black/45 border border-white/10 space-y-1">
+                        <h4 className="font-display font-bold text-xs sm:text-sm text-white flex items-center gap-1.5">
+                          ⏳ Delay Mechanics (Delay)
+                        </h4>
+                        <p className="text-gray-300 text-[11px] sm:text-xs leading-relaxed">
+                          When placed on board, card has a delay indicator (e.g. 1, 2 or 3 turns). It cannot attack immediately. Each turn timer decreases by 1. Reaching <strong className="text-emerald-300">0</strong> makes card active ⚔️ and attacks at the end of each your turn.
                         </p>
                       </div>
 
-                      {/* Mana & Goal */}
-                      <div className="p-2.5 sm:p-3 rounded-xl bg-black/45 border border-white/10 space-y-1.5">
-                        <span className="font-display font-bold text-xs text-cyan-300 flex items-center gap-1.5">
-                          <span className="w-5 h-5 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 font-mono text-[10px] font-bold flex items-center justify-center">3</span>
-                          Mana & Victory Goal
-                        </span>
-                        <p className="text-gray-300 text-[11px] leading-snug">
-                          Mana grows each round (1➔10). Reduce the enemy Lord's Health to <strong className="text-red-400">0 HP</strong> to claim victory!
+                      {/* Mana & Victory Goal */}
+                      <div className="p-3 rounded-xl bg-black/45 border border-white/10 space-y-1">
+                        <h4 className="font-display font-bold text-xs sm:text-sm text-cyan-300 flex items-center gap-1.5">
+                          🔮 Mana & Victory Goal
+                        </h4>
+                        <p className="text-gray-300 text-[11px] sm:text-xs leading-relaxed">
+                          Mana refills and grows each round (1 ➔ 10). Card summoning costs are indicated on their crystal badge. Destroy the enemy Lord by reducing their Health to <strong className="text-red-400">0 HP</strong> to win!
                         </p>
                       </div>
                     </div>
@@ -2571,68 +2571,68 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 )}
 
                 {helpTab === 'skills' && (
-                  <motion.div initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <motion.div initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
                     {/* Vampirism */}
-                    <div className="p-2.5 rounded-xl bg-gradient-to-r from-rose-950/40 to-black/60 border border-rose-900/50 space-y-1">
+                    <div className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-rose-950/40 to-black/60 border border-rose-900/50 space-y-1">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          {renderSkillIcon("vampirism", "w-4 h-4")}
+                        <div className="flex items-center gap-2">
+                          {renderSkillIcon("vampirism", "w-5 h-5")}
                           <span className="font-display font-bold text-xs sm:text-sm text-rose-300">Vampirism [X]</span>
                         </div>
-                        <span className="px-1.5 py-0.5 rounded bg-rose-950 border border-rose-700/60 font-mono text-[9px] font-bold text-rose-300 uppercase">
+                        <span className="px-2 py-0.5 rounded bg-rose-950 border border-rose-700/60 font-mono text-[9px] font-bold text-rose-300 uppercase">
                           On Attack
                         </span>
                       </div>
-                      <p className="text-gray-300 text-[11px] leading-snug">
-                        Every strike against an enemy card <strong className="text-emerald-400">heals self for +X HP</strong> (up to max HP).
+                      <p className="text-gray-300 text-[11px] sm:text-xs leading-relaxed">
+                        Every time creature attacks and damages another card, it heals itself by <strong className="text-emerald-400">+X HP</strong> (up to max HP).
                       </p>
                     </div>
 
                     {/* Hex */}
-                    <div className="p-2.5 rounded-xl bg-gradient-to-r from-purple-950/40 to-black/60 border border-purple-900/50 space-y-1">
+                    <div className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-purple-950/40 to-black/60 border border-purple-900/50 space-y-1">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          {renderSkillIcon("hex", "w-4 h-4")}
+                        <div className="flex items-center gap-2">
+                          {renderSkillIcon("hex", "w-5 h-5")}
                           <span className="font-display font-bold text-xs sm:text-sm text-purple-300">Hex [X]</span>
                         </div>
-                        <span className="px-1.5 py-0.5 rounded bg-purple-950 border border-purple-700/60 font-mono text-[9px] font-bold text-purple-300 uppercase">
+                        <span className="px-2 py-0.5 rounded bg-purple-950 border border-purple-700/60 font-mono text-[9px] font-bold text-purple-300 uppercase">
                           Before Strike
                         </span>
                       </div>
-                      <p className="text-gray-300 text-[11px] leading-snug">
-                        Curses the opposing target: next incoming attack deals <strong className="text-purple-300">+X bonus damage</strong>!
+                      <p className="text-gray-300 text-[11px] sm:text-xs leading-relaxed">
+                        Before dealing damage, hexes the opposite creature, increasing next incoming damage by <strong className="text-purple-300">+X</strong>.
                       </p>
                     </div>
 
                     {/* Plague */}
-                    <div className="p-2.5 rounded-xl bg-gradient-to-r from-emerald-950/40 to-black/60 border border-emerald-900/50 space-y-1">
+                    <div className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-emerald-950/40 to-black/60 border border-emerald-900/50 space-y-1">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          {renderSkillIcon("plague", "w-4 h-4")}
+                        <div className="flex items-center gap-2">
+                          {renderSkillIcon("plague", "w-5 h-5")}
                           <span className="font-display font-bold text-xs sm:text-sm text-emerald-300">Plague [X]</span>
                         </div>
-                        <span className="px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-700/60 font-mono text-[9px] font-bold text-emerald-300 uppercase">
+                        <span className="px-2 py-0.5 rounded bg-emerald-950 border border-emerald-700/60 font-mono text-[9px] font-bold text-emerald-300 uppercase">
                           End of Turn
                         </span>
                       </div>
-                      <p className="text-gray-300 text-[11px] leading-snug">
-                        At turn end, emits spores dealing <strong className="text-emerald-400">X pure damage</strong> to a random living enemy.
+                      <p className="text-gray-300 text-[11px] sm:text-xs leading-relaxed">
+                        At the end of each turn, emits poisonous spores dealing <strong className="text-emerald-400">X pure damage</strong> to a random living enemy on board.
                       </p>
                     </div>
 
                     {/* Sacrifice */}
-                    <div className="p-2.5 rounded-xl bg-gradient-to-r from-red-950/50 to-black/60 border border-red-900/60 space-y-1">
+                    <div className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-red-950/50 to-black/60 border border-red-900/60 space-y-1">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          {renderSkillIcon("sacrifice", "w-4 h-4")}
+                        <div className="flex items-center gap-2">
+                          {renderSkillIcon("sacrifice", "w-5 h-5")}
                           <span className="font-display font-bold text-xs sm:text-sm text-red-300">Sacrifice [X]</span>
                         </div>
-                        <span className="px-1.5 py-0.5 rounded bg-red-950 border border-red-700/60 font-mono text-[9px] font-bold text-red-300 uppercase">
+                        <span className="px-2 py-0.5 rounded bg-red-950 border border-red-700/60 font-mono text-[9px] font-bold text-red-300 uppercase">
                           On Play
                         </span>
                       </div>
-                      <p className="text-gray-300 text-[11px] leading-snug">
-                        Destroys an ally: <strong className="text-emerald-400">heals Hero +X HP</strong> & permanently gains <strong className="text-red-400">+(X/2)⚔️</strong> & <strong className="text-emerald-400">+X❤️</strong>!
+                      <p className="text-gray-300 text-[11px] sm:text-xs leading-relaxed">
+                        On play, destroys a random ally on your board. In return, <strong className="text-emerald-400">heals your hero by +X HP</strong>, and creature permanently gets <strong className="text-red-400">+(X/2) Attack</strong> and <strong className="text-emerald-400">+X Health</strong>.
                       </p>
                     </div>
                   </motion.div>
@@ -2640,56 +2640,47 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                 {helpTab === 'defense' && (
                   <motion.div initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} className="space-y-2.5">
-                    {/* Barrier & Armor */}
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="p-2.5 rounded-xl bg-cyan-950/30 border border-cyan-800/40 space-y-1">
-                        <span className="font-display font-bold text-xs text-cyan-300 flex items-center gap-1">
+                    {/* Barrier, Armor & Dodge */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-800/40 space-y-1">
+                        <span className="font-display font-bold text-xs sm:text-sm text-cyan-300 flex items-center gap-1.5">
                           🛡️ Barrier / Ward
                         </span>
-                        <p className="text-gray-300 text-[11px] leading-snug">
-                          Completely absorbs <strong className="text-cyan-200">100% of the 1st incoming hit</strong> of any strength. Shatters after strike.
+                        <p className="text-gray-300 text-[11px] sm:text-xs leading-relaxed">
+                          A magical shield that completely absorbs <strong className="text-cyan-200">100% of the first incoming attack</strong>, regardless of its damage power. Shatters upon hit.
                         </p>
                       </div>
 
-                      <div className="p-2.5 rounded-xl bg-slate-900/50 border border-slate-700/50 space-y-1">
-                        <span className="font-display font-bold text-xs text-slate-300 flex items-center gap-1">
-                          🔰 Armor & 💨 Dodge
+                      <div className="p-3 rounded-xl bg-slate-900/50 border border-slate-700/50 space-y-1">
+                        <span className="font-display font-bold text-xs sm:text-sm text-slate-300 flex items-center gap-1.5">
+                          🔰 Armor & 💨 Hero Evade
                         </span>
-                        <p className="text-gray-300 text-[11px] leading-snug">
-                          Armor absorbs damage before HP. Agility gear gives Hero a chance to <strong className="text-white">evade</strong> direct strikes!
+                        <p className="text-gray-300 text-[11px] sm:text-xs leading-relaxed">
+                          Armor points absorb damage first before the creature's core Health is touched. Equipped boots and agility talents give your Hero a chance to <strong className="text-white">evade direct attacks</strong>!
                         </p>
                       </div>
                     </div>
 
-                    {/* Master Tips */}
-                    <div className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-br from-purple-950/30 via-black/40 to-amber-950/30 border border-[#ebd09b]/30 space-y-1">
-                      <span className="text-xs font-display font-bold text-[#ebd09b] flex items-center gap-1">
-                        💡 Key Battle Rules:
+                    {/* Master Tips with full detail */}
+                    <div className="p-3 rounded-xl bg-gradient-to-br from-purple-950/30 via-black/40 to-amber-950/30 border border-[#ebd09b]/30 space-y-1.5">
+                      <span className="text-xs sm:text-sm font-display font-bold text-[#ebd09b] flex items-center gap-1.5">
+                        💡 Tactical Pro-Tips:
                       </span>
-                      <div className="grid grid-cols-3 gap-1.5 text-[10px] text-gray-300 text-center font-sans pt-0.5">
-                        <div className="p-1.5 rounded bg-black/40 border border-white/5">
-                          <strong className="text-white block">🎯 Empty Lanes</strong>
-                          <span>Rush enemy Lord with Delay 1 cards</span>
-                        </div>
-                        <div className="p-1.5 rounded bg-black/40 border border-white/5">
-                          <strong className="text-white block">💀 Sacrifice</strong>
-                          <span>Feed weak minions to boost demons</span>
-                        </div>
-                        <div className="p-1.5 rounded bg-black/40 border border-white/5">
-                          <strong className="text-white block">🛡️ Break Shields</strong>
-                          <span>Pop barriers with Plague or light hits</span>
-                        </div>
-                      </div>
+                      <ul className="space-y-1 text-[11px] sm:text-xs text-gray-300 list-disc pl-5 font-sans">
+                        <li><strong className="text-white">Sacrifice strategy:</strong> Sacrifice weak or wounded cards for explosive permanent buffs to your key creatures!</li>
+                        <li><strong className="text-white">Empty lane rush:</strong> Place low-delay attackers (Delay 1) directly opposite empty slots to quickly burn the enemy Lord.</li>
+                        <li><strong className="text-white">Break shields first:</strong> Pop enemy Barrier charges with minor attacks or Plague spores before launching your heaviest strikes.</li>
+                      </ul>
                     </div>
                   </motion.div>
                 )}
               </div>
 
               {/* Modal Footer */}
-              <div className="p-3 bg-black/85 border-t border-gray-800">
+              <div className="p-3 sm:p-3.5 bg-black/85 border-t border-gray-800">
                 <button
                   onClick={() => setShowHelpModal(false)}
-                  className="w-full bg-gradient-to-r from-[#c5a880] to-[#ebd09b] hover:from-[#ebd09b] hover:to-[#fff] text-black font-display font-black py-2.5 rounded-xl transition-all shadow-[0_0_20px_rgba(235,208,155,0.3)] text-xs tracking-widest cursor-pointer active:scale-98"
+                  className="w-full bg-gradient-to-r from-[#c5a880] to-[#ebd09b] hover:from-[#ebd09b] hover:to-[#fff] text-black font-display font-black py-2.5 sm:py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(235,208,155,0.3)] text-xs sm:text-sm tracking-widest cursor-pointer active:scale-98"
                 >
                   ⚔️ UNDERSTOOD, TO BATTLE!
                 </button>
