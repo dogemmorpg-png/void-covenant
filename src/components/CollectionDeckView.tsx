@@ -313,7 +313,7 @@ export const CollectionDeckView: React.FC = () => {
       case 'silver': return `${base} bg-slate-900/80 text-slate-300 border-slate-600/60 shadow-[0_0_10px_rgba(148,163,184,0.2)]`;
       case 'gold': return `${base} bg-[#c5a880]/30 text-[#ebd09b] border-[#c5a880]/50 shadow-[0_0_10px_rgba(235,208,155,0.3)]`;
       case 'legendary': return `${base} bg-purple-950/70 text-purple-300 border-purple-500/60 shadow-[0_0_12px_rgba(168,85,247,0.4)] animate-pulse`;
-      case 'divine': return `${base} bg-gradient-to-r from-amber-950 via-[#261704] to-amber-900 text-amber-300 border-amber-400 shadow-[0_0_14px_rgba(251,191,36,0.6)] ring-1 ring-amber-400/50 animate-pulse`;
+      case 'divine': return `${base} bg-gradient-to-r from-rose-950 via-[#26050d] to-red-950 text-rose-300 border-rose-500 shadow-[0_0_16px_rgba(244,63,94,0.7)] ring-1 ring-rose-400/60 animate-pulse`;
       default: return `${base} bg-black/60 text-gray-400 border-gray-700`;
     }
   };
@@ -359,6 +359,7 @@ export const CollectionDeckView: React.FC = () => {
             card.tier === 'bronze' ? 'text-amber-400' :
             card.tier === 'silver' ? 'text-slate-300' :
             card.tier === 'gold' ? 'text-[#ebd09b]' :
+            card.tier === 'divine' ? 'text-rose-500 font-black drop-shadow-[0_0_8px_rgba(244,63,94,0.9)]' :
             'text-purple-400'
           }`}>
             {card.tier}

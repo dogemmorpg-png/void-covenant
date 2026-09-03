@@ -235,13 +235,13 @@ export const GachaStoreView: React.FC = () => {
           <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('divine'); }}
             className={`px-5 py-2.5 font-display font-black tracking-widest transition-all rounded-xl border flex items-center gap-2 cursor-pointer relative ${
               activeTab === 'divine' 
-                ? 'bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-black border-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.6)]' 
-                : 'bg-amber-950/30 text-amber-400 border-amber-800/60 hover:border-amber-400 hover:shadow-[0_0_15px_rgba(245,158,11,0.3)]'
+                ? 'bg-gradient-to-r from-red-600 via-rose-600 to-red-600 text-white border-rose-300 shadow-[0_0_20px_rgba(244,63,94,0.7)]' 
+                : 'bg-rose-950/30 text-rose-300 border-rose-800/60 hover:border-rose-400 hover:shadow-[0_0_15px_rgba(244,63,94,0.3)]'
             }`}
           >
-            <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+            <Sparkles className="w-4 h-4 text-rose-400 animate-pulse" />
             <span>DIVINE ALTAR</span>
-            <span className="bg-red-600 text-white text-[8px] font-mono px-1.5 py-0.5 rounded-full uppercase font-bold tracking-wider ml-1">
+            <span className="bg-amber-400 text-black text-[8px] font-mono px-1.5 py-0.5 rounded-full uppercase font-bold tracking-wider ml-1">
               EXCLUSIVE
             </span>
           </button>
@@ -479,14 +479,14 @@ export const GachaStoreView: React.FC = () => {
               return (
                 <div 
                   key={card.baseId} 
-                  className="bg-gradient-to-b from-[#18131d] via-[#120f18] to-black border-2 border-amber-500/40 hover:border-amber-400/80 rounded-3xl p-5 flex flex-col justify-between shadow-2xl hover:shadow-[0_0_35px_rgba(245,158,11,0.3)] transition-all duration-300 group relative overflow-hidden"
+                  className="bg-gradient-to-b from-[#1c080d] via-[#14060a] to-black border-2 border-rose-500/50 hover:border-rose-400/90 rounded-3xl p-5 flex flex-col justify-between shadow-2xl hover:shadow-[0_0_35px_rgba(244,63,94,0.4)] transition-all duration-300 group relative overflow-hidden"
                 >
                   {/* Subtle top glow */}
-                  <div className="absolute -top-24 -left-24 w-48 h-48 bg-amber-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
+                  <div className="absolute -top-24 -left-24 w-48 h-48 bg-rose-500/15 rounded-full blur-2xl pointer-events-none group-hover:bg-rose-500/25 transition-all" />
 
                   <div className="space-y-4 relative z-10">
                     {/* Card Portrait & Badges */}
-                    <div className="relative aspect-[3/3.8] rounded-2xl overflow-hidden border border-amber-400/30 shadow-lg bg-black/60">
+                    <div className="relative aspect-[3/3.8] rounded-2xl overflow-hidden border border-rose-400/40 shadow-lg bg-black/60">
                       <img 
                         src={card.image} 
                         alt={card.name} 
@@ -496,12 +496,12 @@ export const GachaStoreView: React.FC = () => {
 
                       {/* Tier & Delay Badges Top */}
                       <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-10">
-                        <span className="px-2 py-0.5 rounded-lg border font-mono text-[9px] uppercase font-black tracking-wider bg-gradient-to-r from-amber-950 to-amber-900 text-amber-300 border-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.6)]">
+                        <span className="px-2 py-0.5 rounded-lg border font-mono text-[9px] uppercase font-black tracking-wider bg-gradient-to-r from-red-950 to-rose-900 text-rose-300 border-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.7)]">
                           DIVINE
                         </span>
                         <div className="flex items-center gap-1.5">
                           {renderManaIcon(getCardManaCost(card), "w-6 h-6")}
-                          <div className="bg-black/80 border border-amber-400/40 rounded-lg px-2 py-0.5 text-[9px] font-mono font-bold text-blue-300 backdrop-blur-sm shadow flex items-center gap-1">
+                          <div className="bg-black/80 border border-rose-400/40 rounded-lg px-2 py-0.5 text-[9px] font-mono font-bold text-blue-300 backdrop-blur-sm shadow flex items-center gap-1">
                             <span>⏳</span> {card.delay}
                           </div>
                         </div>
@@ -521,7 +521,7 @@ export const GachaStoreView: React.FC = () => {
                     {/* Card Title & Owned Status */}
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h4 className="font-display font-black text-lg text-white group-hover:text-amber-300 transition-colors tracking-wide leading-tight">
+                        <h4 className="font-display font-black text-lg text-white group-hover:text-rose-400 transition-colors tracking-wide leading-tight">
                           {card.name}
                         </h4>
                         <p className="text-[11px] text-gray-400 font-sans mt-1 line-clamp-2 leading-relaxed">
@@ -537,14 +537,14 @@ export const GachaStoreView: React.FC = () => {
 
                     {/* Skills Box */}
                     <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 space-y-2">
-                      <div className="text-[10px] font-mono uppercase font-bold text-amber-400 tracking-wider flex items-center gap-1">
-                        <Sparkles className="w-3 h-3" />
+                      <div className="text-[10px] font-mono uppercase font-bold text-rose-400 tracking-wider flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-rose-400" />
                         DIVINE SKILLS:
                       </div>
                       <div className="space-y-1.5">
                         {card.skills.map((skill, sIdx) => (
                           <div key={sIdx} className="flex items-start gap-1.5 text-[10px]">
-                            <span className="font-bold text-amber-300 uppercase shrink-0">[{skill.type} {skill.value}]</span>
+                            <span className="font-bold text-rose-300 uppercase shrink-0">[{skill.type} {skill.value}]</span>
                             <span className="text-gray-300 leading-snug">{skill.description}</span>
                           </div>
                         ))}
@@ -557,7 +557,7 @@ export const GachaStoreView: React.FC = () => {
                     <button
                       disabled={isBuyingThis}
                       onClick={() => buyDivineCard(card.baseId)}
-                      className="w-full bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:to-yellow-400 active:scale-[0.98] text-black font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:shadow-[0_0_25px_rgba(245,158,11,0.7)] flex items-center justify-center gap-2 text-xs uppercase cursor-pointer disabled:opacity-50"
+                      className="w-full bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 hover:from-rose-500 hover:to-red-400 active:scale-[0.98] text-white font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(244,63,94,0.5)] hover:shadow-[0_0_25px_rgba(244,63,94,0.8)] flex items-center justify-center gap-2 text-xs uppercase cursor-pointer disabled:opacity-50"
                     >
                       <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain drop-shadow" />
                       {isBuyingThis ? 'INVOKING...' : 'SUMMON FOR 50 SHARDS'}

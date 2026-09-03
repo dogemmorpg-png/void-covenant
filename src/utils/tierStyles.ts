@@ -17,7 +17,7 @@ export const getCardTierStyles = (tier: string, isSelected: boolean = false, isH
     case 'legendary':
       return baseStyles + hoverEffect + "bg-black border-purple-500/80 shadow-neon-purple " + (isHover ? "hover:border-purple-400 hover:shadow-[0_0_35px_rgba(168,85,247,0.8)]" : "");
     case 'divine':
-      return baseStyles + hoverEffect + "bg-gradient-to-b from-black via-[#181206] to-[#2a1c07] border-amber-300 shadow-[0_0_25px_rgba(251,191,36,0.65)] ring-1 ring-amber-400/60 " + (isHover ? "hover:border-amber-200 hover:shadow-[0_0_40px_rgba(251,191,36,0.9)] hover:ring-amber-300" : "");
+      return baseStyles + hoverEffect + "bg-gradient-to-b from-black via-[#1c070c] to-[#2e0912] border-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.7)] ring-1 ring-rose-400/60 " + (isHover ? "hover:border-rose-400 hover:shadow-[0_0_40px_rgba(244,63,94,0.95)] hover:ring-rose-300" : "");
     default:
       return baseStyles + hoverEffect + "bg-black/60 border-white/10";
   }
