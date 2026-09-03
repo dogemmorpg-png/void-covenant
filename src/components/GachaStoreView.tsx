@@ -502,7 +502,7 @@ export const GachaStoreView: React.FC = () => {
                         <div className="flex items-center gap-1.5">
                           {renderManaIcon(getCardManaCost(card), "w-6 h-6")}
                           <div className="bg-black/80 border border-amber-400/40 rounded-lg px-2 py-0.5 text-[9px] font-mono font-bold text-blue-300 backdrop-blur-sm shadow flex items-center gap-1">
-                            <span>⏳</span> {card.delay}T
+                            <span>⏳</span> {card.delay}
                           </div>
                         </div>
                       </div>

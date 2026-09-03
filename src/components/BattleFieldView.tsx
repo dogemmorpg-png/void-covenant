@@ -212,11 +212,12 @@ interface FloatingTextEffect {
 // Card tier helper functions for pristine styling
 const getTierBorderColor = (tier: string) => {
   switch (tier?.toLowerCase()) {
-    case 'bronze': return 'border-amber-700/60';
-    case 'silver': return 'border-slate-400/60';
-    case 'gold': return 'border-yellow-500/80';
-    case 'obsidian': return 'border-purple-500/80';
-    default: return 'border-amber-500/30';
+    case 'bronze': return 'border-amber-700/60 shadow-[0_0_8px_rgba(245,158,11,0.15)]';
+    case 'silver': return 'border-slate-400/60 shadow-[0_0_8px_rgba(148,163,184,0.15)]';
+    case 'gold': return 'border-yellow-500/80 shadow-[0_0_10px_rgba(234,179,8,0.25)]';
+    case 'legendary': return 'border-purple-500/80 shadow-[0_0_12px_rgba(168,85,247,0.35)]';
+    case 'divine': return 'border-amber-400 shadow-[0_0_16px_rgba(251,191,36,0.6)] ring-1 ring-amber-400/40';
+    default: return 'border-gray-800 hover:border-gray-600';
   }
 };
 
@@ -225,18 +226,20 @@ const getTierBgGradient = (tier: string) => {
     case 'bronze': return 'from-amber-950/40 via-[#151a21] to-[#0d1117]';
     case 'silver': return 'from-slate-900/40 via-[#151a21] to-[#0d1117]';
     case 'gold': return 'from-yellow-950/30 via-[#151a21] to-[#0d1117]';
-    case 'obsidian': return 'from-purple-950/30 via-[#151a21] to-[#0d1117]';
+    case 'legendary': return 'from-purple-950/40 via-[#180f2b] to-[#0d1117]';
+    case 'divine': return 'from-amber-900/50 via-[#261704] to-[#0d1117]';
     default: return 'from-gray-900 via-[#151a21] to-[#0d1117]';
   }
 };
 
 const getTierTextColor = (tier: string) => {
   switch (tier?.toLowerCase()) {
-    case 'bronze': return 'text-amber-500';
-    case 'silver': return 'text-slate-300';
+    case 'bronze': return 'text-amber-500 font-bold';
+    case 'silver': return 'text-slate-300 font-bold';
     case 'gold': return 'text-yellow-400 font-bold';
-    case 'obsidian': return 'text-purple-400 font-bold';
-    default: return 'text-gray-400';
+    case 'legendary': return 'text-purple-400 font-bold';
+    case 'divine': return 'text-amber-400 font-black drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]';
+    default: return 'text-gray-400 font-medium';
   }
 };
 
@@ -2340,7 +2343,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       ? 'border-[#66fcf1] shadow-[0_0_15px_rgba(102,252,241,0.6)]' 
                       : (visualState.playerMana || 0) < (card.manaCost || 1)
                         ? 'border-red-950/20 opacity-40 brightness-75 grayscale'
-                        : 'border-gray-800 hover:border-gray-600'
+                        : getTierBorderColor(card.tier)
                   }`}
                 >
                   <>
