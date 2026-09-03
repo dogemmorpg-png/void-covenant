@@ -2518,12 +2518,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 </button>
               </div>
 
-              {/* Full Rich Body Content */}
+              {/* Full Rich Body Content with Distinct Standalone Cards */}
               <div className="p-3 sm:p-4 text-xs sm:text-[13px] text-gray-300">
                 {helpTab === 'basics' && (
-                  <motion.div initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} className="space-y-2.5">
-                    {/* 5-Slot Linear Line */}
-                    <div className="p-3 rounded-xl bg-black/45 border border-white/10 space-y-1.5">
+                  <motion.div initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
+                    {/* 1. Combat System (Linear Duels) */}
+                    <div className="p-2.5 sm:p-3 rounded-xl bg-black/45 border border-white/10 space-y-1.5">
                       <div className="flex items-center justify-between">
                         <h4 className="font-display font-bold text-xs sm:text-sm text-white flex items-center gap-1.5">
                           🗡️ Combat System (Linear Duels)
@@ -2545,25 +2545,33 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       </div>
                     </div>
 
-                    {/* Delay & Mana in 2 columns */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {/* Turn Delay */}
-                      <div className="p-3 rounded-xl bg-black/45 border border-white/10 space-y-1">
-                        <h4 className="font-display font-bold text-xs sm:text-sm text-white flex items-center gap-1.5">
-                          ⏳ Delay Mechanics (Delay)
+                    {/* 2. Turn Delay */}
+                    <div className="p-2.5 sm:p-3 rounded-xl bg-black/45 border border-white/10 space-y-1.5">
+                      <h4 className="font-display font-bold text-xs sm:text-sm text-white flex items-center gap-1.5">
+                        ⏳ Delay Mechanics (Delay)
+                      </h4>
+                      <p className="text-gray-300 text-[11px] sm:text-xs leading-relaxed">
+                        When placed on board, card has a delay indicator (e.g. 1, 2 or 3 turns). It cannot attack immediately. Each turn timer decreases by 1. Reaching <strong className="text-emerald-300">0</strong> makes card active ⚔️ and attacks at the end of each your turn.
+                      </p>
+                    </div>
+
+                    {/* 3 & 4. Mana Crystals & Victory Goal (SEPARATE STANDALONE CARDS) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div className="p-2.5 sm:p-3 rounded-xl bg-black/45 border border-white/10 space-y-1">
+                        <h4 className="font-display font-bold text-xs sm:text-sm text-cyan-300 flex items-center gap-1.5">
+                          🔮 Mana Crystals
                         </h4>
                         <p className="text-gray-300 text-[11px] sm:text-xs leading-relaxed">
-                          When placed on board, card has a delay indicator (e.g. 1, 2 or 3 turns). It cannot attack immediately. Each turn timer decreases by 1. Reaching <strong className="text-emerald-300">0</strong> makes card active ⚔️ and attacks at the end of each your turn.
+                          Mana refills and grows each round (1 ➔ 10). Each card costs Mana indicated on its crystal badge.
                         </p>
                       </div>
 
-                      {/* Mana & Victory Goal */}
-                      <div className="p-3 rounded-xl bg-black/45 border border-white/10 space-y-1">
-                        <h4 className="font-display font-bold text-xs sm:text-sm text-cyan-300 flex items-center gap-1.5">
-                          🔮 Mana & Victory Goal
+                      <div className="p-2.5 sm:p-3 rounded-xl bg-black/45 border border-white/10 space-y-1">
+                        <h4 className="font-display font-bold text-xs sm:text-sm text-[#ebd09b] flex items-center gap-1.5">
+                          👑 Victory Goal
                         </h4>
                         <p className="text-gray-300 text-[11px] sm:text-xs leading-relaxed">
-                          Mana refills and grows each round (1 ➔ 10). Card summoning costs are indicated on their crystal badge. Destroy the enemy Lord by reducing their Health to <strong className="text-red-400">0 HP</strong> to win!
+                          Destroy the enemy Lord by reducing their Health to <strong className="text-red-400">0 HP</strong> before they destroy yours.
                         </p>
                       </div>
                     </div>
@@ -2639,10 +2647,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 )}
 
                 {helpTab === 'defense' && (
-                  <motion.div initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} className="space-y-2.5">
-                    {/* Barrier, Armor & Dodge */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-800/40 space-y-1">
+                  <motion.div initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
+                    {/* 1 & 2. Barrier & Armor Plates (SEPARATE STANDALONE CARDS) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div className="p-2.5 sm:p-3 rounded-xl bg-cyan-950/30 border border-cyan-800/40 space-y-1">
                         <span className="font-display font-bold text-xs sm:text-sm text-cyan-300 flex items-center gap-1.5">
                           🛡️ Barrier / Ward
                         </span>
@@ -2651,25 +2659,34 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         </p>
                       </div>
 
-                      <div className="p-3 rounded-xl bg-slate-900/50 border border-slate-700/50 space-y-1">
+                      <div className="p-2.5 sm:p-3 rounded-xl bg-slate-900/50 border border-slate-700/50 space-y-1">
                         <span className="font-display font-bold text-xs sm:text-sm text-slate-300 flex items-center gap-1.5">
-                          🔰 Armor & 💨 Hero Evade
+                          🔰 Armor Plates
                         </span>
                         <p className="text-gray-300 text-[11px] sm:text-xs leading-relaxed">
-                          Armor points absorb damage first before the creature's core Health is touched. Equipped boots and agility talents give your Hero a chance to <strong className="text-white">evade direct attacks</strong>!
+                          Armor points absorb damage first before the creature's core Health is touched. Breaks once exhausted.
                         </p>
                       </div>
                     </div>
 
-                    {/* Master Tips with full detail */}
-                    <div className="p-3 rounded-xl bg-gradient-to-br from-purple-950/30 via-black/40 to-amber-950/30 border border-[#ebd09b]/30 space-y-1.5">
+                    {/* 3. Hero Evade / Dodge (SEPARATE STANDALONE CARD) */}
+                    <div className="p-2.5 sm:p-3 rounded-xl bg-black/45 border border-white/10 flex items-center gap-2.5">
+                      <span className="text-xl">💨</span>
+                      <div className="text-[11px] sm:text-xs leading-relaxed">
+                        <strong className="text-white block font-display text-xs sm:text-sm mb-0.5">Hero Evade / Dodge</strong>
+                        <span className="text-gray-300">Equipped boots and agility talents give your Hero a chance to completely dodge direct attacks!</span>
+                      </div>
+                    </div>
+
+                    {/* 4. Master Pro-Tips (SEPARATE STANDALONE CARD) */}
+                    <div className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-br from-purple-950/30 via-black/40 to-amber-950/30 border border-[#ebd09b]/30 space-y-1">
                       <span className="text-xs sm:text-sm font-display font-bold text-[#ebd09b] flex items-center gap-1.5">
                         💡 Tactical Pro-Tips:
                       </span>
-                      <ul className="space-y-1 text-[11px] sm:text-xs text-gray-300 list-disc pl-5 font-sans">
-                        <li><strong className="text-white">Sacrifice strategy:</strong> Sacrifice weak or wounded cards for explosive permanent buffs to your key creatures!</li>
-                        <li><strong className="text-white">Empty lane rush:</strong> Place low-delay attackers (Delay 1) directly opposite empty slots to quickly burn the enemy Lord.</li>
-                        <li><strong className="text-white">Break shields first:</strong> Pop enemy Barrier charges with minor attacks or Plague spores before launching your heaviest strikes.</li>
+                      <ul className="space-y-0.5 text-[11px] sm:text-xs text-gray-300 list-disc pl-5 font-sans">
+                        <li><strong className="text-white">Sacrifice strategy:</strong> Sacrifice weak or wounded cards for explosive buffs to your key creatures!</li>
+                        <li><strong className="text-white">Empty lane rush:</strong> Place low-delay attackers (Delay 1) directly opposite empty slots to burn the enemy Lord.</li>
+                        <li><strong className="text-white">Break shields first:</strong> Pop enemy Barrier charges with minor attacks or Plague spores before heavy strikes.</li>
                       </ul>
                     </div>
                   </motion.div>
