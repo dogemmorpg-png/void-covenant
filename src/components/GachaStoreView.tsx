@@ -7,7 +7,7 @@ import { useToast } from './Toast';
 import { CARD_TEMPLATES, createCardInstance, getCardManaCost } from '../data/cards';
 import { Card, CardTier, Equipment } from '../types';
 import { getRandomEquipmentByTier, generateEquipmentInstance, getEquipmentIcon } from '../data/equipment';
-import { Gem, Coins, Sparkles, Box, Trash2, Shield, Flame, Skull, Sword } from 'lucide-react';
+import { Gem, Coins, Sparkles, Box, Trash2, Shield, Flame, Skull, Sword, Store, Crown, Zap } from 'lucide-react';
 import { assetPreloader, getCardImageUrl } from '../utils/assetPreloader';
 
 const renderManaIcon = (cost: number, sizeClass: string = "w-5 h-5") => {
@@ -36,13 +36,59 @@ export const GachaStoreView: React.FC = () => {
   const { profile, spendGold, spendShards, addCardToCollection, addEquipment, setProfile, setIsShardsShopOpen } = useGame();
   const toast = useToast();
   
-  const [activeTab, setActiveTab] = useState<'cards' | 'equipment'>('cards');
+  const [activeTab, setActiveTab] = useState<'cards' | 'equipment' | 'divine'>('cards');
+  const [buyingCardId, setBuyingCardId] = useState<string | null>(null);
   
   // Animation/Opening state
   const [openingPack, setOpeningPack] = useState<string | null>(null); // 'bronze' | 'obsidian' | 'abyssal' | 'eq_basic' | 'eq_premium' | null
   const [revealedCards, setRevealedCards] = useState<Card[]>([]);
   const [revealedEquipment, setRevealedEquipment] = useState<Equipment[]>([]);
   const [isRevealed, setIsRevealed] = useState(false);
+
+  // Buy Divine Card (costs 50 Shards)
+  const buyDivineCard = async (baseId: string) => {
+    const cardCost = 50;
+    if ((profile.darkShards || 0) < cardCost) {
+      setIsShardsShopOpen(true);
+      toast('Insufficient Dark Shards! Opening Shards Shop...', 'warning');
+      return;
+    }
+
+    try {
+      setBuyingCardId(baseId);
+      const token = localStorage.getItem('void_covenant_token');
+      if (!token) {
+        toast('You must be logged in to purchase', 'error');
+        return;
+      }
+
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action: 'buy_divine_card', payload: { baseId } })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (data.profile) {
+          setProfile(data.profile);
+        }
+        audioSystem.playVictory();
+        triggerOpeningAnimationBackend('divine_card', [data.newCard], []);
+        toast(`✨ Divine entity invoked: ${data.newCard.name}!`, 'success');
+      } else {
+        toast(data.error || 'Failed to summon divine entity', 'error');
+      }
+    } catch (err: any) {
+      console.error('Divine purchase error:', err);
+      toast('Network error during purchase', 'error');
+    } finally {
+      setBuyingCardId(null);
+    }
+  };
 
   // Buy Bronze Pack (costs 300 Gold)
   const buyBronzePack = () => buyPackBackend('bronze');
@@ -151,33 +197,53 @@ export const GachaStoreView: React.FC = () => {
       
       {/* Intro header */}
       <div className="text-center space-y-4">
+        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-950/40 via-black to-amber-950/40 border border-amber-500/40 px-5 py-1.5 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.2)] mb-2">
+          <Store className="w-5 h-5 text-amber-400" />
+          <span className="font-display font-black text-amber-300 text-xs tracking-widest uppercase">
+            ABYSSAL EMPORIUM & ALTAR
+          </span>
+        </div>
         <h2 className="font-display font-black text-3xl md:text-4xl text-white tracking-widest text-shadow-gold">
-          SUMMONING PORTAL
+          VOID SHOP
         </h2>
-        <p className="text-sm text-gray-400 font-sans max-w-xl mx-auto">
-          Offer your accumulated gold and dark shards to the ancient altars. 
-          The abyss will answer with new entities for your army or powerful relics for your lord.
+        <p className="text-sm text-gray-400 font-sans max-w-xl mx-auto leading-relaxed">
+          Offer your accumulated gold and dark shards to acquire booster packs, legendary relics, or invoke forbidden Divine beings directly into your ranks.
         </p>
 
         {/* Tabs */}
-        <div className="flex justify-center gap-4 mt-6">
+        <div className="flex justify-center gap-3 mt-6 flex-wrap">
           <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('cards'); }}
-            className={`px-6 py-2 font-display font-black tracking-widest transition-all rounded-xl border ${
+            className={`px-5 py-2.5 font-display font-black tracking-widest transition-all rounded-xl border flex items-center gap-2 cursor-pointer ${
               activeTab === 'cards' 
                 ? 'bg-[#c5a880] text-black border-[#ebd09b] shadow-[0_0_15px_rgba(235,208,155,0.4)]' 
-                : 'bg-black/50 text-gray-500 border-gray-800 hover:text-[#ebd09b]'
+                : 'bg-black/50 text-gray-400 border-gray-800 hover:text-[#ebd09b] hover:border-gray-700'
             }`}
           >
-            CARDS
+            <Box className="w-4 h-4" />
+            <span>CARD PACKS</span>
           </button>
           <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('equipment'); }}
-            className={`px-6 py-2 font-display font-black tracking-widest transition-all rounded-xl border ${
+            className={`px-5 py-2.5 font-display font-black tracking-widest transition-all rounded-xl border flex items-center gap-2 cursor-pointer ${
               activeTab === 'equipment' 
                 ? 'bg-purple-900 text-white border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.4)]' 
-                : 'bg-black/50 text-gray-500 border-gray-800 hover:text-purple-400'
+                : 'bg-black/50 text-gray-400 border-gray-800 hover:text-purple-400 hover:border-gray-700'
             }`}
           >
-            EQUIPMENT
+            <Shield className="w-4 h-4" />
+            <span>RELIC CHESTS</span>
+          </button>
+          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('divine'); }}
+            className={`px-5 py-2.5 font-display font-black tracking-widest transition-all rounded-xl border flex items-center gap-2 cursor-pointer relative ${
+              activeTab === 'divine' 
+                ? 'bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-black border-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.6)]' 
+                : 'bg-amber-950/30 text-amber-400 border-amber-800/60 hover:border-amber-400 hover:shadow-[0_0_15px_rgba(245,158,11,0.3)]'
+            }`}
+          >
+            <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+            <span>DIVINE ALTAR</span>
+            <span className="bg-red-600 text-white text-[8px] font-mono px-1.5 py-0.5 rounded-full uppercase font-bold tracking-wider ml-1">
+              EXCLUSIVE
+            </span>
           </button>
         </div>
       </div>
@@ -370,6 +436,134 @@ export const GachaStoreView: React.FC = () => {
                 <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-8 h-8 object-contain " /> OPEN FOR 70 <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'divine' && (
+        <div className="space-y-8 max-w-6xl mx-auto">
+          {/* Banner */}
+          <div className="relative rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-amber-950/40 via-purple-950/30 to-black border border-amber-500/30 shadow-[0_0_30px_rgba(245,158,11,0.15)] overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="space-y-2 text-center md:text-left">
+                <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/40 px-3 py-1 rounded-full text-amber-300 text-xs font-mono font-bold tracking-widest uppercase">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  EXCLUSIVE CELESTIAL BEINGS
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-display font-black text-white tracking-widest text-shadow-gold">
+                  ALTAR OF THE DEMIURGE
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-300 font-sans max-w-2xl leading-relaxed">
+                  The most formidable primordial entities in the multiverse. Possessing unmatched stats and devastating skills, they <span className="text-amber-300 font-semibold">cannot be obtained from packs</span> or ascended via standard evolution.
+                </p>
+              </div>
+              <div className="shrink-0 flex items-center gap-3 bg-black/60 border border-amber-500/40 px-5 py-3 rounded-2xl shadow-inner">
+                <img src="/icons/icon_shards.webp" alt="Shards" className="w-9 h-9 object-contain drop-shadow-[0_0_8px_rgba(102,252,241,0.6)]" />
+                <div className="text-left">
+                  <div className="text-[10px] text-gray-400 font-mono font-bold uppercase tracking-wider">Your Balance</div>
+                  <div className="text-xl font-display font-black text-[#66fcf1] leading-none">{profile.darkShards || 0} <span className="text-xs text-gray-400">SHARDS</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Cards Showcase Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {CARD_TEMPLATES.filter(c => c.tier === 'divine').map((card) => {
+              const ownedCount = (profile.collection || []).filter(c => c.baseId === card.baseId).length;
+              const isBuyingThis = buyingCardId === card.baseId;
+
+              return (
+                <div 
+                  key={card.baseId} 
+                  className="bg-gradient-to-b from-[#18131d] via-[#120f18] to-black border-2 border-amber-500/40 hover:border-amber-400/80 rounded-3xl p-5 flex flex-col justify-between shadow-2xl hover:shadow-[0_0_35px_rgba(245,158,11,0.3)] transition-all duration-300 group relative overflow-hidden"
+                >
+                  {/* Subtle top glow */}
+                  <div className="absolute -top-24 -left-24 w-48 h-48 bg-amber-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
+
+                  <div className="space-y-4 relative z-10">
+                    {/* Card Portrait & Badges */}
+                    <div className="relative aspect-[3/3.8] rounded-2xl overflow-hidden border border-amber-400/30 shadow-lg bg-black/60">
+                      <img 
+                        src={card.image} 
+                        alt={card.name} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30 pointer-events-none" />
+
+                      {/* Tier & Delay Badges Top */}
+                      <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-10">
+                        <span className="px-2 py-0.5 rounded-lg border font-mono text-[9px] uppercase font-black tracking-wider bg-gradient-to-r from-amber-950 to-amber-900 text-amber-300 border-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.6)]">
+                          DIVINE
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          {renderManaIcon(getCardManaCost(card), "w-6 h-6")}
+                          <div className="bg-black/80 border border-amber-400/40 rounded-lg px-2 py-0.5 text-[9px] font-mono font-bold text-blue-300 backdrop-blur-sm shadow flex items-center gap-1">
+                            <span>⏳</span> {card.delay}T
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ATK & HP Badges Bottom */}
+                      <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between z-10">
+                        <div className="bg-black/85 border border-red-500/60 rounded-xl px-2.5 py-1 text-xs font-mono font-black text-red-400 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+                          <span className="text-sm">⚔️</span> {card.attack}
+                        </div>
+                        <div className="bg-black/85 border border-emerald-500/60 rounded-xl px-2.5 py-1 text-xs font-mono font-black text-emerald-400 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+                          <span className="text-sm">❤️</span> {card.health}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Title & Owned Status */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h4 className="font-display font-black text-lg text-white group-hover:text-amber-300 transition-colors tracking-wide leading-tight">
+                          {card.name}
+                        </h4>
+                        <p className="text-[11px] text-gray-400 font-sans mt-1 line-clamp-2 leading-relaxed">
+                          {card.description}
+                        </p>
+                      </div>
+                      {ownedCount > 0 && (
+                        <span className="shrink-0 bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 text-[10px] font-mono px-2 py-0.5 rounded-full font-bold">
+                          OWNED: {ownedCount}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Skills Box */}
+                    <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 space-y-2">
+                      <div className="text-[10px] font-mono uppercase font-bold text-amber-400 tracking-wider flex items-center gap-1">
+                        <Sparkles className="w-3 h-3" />
+                        DIVINE SKILLS:
+                      </div>
+                      <div className="space-y-1.5">
+                        {card.skills.map((skill, sIdx) => (
+                          <div key={sIdx} className="flex items-start gap-1.5 text-[10px]">
+                            <span className="font-bold text-amber-300 uppercase shrink-0">[{skill.type} {skill.value}]</span>
+                            <span className="text-gray-300 leading-snug">{skill.description}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Purchase Button */}
+                  <div className="mt-5 pt-3 border-t border-white/10 relative z-10">
+                    <button
+                      disabled={isBuyingThis}
+                      onClick={() => buyDivineCard(card.baseId)}
+                      className="w-full bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:to-yellow-400 active:scale-[0.98] text-black font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:shadow-[0_0_25px_rgba(245,158,11,0.7)] flex items-center justify-center gap-2 text-xs uppercase cursor-pointer disabled:opacity-50"
+                    >
+                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain drop-shadow" />
+                      {isBuyingThis ? 'INVOKING...' : 'SUMMON FOR 50 SHARDS'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

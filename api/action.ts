@@ -843,6 +843,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (profile.pveEnergyMax === undefined) profile.pveEnergyMax = 10;
       successMessage = `Restored +${energyCount} PvE Energy for ${shardCost} Shards!`;
       responseData = { energyCount, shardCost, newEnergy: profile.pveEnergy };
+    } else if (action === 'buy_divine_card') {
+      const { baseId } = payload || {};
+      const template = CARD_TEMPLATES.find((c: any) => c.baseId === baseId && c.tier === 'divine');
+      if (!template) {
+        return res.status(400).json({ error: 'Divine entity template not found.' });
+      }
+
+      const cardCost = 50;
+      const currentShards = profile.darkShards || 0;
+      if (currentShards < cardCost) {
+        return res.status(400).json({ error: 'Not enough Dark Shards' });
+      }
+
+      profile = recordShardTransaction(
+        profile,
+        'SHOP_PURCHASE',
+        -cardCost,
+        `Divine Altar summoning: ${template.name}`,
+        { baseId, cardCost }
+      );
+
+      const newCard = createCardInstance(template, 1);
+      profile.collection = profile.collection || [];
+      profile.collection.push(newCard);
+
+      successMessage = `Divine entity invoked: ${template.name}!`;
+      responseData = { newCard, profile };
     } else if (action === 'withdrawal') {
       const { amountSovereigns, targetAddress } = payload || {};
       const numAmount = parseInt(amountSovereigns, 10);

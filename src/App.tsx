@@ -13,7 +13,7 @@ import { PvpArenaView } from './components/PvpArenaView';
 import { HeroInventoryView } from './components/HeroInventoryView';
 import { TalentsView } from './components/TalentsView';
 import { CampaignStage } from './types';
-import { Swords, FolderGit, Sparkles, Landmark, Award, Trophy, UserCircle2 } from 'lucide-react';
+import { Swords, FolderGit, Sparkles, Landmark, Award, Trophy, UserCircle2, Store } from 'lucide-react';
 import { AIRDROP_TASKS } from './data/cards';
 import { LandingPage } from './components/LandingPage';
 import { RegistrationScreen } from './components/RegistrationScreen';
@@ -365,7 +365,7 @@ function MainAppContent() {
             <span className="text-[10px] font-display font-bold tracking-wider">LORD</span>
           </button>
 
-          {/* Altar Gacha Tab */}
+          {/* Shop Tab */}
           <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('altar'); }}
             className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
               activeTab === 'altar'
@@ -373,8 +373,8 @@ function MainAppContent() {
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            <Sparkles className="w-5 h-5" />
-            <span className="text-[10px] font-display font-bold tracking-wider">SUMMON</span>
+            <Store className="w-5 h-5" />
+            <span className="text-[10px] font-display font-bold tracking-wider">SHOP</span>
           </button>
 
           {/* Bank / Treasury Tab */}
