@@ -348,6 +348,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
   const [helpTab, setHelpTab] = useState<'basics' | 'skills' | 'defense'>('basics');
   const [showLogDrawer, setShowLogDrawer] = useState<boolean>(false);
+  const [logFilter, setLogFilter] = useState<'all' | 'damage' | 'skills' | 'deaths'>('all');
   const [hoveredHandCardIndex, setHoveredHandCardIndex] = useState<number | null>(null);
 
   // Track the final target battle state once the calculation resolves
@@ -1908,61 +1909,243 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           )}
         </button>
 
-        {/* Combat Log Drawer Overlay */}
+        {/* Combat Log Drawer Overlay (REDESIGNED AAA CHRONICLE) */}
         <AnimatePresence>
           {showLogDrawer && (
             <>
               <motion.div
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.5 }}
+                animate={{ opacity: 0.6 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setShowLogDrawer(false)}
-                className="fixed inset-0 bg-black z-45"
+                className="fixed inset-0 bg-black/80 backdrop-blur-sm z-45"
               />
               <motion.div
                 initial={{ x: '100%' }}
                 animate={{ x: 0 }}
                 exit={{ x: '100%' }}
-                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="fixed right-0 top-0 bottom-0 w-80 bg-[#0d1117]/95 border-l border-[#ebd09b]/25 z-50 p-4 flex flex-col justify-between shadow-2xl backdrop-blur-md"
+                transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+                className="fixed right-0 top-0 bottom-0 w-88 sm:w-[420px] bg-gradient-to-b from-[#131822] via-[#0d1017] to-[#0a0d13] border-l border-[#ebd09b]/35 z-50 p-4 sm:p-5 flex flex-col justify-between shadow-[-10px_0_40px_rgba(0,0,0,0.85)] backdrop-blur-md"
               >
-                <div className="flex justify-between items-center border-b border-gray-800 pb-3 mb-3">
-                  <h4 className="font-display font-bold text-xs text-red-400 tracking-wider uppercase flex items-center gap-1.5">
-                    <Scroll className="w-4 h-4 text-red-400" /> BLOODY DUEL LOG
-                  </h4>
-                  <button
-                    onClick={() => setShowLogDrawer(false)}
-                    className="text-gray-500 hover:text-white transition-all cursor-pointer p-1 rounded-lg border border-gray-800/80 hover:border-gray-700 bg-black/40"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+                {/* Header */}
+                <div className="border-b border-gray-800 pb-3 mb-2 space-y-2.5">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-red-950/60 border border-red-500/40 flex items-center justify-center">
+                        <Scroll className="w-4 h-4 text-red-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-display font-black text-xs sm:text-sm text-[#ebd09b] tracking-wider uppercase">
+                          Battle Chronicle
+                        </h4>
+                        <span className="text-[10px] font-mono text-gray-400 block -mt-0.5">Live Duel Combat Logs</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setShowLogDrawer(false)}
+                      className="text-gray-400 hover:text-white transition-all cursor-pointer p-1.5 rounded-lg border border-gray-800 hover:border-gray-600 bg-black/40"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Category Filter Tabs */}
+                  <div className="grid grid-cols-4 gap-1 p-1 bg-black/60 rounded-xl border border-gray-800 text-[10px] font-mono font-bold text-center">
+                    <button
+                      onClick={() => setLogFilter('all')}
+                      className={`py-1 rounded-lg transition-all cursor-pointer ${
+                        logFilter === 'all'
+                          ? 'bg-[#ebd09b] text-black font-black shadow'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      ALL
+                    </button>
+                    <button
+                      onClick={() => setLogFilter('damage')}
+                      className={`py-1 rounded-lg transition-all cursor-pointer ${
+                        logFilter === 'damage'
+                          ? 'bg-red-600 text-white font-black shadow'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      ⚔️ ATK
+                    </button>
+                    <button
+                      onClick={() => setLogFilter('skills')}
+                      className={`py-1 rounded-lg transition-all cursor-pointer ${
+                        logFilter === 'skills'
+                          ? 'bg-purple-600 text-white font-black shadow'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      🔮 SKILL
+                    </button>
+                    <button
+                      onClick={() => setLogFilter('deaths')}
+                      className={`py-1 rounded-lg transition-all cursor-pointer ${
+                        logFilter === 'deaths'
+                          ? 'bg-zinc-700 text-white font-black shadow'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      💀 DEAD
+                    </button>
+                  </div>
                 </div>
 
+                {/* Log List with Styled Event Cards */}
                 <div
                   id="combat-log-scroll"
-                  className="flex-1 overflow-y-auto font-mono text-[9px] text-gray-400 space-y-2 pr-1 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent"
+                  className="flex-1 overflow-y-auto text-xs space-y-2 pr-1 custom-scrollbar"
                 >
-                  {visualState.combatLog.map((log, index) => {
-                    let colorClass = 'text-gray-400';
-                    if (log.includes('TURN')) colorClass = 'text-cyan-400 font-bold border-t border-gray-800 pt-2 mt-2';
-                    else if (log.includes('VICTORY') || log.includes('healed')) colorClass = 'text-emerald-400 font-bold';
-                    else if (log.includes('DEFEAT') || log.includes('fell') || log.includes('Death')) colorClass = 'text-red-500 font-bold';
-                    else if (log.includes('Sacrifice') || log.includes('💀')) colorClass = 'text-yellow-500';
-                    else if (log.includes('Hex')) colorClass = 'text-purple-400';
-                    else if (log.includes('Enemy') || log.includes('😈')) colorClass = 'text-rose-300';
+                  {visualState.combatLog
+                    .filter(log => {
+                      if (logFilter === 'all') return true;
+                      if (logFilter === 'damage') return log.includes('damage') || log.includes('deals') || log.includes('Breakthrough') || log.includes('hits') || log.includes('--- TURN') || log.includes('--- Turn');
+                      if (logFilter === 'skills') return log.includes('Vampirism') || log.includes('Hex') || log.includes('Plague') || log.includes('Sacrifice') || log.includes('healed') || log.includes('Barrier') || log.includes('Armor') || log.includes('⚡') || log.includes('--- TURN') || log.includes('--- Turn');
+                      if (logFilter === 'deaths') return log.includes('destroyed') || log.includes('turns to dust') || log.includes('fell') || log.includes('Death') || log.includes('💀') || log.includes('VICTORY') || log.includes('DEFEAT') || log.includes('--- TURN') || log.includes('--- Turn');
+                      return true;
+                    })
+                    .map((log, index) => {
+                      // 1. Turn Divider
+                      if (log.includes('--- TURN') || log.includes('--- Turn')) {
+                        const turnNum = log.replace(/[^0-9]/g, '') || '?';
+                        return (
+                          <div key={index} className="flex items-center gap-2 my-2 py-1 px-3 rounded-lg bg-gradient-to-r from-amber-950/70 via-black/60 to-transparent border-l-2 border-[#ebd09b]">
+                            <Swords className="w-3.5 h-3.5 text-[#ebd09b]" />
+                            <span className="font-display font-black text-xs text-[#ebd09b] tracking-wider uppercase">
+                              TURN {turnNum}
+                            </span>
+                          </div>
+                        );
+                      }
 
-                    return (
-                      <div key={index} className="border-b border-gray-900/30 pb-1 leading-relaxed" dangerouslySetInnerHTML={{ __html: log }} />
-                    );
-                  })}
+                      // 2. Battle Start
+                      if (log.includes('Battle has begun')) {
+                        return (
+                          <div key={index} className="p-2.5 rounded-xl bg-black/40 border border-white/10 text-gray-300 text-[11px] sm:text-xs flex items-center gap-2.5">
+                            <span className="text-base shrink-0">⚔️</span>
+                            <span className="font-sans leading-relaxed">{log}</span>
+                          </div>
+                        );
+                      }
+
+                      // 3. Breakthrough (Direct Face Damage)
+                      if (log.includes('Breakthrough') || log.includes('direct damage')) {
+                        return (
+                          <div key={index} className="p-2.5 rounded-xl bg-gradient-to-r from-red-950/40 to-black/50 border border-red-800/40 text-[11px] sm:text-xs flex items-start gap-2.5 shadow-sm">
+                            <span className="text-base shrink-0">🎯</span>
+                            <div className="flex-1 leading-relaxed text-gray-200 font-sans">
+                              <span dangerouslySetInnerHTML={{ __html: log }} />
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // 4. Destruction / Death
+                      if (log.includes('destroyed') || log.includes('turns to dust') || log.includes('fell') || log.includes('Death') || log.includes('DEFEAT')) {
+                        return (
+                          <div key={index} className="p-2.5 rounded-xl bg-black/70 border border-red-950/80 text-[11px] sm:text-xs flex items-start gap-2.5 shadow-inner">
+                            <span className="text-base shrink-0">💀</span>
+                            <div className="flex-1 text-red-300/95 leading-relaxed font-sans font-medium">
+                              <span dangerouslySetInnerHTML={{ __html: log }} />
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // 5. Sacrifice
+                      if (log.includes('Sacrifice') || log.includes('💀 Sacrifice')) {
+                        return (
+                          <div key={index} className="p-2.5 rounded-xl bg-gradient-to-r from-amber-950/35 to-black/50 border border-amber-800/40 text-[11px] sm:text-xs flex items-start gap-2.5">
+                            <span className="text-base shrink-0">💀</span>
+                            <div className="flex-1 text-amber-200 leading-relaxed font-sans">
+                              <span dangerouslySetInnerHTML={{ __html: log }} />
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // 6. Healing / Vampirism
+                      if (log.includes('healed') || log.includes('Vampirism') || log.includes('🩸')) {
+                        return (
+                          <div key={index} className="p-2.5 rounded-xl bg-gradient-to-r from-emerald-950/35 to-black/50 border border-emerald-800/40 text-[11px] sm:text-xs flex items-start gap-2.5">
+                            <span className="text-base shrink-0">🩸</span>
+                            <div className="flex-1 text-emerald-200 leading-relaxed font-sans">
+                              <span dangerouslySetInnerHTML={{ __html: log }} />
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // 7. Hex / Curses
+                      if (log.includes('Hex') || log.includes('hexes') || log.includes('🔮')) {
+                        return (
+                          <div key={index} className="p-2.5 rounded-xl bg-gradient-to-r from-purple-950/35 to-black/50 border border-purple-800/40 text-[11px] sm:text-xs flex items-start gap-2.5">
+                            <span className="text-base shrink-0">🔮</span>
+                            <div className="flex-1 text-purple-200 leading-relaxed font-sans">
+                              <span dangerouslySetInnerHTML={{ __html: log }} />
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // 8. Plague
+                      if (log.includes('Plague') || log.includes('poisonous spores') || log.includes('🧪')) {
+                        return (
+                          <div key={index} className="p-2.5 rounded-xl bg-gradient-to-r from-emerald-950/35 to-black/50 border border-emerald-800/40 text-[11px] sm:text-xs flex items-start gap-2.5">
+                            <span className="text-base shrink-0">🧪</span>
+                            <div className="flex-1 text-emerald-300 leading-relaxed font-sans">
+                              <span dangerouslySetInnerHTML={{ __html: log }} />
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // 9. Barrier & Armor
+                      if (log.includes('Barrier') || log.includes('Armor') || log.includes('🛡️')) {
+                        return (
+                          <div key={index} className="p-2.5 rounded-xl bg-gradient-to-r from-cyan-950/35 to-black/50 border border-cyan-800/40 text-[11px] sm:text-xs flex items-start gap-2.5">
+                            <span className="text-base shrink-0">🛡️</span>
+                            <div className="flex-1 text-cyan-200 leading-relaxed font-sans">
+                              <span dangerouslySetInnerHTML={{ __html: log }} />
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // 10. Hero Skills & Commander Stance
+                      if (log.includes('⚡') || log.includes('Commander') || log.includes('Void Strike')) {
+                        return (
+                          <div key={index} className="p-2.5 rounded-xl bg-gradient-to-r from-indigo-950/40 to-black/50 border border-indigo-700/50 text-[11px] sm:text-xs flex items-start gap-2.5 shadow-sm">
+                            <span className="text-base shrink-0">⚡</span>
+                            <div className="flex-1 text-indigo-200 leading-relaxed font-sans font-medium">
+                              <span dangerouslySetInnerHTML={{ __html: log }} />
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // Default Attack/Clash Event Card
+                      return (
+                        <div key={index} className="p-2.5 rounded-xl bg-black/40 border border-white/5 text-[11px] sm:text-xs text-gray-300 flex items-start gap-2.5 leading-relaxed font-sans">
+                          <span className="text-base shrink-0 opacity-70">🗡️</span>
+                          <div className="flex-1">
+                            <span dangerouslySetInnerHTML={{ __html: log }} />
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
 
-                <div className="border-t border-gray-800 pt-3 mt-3">
+                {/* Footer */}
+                <div className="border-t border-gray-800 pt-3 mt-2">
                   <button
                     onClick={() => setShowLogDrawer(false)}
-                    className="w-full bg-black/40 hover:bg-black/60 border border-gray-800 text-gray-400 hover:text-white py-2 rounded-xl text-xs font-mono font-bold cursor-pointer transition-all"
+                    className="w-full bg-black/50 hover:bg-black/80 border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white py-2.5 rounded-xl text-xs font-mono font-bold cursor-pointer transition-all tracking-wider uppercase"
                   >
-                    CLOSE LOG
+                    CLOSE CHRONICLE
                   </button>
                 </div>
               </motion.div>
