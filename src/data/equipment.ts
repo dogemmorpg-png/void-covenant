@@ -1,4 +1,4 @@
-import { Equipment, EquipmentSlot, CardTier } from '../types';
+import { Equipment, EquipmentSlot, CardTier, EquipmentSetDefinition } from '../types';
 
 export const EQUIPMENT_ICONS: Record<string, string> = {
   // BRONZE
@@ -54,8 +54,15 @@ export const EQUIPMENT_ICONS: Record<string, string> = {
   'Chronos Aegis': '/icons/equipment/items/chronos_aegis.png',
   'Gaze of the Voidgod': '/icons/equipment/items/gaze_of_the_voidgod.png',
   'Ring of Infinite Ruin': '/icons/equipment/items/ring_of_infinite_ruin.png',
-  'Singularity Core': '/icons/equipment/items/singularity_core.png',
   'Voidwalker Striders': '/icons/equipment/items/voidwalker_striders.png',
+
+  // DIVINE - SET OF THE DEMIURGE
+  'Blade of the Demiurge': '/icons/equipment/items/abyssal_blade.png',
+  'Carapace of the Demiurge': '/icons/equipment/items/voidplate_armor.png',
+  'Crown of the Demiurge': '/icons/equipment/items/crown_of_thorns.png',
+  'Striders of the Demiurge': '/icons/equipment/items/voidwalker_striders.png',
+  'Seal of the Demiurge': '/icons/equipment/items/ring_of_infinite_ruin.png',
+  'Heart of the Demiurge': '/icons/equipment/items/singularity_core.png',
 };
 
 export const getEquipmentIcon = (nameOrItem?: string | Equipment | null, fallbackSlot?: EquipmentSlot): string => {
@@ -127,7 +134,186 @@ export const EQUIPMENT_TEMPLATES: Omit<Equipment, 'id'>[] = [
   { name: 'Singularity Core', slot: 'amulet', tier: 'legendary', bonusType: 'delayReduction', bonusValue: 1, icon: '/icons/equipment/items/singularity_core.png' },
   { name: 'Boots of the Apocalypse', slot: 'boots', tier: 'legendary', bonusType: 'dodge', bonusValue: 3, icon: '/icons/equipment/items/boots_of_the_apocalypse.png' },
   { name: 'Voidwalker Striders', slot: 'boots', tier: 'legendary', bonusType: 'goldBonus', bonusValue: 15, icon: '/icons/equipment/items/voidwalker_striders.png' },
+
+  // DIVINE TIER - SET OF THE DEMIURGE (6 items)
+  {
+    name: 'Blade of the Demiurge',
+    slot: 'weapon',
+    tier: 'divine',
+    bonusType: 'delayReduction',
+    bonusValue: 1,
+    secondaryBonusType: 'maxHealth',
+    secondaryBonusValue: 15,
+    setId: 'demiurge',
+    description: 'Древний клинок, рассекающий ткань пространства и ускоряющий призыв союзных сущностей.',
+    icon: '/icons/equipment/items/abyssal_blade.png'
+  },
+  {
+    name: 'Carapace of the Demiurge',
+    slot: 'armor',
+    tier: 'divine',
+    bonusType: 'maxHealth',
+    bonusValue: 35,
+    setId: 'demiurge',
+    description: 'Непробиваемый панцирь, выкованный из осколков угасших сверхновых.',
+    icon: '/icons/equipment/items/voidplate_armor.png'
+  },
+  {
+    name: 'Crown of the Demiurge',
+    slot: 'helmet',
+    tier: 'divine',
+    bonusType: 'maxHealth',
+    bonusValue: 25,
+    secondaryBonusType: 'dodge',
+    secondaryBonusValue: 4,
+    setId: 'demiurge',
+    description: 'Венец абсолютного владычества, дарующий прозрение и защиту от ударов.',
+    icon: '/icons/equipment/items/crown_of_thorns.png'
+  },
+  {
+    name: 'Striders of the Demiurge',
+    slot: 'boots',
+    tier: 'divine',
+    bonusType: 'dodge',
+    bonusValue: 7,
+    secondaryBonusType: 'maxHealth',
+    secondaryBonusValue: 15,
+    setId: 'demiurge',
+    description: 'Поступь творца, позволяющая ускользать от сокрушительных выпадов Бездны.',
+    icon: '/icons/equipment/items/voidwalker_striders.png'
+  },
+  {
+    name: 'Seal of the Demiurge',
+    slot: 'ring',
+    tier: 'divine',
+    bonusType: 'goldBonus',
+    bonusValue: 25,
+    secondaryBonusType: 'maxHealth',
+    secondaryBonusValue: 20,
+    setId: 'demiurge',
+    description: 'Перстень с печатью Первородного, приумножающий добываемые сокровища.',
+    icon: '/icons/equipment/items/ring_of_infinite_ruin.png'
+  },
+  {
+    name: 'Heart of the Demiurge',
+    slot: 'amulet',
+    tier: 'divine',
+    bonusType: 'maxHealth',
+    bonusValue: 30,
+    secondaryBonusType: 'dodge',
+    secondaryBonusValue: 5,
+    setId: 'demiurge',
+    description: 'Пульсирующее ядро созидания, поддерживающее непрекращающуюся жизнь владельца.',
+    icon: '/icons/equipment/items/singularity_core.png'
+  },
 ];
+
+export const DEMIURGE_SET: EquipmentSetDefinition = {
+  setId: 'demiurge',
+  name: 'Set of the Demiurge',
+  description: 'Ancient relics forged from primordial void and stellar flame.',
+  color: 'text-rose-500',
+  thresholds: [
+    {
+      pieces: 2,
+      label: "Demiurge's Vitality",
+      description: '+30 Max Hero HP, +5% Dodge',
+      bonus: { maxHealth: 30, dodge: 5 }
+    },
+    {
+      pieces: 4,
+      label: 'Temporal Warp',
+      description: '-1 Turn Delay on all friendly cards',
+      bonus: { delayReduction: 1 }
+    },
+    {
+      pieces: 6,
+      label: 'Cosmic Apotheosis',
+      description: '+1 Starting Mana, +50 Max Hero HP, +3 ATK / +8 HP to summoned creatures',
+      bonus: { startingMana: 1, maxHealth: 50, creatureAtkBuff: 3, creatureHpBuff: 8 }
+    }
+  ]
+};
+
+export const ALL_EQUIPMENT_SETS: Record<string, EquipmentSetDefinition> = {
+  demiurge: DEMIURGE_SET
+};
+
+export interface ActiveSetBonusResult {
+  setId: string;
+  setName: string;
+  piecesEquipped: number;
+  totalPieces: number;
+  thresholds: {
+    pieces: number;
+    label: string;
+    description: string;
+    isActive: boolean;
+  }[];
+  totalBonuses: {
+    maxHealth: number;
+    dodge: number;
+    delayReduction: number;
+    startingMana: number;
+    creatureAtkBuff: number;
+    creatureHpBuff: number;
+  };
+}
+
+export const calculateEquipmentSetBonuses = (equippedItems: (Equipment | null | undefined)[]): ActiveSetBonusResult[] => {
+  const results: ActiveSetBonusResult[] = [];
+  
+  // Group equipped items by setId
+  const setCounts: Record<string, number> = {};
+  equippedItems.forEach(item => {
+    if (item && item.setId) {
+      setCounts[item.setId] = (setCounts[item.setId] || 0) + 1;
+    }
+  });
+
+  Object.entries(setCounts).forEach(([setId, count]) => {
+    const setDef = ALL_EQUIPMENT_SETS[setId];
+    if (!setDef) return;
+
+    const totalBonuses = {
+      maxHealth: 0,
+      dodge: 0,
+      delayReduction: 0,
+      startingMana: 0,
+      creatureAtkBuff: 0,
+      creatureHpBuff: 0,
+    };
+
+    const thresholds = setDef.thresholds.map(t => {
+      const isActive = count >= t.pieces;
+      if (isActive) {
+        if (t.bonus.maxHealth) totalBonuses.maxHealth += t.bonus.maxHealth;
+        if (t.bonus.dodge) totalBonuses.dodge += t.bonus.dodge;
+        if (t.bonus.delayReduction) totalBonuses.delayReduction += t.bonus.delayReduction;
+        if (t.bonus.startingMana) totalBonuses.startingMana += t.bonus.startingMana;
+        if (t.bonus.creatureAtkBuff) totalBonuses.creatureAtkBuff += t.bonus.creatureAtkBuff;
+        if (t.bonus.creatureHpBuff) totalBonuses.creatureHpBuff += t.bonus.creatureHpBuff;
+      }
+      return {
+        pieces: t.pieces,
+        label: t.label,
+        description: t.description,
+        isActive
+      };
+    });
+
+    results.push({
+      setId,
+      setName: setDef.name,
+      piecesEquipped: count,
+      totalPieces: 6,
+      thresholds,
+      totalBonuses
+    });
+  });
+
+  return results;
+};
 
 export const generateEquipmentInstance = (template: Omit<Equipment, 'id'>): Equipment => {
   return {
@@ -140,6 +326,9 @@ export const getRandomEquipmentByTier = (tier: CardTier | 'random'): Omit<Equipm
   let pool = EQUIPMENT_TEMPLATES;
   if (tier !== 'random') {
     pool = pool.filter(e => e.tier === tier);
+  } else {
+    // Divine equipment never drops from random chests
+    pool = pool.filter(e => e.tier !== 'divine');
   }
   return pool[Math.floor(Math.random() * pool.length)];
 };

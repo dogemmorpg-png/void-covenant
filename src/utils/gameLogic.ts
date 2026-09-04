@@ -29,7 +29,15 @@ export function toBattleCard(card: Card): BattleCardState {
 }
 
 // Initialize battle state
-export function initializeBattle(playerDeck: Card[], stage: CampaignStage, playerHeroMaxHealth: number = 100, dodgeChance: number = 0, delayReduction: number = 0): BattleState {
+export function initializeBattle(
+  playerDeck: Card[],
+  stage: CampaignStage,
+  playerHeroMaxHealth: number = 100,
+  dodgeChance: number = 0,
+  delayReduction: number = 0,
+  startingMana: number = 1,
+  creatureBuff: { atk: number; hp: number } = { atk: 0, hp: 0 }
+): BattleState {
   // Shuffle player deck
   const shuffledDeck = [...playerDeck].sort(() => Math.random() - 0.5);
   
@@ -46,8 +54,8 @@ export function initializeBattle(playerDeck: Card[], stage: CampaignStage, playe
     playerHeroMaxHealth: playerHeroMaxHealth,
     enemyHeroHealth: stage.enemyHeroHealth,
     enemyHeroMaxHealth: stage.enemyHeroHealth,
-    playerMana: 1,
-    playerMaxMana: 1,
+    playerMana: startingMana,
+    playerMaxMana: startingMana,
     enemyMana: 1,
     enemyMaxMana: 1,
     playerBoard: Array(5).fill(null),
@@ -61,7 +69,8 @@ export function initializeBattle(playerDeck: Card[], stage: CampaignStage, playe
     phase: 'player_play',
     combatLog: ['Battle has begun! Place your cards on the battlefield.'],
     playerDodgeChance: dodgeChance,
-    playerDelayReduction: delayReduction
+    playerDelayReduction: delayReduction,
+    playerCreatureBuff: creatureBuff
   };
 }
 
@@ -422,6 +431,14 @@ export function simulateCombatTurn(
       if (delayReduc > 0) {
         battleCard.delay = Math.max(0, battleCard.delay - delayReduc);
         battleCard.initialDelay = Math.max(0, battleCard.initialDelay - delayReduc);
+      }
+
+      // Apply Set Bonus creature buff (e.g. 6-piece Demiurge Apotheosis)
+      if (state.playerCreatureBuff && (state.playerCreatureBuff.atk > 0 || state.playerCreatureBuff.hp > 0)) {
+        battleCard.attack += state.playerCreatureBuff.atk;
+        battleCard.health += state.playerCreatureBuff.hp;
+        battleCard.maxHealth += state.playerCreatureBuff.hp;
+        state.combatLog.push(`⚡ Demiurge Apotheosis: ${battleCard.name} is empowered with +${state.playerCreatureBuff.atk} ATK and +${state.playerCreatureBuff.hp} HP!`);
       }
 
       // Place the card on the board
@@ -885,6 +902,14 @@ export function placeCardLocally(
   if (delayReduc > 0) {
     battleCard.delay = Math.max(0, battleCard.delay - delayReduc);
     battleCard.initialDelay = Math.max(0, battleCard.initialDelay - delayReduc);
+  }
+  
+  // Apply Set Bonus creature buff
+  if (state.playerCreatureBuff && (state.playerCreatureBuff.atk > 0 || state.playerCreatureBuff.hp > 0)) {
+    battleCard.attack += state.playerCreatureBuff.atk;
+    battleCard.health += state.playerCreatureBuff.hp;
+    battleCard.maxHealth += state.playerCreatureBuff.hp;
+    state.combatLog.push(`⚡ Demiurge Apotheosis: ${battleCard.name} is empowered with +${state.playerCreatureBuff.atk} ATK and +${state.playerCreatureBuff.hp} HP!`);
   }
   
   state.playerBoard[slotIndex] = battleCard;

@@ -6,7 +6,7 @@ import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CARD_TEMPLATES, createCardInstance, getCardManaCost } from '../data/cards';
 import { Card, CardTier, Equipment } from '../types';
-import { getRandomEquipmentByTier, generateEquipmentInstance, getEquipmentIcon } from '../data/equipment';
+import { getRandomEquipmentByTier, generateEquipmentInstance, getEquipmentIcon, EQUIPMENT_TEMPLATES, DEMIURGE_SET } from '../data/equipment';
 import { Gem, Coins, Sparkles, Box, Trash2, Shield, Flame, Skull, Sword, Store, Crown, Zap } from 'lucide-react';
 import { assetPreloader, getCardImageUrl } from '../utils/assetPreloader';
 
@@ -87,6 +87,52 @@ export const GachaStoreView: React.FC = () => {
       toast('Network error during purchase', 'error');
     } finally {
       setBuyingCardId(null);
+    }
+  };
+
+  const [buyingEquipName, setBuyingEquipName] = useState<string | null>(null);
+
+  const buyDivineEquipment = async (itemName: string) => {
+    const equipCost = 50;
+    if ((profile.darkShards || 0) < equipCost) {
+      setIsShardsShopOpen(true);
+      toast('Insufficient Dark Shards! Opening Shards Shop...', 'warning');
+      return;
+    }
+
+    try {
+      setBuyingEquipName(itemName);
+      const token = localStorage.getItem('void_covenant_token');
+      if (!token) {
+        toast('You must be logged in to purchase', 'error');
+        return;
+      }
+
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action: 'buy_divine_equipment', payload: { itemName } })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (data.profile) {
+          setProfile(data.profile);
+        }
+        audioSystem.playVictory();
+        triggerOpeningAnimationBackend('divine_equip', [], [data.newEquipment]);
+        toast(`🛡️ Divine artifact forged: ${data.newEquipment.name}!`, 'success');
+      } else {
+        toast(data.error || 'Failed to forge divine artifact', 'error');
+      }
+    } catch (err: any) {
+      console.error('Divine equipment purchase error:', err);
+      toast('Network error during purchase', 'error');
+    } finally {
+      setBuyingEquipName(null);
     }
   };
 
@@ -567,6 +613,182 @@ export const GachaStoreView: React.FC = () => {
               );
             })}
           </div>
+
+          {/* DIVINE EQUIPMENT SET: RELICS OF THE DEMIURGE */}
+          <div className="mt-16 pt-10 border-t border-rose-950/70 space-y-8">
+            {/* Section Header with Set Bonus Tracker */}
+            <div className="bg-gradient-to-r from-[#20080f] via-[#14050a] to-[#20080f] border-2 border-rose-500/40 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-80 h-80 bg-rose-600/10 rounded-full blur-3xl pointer-events-none" />
+              
+              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
+                <div className="space-y-1.5 max-w-xl">
+                  <div className="flex items-center gap-2">
+                    <span className="bg-rose-500 text-white font-mono text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(244,63,94,0.7)]">
+                      DIVINE ARTIFACT SET
+                    </span>
+                    <span className="text-gray-400 font-mono text-xs">
+                      • {DEMIURGE_SET.thresholds.length} SET BONUSES
+                    </span>
+                  </div>
+                  <h3 className="font-display font-black text-2xl md:text-3xl text-white tracking-wider flex items-center gap-2.5">
+                    <Shield className="w-6 h-6 text-rose-400 shrink-0" />
+                    <span>RELICS OF THE DEMIURGE</span>
+                  </h3>
+                  <p className="text-xs text-gray-300 font-sans leading-relaxed">
+                    Forge and assemble the 6 sacred pieces of the Primordial Creator to awaken devastating cosmic set resonance.
+                  </p>
+                </div>
+
+                {/* Equipped / Owned Counter */}
+                {(() => {
+                  const demiurgeItems = EQUIPMENT_TEMPLATES.filter(e => e.setId === 'demiurge');
+                  const ownedCount = demiurgeItems.filter(t => (profile.equipment || []).some(e => e.name === t.name)).length;
+                  return (
+                    <div className="bg-black/75 border border-rose-500/30 rounded-2xl px-5 py-3 text-center shrink-0 shadow-lg backdrop-blur-sm">
+                      <span className="text-[10px] font-mono uppercase font-bold text-gray-400 block tracking-wider">Set Progress</span>
+                      <div className="font-display font-black text-2xl text-rose-400">
+                        {ownedCount} <span className="text-gray-500 text-base">/ 6</span>
+                      </div>
+                      <span className="text-[9px] font-mono font-bold text-rose-300/80">COLLECTED</span>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Set Bonus Milestones Banner */}
+              <div className="mt-6 pt-5 border-t border-rose-500/20 grid grid-cols-1 md:grid-cols-3 gap-3 relative z-10">
+                {(() => {
+                  const demiurgeItems = EQUIPMENT_TEMPLATES.filter(e => e.setId === 'demiurge');
+                  const ownedCount = demiurgeItems.filter(t => (profile.equipment || []).some(e => e.name === t.name)).length;
+                  return DEMIURGE_SET.thresholds.map((threshold, tIdx) => {
+                    const isAchieved = ownedCount >= threshold.pieces;
+                    return (
+                      <div 
+                        key={tIdx}
+                        className={`rounded-xl p-3 border transition-all ${
+                          isAchieved
+                            ? 'bg-gradient-to-r from-rose-950/90 to-red-950/70 border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.4)]'
+                            : 'bg-black/50 border-white/10 opacity-75'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span className={`text-[10px] font-mono font-black uppercase tracking-wider ${isAchieved ? 'text-rose-300' : 'text-gray-400'}`}>
+                            [{threshold.pieces} PIECES] {threshold.label}
+                          </span>
+                          {isAchieved ? (
+                            <span className="text-[9px] font-mono font-black text-rose-400 bg-rose-950/80 border border-rose-500/50 px-1.5 py-0.5 rounded shadow">ACTIVE</span>
+                          ) : (
+                            <span className="text-[9px] font-mono text-gray-500">LOCKED</span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-gray-300 font-sans leading-snug">
+                          {threshold.description}
+                        </p>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+            </div>
+
+            {/* 6 Equipment Pieces Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {EQUIPMENT_TEMPLATES.filter(e => e.setId === 'demiurge').map((item) => {
+                const isOwned = (profile.equipment || []).some(e => e.name === item.name);
+                const isEquipped = Object.values(profile.equipped || {}).some(id => {
+                  const eq = (profile.equipment || []).find(e => e.id === id);
+                  return eq?.name === item.name;
+                });
+                const isForging = buyingEquipName === item.name;
+
+                return (
+                  <div
+                    key={item.name}
+                    className="bg-gradient-to-b from-[#1c080d] via-[#14060a] to-black border-2 border-rose-500/40 hover:border-rose-400/90 rounded-3xl p-5 flex flex-col justify-between shadow-2xl hover:shadow-[0_0_35px_rgba(244,63,94,0.35)] transition-all duration-300 group relative overflow-hidden"
+                  >
+                    {/* Ambient corner glow */}
+                    <div className="absolute -top-20 -left-20 w-40 h-40 bg-rose-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-rose-500/20 transition-all" />
+
+                    <div className="space-y-4 relative z-10">
+                      {/* Top Badges */}
+                      <div className="flex items-center justify-between">
+                        <span className="px-2.5 py-0.5 rounded-lg border font-mono text-[9px] uppercase font-black tracking-wider bg-rose-950/80 text-rose-300 border-rose-500/50 shadow">
+                          {item.slot}
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-lg border font-mono text-[9px] uppercase font-black tracking-wider bg-gradient-to-r from-red-950 to-rose-900 text-rose-300 border-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.7)]">
+                          DIVINE SET
+                        </span>
+                      </div>
+
+                      {/* Item Icon Box */}
+                      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-rose-400/30 shadow-lg bg-black/60 flex items-center justify-center p-6 group-hover:border-rose-400/60 transition-colors">
+                        <img
+                          src={getEquipmentIcon(item.name, item.slot)}
+                          alt={item.name}
+                          className="w-24 h-24 object-contain filter drop-shadow-[0_0_16px_rgba(244,63,94,0.6)] group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+
+                      {/* Title & Status */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <h4 className="font-display font-black text-base text-white group-hover:text-rose-400 transition-colors tracking-wide leading-tight">
+                            {item.name}
+                          </h4>
+                          <p className="text-[11px] text-gray-400 font-sans mt-1 line-clamp-2 leading-relaxed">
+                            {item.description}
+                          </p>
+                        </div>
+                        {isEquipped ? (
+                          <span className="shrink-0 bg-cyan-950/80 border border-cyan-500/50 text-cyan-300 text-[9px] font-mono px-2 py-0.5 rounded-full font-bold shadow">
+                            EQUIPPED
+                          </span>
+                        ) : isOwned ? (
+                          <span className="shrink-0 bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-[9px] font-mono px-2 py-0.5 rounded-full font-bold shadow">
+                            OWNED
+                          </span>
+                        ) : null}
+                      </div>
+
+                      {/* Stat Bonuses */}
+                      <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 space-y-1.5">
+                        <div className="flex items-center justify-between text-[11px] font-mono">
+                          <span className="text-gray-400">Primary Power:</span>
+                          <span className="text-rose-300 font-black">
+                            {item.bonusType === 'delayReduction' ? `-${item.bonusValue} Delay` :
+                             item.bonusType === 'dodge' ? `+${item.bonusValue}% Dodge` :
+                             item.bonusType === 'goldBonus' ? `+${item.bonusValue}% Gold` :
+                             `+${item.bonusValue} Max HP`}
+                          </span>
+                        </div>
+                        {item.secondaryBonusType && (
+                          <div className="flex items-center justify-between text-[11px] font-mono pt-1 border-t border-white/5">
+                            <span className="text-gray-400">Secondary Power:</span>
+                            <span className="text-rose-300 font-black">
+                              {item.secondaryBonusType === 'dodge' ? `+${item.secondaryBonusValue}% Dodge` :
+                               `+${item.secondaryBonusValue} Max HP`}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Forge Button */}
+                    <div className="mt-5 pt-3 border-t border-white/10 relative z-10">
+                      <button
+                        disabled={isForging}
+                        onClick={() => buyDivineEquipment(item.name)}
+                        className="w-full bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 hover:from-rose-500 hover:to-red-400 active:scale-[0.98] text-white font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(244,63,94,0.5)] hover:shadow-[0_0_25px_rgba(244,63,94,0.8)] flex items-center justify-center gap-2 text-xs uppercase cursor-pointer disabled:opacity-50"
+                      >
+                        <img src="/icons/icon_shards.webp" alt="Shards" className="w-5 h-5 object-contain drop-shadow" />
+                        {isForging ? 'FORGING...' : 'FORGE FOR 50 SHARDS'}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       )}
 
@@ -680,6 +902,7 @@ export const GachaStoreView: React.FC = () => {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       transition={{ delay: idx * 0.2, type: 'spring' }}
                       className={`relative w-48 h-64 rounded-2xl flex flex-col items-center justify-between border-2 shadow-2xl overflow-hidden p-4 ${
+                        eq.tier === 'divine' ? 'bg-gradient-to-br from-rose-950 via-[#26050d] to-black border-rose-500 shadow-[0_0_35px_rgba(244,63,94,0.7)] ring-1 ring-rose-400/60' :
                         eq.tier === 'legendary' ? 'bg-gradient-to-br from-purple-950 via-[#180424] to-black border-purple-500 shadow-[0_0_30px_rgba(168,85,247,0.5)]' :
                         eq.tier === 'gold' ? 'bg-gradient-to-br from-yellow-950 via-[#1f1404] to-black border-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.35)]' :
                         eq.tier === 'silver' ? 'bg-gradient-to-br from-slate-900 via-[#101720] to-black border-slate-400' :

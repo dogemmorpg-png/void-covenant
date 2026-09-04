@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { Equipment, EquipmentSlot, CardTier } from '../types';
-import { getEquipmentIcon } from '../data/equipment';
+import { getEquipmentIcon, calculateEquipmentSetBonuses, DEMIURGE_SET } from '../data/equipment';
 import { TalentsView } from './TalentsView';
 import { Shield, Sword, Heart, Sparkles, Coins, Hourglass, Wind, Zap, Activity, Flame, Check, RefreshCw, X } from 'lucide-react';
 import { VoidStrikeIcon, BloodAuraIcon, WarlordCryIcon } from './SkillAndStanceIcons';
@@ -49,6 +49,13 @@ const TIER_STYLES: Record<CardTier, { border: string; bg: string; text: string; 
     text: 'text-purple-300',
     glow: 'shadow-[0_0_22px_rgba(168,85,247,0.45)]',
     itemGlow: 'drop-shadow-[0_0_16px_rgba(168,85,247,0.45)]'
+  },
+  divine: {
+    border: 'border-rose-500/90 hover:border-rose-400',
+    bg: 'from-[#350811]/90 via-[#1c0409]/90 to-black',
+    text: 'text-rose-400 font-bold',
+    glow: 'shadow-[0_0_24px_rgba(244,63,94,0.6)] ring-1 ring-rose-400/50',
+    itemGlow: 'drop-shadow-[0_0_16px_rgba(244,63,94,0.7)]'
   }
 };
 
@@ -68,11 +75,26 @@ export const HeroInventoryView: React.FC = () => {
 
   const equippedList = [eqHelmet, eqArmor, eqWeapon, eqAmulet, eqRing, eqBoots].filter(Boolean) as Equipment[];
 
+  // Set Bonus Calculations
+  const setBonusResults = calculateEquipmentSetBonuses(equippedList);
+  const demiurgeBonus = setBonusResults.find(s => s.setId === 'demiurge');
+
+  const setBonusHealth = demiurgeBonus?.totalBonuses.maxHealth || 0;
+  const setBonusDodge = demiurgeBonus?.totalBonuses.dodge || 0;
+  const setBonusDelay = demiurgeBonus?.totalBonuses.delayReduction || 0;
+
   // Bonus Calculations
-  const bonusHealth = equippedList.filter(e => e.bonusType === 'maxHealth').reduce((sum, e) => sum + e.bonusValue, 0);
-  const bonusDodge = equippedList.filter(e => e.bonusType === 'dodge').reduce((sum, e) => sum + e.bonusValue, 0);
+  const bonusHealth = equippedList.filter(e => e.bonusType === 'maxHealth').reduce((sum, e) => sum + e.bonusValue, 0)
+    + equippedList.filter(e => e.secondaryBonusType === 'maxHealth').reduce((sum, e) => sum + (e.secondaryBonusValue || 0), 0)
+    + setBonusHealth;
+
+  const bonusDodge = equippedList.filter(e => e.bonusType === 'dodge').reduce((sum, e) => sum + e.bonusValue, 0)
+    + equippedList.filter(e => e.secondaryBonusType === 'dodge').reduce((sum, e) => sum + (e.secondaryBonusValue || 0), 0)
+    + setBonusDodge;
+
   const bonusGold = equippedList.filter(e => e.bonusType === 'goldBonus').reduce((sum, e) => sum + e.bonusValue, 0);
-  const bonusDelay = equippedList.filter(e => e.bonusType === 'delayReduction').reduce((sum, e) => sum + e.bonusValue, 0);
+  const bonusDelay = equippedList.filter(e => e.bonusType === 'delayReduction').reduce((sum, e) => sum + e.bonusValue, 0)
+    + setBonusDelay;
 
   const baseHealth = profile.heroMaxHealth || 30;
   const totalHealth = baseHealth + bonusHealth;
@@ -252,11 +274,27 @@ export const HeroInventoryView: React.FC = () => {
                         <h5 className="font-display font-black text-sm sm:text-base text-white leading-snug tracking-wide">
                           {item.name}
                         </h5>
-                        <div className="inline-flex items-center gap-1 bg-black/60 border border-emerald-500/30 px-3 py-1 rounded-full shadow-inner">
-                          <span className="text-xs text-emerald-400 font-mono font-bold">
-                            {formatBonusLabel(item.bonusType, item.bonusValue)}
-                          </span>
+                        <div className="flex flex-wrap items-center justify-center gap-1.5">
+                          <div className="inline-flex items-center gap-1 bg-black/60 border border-emerald-500/30 px-3 py-1 rounded-full shadow-inner">
+                            <span className="text-xs text-emerald-400 font-mono font-bold">
+                              {formatBonusLabel(item.bonusType, item.bonusValue)}
+                            </span>
+                          </div>
+                          {item.secondaryBonusType && (
+                            <div className="inline-flex items-center gap-1 bg-black/60 border border-rose-500/30 px-3 py-1 rounded-full shadow-inner">
+                              <span className="text-xs text-rose-400 font-mono font-bold">
+                                {formatBonusLabel(item.secondaryBonusType, item.secondaryBonusValue || 0)}
+                              </span>
+                            </div>
+                          )}
                         </div>
+                        {item.setId && (
+                          <div className="pt-0.5">
+                            <span className="text-[9px] font-mono text-rose-300 font-bold bg-rose-950/70 border border-rose-500/40 px-2 py-0.5 rounded-full shadow">
+                              SET OF THE DEMIURGE
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       {/* Action Button */}
@@ -498,6 +536,83 @@ export const HeroInventoryView: React.FC = () => {
                   Packs available in Shop
                 </span>
               </div>
+            </div>
+          </div>
+
+          {/* SET RESONANCE CARD */}
+          <div className="bg-gradient-to-r from-[#1f0910] via-[#120509] to-[#1f0910] border-2 border-rose-500/40 rounded-3xl p-5 sm:p-6 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-rose-600/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-rose-500/20 pb-4 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-rose-950/80 border border-rose-500/50 flex items-center justify-center shadow-md">
+                  <Shield className="w-5 h-5 text-rose-400" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-display font-black text-white text-base sm:text-lg tracking-wider uppercase">
+                      SET OF THE DEMIURGE
+                    </h4>
+                    <span className="bg-rose-500 text-white font-mono text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow-[0_0_8px_rgba(244,63,94,0.7)]">
+                      DIVINE SET
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400 font-sans mt-0.5">
+                    Equip matching Demiurge relics to awaken ancient cosmic properties.
+                  </p>
+                </div>
+              </div>
+
+              {/* Counter */}
+              {(() => {
+                const demiurgePieces = equippedList.filter(e => e.setId === 'demiurge').length;
+                return (
+                  <div className="bg-black/70 border border-rose-500/30 rounded-2xl px-4 py-2 text-center shrink-0 shadow-inner">
+                    <span className="text-[9px] font-mono uppercase text-gray-400 block font-bold">Active Pieces</span>
+                    <span className="font-display font-black text-xl text-rose-400">
+                      {demiurgePieces} <span className="text-gray-500 text-sm">/ 6</span>
+                    </span>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Thresholds Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 mt-4 relative z-10">
+              {(() => {
+                const demiurgePieces = equippedList.filter(e => e.setId === 'demiurge').length;
+                return DEMIURGE_SET.thresholds.map((threshold, tIdx) => {
+                  const isActive = demiurgePieces >= threshold.pieces;
+                  return (
+                    <div
+                      key={tIdx}
+                      className={`rounded-2xl p-4 border transition-all ${
+                        isActive
+                          ? 'bg-gradient-to-r from-rose-950/90 to-[#22060e]/90 border-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.4)] ring-1 ring-rose-400/50'
+                          : 'bg-black/50 border-white/10 opacity-70'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <span className={`text-[10px] font-mono font-black uppercase tracking-wider ${isActive ? 'text-rose-300' : 'text-gray-400'}`}>
+                          [{threshold.pieces} PIECES] {threshold.label}
+                        </span>
+                        {isActive ? (
+                          <span className="text-[9px] font-mono font-black text-rose-300 bg-rose-950 border border-rose-500/70 px-2 py-0.5 rounded-full shadow-[0_0_8px_rgba(244,63,94,0.7)] flex items-center gap-1">
+                            <Check className="w-2.5 h-2.5" /> ACTIVE
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-mono text-gray-500 bg-black/60 px-2 py-0.5 rounded-full border border-white/5">
+                            {threshold.pieces - demiurgePieces} MORE NEEDED
+                          </span>
+                        )}
+                      </div>
+                      <p className={`text-xs font-sans leading-relaxed ${isActive ? 'text-gray-100 font-medium' : 'text-gray-400'}`}>
+                        {threshold.description}
+                      </p>
+                    </div>
+                  );
+                });
+              })()}
             </div>
           </div>
         

@@ -3,8 +3,9 @@ import { getCardTierStyles } from '../utils/tierStyles';
 import { audioSystem } from '../utils/AudioSystem';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
-import { CampaignStage, BattleState, BattleCardState } from '../types';
+import { CampaignStage, BattleState, BattleCardState, Equipment } from '../types';
 import { initializeBattle, simulateCombatTurn, toBattleCard, placeCardLocally } from '../utils/gameLogic';
+import { calculateEquipmentSetBonuses } from '../data/equipment';
 import { 
   Swords, 
   Skull, 
@@ -287,16 +288,36 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const { profile, setProfile, submitBattleResult } = useGame();
   const toast = useToast();
   
-  // Calculate total bonuses from equipped items by type
+  // Calculate total bonuses from equipped items and active sets
+  const equippedList = Object.values(profile.equipped || {})
+    .map(eqId => profile.equipment?.find(e => e.id === eqId))
+    .filter(Boolean) as Equipment[];
+
+  const setBonusResults = calculateEquipmentSetBonuses(equippedList);
+  const demiurgeBonus = setBonusResults.find(s => s.setId === 'demiurge');
+
   const getEquipmentBonus = (bonusType: string) => {
     let bonus = 0;
-    Object.values(profile.equipped).forEach(eqId => {
-      const eq = profile.equipment.find(e => e.id === eqId);
-      if (eq && eq.bonusType === bonusType) {
+    equippedList.forEach(eq => {
+      if (eq.bonusType === bonusType) {
         bonus += eq.bonusValue;
       }
+      if (eq.secondaryBonusType === bonusType) {
+        bonus += (eq.secondaryBonusValue || 0);
+      }
     });
+    if (demiurgeBonus) {
+      if (bonusType === 'maxHealth') bonus += demiurgeBonus.totalBonuses.maxHealth;
+      if (bonusType === 'dodge') bonus += demiurgeBonus.totalBonuses.dodge;
+      if (bonusType === 'delayReduction') bonus += demiurgeBonus.totalBonuses.delayReduction;
+    }
     return bonus;
+  };
+
+  const startingPlayerMana = 1 + (demiurgeBonus?.totalBonuses.startingMana || 0);
+  const playerCreatureBuff = {
+    atk: demiurgeBonus?.totalBonuses.creatureAtkBuff || 0,
+    hp: demiurgeBonus?.totalBonuses.creatureHpBuff || 0,
   };
 
   const [battle, setBattle] = useState<BattleState>(() => initializeBattle(
@@ -304,7 +325,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     stage,
     (profile?.heroMaxHealth || 30) + getEquipmentBonus('maxHealth'),
     getEquipmentBonus('dodge'),
-    getEquipmentBonus('delayReduction')
+    getEquipmentBonus('delayReduction'),
+    startingPlayerMana,
+    playerCreatureBuff
   ));
 
   // Preload battle creature assets immediately
@@ -417,6 +440,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           }
         }
         
+        if (playState.playerCreatureBuff && (playState.playerCreatureBuff.atk > 0 || playState.playerCreatureBuff.hp > 0)) {
+          bCard.attack += playState.playerCreatureBuff.atk;
+          bCard.health += playState.playerCreatureBuff.hp;
+          bCard.maxHealth += playState.playerCreatureBuff.hp;
+        }
+
         playState.playerBoard[playedSlotIndex] = bCard;
         playState.playerHand.splice(cardIndex, 1);
       }

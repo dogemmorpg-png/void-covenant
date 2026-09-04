@@ -5,6 +5,7 @@ const jwt = (jwtPkg as any).default || jwtPkg;
 import { createClient } from '@supabase/supabase-js';
 import { PlayerProfile } from './_shared/types.js';
 import { CARD_TEMPLATES, createCardInstance, generateCampaignStage, AIRDROP_TASKS } from './_shared/cards.js';
+import { EQUIPMENT_TEMPLATES, generateEquipmentInstance } from './_shared/equipment.js';
 import { calculateEnergy, processExpGain } from './_shared/energyHelper.js';
 import { checkAndPerformPvpRollover, DEFAULT_LEAGUE_REWARDS } from './_shared/pvpRollover.js';
 import { recordShardTransaction } from './_shared/shardLogger.js';
@@ -870,6 +871,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       successMessage = `Divine entity invoked: ${template.name}!`;
       responseData = { newCard, profile };
+    } else if (action === 'buy_divine_equipment') {
+      const { itemName } = payload || {};
+      const template = EQUIPMENT_TEMPLATES.find((e: any) => e.name === itemName && e.tier === 'divine');
+      if (!template) {
+        return res.status(400).json({ error: 'Divine equipment template not found.' });
+      }
+
+      const equipCost = 50;
+      const currentShards = profile.darkShards || 0;
+      if (currentShards < equipCost) {
+        return res.status(400).json({ error: 'Not enough Dark Shards' });
+      }
+
+      profile = recordShardTransaction(
+        profile,
+        'SHOP_PURCHASE',
+        -equipCost,
+        `Divine Relic forged: ${template.name}`,
+        { itemName, equipCost }
+      );
+
+      const newEquipment = generateEquipmentInstance(template);
+      profile.equipment = profile.equipment || [];
+      profile.equipment.push(newEquipment);
+
+      successMessage = `Divine relic forged: ${template.name}!`;
+      responseData = { newEquipment, profile };
     } else if (action === 'withdrawal') {
       const { amountSovereigns, targetAddress } = payload || {};
       const numAmount = parseInt(amountSovereigns, 10);

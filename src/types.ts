@@ -10,6 +10,32 @@ export interface Equipment {
   bonusType: 'maxHealth' | 'dodge' | 'goldBonus' | 'delayReduction';
   bonusValue: number;
   icon?: string;
+  setId?: string; // e.g. 'demiurge'
+  secondaryBonusType?: 'maxHealth' | 'dodge' | 'goldBonus' | 'delayReduction';
+  secondaryBonusValue?: number;
+  description?: string;
+}
+
+export interface SetBonusThreshold {
+  pieces: number;
+  label: string;
+  description: string;
+  bonus: {
+    maxHealth?: number;
+    dodge?: number;
+    delayReduction?: number;
+    startingMana?: number;
+    creatureAtkBuff?: number;
+    creatureHpBuff?: number;
+  };
+}
+
+export interface EquipmentSetDefinition {
+  setId: string;
+  name: string;
+  description: string;
+  color: string;
+  thresholds: SetBonusThreshold[];
 }
 
 export type SkillType = 'hex' | 'vampirism' | 'plague' | 'sacrifice';
@@ -203,6 +229,7 @@ export interface BattleState {
   combatLog: string[];
   playerDodgeChance?: number;
   playerDelayReduction?: number;
+  playerCreatureBuff?: { atk: number; hp: number };
 }
 
 export interface AirdropTask {
