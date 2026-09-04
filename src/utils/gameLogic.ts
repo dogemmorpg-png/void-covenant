@@ -282,6 +282,26 @@ export function simulateCombatTurn(
             logs.push(`🔥 Warlord's Cry heals ${targetCard.name} for ${s.aoeHeal}!`);
           }
           animateSequence.push({ type: 'hero_skill', stance: 'warlord_cry', targetSlot: targetSlot, bonusAtk: s.bonusAtk, bonusArmor: s.bonusArmor, aoeHeal: s.aoeHeal, delayReduced });
+        } else {
+          // Rally cards in hand if board is empty
+          if (state.playerHand.length > 0) {
+            state.playerHand.forEach(c => {
+              if (c.delay > 0) c.delay = Math.max(0, c.delay - 1);
+            });
+            logs.push(`🔥 Commander roars with Warlord's Cry! Rallied forces in hand (-1 Delay)!`);
+          } else {
+            logs.push(`🔥 Commander roars with Warlord's Cry!`);
+          }
+          animateSequence.push({ 
+            type: 'hero_skill', 
+            stance: 'warlord_cry', 
+            targetSlot: -1, 
+            bonusAtk: 0, 
+            bonusArmor: 0, 
+            aoeHeal: 0, 
+            delayReduced: true, 
+            side: 'player' 
+          });
         }
       }
     }
@@ -294,7 +314,7 @@ export function simulateCombatTurn(
     
     // In PvP, calculate exact talent stats from the enemy commander's talent tree
     const stats = isPvp ? getTalentStats(stage.enemyTalents || {}, enemyStance) : null;
-    const triggerChance = stats ? stats.triggerChance : Math.min(35, 15 + Math.floor(stage.id / 5) * 1.5);
+    const triggerChance = stats ? Math.max(25, stats.triggerChance) : Math.min(50, Math.max(25, 25 + Math.floor(stage.id / 5) * 1.5));
     
     if (Math.random() * 100 < triggerChance) {
       logs.push(`⚡ Enemy Commander activated ${enemyStance.toUpperCase()} (${triggerChance.toFixed(1)}% chance)!`);
@@ -583,6 +603,26 @@ export function simulateCombatTurn(
               });
             }
           }
+        } else {
+          // Fallback if no creatures on board: Roar and reduce delay of cards in enemy hand
+          if (state.enemyHand.length > 0) {
+            state.enemyHand.forEach(c => {
+              if (c.delay > 0) c.delay = Math.max(0, c.delay - 1);
+            });
+            logs.push(`🔥 Boss roars with Warlord's Cry! Rallied forces in hand (-1 Delay)!`);
+          } else {
+            logs.push(`🔥 Boss roars with Warlord's Cry!`);
+          }
+          animateSequence.push({ 
+            type: 'hero_skill', 
+            stance: 'warlord_cry', 
+            targetSlot: -1, 
+            bonusAtk: 0, 
+            bonusArmor: 0, 
+            aoeHeal: 0, 
+            delayReduced: true, 
+            side: 'enemy' 
+          });
         }
       }
     }

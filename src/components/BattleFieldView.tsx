@@ -744,19 +744,28 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               }, 180 / speedMultiplier);
             }
           } else if (step.stance === 'warlord_cry') {
-            stepDescription = `🔥 Warlord's Cry: Boosts ${cardName || 'ally'} stats!`;
             audioSystem.playPlace();
-            setAnimatingSlot({ side: targetSide, slot: step.targetSlot, type: 'heal' });
-            setTimeout(() => {
-              const target = targetBoard[step.targetSlot];
-              if (target) {
-                if (step.bonusAtk > 0) target.attack += step.bonusAtk;
-                if (step.bonusArmor > 0) target.armor = (target.armor || 0) + step.bonusArmor;
-                if (step.aoeHeal > 0) target.health = Math.min(target.maxHealth, target.health + step.aoeHeal);
-              }
-              addFloatingText('🔥 BUFF', { side: targetSide, slot: step.targetSlot }, 'text-yellow-400 font-bold');
-              addFloatingText("WARLORD'S CRY 🔥", casterHeroLabel, 'text-yellow-400 font-bold text-xs');
-            }, 180 / speedMultiplier);
+            if (step.targetSlot === -1) {
+              stepDescription = `🔥 Warlord's Cry: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} roars, rallying forces!`;
+              setAnimatingSlot({ side: targetSide, slot: -1, type: 'heal' });
+              setTimeout(() => {
+                addFloatingText('🔥 BATTLE ROAR!', casterHeroLabel, 'text-yellow-400 font-black text-sm scale-110');
+                addFloatingText("WARLORD'S CRY 🔥", casterHeroLabel, 'text-yellow-400 font-bold text-xs');
+              }, 180 / speedMultiplier);
+            } else {
+              stepDescription = `🔥 Warlord's Cry: Boosts ${cardName || 'ally'} stats!`;
+              setAnimatingSlot({ side: targetSide, slot: step.targetSlot, type: 'heal' });
+              setTimeout(() => {
+                const target = targetBoard[step.targetSlot];
+                if (target) {
+                  if (step.bonusAtk > 0) target.attack += step.bonusAtk;
+                  if (step.bonusArmor > 0) target.armor = (target.armor || 0) + step.bonusArmor;
+                  if (step.aoeHeal > 0) target.health = Math.min(target.maxHealth, target.health + step.aoeHeal);
+                }
+                addFloatingText('🔥 BUFF', { side: targetSide, slot: step.targetSlot }, 'text-yellow-400 font-bold');
+                addFloatingText("WARLORD'S CRY 🔥", casterHeroLabel, 'text-yellow-400 font-bold text-xs');
+              }, 180 / speedMultiplier);
+            }
           }
           break;
         }
