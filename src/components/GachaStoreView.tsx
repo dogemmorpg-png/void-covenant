@@ -310,19 +310,29 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
       {/* MAIN STORE VIEW: SIDEBAR + MAIN SHOWCASE */}
       <div className="flex flex-col md:flex-row gap-4 lg:gap-5 items-stretch">
         
-        {/* Left Sidebar Navigation (Wide, clean, full titles) */}
-        <div className="w-full md:w-64 lg:w-72 shrink-0 bg-[#0c0f14]/90 border border-white/10 rounded-2xl p-3 flex flex-row md:flex-col gap-2 shadow-2xl backdrop-blur-md overflow-x-auto md:overflow-x-visible">
+        {/* Left Sidebar Navigation (Dark Gothic RPG Store Menu) */}
+        <div className="w-full md:w-64 lg:w-72 shrink-0 bg-gradient-to-b from-[#121620]/95 via-[#0c0f16]/95 to-[#08090e]/95 border border-amber-500/20 rounded-2xl p-3 flex flex-row md:flex-col gap-2.5 shadow-2xl backdrop-blur-md overflow-x-auto md:overflow-x-visible relative overflow-hidden">
           
-          {/* Shop Header in Sidebar (Enlarged & Prominent) */}
-          <div className="hidden md:flex items-center gap-3 px-3.5 py-3 border-b border-white/10 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/25 via-rose-500/20 to-black border border-amber-400/50 flex items-center justify-center shadow-[0_0_14px_rgba(245,158,11,0.3)] shrink-0">
-              <Store className="w-5 h-5 text-amber-400" />
+          {/* Subtle ambient lighting */}
+          <div className="absolute -top-16 -left-16 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute -bottom-16 -right-16 w-32 h-32 bg-rose-500/10 rounded-full blur-2xl pointer-events-none" />
+
+          {/* Shop Header in Sidebar (Enlarged & Prominent with Treasury Asset) */}
+          <div className="hidden md:flex items-center gap-3.5 px-3 py-3 border-b border-white/10 mb-1 relative z-10">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-b from-amber-950/80 to-black/90 border border-amber-500/50 p-1.5 flex items-center justify-center shadow-[0_0_18px_rgba(245,158,11,0.35)] shrink-0 group relative overflow-hidden">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.35),transparent_70%)]" />
+              <img
+                src="/shop/abyssal_treasury.png"
+                alt="Void Shop"
+                className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(245,158,11,0.8)] relative z-10"
+              />
             </div>
-            <div>
-              <div className="text-[9px] font-mono font-bold tracking-widest text-amber-400 uppercase">
-                EMPORIUM
+            <div className="min-w-0">
+              <div className="text-[10px] font-mono font-black tracking-widest text-amber-400 uppercase flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3 text-amber-400" />
+                <span>EMPORIUM</span>
               </div>
-              <h2 className="font-display font-black text-base lg:text-lg text-white tracking-wider text-shadow-gold leading-tight">
+              <h2 className="font-display font-black text-lg lg:text-xl text-white tracking-widest text-shadow-gold leading-tight uppercase">
                 VOID SHOP
               </h2>
             </div>
@@ -334,20 +344,27 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
               audioSystem.playClick();
               setActiveCategory('boosters');
             }}
-            className={`w-full text-left p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 shrink-0 md:shrink ${
+            className={`w-full text-left p-2.5 sm:p-3 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between gap-3 shrink-0 md:shrink group relative overflow-hidden ${
               activeCategory === 'boosters'
-                ? 'bg-gradient-to-r from-amber-950/80 to-[#1c140a] text-white border-amber-500/80 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
-                : 'bg-black/40 text-gray-400 border-white/5 hover:border-amber-500/40 hover:bg-white/5 hover:text-amber-200'
+                ? 'bg-gradient-to-r from-[#0c2430] via-[#091a24] to-[#07131b] text-white border-cyan-400/80 shadow-[0_0_20px_rgba(102,252,241,0.25)] ring-1 ring-cyan-400/30'
+                : 'bg-[#10141d]/60 text-gray-400 border-white/5 hover:border-cyan-500/40 hover:bg-cyan-950/20 hover:text-cyan-200'
             }`}
           >
             <div className="flex items-center gap-3 min-w-0">
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${
-                activeCategory === 'boosters' ? 'bg-amber-500/20 border-amber-400/60 text-amber-300' : 'bg-black/50 border-white/10 text-gray-400'
+              <div className={`w-12 h-12 rounded-xl p-1 flex items-center justify-center border shrink-0 relative overflow-hidden transition-all group-hover:scale-105 ${
+                activeCategory === 'boosters'
+                  ? 'bg-gradient-to-b from-cyan-950 to-black border-cyan-400/80 shadow-[0_0_14px_rgba(102,252,241,0.4)]'
+                  : 'bg-black/60 border-white/10 group-hover:border-cyan-500/40'
               }`}>
-                <Box className="w-4 h-4" />
+                <div className={`absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(102,252,241,0.3),transparent_70%)] ${activeCategory === 'boosters' ? 'opacity-100' : 'opacity-20'}`} />
+                <img
+                  src="/packs/pack_obsidian.webp"
+                  alt="Card Boosters"
+                  className={`w-full h-full object-contain relative z-10 filter ${activeCategory === 'boosters' ? 'drop-shadow-[0_0_8px_rgba(102,252,241,0.8)]' : 'opacity-80'}`}
+                />
               </div>
               <div className="min-w-0">
-                <div className="font-display font-bold text-xs tracking-wider uppercase">
+                <div className="font-display font-black text-xs sm:text-sm tracking-wider uppercase text-white group-hover:text-cyan-200 transition-colors">
                   Card Boosters
                 </div>
                 <div className="text-[10px] text-gray-400 font-mono hidden md:block">
@@ -355,7 +372,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                 </div>
               </div>
             </div>
-            <ChevronRight className={`w-4 h-4 hidden md:block ${activeCategory === 'boosters' ? 'text-amber-400' : 'text-gray-600'}`} />
+            <ChevronRight className={`w-4 h-4 hidden md:block transition-transform group-hover:translate-x-0.5 ${activeCategory === 'boosters' ? 'text-cyan-300' : 'text-gray-600'}`} />
           </button>
 
           {/* 2. Relic Chests */}
@@ -364,20 +381,27 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
               audioSystem.playClick();
               setActiveCategory('chests');
             }}
-            className={`w-full text-left p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 shrink-0 md:shrink ${
+            className={`w-full text-left p-2.5 sm:p-3 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between gap-3 shrink-0 md:shrink group relative overflow-hidden ${
               activeCategory === 'chests'
-                ? 'bg-gradient-to-r from-purple-950/80 to-[#180b22] text-white border-purple-500/80 shadow-[0_0_15px_rgba(168,85,247,0.25)]'
-                : 'bg-black/40 text-gray-400 border-white/5 hover:border-purple-500/40 hover:bg-white/5 hover:text-purple-200'
+                ? 'bg-gradient-to-r from-[#230d36] via-[#190927] to-[#11051b] text-white border-purple-400/80 shadow-[0_0_20px_rgba(168,85,247,0.25)] ring-1 ring-purple-400/30'
+                : 'bg-[#10141d]/60 text-gray-400 border-white/5 hover:border-purple-500/40 hover:bg-purple-950/20 hover:text-purple-200'
             }`}
           >
             <div className="flex items-center gap-3 min-w-0">
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${
-                activeCategory === 'chests' ? 'bg-purple-500/20 border-purple-400/60 text-purple-300' : 'bg-black/50 border-white/10 text-gray-400'
+              <div className={`w-12 h-12 rounded-xl p-1 flex items-center justify-center border shrink-0 relative overflow-hidden transition-all group-hover:scale-105 ${
+                activeCategory === 'chests'
+                  ? 'bg-gradient-to-b from-purple-950 to-black border-purple-400/80 shadow-[0_0_14px_rgba(168,85,247,0.4)]'
+                  : 'bg-black/60 border-white/10 group-hover:border-purple-500/40'
               }`}>
-                <Shield className="w-4 h-4" />
+                <div className={`absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.3),transparent_70%)] ${activeCategory === 'chests' ? 'opacity-100' : 'opacity-20'}`} />
+                <img
+                  src="/packs/chest_premium.webp"
+                  alt="Relic Chests"
+                  className={`w-full h-full object-contain relative z-10 filter ${activeCategory === 'chests' ? 'drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]' : 'opacity-80'}`}
+                />
               </div>
               <div className="min-w-0">
-                <div className="font-display font-bold text-xs tracking-wider uppercase">
+                <div className="font-display font-black text-xs sm:text-sm tracking-wider uppercase text-white group-hover:text-purple-200 transition-colors">
                   Relic Chests
                 </div>
                 <div className="text-[10px] text-gray-400 font-mono hidden md:block">
@@ -385,7 +409,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                 </div>
               </div>
             </div>
-            <ChevronRight className={`w-4 h-4 hidden md:block ${activeCategory === 'chests' ? 'text-purple-400' : 'text-gray-600'}`} />
+            <ChevronRight className={`w-4 h-4 hidden md:block transition-transform group-hover:translate-x-0.5 ${activeCategory === 'chests' ? 'text-purple-300' : 'text-gray-600'}`} />
           </button>
 
           {/* 3. Divine Pantheon */}
@@ -394,24 +418,31 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
               audioSystem.playClick();
               setActiveCategory('pantheon');
             }}
-            className={`w-full text-left p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 shrink-0 md:shrink ${
+            className={`w-full text-left p-2.5 sm:p-3 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between gap-3 shrink-0 md:shrink group relative overflow-hidden ${
               activeCategory === 'pantheon'
-                ? 'bg-gradient-to-r from-rose-950/90 to-[#220710] text-white border-rose-500/80 shadow-[0_0_18px_rgba(244,63,94,0.3)]'
-                : 'bg-black/40 text-gray-400 border-white/5 hover:border-rose-500/40 hover:bg-white/5 hover:text-rose-200'
+                ? 'bg-gradient-to-r from-amber-950/90 via-[#221508] to-black text-white border-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.25)] ring-1 ring-amber-400/30'
+                : 'bg-[#10141d]/60 text-gray-400 border-white/5 hover:border-amber-500/40 hover:bg-amber-950/20 hover:text-amber-200'
             }`}
           >
             <div className="flex items-center gap-3 min-w-0">
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${
-                activeCategory === 'pantheon' ? 'bg-rose-500/20 border-rose-400/60 text-rose-300' : 'bg-black/50 border-white/10 text-gray-400'
+              <div className={`w-12 h-12 rounded-xl p-1.5 flex items-center justify-center border shrink-0 relative overflow-hidden transition-all group-hover:scale-105 ${
+                activeCategory === 'pantheon'
+                  ? 'bg-gradient-to-b from-amber-950 to-black border-amber-400/80 shadow-[0_0_14px_rgba(245,158,11,0.4)]'
+                  : 'bg-black/60 border-white/10 group-hover:border-amber-500/40'
               }`}>
-                <Crown className="w-4 h-4" />
+                <div className={`absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.35),transparent_70%)] ${activeCategory === 'pantheon' ? 'opacity-100' : 'opacity-20'}`} />
+                <img
+                  src="/icons/crown.png"
+                  alt="Divine Pantheon"
+                  className={`w-full h-full object-contain relative z-10 filter ${activeCategory === 'pantheon' ? 'drop-shadow-[0_0_8px_rgba(245,158,11,0.85)]' : 'opacity-80'}`}
+                />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-display font-bold text-xs tracking-wider uppercase">
+                  <span className="font-display font-black text-xs sm:text-sm tracking-wider uppercase text-white group-hover:text-amber-200 transition-colors">
                     Divine Pantheon
                   </span>
-                  <span className="bg-amber-400 text-black text-[8px] font-mono px-1 py-0.2 rounded font-black tracking-wider hidden md:inline">
+                  <span className="bg-gradient-to-r from-amber-400 to-amber-500 text-black text-[8px] font-mono px-1 py-0.2 rounded font-black tracking-wider hidden md:inline shadow-[0_0_8px_rgba(245,158,11,0.4)]">
                     EXCLUSIVE
                   </span>
                 </div>
@@ -420,7 +451,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                 </div>
               </div>
             </div>
-            <ChevronRight className={`w-4 h-4 hidden md:block ${activeCategory === 'pantheon' ? 'text-rose-400' : 'text-gray-600'}`} />
+            <ChevronRight className={`w-4 h-4 hidden md:block transition-transform group-hover:translate-x-0.5 ${activeCategory === 'pantheon' ? 'text-amber-300' : 'text-gray-600'}`} />
           </button>
 
           {/* 4. Demiurge Relics */}
@@ -429,24 +460,35 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
               audioSystem.playClick();
               setActiveCategory('demiurge');
             }}
-            className={`w-full text-left p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 shrink-0 md:shrink ${
+            className={`w-full text-left p-2.5 sm:p-3 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between gap-3 shrink-0 md:shrink group relative overflow-hidden ${
               activeCategory === 'demiurge'
-                ? 'bg-gradient-to-r from-rose-950/90 via-red-950/80 to-black text-white border-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.35)]'
-                : 'bg-black/40 text-gray-400 border-white/5 hover:border-rose-500/40 hover:bg-white/5 hover:text-rose-200'
+                ? 'bg-gradient-to-r from-rose-950/95 via-red-950/80 to-black text-white border-rose-400/80 shadow-[0_0_20px_rgba(244,63,94,0.35)] ring-1 ring-rose-400/30'
+                : 'bg-[#10141d]/60 text-gray-400 border-white/5 hover:border-rose-500/40 hover:bg-rose-950/20 hover:text-rose-200'
             }`}
           >
             <div className="flex items-center gap-3 min-w-0">
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${
-                activeCategory === 'demiurge' ? 'bg-rose-500/20 border-rose-400/60 text-rose-300' : 'bg-black/50 border-white/10 text-gray-400'
+              <div className={`w-12 h-12 rounded-xl p-1.5 flex items-center justify-center border shrink-0 relative overflow-hidden transition-all group-hover:scale-105 ${
+                activeCategory === 'demiurge'
+                  ? 'bg-gradient-to-b from-rose-950 to-black border-rose-400/80 shadow-[0_0_14px_rgba(244,63,94,0.4)]'
+                  : 'bg-black/60 border-white/10 group-hover:border-rose-500/40'
               }`}>
-                <Sword className="w-4 h-4" />
+                <div className={`absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(244,63,94,0.35),transparent_70%)] ${activeCategory === 'demiurge' ? 'opacity-100' : 'opacity-20'}`} />
+                <img
+                  src="/icons/equipment/demiurge_crest.png"
+                  alt="Demiurge Relics"
+                  className={`w-full h-full object-contain relative z-10 filter ${activeCategory === 'demiurge' ? 'drop-shadow-[0_0_8px_rgba(244,63,94,0.85)]' : 'opacity-80'}`}
+                />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-display font-bold text-xs tracking-wider uppercase">
+                  <span className="font-display font-black text-xs sm:text-sm tracking-wider uppercase text-white group-hover:text-rose-200 transition-colors">
                     Demiurge Relics
                   </span>
-                  <span className="bg-rose-950 border border-rose-500/60 text-rose-300 text-[8px] font-mono px-1.5 py-0.2 rounded font-black">
+                  <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded font-black tracking-wider border ${
+                    ownedDemiurgeCount === 6
+                      ? 'bg-emerald-950 border-emerald-500/60 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.3)]'
+                      : 'bg-rose-950 border-rose-500/60 text-rose-300'
+                  }`}>
                     {ownedDemiurgeCount}/6
                   </span>
                 </div>
@@ -455,7 +497,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                 </div>
               </div>
             </div>
-            <ChevronRight className={`w-4 h-4 hidden md:block ${activeCategory === 'demiurge' ? 'text-rose-400' : 'text-gray-600'}`} />
+            <ChevronRight className={`w-4 h-4 hidden md:block transition-transform group-hover:translate-x-0.5 ${activeCategory === 'demiurge' ? 'text-rose-300' : 'text-gray-600'}`} />
           </button>
 
         </div>
