@@ -359,43 +359,43 @@ export const HeroInventoryView: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-2 sm:px-6 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 py-1 sm:px-6 space-y-3">
       
       {/* Sub-Tab Switcher at Top */}
-      <div className="flex gap-4 justify-center max-w-md mx-auto">
+      <div className="flex gap-3 justify-center max-w-sm mx-auto">
         <button 
           onClick={() => setSubTab('equipment')}
-          className={`flex-1 py-3 px-6 rounded-2xl font-display font-black tracking-widest text-xs sm:text-sm transition-all duration-300 uppercase flex items-center justify-center gap-2 cursor-pointer ${
+          className={`flex-1 py-2 px-5 rounded-xl font-display font-black tracking-widest text-xs transition-all duration-300 uppercase flex items-center justify-center gap-2 cursor-pointer ${
             subTab === 'equipment' 
-              ? 'bg-gradient-to-b from-[#3b1248] via-[#240a2c] to-[#120417] text-purple-200 border-2 border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.35)]' 
+              ? 'bg-gradient-to-b from-[#3b1248] via-[#240a2c] to-[#120417] text-purple-200 border-2 border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.35)]' 
               : 'bg-black/40 text-gray-500 border border-white/5 hover:border-white/20 hover:text-gray-300'
           }`}
         >
-          <Sparkles className="w-4 h-4" /> RELICS & GEAR
+          <Sparkles className="w-3.5 h-3.5" /> RELICS & GEAR
         </button>
         <button 
           onClick={() => setSubTab('talents')}
-          className={`flex-1 py-3 px-6 rounded-2xl font-display font-black tracking-widest text-xs sm:text-sm transition-all duration-300 uppercase flex items-center justify-center gap-2 cursor-pointer ${
+          className={`flex-1 py-2 px-5 rounded-xl font-display font-black tracking-widest text-xs transition-all duration-300 uppercase flex items-center justify-center gap-2 cursor-pointer ${
             subTab === 'talents' 
-              ? 'bg-gradient-to-b from-[#3a2208] via-[#241403] to-[#100801] text-amber-200 border-2 border-amber-500 shadow-[0_0_20px_rgba(251,191,36,0.35)]' 
+              ? 'bg-gradient-to-b from-[#3a2208] via-[#241403] to-[#100801] text-amber-200 border-2 border-amber-500 shadow-[0_0_15px_rgba(251,191,36,0.35)]' 
               : 'bg-black/40 text-gray-500 border border-white/5 hover:border-white/20 hover:text-gray-300'
           }`}
         >
-          <Zap className="w-4 h-4" /> TALENT TREE
+          <Zap className="w-3.5 h-3.5" /> TALENT TREE
         </button>
       </div>
 
       {subTab === 'equipment' ? (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
             
             {/* Column 1: Lord Profile & Battle Attributes (col-span-3) */}
-            <div className="lg:col-span-3 bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-[#c5a880]/30 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col justify-between space-y-5 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-44 h-44 bg-purple-900/10 blur-3xl pointer-events-none" />
+            <div className="lg:col-span-3 bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-[#c5a880]/30 rounded-3xl p-4 sm:p-4.5 shadow-2xl flex flex-col justify-between space-y-3 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-36 h-36 bg-purple-900/10 blur-3xl pointer-events-none" />
               
-              <div className="flex flex-col items-center text-center space-y-3 relative z-10">
+              <div className="flex flex-col items-center text-center space-y-2 relative z-10">
                 {/* Circular Avatar Frame */}
-                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-b from-purple-950 to-black border-2 border-[#ebd09b] p-1 shadow-[0_0_25px_rgba(235,208,155,0.3)] flex items-center justify-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-b from-purple-950 to-black border-2 border-[#ebd09b] p-1 shadow-[0_0_20px_rgba(235,208,155,0.25)] flex items-center justify-center">
                   {profile.avatarUrl ? (
                     <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                   ) : (
@@ -403,38 +403,38 @@ export const HeroInventoryView: React.FC = () => {
                   )}
                 </div>
 
-                <div className="space-y-1">
-                  <h3 className="font-display font-black text-lg sm:text-xl text-white tracking-widest uppercase text-shadow-gold truncate max-w-[220px]">
+                <div className="space-y-0.5">
+                  <h3 className="font-display font-black text-base sm:text-lg text-white tracking-widest uppercase text-shadow-gold truncate max-w-[200px]">
                     {profile.username || 'Abyssal Lord'}
                   </h3>
-                  <div className="inline-flex items-center gap-1.5 text-[#ebd09b] font-mono text-xs font-black bg-[#ebd09b]/10 border border-[#ebd09b]/30 px-3 py-0.5 rounded-full shadow-inner">
+                  <div className="inline-flex items-center gap-1.5 text-[#ebd09b] font-mono text-[10px] font-black bg-[#ebd09b]/10 border border-[#ebd09b]/30 px-2.5 py-0.5 rounded-full shadow-inner">
                     LEVEL {profile.level}
                   </div>
                 </div>
 
                 {/* Stance Banner */}
-                <div className="w-full bg-black/60 border border-white/10 rounded-2xl p-2.5 flex items-center justify-between">
-                  <div className="flex items-center gap-2.5 text-left">
-                    <div className="w-8 h-8 rounded-xl bg-black/70 border border-white/10 flex items-center justify-center shrink-0">
+                <div className="w-full bg-black/60 border border-white/10 rounded-xl p-2 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-left">
+                    <div className="w-7 h-7 rounded-lg bg-black/70 border border-white/10 flex items-center justify-center shrink-0">
                       {activeStance.icon}
                     </div>
                     <div>
                       <span className={`text-[10px] font-display font-black uppercase tracking-wider block ${activeStance.color}`}>
                         {activeStance.label}
                       </span>
-                      <span className="text-[9px] text-gray-400 font-sans block">{activeStance.desc}</span>
+                      <span className="text-[8px] text-gray-400 font-sans block truncate max-w-[140px]">{activeStance.desc}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* EXP Progress Bar */}
-              <div className="space-y-1.5 relative z-10">
-                <div className="flex justify-between text-gray-400 text-[10px] font-mono uppercase font-bold">
+              <div className="space-y-1 relative z-10">
+                <div className="flex justify-between text-gray-400 text-[9px] font-mono uppercase font-bold">
                   <span>EXP</span>
                   <span className="text-gray-300">{Math.floor(profile.exp).toLocaleString()} / {reqExp.toLocaleString()}</span>
                 </div>
-                <div className="w-full h-2 bg-black/80 rounded-full overflow-hidden border border-white/10 shadow-inner">
+                <div className="w-full h-1.5 bg-black/80 rounded-full overflow-hidden border border-white/10 shadow-inner">
                   <div 
                     className="h-full bg-gradient-to-r from-purple-500 via-indigo-400 to-emerald-400 transition-all duration-500 shadow-[0_0_8px_rgba(168,85,247,0.5)]" 
                     style={{ width: `${expPercent}%` }} 
@@ -443,60 +443,60 @@ export const HeroInventoryView: React.FC = () => {
               </div>
 
               {/* ALL LORD CHARACTERISTICS / STATS */}
-              <div className="space-y-2.5 relative z-10">
-                <div className="flex items-center justify-between border-b border-gray-800 pb-1.5">
-                  <span className="text-[11px] font-display font-black text-[#ebd09b] tracking-wider uppercase">
+              <div className="space-y-2 relative z-10">
+                <div className="flex items-center justify-between border-b border-gray-800 pb-1">
+                  <span className="text-[10px] font-display font-black text-[#ebd09b] tracking-wider uppercase">
                     BATTLE ATTRIBUTES
                   </span>
-                  <span className="text-[10px] font-mono text-purple-400 font-bold bg-purple-950/50 border border-purple-500/30 px-2.5 py-0.5 rounded-full">
+                  <span className="text-[9px] font-mono text-purple-400 font-bold bg-purple-950/50 border border-purple-500/30 px-2 py-0.5 rounded-full">
                     {equippedList.length}/6 Relics
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 gap-2 font-mono">
+                <div className="grid grid-cols-1 gap-1.5 font-mono">
                   {/* Max Health */}
-                  <div className="bg-black/60 border border-emerald-500/25 px-3.5 py-2.5 rounded-2xl flex items-center justify-between shadow-sm">
-                    <span className="flex items-center gap-2 text-gray-400 text-[11px] uppercase font-bold">
-                      <Heart className="w-4 h-4 text-emerald-400" /> Max Health
+                  <div className="bg-black/60 border border-emerald-500/25 px-3 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
+                    <span className="flex items-center gap-1.5 text-gray-400 text-[10px] uppercase font-bold">
+                      <Heart className="w-3.5 h-3.5 text-emerald-400" /> Max Health
                     </span>
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-emerald-300 font-display font-black text-base">{totalHealth}</span>
+                      <span className="text-emerald-300 font-display font-black text-sm">{totalHealth}</span>
                       {bonusHealth > 0 && (
-                        <span className="text-[10px] text-emerald-400/80 font-bold">+{bonusHealth}</span>
+                        <span className="text-[9px] text-emerald-400/80 font-bold">+{bonusHealth}</span>
                       )}
                     </div>
                   </div>
 
                   {/* Dodge Chance */}
-                  <div className="bg-black/60 border border-cyan-500/25 px-3.5 py-2.5 rounded-2xl flex items-center justify-between shadow-sm">
-                    <span className="flex items-center gap-2 text-gray-400 text-[11px] uppercase font-bold">
-                      <Wind className="w-4 h-4 text-cyan-400" /> Dodge Chance
+                  <div className="bg-black/60 border border-cyan-500/25 px-3 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
+                    <span className="flex items-center gap-1.5 text-gray-400 text-[10px] uppercase font-bold">
+                      <Wind className="w-3.5 h-3.5 text-cyan-400" /> Dodge Chance
                     </span>
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-cyan-300 font-display font-black text-base">{bonusDodge}%</span>
+                      <span className="text-cyan-300 font-display font-black text-sm">{bonusDodge}%</span>
                       {bonusDodge > 0 && (
-                        <span className="text-[10px] text-cyan-400/80 font-bold">+{bonusDodge}%</span>
+                        <span className="text-[9px] text-cyan-400/80 font-bold">+{bonusDodge}%</span>
                       )}
                     </div>
                   </div>
 
                   {/* Gold Bonus */}
-                  <div className="bg-black/60 border border-amber-500/25 px-3.5 py-2.5 rounded-2xl flex items-center justify-between shadow-sm">
-                    <span className="flex items-center gap-2 text-gray-400 text-[11px] uppercase font-bold">
-                      <Coins className="w-4 h-4 text-amber-400" /> Gold Gain
+                  <div className="bg-black/60 border border-amber-500/25 px-3 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
+                    <span className="flex items-center gap-1.5 text-gray-400 text-[10px] uppercase font-bold">
+                      <Coins className="w-3.5 h-3.5 text-amber-400" /> Gold Gain
                     </span>
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-amber-300 font-display font-black text-base">+{bonusGold}%</span>
+                      <span className="text-amber-300 font-display font-black text-sm">+{bonusGold}%</span>
                     </div>
                   </div>
 
                   {/* Delay Reduction */}
-                  <div className="bg-black/60 border border-purple-500/25 px-3.5 py-2.5 rounded-2xl flex items-center justify-between shadow-sm">
-                    <span className="flex items-center gap-2 text-gray-400 text-[11px] uppercase font-bold">
-                      <Hourglass className="w-4 h-4 text-purple-400" /> Card Delay
+                  <div className="bg-black/60 border border-purple-500/25 px-3 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
+                    <span className="flex items-center gap-1.5 text-gray-400 text-[10px] uppercase font-bold">
+                      <Hourglass className="w-3.5 h-3.5 text-purple-400" /> Card Delay
                     </span>
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-purple-300 font-display font-black text-sm">
+                      <span className="text-purple-300 font-display font-black text-xs">
                         {bonusDelay > 0 ? `-${bonusDelay} Turn` : 'Standard'}
                       </span>
                     </div>
@@ -506,32 +506,32 @@ export const HeroInventoryView: React.FC = () => {
             </div>
 
             {/* Column 2: Paperdoll Mannequin (col-span-5) */}
-            <div className="lg:col-span-5 bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-purple-900/40 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col justify-between relative overflow-hidden">
+            <div className="lg:col-span-5 bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-purple-900/40 rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col justify-between relative overflow-hidden">
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.08),transparent_70%)] pointer-events-none" />
               
-              <div className="flex items-center justify-between border-b border-purple-900/50 pb-2.5 mb-2 relative z-10">
-                <h3 className="font-display font-black text-sm sm:text-base text-purple-200 tracking-widest uppercase">
+              <div className="flex items-center justify-between border-b border-purple-900/50 pb-2 mb-1.5 relative z-10">
+                <h3 className="font-display font-black text-xs sm:text-sm text-purple-200 tracking-widest uppercase">
                   EQUIPPED RELICS
                 </h3>
-                <span className="text-[10px] font-mono text-gray-400">
+                <span className="text-[9px] font-mono text-gray-400">
                   Select slot to equip
                 </span>
               </div>
 
               {/* Paperdoll Mannequin Grid */}
-              <div className="flex items-center justify-center my-auto py-2 relative z-10">
-                <div className="flex items-center justify-center gap-3 sm:gap-6 w-full">
+              <div className="flex items-center justify-center my-auto py-1 relative z-10">
+                <div className="flex items-center justify-center gap-2 sm:gap-4 w-full">
                   
                   {/* Left Slots Column */}
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2 sm:gap-2.5">
                     {renderSlotBox('helmet', 'HELMET', '/icons/equipment/slot_helmet.png')}
                     {renderSlotBox('weapon', 'WEAPON', '/icons/equipment/slot_weapon.png')}
                     {renderSlotBox('ring', 'RING', '/icons/equipment/slot_ring.png')}
                   </div>
 
                   {/* Center Gothic Mannequin Silhouette */}
-                  <div className="w-24 h-56 sm:w-32 sm:h-72 relative flex items-center justify-center">
-                    <div className="w-full h-full bg-black/40 border border-purple-500/20 rounded-3xl flex items-center justify-center p-2.5 shadow-inner overflow-hidden">
+                  <div className="w-20 h-48 sm:w-28 sm:h-64 relative flex items-center justify-center">
+                    <div className="w-full h-full bg-black/40 border border-purple-500/20 rounded-2xl flex items-center justify-center p-2 shadow-inner overflow-hidden">
                       <img 
                         src="/icons/equipment/lord_silhouette.png" 
                         alt="Lord Silhouette" 
@@ -541,7 +541,7 @@ export const HeroInventoryView: React.FC = () => {
                   </div>
 
                   {/* Right Slots Column */}
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2 sm:gap-2.5">
                     {renderSlotBox('amulet', 'AMULET', '/icons/equipment/slot_amulet.png')}
                     {renderSlotBox('armor', 'ARMOR', '/icons/equipment/slot_armor.png')}
                     {renderSlotBox('boots', 'BOOTS', '/icons/equipment/slot_boots.png')}
@@ -551,33 +551,33 @@ export const HeroInventoryView: React.FC = () => {
               </div>
 
               {/* Bottom Quick Help Bar */}
-              <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-center relative z-10 text-[11px] font-mono text-purple-300/80">
+              <div className="mt-2 pt-2 border-t border-white/5 flex items-center justify-center relative z-10 text-[10px] font-mono text-purple-300/80">
                 <span className="flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-purple-400" /> Tap slot to swap relics
+                  <Sparkles className="w-3.5 h-3.5 text-purple-400" /> Tap slot to swap relics
                 </span>
               </div>
             </div>
 
             {/* Column 3: Set Resonance Monolith (col-span-4) */}
-            <div className="lg:col-span-4 bg-gradient-to-b from-[#210912] via-[#14050b] to-[#0a0205] border-2 border-rose-500/40 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col justify-between relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-56 h-56 bg-rose-600/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="lg:col-span-4 bg-gradient-to-b from-[#210912] via-[#14050b] to-[#0a0205] border-2 border-rose-500/40 rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col justify-between relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-rose-600/10 rounded-full blur-3xl pointer-events-none" />
 
               {/* Header with Crest */}
-              <div className="relative z-10 border-b border-rose-500/20 pb-3.5">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-14 h-14 rounded-2xl bg-rose-950/80 border border-rose-500/50 p-1 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.35)] shrink-0">
+              <div className="relative z-10 border-b border-rose-500/20 pb-2.5">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-rose-950/80 border border-rose-500/50 p-1 flex items-center justify-center shadow-[0_0_15px_rgba(244,63,94,0.35)] shrink-0">
                     <img 
                       src="/icons/equipment/demiurge_crest.png" 
                       alt="Demiurge Crest" 
-                      className="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(244,63,94,0.7)]" 
+                      className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(244,63,94,0.7)]" 
                     />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-1.5">
-                      <h4 className="font-display font-black text-white text-sm sm:text-base tracking-wider uppercase truncate">
+                      <h4 className="font-display font-black text-white text-xs sm:text-sm tracking-wider uppercase truncate">
                         SET OF THE DEMIURGE
                       </h4>
-                      <span className="bg-rose-500 text-white font-mono text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow-[0_0_8px_rgba(244,63,94,0.7)] shrink-0">
+                      <span className="bg-rose-500 text-white font-mono text-[8px] font-black uppercase px-2 py-0.5 rounded-full shadow-[0_0_8px_rgba(244,63,94,0.7)] shrink-0">
                         DIVINE
                       </span>
                     </div>
@@ -586,9 +586,9 @@ export const HeroInventoryView: React.FC = () => {
                     {(() => {
                       const demiurgePieces = equippedList.filter(e => e.setId === 'demiurge').length;
                       return (
-                        <div className="mt-1.5 flex items-center justify-between">
-                          <span className="text-[10px] font-mono text-gray-400 font-bold uppercase">Resonance</span>
-                          <span className="font-mono font-black text-sm text-rose-300">
+                        <div className="mt-1 flex items-center justify-between">
+                          <span className="text-[9px] font-mono text-gray-400 font-bold uppercase">Resonance</span>
+                          <span className="font-mono font-black text-xs text-rose-300">
                             {demiurgePieces} / 6 Pieces
                           </span>
                         </div>
@@ -601,13 +601,13 @@ export const HeroInventoryView: React.FC = () => {
                 {(() => {
                   const demiurgePieces = equippedList.filter(e => e.setId === 'demiurge').length;
                   return (
-                    <div className="grid grid-cols-6 gap-1.5 mt-3">
+                    <div className="grid grid-cols-6 gap-1 mt-2">
                       {[1, 2, 3, 4, 5, 6].map(i => (
                         <div 
                           key={i} 
-                          className={`h-2 rounded-full transition-all duration-300 ${
+                          className={`h-1.5 rounded-full transition-all duration-300 ${
                             i <= demiurgePieces 
-                              ? 'bg-gradient-to-r from-rose-500 to-amber-400 shadow-[0_0_10px_rgba(244,63,94,0.8)]' 
+                              ? 'bg-gradient-to-r from-rose-500 to-amber-400 shadow-[0_0_8px_rgba(244,63,94,0.8)]' 
                               : 'bg-black/60 border border-white/10'
                           }`}
                         />
@@ -618,7 +618,7 @@ export const HeroInventoryView: React.FC = () => {
               </div>
 
               {/* 3 Milestone Tier Cards */}
-              <div className="space-y-2.5 my-auto py-3 relative z-10">
+              <div className="space-y-2 my-auto py-2 relative z-10">
                 {(() => {
                   const demiurgePieces = equippedList.filter(e => e.setId === 'demiurge').length;
                   return DEMIURGE_SET.thresholds.map((threshold, tIdx) => {
@@ -626,36 +626,36 @@ export const HeroInventoryView: React.FC = () => {
                     return (
                       <div
                         key={tIdx}
-                        className={`rounded-2xl p-3 border transition-all duration-300 ${
+                        className={`rounded-xl p-2.5 border transition-all duration-300 ${
                           isActive
-                            ? 'bg-gradient-to-r from-rose-950/90 via-[#270710]/90 to-rose-950/80 border-rose-400/90 shadow-[0_0_15px_rgba(244,63,94,0.35)] ring-1 ring-rose-400/40'
+                            ? 'bg-gradient-to-r from-rose-950/90 via-[#270710]/90 to-rose-950/80 border-rose-400/90 shadow-[0_0_12px_rgba(244,63,94,0.35)] ring-1 ring-rose-400/40'
                             : 'bg-black/50 border-white/10 opacity-60'
                         }`}
                       >
-                        <div className="flex items-center justify-between gap-1.5 mb-1.5">
-                          <div className="flex items-center gap-2">
-                            <span className={`w-5 h-5 rounded-md text-[10px] font-mono font-black flex items-center justify-center ${
+                        <div className="flex items-center justify-between gap-1.5 mb-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className={`w-4 h-4 rounded-md text-[9px] font-mono font-black flex items-center justify-center ${
                               isActive ? 'bg-rose-500 text-black font-bold' : 'bg-white/10 text-gray-400'
                             }`}>
                               {threshold.pieces}
                             </span>
-                            <span className={`text-[11px] font-mono font-black uppercase tracking-wider ${isActive ? 'text-rose-200' : 'text-gray-400'}`}>
+                            <span className={`text-[10px] font-mono font-black uppercase tracking-wider ${isActive ? 'text-rose-200' : 'text-gray-400'}`}>
                               {threshold.label}
                             </span>
                           </div>
 
                           {isActive ? (
-                            <span className="text-[9px] font-mono font-black text-rose-300 bg-rose-950 border border-rose-500/70 px-2 py-0.5 rounded-full flex items-center gap-1 shadow-[0_0_6px_rgba(244,63,94,0.6)]">
-                              <Check className="w-3 h-3" /> ACTIVE
+                            <span className="text-[8px] font-mono font-black text-rose-300 bg-rose-950 border border-rose-500/70 px-1.5 py-0.5 rounded-full flex items-center gap-1 shadow-[0_0_6px_rgba(244,63,94,0.6)]">
+                              <Check className="w-2.5 h-2.5" /> ACTIVE
                             </span>
                           ) : (
-                            <span className="text-[9px] font-mono text-gray-500">
+                            <span className="text-[8px] font-mono text-gray-500">
                               {threshold.pieces - demiurgePieces} needed
                             </span>
                           )}
                         </div>
 
-                        <p className={`text-[11px] font-sans leading-relaxed ${isActive ? 'text-rose-100 font-medium' : 'text-gray-400'}`}>
+                        <p className={`text-[10px] font-sans leading-snug ${isActive ? 'text-rose-100 font-medium' : 'text-gray-400'}`}>
                           {threshold.description}
                         </p>
                       </div>
@@ -665,8 +665,8 @@ export const HeroInventoryView: React.FC = () => {
               </div>
 
               {/* Set Lore / Status Tag at bottom */}
-              <div className="pt-2.5 border-t border-rose-500/20 text-center relative z-10">
-                <span className="text-[10px] font-mono text-gray-400 italic">
+              <div className="pt-2 border-t border-rose-500/20 text-center relative z-10">
+                <span className="text-[9px] font-mono text-gray-400 italic">
                   Forged at the Divine Altar in the Shop
                 </span>
               </div>
