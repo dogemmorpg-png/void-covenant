@@ -3,7 +3,7 @@ import { useGame } from '../context/GameContext';
 import { Equipment, EquipmentSlot, CardTier } from '../types';
 import { getEquipmentIcon, calculateEquipmentSetBonuses, DEMIURGE_SET } from '../data/equipment';
 import { TalentsView } from './TalentsView';
-import { Shield, Sword, Heart, Sparkles, Coins, Hourglass, Wind, Zap, Activity, Flame, Check, RefreshCw, X } from 'lucide-react';
+import { Shield, Sword, Heart, Sparkles, Coins, Hourglass, Wind, Zap, Activity, Flame, Check, RefreshCw, X, ShoppingBag, ArrowRight } from 'lucide-react';
 import { VoidStrikeIcon, BloodAuraIcon, WarlordCryIcon } from './SkillAndStanceIcons';
 
 interface SlotConfig {
@@ -67,7 +67,11 @@ const TIER_PRIORITY: Record<CardTier, number> = {
   bronze: 1,
 };
 
-export const HeroInventoryView: React.FC = () => {
+interface HeroInventoryViewProps {
+  onNavigateToShop?: (tab?: 'cards' | 'equipment' | 'divine') => void;
+}
+
+export const HeroInventoryView: React.FC<HeroInventoryViewProps> = ({ onNavigateToShop }) => {
   const { profile, equipItem, unequipItem } = useGame();
   
   const [selectedSlot, setSelectedSlot] = useState<EquipmentSlot | null>(null);
@@ -664,11 +668,16 @@ export const HeroInventoryView: React.FC = () => {
                 })()}
               </div>
 
-              {/* Set Lore / Status Tag at bottom */}
+              {/* Buy Set / Forge at Divine Altar Button */}
               <div className="pt-2 border-t border-rose-500/20 text-center relative z-10">
-                <span className="text-[9px] font-mono text-gray-400 italic">
-                  Forged at the Divine Altar in the Shop
-                </span>
+                <button
+                  onClick={() => onNavigateToShop?.('divine')}
+                  className="w-full py-2 px-3 bg-gradient-to-r from-rose-950 via-red-900 to-rose-950 hover:from-red-900 hover:via-rose-800 hover:to-red-900 border border-rose-500/60 hover:border-rose-400 text-rose-200 hover:text-white font-display font-black text-xs uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(244,63,94,0.3)] hover:shadow-[0_0_22px_rgba(244,63,94,0.6)] flex items-center justify-center gap-2 cursor-pointer group"
+                >
+                  <ShoppingBag className="w-3.5 h-3.5 text-rose-400 group-hover:scale-110 transition-transform" />
+                  <span>FORGE SET IN SHOP</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-rose-400/80 group-hover:translate-x-0.5 transition-transform" />
+                </button>
               </div>
             </div>
 

@@ -32,11 +32,21 @@ const renderManaIcon = (cost: number, sizeClass: string = "w-5 h-5") => {
   );
 };
 
-export const GachaStoreView: React.FC = () => {
+interface GachaStoreViewProps {
+  initialTab?: 'cards' | 'equipment' | 'divine';
+}
+
+export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'cards' }) => {
   const { profile, spendGold, spendShards, addCardToCollection, addEquipment, setProfile, setIsShardsShopOpen } = useGame();
   const toast = useToast();
   
-  const [activeTab, setActiveTab] = useState<'cards' | 'equipment' | 'divine'>('cards');
+  const [activeTab, setActiveTab] = useState<'cards' | 'equipment' | 'divine'>(initialTab);
+
+  React.useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
   const [buyingCardId, setBuyingCardId] = useState<string | null>(null);
   
   // Animation/Opening state

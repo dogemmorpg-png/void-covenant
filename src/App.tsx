@@ -46,6 +46,7 @@ function MainAppContent() {
 
   // Tab states
   const [activeTab, setActiveTab] = useState<'campaign' | 'pvp' | 'collection' | 'hero' | 'talents' | 'altar' | 'bank'>('campaign');
+  const [shopInitialTab, setShopInitialTab] = useState<'cards' | 'equipment' | 'divine'>('cards');
   
   // Active Battle stage state
   const [activeBattleStage, setActiveBattleStage] = useState<CampaignStage | null>(null);
@@ -295,7 +296,12 @@ function MainAppContent() {
             </div>
 
             <div className={activeTab === 'hero' ? 'block' : 'hidden'}>
-              <HeroInventoryView />
+              <HeroInventoryView 
+                onNavigateToShop={(tab = 'divine') => {
+                  setShopInitialTab(tab);
+                  setActiveTab('altar');
+                }}
+              />
             </div>
 
             <div className={activeTab === 'talents' ? 'block' : 'hidden'}>
@@ -303,7 +309,7 @@ function MainAppContent() {
             </div>
 
             <div className={activeTab === 'altar' ? 'block' : 'hidden'}>
-              <GachaStoreView />
+              <GachaStoreView initialTab={shopInitialTab} />
             </div>
 
             <div className={activeTab === 'bank' ? 'block' : 'hidden'}>
