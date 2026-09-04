@@ -59,6 +59,14 @@ const TIER_STYLES: Record<CardTier, { border: string; bg: string; text: string; 
   }
 };
 
+const TIER_PRIORITY: Record<CardTier, number> = {
+  divine: 5,
+  legendary: 4,
+  gold: 3,
+  silver: 2,
+  bronze: 1,
+};
+
 export const HeroInventoryView: React.FC = () => {
   const { profile, equipItem, unequipItem } = useGame();
   
@@ -186,8 +194,26 @@ export const HeroInventoryView: React.FC = () => {
 
   const renderInventoryModal = () => {
     if (!selectedSlot) return null;
-    const inventoryItems = profile.equipment?.filter(e => e.slot === selectedSlot) || [];
+    const rawItems = profile.equipment?.filter(e => e.slot === selectedSlot) || [];
     const equippedItemId = profile.equipped?.[selectedSlot];
+    const inventoryItems = [...rawItems].sort((a, b) => {
+      // If one is equipped, show it first
+      const aEquipped = a.id === equippedItemId;
+      const bEquipped = b.id === equippedItemId;
+      if (aEquipped && !bEquipped) return -1;
+      if (!aEquipped && bEquipped) return 1;
+
+      // Primary sort: Tier descending (divine -> legendary -> gold -> silver -> bronze)
+      const tierDiff = (TIER_PRIORITY[b.tier] || 0) - (TIER_PRIORITY[a.tier] || 0);
+      if (tierDiff !== 0) return tierDiff;
+
+      // Secondary sort: Primary bonus value descending
+      const bonusDiff = (b.bonusValue || 0) - (a.bonusValue || 0);
+      if (bonusDiff !== 0) return bonusDiff;
+
+      // Tertiary sort: Name alphabetical
+      return a.name.localeCompare(b.name);
+    });
     const slotCfg = SLOTS_CONFIG.find(s => s.slot === selectedSlot);
 
     return (

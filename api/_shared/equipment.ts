@@ -68,7 +68,7 @@ export const EQUIPMENT_TEMPLATES: Omit<Equipment, 'id'>[] = [
     secondaryBonusType: 'maxHealth',
     secondaryBonusValue: 15,
     setId: 'demiurge',
-    description: 'Древний клинок, рассекающий ткань пространства и ускоряющий призыв союзных сущностей.',
+    description: 'An ancient cosmic blade that sunders reality and hastens allied summons.',
     icon: '/icons/equipment/items/blade_of_the_demiurge.png'
   },
   {
@@ -78,7 +78,7 @@ export const EQUIPMENT_TEMPLATES: Omit<Equipment, 'id'>[] = [
     bonusType: 'maxHealth',
     bonusValue: 35,
     setId: 'demiurge',
-    description: 'Непробиваемый панцирь, выкованный из осколков угасших сверхновых.',
+    description: 'An impenetrable cuirass forged from the remnants of collapsing supernovas.',
     icon: '/icons/equipment/items/carapace_of_the_demiurge.png'
   },
   {
@@ -90,7 +90,7 @@ export const EQUIPMENT_TEMPLATES: Omit<Equipment, 'id'>[] = [
     secondaryBonusType: 'dodge',
     secondaryBonusValue: 4,
     setId: 'demiurge',
-    description: 'Венец абсолютного владычества, дарующий прозрение и защиту от ударов.',
+    description: 'A diadem of supreme celestial authority, granting foresight and elusive grace.',
     icon: '/icons/equipment/items/crown_of_the_demiurge.png'
   },
   {
@@ -102,7 +102,7 @@ export const EQUIPMENT_TEMPLATES: Omit<Equipment, 'id'>[] = [
     secondaryBonusType: 'maxHealth',
     secondaryBonusValue: 15,
     setId: 'demiurge',
-    description: 'Поступь творца, позволяющая ускользать от сокрушительных выпадов Бездны.',
+    description: 'Gilded celestial greaves that slip past devastating blows of the Void.',
     icon: '/icons/equipment/items/striders_of_the_demiurge.png'
   },
   {
@@ -114,7 +114,7 @@ export const EQUIPMENT_TEMPLATES: Omit<Equipment, 'id'>[] = [
     secondaryBonusType: 'maxHealth',
     secondaryBonusValue: 20,
     setId: 'demiurge',
-    description: 'Перстень с печатью Первородного, приумножающий добываемые сокровища.',
+    description: 'A primordial signet ring resonating with cosmic wealth and ancient vitality.',
     icon: '/icons/equipment/items/seal_of_the_demiurge.png'
   },
   {
@@ -126,7 +126,7 @@ export const EQUIPMENT_TEMPLATES: Omit<Equipment, 'id'>[] = [
     secondaryBonusType: 'dodge',
     secondaryBonusValue: 5,
     setId: 'demiurge',
-    description: 'Пульсирующее ядро созидания, поддерживающее непрекращающуюся жизнь владельца.',
+    description: 'A pulsating core of stellar genesis, fueling boundless life force in its bearer.',
     icon: '/icons/equipment/items/heart_of_the_demiurge.png'
   },
 ];
