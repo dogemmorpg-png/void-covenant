@@ -832,10 +832,10 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           </div>
                         </div>
 
-                        {/* Card Title & Lore */}
+                        {/* Card Title & Lore (Full Name, No Truncation) */}
                         <div>
-                          <div className="flex items-center justify-between gap-2">
-                            <h4 className="font-display font-black text-base text-white group-hover:text-rose-400 transition-colors tracking-wide truncate">
+                          <div className="flex items-start justify-between gap-2">
+                            <h4 className="font-display font-black text-sm lg:text-base text-white group-hover:text-rose-400 transition-colors tracking-wide leading-tight">
                               {card.name}
                             </h4>
                             {ownedCount > 0 && (
@@ -844,12 +844,12 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                               </span>
                             )}
                           </div>
-                          <p className="text-[11px] text-gray-400 font-sans mt-0.5 line-clamp-1 leading-snug">
+                          <p className="text-[11px] text-gray-400 font-sans mt-1 line-clamp-2 leading-snug">
                             {card.description}
                           </p>
                         </div>
 
-                        {/* Skills Box */}
+                        {/* Skills Box (Clean multi-line) */}
                         <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 space-y-1.5">
                           <div className="text-[9px] font-mono uppercase font-bold text-rose-400 tracking-wider flex items-center gap-1">
                             <Sparkles className="w-3 h-3 text-rose-400" />
@@ -857,9 +857,9 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           </div>
                           <div className="space-y-1">
                             {card.skills.map((skill, sIdx) => (
-                              <div key={sIdx} className="flex items-baseline gap-1.5 text-[10px] leading-tight">
+                              <div key={sIdx} className="flex items-start gap-1.5 text-[10px] leading-snug">
                                 <span className="font-mono font-bold text-rose-300 uppercase shrink-0">[{skill.type} {skill.value}]</span>
-                                <span className="text-gray-300 line-clamp-1" title={skill.description}>{skill.description}</span>
+                                <span className="text-gray-300 line-clamp-2" title={skill.description}>{skill.description}</span>
                               </div>
                             ))}
                           </div>
