@@ -660,93 +660,103 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           const cardName = targetBoard[step.targetSlot]?.name;
           const casterHeroLabel = isPlayerCaster ? 'player-hero' : 'enemy-hero';
           const targetHeroLabel = isPlayerCaster ? 'enemy-hero' : 'player-hero';
-          
+
           if (step.stance === 'void_strike') {
+            audioSystem.playAttack();
             if (step.targetSlot === -1) {
-              stepDescription = `⚡ Void Strike: ${isPlayerCaster ? 'Lord' : 'Boss'} deals -${step.damage} damage to ${isPlayerCaster ? 'Enemy' : 'Player'} Lord directly!`;
-              audioSystem.playAttack();
-              if (targetSide === 'player') {
-                copy.playerHeroHealth = Math.max(0, copy.playerHeroHealth - step.damage);
-              } else {
-                copy.enemyHeroHealth = Math.max(0, copy.enemyHeroHealth - step.damage);
-              }
-              addFloatingText(`⚡ -${step.damage}`, targetHeroLabel, 'text-cyan-400 font-black text-lg scale-125 text-shadow-glow');
-              addFloatingText('VOID STRIKE ⚡', casterHeroLabel, 'text-cyan-400 font-bold text-xs');
-            } else {
-              stepDescription = `⚡ Void Strike: ${isPlayerCaster ? 'Lord' : 'Boss'} deals -${step.damage} damage to ${cardName || 'target'}`;
-              audioSystem.playAttack();
-              setAnimatingSlot({ side: targetSide, slot: step.targetSlot, type: 'hit' });
-              const target = targetBoard[step.targetSlot];
-              if (target) {
-                if (step.barrierBlocked) {
-                  target.barrier = false;
-                  target.ward = false;
-                  setBarrierShatterSlot({ side: targetSide, slot: step.targetSlot });
-                  setTimeout(() => setBarrierShatterSlot(null), 850 / speedMultiplier);
-                  addFloatingText('✨ BARRIER BLOCKED!', { side: targetSide, slot: step.targetSlot }, 'text-amber-300 font-black text-xs scale-125 text-shadow-glow');
+              stepDescription = `⚡ Void Strike: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} deals -${step.damage} damage to ${isPlayerCaster ? 'Enemy' : 'Player'} Lord directly!`;
+              setAnimatingSlot({ side: targetSide, slot: -1, type: 'hit' });
+              setTimeout(() => {
+                if (targetSide === 'player') {
+                  copy.playerHeroHealth = Math.max(0, copy.playerHeroHealth - step.damage);
                 } else {
-                  if (step.armorAbsorbed > 0) {
-                    target.armor = Math.max(0, (target.armor || 0) - step.armorAbsorbed);
-                    setArmorSparkSlot({ side: targetSide, slot: step.targetSlot });
-                    setTimeout(() => setArmorSparkSlot(null), 500 / speedMultiplier);
-                    addFloatingText(`🛡️ -${step.armorAbsorbed} ARMOR`, { side: targetSide, slot: step.targetSlot }, 'text-cyan-300 font-black text-xs');
-                  }
-                  if (step.armorBroken) {
-                    target.armor = 0;
-                    setArmorBreakSlot({ side: targetSide, slot: step.targetSlot });
-                    setTimeout(() => setArmorBreakSlot(null), 850 / speedMultiplier);
-                    addFloatingText('💥 ARMOR BROKEN!', { side: targetSide, slot: step.targetSlot }, 'text-red-400 font-black text-xs');
-                  }
-                  target.health = Math.max(0, target.health - step.damage);
-                  if (step.damage > 0) {
-                    addFloatingText(`⚡ -${step.damage}`, { side: targetSide, slot: step.targetSlot }, 'text-cyan-400 font-black text-sm scale-125');
+                  copy.enemyHeroHealth = Math.max(0, copy.enemyHeroHealth - step.damage);
+                }
+                addFloatingText(`⚡ -${step.damage}`, targetHeroLabel, 'text-cyan-400 font-black text-lg scale-125 text-shadow-glow');
+                addFloatingText('VOID STRIKE ⚡', casterHeroLabel, 'text-cyan-400 font-bold text-xs');
+              }, 180 / speedMultiplier);
+            } else {
+              stepDescription = `⚡ Void Strike: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} deals -${step.damage} damage to ${cardName || 'target'}`;
+              setAnimatingSlot({ side: targetSide, slot: step.targetSlot, type: 'hit' });
+              setTimeout(() => {
+                const target = targetBoard[step.targetSlot];
+                if (target) {
+                  if (step.barrierBlocked) {
+                    target.barrier = false;
+                    target.ward = false;
+                    setBarrierShatterSlot({ side: targetSide, slot: step.targetSlot });
+                    setTimeout(() => setBarrierShatterSlot(null), 850 / speedMultiplier);
+                    addFloatingText('✨ BARRIER BLOCKED!', { side: targetSide, slot: step.targetSlot }, 'text-amber-300 font-black text-xs scale-125 text-shadow-glow');
+                  } else {
+                    if (step.armorAbsorbed > 0) {
+                      target.armor = Math.max(0, (target.armor || 0) - step.armorAbsorbed);
+                      setArmorSparkSlot({ side: targetSide, slot: step.targetSlot });
+                      setTimeout(() => setArmorSparkSlot(null), 500 / speedMultiplier);
+                      addFloatingText(`🛡️ -${step.armorAbsorbed} ARMOR`, { side: targetSide, slot: step.targetSlot }, 'text-cyan-300 font-black text-xs');
+                    }
+                    if (step.armorBroken) {
+                      target.armor = 0;
+                      setArmorBreakSlot({ side: targetSide, slot: step.targetSlot });
+                      setTimeout(() => setArmorBreakSlot(null), 850 / speedMultiplier);
+                      addFloatingText('💥 ARMOR BROKEN!', { side: targetSide, slot: step.targetSlot }, 'text-red-400 font-black text-xs');
+                    }
+                    target.health = Math.max(0, target.health - step.damage);
+                    if (step.damage > 0) {
+                      addFloatingText(`⚡ -${step.damage}`, { side: targetSide, slot: step.targetSlot }, 'text-cyan-400 font-black text-sm scale-125');
+                    }
                   }
                 }
-              }
-              addFloatingText('VOID STRIKE ⚡', casterHeroLabel, 'text-cyan-400 font-bold text-xs');
+                addFloatingText('VOID STRIKE ⚡', casterHeroLabel, 'text-cyan-400 font-bold text-xs');
+              }, 180 / speedMultiplier);
             }
           } else if (step.stance === 'blood_aura') {
+            audioSystem.playHeal();
             if (step.targetSlot === -1) {
-              stepDescription = `🩸 Blood Aura: ${isPlayerCaster ? 'Lord' : 'Boss'} heals directly for +${step.heal} HP`;
-              audioSystem.playHeal();
-              if (targetSide === 'player') {
-                copy.playerHeroHealth = Math.min(copy.playerHeroMaxHealth, copy.playerHeroHealth + step.heal);
-              } else {
-                copy.enemyHeroHealth = Math.min(copy.enemyHeroMaxHealth, copy.enemyHeroHealth + step.heal);
-              }
-              addFloatingText(`🩸 +${step.heal}`, targetHeroLabel, 'text-emerald-400 font-bold');
-              addFloatingText('BLOOD AURA 🩸', casterHeroLabel, 'text-rose-400 font-bold text-xs');
+              stepDescription = `🩸 Blood Aura: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} heals directly for +${step.heal} HP`;
+              setAnimatingSlot({ side: targetSide, slot: -1, type: 'heal' });
+              setTimeout(() => {
+                if (targetSide === 'player') {
+                  copy.playerHeroHealth = Math.min(copy.playerHeroMaxHealth, copy.playerHeroHealth + step.heal);
+                } else {
+                  copy.enemyHeroHealth = Math.min(copy.enemyHeroMaxHealth, copy.enemyHeroHealth + step.heal);
+                }
+                addFloatingText(`🩸 +${step.heal}`, targetHeroLabel, 'text-emerald-400 font-bold');
+                addFloatingText('BLOOD AURA 🩸', casterHeroLabel, 'text-rose-400 font-bold text-xs');
+              }, 180 / speedMultiplier);
             } else {
               stepDescription = `🩸 Blood Aura: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} heals ${cardName || 'ally'} for +${step.heal} HP`;
-              audioSystem.playHeal();
               setAnimatingSlot({ side: targetSide, slot: step.targetSlot, type: 'heal' });
-              const target = targetBoard[step.targetSlot];
-              if (target) {
-                target.health = Math.min(target.maxHealth, target.health + step.heal);
-                if (step.barrier || step.ward) {
-                  target.barrier = true;
-                  target.ward = true;
+              setTimeout(() => {
+                const target = targetBoard[step.targetSlot];
+                if (target) {
+                  target.health = Math.min(target.maxHealth, target.health + step.heal);
+                  if (step.barrier || step.ward) {
+                    target.barrier = true;
+                    target.ward = true;
+                  }
+                  if (step.bonusMaxHp > 0) {
+                    target.maxHealth += step.bonusMaxHp;
+                    target.health += step.bonusMaxHp;
+                  }
                 }
-                if (step.bonusMaxHp > 0) {
-                  target.maxHealth += step.bonusMaxHp;
-                  target.health += step.bonusMaxHp;
-                }
-              }
-              addFloatingText(`🩸 +${step.heal}`, { side: targetSide, slot: step.targetSlot }, 'text-emerald-400 font-bold');
-              addFloatingText('BLOOD AURA 🩸', casterHeroLabel, 'text-rose-400 font-bold text-xs');
+                addFloatingText(`🩸 +${step.heal}`, { side: targetSide, slot: step.targetSlot }, 'text-emerald-400 font-bold');
+                addFloatingText('BLOOD AURA 🩸', casterHeroLabel, 'text-rose-400 font-bold text-xs');
+              }, 180 / speedMultiplier);
             }
           } else if (step.stance === 'warlord_cry') {
             stepDescription = `🔥 Warlord's Cry: Boosts ${cardName || 'ally'} stats!`;
             audioSystem.playPlace();
             setAnimatingSlot({ side: targetSide, slot: step.targetSlot, type: 'heal' });
-            const target = targetBoard[step.targetSlot];
-            if (target) {
-              if (step.bonusAtk > 0) target.attack += step.bonusAtk;
-              if (step.bonusArmor > 0) target.armor = (target.armor || 0) + step.bonusArmor;
-              if (step.aoeHeal > 0) target.health = Math.min(target.maxHealth, target.health + step.aoeHeal);
-            }
-            addFloatingText('🔥 BUFF', { side: targetSide, slot: step.targetSlot }, 'text-yellow-400 font-bold');
-            addFloatingText("WARLORD'S CRY 🔥", casterHeroLabel, 'text-yellow-400 font-bold text-xs');
+            setTimeout(() => {
+              const target = targetBoard[step.targetSlot];
+              if (target) {
+                if (step.bonusAtk > 0) target.attack += step.bonusAtk;
+                if (step.bonusArmor > 0) target.armor = (target.armor || 0) + step.bonusArmor;
+                if (step.aoeHeal > 0) target.health = Math.min(target.maxHealth, target.health + step.aoeHeal);
+              }
+              addFloatingText('🔥 BUFF', { side: targetSide, slot: step.targetSlot }, 'text-yellow-400 font-bold');
+              addFloatingText("WARLORD'S CRY 🔥", casterHeroLabel, 'text-yellow-400 font-bold text-xs');
+            }, 180 / speedMultiplier);
           }
           break;
         }
@@ -1048,7 +1058,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#ebd09b]/15 to-transparent -translate-y-1/2 pointer-events-none z-10" />
 
           {/* Glowing Lord casting lasers / energy beams */}
-          {isAnimating && currentStep && currentStep.type === 'hero_skill' && animatingSlot !== null && (
+          {isAnimating && currentStep && currentStep.type === 'hero_skill' && (
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-25">
               <defs>
                 <linearGradient id="voidStrikeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -1067,18 +1077,30 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               {(() => {
                 const stance = currentStep.stance;
                 const slot = currentStep.targetSlot;
+                const casterSide = currentStep.side || 'player';
+                const isPlayerCaster = casterSide === 'player';
                 
+                // Which side is being targeted?
+                const targetSide = isPlayerCaster
+                  ? (stance === 'void_strike' ? 'enemy' : 'player')
+                  : (stance === 'void_strike' ? 'player' : 'enemy');
+
                 // Casting Lord coordinates (Top-Left or Bottom-Left avatar positions)
-                let startX = '55px';
-                let startY = '46px'; // Enemy Lord Y
-                
-                if (stance === 'blood_aura' || stance === 'warlord_cry') {
-                  startY = 'calc(100% - 46px)'; // Player Lord Y
+                const startX = '56px';
+                const startY = isPlayerCaster ? 'calc(100% - 52px)' : '52px';
+
+                // Target coordinates
+                let endX = '56px';
+                let endY = '52px';
+
+                if (slot !== undefined && slot >= 0) {
+                  endX = `${20 * slot + 10}%`;
+                  endY = targetSide === 'enemy' ? '30%' : '70%';
+                } else {
+                  // Direct target on Hero portrait
+                  endX = '56px';
+                  endY = targetSide === 'enemy' ? '52px' : 'calc(100% - 52px)';
                 }
-                
-                // Target card coordinates
-                const endX = `${20 * slot + 10}%`;
-                const endY = (stance === 'blood_aura' || stance === 'warlord_cry') ? '70%' : '30%';
                 
                 let strokeColor = 'url(#voidStrikeGrad)';
                 let glowColor = 'rgba(6, 182, 212, 0.95)';
@@ -1099,18 +1121,18 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       x2={endX}
                       y2={endY}
                       stroke={strokeColor}
-                      strokeWidth="4"
+                      strokeWidth="5"
                       strokeLinecap="round"
                       className="animate-pulse"
-                      style={{ filter: `drop-shadow(0 0 10px ${glowColor})` }}
+                      style={{ filter: `drop-shadow(0 0 12px ${glowColor})` }}
                     />
                     <circle
                       cx={endX}
                       cy={endY}
-                      r="6.5"
+                      r="8"
                       fill={stance === 'void_strike' ? '#06b6d4' : (stance === 'blood_aura' ? '#ef4444' : '#f59e0b')}
                       className="animate-ping"
-                      style={{ filter: `drop-shadow(0 0 12px ${glowColor})` }}
+                      style={{ filter: `drop-shadow(0 0 14px ${glowColor})` }}
                     />
                   </>
                 );
@@ -1177,14 +1199,17 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
           {/* 1. ENEMY HERO PORTRAIT (Top-Left corner - large format) */}
           {(() => {
-            const isEnemyCasting = currentStep?.type === 'hero_skill' && currentStep.stance === 'void_strike' && animatingSlot !== null;
+            const isEnemyCasting = currentStep?.type === 'hero_skill' && currentStep.side === 'enemy';
+            const enemyGlowColor = currentStep?.stance === 'void_strike' 
+              ? 'rgba(6, 182, 212, 0.9)' 
+              : (currentStep?.stance === 'blood_aura' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(245, 158, 11, 0.9)');
             return (
               <motion.div 
                 animate={{
-                  scale: isEnemyCasting ? [1, 1.12, 1.12, 1] : 1,
+                  scale: isEnemyCasting ? [1, 1.14, 1.14, 1] : 1,
                   rotate: isEnemyCasting ? [0, 4, -4, 4, -4, 0] : 0,
                   boxShadow: isEnemyCasting 
-                    ? "0 0 25px rgba(6, 182, 212, 0.8)" 
+                    ? `0 0 30px ${enemyGlowColor}` 
                     : "0 4px 6px rgba(0, 0, 0, 0.3)"
                 }}
                 transition={{ duration: 0.65 }}
@@ -1220,17 +1245,17 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
           {/* 2. PLAYER HERO PORTRAIT (Bottom-Left corner - large format) */}
           {(() => {
-            const isPlayerCasting = currentStep?.type === 'hero_skill' && 
-              (currentStep.stance === 'blood_aura' || currentStep.stance === 'warlord_cry') && 
-              animatingSlot !== null;
-            const glowColor = currentStep?.stance === 'blood_aura' ? 'rgba(239, 68, 68, 0.8)' : 'rgba(245, 158, 11, 0.8)';
+            const isPlayerCasting = currentStep?.type === 'hero_skill' && (!currentStep.side || currentStep.side === 'player');
+            const playerGlowColor = currentStep?.stance === 'void_strike' 
+              ? 'rgba(6, 182, 212, 0.9)' 
+              : (currentStep?.stance === 'blood_aura' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(245, 158, 11, 0.9)');
             return (
               <motion.div 
                 animate={{
-                  scale: isPlayerCasting ? [1, 1.12, 1.12, 1] : 1,
+                  scale: isPlayerCasting ? [1, 1.14, 1.14, 1] : 1,
                   rotate: isPlayerCasting ? [0, 4, -4, 4, -4, 0] : 0,
                   boxShadow: isPlayerCasting 
-                    ? `0 0 25px ${glowColor}` 
+                    ? `0 0 30px ${playerGlowColor}` 
                     : "0 4px 6px rgba(0, 0, 0, 0.3)"
                 }}
                 transition={{ duration: 0.65 }}
@@ -1582,6 +1607,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       {currentStep?.type === 'hero_skill' && 
                        currentStep.stance === 'void_strike' && 
                        currentStep.targetSlot === idx && 
+                       animatingSlot?.side === side &&
                        animatingSlot?.type === 'hit' && (
                         <motion.div
                           initial={{ opacity: 0, scale: 0.9 }}
@@ -1599,6 +1625,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       {currentStep?.type === 'hero_skill' && 
                        currentStep.stance === 'blood_aura' && 
                        currentStep.targetSlot === idx && 
+                       animatingSlot?.side === side &&
                        animatingSlot?.type === 'heal' && (
                         <motion.div
                           initial={{ opacity: 0, scale: 0.9 }}
@@ -1616,6 +1643,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       {currentStep?.type === 'hero_skill' && 
                        currentStep.stance === 'warlord_cry' && 
                        currentStep.targetSlot === idx && 
+                       animatingSlot?.side === side &&
                        animatingSlot?.type === 'heal' && (
                         <motion.div
                           initial={{ opacity: 0, scale: 0.9 }}
