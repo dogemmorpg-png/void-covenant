@@ -57,12 +57,12 @@ export const EQUIPMENT_ICONS: Record<string, string> = {
   'Voidwalker Striders': '/icons/equipment/items/voidwalker_striders.png',
 
   // DIVINE - SET OF THE DEMIURGE
-  'Blade of the Demiurge': '/icons/equipment/items/abyssal_blade.png',
-  'Carapace of the Demiurge': '/icons/equipment/items/voidplate_armor.png',
-  'Crown of the Demiurge': '/icons/equipment/items/crown_of_thorns.png',
-  'Striders of the Demiurge': '/icons/equipment/items/voidwalker_striders.png',
-  'Seal of the Demiurge': '/icons/equipment/items/ring_of_infinite_ruin.png',
-  'Heart of the Demiurge': '/icons/equipment/items/singularity_core.png',
+  'Blade of the Demiurge': '/icons/equipment/items/blade_of_the_demiurge.png',
+  'Carapace of the Demiurge': '/icons/equipment/items/carapace_of_the_demiurge.png',
+  'Crown of the Demiurge': '/icons/equipment/items/crown_of_the_demiurge.png',
+  'Striders of the Demiurge': '/icons/equipment/items/striders_of_the_demiurge.png',
+  'Seal of the Demiurge': '/icons/equipment/items/seal_of_the_demiurge.png',
+  'Heart of the Demiurge': '/icons/equipment/items/heart_of_the_demiurge.png',
 };
 
 export const getEquipmentIcon = (nameOrItem?: string | Equipment | null, fallbackSlot?: EquipmentSlot): string => {
@@ -146,7 +146,7 @@ export const EQUIPMENT_TEMPLATES: Omit<Equipment, 'id'>[] = [
     secondaryBonusValue: 15,
     setId: 'demiurge',
     description: 'Древний клинок, рассекающий ткань пространства и ускоряющий призыв союзных сущностей.',
-    icon: '/icons/equipment/items/abyssal_blade.png'
+    icon: '/icons/equipment/items/blade_of_the_demiurge.png'
   },
   {
     name: 'Carapace of the Demiurge',
@@ -156,7 +156,7 @@ export const EQUIPMENT_TEMPLATES: Omit<Equipment, 'id'>[] = [
     bonusValue: 35,
     setId: 'demiurge',
     description: 'Непробиваемый панцирь, выкованный из осколков угасших сверхновых.',
-    icon: '/icons/equipment/items/voidplate_armor.png'
+    icon: '/icons/equipment/items/carapace_of_the_demiurge.png'
   },
   {
     name: 'Crown of the Demiurge',
@@ -168,7 +168,7 @@ export const EQUIPMENT_TEMPLATES: Omit<Equipment, 'id'>[] = [
     secondaryBonusValue: 4,
     setId: 'demiurge',
     description: 'Венец абсолютного владычества, дарующий прозрение и защиту от ударов.',
-    icon: '/icons/equipment/items/crown_of_thorns.png'
+    icon: '/icons/equipment/items/crown_of_the_demiurge.png'
   },
   {
     name: 'Striders of the Demiurge',
@@ -180,7 +180,7 @@ export const EQUIPMENT_TEMPLATES: Omit<Equipment, 'id'>[] = [
     secondaryBonusValue: 15,
     setId: 'demiurge',
     description: 'Поступь творца, позволяющая ускользать от сокрушительных выпадов Бездны.',
-    icon: '/icons/equipment/items/voidwalker_striders.png'
+    icon: '/icons/equipment/items/striders_of_the_demiurge.png'
   },
   {
     name: 'Seal of the Demiurge',
@@ -192,7 +192,7 @@ export const EQUIPMENT_TEMPLATES: Omit<Equipment, 'id'>[] = [
     secondaryBonusValue: 20,
     setId: 'demiurge',
     description: 'Перстень с печатью Первородного, приумножающий добываемые сокровища.',
-    icon: '/icons/equipment/items/ring_of_infinite_ruin.png'
+    icon: '/icons/equipment/items/seal_of_the_demiurge.png'
   },
   {
     name: 'Heart of the Demiurge',
@@ -204,7 +204,7 @@ export const EQUIPMENT_TEMPLATES: Omit<Equipment, 'id'>[] = [
     secondaryBonusValue: 5,
     setId: 'demiurge',
     description: 'Пульсирующее ядро созидания, поддерживающее непрекращающуюся жизнь владельца.',
-    icon: '/icons/equipment/items/singularity_core.png'
+    icon: '/icons/equipment/items/heart_of_the_demiurge.png'
   },
 ];
 
