@@ -434,52 +434,52 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
               </div>
 
               {/* 3 Pack Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 lg:gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5">
                 
                 {/* Bronze Pack */}
-                <div className="bg-[#141820] border border-amber-900/40 rounded-2xl p-3.5 flex flex-col justify-between hover:border-amber-500/60 transition-all shadow-xl hover:shadow-[0_0_25px_rgba(245,158,11,0.2)] group">
-                  <div className="space-y-2.5">
+                <div className="bg-[#141820] border border-amber-900/40 rounded-2xl p-4 flex flex-col justify-between hover:border-amber-500/60 transition-all shadow-xl hover:shadow-[0_0_25px_rgba(245,158,11,0.2)] group">
+                  <div className="space-y-3.5">
                     {/* Pack Art Box */}
-                    <div className="h-36 sm:h-40 rounded-xl bg-gradient-to-b from-amber-950/30 to-black/70 border border-amber-900/20 flex flex-col items-center justify-center relative overflow-hidden">
+                    <div className="h-50 sm:h-52 rounded-xl bg-gradient-to-b from-amber-950/30 to-black/70 border border-amber-900/20 flex flex-col items-center justify-center relative overflow-hidden">
                       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(197,168,128,0.2),transparent_70%)]" />
                       <img 
                         src="/packs/pack_bronze.webp" 
                         alt="Bronze Pack" 
                         decoding="async" 
-                        className="w-28 h-28 sm:w-32 sm:h-32 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(197,168,128,0.45)]" 
+                        className="w-40 h-40 sm:w-44 sm:h-44 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_22px_rgba(197,168,128,0.5)]" 
                       />
-                      <span className="absolute bottom-1.5 font-display font-black text-[10px] text-amber-500 tracking-widest uppercase">
+                      <span className="absolute bottom-2 font-display font-black text-xs text-amber-500 tracking-widest uppercase">
                         BRONZE PACK
                       </span>
                     </div>
 
                     <div>
-                      <h4 className="font-display font-black text-sm sm:text-base text-white">
+                      <h4 className="font-display font-black text-base sm:text-lg text-white">
                         Bronze Booster
                       </h4>
                     </div>
 
                     {/* Clean Drop Rates Box */}
-                    <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 text-xs font-mono space-y-1">
+                    <div className="bg-black/60 border border-white/10 rounded-xl p-3 text-xs font-mono space-y-1.5">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400">Common (Bronze):</span>
-                        <span className="text-amber-400 font-bold">95%</span>
+                        <span className="text-amber-400 font-bold text-sm">95%</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400">Rare (Silver):</span>
-                        <span className="text-gray-200 font-bold">5%</span>
+                        <span className="text-gray-200 font-bold text-sm">5%</span>
                       </div>
-                      <div className="flex justify-between items-center border-t border-white/5 pt-1 text-gray-400">
+                      <div className="flex justify-between items-center border-t border-white/5 pt-1.5 text-gray-400">
                         <span>Guaranteed:</span>
                         <span className="text-white font-semibold">Level 1 Card</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-3">
+                  <div className="mt-4">
                     <button
                       onClick={buyBronzePack}
-                      className="w-full bg-[#c5a880] hover:bg-[#ebd09b] text-black font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer active:scale-95"
+                      className="w-full bg-[#c5a880] hover:bg-[#ebd09b] text-black font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer active:scale-95"
                     >
                       <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain" />
                       300 GOLD
@@ -488,49 +488,49 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                 </div>
 
                 {/* Obsidian Pack */}
-                <div className="bg-[#141820] border border-indigo-950 rounded-2xl p-3.5 flex flex-col justify-between hover:border-cyan-400/60 transition-all shadow-xl gothic-glow-blue group">
-                  <div className="space-y-2.5">
+                <div className="bg-[#141820] border border-indigo-950 rounded-2xl p-4 flex flex-col justify-between hover:border-cyan-400/60 transition-all shadow-xl gothic-glow-blue group">
+                  <div className="space-y-3.5">
                     {/* Pack Art Box */}
-                    <div className="h-36 sm:h-40 rounded-xl bg-gradient-to-b from-indigo-950/40 to-black/70 border border-indigo-900/20 flex flex-col items-center justify-center relative overflow-hidden">
+                    <div className="h-50 sm:h-52 rounded-xl bg-gradient-to-b from-indigo-950/40 to-black/70 border border-indigo-900/20 flex flex-col items-center justify-center relative overflow-hidden">
                       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(102,252,241,0.2),transparent_70%)]" />
                       <img 
                         src="/packs/pack_obsidian.webp" 
                         alt="Obsidian Pack" 
                         decoding="async" 
-                        className="w-28 h-28 sm:w-32 sm:h-32 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(102,252,241,0.45)]" 
+                        className="w-40 h-40 sm:w-44 sm:h-44 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_22px_rgba(102,252,241,0.5)]" 
                       />
-                      <span className="absolute bottom-1.5 font-display font-black text-[10px] text-[#66fcf1] tracking-widest uppercase text-shadow-gold">
+                      <span className="absolute bottom-2 font-display font-black text-xs text-[#66fcf1] tracking-widest uppercase text-shadow-gold">
                         OBSIDIAN PACK
                       </span>
                     </div>
 
                     <div>
-                      <h4 className="font-display font-black text-sm sm:text-base text-white">
+                      <h4 className="font-display font-black text-base sm:text-lg text-white">
                         Obsidian Set
                       </h4>
                     </div>
 
                     {/* Clean Drop Rates Box */}
-                    <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 text-xs font-mono space-y-1">
+                    <div className="bg-black/60 border border-white/10 rounded-xl p-3 text-xs font-mono space-y-1.5">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400">Silver Cards:</span>
-                        <span className="text-[#66fcf1] font-bold">50%</span>
+                        <span className="text-[#66fcf1] font-bold text-sm">50%</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400">Gold Cards:</span>
-                        <span className="text-amber-400 font-bold">10%</span>
+                        <span className="text-amber-400 font-bold text-sm">10%</span>
                       </div>
-                      <div className="flex justify-between items-center border-t border-white/5 pt-1 text-gray-400">
+                      <div className="flex justify-between items-center border-t border-white/5 pt-1.5 text-gray-400">
                         <span>Level 2 Chance:</span>
                         <span className="text-cyan-300 font-semibold">30%</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-3">
+                  <div className="mt-4">
                     <button
                       onClick={buyObsidianPack}
-                      className="w-full bg-gradient-to-r from-indigo-900 to-[#1f2833] hover:from-[#45a29e] hover:to-indigo-900 text-[#66fcf1] border border-[#66fcf1]/30 font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer active:scale-95"
+                      className="w-full bg-gradient-to-r from-indigo-900 to-[#1f2833] hover:from-[#45a29e] hover:to-indigo-900 text-[#66fcf1] border border-[#66fcf1]/30 font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer active:scale-95"
                     >
                       <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
                       30 SHARDS
@@ -539,49 +539,49 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                 </div>
 
                 {/* Abyssal Pack */}
-                <div className="bg-[#141820] border border-red-950 rounded-2xl p-3.5 flex flex-col justify-between hover:border-red-500/60 transition-all shadow-xl gothic-glow-purple group">
-                  <div className="space-y-2.5">
+                <div className="bg-[#141820] border border-red-950 rounded-2xl p-4 flex flex-col justify-between hover:border-red-500/60 transition-all shadow-xl gothic-glow-purple group">
+                  <div className="space-y-3.5">
                     {/* Pack Art Box */}
-                    <div className="h-36 sm:h-40 rounded-xl bg-gradient-to-b from-red-950/40 to-black/70 border border-red-900/20 flex flex-col items-center justify-center relative overflow-hidden">
+                    <div className="h-50 sm:h-52 rounded-xl bg-gradient-to-b from-red-950/40 to-black/70 border border-red-900/20 flex flex-col items-center justify-center relative overflow-hidden">
                       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(221,44,64,0.22),transparent_70%)]" />
                       <img 
                         src="/packs/pack_abyssal.webp" 
                         alt="Abyssal Pack" 
                         decoding="async" 
-                        className="w-28 h-28 sm:w-32 sm:h-32 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(221,44,64,0.45)]" 
+                        className="w-40 h-40 sm:w-44 sm:h-44 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_22px_rgba(221,44,64,0.5)]" 
                       />
-                      <span className="absolute bottom-1.5 font-display font-black text-[10px] text-[#dd2c40] tracking-widest uppercase text-shadow-crimson">
+                      <span className="absolute bottom-2 font-display font-black text-xs text-[#dd2c40] tracking-widest uppercase text-shadow-crimson">
                         ABYSSAL PACK
                       </span>
                     </div>
 
                     <div>
-                      <h4 className="font-display font-black text-sm sm:text-base text-white">
+                      <h4 className="font-display font-black text-base sm:text-lg text-white">
                         Abyssal Lord Pack
                       </h4>
                     </div>
 
                     {/* Clean Drop Rates Box */}
-                    <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 text-xs font-mono space-y-1">
+                    <div className="bg-black/60 border border-white/10 rounded-xl p-3 text-xs font-mono space-y-1.5">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400">Gold Cards:</span>
-                        <span className="text-amber-400 font-bold">45%</span>
+                        <span className="text-amber-400 font-bold text-sm">45%</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400">Legendary Cards:</span>
-                        <span className="text-purple-400 font-bold">15%</span>
+                        <span className="text-purple-400 font-bold text-sm">15%</span>
                       </div>
-                      <div className="flex justify-between items-center border-t border-white/5 pt-1 text-gray-400">
+                      <div className="flex justify-between items-center border-t border-white/5 pt-1.5 text-gray-400">
                         <span>Level 2 Chance:</span>
                         <span className="text-rose-400 font-semibold">40%</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-3">
+                  <div className="mt-4">
                     <button
                       onClick={buyAbyssalPack}
-                      className="w-full bg-gradient-to-r from-[#880d1e] to-[#4e0707] hover:from-[#dd2c40] hover:to-[#880d1e] text-white border border-[#dd2c40]/30 font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer active:scale-95"
+                      className="w-full bg-gradient-to-r from-[#880d1e] to-[#4e0707] hover:from-[#dd2c40] hover:to-[#880d1e] text-white border border-[#dd2c40]/30 font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer active:scale-95"
                     >
                       <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
                       70 SHARDS
@@ -612,51 +612,51 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
               </div>
 
               {/* 3 Chest Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 lg:gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5">
                 
                 {/* Basic Chest */}
-                <div className="bg-[#141820] border border-[#c5a880]/40 rounded-2xl p-3.5 flex flex-col justify-between hover:border-[#ebd09b]/60 transition-all shadow-xl group">
-                  <div className="space-y-2.5">
+                <div className="bg-[#141820] border border-[#c5a880]/40 rounded-2xl p-4 flex flex-col justify-between hover:border-[#ebd09b]/60 transition-all shadow-xl group">
+                  <div className="space-y-3.5">
                     {/* Chest Art Box */}
-                    <div className="h-36 sm:h-40 rounded-xl bg-gradient-to-b from-[#4a3f35]/50 to-black/70 border border-[#c5a880]/20 flex flex-col items-center justify-center relative overflow-hidden">
+                    <div className="h-50 sm:h-52 rounded-xl bg-gradient-to-b from-[#4a3f35]/50 to-black/70 border border-[#c5a880]/20 flex flex-col items-center justify-center relative overflow-hidden">
                       <img 
                         src="/packs/chest_basic.webp" 
                         alt="Basic Relics" 
                         decoding="async" 
-                        className="w-28 h-28 sm:w-32 sm:h-32 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(197,168,128,0.45)]" 
+                        className="w-40 h-40 sm:w-44 sm:h-44 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_22px_rgba(197,168,128,0.5)]" 
                       />
-                      <span className="absolute bottom-1.5 font-display font-black text-[10px] text-[#ebd09b] tracking-widest uppercase">
+                      <span className="absolute bottom-2 font-display font-black text-xs text-[#ebd09b] tracking-widest uppercase">
                         BASIC RELICS
                       </span>
                     </div>
 
                     <div>
-                      <h4 className="font-display font-black text-sm sm:text-base text-white">
+                      <h4 className="font-display font-black text-base sm:text-lg text-white">
                         Basic Equipment Chest
                       </h4>
                     </div>
 
                     {/* Clean Drop Rates Box */}
-                    <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 text-xs font-mono space-y-1">
+                    <div className="bg-black/60 border border-white/10 rounded-xl p-3 text-xs font-mono space-y-1.5">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400">Bronze Equipment:</span>
-                        <span className="text-amber-400 font-bold">80%</span>
+                        <span className="text-amber-400 font-bold text-sm">80%</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400">Silver Equipment:</span>
-                        <span className="text-gray-200 font-bold">20%</span>
+                        <span className="text-gray-200 font-bold text-sm">20%</span>
                       </div>
-                      <div className="flex justify-between items-center border-t border-white/5 pt-1 text-gray-400">
+                      <div className="flex justify-between items-center border-t border-white/5 pt-1.5 text-gray-400">
                         <span>Tier Range:</span>
                         <span className="text-white font-semibold">Bronze - Silver</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-3">
+                  <div className="mt-4">
                     <button
                       onClick={buyBasicEquipmentPack}
-                      className="w-full bg-[#1f2833] hover:bg-[#2b3746] text-[#ebd09b] border border-[#c5a880]/40 font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer active:scale-95"
+                      className="w-full bg-[#1f2833] hover:bg-[#2b3746] text-[#ebd09b] border border-[#c5a880]/40 font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer active:scale-95"
                     >
                       <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain" />
                       500 GOLD
@@ -665,49 +665,49 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                 </div>
 
                 {/* Rare Chest */}
-                <div className="bg-[#141820] border border-indigo-950 rounded-2xl p-3.5 flex flex-col justify-between hover:border-cyan-400/60 transition-all shadow-xl gothic-glow-blue group">
-                  <div className="space-y-2.5">
+                <div className="bg-[#141820] border border-indigo-950 rounded-2xl p-4 flex flex-col justify-between hover:border-cyan-400/60 transition-all shadow-xl gothic-glow-blue group">
+                  <div className="space-y-3.5">
                     {/* Chest Art Box */}
-                    <div className="h-36 sm:h-40 rounded-xl bg-gradient-to-b from-indigo-950/40 to-black/70 border border-indigo-900/20 flex flex-col items-center justify-center relative overflow-hidden">
+                    <div className="h-50 sm:h-52 rounded-xl bg-gradient-to-b from-indigo-950/40 to-black/70 border border-indigo-900/20 flex flex-col items-center justify-center relative overflow-hidden">
                       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(102,252,241,0.2),transparent_70%)]" />
                       <img 
                         src="/packs/chest_rare.webp" 
                         alt="Rare Relics" 
                         decoding="async" 
-                        className="w-28 h-28 sm:w-32 sm:h-32 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(102,252,241,0.45)]" 
+                        className="w-40 h-40 sm:w-44 sm:h-44 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_22px_rgba(102,252,241,0.5)]" 
                       />
-                      <span className="absolute bottom-1.5 font-display font-black text-[10px] text-[#66fcf1] tracking-widest uppercase text-shadow-gold">
+                      <span className="absolute bottom-2 font-display font-black text-xs text-[#66fcf1] tracking-widest uppercase text-shadow-gold">
                         RARE RELICS
                       </span>
                     </div>
 
                     <div>
-                      <h4 className="font-display font-black text-sm sm:text-base text-white">
+                      <h4 className="font-display font-black text-base sm:text-lg text-white">
                         Rare Equipment Chest
                       </h4>
                     </div>
 
                     {/* Clean Drop Rates Box */}
-                    <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 text-xs font-mono space-y-1">
+                    <div className="bg-black/60 border border-white/10 rounded-xl p-3 text-xs font-mono space-y-1.5">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400">Bronze Equipment:</span>
-                        <span className="text-amber-500 font-bold">40%</span>
+                        <span className="text-amber-500 font-bold text-sm">40%</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400">Silver Equipment:</span>
-                        <span className="text-cyan-300 font-bold">50%</span>
+                        <span className="text-cyan-300 font-bold text-sm">50%</span>
                       </div>
-                      <div className="flex justify-between items-center border-t border-white/5 pt-1 text-gray-400">
+                      <div className="flex justify-between items-center border-t border-white/5 pt-1.5 text-gray-400">
                         <span>Gold Equipment:</span>
                         <span className="text-amber-400 font-semibold">10%</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-3">
+                  <div className="mt-4">
                     <button
                       onClick={buyRareEquipmentPack}
-                      className="w-full bg-gradient-to-r from-indigo-900 to-[#1f2833] hover:from-[#45a29e] hover:to-indigo-900 text-[#66fcf1] border border-[#66fcf1]/30 font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer active:scale-95"
+                      className="w-full bg-gradient-to-r from-indigo-900 to-[#1f2833] hover:from-[#45a29e] hover:to-indigo-900 text-[#66fcf1] border border-[#66fcf1]/30 font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer active:scale-95"
                     >
                       <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
                       30 SHARDS
@@ -716,49 +716,49 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                 </div>
 
                 {/* Premium Chest */}
-                <div className="bg-[#141820] border border-red-950 rounded-2xl p-3.5 flex flex-col justify-between hover:border-red-500/60 transition-all shadow-xl gothic-glow-purple group">
-                  <div className="space-y-2.5">
+                <div className="bg-[#141820] border border-red-950 rounded-2xl p-4 flex flex-col justify-between hover:border-red-500/60 transition-all shadow-xl gothic-glow-purple group">
+                  <div className="space-y-3.5">
                     {/* Chest Art Box */}
-                    <div className="h-36 sm:h-40 rounded-xl bg-gradient-to-b from-red-950/40 to-black/70 border border-red-500/20 flex flex-col items-center justify-center relative overflow-hidden">
+                    <div className="h-50 sm:h-52 rounded-xl bg-gradient-to-b from-red-950/40 to-black/70 border border-red-500/20 flex flex-col items-center justify-center relative overflow-hidden">
                       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(221,44,64,0.22),transparent_70%)]" />
                       <img 
                         src="/packs/chest_premium.webp" 
                         alt="Premium Relics" 
                         decoding="async" 
-                        className="w-28 h-28 sm:w-32 sm:h-32 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(221,44,64,0.45)]" 
+                        className="w-40 h-40 sm:w-44 sm:h-44 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_22px_rgba(221,44,64,0.5)]" 
                       />
-                      <span className="absolute bottom-1.5 font-display font-black text-[10px] text-[#dd2c40] tracking-widest uppercase text-shadow-crimson">
+                      <span className="absolute bottom-2 font-display font-black text-xs text-[#dd2c40] tracking-widest uppercase text-shadow-crimson">
                         PREMIUM RELICS
                       </span>
                     </div>
 
                     <div>
-                      <h4 className="font-display font-black text-sm sm:text-base text-white">
+                      <h4 className="font-display font-black text-base sm:text-lg text-white">
                         Premium Equipment Chest
                       </h4>
                     </div>
 
                     {/* Clean Drop Rates Box */}
-                    <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 text-xs font-mono space-y-1">
+                    <div className="bg-black/60 border border-white/10 rounded-xl p-3 text-xs font-mono space-y-1.5">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400">Silver Equipment:</span>
-                        <span className="text-cyan-300 font-bold">60%</span>
+                        <span className="text-cyan-300 font-bold text-sm">60%</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400">Gold Equipment:</span>
-                        <span className="text-amber-400 font-bold">35%</span>
+                        <span className="text-amber-400 font-bold text-sm">35%</span>
                       </div>
-                      <div className="flex justify-between items-center border-t border-white/5 pt-1 text-gray-400">
+                      <div className="flex justify-between items-center border-t border-white/5 pt-1.5 text-gray-400">
                         <span>Legendary Equipment:</span>
                         <span className="text-purple-400 font-semibold">5%</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-3">
+                  <div className="mt-4">
                     <button
                       onClick={buyPremiumEquipmentPack}
-                      className="w-full bg-gradient-to-r from-[#880d1e] to-[#4e0707] hover:from-[#dd2c40] hover:to-[#880d1e] text-white border border-[#dd2c40]/30 font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer active:scale-95"
+                      className="w-full bg-gradient-to-r from-[#880d1e] to-[#4e0707] hover:from-[#dd2c40] hover:to-[#880d1e] text-white border border-[#dd2c40]/30 font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer active:scale-95"
                     >
                       <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
                       70 SHARDS
