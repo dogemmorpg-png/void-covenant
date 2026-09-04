@@ -320,6 +320,39 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     hp: demiurgeBonus?.totalBonuses.creatureHpBuff || 0,
   };
 
+  // Calculate total bonuses for Enemy from stage (PvP or custom encounters)
+  const enemyEquippedList = stage.enemyEquipped 
+    ? Object.values(stage.enemyEquipped)
+        .map(eqId => stage.enemyEquipment?.find(e => e.id === eqId))
+        .filter(Boolean) as Equipment[]
+    : (stage.enemyEquipment || []);
+
+  const enemySetBonusResults = calculateEquipmentSetBonuses(enemyEquippedList);
+  const enemyDemiurgeBonus = enemySetBonusResults.find(s => s.setId === 'demiurge');
+
+  const getEnemyEquipmentBonus = (bonusType: string) => {
+    let bonus = 0;
+    enemyEquippedList.forEach(eq => {
+      if (eq.bonusType === bonusType) bonus += eq.bonusValue;
+      if (eq.secondaryBonusType === bonusType) bonus += (eq.secondaryBonusValue || 0);
+    });
+    if (enemyDemiurgeBonus) {
+      if (bonusType === 'maxHealth') bonus += enemyDemiurgeBonus.totalBonuses.maxHealth;
+      if (bonusType === 'dodge') bonus += enemyDemiurgeBonus.totalBonuses.dodge;
+      if (bonusType === 'delayReduction') bonus += enemyDemiurgeBonus.totalBonuses.delayReduction;
+    }
+    return bonus;
+  };
+
+  const enemyHeroMaxHealth = stage.enemyHeroHealth > 0 ? stage.enemyHeroHealth : (30 + ((stage.enemyLevel || 1) - 1) * 2 + getEnemyEquipmentBonus('maxHealth'));
+  const enemyDodgeChance = stage.enemyDodgeChance !== undefined ? stage.enemyDodgeChance : getEnemyEquipmentBonus('dodge');
+  const enemyDelayReduction = stage.enemyDelayReduction !== undefined ? stage.enemyDelayReduction : getEnemyEquipmentBonus('delayReduction');
+  const enemyStartingMana = stage.enemyStartingMana !== undefined ? stage.enemyStartingMana : (1 + (enemyDemiurgeBonus?.totalBonuses.startingMana || 0));
+  const enemyCreatureBuff = stage.enemyCreatureBuff || {
+    atk: enemyDemiurgeBonus?.totalBonuses.creatureAtkBuff || 0,
+    hp: enemyDemiurgeBonus?.totalBonuses.creatureHpBuff || 0
+  };
+
   const [battle, setBattle] = useState<BattleState>(() => initializeBattle(
     (profile?.collection || []).filter(c => (profile?.deck || []).includes(c.id)),
     stage,
@@ -327,7 +360,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     getEquipmentBonus('dodge'),
     getEquipmentBonus('delayReduction'),
     startingPlayerMana,
-    playerCreatureBuff
+    playerCreatureBuff,
+    enemyHeroMaxHealth,
+    enemyDodgeChance,
+    enemyDelayReduction,
+    enemyStartingMana,
+    enemyCreatureBuff
   ));
 
   // Preload battle creature assets immediately
@@ -679,21 +717,19 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               addFloatingText(`🩸 +${step.heal}`, targetHeroLabel, 'text-emerald-400 font-bold');
               addFloatingText('BLOOD AURA 🩸', casterHeroLabel, 'text-rose-400 font-bold text-xs');
             } else {
-              stepDescription = `🩸 Blood Aura: ${isPlayerCaster ? 'Lord' : 'Boss'} heals ${cardName || 'ally'} for +${step.heal} HP`;
+              stepDescription = `🩸 Blood Aura: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} heals ${cardName || 'ally'} for +${step.heal} HP`;
               audioSystem.playHeal();
               setAnimatingSlot({ side: targetSide, slot: step.targetSlot, type: 'heal' });
               const target = targetBoard[step.targetSlot];
               if (target) {
                 target.health = Math.min(target.maxHealth, target.health + step.heal);
-                if (isPlayerCaster) {
-                  if (step.barrier || step.ward) {
-                    target.barrier = true;
-                    target.ward = true;
-                  }
-                  if (step.bonusMaxHp > 0) {
-                    target.maxHealth += step.bonusMaxHp;
-                    target.health += step.bonusMaxHp;
-                  }
+                if (step.barrier || step.ward) {
+                  target.barrier = true;
+                  target.ward = true;
+                }
+                if (step.bonusMaxHp > 0) {
+                  target.maxHealth += step.bonusMaxHp;
+                  target.health += step.bonusMaxHp;
                 }
               }
               addFloatingText(`🩸 +${step.heal}`, { side: targetSide, slot: step.targetSlot }, 'text-emerald-400 font-bold');
@@ -706,10 +742,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             const target = targetBoard[step.targetSlot];
             if (target) {
               if (step.bonusAtk > 0) target.attack += step.bonusAtk;
-              if (isPlayerCaster) {
-                if (step.bonusArmor > 0) target.armor = (target.armor || 0) + step.bonusArmor;
-                if (step.aoeHeal > 0) target.health = Math.min(target.maxHealth, target.health + step.aoeHeal);
-              }
+              if (step.bonusArmor > 0) target.armor = (target.armor || 0) + step.bonusArmor;
+              if (step.aoeHeal > 0) target.health = Math.min(target.maxHealth, target.health + step.aoeHeal);
             }
             addFloatingText('🔥 BUFF', { side: targetSide, slot: step.targetSlot }, 'text-yellow-400 font-bold');
             addFloatingText("WARLORD'S CRY 🔥", casterHeroLabel, 'text-yellow-400 font-bold text-xs');
@@ -718,17 +752,24 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         }
 
         case 'hero_heal': {
-          stepDescription = `💚 Commander heals for +${step.heal} HP`;
+          const isEnemy = step.side === 'enemy';
+          stepDescription = `💚 ${isEnemy ? 'Enemy Commander' : 'Commander'} heals for +${step.heal} HP`;
           audioSystem.playHeal();
-          copy.playerHeroHealth = Math.min(copy.playerHeroMaxHealth, copy.playerHeroHealth + step.heal);
-          addFloatingText(`+${step.heal} HP 💚`, 'player-hero', 'text-emerald-400 font-black text-sm');
+          if (isEnemy) {
+            copy.enemyHeroHealth = Math.min(copy.enemyHeroMaxHealth, copy.enemyHeroHealth + step.heal);
+            addFloatingText(`+${step.heal} HP 💚`, 'enemy-hero', 'text-emerald-400 font-black text-sm');
+          } else {
+            copy.playerHeroHealth = Math.min(copy.playerHeroMaxHealth, copy.playerHeroHealth + step.heal);
+            addFloatingText(`+${step.heal} HP 💚`, 'player-hero', 'text-emerald-400 font-black text-sm');
+          }
           break;
         }
 
         case 'dodge': {
-          stepDescription = `🛡️ Evaded! The Lord dodged the attack!`;
+          const isEnemy = step.side === 'enemy';
+          stepDescription = `🛡️ Evaded! ${isEnemy ? 'The Enemy Commander' : 'Your Lord'} dodged the attack!`;
           setTimeout(() => {
-            addFloatingText('DODGE!', 'player-hero', 'text-blue-400 font-black text-lg scale-125 text-shadow-glow');
+            addFloatingText('DODGE!', isEnemy ? 'enemy-hero' : 'player-hero', 'text-blue-400 font-black text-lg scale-125 text-shadow-glow');
           }, 100 / speedMultiplier);
           break;
         }
@@ -858,7 +899,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   // Handle End Turn click
   const handleEndTurnWithoutCard = () => {
     setIsSimulating(true);
-    const { nextState, animateSequence: steps } = simulateCombatTurn(battle, null, null, profile, battleType === 'campaign' ? stage : null);
+    const { nextState, animateSequence: steps } = simulateCombatTurn(battle, null, null, profile, stage);
     
     setFinalBattleState(nextState);
     setupPlaybackState(null, null, steps);

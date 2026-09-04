@@ -160,6 +160,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               maxXp: c.maxXp || 100
             }));
 
+          const equippedList = Object.values(data.equipped || {})
+            .map((eqId: any) => (data.equipment || []).find((e: any) => e && e.id === eqId))
+            .filter(Boolean);
+
+          const oppLevel = data.level || 1;
+          const oppMaxHealth = data.heroMaxHealth || (30 + (oppLevel - 1) * 2);
+
           return {
             walletAddress: r.wallet_address,
             username: data.username,
@@ -167,10 +174,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             pvpLeague: data.pvpLeague || 'Bronze',
             pvpLP: data.pvpLP !== undefined ? data.pvpLP : 0,
             avatarUrl: data.avatarUrl || '/avatars/knight.webp',
-            level: data.level || 1,
+            level: oppLevel,
+            heroMaxHealth: oppMaxHealth,
             activeStance: data.activeStance || 'void_strike',
             talents: data.talents || {},
             deck: mappedDeck,
+            equipment: data.equipment || [],
+            equipped: data.equipped || {},
+            equippedList: equippedList,
             isBot: false
           };
         })
@@ -199,6 +210,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const variance = Math.floor(Math.random() * 101) - 50; // -50 to +50 MMR
       const botRating = Math.max(100, playerRating + variance);
       const botLevel = Math.max(1, Math.min(30, Math.floor(botRating / 100) + Math.floor(Math.random() * 3)));
+      const botMaxHealth = 30 + (botLevel - 1) * 2;
 
       // Generate bot deck (10 cards from CARD_TEMPLATES)
       const botDeck = Array.from({ length: 10 }, () => {
@@ -232,9 +244,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         pvpLP: Math.max(0, (profileData.pvpLP || 0) + Math.floor(Math.random() * 41) - 20),
         avatarUrl: botAvatars[Math.floor(Math.random() * botAvatars.length)],
         level: botLevel,
+        heroMaxHealth: botMaxHealth,
         activeStance: Math.random() < 0.35 ? 'warlord_cry' : (Math.random() < 0.5 ? 'blood_aura' : 'void_strike'),
         talents: {},
         deck: botDeck,
+        equipment: [],
+        equipped: {},
+        equippedList: [],
         isBot: true
       };
     }
@@ -250,7 +266,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       stance: opponent.activeStance || 'void_strike',
       talents: opponent.talents || {},
       avatarUrl: opponent.avatarUrl || '/avatars/knight.webp',
-      level: opponent.level || 1
+      level: opponent.level || 1,
+      heroMaxHealth: opponent.heroMaxHealth || (30 + ((opponent.level || 1) - 1) * 2),
+      equipment: opponent.equipment || [],
+      equipped: opponent.equipped || {},
+      equippedList: opponent.equippedList || [],
+      isBot: opponent.isBot
     };
 
     // 6. Save player profile to DB

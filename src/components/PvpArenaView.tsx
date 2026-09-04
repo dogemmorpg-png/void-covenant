@@ -5,6 +5,7 @@ import { CampaignStage } from '../types';
 import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User, Info, Gift, Sparkles, CheckCircle2, Coins, Lock } from 'lucide-react';
 import { renderStanceIcon } from './SkillAndStanceIcons';
 import { assetPreloader } from '../utils/assetPreloader';
+import { calculateEquipmentSetBonuses } from '../data/equipment';
 
 import { ALL_LEAGUE_REWARDS, LeagueRewardBracket, LeagueTierRewards } from '../data/leagueRewards';
 export { ALL_LEAGUE_REWARDS };
@@ -469,6 +470,44 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
     const opponentLP = opponent.lp !== undefined ? opponent.lp : (opponent.pvpLP !== undefined ? opponent.pvpLP : (opponent.rating || opponent.pvpRating || 0));
 
+    // Calculate full opponent equipment and set bonuses
+    const opponentEquippedList = (opponent.equippedList && opponent.equippedList.length > 0)
+      ? opponent.equippedList
+      : (opponent.equipped 
+          ? Object.values(opponent.equipped).map((eqId: any) => (opponent.equipment || []).find((e: any) => e.id === eqId)).filter(Boolean)
+          : (opponent.equipment || []));
+
+    const opponentSetBonuses = calculateEquipmentSetBonuses(opponentEquippedList);
+    const opponentDemiurge = opponentSetBonuses.find(s => s.setId === 'demiurge');
+
+    let opponentEquipHealth = 0;
+    let opponentDodge = 0;
+    let opponentDelayReduction = 0;
+
+    opponentEquippedList.forEach((eq: any) => {
+      if (eq.bonusType === 'maxHealth') opponentEquipHealth += eq.bonusValue;
+      if (eq.bonusType === 'dodge') opponentDodge += eq.bonusValue;
+      if (eq.bonusType === 'delayReduction') opponentDelayReduction += eq.bonusValue;
+      if (eq.secondaryBonusType === 'maxHealth') opponentEquipHealth += (eq.secondaryBonusValue || 0);
+      if (eq.secondaryBonusType === 'dodge') opponentDodge += (eq.secondaryBonusValue || 0);
+      if (eq.secondaryBonusType === 'delayReduction') opponentDelayReduction += (eq.secondaryBonusValue || 0);
+    });
+
+    if (opponentDemiurge) {
+      opponentEquipHealth += opponentDemiurge.totalBonuses.maxHealth;
+      opponentDodge += opponentDemiurge.totalBonuses.dodge;
+      opponentDelayReduction += opponentDemiurge.totalBonuses.delayReduction;
+    }
+
+    const opponentLevel = opponent.level || 1;
+    const opponentBaseHealth = opponent.heroMaxHealth || (30 + (opponentLevel - 1) * 2);
+    const totalOpponentHealth = opponentBaseHealth + opponentEquipHealth;
+    const opponentStartingMana = 1 + (opponentDemiurge?.totalBonuses.startingMana || 0);
+    const opponentCreatureBuff = {
+      atk: opponentDemiurge?.totalBonuses.creatureAtkBuff || 0,
+      hp: opponentDemiurge?.totalBonuses.creatureHpBuff || 0
+    };
+
     const opponentPayload = {
       opponentWalletAddress: opponent.walletAddress,
       opponentName: opponent.name || opponent.username,
@@ -487,11 +526,18 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       dustReward: 30 + Math.floor((profile.pvpLP || 0) / 20),
       shardsReward: 0,
       enemyHeroName: opponent.name || opponent.username,
-      enemyHeroHealth: 30 + Math.min(20, Math.floor(opponentLP / 150)),
+      enemyHeroHealth: totalOpponentHealth,
       enemyHeroImage: opponent.avatarUrl || '/avatars/knight.webp', // Pass the opponent's real avatar URL!
       enemyDeck: opponent.deck,
       enemyStance: opponent.stance || opponent.activeStance,
-      enemyTalents: opponent.talents
+      enemyTalents: opponent.talents,
+      enemyLevel: opponentLevel,
+      enemyEquipment: opponent.equipment || [],
+      enemyEquipped: opponent.equipped || {},
+      enemyDodgeChance: opponentDodge,
+      enemyDelayReduction: opponentDelayReduction,
+      enemyStartingMana: opponentStartingMana,
+      enemyCreatureBuff: opponentCreatureBuff
     };
 
     try {

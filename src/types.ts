@@ -180,6 +180,13 @@ export interface CampaignStage {
   cardReward?: Omit<Card, 'id'>; // guaranteed card template drop on boss levels
   enemyStance?: string;
   enemyTalents?: Record<string, number>;
+  enemyLevel?: number;
+  enemyEquipment?: Equipment[];
+  enemyEquipped?: Record<string, string>;
+  enemyDodgeChance?: number;
+  enemyDelayReduction?: number;
+  enemyStartingMana?: number;
+  enemyCreatureBuff?: { atk: number; hp: number };
 }
 
 export interface BattleCardState {
@@ -230,6 +237,9 @@ export interface BattleState {
   playerDodgeChance?: number;
   playerDelayReduction?: number;
   playerCreatureBuff?: { atk: number; hp: number };
+  enemyDodgeChance?: number;
+  enemyDelayReduction?: number;
+  enemyCreatureBuff?: { atk: number; hp: number };
 }
 
 export interface AirdropTask {

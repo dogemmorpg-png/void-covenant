@@ -36,7 +36,12 @@ export function initializeBattle(
   dodgeChance: number = 0,
   delayReduction: number = 0,
   startingMana: number = 1,
-  creatureBuff: { atk: number; hp: number } = { atk: 0, hp: 0 }
+  creatureBuff: { atk: number; hp: number } = { atk: 0, hp: 0 },
+  enemyHeroMaxHealth?: number,
+  enemyDodgeChance: number = 0,
+  enemyDelayReduction: number = 0,
+  enemyStartingMana: number = 1,
+  enemyCreatureBuff: { atk: number; hp: number } = { atk: 0, hp: 0 }
 ): BattleState {
   // Shuffle player deck
   const shuffledDeck = [...playerDeck].sort(() => Math.random() - 0.5);
@@ -48,16 +53,18 @@ export function initializeBattle(
   // Enemy deck templates (exactly 12 for normal stages, 14 for Bosses)
   const enemyDeckTemplates = [...stage.enemyDeck].sort(() => Math.random() - 0.5);
   
+  const resolvedEnemyHp = enemyHeroMaxHealth !== undefined && enemyHeroMaxHealth > 0 ? enemyHeroMaxHealth : stage.enemyHeroHealth;
+
   // Create state
   return {
     playerHeroHealth: playerHeroMaxHealth,
     playerHeroMaxHealth: playerHeroMaxHealth,
-    enemyHeroHealth: stage.enemyHeroHealth,
-    enemyHeroMaxHealth: stage.enemyHeroHealth,
+    enemyHeroHealth: resolvedEnemyHp,
+    enemyHeroMaxHealth: resolvedEnemyHp,
     playerMana: startingMana,
     playerMaxMana: startingMana,
-    enemyMana: 1,
-    enemyMaxMana: 1,
+    enemyMana: enemyStartingMana,
+    enemyMaxMana: enemyStartingMana,
     playerBoard: Array(5).fill(null),
     enemyBoard: Array(5).fill(null),
     playerHand,
@@ -70,7 +77,10 @@ export function initializeBattle(
     combatLog: ['Battle has begun! Place your cards on the battlefield.'],
     playerDodgeChance: dodgeChance,
     playerDelayReduction: delayReduction,
-    playerCreatureBuff: creatureBuff
+    playerCreatureBuff: creatureBuff,
+    enemyDodgeChance,
+    enemyDelayReduction,
+    enemyCreatureBuff
   };
 }
 
@@ -277,89 +287,308 @@ export function simulateCombatTurn(
     }
   }
 
-  // --- ENEMY BOSS HERO PHASE ---
+  // --- ENEMY BOSS / PVP HERO PHASE ---
   if (stage && (stage.id % 5 === 0 || stage.id === -1)) {
-    const bossStance = stage.id === -1 ? (stage.enemyStance || 'void_strike') : (stage.id % 15 === 5 ? 'warlord_cry' : (stage.id % 15 === 10 ? 'blood_aura' : 'void_strike'));
-    const triggerChance = stage.id === -1 ? 25 : Math.min(35, 15 + Math.floor(stage.id / 5) * 1.5);
+    const isPvp = stage.id === -1;
+    const enemyStance = (isPvp ? (stage.enemyStance || 'void_strike') : (stage.id % 15 === 5 ? 'warlord_cry' : (stage.id % 15 === 10 ? 'blood_aura' : 'void_strike'))) as TalentStance;
+    
+    // In PvP, calculate exact talent stats from the enemy commander's talent tree
+    const stats = isPvp ? getTalentStats(stage.enemyTalents || {}, enemyStance) : null;
+    const triggerChance = stats ? stats.triggerChance : Math.min(35, 15 + Math.floor(stage.id / 5) * 1.5);
     
     if (Math.random() * 100 < triggerChance) {
-      logs.push(`⚡ Enemy Commander activated ${bossStance.toUpperCase()} (${triggerChance.toFixed(1)}% chance)!`);
+      logs.push(`⚡ Enemy Commander activated ${enemyStance.toUpperCase()} (${triggerChance.toFixed(1)}% chance)!`);
       
-      if (bossStance === 'void_strike') {
+      if (enemyStance === 'void_strike') {
         const activePlayers = [];
         for (let i = 0; i < 5; i++) if (state.playerBoard[i] && !state.playerBoard[i].isDead) activePlayers.push(i);
-        
-        const damage = stage.id === -1 ? 4 : 2 + Math.floor((stage.id - 15) / 10);
-        if (activePlayers.length > 0) {
-          const targetSlot = activePlayers[Math.floor(Math.random() * activePlayers.length)];
-          const targetCard = state.playerBoard[targetSlot];
-          if (targetCard) {
-            targetCard.health = Math.max(0, targetCard.health - damage);
-            logs.push(`   Boss deals -${damage} Void Strike damage to your ${targetCard.name}!`);
-            animateSequence.push({ type: 'hero_skill', stance: 'void_strike', targetSlot, damage, side: 'enemy' });
-            
-            if (targetCard.health <= 0) {
-              targetCard.isDead = true;
-              state.playerBoard[targetSlot] = null;
-              logs.push(`   💀 Your ${targetCard.name} was destroyed!`);
+
+        if (isPvp && stats) {
+          const s = stats as any;
+          if (activePlayers.length > 0) {
+            const targets = [activePlayers[Math.floor(Math.random() * activePlayers.length)]];
+            if (s.chainChance > 0 && Math.random() * 100 < s.chainChance && activePlayers.length > 1) {
+              const remaining = activePlayers.filter(i => i !== targets[0]);
+              targets.push(remaining[Math.floor(Math.random() * remaining.length)]);
+            }
+            if (s.singularity) {
+              const mainTarget = targets[0];
+              [mainTarget - 1, mainTarget + 1].forEach(adj => {
+                if (activePlayers.includes(adj) && !targets.includes(adj)) {
+                  targets.push(adj);
+                }
+              });
+            }
+
+            let totalLeech = 0;
+            for (const targetIdx of targets) {
+              const targetCard = state.playerBoard[targetIdx]!;
+              let dmg = s.baseDamage;
+              if (targetIdx !== targets[0] && s.singularity) {
+                dmg = Math.max(1, Math.floor(dmg / 2));
+              }
+              if (s.executeDamage > 0 && (targetCard.health / targetCard.maxHealth) <= 0.5) {
+                dmg += s.executeDamage;
+              }
+
+              let actualDamage = dmg;
+              let isBarrierBlocked = false;
+              let armorAbsorbed = 0;
+              let isArmorBroken = false;
+
+              if (!s.pierce) {
+                const hasBarrier = targetCard.barrier ?? targetCard.ward;
+                if (hasBarrier) {
+                  actualDamage = 0;
+                  targetCard.barrier = false;
+                  targetCard.ward = false;
+                  isBarrierBlocked = true;
+                  logs.push(`🔮 Enemy Void Strike on ${targetCard.name} was absorbed by Barrier!`);
+                } else if ((targetCard.armor || 0) > 0) {
+                  const initialArmor = targetCard.armor!;
+                  if (initialArmor >= actualDamage) {
+                    targetCard.armor! -= actualDamage;
+                    armorAbsorbed = actualDamage;
+                    actualDamage = 0;
+                    if (targetCard.armor === 0) isArmorBroken = true;
+                  } else {
+                    armorAbsorbed = initialArmor;
+                    actualDamage -= initialArmor;
+                    targetCard.armor = 0;
+                    isArmorBroken = true;
+                  }
+                  logs.push(`🛡️ ${targetCard.name}'s Armor absorbed ${armorAbsorbed} damage!`);
+                }
+              } else {
+                logs.push(`⚡ Enemy Void Strike pierces through defenses!`);
+              }
+
+              targetCard.health -= actualDamage;
+              if (actualDamage > 0) totalLeech += actualDamage;
+              logs.push(`⚡ Enemy Void Strike hits ${targetCard.name} for ${actualDamage} damage!`);
+              animateSequence.push({
+                type: 'hero_skill',
+                stance: 'void_strike',
+                targetSlot: targetIdx,
+                damage: actualDamage,
+                barrierBlocked: isBarrierBlocked,
+                armorAbsorbed,
+                armorBroken: isArmorBroken,
+                side: 'enemy'
+              });
+
+              if (targetCard.health <= 0) {
+                targetCard.isDead = true;
+                state.playerBoard[targetIdx] = null;
+                logs.push(`💀 Your card ${targetCard.name} has been destroyed by Enemy Void Strike!`);
+                animateSequence.push({ type: 'death', side: 'player', slot: targetIdx });
+              }
+            }
+
+            if (s.leechPercent > 0 && totalLeech > 0) {
+              const heal = Math.floor(totalLeech * (s.leechPercent / 100));
+              if (heal > 0) {
+                state.enemyHeroHealth = Math.min(state.enemyHeroMaxHealth, state.enemyHeroHealth + heal);
+                animateSequence.push({ type: 'hero_heal', heal, side: 'enemy' });
+                logs.push(`⚡ Enemy Void Strike leeches +${heal} HP to the Enemy Lord!`);
+              }
+            }
+          } else {
+            // Direct strike on player lord if board is empty
+            const dmg = s.baseDamage;
+            state.playerHeroHealth = Math.max(0, state.playerHeroHealth - dmg);
+            logs.push(`⚡ Enemy Void Strike strikes your Lord directly for -${dmg} damage!`);
+            animateSequence.push({
+              type: 'hero_skill',
+              stance: 'void_strike',
+              targetSlot: -1,
+              damage: dmg,
+              side: 'enemy'
+            });
+            if (s.leechPercent > 0) {
+              const heal = Math.floor(dmg * (s.leechPercent / 100));
+              if (heal > 0) {
+                state.enemyHeroHealth = Math.min(state.enemyHeroMaxHealth, state.enemyHeroHealth + heal);
+                animateSequence.push({ type: 'hero_heal', heal, side: 'enemy' });
+              }
             }
           }
         } else {
-          state.playerHeroHealth = Math.max(0, state.playerHeroHealth - damage);
-          logs.push(`   Boss deals -${damage} Void Strike damage to your Lord directly!`);
-          animateSequence.push({ type: 'hero_skill', stance: 'void_strike', targetSlot: -1, damage, side: 'enemy' });
-        }
-      } 
-      else if (bossStance === 'blood_aura') {
-        const damagedEnemies = [];
-        for (let i = 0; i < 5; i++) {
-          const c = state.enemyBoard[i];
-          if (c && !c.isDead && c.health < c.maxHealth) damagedEnemies.push(i);
-        }
-        
-        const heal = stage.id === -1 ? 6 : 3 + Math.floor((stage.id - 10) / 10);
-        if (damagedEnemies.length > 0) {
-          const targetSlot = damagedEnemies[Math.floor(Math.random() * damagedEnemies.length)];
-          const targetCard = state.enemyBoard[targetSlot];
-          if (targetCard) {
-            targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + heal);
-            logs.push(`   Boss heals their ${targetCard.name} for +${heal} HP!`);
-            animateSequence.push({ type: 'hero_skill', stance: 'blood_aura', targetSlot, heal, side: 'enemy' });
+          // Campaign boss fallback
+          const damage = 2 + Math.floor((stage.id - 15) / 10);
+          if (activePlayers.length > 0) {
+            const targetSlot = activePlayers[Math.floor(Math.random() * activePlayers.length)];
+            const targetCard = state.playerBoard[targetSlot];
+            if (targetCard) {
+              targetCard.health = Math.max(0, targetCard.health - damage);
+              logs.push(`   Boss deals -${damage} Void Strike damage to your ${targetCard.name}!`);
+              animateSequence.push({ type: 'hero_skill', stance: 'void_strike', targetSlot, damage, side: 'enemy' });
+              if (targetCard.health <= 0) {
+                targetCard.isDead = true;
+                state.playerBoard[targetSlot] = null;
+                logs.push(`   💀 Your ${targetCard.name} was destroyed!`);
+                animateSequence.push({ type: 'death', side: 'player', slot: targetSlot });
+              }
+            }
+          } else {
+            state.playerHeroHealth = Math.max(0, state.playerHeroHealth - damage);
+            logs.push(`   Boss deals -${damage} Void Strike damage to your Lord directly!`);
+            animateSequence.push({ type: 'hero_skill', stance: 'void_strike', targetSlot, damage, side: 'enemy' });
           }
-        } else {
-          state.enemyHeroHealth = Math.min(state.enemyHeroMaxHealth, state.enemyHeroHealth + heal);
-          logs.push(`   Boss heals their Lord for +${heal} HP!`);
-          animateSequence.push({ type: 'hero_skill', stance: 'blood_aura', targetSlot: -1, heal, side: 'enemy' });
         }
       } 
-      else if (bossStance === 'warlord_cry') {
+      else if (enemyStance === 'blood_aura') {
         const activeEnemies = [];
         for (let i = 0; i < 5; i++) if (state.enemyBoard[i] && !state.enemyBoard[i].isDead) activeEnemies.push(i);
-        
-        if (activeEnemies.length > 0) {
-          const bonusAtk = stage.id === -1 ? 2 : 1 + Math.floor((stage.id - 5) / 15);
-          const targetSlot = activeEnemies[Math.floor(Math.random() * activeEnemies.length)];
-          const targetCard = state.enemyBoard[targetSlot];
-          if (targetCard) {
-            targetCard.attack += bonusAtk;
-            logs.push(`   Boss roars! Buffs ${targetCard.name} with +${bonusAtk} Attack!`);
-            animateSequence.push({ 
-              type: 'hero_skill', 
-              stance: 'warlord_cry', 
-              targetSlot, 
-              bonusAtk, 
-              bonusArmor: 0, 
-              aoeHeal: 0, 
-              delayReduced: false, 
-              side: 'enemy' 
+
+        if (isPvp && stats) {
+          const s = stats as any;
+          const triggers = s.doubleTrigger ? 2 : 1;
+          for (let t = 0; t < triggers; t++) {
+            const currentActive = [];
+            for (let i = 0; i < 5; i++) if (state.enemyBoard[i] && !state.enemyBoard[i].isDead) currentActive.push(i);
+            if (currentActive.length === 0) {
+              const heal = s.baseHealing;
+              state.enemyHeroHealth = Math.min(state.enemyHeroMaxHealth, state.enemyHeroHealth + heal);
+              logs.push(`🩸 Enemy Blood Aura healed Enemy Lord for +${heal} HP.`);
+              animateSequence.push({ type: 'hero_skill', stance: 'blood_aura', targetSlot: -1, heal, side: 'enemy' });
+              break;
+            }
+
+            currentActive.sort((a, b) => (state.enemyBoard[a]!.health / state.enemyBoard[a]!.maxHealth) - (state.enemyBoard[b]!.health / state.enemyBoard[b]!.maxHealth));
+            const targetSlot = currentActive[0];
+            const targetCard = state.enemyBoard[targetSlot]!;
+            const heal = s.baseHealing;
+            let cleansed = false;
+
+            if (targetCard.health >= targetCard.maxHealth && s.overflowPercent > 0) {
+              const lordHeal = Math.max(1, Math.floor(heal * (s.overflowPercent / 100)));
+              state.enemyHeroHealth = Math.min(state.enemyHeroMaxHealth, state.enemyHeroHealth + lordHeal);
+              animateSequence.push({ type: 'hero_heal', heal: lordHeal, side: 'enemy' });
+              logs.push(`🩸 Enemy Blood Aura healed Enemy Lord for +${lordHeal} HP (Overflow).`);
+            } else {
+              targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + heal);
+              logs.push(`🩸 Enemy Blood Aura healed ${targetCard.name} for +${heal} HP.`);
+              if (s.cleanseChance > 0 && Math.random() * 100 < s.cleanseChance) {
+                if (targetCard.hexedAmount > 0) {
+                  targetCard.hexedAmount = 0;
+                  cleansed = true;
+                  logs.push(`🩸 Enemy Blood Aura cleansed Hex from ${targetCard.name}!`);
+                }
+              }
+            }
+
+            if (s.ward && !targetCard.barrier && !targetCard.ward) {
+              targetCard.barrier = true;
+              targetCard.ward = true;
+              logs.push(`🩸 Enemy Blood Aura granted Barrier to ${targetCard.name}!`);
+            }
+            if (s.bonusMaxHp > 0) {
+              targetCard.maxHealth += s.bonusMaxHp;
+              targetCard.health += s.bonusMaxHp;
+              logs.push(`🩸 Enemy Blood Aura expanded ${targetCard.name}'s max HP by +${s.bonusMaxHp}!`);
+            }
+            animateSequence.push({
+              type: 'hero_skill',
+              stance: 'blood_aura',
+              targetSlot,
+              heal,
+              barrier: s.ward,
+              ward: s.ward,
+              bonusMaxHp: s.bonusMaxHp,
+              cleanse: cleansed,
+              side: 'enemy'
             });
+          }
+        } else {
+          // Campaign boss fallback
+          const heal = 3 + Math.floor((stage.id - 10) / 10);
+          if (activeEnemies.length > 0) {
+            const targetSlot = activeEnemies[Math.floor(Math.random() * activeEnemies.length)];
+            const targetCard = state.enemyBoard[targetSlot];
+            if (targetCard) {
+              targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + heal);
+              logs.push(`   Boss heals their ${targetCard.name} for +${heal} HP!`);
+              animateSequence.push({ type: 'hero_skill', stance: 'blood_aura', targetSlot, heal, side: 'enemy' });
+            }
+          } else {
+            state.enemyHeroHealth = Math.min(state.enemyHeroMaxHealth, state.enemyHeroHealth + heal);
+            logs.push(`   Boss heals their Lord for +${heal} HP!`);
+            animateSequence.push({ type: 'hero_skill', stance: 'blood_aura', targetSlot: -1, heal, side: 'enemy' });
+          }
+        }
+      } 
+      else if (enemyStance === 'warlord_cry') {
+        const activeEnemies = [];
+        for (let i = 0; i < 5; i++) if (state.enemyBoard[i] && !state.enemyBoard[i].isDead) activeEnemies.push(i);
+
+        if (activeEnemies.length > 0) {
+          if (isPvp && stats) {
+            const targetSlot = activeEnemies[Math.floor(Math.random() * activeEnemies.length)];
+            const targetCard = state.enemyBoard[targetSlot]!;
+            const s = stats as any;
+
+            targetCard.buffs = targetCard.buffs || [];
+            if (s.bonusAtk > 0) {
+              targetCard.attack += s.bonusAtk;
+              if (!s.permanent) {
+                targetCard.buffs.push({ type: 'attack', amount: s.bonusAtk, turnsRemaining: s.durationTurns });
+              }
+              logs.push(`🔥 Enemy Warlord's Cry boosts ${targetCard.name}'s ATK by +${s.bonusAtk}!`);
+            }
+            if (s.bonusArmor > 0) {
+              targetCard.armor = (targetCard.armor || 0) + s.bonusArmor;
+              if (!s.permanent) {
+                targetCard.buffs.push({ type: 'armor', amount: s.bonusArmor, turnsRemaining: s.durationTurns });
+              }
+              logs.push(`🔥 Enemy Warlord's Cry grants ${targetCard.name} +${s.bonusArmor} Armor!`);
+            }
+            let delayReduced = false;
+            if (s.momentumChance > 0 && Math.random() * 100 < s.momentumChance) {
+              targetCard.delay = Math.max(0, targetCard.delay - 1);
+              delayReduced = true;
+              logs.push(`🔥 Enemy Warlord's Cry reduced ${targetCard.name}'s Delay by 1!`);
+            }
+            if (s.aoeHeal > 0) {
+              targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + s.aoeHeal);
+              logs.push(`🔥 Enemy Warlord's Cry heals ${targetCard.name} for +${s.aoeHeal}!`);
+            }
+            animateSequence.push({
+              type: 'hero_skill',
+              stance: 'warlord_cry',
+              targetSlot,
+              bonusAtk: s.bonusAtk,
+              bonusArmor: s.bonusArmor,
+              aoeHeal: s.aoeHeal,
+              delayReduced,
+              side: 'enemy'
+            });
+          } else {
+            // Campaign boss fallback
+            const bonusAtk = 1 + Math.floor((stage.id - 5) / 15);
+            const targetSlot = activeEnemies[Math.floor(Math.random() * activeEnemies.length)];
+            const targetCard = state.enemyBoard[targetSlot];
+            if (targetCard) {
+              targetCard.attack += bonusAtk;
+              logs.push(`   Boss roars! Buffs ${targetCard.name} with +${bonusAtk} Attack!`);
+              animateSequence.push({ 
+                type: 'hero_skill', 
+                stance: 'warlord_cry', 
+                targetSlot, 
+                bonusAtk, 
+                bonusArmor: 0, 
+                aoeHeal: 0, 
+                delayReduced: false, 
+                side: 'enemy' 
+              });
+            }
           }
         }
       }
     }
   }
 
-  // Process expiring buffs on Player Board
+  // Process expiring buffs on Player and Enemy Board
   for (let i = 0; i < 5; i++) {
     const card = state.playerBoard[i];
     if (card && card.buffs && card.buffs.length > 0) {
@@ -369,6 +598,20 @@ export function simulateCombatTurn(
           if (buff.type === 'attack') card.attack = Math.max(0, card.attack - buff.amount);
           if (buff.type === 'armor') card.armor = Math.max(0, (card.armor || 0) - buff.amount);
           logs.push(`⏳ ${card.name}'s Warlord buff (+${buff.amount} ${buff.type}) has expired.`);
+          return false;
+        }
+        return true;
+      });
+    }
+
+    const enemyCard = state.enemyBoard[i];
+    if (enemyCard && enemyCard.buffs && enemyCard.buffs.length > 0) {
+      enemyCard.buffs = enemyCard.buffs.filter(buff => {
+        buff.turnsRemaining -= 1;
+        if (buff.turnsRemaining <= 0) {
+          if (buff.type === 'attack') enemyCard.attack = Math.max(0, enemyCard.attack - buff.amount);
+          if (buff.type === 'armor') enemyCard.armor = Math.max(0, (enemyCard.armor || 0) - buff.amount);
+          logs.push(`⏳ Enemy ${enemyCard.name}'s Warlord buff (+${buff.amount} ${buff.type}) has expired.`);
           return false;
         }
         return true;
@@ -499,6 +742,21 @@ export function simulateCombatTurn(
           logs.push(`💀 [Enemy] ${enemyCard.name} sacrifices ${sacrCard.name}! Enemy hero healed for +${enemySacSkill.value} HP.`);
         }
 
+        // Apply Enemy Delay Reduction (from Equipment / Demiurge set)
+        const enemyDelayReduc = state.enemyDelayReduction || 0;
+        if (enemyDelayReduc > 0) {
+          enemyCard.delay = Math.max(0, enemyCard.delay - enemyDelayReduc);
+          enemyCard.initialDelay = Math.max(0, enemyCard.initialDelay - enemyDelayReduc);
+        }
+
+        // Apply Enemy Creature Buff (e.g. Demiurge Apotheosis 6-pc)
+        if (state.enemyCreatureBuff && (state.enemyCreatureBuff.atk > 0 || state.enemyCreatureBuff.hp > 0)) {
+          enemyCard.attack += state.enemyCreatureBuff.atk;
+          enemyCard.health += state.enemyCreatureBuff.hp;
+          enemyCard.maxHealth += state.enemyCreatureBuff.hp;
+          logs.push(`⚡ Enemy Demiurge Apotheosis: ${enemyCard.name} is empowered with +${state.enemyCreatureBuff.atk} ATK and +${state.enemyCreatureBuff.hp} HP!`);
+        }
+
         state.enemyBoard[chosenSlot] = enemyCard;
         state.enemyHand.shift();
         state.enemyDeckSize = state.enemyHand.length;
@@ -619,16 +877,26 @@ export function simulateCombatTurn(
         }
       } else {
         // Direct damage to Enemy Hero!
-        const totalDamage = pCard.attack;
-        state.enemyHeroHealth = Math.max(0, state.enemyHeroHealth - totalDamage);
-        logs.push(`💥 ${pCard.name} deals ${totalDamage} direct damage to the Enemy Hero! (Enemy HP: ${state.enemyHeroHealth}/${state.enemyHeroMaxHealth})`);
-        
-        animateSequence.push({
-          type: 'direct_attack',
-          attacker: 'player',
-          slot: i,
-          damage: totalDamage
-        });
+        const enemyDodgeChance = state.enemyDodgeChance || 0;
+        if (enemyDodgeChance > 0 && Math.random() * 100 < enemyDodgeChance) {
+          logs.push(`🛡️ DODGE! Enemy Hero evaded the attack from ${pCard.name}!`);
+          animateSequence.push({
+            type: 'dodge',
+            side: 'enemy',
+            slot: i
+          });
+        } else {
+          const totalDamage = pCard.attack;
+          state.enemyHeroHealth = Math.max(0, state.enemyHeroHealth - totalDamage);
+          logs.push(`💥 ${pCard.name} deals ${totalDamage} direct damage to the Enemy Hero! (Enemy HP: ${state.enemyHeroHealth}/${state.enemyHeroMaxHealth})`);
+          
+          animateSequence.push({
+            type: 'direct_attack',
+            attacker: 'player',
+            slot: i,
+            damage: totalDamage
+          });
+        }
       }
     }
 
