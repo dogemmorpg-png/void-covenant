@@ -257,7 +257,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-2 sm:px-4 py-0 sm:py-1">
+    <div className="max-w-7xl mx-auto px-2 sm:px-4 pt-2 sm:pt-3 pb-1">
       
       {/* MAIN STORE VIEW: SIDEBAR + MAIN SHOWCASE */}
       <div className="flex flex-col md:flex-row gap-4 lg:gap-5 items-stretch">
