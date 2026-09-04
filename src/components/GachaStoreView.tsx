@@ -265,16 +265,16 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
         {/* Left Sidebar Navigation (Wide, clean, full titles) */}
         <div className="w-full md:w-64 lg:w-72 shrink-0 bg-[#0c0f14]/90 border border-white/10 rounded-2xl p-3 flex flex-row md:flex-col gap-2 shadow-2xl backdrop-blur-md overflow-x-auto md:overflow-x-visible">
           
-          {/* Shop Header in Sidebar */}
-          <div className="hidden md:flex items-center gap-2.5 px-3 py-2 border-b border-white/10 mb-1">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500/20 via-rose-500/20 to-black border border-amber-400/40 flex items-center justify-center shadow-[0_0_10px_rgba(245,158,11,0.25)]">
-              <Store className="w-3.5 h-3.5 text-amber-400" />
+          {/* Shop Header in Sidebar (Enlarged & Prominent) */}
+          <div className="hidden md:flex items-center gap-3 px-3.5 py-3 border-b border-white/10 mb-2">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/25 via-rose-500/20 to-black border border-amber-400/50 flex items-center justify-center shadow-[0_0_14px_rgba(245,158,11,0.3)] shrink-0">
+              <Store className="w-5 h-5 text-amber-400" />
             </div>
             <div>
-              <div className="text-[8px] font-mono font-bold tracking-widest text-amber-400/90 uppercase">
+              <div className="text-[9px] font-mono font-bold tracking-widest text-amber-400 uppercase">
                 EMPORIUM
               </div>
-              <h2 className="font-display font-black text-sm text-white tracking-wider text-shadow-gold leading-none">
+              <h2 className="font-display font-black text-base lg:text-lg text-white tracking-wider text-shadow-gold leading-tight">
                 VOID SHOP
               </h2>
             </div>
@@ -428,9 +428,6 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   </h2>
                   <span className="text-xs text-gray-400 font-mono hidden sm:inline">• 3 Cards Per Pack</span>
                 </div>
-                <span className="text-[10px] font-mono text-amber-400 bg-amber-950/60 border border-amber-500/40 px-2.5 py-0.5 rounded-md">
-                  GUARANTEED SUMMONS
-                </span>
               </div>
 
               {/* 3 Pack Cards Grid */}
