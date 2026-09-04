@@ -317,24 +317,14 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
           <div className="absolute -top-16 -left-16 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
           <div className="absolute -bottom-16 -right-16 w-32 h-32 bg-rose-500/10 rounded-full blur-2xl pointer-events-none" />
 
-          {/* Shop Header in Sidebar (Enlarged & Prominent with Treasury Asset) */}
-          <div className="hidden md:flex items-center gap-3.5 px-3 py-3 border-b border-white/10 mb-1 relative z-10">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-b from-amber-950/80 to-black/90 border border-amber-500/50 p-1.5 flex items-center justify-center shadow-[0_0_18px_rgba(245,158,11,0.35)] shrink-0 group relative overflow-hidden">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.35),transparent_70%)]" />
-              <img
-                src="/shop/abyssal_treasury.png"
-                alt="Void Shop"
-                className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(245,158,11,0.8)] relative z-10"
-              />
-            </div>
-            <div className="min-w-0">
-              <div className="text-[10px] font-mono font-black tracking-widest text-amber-400 uppercase flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3 text-amber-400" />
-                <span>EMPORIUM</span>
-              </div>
-              <h2 className="font-display font-black text-lg lg:text-xl text-white tracking-widest text-shadow-gold leading-tight uppercase">
+          {/* Shop Header in Sidebar (Stylized Gothic Title Banner) */}
+          <div className="hidden md:flex items-center justify-center py-3.5 px-3 border-b border-amber-500/20 mb-2 relative z-10">
+            <div className="flex items-center gap-2.5">
+              <span className="h-[1px] w-6 sm:w-8 bg-gradient-to-r from-transparent via-amber-500/60 to-amber-400" />
+              <h2 className="font-display font-black text-lg lg:text-xl tracking-[0.25em] text-transparent bg-clip-text bg-gradient-to-b from-white via-amber-200 to-amber-500 drop-shadow-[0_2px_10px_rgba(245,158,11,0.5)] uppercase select-none">
                 VOID SHOP
               </h2>
+              <span className="h-[1px] w-6 sm:w-8 bg-gradient-to-l from-transparent via-amber-500/60 to-amber-400" />
             </div>
           </div>
 
