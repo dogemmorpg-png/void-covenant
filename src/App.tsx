@@ -262,7 +262,7 @@ function MainAppContent() {
            {!isPvpMatching && !isPvpModalOpen && <HeaderHUD onNavigateTab={setActiveTab} />}
 
           {/* Tab content */}
-          <div className="py-6">
+          <div className="py-3 sm:py-4">
             <div className={activeTab === 'campaign' ? 'block' : 'hidden'}>
               <CampaignView onStartBattle={async (stage) => {
                 const success = await startBattleOnServer('campaign', stage.id.toString(), stage.energyCost);
