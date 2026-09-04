@@ -101,10 +101,10 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-4 flex items-center justify-center min-h-[calc(100vh-220px)] animate-fadeIn">
+    <div className="max-w-5xl mx-auto px-4 py-1 sm:py-2 flex items-center justify-center animate-fadeIn">
       
       {/* Unified Majestic Slate Panel */}
-      <div className={`glass-panel rounded-3xl pt-8 px-8 pb-5 w-full relative overflow-hidden flex flex-col justify-between ${
+      <div className={`glass-panel rounded-3xl pt-5 sm:pt-6 px-6 sm:px-8 pb-4 w-full relative overflow-hidden flex flex-col justify-between ${
         isBoss 
           ? 'border-red-950/60 shadow-[0_0_50px_rgba(220,38,38,0.12)]' 
           : 'border-[#ebd09b]/20 shadow-[0_0_40px_rgba(0,0,0,0.8)]'
@@ -120,24 +120,24 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
         <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#ebd09b]/35 pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#ebd09b]/35 pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col justify-between h-full space-y-4">
+        <div className="relative z-10 flex flex-col justify-between h-full space-y-2.5 sm:space-y-3">
           
           {/* Row 1: Title & Description Centered with Prominent Energy Badge */}
-          <div className="text-center border-b border-gray-800/80 pb-4 flex flex-col items-center">
-            <h2 className="font-display font-black text-2xl md:text-3xl text-white tracking-widest text-shadow-gold">
+          <div className="text-center border-b border-gray-800/80 pb-2.5 sm:pb-3 flex flex-col items-center">
+            <h2 className="font-display font-black text-xl md:text-2xl text-white tracking-widest text-shadow-gold">
               THE ENDLESS ABYSS
             </h2>
-            <p className="text-xs text-gray-400 mt-1.5 max-w-xl mx-auto font-sans leading-relaxed">
+            <p className="text-xs text-gray-400 mt-1 max-w-xl mx-auto font-sans leading-relaxed">
               Descend into the infinite depths. Defeat the dark entities to claim ancient resources.
             </p>
 
             {/* Prominent Centered Energy Badge with + Button */}
             <div 
               onClick={() => setIsBuyEnergyModalOpen(true)}
-              className="mt-3.5 inline-flex items-center gap-2.5 bg-gradient-to-r from-[#061c12] via-black to-[#061c12] border border-emerald-500/50 hover:border-emerald-400 rounded-full py-1 pl-3 pr-1.5 shadow-[0_0_18px_rgba(16,185,129,0.25)] hover:shadow-[0_0_24px_rgba(16,185,129,0.4)] select-none transition-all cursor-pointer group hover:scale-105 active:scale-95"
+              className="mt-2 sm:mt-2.5 inline-flex items-center gap-2.5 bg-gradient-to-r from-[#061c12] via-black to-[#061c12] border border-emerald-500/50 hover:border-emerald-400 rounded-full py-1 pl-3 pr-1.5 shadow-[0_0_18px_rgba(16,185,129,0.25)] hover:shadow-[0_0_24px_rgba(16,185,129,0.4)] select-none transition-all cursor-pointer group hover:scale-105 active:scale-95"
               title="Click to Refill Energy with Dark Shards"
             >
-              <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.9)] group-hover:scale-110 transition-transform" />
+              <img src="/icons/icon_energy.webp" alt="Energy" className="w-4.5 h-4.5 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.9)] group-hover:scale-110 transition-transform" />
               <div className="flex items-baseline gap-1.5 leading-none">
                 <span className="font-display font-bold text-xs text-gray-300 tracking-wider">ENERGY:</span>
                 <span className="font-mono text-sm font-black text-emerald-400">
@@ -157,30 +157,30 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
           </div>
 
           {/* Row 2: Large Centered Floor Selector */}
-          <div className="flex justify-center items-center py-2">
-            <div className="flex items-center gap-8 bg-black/40 border border-gray-800/50 rounded-[32px] py-4.5 px-8 shadow-inner">
+          <div className="flex justify-center items-center py-1">
+            <div className="flex items-center gap-6 sm:gap-8 bg-black/40 border border-gray-800/50 rounded-[28px] py-2 sm:py-2.5 px-6 sm:px-8 shadow-inner">
               <button 
                 onClick={handlePrev}
                 disabled={viewingFloor === 1}
-                className="p-4 rounded-2xl bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
+                className="p-2.5 sm:p-3 rounded-2xl bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
               >
-                <ChevronLeft className="w-7 h-7" />
+                <ChevronLeft className="w-6 h-6" />
               </button>
 
-              <div className="flex flex-col items-center w-44 select-none">
+              <div className="flex flex-col items-center w-40 sm:w-44 select-none">
                 <span className={`text-[11px] font-mono tracking-widest uppercase font-bold ${isBoss ? 'text-red-500 animate-pulse' : 'text-[#ebd09b]'}`}>
                   {isBoss ? 'Boss Floor' : 'Floor'}
                 </span>
-                <div className="text-6xl font-display font-black text-white text-shadow-gold leading-none my-1">
+                <div className="text-4xl sm:text-5xl font-display font-black text-white text-shadow-gold leading-none my-0.5">
                   {viewingFloor}
                 </div>
                 
                 {/* Stars display directly under the floor number */}
-                <div className="flex justify-center gap-1.5 my-1.5">
+                <div className="flex justify-center gap-1.5 my-1">
                   {[1, 2, 3].map(star => (
                     <Star 
                       key={star} 
-                      className={`w-6 h-6 ${star <= stageStars ? 'text-[#ebd09b] fill-[#ebd09b] drop-shadow-[0_0_8px_rgba(235,208,155,0.8)]' : 'text-gray-700'}`} 
+                      className={`w-5 h-5 ${star <= stageStars ? 'text-[#ebd09b] fill-[#ebd09b] drop-shadow-[0_0_8px_rgba(235,208,155,0.8)]' : 'text-gray-700'}`} 
                     />
                   ))}
                 </div>
@@ -195,74 +195,74 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
               <button 
                 onClick={handleNext}
                 disabled={viewingFloor >= maxFloor}
-                className="p-4 rounded-2xl bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
+                className="p-2.5 sm:p-3 rounded-2xl bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
               >
-                <ChevronRight className="w-7 h-7" />
+                <ChevronRight className="w-6 h-6" />
               </button>
             </div>
           </div>
 
           {/* Row 3: Encounter & Drops Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5 mb-1 sm:mb-2">
             
             {/* Encounter details */}
-            <div className="space-y-3">
+            <div className="space-y-1.5">
               <span className="text-[10px] font-mono text-gray-500 tracking-widest uppercase font-bold block">Encounter</span>
-              <div className="bg-black/50 border border-gray-800/60 rounded-2xl p-5 flex items-center gap-4 shadow-inner min-h-[110px]">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center border shrink-0 ${isBoss ? 'bg-[#4e0707] border-[#dd2c40]/50' : 'bg-[#1f2833] border-cyan-900'} overflow-hidden`}>
+              <div className="bg-black/50 border border-gray-800/60 rounded-2xl p-3.5 sm:p-4 flex items-center gap-3.5 shadow-inner min-h-[85px] sm:min-h-[90px]">
+                <div className={`w-13 h-13 sm:w-14 sm:h-14 rounded-full flex items-center justify-center border shrink-0 ${isBoss ? 'bg-[#4e0707] border-[#dd2c40]/50' : 'bg-[#1f2833] border-cyan-900'} overflow-hidden`}>
                   {selectedStage.enemyHeroImage?.startsWith('/') ? (
                     <img src={selectedStage.enemyHeroImage} alt="Enemy Hero" className="w-full h-full object-cover animate-pulse" />
                   ) : (
-                    isBoss ? <Crown className="w-8 h-8 text-purple-500 drop-shadow-[0_0_12px_rgba(168,85,247,0.8)] animate-pulse" /> : <Skull className="w-7 h-7 text-red-500/90" />
+                    isBoss ? <Crown className="w-7 h-7 text-purple-500 drop-shadow-[0_0_12px_rgba(168,85,247,0.8)] animate-pulse" /> : <Skull className="w-6 h-6 text-red-500/90" />
                   )}
                 </div>
                 <div>
-                  <h4 className="font-display font-bold text-white text-lg leading-none">{selectedStage.enemyHeroName}</h4>
-                  <p className="text-xs font-mono text-gray-400 mt-2.5">Hero Health: <span className="text-[#dd2c40] font-bold">{selectedStage.enemyHeroHealth} HP</span></p>
+                  <h4 className="font-display font-bold text-white text-base sm:text-lg leading-none">{selectedStage.enemyHeroName}</h4>
+                  <p className="text-xs font-mono text-gray-400 mt-1.5">Hero Health: <span className="text-[#dd2c40] font-bold">{selectedStage.enemyHeroHealth} HP</span></p>
                   <p className="text-[10px] text-gray-500 font-mono mt-0.5">Deck Size: {selectedStage.enemyDeck.length} Cards</p>
                 </div>
               </div>
             </div>
 
             {/* Guaranteed Rewards */}
-            <div className="space-y-3">
+            <div className="space-y-1.5">
               <span className="text-[10px] font-mono text-[#ebd09b]/80 tracking-widest uppercase font-bold block">VICTORY REWARDS</span>
-              <div className="bg-black/50 border border-gray-800/60 rounded-2xl p-4 flex items-center justify-around gap-2 shadow-inner min-h-[110px]">
+              <div className="bg-black/50 border border-gray-800/60 rounded-2xl p-2.5 sm:p-3 flex items-center justify-around gap-2 shadow-inner min-h-[85px] sm:min-h-[90px]">
                 
                 {/* Gold Pill */}
-                <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-amber-500/20 hover:border-amber-400/50 hover:bg-amber-500/[0.06] transition-all cursor-default group">
+                <div className="flex-1 flex flex-col items-center justify-center p-1.5 sm:p-2 rounded-xl bg-white/[0.03] border border-amber-500/20 hover:border-amber-400/50 hover:bg-amber-500/[0.06] transition-all cursor-default group">
                   <div className="flex items-center gap-1.5">
-                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] group-hover:scale-110 transition-transform" />
-                    <span className="font-mono font-black text-amber-300 text-base leading-none">+{selectedStage.goldReward}</span>
+                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 sm:w-6 sm:h-6 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] group-hover:scale-110 transition-transform" />
+                    <span className="font-mono font-black text-amber-300 text-sm sm:text-base leading-none">+{selectedStage.goldReward}</span>
                   </div>
-                  <span className="text-[9px] text-amber-500/70 font-mono uppercase tracking-wider font-semibold mt-1">Gold</span>
+                  <span className="text-[9px] text-amber-500/70 font-mono uppercase tracking-wider font-semibold mt-0.5">Gold</span>
                 </div>
 
                 {/* Dust Pill */}
-                <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-cyan-500/20 hover:border-cyan-400/50 hover:bg-cyan-500/[0.06] transition-all cursor-default group">
+                <div className="flex-1 flex flex-col items-center justify-center p-1.5 sm:p-2 rounded-xl bg-white/[0.03] border border-cyan-500/20 hover:border-cyan-400/50 hover:bg-cyan-500/[0.06] transition-all cursor-default group">
                   <div className="flex items-center gap-1.5">
-                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-8 h-8 object-contain drop-shadow-[0_0_10px_rgba(102,252,241,0.6)] scale-135 group-hover:scale-145 transition-transform" />
-                    <span className="font-mono font-black text-[#66fcf1] text-base leading-none">+{selectedStage.dustReward}</span>
+                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-6 h-6 sm:w-7 sm:h-7 object-contain drop-shadow-[0_0_10px_rgba(102,252,241,0.6)] scale-125 group-hover:scale-135 transition-transform" />
+                    <span className="font-mono font-black text-[#66fcf1] text-sm sm:text-base leading-none">+{selectedStage.dustReward}</span>
                   </div>
-                  <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider font-semibold mt-1">Dust</span>
+                  <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider font-semibold mt-0.5">Dust</span>
                 </div>
 
                 {/* Shards or EXP Pill */}
                 {selectedStage.shardsReward > 0 ? (
-                  <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-red-500/20 hover:border-red-400/50 hover:bg-red-500/[0.06] transition-all cursor-default group">
+                  <div className="flex-1 flex flex-col items-center justify-center p-1.5 sm:p-2 rounded-xl bg-white/[0.03] border border-red-500/20 hover:border-red-400/50 hover:bg-red-500/[0.06] transition-all cursor-default group">
                     <div className="flex items-center gap-1.5">
-                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.5)] scale-110 group-hover:scale-120 transition-transform" />
-                      <span className="font-mono font-black text-rose-400 text-base leading-none">+{selectedStage.shardsReward}</span>
+                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-5 h-5 sm:w-6 sm:h-6 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.5)] scale-110 group-hover:scale-120 transition-transform" />
+                      <span className="font-mono font-black text-rose-400 text-sm sm:text-base leading-none">+{selectedStage.shardsReward}</span>
                     </div>
-                    <span className="text-[9px] text-red-400/70 font-mono uppercase tracking-wider font-semibold mt-1">Shards</span>
+                    <span className="text-[9px] text-red-400/70 font-mono uppercase tracking-wider font-semibold mt-0.5">Shards</span>
                   </div>
                 ) : (
-                  <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-emerald-500/20 hover:border-emerald-400/50 hover:bg-emerald-500/[0.06] transition-all cursor-default group">
+                  <div className="flex-1 flex flex-col items-center justify-center p-1.5 sm:p-2 rounded-xl bg-white/[0.03] border border-emerald-500/20 hover:border-emerald-400/50 hover:bg-emerald-500/[0.06] transition-all cursor-default group">
                     <div className="flex items-center gap-1.5">
-                      <img src="/icons/icon_exp.webp" alt="EXP" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.7)] group-hover:scale-110 transition-transform" />
-                      <span className="font-mono font-black text-emerald-400 text-base leading-none">+50</span>
+                      <img src="/icons/icon_exp.webp" alt="EXP" className="w-5 h-5 sm:w-6 sm:h-6 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.7)] group-hover:scale-110 transition-transform" />
+                      <span className="font-mono font-black text-emerald-400 text-sm sm:text-base leading-none">+50</span>
                     </div>
-                    <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider font-semibold mt-1">Hero EXP</span>
+                    <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider font-semibold mt-0.5">Hero EXP</span>
                   </div>
                 )}
 
@@ -273,26 +273,26 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
 
           {/* Card Reward Info if exists */}
           {selectedStage.cardReward && (
-            <div className="bg-black/50 border border-emerald-500/20 p-4 rounded-2xl flex items-center justify-between shadow-inner mb-2">
+            <div className="bg-black/50 border border-emerald-500/20 p-3 sm:p-3.5 rounded-2xl flex items-center justify-between shadow-inner mb-1 sm:mb-2">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-emerald-950/40 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                  <Award className="w-5 h-5 text-emerald-400" />
+                <div className="w-9 h-9 rounded-full bg-emerald-950/40 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                  <Award className="w-4.5 h-4.5 text-emerald-400" />
                 </div>
                 <div>
                   <span className="text-emerald-400 font-bold text-xs block leading-none">Guaranteed Card Drop</span>
-                  <span className="text-[10px] text-gray-400 font-mono mt-1.5">{selectedStage.cardReward.name}</span>
+                  <span className="text-[10px] text-gray-400 font-mono mt-1">{selectedStage.cardReward.name}</span>
                 </div>
               </div>
-              <span className="text-[10px] bg-emerald-950/40 text-emerald-400 px-3 py-1 rounded-lg font-mono border border-emerald-500/20">Guaranteed</span>
+              <span className="text-[10px] bg-emerald-950/40 text-emerald-400 px-3 py-0.5 rounded-lg font-mono border border-emerald-500/20">Guaranteed</span>
             </div>
           )}
 
           {/* Action Buttons Area */}
-          <div className="pt-4 border-t border-gray-800/80 flex flex-col items-center">
-            <div className="flex w-full max-w-xl gap-5">
+          <div className="pt-3 border-t border-gray-800/80 flex flex-col items-center">
+            <div className="flex w-full max-w-xl gap-4 sm:gap-5">
               <button
                 onClick={handleStart}
-                className={`flex-1 font-display font-bold tracking-widest py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-4 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase ${
+                className={`flex-1 font-display font-bold tracking-widest py-3 sm:py-3.5 px-5 sm:px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 sm:gap-4 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase ${
                   isBoss 
                     ? 'bg-gradient-to-b from-[#3a0b12] via-[#200508] to-[#140204] border-2 border-red-600/50 hover:border-red-500 text-red-400 hover:text-white shadow-[0_0_15px_rgba(220,38,38,0.15)] hover:shadow-[0_0_25px_rgba(239,68,68,0.35)]'
                     : 'bg-gradient-to-b from-[#221a12] via-[#150f0a] to-[#0c0805] border-2 border-[#c5a880]/50 hover:border-[#ebd09b] text-[#ebd09b] hover:text-white shadow-[0_0_15px_rgba(197,168,128,0.15)] hover:shadow-[0_0_25px_rgba(235,208,155,0.35)]'
@@ -300,24 +300,24 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
               >
                 <Swords className="w-5 h-5 animate-pulse" /> 
                 <span className="mr-0.5">BATTLE</span>
-                <span className={`flex items-center gap-1.5 bg-black/50 border rounded-full px-3 py-1 font-mono text-lg font-bold text-emerald-400 shadow-inner ${
+                <span className={`flex items-center gap-1.5 bg-black/50 border rounded-full px-2.5 py-0.5 font-mono text-base sm:text-lg font-bold text-emerald-400 shadow-inner ${
                   isBoss ? 'border-red-500/30' : 'border-[#ebd09b]/35'
                 }`}>
                   {selectedStage.energyCost}
-                  <img src="/icons/icon_energy.webp" alt="Energy" className="w-7 h-7 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
+                  <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 sm:w-6 sm:h-6 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
                 </span>
               </button>
               
               {stageStars === 3 && (
                 <button
                   onClick={handleSweep}
-                  className="flex-1 font-display font-bold tracking-widest py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-4 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase bg-gradient-to-b from-[#1b122c] via-[#0e071a] to-[#06020c] border-2 border-purple-600/50 hover:border-purple-400 text-purple-400 hover:text-white shadow-[0_0_15px_rgba(147,51,234,0.15)] hover:shadow-[0_0_25px_rgba(168,85,247,0.35)]"
+                  className="flex-1 font-display font-bold tracking-widest py-3 sm:py-3.5 px-5 sm:px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 sm:gap-4 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase bg-gradient-to-b from-[#1b122c] via-[#0e071a] to-[#06020c] border-2 border-purple-600/50 hover:border-purple-400 text-purple-400 hover:text-white shadow-[0_0_15px_rgba(147,51,234,0.15)] hover:shadow-[0_0_25px_rgba(168,85,247,0.35)]"
                 >
                   <FastForward className="w-5 h-5" /> 
                   <span className="mr-0.5">SWEEP</span>
-                  <span className="flex items-center gap-1.5 bg-black/50 border border-purple-500/30 rounded-full px-3 py-1 font-mono text-lg font-bold text-emerald-400 shadow-inner">
+                  <span className="flex items-center gap-1.5 bg-black/50 border border-purple-500/30 rounded-full px-2.5 py-0.5 font-mono text-base sm:text-lg font-bold text-emerald-400 shadow-inner">
                     {selectedStage.energyCost}
-                    <img src="/icons/icon_energy.webp" alt="Energy" className="w-7 h-7 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
+                    <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 sm:w-6 sm:h-6 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
                   </span>
                 </button>
               )}
