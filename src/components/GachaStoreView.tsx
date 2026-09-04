@@ -939,6 +939,19 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
             });
             const isForgingCurrent = buyingEquipName === currentItem.name;
 
+            const getItemStatSummary = (item: (typeof demiurgeItems)[0]) => {
+              const parts: string[] = [];
+              if (item.bonusType === 'delayReduction') parts.push(`-${item.bonusValue} Delay`);
+              else if (item.bonusType === 'dodge') parts.push(`+${item.bonusValue}% Dodge`);
+              else if (item.bonusType === 'goldBonus') parts.push(`+${item.bonusValue}% Gold`);
+              else if (item.bonusType === 'maxHealth') parts.push(`+${item.bonusValue} HP`);
+
+              if (item.secondaryBonusType === 'dodge') parts.push(`+${item.secondaryBonusValue}% Dodge`);
+              else if (item.secondaryBonusType === 'maxHealth') parts.push(`+${item.secondaryBonusValue} HP`);
+              
+              return parts.join(' • ');
+            };
+
             return (
               <div className="space-y-4">
                 
@@ -969,7 +982,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       <span>FORGING ENTIRE SET...</span>
                     ) : (
                       <div className="flex items-center gap-1.5">
-                        <span>BUY FULL SET (6 PCS):</span>
+                        <span>BUY FULL SET (6 PIECES):</span>
                         <span className="line-through text-rose-200/70 text-[10px]">300</span>
                         <span className="text-amber-300 font-mono text-sm font-black flex items-center gap-0.5">
                           <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain inline" />
@@ -986,11 +999,16 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                 {/* Main Altar Area: Left 6-Slot Grid + Right Detailed Item Forge */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
                   
-                  {/* Left Column: 6 Set Piece Selectors (Pills) */}
-                  <div className="lg:col-span-5 flex flex-col justify-between gap-2 bg-black/40 border border-white/10 rounded-2xl p-3">
+                  {/* Left Column: 6 Set Piece Selectors */}
+                  <div className="lg:col-span-5 flex flex-col justify-between gap-2.5 bg-black/50 border border-rose-500/20 rounded-2xl p-3 shadow-xl">
                     <div className="text-[10px] font-mono text-rose-400 uppercase font-black tracking-wider px-1 flex items-center justify-between">
-                      <span>SELECT SET PIECE</span>
-                      <span className="text-gray-400 font-mono">{ownedDemiurgeCount}/6 OWNED</span>
+                      <span className="flex items-center gap-1.5">
+                        <Sword className="w-3 h-3 text-rose-400" />
+                        SELECT SET PIECE
+                      </span>
+                      <span className="text-gray-300 font-mono font-bold bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                        {ownedDemiurgeCount}/6 OWNED
+                      </span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 flex-1">
@@ -1005,30 +1023,53 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                               audioSystem.playClick();
                               setSelectedDemiurgeItemName(item.name);
                             }}
-                            className={`p-2.5 rounded-xl border transition-all text-left flex items-center gap-2.5 cursor-pointer relative overflow-hidden group ${
+                            className={`p-2.5 rounded-xl border-2 transition-all text-left flex items-center gap-2.5 cursor-pointer relative overflow-hidden group ${
                               isSelected
-                                ? 'bg-gradient-to-r from-rose-950/90 to-[#220710] border-rose-400 text-white shadow-[0_0_15px_rgba(244,63,94,0.4)]'
-                                : 'bg-black/60 border-white/10 text-gray-400 hover:border-rose-500/40 hover:bg-white/5 hover:text-rose-200'
+                                ? 'bg-gradient-to-br from-rose-950/95 via-[#230812] to-black border-rose-400 text-white shadow-[0_0_20px_rgba(244,63,94,0.45)] ring-1 ring-rose-400/40'
+                                : itemOwned
+                                ? 'bg-gradient-to-br from-[#180a10]/90 via-black to-black border-rose-950/60 hover:border-rose-500/50 hover:bg-rose-950/20 text-gray-300'
+                                : 'bg-black/60 border-white/10 hover:border-rose-500/40 hover:bg-white/5 text-gray-400'
                             }`}
                           >
-                            <div className={`w-10 h-10 rounded-lg p-1.5 flex items-center justify-center border shrink-0 ${
-                              itemOwned ? 'bg-rose-950/80 border-rose-500/60' : 'bg-black/60 border-white/10'
+                            {/* Frame with Icon */}
+                            <div className={`w-13 h-13 sm:w-14 sm:h-14 rounded-xl p-1 flex items-center justify-center border shrink-0 relative overflow-hidden transition-transform group-hover:scale-105 ${
+                              itemOwned 
+                                ? 'bg-gradient-to-b from-rose-950 to-black border-rose-500/70 shadow-[0_0_12px_rgba(244,63,94,0.4)]' 
+                                : 'bg-black/80 border-white/15'
                             }`}>
+                              <div className={`absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(244,63,94,0.35),transparent_70%)] ${itemOwned ? 'opacity-100' : 'opacity-20'}`} />
                               <img
                                 src={getEquipmentIcon(item.name, item.slot)}
                                 alt={item.name}
-                                className={`w-full h-full object-contain filter ${itemOwned ? 'drop-shadow-[0_0_8px_rgba(244,63,94,0.7)]' : 'grayscale opacity-60'}`}
+                                className={`w-full h-full object-contain relative z-10 filter ${
+                                  itemOwned ? 'drop-shadow-[0_0_10px_rgba(244,63,94,0.85)]' : 'grayscale opacity-60'
+                                }`}
                               />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="text-[9px] font-mono uppercase text-gray-500 flex items-center justify-between">
-                                <span>{item.slot}</span>
-                                {itemOwned && (
-                                  <span className="text-emerald-400 font-bold">✓</span>
+
+                            {/* Text & Stats */}
+                            <div className="min-w-0 flex-1 flex flex-col justify-between py-0.5">
+                              <div className="flex items-center justify-between gap-1">
+                                <span className="text-[10px] font-mono uppercase font-black tracking-widest text-rose-400">
+                                  {item.slot}
+                                </span>
+                                {itemOwned ? (
+                                  <span className="bg-emerald-950/90 border border-emerald-500/60 text-emerald-300 text-[8px] sm:text-[9px] font-mono px-1.5 py-0.2 rounded font-black tracking-wider shadow-[0_0_8px_rgba(16,185,129,0.35)] shrink-0 flex items-center gap-0.5">
+                                    <span>✓</span> OWNED
+                                  </span>
+                                ) : (
+                                  <span className="bg-white/5 border border-white/10 text-gray-400 text-[8px] sm:text-[9px] font-mono px-1.5 py-0.2 rounded font-bold shrink-0">
+                                    50 🔷
+                                  </span>
                                 )}
                               </div>
-                              <div className="font-display font-bold text-xs text-white truncate leading-tight mt-0.5">
+
+                              <div className="font-display font-black text-xs sm:text-sm text-white truncate leading-tight mt-0.5 group-hover:text-rose-200 transition-colors">
                                 {item.name.replace(' of the Demiurge', '')}
+                              </div>
+
+                              <div className="text-[9px] sm:text-[10px] font-mono font-bold text-amber-300/90 mt-0.5 truncate">
+                                {getItemStatSummary(item)}
                               </div>
                             </div>
                           </button>
@@ -1145,33 +1186,76 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
 
                 </div>
 
-                {/* Bottom Compact Resonance Bar (2 PC, 4 PC, 6 PC) */}
-                <div className="bg-black/60 border border-rose-500/30 rounded-xl p-2.5">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                {/* Bottom Set Resonance Bar */}
+                <div className="bg-black/60 border border-rose-500/30 rounded-2xl p-3 md:p-3.5 space-y-2.5">
+                  <div className="flex items-center justify-between px-1">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
+                      <span className="font-display font-black text-xs md:text-sm text-white tracking-widest uppercase text-shadow-gold">
+                        Demiurge Set Resonance Bonuses
+                      </span>
+                    </div>
+                    <span className="text-[10px] md:text-xs font-mono text-rose-300 font-bold">
+                      {ownedDemiurgeCount} of 6 Pieces Acquired
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
                     {DEMIURGE_SET.thresholds.map((threshold, tIdx) => {
                       const isAchieved = ownedDemiurgeCount >= threshold.pieces;
                       return (
                         <div 
                           key={tIdx}
-                          className={`px-3 py-1.5 rounded-lg border transition-all flex items-center justify-between gap-2 ${
+                          className={`p-3 rounded-xl border-2 transition-all relative overflow-hidden flex flex-col justify-between gap-1.5 ${
                             isAchieved
-                              ? 'bg-rose-950/80 border-rose-400 text-rose-300 shadow-[0_0_10px_rgba(244,63,94,0.25)]'
-                              : 'bg-black/40 border-white/5 opacity-60 text-gray-500'
+                              ? 'bg-gradient-to-br from-rose-950/85 via-[#230812] to-black border-rose-400/90 text-white shadow-[0_0_18px_rgba(244,63,94,0.3)]'
+                              : 'bg-black/50 border-white/10 opacity-70 text-gray-400'
                           }`}
                         >
-                          <div className="min-w-0">
-                            <div className="text-[10px] font-mono font-bold truncate">
-                              [{threshold.pieces} PC] {threshold.label}
-                            </div>
-                            <div className="text-[9px] font-sans text-gray-400 truncate">
-                              {threshold.description}
-                            </div>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className={`text-[10px] font-mono font-black tracking-wider uppercase px-2 py-0.5 rounded ${
+                              isAchieved 
+                                ? 'bg-rose-500/30 text-rose-200 border border-rose-400/40' 
+                                : 'bg-white/5 text-gray-400 border border-white/10'
+                            }`}>
+                              {threshold.pieces === 6 ? '6 PIECES (FULL SET)' : `${threshold.pieces} PIECES BONUS`}
+                            </span>
+                            <span className={`text-[9px] font-mono font-black px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1 ${
+                              isAchieved 
+                                ? 'bg-emerald-950 border border-emerald-400 text-emerald-300 shadow-[0_0_10px_rgba(52,211,153,0.4)]' 
+                                : 'text-gray-500 bg-black/60 border border-white/5'
+                            }`}>
+                              {isAchieved ? '⚡ ACTIVE' : `🔒 LOCKED (${ownedDemiurgeCount}/${threshold.pieces})`}
+                            </span>
                           </div>
-                          <span className={`text-[8px] font-mono font-black px-1.5 py-0.2 rounded shrink-0 ${
-                            isAchieved ? 'bg-rose-500/40 text-rose-200' : 'text-gray-600 bg-white/5'
-                          }`}>
-                            {isAchieved ? 'ACTIVE' : 'LOCKED'}
-                          </span>
+
+                          <div className="font-display font-black text-xs md:text-sm text-white tracking-wide mt-0.5">
+                            {threshold.label}
+                          </div>
+
+                          {/* Stat description clearly displayed without truncation */}
+                          {threshold.pieces === 2 && (
+                            <div className="text-[11px] md:text-xs font-mono space-x-1.5 leading-snug">
+                              <span className="text-emerald-300 font-black">+30 Max Hero HP</span>
+                              <span className="text-gray-500">•</span>
+                              <span className="text-cyan-300 font-black">+5% Dodge</span>
+                            </div>
+                          )}
+                          {threshold.pieces === 4 && (
+                            <div className="text-[11px] md:text-xs leading-snug">
+                              <span className="text-amber-300 font-mono font-black">-1 Turn Delay</span>
+                              <span className="text-gray-300 font-sans ml-1">on all friendly summoned cards</span>
+                            </div>
+                          )}
+                          {threshold.pieces === 6 && (
+                            <div className="text-[11px] md:text-xs font-mono leading-snug flex flex-wrap gap-x-1.5 gap-y-0.5">
+                              <span className="text-purple-300 font-black">+1 Starting Mana</span>
+                              <span className="text-gray-500">•</span>
+                              <span className="text-emerald-300 font-black">+50 Max HP</span>
+                              <span className="text-gray-500">•</span>
+                              <span className="text-rose-300 font-black">+3 ATK / +8 HP to creatures</span>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
