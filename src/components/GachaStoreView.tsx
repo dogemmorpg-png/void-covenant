@@ -798,18 +798,18 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                     >
                       <div className="absolute -top-24 -left-24 w-48 h-48 bg-rose-500/15 rounded-full blur-2xl pointer-events-none group-hover:bg-rose-500/25 transition-all" />
 
-                      <div className="space-y-3 relative z-10">
-                        {/* Compact Card Portrait & Badges */}
-                        <div className="relative h-44 sm:h-48 rounded-xl overflow-hidden border border-rose-400/40 shadow-lg bg-black/60">
+                      <div className="space-y-3.5 relative z-10">
+                        {/* Card Portrait & Badges */}
+                        <div className="relative h-52 sm:h-56 rounded-xl overflow-hidden border border-rose-400/40 shadow-lg bg-black/60">
                           <img 
                             src={card.image} 
                             alt={card.name} 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/40 pointer-events-none" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/30 pointer-events-none" />
 
                           {/* Tier & Delay Badges Top */}
-                          <div className="absolute top-2 left-2 right-2 flex items-center justify-between z-10">
+                          <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-10">
                             <span className="px-2 py-0.5 rounded-lg border font-mono text-[9px] uppercase font-black tracking-wider bg-gradient-to-r from-red-950 to-rose-900 text-rose-300 border-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.7)]">
                               DIVINE
                             </span>
@@ -822,29 +822,34 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           </div>
 
                           {/* ATK & HP Badges Bottom */}
-                          <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between z-10">
-                            <div className="bg-black/85 border border-red-500/60 rounded-lg px-2 py-0.5 text-xs font-mono font-black text-red-400 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+                          <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between z-10">
+                            <div className="bg-black/85 border border-red-500/60 rounded-lg px-2.5 py-1 text-xs font-mono font-black text-red-400 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
                               <span className="text-xs">⚔️</span> {card.attack}
                             </div>
-                            <div className="bg-black/85 border border-emerald-500/60 rounded-lg px-2 py-0.5 text-xs font-mono font-black text-emerald-400 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+                            <div className="bg-black/85 border border-emerald-500/60 rounded-lg px-2.5 py-1 text-xs font-mono font-black text-emerald-400 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
                               <span className="text-xs">❤️</span> {card.health}
                             </div>
                           </div>
                         </div>
 
-                        {/* Card Title & Owned Status */}
-                        <div className="flex items-center justify-between gap-2">
-                          <h4 className="font-display font-black text-sm sm:text-base text-white group-hover:text-rose-400 transition-colors tracking-wide truncate">
-                            {card.name}
-                          </h4>
-                          {ownedCount > 0 && (
-                            <span className="shrink-0 bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-[9px] font-mono px-2 py-0.5 rounded-full font-bold">
-                              OWNED: {ownedCount}
-                            </span>
-                          )}
+                        {/* Card Title & Lore */}
+                        <div>
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="font-display font-black text-base text-white group-hover:text-rose-400 transition-colors tracking-wide truncate">
+                              {card.name}
+                            </h4>
+                            {ownedCount > 0 && (
+                              <span className="shrink-0 bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-[9px] font-mono px-2 py-0.5 rounded-full font-bold">
+                                OWNED: {ownedCount}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-gray-400 font-sans mt-0.5 line-clamp-1 leading-snug">
+                            {card.description}
+                          </p>
                         </div>
 
-                        {/* Streamlined Skills Box */}
+                        {/* Skills Box */}
                         <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 space-y-1.5">
                           <div className="text-[9px] font-mono uppercase font-bold text-rose-400 tracking-wider flex items-center gap-1">
                             <Sparkles className="w-3 h-3 text-rose-400" />
@@ -854,7 +859,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                             {card.skills.map((skill, sIdx) => (
                               <div key={sIdx} className="flex items-baseline gap-1.5 text-[10px] leading-tight">
                                 <span className="font-mono font-bold text-rose-300 uppercase shrink-0">[{skill.type} {skill.value}]</span>
-                                <span className="text-gray-300 truncate" title={skill.description}>{skill.description}</span>
+                                <span className="text-gray-300 line-clamp-1" title={skill.description}>{skill.description}</span>
                               </div>
                             ))}
                           </div>
@@ -869,7 +874,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           className="w-full bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 hover:from-rose-500 hover:to-red-400 active:scale-[0.98] text-white font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(244,63,94,0.5)] hover:shadow-[0_0_25px_rgba(244,63,94,0.8)] flex items-center justify-center gap-2 text-xs uppercase cursor-pointer disabled:opacity-50"
                         >
                           <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow" />
-                          {isBuyingThis ? 'INVOKING...' : '50 SHARDS'}
+                          {isBuyingThis ? 'INVOKING...' : 'SUMMON FOR 50 SHARDS'}
                         </button>
                       </div>
                     </div>
