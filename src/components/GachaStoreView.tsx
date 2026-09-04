@@ -1011,7 +1011,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 flex-1">
+                    <div className="grid grid-cols-2 gap-2.5 flex-1">
                       {demiurgeItems.map((item) => {
                         const itemOwned = (profile.equipment || []).some(e => e.name === item.name);
                         const isSelected = selectedDemiurgeItemName === item.name;
@@ -1023,16 +1023,32 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                               audioSystem.playClick();
                               setSelectedDemiurgeItemName(item.name);
                             }}
-                            className={`p-2.5 rounded-xl border-2 transition-all text-left flex items-center gap-2.5 cursor-pointer relative overflow-hidden group ${
+                            className={`p-2.5 rounded-2xl border-2 transition-all flex flex-col items-center justify-between cursor-pointer relative overflow-hidden group ${
                               isSelected
-                                ? 'bg-gradient-to-br from-rose-950/95 via-[#230812] to-black border-rose-400 text-white shadow-[0_0_20px_rgba(244,63,94,0.45)] ring-1 ring-rose-400/40'
+                                ? 'bg-gradient-to-b from-rose-950/95 via-[#230812] to-black border-rose-400 text-white shadow-[0_0_20px_rgba(244,63,94,0.45)] ring-1 ring-rose-400/40'
                                 : itemOwned
-                                ? 'bg-gradient-to-br from-[#180a10]/90 via-black to-black border-rose-950/60 hover:border-rose-500/50 hover:bg-rose-950/20 text-gray-300'
+                                ? 'bg-gradient-to-b from-[#180a10]/90 via-black to-black border-rose-950/60 hover:border-rose-500/50 hover:bg-rose-950/20 text-gray-300'
                                 : 'bg-black/60 border-white/10 hover:border-rose-500/40 hover:bg-white/5 text-gray-400'
                             }`}
                           >
-                            {/* Frame with Icon */}
-                            <div className={`w-13 h-13 sm:w-14 sm:h-14 rounded-xl p-1 flex items-center justify-center border shrink-0 relative overflow-hidden transition-transform group-hover:scale-105 ${
+                            {/* Top row: Slot & Owned Badge */}
+                            <div className="flex items-center justify-between w-full">
+                              <span className="text-[10px] font-mono uppercase font-black tracking-wider text-rose-400">
+                                {item.slot}
+                              </span>
+                              {itemOwned ? (
+                                <span className="bg-emerald-950/90 border border-emerald-500/60 text-emerald-300 text-[8px] sm:text-[9px] font-mono px-1.5 py-0.2 rounded font-black tracking-wider shadow-[0_0_8px_rgba(16,185,129,0.35)] flex items-center gap-0.5">
+                                  <span>✓</span> OWNED
+                                </span>
+                              ) : (
+                                <span className="bg-white/5 border border-white/10 text-gray-400 text-[8px] sm:text-[9px] font-mono px-1.5 py-0.2 rounded font-bold">
+                                  50 🔷
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Centered Large Icon with glowing aura */}
+                            <div className={`w-14 h-14 sm:w-16 sm:h-16 my-1.5 rounded-xl p-1.5 flex items-center justify-center border shrink-0 relative overflow-hidden transition-transform group-hover:scale-105 ${
                               itemOwned 
                                 ? 'bg-gradient-to-b from-rose-950 to-black border-rose-500/70 shadow-[0_0_12px_rgba(244,63,94,0.4)]' 
                                 : 'bg-black/80 border-white/15'
@@ -1047,27 +1063,11 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                               />
                             </div>
 
-                            {/* Text & Stats */}
-                            <div className="min-w-0 flex-1 flex flex-col justify-between py-0.5">
-                              <div className="flex items-center justify-between gap-1">
-                                <span className="text-[10px] font-mono uppercase font-black tracking-widest text-rose-400">
-                                  {item.slot}
-                                </span>
-                                {itemOwned ? (
-                                  <span className="bg-emerald-950/90 border border-emerald-500/60 text-emerald-300 text-[8px] sm:text-[9px] font-mono px-1.5 py-0.2 rounded font-black tracking-wider shadow-[0_0_8px_rgba(16,185,129,0.35)] shrink-0 flex items-center gap-0.5">
-                                    <span>✓</span> OWNED
-                                  </span>
-                                ) : (
-                                  <span className="bg-white/5 border border-white/10 text-gray-400 text-[8px] sm:text-[9px] font-mono px-1.5 py-0.2 rounded font-bold shrink-0">
-                                    50 🔷
-                                  </span>
-                                )}
-                              </div>
-
-                              <div className="font-display font-black text-xs sm:text-sm text-white truncate leading-tight mt-0.5 group-hover:text-rose-200 transition-colors">
+                            {/* Bottom: Name & Centered Stat */}
+                            <div className="w-full text-center">
+                              <div className="font-display font-black text-xs sm:text-sm text-white truncate leading-tight group-hover:text-rose-200 transition-colors">
                                 {item.name.replace(' of the Demiurge', '')}
                               </div>
-
                               <div className="text-[9px] sm:text-[10px] font-mono font-bold text-amber-300/90 mt-0.5 truncate">
                                 {getItemStatSummary(item)}
                               </div>
