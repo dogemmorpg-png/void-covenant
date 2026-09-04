@@ -767,30 +767,26 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
             </div>
           )}
 
-          {/* ===================== 3. DIVINE PANTHEON (RESTORED FULL DESIGN) ===================== */}
+          {/* ===================== 3. DIVINE PANTHEON (COMPACT SCREEN FIT) ===================== */}
           {activeCategory === 'pantheon' && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               
               {/* Category Header */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-rose-950/60 pb-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <Crown className="w-5 h-5 text-rose-400" />
-                    <h2 className="font-display font-black text-xl md:text-2xl text-white tracking-widest text-shadow-gold uppercase">
-                      Divine Pantheon
-                    </h2>
-                  </div>
-                  <p className="text-xs text-gray-400 font-sans">
-                    The primordial architects of reality. Cannot be acquired via boosters or standard evolution.
-                  </p>
+              <div className="flex items-center justify-between border-b border-rose-950/60 pb-2.5">
+                <div className="flex items-center gap-2.5">
+                  <Crown className="w-5 h-5 text-rose-400" />
+                  <h2 className="font-display font-black text-lg md:text-xl text-white tracking-widest text-shadow-gold uppercase">
+                    Divine Pantheon
+                  </h2>
+                  <span className="text-xs text-gray-400 font-mono hidden sm:inline">• 3 Primordial Invocations</span>
                 </div>
-                <div className="bg-black/60 border border-rose-500/40 rounded-xl px-3.5 py-1.5 text-xs font-mono text-rose-300">
+                <div className="bg-black/60 border border-rose-500/40 rounded-xl px-3 py-1 text-xs font-mono text-rose-300">
                   Fixed Price: <span className="font-bold text-amber-400">50 Dark Shards</span>
                 </div>
               </div>
 
               {/* 3 Divine Cards Showcase Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5">
                 {CARD_TEMPLATES.filter(c => c.tier === 'divine').map((card) => {
                   const ownedCount = (profile.collection || []).filter(c => c.baseId === card.baseId).length;
                   const isBuyingThis = buyingCardId === card.baseId;
@@ -798,27 +794,27 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   return (
                     <div 
                       key={card.baseId} 
-                      className="bg-gradient-to-b from-[#1c080d] via-[#14060a] to-black border-2 border-rose-500/40 hover:border-rose-400/90 rounded-3xl p-5 flex flex-col justify-between shadow-2xl hover:shadow-[0_0_35px_rgba(244,63,94,0.35)] transition-all duration-300 group relative overflow-hidden"
+                      className="bg-gradient-to-b from-[#1c080d] via-[#14060a] to-black border-2 border-rose-500/40 hover:border-rose-400/90 rounded-2xl p-4 flex flex-col justify-between shadow-2xl hover:shadow-[0_0_35px_rgba(244,63,94,0.35)] transition-all duration-300 group relative overflow-hidden"
                     >
                       <div className="absolute -top-24 -left-24 w-48 h-48 bg-rose-500/15 rounded-full blur-2xl pointer-events-none group-hover:bg-rose-500/25 transition-all" />
 
-                      <div className="space-y-4 relative z-10">
-                        {/* Card Portrait & Badges */}
-                        <div className="relative aspect-[3/3.8] rounded-2xl overflow-hidden border border-rose-400/40 shadow-lg bg-black/60">
+                      <div className="space-y-3 relative z-10">
+                        {/* Compact Card Portrait & Badges */}
+                        <div className="relative h-44 sm:h-48 rounded-xl overflow-hidden border border-rose-400/40 shadow-lg bg-black/60">
                           <img 
                             src={card.image} 
                             alt={card.name} 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30 pointer-events-none" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/40 pointer-events-none" />
 
                           {/* Tier & Delay Badges Top */}
-                          <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-10">
+                          <div className="absolute top-2 left-2 right-2 flex items-center justify-between z-10">
                             <span className="px-2 py-0.5 rounded-lg border font-mono text-[9px] uppercase font-black tracking-wider bg-gradient-to-r from-red-950 to-rose-900 text-rose-300 border-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.7)]">
                               DIVINE
                             </span>
                             <div className="flex items-center gap-1.5">
-                              {renderManaIcon(getCardManaCost(card), "w-6 h-6")}
+                              {renderManaIcon(getCardManaCost(card), "w-5 h-5")}
                               <div className="bg-black/80 border border-rose-400/40 rounded-lg px-2 py-0.5 text-[9px] font-mono font-bold text-blue-300 backdrop-blur-sm shadow flex items-center gap-1">
                                 <span>⏳</span> {card.delay}
                               </div>
@@ -826,44 +822,39 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           </div>
 
                           {/* ATK & HP Badges Bottom */}
-                          <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between z-10">
-                            <div className="bg-black/85 border border-red-500/60 rounded-xl px-2.5 py-1 text-xs font-mono font-black text-red-400 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
-                              <span className="text-sm">⚔️</span> {card.attack}
+                          <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between z-10">
+                            <div className="bg-black/85 border border-red-500/60 rounded-lg px-2 py-0.5 text-xs font-mono font-black text-red-400 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+                              <span className="text-xs">⚔️</span> {card.attack}
                             </div>
-                            <div className="bg-black/85 border border-emerald-500/60 rounded-xl px-2.5 py-1 text-xs font-mono font-black text-emerald-400 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
-                              <span className="text-sm">❤️</span> {card.health}
+                            <div className="bg-black/85 border border-emerald-500/60 rounded-lg px-2 py-0.5 text-xs font-mono font-black text-emerald-400 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+                              <span className="text-xs">❤️</span> {card.health}
                             </div>
                           </div>
                         </div>
 
                         {/* Card Title & Owned Status */}
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <h4 className="font-display font-black text-base text-white group-hover:text-rose-400 transition-colors tracking-wide leading-tight">
-                              {card.name}
-                            </h4>
-                            <p className="text-[11px] text-gray-400 font-sans mt-1 line-clamp-2 leading-relaxed">
-                              {card.description}
-                            </p>
-                          </div>
+                        <div className="flex items-center justify-between gap-2">
+                          <h4 className="font-display font-black text-sm sm:text-base text-white group-hover:text-rose-400 transition-colors tracking-wide truncate">
+                            {card.name}
+                          </h4>
                           {ownedCount > 0 && (
-                            <span className="shrink-0 bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 text-[10px] font-mono px-2 py-0.5 rounded-full font-bold">
+                            <span className="shrink-0 bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-[9px] font-mono px-2 py-0.5 rounded-full font-bold">
                               OWNED: {ownedCount}
                             </span>
                           )}
                         </div>
 
-                        {/* Skills Box */}
-                        <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 space-y-2">
-                          <div className="text-[10px] font-mono uppercase font-bold text-rose-400 tracking-wider flex items-center gap-1">
+                        {/* Streamlined Skills Box */}
+                        <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 space-y-1.5">
+                          <div className="text-[9px] font-mono uppercase font-bold text-rose-400 tracking-wider flex items-center gap-1">
                             <Sparkles className="w-3 h-3 text-rose-400" />
                             DIVINE SKILLS:
                           </div>
-                          <div className="space-y-1.5">
+                          <div className="space-y-1">
                             {card.skills.map((skill, sIdx) => (
-                              <div key={sIdx} className="flex items-start gap-1.5 text-[10px]">
-                                <span className="font-bold text-rose-300 uppercase shrink-0">[{skill.type} {skill.value}]</span>
-                                <span className="text-gray-300 leading-snug">{skill.description}</span>
+                              <div key={sIdx} className="flex items-baseline gap-1.5 text-[10px] leading-tight">
+                                <span className="font-mono font-bold text-rose-300 uppercase shrink-0">[{skill.type} {skill.value}]</span>
+                                <span className="text-gray-300 truncate" title={skill.description}>{skill.description}</span>
                               </div>
                             ))}
                           </div>
@@ -871,14 +862,14 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       </div>
 
                       {/* Purchase Button */}
-                      <div className="mt-5 pt-3 border-t border-white/10 relative z-10">
+                      <div className="mt-4">
                         <button
                           disabled={isBuyingThis}
                           onClick={() => buyDivineCard(card.baseId)}
-                          className="w-full bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 hover:from-rose-500 hover:to-red-400 active:scale-[0.98] text-white font-display font-black tracking-widest py-2.5 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(244,63,94,0.5)] hover:shadow-[0_0_25px_rgba(244,63,94,0.8)] flex items-center justify-center gap-2 text-xs uppercase cursor-pointer disabled:opacity-50"
+                          className="w-full bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 hover:from-rose-500 hover:to-red-400 active:scale-[0.98] text-white font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(244,63,94,0.5)] hover:shadow-[0_0_25px_rgba(244,63,94,0.8)] flex items-center justify-center gap-2 text-xs uppercase cursor-pointer disabled:opacity-50"
                         >
-                          <img src="/icons/icon_shards.webp" alt="Shards" className="w-5 h-5 object-contain drop-shadow" />
-                          {isBuyingThis ? 'INVOKING...' : 'SUMMON FOR 50 SHARDS'}
+                          <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow" />
+                          {isBuyingThis ? 'INVOKING...' : '50 SHARDS'}
                         </button>
                       </div>
                     </div>
