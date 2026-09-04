@@ -386,16 +386,16 @@ export const HeroInventoryView: React.FC = () => {
       </div>
 
       {subTab === 'equipment' ? (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
             
-            {/* Left Column: Lord Profile & Active Attributes */}
-            <div className="lg:col-span-5 bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-[#c5a880]/30 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col justify-between space-y-5 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-purple-900/10 blur-3xl pointer-events-none" />
+            {/* Column 1: Lord Profile & Battle Attributes (col-span-3 or 4) */}
+            <div className="md:col-span-3 lg:col-span-3 bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-[#c5a880]/30 rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col justify-between space-y-4 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-36 h-36 bg-purple-900/10 blur-3xl pointer-events-none" />
               
-              <div className="flex flex-col items-center text-center space-y-2.5 relative z-10">
+              <div className="flex flex-col items-center text-center space-y-2 relative z-10">
                 {/* Circular Avatar Frame */}
-                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-b from-purple-950 to-black border-2 border-[#ebd09b] p-1 shadow-[0_0_20px_rgba(235,208,155,0.25)] flex items-center justify-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-b from-purple-950 to-black border-2 border-[#ebd09b] p-1 shadow-[0_0_20px_rgba(235,208,155,0.25)] flex items-center justify-center">
                   {profile.avatarUrl ? (
                     <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                   ) : (
@@ -403,26 +403,26 @@ export const HeroInventoryView: React.FC = () => {
                   )}
                 </div>
 
-                <div className="space-y-1">
-                  <h3 className="font-display font-black text-xl sm:text-2xl text-white tracking-widest uppercase text-shadow-gold">
+                <div className="space-y-0.5">
+                  <h3 className="font-display font-black text-base sm:text-lg text-white tracking-widest uppercase text-shadow-gold truncate max-w-[200px]">
                     {profile.username || 'Abyssal Lord'}
                   </h3>
-                  <div className="inline-flex items-center gap-1.5 text-[#ebd09b] font-mono text-xs font-black bg-[#ebd09b]/10 border border-[#ebd09b]/30 px-3 py-0.5 rounded-full shadow-inner">
+                  <div className="inline-flex items-center gap-1 text-[#ebd09b] font-mono text-[10px] font-black bg-[#ebd09b]/10 border border-[#ebd09b]/30 px-2.5 py-0.5 rounded-full shadow-inner">
                     LEVEL {profile.level}
                   </div>
                 </div>
 
                 {/* Stance Banner */}
-                <div className="w-full bg-black/50 border border-white/10 rounded-xl p-2.5 flex items-center justify-between">
+                <div className="w-full bg-black/50 border border-white/10 rounded-xl p-2 flex items-center justify-between">
                   <div className="flex items-center gap-2 text-left">
-                    <div className="w-7 h-7 rounded-lg bg-black/60 border border-white/10 flex items-center justify-center">
+                    <div className="w-6 h-6 rounded-lg bg-black/60 border border-white/10 flex items-center justify-center">
                       {activeStance.icon}
                     </div>
                     <div>
-                      <span className={`text-[10px] font-display font-black uppercase tracking-wider block ${activeStance.color}`}>
-                        STANCE: {activeStance.label}
+                      <span className={`text-[9px] font-display font-black uppercase tracking-wider block ${activeStance.color}`}>
+                        {activeStance.label}
                       </span>
-                      <span className="text-[9px] text-gray-400 font-sans block">{activeStance.desc}</span>
+                      <span className="text-[8px] text-gray-400 font-sans block truncate max-w-[140px]">{activeStance.desc}</span>
                     </div>
                   </div>
                 </div>
@@ -430,13 +430,13 @@ export const HeroInventoryView: React.FC = () => {
 
               {/* EXP Progress Bar */}
               <div className="space-y-1 relative z-10">
-                <div className="flex justify-between text-gray-400 text-[10px] font-mono uppercase font-bold">
-                  <span>EXPERIENCE</span>
-                  <span className="text-gray-300">{Math.floor(profile.exp).toLocaleString()} / {reqExp.toLocaleString()} EXP</span>
+                <div className="flex justify-between text-gray-400 text-[9px] font-mono uppercase font-bold">
+                  <span>EXP</span>
+                  <span className="text-gray-300">{Math.floor(profile.exp).toLocaleString()} / {reqExp.toLocaleString()}</span>
                 </div>
-                <div className="w-full h-2 bg-black/80 rounded-full overflow-hidden border border-white/10 shadow-inner">
+                <div className="w-full h-1.5 bg-black/80 rounded-full overflow-hidden border border-white/10 shadow-inner">
                   <div 
-                    className="h-full bg-gradient-to-r from-purple-500 via-indigo-400 to-emerald-400 transition-all duration-500 shadow-[0_0_10px_rgba(168,85,247,0.5)]" 
+                    className="h-full bg-gradient-to-r from-purple-500 via-indigo-400 to-emerald-400 transition-all duration-500" 
                     style={{ width: `${expPercent}%` }} 
                   />
                 </div>
@@ -444,62 +444,59 @@ export const HeroInventoryView: React.FC = () => {
 
               {/* ALL LORD CHARACTERISTICS / STATS */}
               <div className="space-y-2 relative z-10">
-                <div className="flex items-center justify-between border-b border-gray-800 pb-1.5">
-                  <span className="text-[11px] font-display font-black text-[#ebd09b] tracking-wider uppercase">
-                    BATTLE ATTRIBUTES
+                <div className="flex items-center justify-between border-b border-gray-800 pb-1">
+                  <span className="text-[10px] font-display font-black text-[#ebd09b] tracking-wider uppercase">
+                    ATTRIBUTES
                   </span>
                   <span className="text-[9px] font-mono text-purple-400 font-bold bg-purple-950/50 border border-purple-500/30 px-2 py-0.5 rounded-full">
-                    {equippedList.length}/6 Relics Active
+                    {equippedList.length}/6 Relics
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 font-mono">
+                <div className="grid grid-cols-1 gap-1.5 font-mono">
                   {/* Max Health */}
-                  <div className="bg-black/60 border border-emerald-500/25 p-2.5 rounded-2xl flex flex-col justify-between shadow-sm">
-                    <div className="flex items-center justify-between text-gray-400 text-[10px] uppercase font-bold">
-                      <span className="flex items-center gap-1 text-emerald-400"><Heart className="w-3.5 h-3.5 text-emerald-400" /> Max Health</span>
-                    </div>
-                    <div className="mt-1 flex items-baseline gap-1.5">
-                      <span className="text-emerald-300 font-display font-black text-base sm:text-lg">{totalHealth}</span>
+                  <div className="bg-black/60 border border-emerald-500/25 px-3 py-2 rounded-xl flex items-center justify-between shadow-sm">
+                    <span className="flex items-center gap-1.5 text-gray-400 text-[10px] uppercase font-bold">
+                      <Heart className="w-3.5 h-3.5 text-emerald-400" /> Health
+                    </span>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-emerald-300 font-display font-black text-sm">{totalHealth}</span>
                       {bonusHealth > 0 && (
-                        <span className="text-[10px] text-emerald-400/80 font-bold">+{bonusHealth} gear</span>
+                        <span className="text-[9px] text-emerald-400/80 font-bold">+{bonusHealth}</span>
                       )}
                     </div>
                   </div>
 
                   {/* Dodge Chance */}
-                  <div className="bg-black/60 border border-cyan-500/25 p-2.5 rounded-2xl flex flex-col justify-between shadow-sm">
-                    <div className="flex items-center justify-between text-gray-400 text-[10px] uppercase font-bold">
-                      <span className="flex items-center gap-1 text-cyan-400"><Wind className="w-3.5 h-3.5 text-cyan-400" /> Dodge Chance</span>
-                    </div>
-                    <div className="mt-1 flex items-baseline gap-1.5">
-                      <span className="text-cyan-300 font-display font-black text-base sm:text-lg">{bonusDodge}%</span>
+                  <div className="bg-black/60 border border-cyan-500/25 px-3 py-2 rounded-xl flex items-center justify-between shadow-sm">
+                    <span className="flex items-center gap-1.5 text-gray-400 text-[10px] uppercase font-bold">
+                      <Wind className="w-3.5 h-3.5 text-cyan-400" /> Dodge
+                    </span>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-cyan-300 font-display font-black text-sm">{bonusDodge}%</span>
                       {bonusDodge > 0 && (
-                        <span className="text-[10px] text-cyan-400/80 font-bold">+{bonusDodge}% gear</span>
+                        <span className="text-[9px] text-cyan-400/80 font-bold">+{bonusDodge}%</span>
                       )}
                     </div>
                   </div>
 
                   {/* Gold Bonus */}
-                  <div className="bg-black/60 border border-amber-500/25 p-2.5 rounded-2xl flex flex-col justify-between shadow-sm">
-                    <div className="flex items-center justify-between text-gray-400 text-[10px] uppercase font-bold">
-                      <span className="flex items-center gap-1 text-amber-400"><Coins className="w-3.5 h-3.5 text-amber-400" /> Gold Gain</span>
-                    </div>
-                    <div className="mt-1 flex items-baseline gap-1.5">
-                      <span className="text-amber-300 font-display font-black text-base sm:text-lg">+{bonusGold}%</span>
-                      {bonusGold > 0 && (
-                        <span className="text-[10px] text-amber-400/80 font-bold">+{bonusGold}% gear</span>
-                      )}
+                  <div className="bg-black/60 border border-amber-500/25 px-3 py-2 rounded-xl flex items-center justify-between shadow-sm">
+                    <span className="flex items-center gap-1.5 text-gray-400 text-[10px] uppercase font-bold">
+                      <Coins className="w-3.5 h-3.5 text-amber-400" /> Gold
+                    </span>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-amber-300 font-display font-black text-sm">+{bonusGold}%</span>
                     </div>
                   </div>
 
                   {/* Delay Reduction */}
-                  <div className="bg-black/60 border border-purple-500/25 p-2.5 rounded-2xl flex flex-col justify-between shadow-sm">
-                    <div className="flex items-center justify-between text-gray-400 text-[10px] uppercase font-bold">
-                      <span className="flex items-center gap-1 text-purple-400"><Hourglass className="w-3.5 h-3.5 text-purple-400" /> Card Delay</span>
-                    </div>
-                    <div className="mt-1 flex items-baseline gap-1.5">
-                      <span className="text-purple-300 font-display font-black text-sm sm:text-base">
+                  <div className="bg-black/60 border border-purple-500/25 px-3 py-2 rounded-xl flex items-center justify-between shadow-sm">
+                    <span className="flex items-center gap-1.5 text-gray-400 text-[10px] uppercase font-bold">
+                      <Hourglass className="w-3.5 h-3.5 text-purple-400" /> Delay
+                    </span>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-purple-300 font-display font-black text-xs">
                         {bonusDelay > 0 ? `-${bonusDelay} Turn` : 'Standard'}
                       </span>
                     </div>
@@ -508,33 +505,33 @@ export const HeroInventoryView: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Column: Equipped Relics Paperdoll Mannequin */}
-            <div className="lg:col-span-7 bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-purple-900/40 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col justify-between relative overflow-hidden">
+            {/* Column 2: Paperdoll Mannequin (col-span-5) */}
+            <div className="md:col-span-5 lg:col-span-5 bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-purple-900/40 rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col justify-between relative overflow-hidden">
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.08),transparent_70%)] pointer-events-none" />
               
-              <div className="flex items-center justify-between border-b border-purple-900/50 pb-2.5 mb-4 relative z-10">
-                <h3 className="font-display font-black text-base sm:text-lg text-purple-200 tracking-widest uppercase">
-                  EQUIPPED RELICS & APPAREL
+              <div className="flex items-center justify-between border-b border-purple-900/50 pb-2 mb-2 relative z-10">
+                <h3 className="font-display font-black text-xs sm:text-sm text-purple-200 tracking-widest uppercase">
+                  EQUIPPED RELICS
                 </h3>
-                <span className="text-[10px] font-mono text-gray-400">
-                  Click a slot to equip or manage gear
+                <span className="text-[9px] font-mono text-gray-400">
+                  Select slot to equip
                 </span>
               </div>
 
               {/* Paperdoll Mannequin Grid */}
-              <div className="flex items-center justify-center my-auto py-2 relative z-10">
-                <div className="flex items-center justify-center gap-3 sm:gap-6 w-full max-w-lg">
+              <div className="flex items-center justify-center my-auto py-1 relative z-10">
+                <div className="flex items-center justify-center gap-2 sm:gap-4 w-full">
                   
                   {/* Left Slots Column */}
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2.5">
                     {renderSlotBox('helmet', 'HELMET', '/icons/equipment/slot_helmet.png')}
                     {renderSlotBox('weapon', 'WEAPON', '/icons/equipment/slot_weapon.png')}
                     {renderSlotBox('ring', 'RING', '/icons/equipment/slot_ring.png')}
                   </div>
 
                   {/* Center Gothic Mannequin Silhouette */}
-                  <div className="w-24 h-56 sm:w-32 sm:h-72 relative flex items-center justify-center">
-                    <div className="w-full h-full bg-black/40 border border-purple-500/20 rounded-3xl flex items-center justify-center p-2 shadow-inner overflow-hidden">
+                  <div className="w-20 h-48 sm:w-28 sm:h-64 relative flex items-center justify-center">
+                    <div className="w-full h-full bg-black/40 border border-purple-500/20 rounded-2xl flex items-center justify-center p-2 shadow-inner overflow-hidden">
                       <img 
                         src="/icons/equipment/lord_silhouette.png" 
                         alt="Lord Silhouette" 
@@ -544,7 +541,7 @@ export const HeroInventoryView: React.FC = () => {
                   </div>
 
                   {/* Right Slots Column */}
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2.5">
                     {renderSlotBox('amulet', 'AMULET', '/icons/equipment/slot_amulet.png')}
                     {renderSlotBox('armor', 'ARMOR', '/icons/equipment/slot_armor.png')}
                     {renderSlotBox('boots', 'BOOTS', '/icons/equipment/slot_boots.png')}
@@ -554,92 +551,127 @@ export const HeroInventoryView: React.FC = () => {
               </div>
 
               {/* Bottom Quick Help Bar */}
-              <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between relative z-10 text-[11px] font-mono text-gray-400">
-                <span className="flex items-center gap-1.5 text-purple-300/80">
-                  <Sparkles className="w-3.5 h-3.5 text-purple-400" /> Click any slot to view and equip matching relics
-                </span>
-                <span className="text-gray-500 text-[10px] hidden sm:inline">
-                  Packs available in Shop
+              <div className="mt-2 pt-2 border-t border-white/5 flex items-center justify-center relative z-10 text-[10px] font-mono text-purple-300/80">
+                <span className="flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-purple-400" /> Tap slot to swap relics
                 </span>
               </div>
             </div>
-          </div>
 
-          {/* SET RESONANCE CARD */}
-          <div className="bg-gradient-to-r from-[#1f0910] via-[#120509] to-[#1f0910] border-2 border-rose-500/40 rounded-3xl p-5 sm:p-6 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-rose-600/10 rounded-full blur-3xl pointer-events-none" />
+            {/* Column 3: Set Resonance Monolith (col-span-4) */}
+            <div className="md:col-span-4 lg:col-span-4 bg-gradient-to-b from-[#210912] via-[#14050b] to-[#0a0205] border-2 border-rose-500/40 rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col justify-between relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-rose-600/10 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-rose-500/20 pb-4 relative z-10">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-rose-950/80 border border-rose-500/50 flex items-center justify-center shadow-md">
-                  <Shield className="w-5 h-5 text-rose-400" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-display font-black text-white text-base sm:text-lg tracking-wider uppercase">
-                      SET OF THE DEMIURGE
-                    </h4>
-                    <span className="bg-rose-500 text-white font-mono text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow-[0_0_8px_rgba(244,63,94,0.7)]">
-                      DIVINE SET
-                    </span>
+              {/* Header with Crest */}
+              <div className="relative z-10 border-b border-rose-500/20 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-rose-950/80 border border-rose-500/50 p-1 flex items-center justify-center shadow-[0_0_15px_rgba(244,63,94,0.3)] shrink-0">
+                    <img 
+                      src="/icons/equipment/demiurge_crest.png" 
+                      alt="Demiurge Crest" 
+                      className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(244,63,94,0.7)]" 
+                    />
                   </div>
-                  <p className="text-xs text-gray-400 font-sans mt-0.5">
-                    Equip matching Demiurge relics to awaken ancient cosmic properties.
-                  </p>
-                </div>
-              </div>
-
-              {/* Counter */}
-              {(() => {
-                const demiurgePieces = equippedList.filter(e => e.setId === 'demiurge').length;
-                return (
-                  <div className="bg-black/70 border border-rose-500/30 rounded-2xl px-4 py-2 text-center shrink-0 shadow-inner">
-                    <span className="text-[9px] font-mono uppercase text-gray-400 block font-bold">Active Pieces</span>
-                    <span className="font-display font-black text-xl text-rose-400">
-                      {demiurgePieces} <span className="text-gray-500 text-sm">/ 6</span>
-                    </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <h4 className="font-display font-black text-white text-xs sm:text-sm tracking-wider uppercase truncate">
+                        SET OF THE DEMIURGE
+                      </h4>
+                      <span className="bg-rose-500 text-white font-mono text-[8px] font-black uppercase px-1.5 py-0.5 rounded-full shadow-[0_0_8px_rgba(244,63,94,0.7)] shrink-0">
+                        DIVINE
+                      </span>
+                    </div>
+                    
+                    {/* Active pieces counter pills */}
+                    {(() => {
+                      const demiurgePieces = equippedList.filter(e => e.setId === 'demiurge').length;
+                      return (
+                        <div className="mt-1.5 flex items-center justify-between">
+                          <span className="text-[9px] font-mono text-gray-400 font-bold uppercase">Resonance</span>
+                          <span className="font-mono font-black text-xs text-rose-300">
+                            {demiurgePieces} / 6 Pieces
+                          </span>
+                        </div>
+                      );
+                    })()}
                   </div>
-                );
-              })()}
-            </div>
+                </div>
 
-            {/* Thresholds Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 mt-4 relative z-10">
-              {(() => {
-                const demiurgePieces = equippedList.filter(e => e.setId === 'demiurge').length;
-                return DEMIURGE_SET.thresholds.map((threshold, tIdx) => {
-                  const isActive = demiurgePieces >= threshold.pieces;
+                {/* Visual Progress Bar (6 pips) */}
+                {(() => {
+                  const demiurgePieces = equippedList.filter(e => e.setId === 'demiurge').length;
                   return (
-                    <div
-                      key={tIdx}
-                      className={`rounded-2xl p-4 border transition-all ${
-                        isActive
-                          ? 'bg-gradient-to-r from-rose-950/90 to-[#22060e]/90 border-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.4)] ring-1 ring-rose-400/50'
-                          : 'bg-black/50 border-white/10 opacity-70'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-2 mb-1.5">
-                        <span className={`text-[10px] font-mono font-black uppercase tracking-wider ${isActive ? 'text-rose-300' : 'text-gray-400'}`}>
-                          [{threshold.pieces} PIECES] {threshold.label}
-                        </span>
-                        {isActive ? (
-                          <span className="text-[9px] font-mono font-black text-rose-300 bg-rose-950 border border-rose-500/70 px-2 py-0.5 rounded-full shadow-[0_0_8px_rgba(244,63,94,0.7)] flex items-center gap-1">
-                            <Check className="w-2.5 h-2.5" /> ACTIVE
-                          </span>
-                        ) : (
-                          <span className="text-[9px] font-mono text-gray-500 bg-black/60 px-2 py-0.5 rounded-full border border-white/5">
-                            {threshold.pieces - demiurgePieces} MORE NEEDED
-                          </span>
-                        )}
-                      </div>
-                      <p className={`text-xs font-sans leading-relaxed ${isActive ? 'text-gray-100 font-medium' : 'text-gray-400'}`}>
-                        {threshold.description}
-                      </p>
+                    <div className="grid grid-cols-6 gap-1 mt-2.5">
+                      {[1, 2, 3, 4, 5, 6].map(i => (
+                        <div 
+                          key={i} 
+                          className={`h-1.5 rounded-full transition-all duration-300 ${
+                            i <= demiurgePieces 
+                              ? 'bg-gradient-to-r from-rose-500 to-amber-400 shadow-[0_0_8px_rgba(244,63,94,0.8)]' 
+                              : 'bg-black/60 border border-white/10'
+                          }`}
+                        />
+                      ))}
                     </div>
                   );
-                });
-              })()}
+                })()}
+              </div>
+
+              {/* 3 Milestone Tier Cards */}
+              <div className="space-y-2 my-auto py-2 relative z-10">
+                {(() => {
+                  const demiurgePieces = equippedList.filter(e => e.setId === 'demiurge').length;
+                  return DEMIURGE_SET.thresholds.map((threshold, tIdx) => {
+                    const isActive = demiurgePieces >= threshold.pieces;
+                    return (
+                      <div
+                        key={tIdx}
+                        className={`rounded-2xl p-2.5 border transition-all duration-300 ${
+                          isActive
+                            ? 'bg-gradient-to-r from-rose-950/90 via-[#270710]/90 to-rose-950/80 border-rose-400/90 shadow-[0_0_15px_rgba(244,63,94,0.35)] ring-1 ring-rose-400/40'
+                            : 'bg-black/50 border-white/10 opacity-60'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-1 mb-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className={`w-4 h-4 rounded-md text-[9px] font-mono font-black flex items-center justify-center ${
+                              isActive ? 'bg-rose-500 text-black font-bold' : 'bg-white/10 text-gray-400'
+                            }`}>
+                              {threshold.pieces}
+                            </span>
+                            <span className={`text-[10px] font-mono font-black uppercase tracking-wider ${isActive ? 'text-rose-200' : 'text-gray-400'}`}>
+                              {threshold.label}
+                            </span>
+                          </div>
+
+                          {isActive ? (
+                            <span className="text-[8px] font-mono font-black text-rose-300 bg-rose-950 border border-rose-500/70 px-1.5 py-0.5 rounded-full flex items-center gap-1 shadow-[0_0_6px_rgba(244,63,94,0.6)]">
+                              <Check className="w-2.5 h-2.5" /> ACTIVE
+                            </span>
+                          ) : (
+                            <span className="text-[8px] font-mono text-gray-500">
+                              {threshold.pieces - demiurgePieces} needed
+                            </span>
+                          )}
+                        </div>
+
+                        <p className={`text-[10px] font-sans leading-snug ${isActive ? 'text-rose-100 font-medium' : 'text-gray-400'}`}>
+                          {threshold.description}
+                        </p>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+
+              {/* Set Lore / Status Tag at bottom */}
+              <div className="pt-2 border-t border-rose-500/20 text-center relative z-10">
+                <span className="text-[9px] font-mono text-gray-400 italic">
+                  Forged at the Divine Altar in the Shop
+                </span>
+              </div>
             </div>
+
           </div>
         
           {/* Relic Selection Modal Popup */}
