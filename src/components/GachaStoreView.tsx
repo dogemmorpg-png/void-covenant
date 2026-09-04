@@ -170,6 +170,54 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
     }
   };
 
+  const [selectedDemiurgeItemName, setSelectedDemiurgeItemName] = useState<string>(demiurgeItems[0]?.name || 'Blade of the Demiurge');
+  const [isBuyingSet, setIsBuyingSet] = useState(false);
+
+  // Buy Full Demiurge Set (discounted 250 Shards instead of 300)
+  const buyDivineSet = async () => {
+    const bundleCost = 250;
+    if ((profile.darkShards || 0) < bundleCost) {
+      setIsShardsShopOpen(true);
+      toast(`Insufficient Dark Shards! Bundle costs ${bundleCost} Shards. Opening Shards Shop...`, 'warning');
+      return;
+    }
+
+    try {
+      setIsBuyingSet(true);
+      const token = localStorage.getItem('void_covenant_token');
+      if (!token) {
+        toast('You must be logged in to purchase', 'error');
+        return;
+      }
+
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action: 'buy_divine_set' })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (data.profile) {
+          setProfile(data.profile);
+        }
+        audioSystem.playVictory();
+        triggerOpeningAnimationBackend('divine_equip', [], data.newEquipments || []);
+        toast('✨ All 6 pieces of the Demiurge Set have been forged!', 'success');
+      } else {
+        toast(data.error || 'Failed to forge complete set', 'error');
+      }
+    } catch (err: any) {
+      console.error('Divine set purchase error:', err);
+      toast('Network error during bundle purchase', 'error');
+    } finally {
+      setIsBuyingSet(false);
+    }
+  };
+
   // Booster & Chest purchases
   const buyBronzePack = () => buyPackBackend('bronze');
   const buyObsidianPack = () => buyPackBackend('obsidian');
@@ -780,9 +828,6 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   </h2>
                   <span className="text-xs text-gray-400 font-mono hidden sm:inline">• 3 Primordial Invocations</span>
                 </div>
-                <div className="bg-black/60 border border-rose-500/40 rounded-xl px-3 py-1 text-xs font-mono text-rose-300">
-                  Fixed Price: <span className="font-bold text-amber-400">50 Dark Shards</span>
-                </div>
               </div>
 
               {/* 3 Divine Cards Showcase Grid */}
@@ -884,182 +929,258 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
             </div>
           )}
 
-          {/* ===================== 4. DEMIURGE RELICS (RESTORED FULL DESIGN) ===================== */}
-          {activeCategory === 'demiurge' && (
-            <div className="space-y-6">
-              
-              {/* Category Header */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-rose-950/60 pb-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+          {/* ===================== 4. DEMIURGE RELICS (INTERACTIVE FORGE ALTAR) ===================== */}
+          {activeCategory === 'demiurge' && (() => {
+            const currentItem = demiurgeItems.find(i => i.name === selectedDemiurgeItemName) || demiurgeItems[0];
+            const isOwned = (profile.equipment || []).some(e => e.name === currentItem.name);
+            const isEquipped = Object.values(profile.equipped || {}).some(id => {
+              const eq = (profile.equipment || []).find(e => e.id === id);
+              return eq?.name === currentItem.name;
+            });
+            const isForgingCurrent = buyingEquipName === currentItem.name;
+
+            return (
+              <div className="space-y-4">
+                
+                {/* Category Header with Bundle Buy Action */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-rose-950/60 pb-2.5">
+                  <div className="flex items-center gap-2.5">
                     <Sword className="w-5 h-5 text-rose-400" />
-                    <h2 className="font-display font-black text-xl md:text-2xl text-white tracking-widest text-shadow-gold uppercase">
+                    <h2 className="font-display font-black text-lg md:text-xl text-white tracking-widest text-shadow-gold uppercase">
                       Relics of the Demiurge
                     </h2>
-                  </div>
-                  <p className="text-xs text-gray-400 font-sans">
-                    Forge individual divine set pieces to unlock massive lord bonuses and cosmic delay reduction.
-                  </p>
-                </div>
-                <div className="bg-black/60 border border-rose-500/40 rounded-xl px-3.5 py-1.5 text-xs font-mono text-rose-300">
-                  Fixed Price: <span className="font-bold text-amber-400">50 Dark Shards</span> per piece
-                </div>
-              </div>
-
-              {/* Set Resonance Monolith Header Box */}
-              <div className="bg-gradient-to-r from-[#20080f] via-[#14050a] to-[#20080f] border border-rose-500/40 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div>
-                    <span className="text-[10px] font-mono text-rose-400 uppercase font-black tracking-widest">
-                      SET RESONANCE STATUS
-                    </span>
-                    <h3 className="font-display font-black text-lg text-white">
-                      Cosmic Sovereign Synergy
-                    </h3>
+                    <span className="text-xs text-gray-400 font-mono hidden sm:inline">• 6-Piece Divine Set</span>
                   </div>
 
-                  <div className="flex items-center gap-3 bg-black/60 border border-rose-500/30 rounded-xl px-4 py-2">
-                    <div className="text-left">
-                      <span className="text-[9px] font-mono text-gray-400 uppercase block">Assembled</span>
-                      <span className="font-display font-black text-lg text-rose-400 leading-none">
-                        {ownedDemiurgeCount} <span className="text-gray-500 text-xs">/ 6</span>
-                      </span>
+                  {/* Buy Full Set with Discount Button */}
+                  <button
+                    disabled={isBuyingSet || ownedDemiurgeCount === 6}
+                    onClick={buyDivineSet}
+                    className={`px-4 py-2 rounded-xl font-display font-black text-xs tracking-wider transition-all flex items-center gap-2 shadow-lg cursor-pointer ${
+                      ownedDemiurgeCount === 6
+                        ? 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 cursor-default opacity-80'
+                        : 'bg-gradient-to-r from-amber-600 via-rose-600 to-amber-600 hover:from-amber-500 hover:to-rose-500 text-white border border-amber-400/50 shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:scale-105 active:scale-95'
+                    }`}
+                  >
+                    <Crown className="w-4 h-4 text-amber-300" />
+                    {ownedDemiurgeCount === 6 ? (
+                      <span>FULL SET ASSEMBLED (6/6)</span>
+                    ) : isBuyingSet ? (
+                      <span>FORGING ENTIRE SET...</span>
+                    ) : (
+                      <div className="flex items-center gap-1.5">
+                        <span>BUY FULL SET (6 PCS):</span>
+                        <span className="line-through text-rose-200/70 text-[10px]">300</span>
+                        <span className="text-amber-300 font-mono text-sm font-black flex items-center gap-0.5">
+                          <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain inline" />
+                          250
+                        </span>
+                        <span className="bg-amber-400 text-black text-[9px] px-1 py-0.2 rounded font-black tracking-normal ml-1">
+                          -17%
+                        </span>
+                      </div>
+                    )}
+                  </button>
+                </div>
+
+                {/* Main Altar Area: Left 6-Slot Grid + Right Detailed Item Forge */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+                  
+                  {/* Left Column: 6 Set Piece Selectors (Pills) */}
+                  <div className="lg:col-span-5 flex flex-col justify-between gap-2 bg-black/40 border border-white/10 rounded-2xl p-3">
+                    <div className="text-[10px] font-mono text-rose-400 uppercase font-black tracking-wider px-1 flex items-center justify-between">
+                      <span>SELECT SET PIECE</span>
+                      <span className="text-gray-400 font-mono">{ownedDemiurgeCount}/6 OWNED</span>
                     </div>
-                    <div className="w-24 bg-gray-800 h-2 rounded-full overflow-hidden">
-                      <div 
-                        className="bg-gradient-to-r from-amber-500 to-rose-500 h-full rounded-full transition-all duration-500"
-                        style={{ width: `${(ownedDemiurgeCount / 6) * 100}%` }}
-                      />
+
+                    <div className="grid grid-cols-2 gap-2 flex-1">
+                      {demiurgeItems.map((item) => {
+                        const itemOwned = (profile.equipment || []).some(e => e.name === item.name);
+                        const isSelected = selectedDemiurgeItemName === item.name;
+
+                        return (
+                          <button
+                            key={item.name}
+                            onClick={() => {
+                              audioSystem.playClick();
+                              setSelectedDemiurgeItemName(item.name);
+                            }}
+                            className={`p-2.5 rounded-xl border transition-all text-left flex items-center gap-2.5 cursor-pointer relative overflow-hidden group ${
+                              isSelected
+                                ? 'bg-gradient-to-r from-rose-950/90 to-[#220710] border-rose-400 text-white shadow-[0_0_15px_rgba(244,63,94,0.4)]'
+                                : 'bg-black/60 border-white/10 text-gray-400 hover:border-rose-500/40 hover:bg-white/5 hover:text-rose-200'
+                            }`}
+                          >
+                            <div className={`w-10 h-10 rounded-lg p-1.5 flex items-center justify-center border shrink-0 ${
+                              itemOwned ? 'bg-rose-950/80 border-rose-500/60' : 'bg-black/60 border-white/10'
+                            }`}>
+                              <img
+                                src={getEquipmentIcon(item.name, item.slot)}
+                                alt={item.name}
+                                className={`w-full h-full object-contain filter ${itemOwned ? 'drop-shadow-[0_0_8px_rgba(244,63,94,0.7)]' : 'grayscale opacity-60'}`}
+                              />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="text-[9px] font-mono uppercase text-gray-500 flex items-center justify-between">
+                                <span>{item.slot}</span>
+                                {itemOwned && (
+                                  <span className="text-emerald-400 font-bold">✓</span>
+                                )}
+                              </div>
+                              <div className="font-display font-bold text-xs text-white truncate leading-tight mt-0.5">
+                                {item.name.replace(' of the Demiurge', '')}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Quick Set Progress Bar */}
+                    <div className="pt-2 border-t border-white/10 px-1">
+                      <div className="flex justify-between items-center text-[10px] font-mono text-gray-400 mb-1">
+                        <span>Set Assembly</span>
+                        <span className="text-rose-400 font-bold">{Math.round((ownedDemiurgeCount / 6) * 100)}%</span>
+                      </div>
+                      <div className="w-full bg-gray-900 h-2 rounded-full overflow-hidden border border-white/5">
+                        <div 
+                          className="bg-gradient-to-r from-amber-500 via-rose-500 to-red-600 h-full rounded-full transition-all duration-500"
+                          style={{ width: `${(ownedDemiurgeCount / 6) * 100}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* 3 Milestone Badges */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-2 border-t border-rose-500/20">
-                  {DEMIURGE_SET.thresholds.map((threshold, tIdx) => {
-                    const isAchieved = ownedDemiurgeCount >= threshold.pieces;
-                    return (
-                      <div 
-                        key={tIdx}
-                        className={`p-2.5 rounded-xl border transition-all ${
-                          isAchieved
-                            ? 'bg-rose-950/80 border-rose-400 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.3)]'
-                            : 'bg-black/50 border-white/10 opacity-70 text-gray-400'
-                        }`}
+                  {/* Right Column: Selected Relic Showcase & Forge Action */}
+                  <div className="lg:col-span-7 bg-gradient-to-b from-[#1c080d] via-[#14060a] to-black border-2 border-rose-500/40 rounded-2xl p-4 flex flex-col justify-between shadow-2xl relative overflow-hidden">
+                    <div className="space-y-3 relative z-10">
+                      
+                      {/* Top Slot Header */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2.5 py-0.5 rounded-lg border font-mono text-[10px] uppercase font-black tracking-wider bg-rose-950/90 text-rose-300 border-rose-500/60">
+                            {currentItem.slot}
+                          </span>
+                          <span className="px-2.5 py-0.5 rounded-lg border font-mono text-[10px] uppercase font-black tracking-wider bg-gradient-to-r from-red-950 to-rose-900 text-rose-300 border-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.4)]">
+                            DIVINE ARTIFACT
+                          </span>
+                        </div>
+                        {isEquipped ? (
+                          <span className="bg-cyan-950/80 border border-cyan-500/50 text-cyan-300 text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold shadow">
+                            EQUIPPED
+                          </span>
+                        ) : isOwned ? (
+                          <span className="bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold shadow">
+                            OWNED IN INVENTORY
+                          </span>
+                        ) : (
+                          <span className="bg-amber-950/80 border border-amber-500/40 text-amber-300 text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold shadow">
+                            NOT ACQUIRED
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Large Center Art with Glow */}
+                      <div className="relative h-44 sm:h-48 rounded-xl overflow-hidden border border-rose-400/30 bg-black/70 flex items-center justify-center p-4 shadow-inner">
+                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(244,63,94,0.25),transparent_70%)]" />
+                        <img
+                          src={getEquipmentIcon(currentItem.name, currentItem.slot)}
+                          alt={currentItem.name}
+                          className="w-32 h-32 object-contain filter drop-shadow-[0_0_24px_rgba(244,63,94,0.7)] group-hover:scale-105 transition-transform duration-500 relative z-10"
+                        />
+                      </div>
+
+                      {/* Item Title & Lore */}
+                      <div>
+                        <h3 className="font-display font-black text-lg text-white tracking-wide">
+                          {currentItem.name}
+                        </h3>
+                        <p className="text-xs text-gray-300 font-sans mt-0.5 leading-snug">
+                          {currentItem.description}
+                        </p>
+                      </div>
+
+                      {/* Stat Bonuses Grid */}
+                      <div className="grid grid-cols-2 gap-2 bg-black/60 border border-white/10 rounded-xl p-3 text-xs font-mono">
+                        <div>
+                          <span className="text-gray-400 text-[10px] block uppercase">Primary Power</span>
+                          <span className="text-rose-300 font-black text-sm">
+                            {currentItem.bonusType === 'delayReduction' ? `-${currentItem.bonusValue} Delay` :
+                             currentItem.bonusType === 'dodge' ? `+${currentItem.bonusValue}% Dodge` :
+                             currentItem.bonusType === 'goldBonus' ? `+${currentItem.bonusValue}% Gold` :
+                             `+${currentItem.bonusValue} Max HP`}
+                          </span>
+                        </div>
+                        {currentItem.secondaryBonusType ? (
+                          <div>
+                            <span className="text-gray-400 text-[10px] block uppercase">Secondary Power</span>
+                            <span className="text-rose-300 font-black text-sm">
+                              {currentItem.secondaryBonusType === 'dodge' ? `+${currentItem.secondaryBonusValue}% Dodge` :
+                               `+${currentItem.secondaryBonusValue} Max HP`}
+                            </span>
+                          </div>
+                        ) : (
+                          <div>
+                            <span className="text-gray-400 text-[10px] block uppercase">Set Affiliation</span>
+                            <span className="text-amber-400 font-black text-sm">Demiurge Resonance</span>
+                          </div>
+                        )}
+                      </div>
+
+                    </div>
+
+                    {/* Action Button for Single Piece */}
+                    <div className="mt-4 pt-3 border-t border-white/10 relative z-10">
+                      <button
+                        disabled={isForgingCurrent}
+                        onClick={() => buyDivineEquipment(currentItem.name)}
+                        className="w-full bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 hover:from-rose-500 hover:to-red-400 active:scale-[0.98] text-white font-display font-black tracking-widest py-3 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(244,63,94,0.5)] hover:shadow-[0_0_25px_rgba(244,63,94,0.8)] flex items-center justify-center gap-2 text-xs uppercase cursor-pointer disabled:opacity-50"
                       >
-                        <div className="flex items-center justify-between text-[10px] font-mono font-bold mb-1">
-                          <span>[{threshold.pieces} PC] {threshold.label}</span>
-                          <span className={`text-[9px] px-1.5 py-0.2 rounded font-black ${
-                            isAchieved ? 'bg-rose-500/40 text-rose-300' : 'text-gray-600'
+                        <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow" />
+                        {isForgingCurrent ? 'FORGING ARTIFACT...' : `FORGE PIECE (50 SHARDS)`}
+                      </button>
+                    </div>
+
+                  </div>
+
+                </div>
+
+                {/* Bottom Compact Resonance Bar (2 PC, 4 PC, 6 PC) */}
+                <div className="bg-black/60 border border-rose-500/30 rounded-xl p-2.5">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    {DEMIURGE_SET.thresholds.map((threshold, tIdx) => {
+                      const isAchieved = ownedDemiurgeCount >= threshold.pieces;
+                      return (
+                        <div 
+                          key={tIdx}
+                          className={`px-3 py-1.5 rounded-lg border transition-all flex items-center justify-between gap-2 ${
+                            isAchieved
+                              ? 'bg-rose-950/80 border-rose-400 text-rose-300 shadow-[0_0_10px_rgba(244,63,94,0.25)]'
+                              : 'bg-black/40 border-white/5 opacity-60 text-gray-500'
+                          }`}
+                        >
+                          <div className="min-w-0">
+                            <div className="text-[10px] font-mono font-bold truncate">
+                              [{threshold.pieces} PC] {threshold.label}
+                            </div>
+                            <div className="text-[9px] font-sans text-gray-400 truncate">
+                              {threshold.description}
+                            </div>
+                          </div>
+                          <span className={`text-[8px] font-mono font-black px-1.5 py-0.2 rounded shrink-0 ${
+                            isAchieved ? 'bg-rose-500/40 text-rose-200' : 'text-gray-600 bg-white/5'
                           }`}>
                             {isAchieved ? 'ACTIVE' : 'LOCKED'}
                           </span>
                         </div>
-                        <div className="text-[11px] font-sans text-gray-300">
-                          {threshold.description}
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
+
               </div>
-
-              {/* 6 Equipment Pieces Showcase Grid (Full 3x2 Grid) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {demiurgeItems.map((item) => {
-                  const isOwned = (profile.equipment || []).some(e => e.name === item.name);
-                  const isEquipped = Object.values(profile.equipped || {}).some(id => {
-                    const eq = (profile.equipment || []).find(e => e.id === id);
-                    return eq?.name === item.name;
-                  });
-                  const isForging = buyingEquipName === item.name;
-
-                  return (
-                    <div
-                      key={item.name}
-                      className="bg-gradient-to-b from-[#1c080d] via-[#14060a] to-black border-2 border-rose-500/40 hover:border-rose-400/90 rounded-2xl p-4 flex flex-col justify-between shadow-xl hover:shadow-[0_0_30px_rgba(244,63,94,0.3)] transition-all duration-300 group relative overflow-hidden"
-                    >
-                      <div className="space-y-3 relative z-10">
-                        {/* Top Badges */}
-                        <div className="flex items-center justify-between">
-                          <span className="px-2 py-0.5 rounded-lg border font-mono text-[9px] uppercase font-black tracking-wider bg-rose-950/80 text-rose-300 border-rose-500/50">
-                            {item.slot}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-lg border font-mono text-[9px] uppercase font-black tracking-wider bg-gradient-to-r from-red-950 to-rose-900 text-rose-300 border-rose-400">
-                            DIVINE SET
-                          </span>
-                        </div>
-
-                        {/* Item Icon Box */}
-                        <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-rose-400/30 shadow-lg bg-black/60 flex items-center justify-center p-4 group-hover:border-rose-400/60 transition-colors">
-                          <img
-                            src={getEquipmentIcon(item.name, item.slot)}
-                            alt={item.name}
-                            className="w-20 h-20 object-contain filter drop-shadow-[0_0_14px_rgba(244,63,94,0.6)] group-hover:scale-110 transition-transform duration-500"
-                          />
-                        </div>
-
-                        {/* Title & Status */}
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <h4 className="font-display font-black text-sm text-white group-hover:text-rose-400 transition-colors tracking-wide leading-tight">
-                              {item.name}
-                            </h4>
-                            <p className="text-[10px] text-gray-400 font-sans mt-1 line-clamp-2 leading-relaxed">
-                              {item.description}
-                            </p>
-                          </div>
-                          {isEquipped ? (
-                            <span className="shrink-0 bg-cyan-950/80 border border-cyan-500/50 text-cyan-300 text-[8px] font-mono px-1.5 py-0.5 rounded-full font-bold shadow">
-                              EQUIPPED
-                            </span>
-                          ) : isOwned ? (
-                            <span className="shrink-0 bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-[8px] font-mono px-1.5 py-0.5 rounded-full font-bold shadow">
-                              OWNED
-                            </span>
-                          ) : null}
-                        </div>
-
-                        {/* Stat Bonuses */}
-                        <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 space-y-1">
-                          <div className="flex items-center justify-between text-[10px] font-mono">
-                            <span className="text-gray-400">Primary Power:</span>
-                            <span className="text-rose-300 font-black">
-                              {item.bonusType === 'delayReduction' ? `-${item.bonusValue} Delay` :
-                               item.bonusType === 'dodge' ? `+${item.bonusValue}% Dodge` :
-                               item.bonusType === 'goldBonus' ? `+${item.bonusValue}% Gold` :
-                               `+${item.bonusValue} Max HP`}
-                            </span>
-                          </div>
-                          {item.secondaryBonusType && (
-                            <div className="flex items-center justify-between text-[10px] font-mono pt-1 border-t border-white/5">
-                              <span className="text-gray-400">Secondary Power:</span>
-                              <span className="text-rose-300 font-black">
-                                {item.secondaryBonusType === 'dodge' ? `+${item.secondaryBonusValue}% Dodge` :
-                                 `+${item.secondaryBonusValue} Max HP`}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Forge Button */}
-                      <div className="mt-4 pt-2.5 border-t border-white/10 relative z-10">
-                        <button
-                          disabled={isForging}
-                          onClick={() => buyDivineEquipment(item.name)}
-                          className="w-full bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 hover:from-rose-500 hover:to-red-400 active:scale-[0.98] text-white font-display font-black tracking-widest py-2 px-3 rounded-xl transition-all shadow-[0_0_15px_rgba(244,63,94,0.4)] hover:shadow-[0_0_20px_rgba(244,63,94,0.7)] flex items-center justify-center gap-2 text-xs uppercase cursor-pointer disabled:opacity-50"
-                        >
-                          <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow" />
-                          {isForging ? 'FORGING...' : 'FORGE FOR 50 SHARDS'}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+            );
+          })()}
 
         </div>
 

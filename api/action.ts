@@ -898,6 +898,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       successMessage = `Divine relic forged: ${template.name}!`;
       responseData = { newEquipment, profile };
+    } else if (action === 'buy_divine_set') {
+      const demiurgeTemplates = EQUIPMENT_TEMPLATES.filter((e: any) => e.tier === 'divine' && e.setId === 'demiurge');
+      if (!demiurgeTemplates || demiurgeTemplates.length === 0) {
+        return res.status(400).json({ error: 'Demiurge set templates not found.' });
+      }
+
+      // Discount: 250 Dark Shards instead of 300 (50 shards discount)
+      const bundleCost = 250;
+      const currentShards = profile.darkShards || 0;
+      if (currentShards < bundleCost) {
+        return res.status(400).json({ error: `Not enough Dark Shards! Bundle costs ${bundleCost} Shards.` });
+      }
+
+      profile = recordShardTransaction(
+        profile,
+        'SHOP_PURCHASE',
+        -bundleCost,
+        'Complete Demiurge Relic Set forged (6 pieces)',
+        { bundleCost, count: demiurgeTemplates.length }
+      );
+
+      profile.equipment = profile.equipment || [];
+      const newEquipments: any[] = [];
+
+      for (const t of demiurgeTemplates) {
+        // Give one piece of each template in the set
+        const inst = generateEquipmentInstance(t);
+        profile.equipment.push(inst);
+        newEquipments.push(inst);
+      }
+
+      successMessage = '✨ The Complete Demiurge Relic Set has been forged!';
+      responseData = { newEquipments, profile };
     } else if (action === 'withdrawal') {
       const { amountSovereigns, targetAddress } = payload || {};
       const numAmount = parseInt(amountSovereigns, 10);
