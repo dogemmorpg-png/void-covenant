@@ -325,26 +325,26 @@ function MainAppContent() {
           
           {/* Campaign Tab */}
           <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('campaign'); }}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               activeTab === 'campaign'
-                ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-black/50 border border-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
+                : 'hover:opacity-100 opacity-90'
             }`}
           >
-            <Swords className="w-5 h-5" />
-            <span className="text-[10px] font-display font-bold tracking-wider">CAMPAIGN</span>
+            <Swords className="w-5 h-5 text-emerald-400" />
+            <span className="text-[10px] font-display font-bold tracking-wider text-emerald-300">CAMPAIGN</span>
           </button>
 
           {/* Arena Tab */}
           <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('pvp'); }}
-            className={`relative flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
+            className={`relative flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               activeTab === 'pvp'
-                ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-black/50 border border-rose-500/40 shadow-[0_0_12px_rgba(244,63,94,0.25)]'
+                : 'hover:opacity-100 opacity-90'
             }`}
           >
-            <Trophy className="w-5 h-5" />
-            <span className="text-[10px] font-display font-bold tracking-wider">ARENA</span>
+            <Trophy className="w-5 h-5 text-rose-400" />
+            <span className="text-[10px] font-display font-bold tracking-wider text-rose-300">ARENA</span>
             {hasNewDefenseAttacks && activeTab !== 'pvp' && (
               <span className="absolute top-1 right-2 flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
@@ -355,7 +355,7 @@ function MainAppContent() {
 
           {/* Collection Tab */}
           <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('collection'); }}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               activeTab === 'collection'
                 ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
                 : 'text-gray-400 hover:text-white'
@@ -367,7 +367,7 @@ function MainAppContent() {
 
           {/* Hero Tab */}
           <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('hero'); }}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               activeTab === 'hero'
                 ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
                 : 'text-gray-400 hover:text-white'
@@ -379,22 +379,22 @@ function MainAppContent() {
 
           {/* Shop Tab */}
           <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('altar'); }}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               activeTab === 'altar'
-                ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-black/50 border border-purple-500/40 shadow-[0_0_12px_rgba(168,85,247,0.25)]'
+                : 'hover:opacity-100 opacity-90'
             }`}
           >
-            <Store className="w-5 h-5" />
-            <span className="text-[10px] font-display font-bold tracking-wider">SHOP</span>
+            <Store className="w-5 h-5 text-purple-400" />
+            <span className="text-[10px] font-display font-bold tracking-wider text-purple-300">SHOP</span>
           </button>
 
           {/* Bank / Treasury Tab */}
           <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('bank'); }}
-            className={`relative flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
+            className={`relative flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               activeTab === 'bank'
-                ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-black/50 border border-amber-500/40 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
+                : 'hover:opacity-100 opacity-90'
             }`}
           >
             <Landmark className="w-5 h-5 text-amber-400" />
