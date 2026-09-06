@@ -15,6 +15,22 @@ function getSupabase() {
   return createClient(supabaseUrl, supabaseKey);
 }
 
+const VALID_AVATARS = [
+  '/avatars/knight.webp',
+  '/avatars/lich.webp',
+  '/avatars/vampire.webp',
+  '/avatars/rogue.webp'
+];
+
+function sanitizeAvatarUrl(url?: string): string {
+  if (!url) return '/avatars/knight.webp';
+  if (VALID_AVATARS.includes(url)) return url;
+  if (url.includes('mage')) return '/avatars/vampire.webp';
+  if (url.includes('thief')) return '/avatars/rogue.webp';
+  if (url.startsWith('/avatars/')) return '/avatars/knight.webp';
+  return url;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS setup
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -71,6 +87,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const profileData = currentPlayerRow.data;
+    if (profileData.activePvpOpponent?.avatarUrl) {
+      profileData.activePvpOpponent.avatarUrl = sanitizeAvatarUrl(profileData.activePvpOpponent.avatarUrl);
+    }
     const playerRating = profileData.pvpRating || 100;
     const playerLeague = profileData.pvpLeague || 'Bronze';
 
@@ -174,7 +193,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             pvpRating: data.pvpRating || 100,
             pvpLeague: data.pvpLeague || 'Bronze',
             pvpLP: data.pvpLP !== undefined ? data.pvpLP : 0,
-            avatarUrl: data.avatarUrl || '/avatars/knight.webp',
+            avatarUrl: sanitizeAvatarUrl(data.avatarUrl),
             level: oppLevel,
             heroMaxHealth: oppMaxHealth,
             activeStance: data.activeStance || 'void_strike',
@@ -205,7 +224,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // 4. Fallback to bot if no real player found
     if (!opponent) {
       const botNames = ['Void_Stalker', 'Acheron_Cultist', 'Lilith_Gloom', 'DoomBringer', 'HexMage', 'Doom_Herald', 'Soul_Reaver'];
-      const botAvatars = ['/avatars/knight.webp', '/avatars/mage.webp', '/avatars/thief.webp'];
+      const botAvatars = VALID_AVATARS;
       
       const botName = botNames[Math.floor(Math.random() * botNames.length)] + '_' + Math.floor(Math.random() * 90 + 10);
       const variance = Math.floor(Math.random() * 101) - 50; // -50 to +50 MMR
@@ -266,7 +285,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       deck: opponent.deck,
       stance: opponent.activeStance || 'void_strike',
       talents: opponent.talents || {},
-      avatarUrl: opponent.avatarUrl || '/avatars/knight.webp',
+      avatarUrl: sanitizeAvatarUrl(opponent.avatarUrl),
       level: opponent.level || 1,
       heroMaxHealth: opponent.heroMaxHealth || (30 + ((opponent.level || 1) - 1) * 2),
       equipment: opponent.equipment || [],

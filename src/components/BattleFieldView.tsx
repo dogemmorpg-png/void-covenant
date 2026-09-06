@@ -1228,7 +1228,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   <div className="w-18 h-18 rounded-full border-4 border-red-700/80 bg-[#1c0808] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
                     {renderFloatingTextsFor('enemy-hero')}
                     {stage.enemyHeroImage && (stage.enemyHeroImage.startsWith('/') || stage.enemyHeroImage.startsWith('http')) ? (
-                      <img src={stage.enemyHeroImage} alt="Enemy Hero" className="w-full h-full object-cover" />
+                      <img 
+                        src={stage.enemyHeroImage.includes('mage') ? '/avatars/vampire.webp' : (stage.enemyHeroImage.includes('thief') ? '/avatars/rogue.webp' : stage.enemyHeroImage)} 
+                        alt="Enemy Hero" 
+                        className="w-full h-full object-cover" 
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = '/avatars/knight.webp';
+                        }}
+                      />
                     ) : (
                       <Skull className="w-7 h-7 text-[#dd2c40]" />
                     )}
@@ -1274,7 +1281,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   <div className="w-18 h-18 rounded-full border-4 border-cyan-600/80 bg-[#0d161d] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
                     {renderFloatingTextsFor('player-hero')}
                     {profile.avatarUrl ? (
-                      <img src={profile.avatarUrl} alt="Hero Avatar" className="w-full h-full object-cover" />
+                      <img 
+                        src={profile.avatarUrl} 
+                        alt="Hero Avatar" 
+                        className="w-full h-full object-cover" 
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = '/avatars/knight.webp';
+                        }}
+                      />
                     ) : (
                       <Shield className="w-7 h-7 text-[#66fcf1]" />
                     )}

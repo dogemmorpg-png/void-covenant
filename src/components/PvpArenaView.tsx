@@ -47,6 +47,13 @@ const LEAGUE_TABLE_DATA = [
   { name: 'Bronze', icon: '/icons/league_bronze.png', capacity: 'Open Tier', color: 'text-amber-400', promo: 'Top 60 (#1–#60)', safe: 'Ranks #61+', demo: '' }
 ];
 
+const getSafeAvatarUrl = (url?: string) => {
+  if (!url) return '/avatars/knight.webp';
+  if (url.includes('mage')) return '/avatars/vampire.webp';
+  if (url.includes('thief')) return '/avatars/rogue.webp';
+  return url;
+};
+
 export const PvpArenaView: React.FC<PvpArenaViewProps> = ({ 
   onStartBattle, 
   isMatching, 
@@ -582,7 +589,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       shardsReward: 0,
       enemyHeroName: opponent.name || opponent.username,
       enemyHeroHealth: totalOpponentHealth,
-      enemyHeroImage: opponent.avatarUrl || '/avatars/knight.webp', // Pass the opponent's real avatar URL!
+      enemyHeroImage: getSafeAvatarUrl(opponent.avatarUrl), // Pass the opponent's real avatar URL!
       enemyDeck: opponent.deck,
       enemyStance: opponent.stance || opponent.activeStance,
       enemyTalents: opponent.talents,
@@ -666,9 +673,12 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               <div className="relative">
                 <div className="w-24 h-24 rounded-2xl border-2 border-amber-400/60 p-0.5 bg-black/60 shadow-[0_0_20px_rgba(245,158,11,0.25)] overflow-hidden">
                   <img 
-                    src={activeOpponent.avatarUrl || '/avatars/knight.webp'} 
+                    src={getSafeAvatarUrl(activeOpponent.avatarUrl)} 
                     alt="Avatar" 
                     className="w-full h-full rounded-xl object-cover" 
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/avatars/knight.webp';
+                    }}
                   />
                 </div>
                 <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-600 to-yellow-600 border border-amber-300 text-black px-2.5 py-0.5 rounded-full font-mono text-[9px] font-black uppercase tracking-wider shadow-md">
