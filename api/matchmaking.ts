@@ -232,12 +232,109 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const botLevel = Math.max(1, Math.min(30, Math.floor(botRating / 100) + Math.floor(Math.random() * 3)));
       const botMaxHealth = 30 + (botLevel - 1) * 2;
 
-      // Generate bot deck (10 cards from CARD_TEMPLATES)
-      const botDeck = Array.from({ length: 10 }, () => {
-        const randomTemplate = CARD_TEMPLATES[Math.floor(Math.random() * CARD_TEMPLATES.length)];
-        const mmrMultiplier = 1 + (botRating - 100) * 0.0003;
+      // Group templates by tier for fair distribution
+      const bronzeTemplates = CARD_TEMPLATES.filter(c => c.tier === 'bronze');
+      const silverTemplates = CARD_TEMPLATES.filter(c => c.tier === 'silver');
+      const goldTemplates = CARD_TEMPLATES.filter(c => c.tier === 'gold');
+      const legendaryTemplates = CARD_TEMPLATES.filter(c => c.tier === 'legendary' || c.tier === 'divine');
+
+      // Analyze player's current deck composition
+      const playerDeckCards = (profileData.deck || [])
+        .map(id => (profileData.collection || []).find(c => c && c.id === id))
+        .filter(Boolean);
+
+      let playerBronze = 0, playerSilver = 0, playerGold = 0, playerLegendary = 0;
+      let totalPlayerLevel = 0;
+      for (const c of playerDeckCards) {
+        if (c.tier === 'legendary' || c.tier === 'divine') playerLegendary++;
+        else if (c.tier === 'gold') playerGold++;
+        else if (c.tier === 'silver') playerSilver++;
+        else playerBronze++;
+        totalPlayerLevel += (c.level || 1);
+      }
+      const avgPlayerLevel = playerDeckCards.length > 0
+        ? Math.round(totalPlayerLevel / playerDeckCards.length)
+        : 1;
+
+      // Determine bot deck composition
+      let botBronzeCount = 0;
+      let botSilverCount = 0;
+      let botGoldCount = 0;
+      let botLegendaryCount = 0;
+
+      if (playerDeckCards.length > 0) {
+        // Mirrored generation with fair balance:
+        // Bot mirrors player's quality with slight handicap (player retains power edge)
+        botLegendaryCount = Math.max(0, Math.floor(playerLegendary * 0.7));
+        botGoldCount = Math.max(0, Math.floor(playerGold * 0.8));
+        // Remaining slots filled with silver and bronze
+        const remainingForLower = 10 - botLegendaryCount - botGoldCount;
+        const playerSilverRatio = playerSilver / Math.max(1, playerSilver + playerBronze);
+        botSilverCount = Math.min(remainingForLower, Math.round(remainingForLower * playerSilverRatio));
+        botBronzeCount = Math.max(0, remainingForLower - botSilverCount);
+      } else {
+        // Fallback by League if player deck couldn't be loaded
+        const league = (playerLeague || 'Bronze').toLowerCase();
+        if (league.includes('bronze')) {
+          botBronzeCount = 8; botSilverCount = 2; botGoldCount = 0; botLegendaryCount = 0;
+        } else if (league.includes('silver')) {
+          botBronzeCount = 5; botSilverCount = 4; botGoldCount = 1; botLegendaryCount = 0;
+        } else if (league.includes('gold')) {
+          botBronzeCount = 3; botSilverCount = 4; botGoldCount = 3; botLegendaryCount = 0;
+        } else if (league.includes('platinum') || league.includes('emerald')) {
+          botBronzeCount = 2; botSilverCount = 3; botGoldCount = 4; botLegendaryCount = 1;
+        } else {
+          botBronzeCount = 0; botSilverCount = 2; botGoldCount = 5; botLegendaryCount = 3;
+        }
+      }
+
+      // Safeguard: Ensure total is exactly 10 cards
+      let totalAssigned = botBronzeCount + botSilverCount + botGoldCount + botLegendaryCount;
+      if (totalAssigned < 10) {
+        botBronzeCount += (10 - totalAssigned);
+      } else if (totalAssigned > 10) {
+        const diff = totalAssigned - 10;
+        if (botBronzeCount >= diff) botBronzeCount -= diff;
+        else if (botSilverCount >= diff) botSilverCount -= diff;
+        else botGoldCount -= diff;
+      }
+
+      // Card level is matched to player's deck or bot MMR (whichever is lower/fairer)
+      const botCardLevel = Math.max(1, Math.min(avgPlayerLevel, 1 + Math.floor(botRating / 500)));
+
+      // Pick random templates without excessive duplicates (max 2 duplicates of same baseId)
+      function pickTemplates(pool: any[], count: number, usedCount: Record<string, number>): any[] {
+        if (!pool || pool.length === 0) return [];
+        const picked: any[] = [];
+        for (let i = 0; i < count; i++) {
+          const available = pool.filter(c => (usedCount[c.baseId] || 0) < 2);
+          const choice = available.length > 0
+            ? available[Math.floor(Math.random() * available.length)]
+            : pool[Math.floor(Math.random() * pool.length)];
+          usedCount[choice.baseId] = (usedCount[choice.baseId] || 0) + 1;
+          picked.push(choice);
+        }
+        return picked;
+      }
+
+      const usedTemplateCounts: Record<string, number> = {};
+      const chosenTemplates = [
+        ...pickTemplates(bronzeTemplates, botBronzeCount, usedTemplateCounts),
+        ...pickTemplates(silverTemplates, botSilverCount, usedTemplateCounts),
+        ...pickTemplates(goldTemplates, botGoldCount, usedTemplateCounts),
+        ...pickTemplates(legendaryTemplates.length > 0 ? legendaryTemplates : goldTemplates, botLegendaryCount, usedTemplateCounts)
+      ];
+
+      // Shuffle the deck so card tiers are naturally distributed
+      for (let i = chosenTemplates.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [chosenTemplates[i], chosenTemplates[j]] = [chosenTemplates[j], chosenTemplates[i]];
+      }
+
+      // Generate bot deck instances
+      const mmrMultiplier = 1 + (botRating - 100) * 0.0003;
+      const botDeck = chosenTemplates.map(randomTemplate => {
         const scaledHealth = Math.round(randomTemplate.health * mmrMultiplier);
-        const level = 1 + Math.min(4, Math.floor(botRating / 400));
         return {
           baseId: randomTemplate.baseId,
           name: randomTemplate.name,
@@ -250,7 +347,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           skills: randomTemplate.skills || [],
           image: randomTemplate.image,
           color: randomTemplate.color,
-          level: level,
+          level: botCardLevel,
           xp: 0,
           maxXp: 100
         };
