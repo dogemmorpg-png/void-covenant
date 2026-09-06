@@ -6,7 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 import { PlayerProfile } from './_shared/types.js';
 import { CARD_TEMPLATES, createCardInstance, generateCampaignStage, AIRDROP_TASKS } from './_shared/cards.js';
 import { EQUIPMENT_TEMPLATES, generateEquipmentInstance } from './_shared/equipment.js';
-import { calculateEnergy, processExpGain } from './_shared/energyHelper.js';
+import { calculateEnergy, processExpGain, getActiveSubscriptionTier, getTierLimits } from './_shared/energyHelper.js';
 import { checkAndPerformPvpRollover, DEFAULT_LEAGUE_REWARDS } from './_shared/pvpRollover.js';
 import { recordShardTransaction } from './_shared/shardLogger.js';
 
@@ -163,8 +163,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           { id: 'c_starter_5', templateId: 's1_dark_acolyte', name: 'Dark Acolyte', tier: 'Common', attack: 4, health: 4, manaCost: 2, image: '/cards/dark_acolyte.webp', count: 1, level: 1 }
         ],
         deck: ['c_starter_1', 'c_starter_2', 'c_starter_3', 'c_starter_4', 'c_starter_5'],
-        pveEnergy: 10,
-        pveEnergyMax: 10,
+        pveEnergy: 5,
+        pveEnergyMax: 5,
         pvpEnergy: 5,
         pvpEnergyMax: 5,
         pvpTickets: 5,
@@ -841,7 +841,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         { energyCount, shardCost }
       );
       profile.pveEnergy = (profile.pveEnergy || 0) + energyCount;
-      if (profile.pveEnergyMax === undefined) profile.pveEnergyMax = 10;
+      if (profile.pveEnergyMax === undefined) {
+        const tier = getActiveSubscriptionTier ? getActiveSubscriptionTier(profile) : 'free';
+        profile.pveEnergyMax = tier === 'vip' ? 15 : (tier === 'premium' ? 10 : 5);
+      }
       successMessage = `Restored +${energyCount} PvE Energy for ${shardCost} Shards!`;
       responseData = { energyCount, shardCost, newEnergy: profile.pveEnergy };
     } else if (action === 'buy_divine_card') {

@@ -94,7 +94,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         profile = {
           gold: 1000, dust: 250, darkShards: 50,
           collection: [], deck: [],
-          pveEnergy: 10, pveEnergyMax: 10,
+          pveEnergy: 5, pveEnergyMax: 5,
           pvpEnergy: 5, pvpEnergyMax: 5,
           lastEnergyRefill: Date.now(),
           pveProgress: 1, pvpRating: 100,

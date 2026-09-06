@@ -89,8 +89,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           { id: 'c_starter_5', templateId: 's1_dark_acolyte', name: 'Dark Acolyte', tier: 'Common', attack: 4, health: 4, manaCost: 2, image: '/cards/dark_acolyte.webp', count: 1, level: 1 }
         ],
         deck: ['c_starter_1', 'c_starter_2', 'c_starter_3', 'c_starter_4', 'c_starter_5'],
-        pveEnergy: 10,
-        pveEnergyMax: 10,
+        pveEnergy: 5,
+        pveEnergyMax: 5,
         pvpEnergy: 5,
         pvpEnergyMax: 5,
         lastEnergyRefill: Date.now(),
