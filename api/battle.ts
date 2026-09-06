@@ -153,6 +153,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
+    // Fair reward bonus calculation: guarantees at least +1 if player has an active multiplier > 1.0
+    function applyMultiplierWithMinimum(baseValue: number, multiplier: number): number {
+      if (multiplier <= 1 || baseValue <= 0) return Math.round(baseValue);
+      const rawBonus = baseValue * (multiplier - 1);
+      const bonus = Math.max(1, Math.round(rawBonus));
+      return baseValue + bonus;
+    }
+
     if (battleType === 'campaign') {
       const floorNum = parseInt(stageId);
       if (isNaN(floorNum)) return res.status(400).json({ error: 'Invalid stage ID' });
@@ -165,9 +173,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const baseDust = stage.rewards.dust || (floorNum * 5 + 10);
         const baseExp = stage.rewards.exp || (floorNum * 20 + 40);
 
-        goldReward = Math.floor(baseGold * goldMultiplier);
+        goldReward = applyMultiplierWithMinimum(baseGold, goldMultiplier);
         dustReward = baseDust;
-        expReward = Math.floor(baseExp * expMultiplier);
+        expReward = applyMultiplierWithMinimum(baseExp, expMultiplier);
 
         const currentCleared = profile.pveProgress || 1;
         if (floorNum >= currentCleared) {
@@ -188,9 +196,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           cardRewardStr = newCardInstance.name;
         }
       } else {
-        goldReward = Math.floor(5 * goldMultiplier);
+        goldReward = applyMultiplierWithMinimum(5, goldMultiplier);
         dustReward = 2;
-        expReward = Math.floor(10 * expMultiplier);
+        expReward = applyMultiplierWithMinimum(10, expMultiplier);
       }
 
     } else if (battleType === 'pvp') {
@@ -211,7 +219,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (result === 'win') {
         const baseGold = 300 + Math.floor((profile.pvpLP || 0) / 4);
         const baseDust = 30 + Math.floor((profile.pvpLP || 0) / 20);
-        goldReward = Math.floor(baseGold * goldMultiplier);
+        goldReward = applyMultiplierWithMinimum(baseGold, goldMultiplier);
         dustReward = baseDust;
         expReward = 0; // EXP is strictly exclusive to PvE Campaign
 
@@ -246,7 +254,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
         }
       } else {
-        goldReward = Math.floor(50 * goldMultiplier);
+        goldReward = applyMultiplierWithMinimum(50, goldMultiplier);
         dustReward = 5;
         expReward = 0; // EXP is strictly exclusive to PvE Campaign
 
