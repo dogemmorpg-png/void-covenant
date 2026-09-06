@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CampaignStage } from '../types';
-import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User, Info, Gift, Sparkles, CheckCircle2, Coins, Lock, Plus } from 'lucide-react';
+import { Swords, Award, Zap, Trophy, Shield, ShieldCheck, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User, Info, Gift, Sparkles, CheckCircle2, Coins, Lock, Plus } from 'lucide-react';
 import { renderStanceIcon } from './SkillAndStanceIcons';
 import { assetPreloader } from '../utils/assetPreloader';
 import { calculateEquipmentSetBonuses } from '../data/equipment';
@@ -53,7 +53,17 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   isModalOpen,
   setIsModalOpen
 }) => {
-  const { profile, updateProfile, buyPvpTickets, leagueRewardsConfig, hasNewDefenseAttacks, markDefenseHistoryAsViewed } = useGame();
+  const { 
+    profile, 
+    updateProfile, 
+    buyPvpTickets, 
+    leagueRewardsConfig, 
+    hasNewDefenseAttacks, 
+    markDefenseHistoryAsViewed,
+    activateShield,
+    buyShield,
+    setIsShardsShopOpen
+  } = useGame();
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState<'duels' | 'rewards' | 'history'>('duels');
@@ -67,6 +77,32 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   const [isBuyTicketsModalOpen, setIsBuyTicketsModalOpen] = useState(false);
   const [isLeagueRulesModalOpen, setIsLeagueRulesModalOpen] = useState(false);
   const [myOwnLeagueRank, setMyOwnLeagueRank] = useState<number | string>(1);
+
+  // Peace Shield States
+  const [isShieldModalOpen, setIsShieldModalOpen] = useState(false);
+  const [isActivatingShield, setIsActivatingShield] = useState(false);
+  const [isBuyingShield, setIsBuyingShield] = useState(false);
+  const [shieldTimeLeft, setShieldTimeLeft] = useState<string | null>(null);
+
+  // Shield countdown ticker
+  useEffect(() => {
+    const updateShieldTimer = () => {
+      const until = profile.activeShieldUntil || 0;
+      const diff = until - Date.now();
+      if (diff <= 0) {
+        setShieldTimeLeft(null);
+      } else {
+        const totalSec = Math.floor(diff / 1000);
+        const h = Math.floor(totalSec / 3600);
+        const m = Math.floor((totalSec % 3600) / 60);
+        const s = totalSec % 60;
+        setShieldTimeLeft(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`);
+      }
+    };
+    updateShieldTimer();
+    const interval = setInterval(updateShieldTimer, 1000);
+    return () => clearInterval(interval);
+  }, [profile.activeShieldUntil]);
 
   // League calculation helper
   const getLeagueDetails = (leagueName: string) => {
@@ -729,13 +765,50 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               </div>
             </div>
 
+            {/* Peace Shield */}
+            <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[130px] flex flex-col items-center">
+              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-bold block mb-1">PEACE SHIELD</span>
+              <button
+                onClick={() => setIsShieldModalOpen(true)}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold transition-all cursor-pointer ${
+                  shieldTimeLeft 
+                    ? 'bg-emerald-950/80 border border-emerald-500/70 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.35)] animate-pulse'
+                    : 'bg-black/50 border border-white/15 text-gray-400 hover:text-white hover:border-amber-400/50'
+                }`}
+                title="Manage territory defense shields"
+              >
+                {shieldTimeLeft ? (
+                  <>
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>{shieldTimeLeft}</span>
+                  </>
+                ) : (
+                  <>
+                    <Shield className="w-3.5 h-3.5 text-gray-400" />
+                    <span>SHIELD: OFF</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Daily Sovereigns Won Progress (for subscribers or when > 0) */}
+            {((profile.subscriptionExpiresAt && profile.subscriptionExpiresAt > Date.now()) || (profile.dailySovereignsWonToday || 0) > 0) && (
+              <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[110px]">
+                <span className="text-[10px] font-mono text-amber-400 uppercase tracking-widest font-bold block">DAILY SOV</span>
+                <div className="font-mono text-sm sm:text-base font-black text-amber-300 flex items-center justify-center gap-1 mt-1">
+                  <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 object-contain" />
+                  <span>{profile.dailySovereignsWonToday || 0}/{profile.subscriptionTier === 'ultra' ? 24 : 10}</span>
+                </div>
+              </div>
+            )}
+
             {/* Arena Tickets (Prominent counter + Reserve badge + Buy button) */}
             <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[170px] flex flex-col items-center">
               <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-bold block">ARENA TICKETS</span>
               <div className="flex items-center justify-center gap-2 mt-1 flex-nowrap">
                 <div className="font-mono text-lg sm:text-xl font-black text-rose-400 flex items-center gap-1.5 shrink-0">
                   <img src="/icons/ticket.png" alt="Ticket" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(244,63,94,0.4)]" />
-                  <span>{profile.pvpEnergy !== undefined ? profile.pvpEnergy : 5}/5</span>
+                  <span>{profile.pvpEnergy !== undefined ? profile.pvpEnergy : (profile.pvpEnergyMax || 5)}/{profile.pvpEnergyMax || 5}</span>
                   {(profile.pvpBonusTickets || 0) > 0 && (
                     <span className="text-[10px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-500/50 px-1.5 py-0.5 rounded-md shadow-sm ml-0.5" title="Purchased tickets reserve">
                       +{profile.pvpBonusTickets}
@@ -1885,6 +1958,179 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             >
               Understood
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Peace Shield Chamber Modal */}
+      {isShieldModalOpen && (
+        <div className="fixed inset-0 z-[95] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-gradient-to-b from-[#161a22] via-[#10131a] to-[#0c0e14] border-2 border-emerald-500/40 rounded-3xl p-6 max-w-lg w-full space-y-5 shadow-[0_0_40px_rgba(0,0,0,0.9)] relative overflow-hidden">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                <h3 className="font-display font-black text-base text-white tracking-wider uppercase">
+                  VOID AEGIS DEFENSE SHIELDS
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsShieldModalOpen(false)}
+                className="w-7 h-7 rounded-full bg-black/60 hover:bg-black border border-white/15 text-gray-400 hover:text-white flex items-center justify-center font-bold transition-all cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Current Shield Status */}
+            <div className={`p-4 rounded-2xl border flex items-center justify-between ${
+              shieldTimeLeft
+                ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-200'
+                : 'bg-black/50 border-white/10 text-gray-400'
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  shieldTimeLeft ? 'bg-emerald-900/60 text-emerald-400' : 'bg-white/5 text-gray-500'
+                }`}>
+                  {shieldTimeLeft ? <ShieldCheck className="w-6 h-6 animate-pulse" /> : <Shield className="w-6 h-6" />}
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-wider block text-gray-400">Territory Status</span>
+                  <span className="font-display font-black text-sm">
+                    {shieldTimeLeft ? 'IMMUNE TO ATTACKS' : 'UNPROTECTED (VULNERABLE)'}
+                  </span>
+                </div>
+              </div>
+
+              {shieldTimeLeft && (
+                <div className="text-right font-mono">
+                  <span className="text-[10px] text-gray-400 uppercase block">Time Remaining</span>
+                  <span className="text-base font-black text-emerald-400">{shieldTimeLeft}</span>
+                </div>
+              )}
+            </div>
+
+            <p className="text-xs text-gray-300 font-sans leading-relaxed">
+              While a Void Aegis Shield is active, your domain cannot be attacked by other lords in the Arena. Your LP and rank are completely shielded while you sleep or take a break.
+            </p>
+
+            {/* Inventory Section */}
+            <div className="space-y-2">
+              <span className="text-[11px] font-mono font-bold text-gray-400 uppercase tracking-wider block">
+                Your Shield Inventory
+              </span>
+
+              <div className="grid grid-cols-3 gap-2.5">
+                {(['3h', '6h', '12h'] as const).map((type) => {
+                  const count = profile.shieldsInventory?.[type] || 0;
+                  const label = type === '3h' ? '3 Hours' : type === '6h' ? '6 Hours' : '12 Hours';
+                  return (
+                    <div key={type} className="bg-black/40 border border-white/10 rounded-2xl p-3 text-center flex flex-col justify-between">
+                      <div>
+                        <span className="text-xs font-display font-bold text-white block">{label}</span>
+                        <span className="font-mono text-xs font-black text-amber-300 block mt-1">
+                          {count} Owned
+                        </span>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          setIsActivatingShield(true);
+                          try {
+                            const res = await activateShield(type);
+                            if (res.success) {
+                              toast(res.message, 'success');
+                              audioSystem.playVictory();
+                            } else {
+                              toast(res.message, 'error');
+                            }
+                          } catch (e: any) {
+                            toast(e.message || 'Activation failed', 'error');
+                          } finally {
+                            setIsActivatingShield(false);
+                          }
+                        }}
+                        disabled={count < 1 || isActivatingShield}
+                        className={`mt-2 py-1.5 px-2 rounded-xl font-display font-black text-[10px] tracking-wider uppercase transition-all cursor-pointer ${
+                          count > 0 && !isActivatingShield
+                            ? 'bg-emerald-600 hover:bg-emerald-500 text-black shadow-md hover:scale-105 active:scale-95'
+                            : 'bg-white/5 text-gray-600 cursor-not-allowed'
+                        }`}
+                      >
+                        ACTIVATE
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Buy More Shields Section (Dark Shards ONLY) */}
+            <div className="space-y-2 pt-1 border-t border-white/10">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold text-gray-400 uppercase tracking-wider block">
+                  Purchase Void Shields (Dark Shards)
+                </span>
+                <div className="flex items-center gap-1 text-xs font-mono text-purple-300">
+                  <img src="/icons/dark_shard.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
+                  <span>{profile.darkShards || 0}</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2.5">
+                {[
+                  { type: '3h' as const, label: '3 Hours', cost: 8 },
+                  { type: '6h' as const, label: '6 Hours', cost: 15 },
+                  { type: '12h' as const, label: '12 Hours', cost: 25 }
+                ].map((item) => (
+                  <div key={item.type} className="bg-black/50 border border-purple-500/20 hover:border-purple-500/50 rounded-2xl p-3 text-center flex flex-col justify-between transition-all">
+                    <div>
+                      <span className="text-xs font-display font-bold text-gray-200 block">{item.label}</span>
+                      <div className="flex items-center justify-center gap-1 font-mono text-xs font-bold text-purple-300 mt-1">
+                        <img src="/icons/dark_shard.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
+                        <span>{item.cost}</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        if ((profile.darkShards || 0) < item.cost) {
+                          toast(`Need ${item.cost} Dark Shards. Opening shop...`, 'warning');
+                          setIsShardsShopOpen(true);
+                          return;
+                        }
+                        setIsBuyingShield(true);
+                        try {
+                          const res = await buyShield(item.type);
+                          if (res.success) {
+                            toast(res.message, 'success');
+                            audioSystem.playVictory();
+                          } else {
+                            toast(res.message, 'error');
+                          }
+                        } catch (e: any) {
+                          toast(e.message || 'Purchase failed', 'error');
+                        } finally {
+                          setIsBuyingShield(false);
+                        }
+                      }}
+                      disabled={isBuyingShield}
+                      className="mt-2 py-1.5 px-2 rounded-xl font-display font-black text-[10px] tracking-wider uppercase bg-purple-600 hover:bg-purple-500 text-white shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                    >
+                      BUY
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Subscription Note */}
+            <div className="bg-amber-950/30 border border-amber-500/30 rounded-2xl p-3 flex items-start gap-2.5 text-xs text-amber-200 font-sans">
+              <Sparkles className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <p>
+                <strong className="text-white">Daily Subscriber Free Shields:</strong> Premium Lords receive <strong>1x 3h Shield</strong> daily. Ultra Overlords receive <strong>1x 6h Shield</strong> daily in their Pass Tributes.
+              </p>
+            </div>
+
           </div>
         </div>
       )}

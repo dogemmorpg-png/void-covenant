@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { Landmark, ArrowUpRight, Clock, ShieldCheck, CheckCircle2, AlertCircle, Wallet, Coins, RefreshCw } from 'lucide-react';
 import { audioSystem } from '../utils/AudioSystem';
@@ -15,6 +15,11 @@ export const BankView: React.FC = () => {
   const numAmount = parseInt(withdrawAmount, 10) || 0;
   const usdtEquivalent = (numAmount * 0.01).toFixed(2);
   const totalUsdtBalance = (balance * 0.01).toFixed(2);
+
+  const isSubActive = profile.subscriptionExpiresAt && profile.subscriptionExpiresAt > Date.now();
+  const subTier = isSubActive ? (profile.subscriptionTier || 'free') : 'free';
+  const minWithdrawal = subTier === 'ultra' ? 2000 : subTier === 'premium' ? 2500 : 3000;
+  const minUsdt = (minWithdrawal * 0.01).toFixed(2);
 
   const handleQuickPercent = (pct: number) => {
     audioSystem.playClick();
@@ -34,8 +39,11 @@ export const BankView: React.FC = () => {
     audioSystem.playClick();
     setFeedback(null);
 
-    if (numAmount < 100) {
-      setFeedback({ type: 'error', message: 'Minimum withdrawal is 100 Blood Sovereigns ($1.00 USDT).' });
+    if (numAmount < minWithdrawal) {
+      setFeedback({ 
+        type: 'error', 
+        message: `Minimum withdrawal for ${subTier.toUpperCase()} is ${minWithdrawal} Blood Sovereigns ($${minUsdt} USDT).` 
+      });
       return;
     }
 
@@ -124,7 +132,7 @@ export const BankView: React.FC = () => {
             <div className="grid grid-cols-3 gap-2 mt-4 text-center">
               <div className="bg-black/30 p-2.5 rounded-xl border border-white/5">
                 <span className="text-[9px] font-mono text-gray-400 uppercase block">Min. Payout</span>
-                <span className="text-xs font-mono font-bold text-amber-300">100 SOV ($1)</span>
+                <span className="text-xs font-mono font-bold text-amber-300">{minWithdrawal} SOV (${minUsdt})</span>
               </div>
               <div className="bg-black/30 p-2.5 rounded-xl border border-white/5">
                 <span className="text-[9px] font-mono text-gray-400 uppercase block">Exchange Rate</span>
@@ -139,10 +147,21 @@ export const BankView: React.FC = () => {
 
           {/* Withdrawal Terminal Form */}
           <div className="bg-[#141820] border border-amber-500/20 rounded-3xl p-6 shadow-xl relative">
-            <h3 className="font-display font-bold text-base text-white tracking-wider flex items-center gap-2 mb-4">
-              <ArrowUpRight className="w-5 h-5 text-amber-400" />
-              WITHDRAWAL TERMINAL
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display font-bold text-base text-white tracking-wider flex items-center gap-2">
+                <ArrowUpRight className="w-5 h-5 text-amber-400" />
+                WITHDRAWAL TERMINAL
+              </h3>
+              <span className={`text-[10px] font-mono font-black px-2.5 py-0.5 rounded-full uppercase border ${
+                subTier === 'ultra'
+                  ? 'bg-purple-950/70 border-purple-500/60 text-purple-300 shadow-[0_0_8px_rgba(168,85,247,0.3)]'
+                  : subTier === 'premium'
+                  ? 'bg-amber-950/70 border-amber-500/60 text-amber-300'
+                  : 'bg-black/50 border-white/10 text-gray-400'
+              }`}>
+                {subTier.toUpperCase()} LIMIT: {minWithdrawal} SOV
+              </span>
+            </div>
 
             <form onSubmit={handleSubmitWithdrawal} className="space-y-4">
               
@@ -158,11 +177,11 @@ export const BankView: React.FC = () => {
                 <div className="relative">
                   <input
                     type="number"
-                    min="100"
+                    min={minWithdrawal}
                     max={balance}
                     value={withdrawAmount}
                     onChange={(e) => setWithdrawAmount(e.target.value)}
-                    placeholder="Enter amount (min 100)"
+                    placeholder={`Enter amount (min ${minWithdrawal})`}
                     className="w-full bg-black/60 border border-white/15 focus:border-amber-500 rounded-xl px-4 py-3 text-white font-mono text-base outline-none transition-colors"
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-xs font-bold text-amber-400">
@@ -236,9 +255,9 @@ export const BankView: React.FC = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isSubmitting || balance < 100 || numAmount < 100 || numAmount > balance}
+                disabled={isSubmitting || balance < minWithdrawal || numAmount < minWithdrawal || numAmount > balance}
                 className={`w-full py-3 rounded-xl font-display font-black text-sm tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                  balance >= 100 && numAmount >= 100 && numAmount <= balance && !isSubmitting
+                  balance >= minWithdrawal && numAmount >= minWithdrawal && numAmount <= balance && !isSubmitting
                     ? 'bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-400 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:scale-[1.02] active:scale-98'
                     : 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700/50'
                 }`}

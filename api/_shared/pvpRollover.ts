@@ -332,12 +332,15 @@ export async function checkAndPerformPvpRollover(
       originalLeague: r.data?.pvpLeague || 'Bronze'
     }));
 
-    // 4. Reset daily tickets to 5 for all players, keeping bonus tickets intact
+    // 4. Reset daily tickets based on subscription tier (Free: 5, Premium: 8, Ultra: 12), keeping bonus tickets intact
     players.forEach(p => {
-      p.profile.pvpEnergy = 5;
-      p.profile.pvpEnergyMax = 5;
+      const isSubActive = p.profile.subscriptionExpiresAt && p.profile.subscriptionExpiresAt > Date.now();
+      const tier = isSubActive ? (p.profile.subscriptionTier || 'free') : 'free';
+      const pvpMax = tier === 'ultra' ? 12 : tier === 'premium' ? 8 : 5;
+      p.profile.pvpEnergy = pvpMax;
+      p.profile.pvpEnergyMax = pvpMax;
       p.profile.pvpBonusTickets = p.profile.pvpBonusTickets || 0;
-      p.profile.pvpTickets = 5 + p.profile.pvpBonusTickets;
+      p.profile.pvpTickets = pvpMax + p.profile.pvpBonusTickets;
     });
 
     let totalPromoted = 0;
@@ -399,7 +402,18 @@ export async function checkAndPerformPvpRollover(
         const calculated = calculateLeagueRewards(customLeagueConfig, leagueName, rank);
         const goldReward = calculated.gold;
         const dustReward = calculated.dust;
-        const sovereignsReward = calculated.sovereigns;
+        let sovereignsReward = calculated.sovereigns;
+
+        // Subscription bonus: +15% for Premium, +25% for Ultra
+        const isSubActive = p.profile.subscriptionExpiresAt && p.profile.subscriptionExpiresAt > Date.now();
+        const tier = isSubActive ? (p.profile.subscriptionTier || 'free') : 'free';
+        if (sovereignsReward > 0) {
+          if (tier === 'ultra') {
+            sovereignsReward = Math.round(sovereignsReward * 1.25);
+          } else if (tier === 'premium') {
+            sovereignsReward = Math.round(sovereignsReward * 1.15);
+          }
+        }
 
         // Generate Mail Message for Player Inbox
         const mailMessage = {

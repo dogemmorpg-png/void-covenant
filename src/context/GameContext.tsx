@@ -36,6 +36,10 @@ interface GameContextType {
   addCardToCollection: (cardTemplate: CardTemplate, level?: number) => Card;
   toggleDeckCard: (cardId: string) => { success: boolean; message: string };
   completeAirdropTask: (taskId: string) => Promise<{ success: boolean; message: string }>;
+  buySubscription: (tier: 'premium' | 'ultra', durationDays: 30 | 90) => Promise<{ success: boolean; message: string }>;
+  claimDailySubscription: () => Promise<{ success: boolean; message: string }>;
+  activateShield: (shieldType: '3h' | '6h' | '12h') => Promise<{ success: boolean; message: string }>;
+  buyShield: (shieldType: '3h' | '6h' | '12h') => Promise<{ success: boolean; message: string }>;
   addExp: (amount: number) => void;
   addCampaignStars: (stageId: string, stars: number) => void;
   addEquipment: (equipment: Equipment) => void;
@@ -199,11 +203,16 @@ const createDefaultProfile = (): PlayerProfile => {
   bloodSovereigns: 0,
   collection: starterDeck,
   deck: starterDeck.map(c => c.id), // All 10 starter cards
-  pveEnergy: 10,
-  pveEnergyMax: 10,
+  pveEnergy: 5,
+  pveEnergyMax: 5,
   pvpEnergy: 5,
   pvpEnergyMax: 5,
   pvpTickets: 5,
+  subscriptionTier: 'free',
+  subscriptionExpiresAt: 0,
+  shieldsInventory: { '3h': 0, '6h': 0, '12h': 0 },
+  activeShieldUntil: 0,
+  dailySovereignsWonToday: 0,
   lastEnergyRefill: Date.now(),
   lastPveEnergyRefill: Date.now(),
   lastPvpEnergyRefill: Date.now(),
@@ -1514,6 +1523,22 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return res;
   };
 
+  const buySubscription = async (tier: 'premium' | 'ultra', durationDays: 30 | 90) => {
+    return await submitAction('buy_subscription', { tier, durationDays });
+  };
+
+  const claimDailySubscription = async () => {
+    return await submitAction('claim_daily_subscription', {});
+  };
+
+  const activateShield = async (shieldType: '3h' | '6h' | '12h') => {
+    return await submitAction('activate_shield', { shieldType });
+  };
+
+  const buyShield = async (shieldType: '3h' | '6h' | '12h') => {
+    return await submitAction('buy_shield', { shieldType });
+  };
+
   return (
     <GameContext.Provider
       value={{
@@ -1530,6 +1555,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         spendShards,
         spendBloodSovereigns,
         requestWithdrawal,
+        buySubscription,
+        claimDailySubscription,
+        activateShield,
+        buyShield,
         usePveEnergy,
         usePvpEnergy,
         buyPvpTickets,

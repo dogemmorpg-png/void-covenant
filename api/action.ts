@@ -935,8 +935,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { amountSovereigns, targetAddress } = payload || {};
       const numAmount = parseInt(amountSovereigns, 10);
 
-      if (isNaN(numAmount) || numAmount < 100) {
-        return res.status(400).json({ error: 'Minimum withdrawal is 100 Blood Sovereigns ($1.00 USDT).' });
+      const isSubActive = profile.subscriptionExpiresAt && profile.subscriptionExpiresAt > Date.now();
+      const subTier = isSubActive ? (profile.subscriptionTier || 'free') : 'free';
+      const minSov = subTier === 'ultra' ? 2000 : subTier === 'premium' ? 2500 : 3000;
+
+      if (isNaN(numAmount) || numAmount < minSov) {
+        return res.status(400).json({ error: `Minimum withdrawal for ${subTier.toUpperCase()} tier is ${minSov} Blood Sovereigns ($${(minSov * 0.01).toFixed(2)} USDT).` });
       }
 
       if (!targetAddress || typeof targetAddress !== 'string' || targetAddress.trim().length < 24) {
@@ -1040,6 +1044,123 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       successMessage = `Claimed all rewards from ${claimedCount} letter(s)!`;
       responseData = { claimedCount, totalGold, totalDust, totalShards, totalSovereigns };
+    } else if (action === 'buy_subscription') {
+      const { tier, durationDays } = payload || {};
+      if (!tier || !['premium', 'ultra'].includes(tier) || !durationDays || ![30, 90].includes(durationDays)) {
+        return res.status(400).json({ error: 'Invalid subscription tier or duration.' });
+      }
+
+      const PRICES: Record<string, Record<number, number>> = {
+        premium: { 30: 150, 90: 400 },
+        ultra: { 30: 350, 90: 900 }
+      };
+
+      const cost = PRICES[tier]?.[durationDays];
+      if (!cost) return res.status(400).json({ error: 'Price configuration error.' });
+
+      if ((profile.darkShards || 0) < cost) {
+        return res.status(400).json({ error: `Insufficient Dark Shards! Need ${cost} Shards, you have ${profile.darkShards || 0}.` });
+      }
+
+      profile.darkShards = (profile.darkShards || 0) - cost;
+      const durationMs = durationDays * 24 * 60 * 60 * 1000;
+      const isCurrentActive = profile.subscriptionExpiresAt && profile.subscriptionExpiresAt > Date.now();
+
+      if (isCurrentActive && profile.subscriptionTier === tier) {
+        profile.subscriptionExpiresAt = (profile.subscriptionExpiresAt || Date.now()) + durationMs;
+      } else {
+        profile.subscriptionExpiresAt = Date.now() + durationMs;
+      }
+
+      profile.subscriptionTier = tier;
+      profile = calculateEnergy(profile);
+
+      profile = recordShardTransaction(
+        profile,
+        'BUY_SUBSCRIPTION',
+        -cost,
+        `Purchased ${tier.toUpperCase()} Subscription (${durationDays} Days)`,
+        { tier, durationDays, cost }
+      );
+
+      successMessage = `👑 Hail, Lord! You have unlocked the ${tier.toUpperCase()} Pass for ${durationDays} days!`;
+      responseData = { subscriptionTier: tier, subscriptionExpiresAt: profile.subscriptionExpiresAt };
+    } else if (action === 'claim_daily_subscription') {
+      const isSubActive = profile.subscriptionExpiresAt && profile.subscriptionExpiresAt > Date.now();
+      if (!isSubActive) {
+        return res.status(400).json({ error: 'No active subscription found. Upgrade to claim daily tributes.' });
+      }
+
+      const todayUtc = new Date().toISOString().slice(0, 10);
+      if (profile.lastDailySubscriptionClaim === todayUtc) {
+        return res.status(400).json({ error: 'Daily subscription tribute has already been claimed today.' });
+      }
+
+      const tier = profile.subscriptionTier || 'premium';
+      const goldReward = tier === 'ultra' ? 3000 : 1000;
+      const dustReward = tier === 'ultra' ? 400 : 150;
+      const shieldType = tier === 'ultra' ? '6h' : '3h';
+
+      profile.gold = (profile.gold || 0) + goldReward;
+      profile.dust = (profile.dust || 0) + dustReward;
+
+      profile.shieldsInventory = profile.shieldsInventory || { '3h': 0, '6h': 0, '12h': 0 };
+      profile.shieldsInventory[shieldType] = (profile.shieldsInventory[shieldType] || 0) + 1;
+      profile.lastDailySubscriptionClaim = todayUtc;
+
+      successMessage = `⚔️ Daily ${tier.toUpperCase()} Tribute claimed: +${goldReward} Gold, +${dustReward} Dust, +1 ${shieldType} Void Aegis Shield!`;
+      responseData = { goldReward, dustReward, shieldType };
+    } else if (action === 'activate_shield') {
+      const { shieldType } = payload || {};
+      if (!shieldType || !['3h', '6h', '12h'].includes(shieldType)) {
+        return res.status(400).json({ error: 'Invalid shield type.' });
+      }
+
+      profile.shieldsInventory = profile.shieldsInventory || { '3h': 0, '6h': 0, '12h': 0 };
+      const count = profile.shieldsInventory[shieldType] || 0;
+      if (count < 1) {
+        return res.status(400).json({ error: `You do not have any ${shieldType} Void Shields in your inventory.` });
+      }
+
+      profile.shieldsInventory[shieldType] = count - 1;
+      const hours = shieldType === '12h' ? 12 : shieldType === '6h' ? 6 : 3;
+      const durationMs = hours * 3600 * 1000;
+
+      profile.activeShieldUntil = Math.max(Date.now(), profile.activeShieldUntil || 0) + durationMs;
+
+      successMessage = `🛡️ Void Aegis activated! Your territory is immune to Arena attacks for ${hours} hours.`;
+      responseData = { activeShieldUntil: profile.activeShieldUntil };
+    } else if (action === 'buy_shield') {
+      const { shieldType } = payload || {};
+      if (!shieldType || !['3h', '6h', '12h'].includes(shieldType)) {
+        return res.status(400).json({ error: 'Invalid shield type.' });
+      }
+
+      const SHIELD_PRICES: Record<string, number> = {
+        '3h': 8,
+        '6h': 15,
+        '12h': 25
+      };
+
+      const cost = SHIELD_PRICES[shieldType];
+      if ((profile.darkShards || 0) < cost) {
+        return res.status(400).json({ error: `Insufficient Dark Shards! Need ${cost} Shards, you have ${profile.darkShards || 0}.` });
+      }
+
+      profile.darkShards = (profile.darkShards || 0) - cost;
+      profile.shieldsInventory = profile.shieldsInventory || { '3h': 0, '6h': 0, '12h': 0 };
+      profile.shieldsInventory[shieldType] = (profile.shieldsInventory[shieldType] || 0) + 1;
+
+      profile = recordShardTransaction(
+        profile,
+        'BUY_SHIELD',
+        -cost,
+        `Purchased ${shieldType} Void Aegis for ${cost} Dark Shards`,
+        { shieldType, cost }
+      );
+
+      successMessage = `🛡️ Purchased 1x ${shieldType} Void Aegis Shield!`;
+      responseData = { shieldsInventory: profile.shieldsInventory, darkShards: profile.darkShards };
     } else {
       return res.status(400).json({ error: 'Unknown action' });
     }

@@ -5,7 +5,7 @@ const jwt = (jwtPkg as any).default || jwtPkg;
 import { createClient } from '@supabase/supabase-js';
 import { PlayerProfile, CardTemplate } from './_shared/types.js';
 import { generateCampaignStage, createCardInstance } from './_shared/cards.js';
-import { calculateEnergy, processExpGain } from './_shared/energyHelper.js';
+import { calculateEnergy, processExpGain, getActiveSubscriptionTier } from './_shared/energyHelper.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
@@ -134,8 +134,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let expReward = 0;
     let shardsReward = 0;
     let cardRewardStr = '';
+    let sovereignsReward = 0;
 
+    const subTier = getActiveSubscriptionTier(profile);
     let goldMultiplier = 1;
+    if (subTier === 'ultra') {
+      goldMultiplier += 0.50; // +50% Gold drop
+    } else if (subTier === 'premium') {
+      goldMultiplier += 0.25; // +25% Gold drop
+    }
+
     let expMultiplier = 1;
     if (profile.equipped && profile.equipment) {
       Object.values(profile.equipped).forEach(eqId => {
@@ -213,6 +221,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         attackerLPChange = 20;
         defenderLPChange = -15;
+
+        // Sovereigns reward for subscribers
+        const todayUtc = new Date().toISOString().slice(0, 10);
+        if (profile.lastSovereignsWonDate !== todayUtc) {
+          profile.dailySovereignsWonToday = 0;
+          profile.lastSovereignsWonDate = todayUtc;
+        }
+
+        const currentWonToday = profile.dailySovereignsWonToday || 0;
+        if (subTier === 'ultra') {
+          const cap = 24;
+          if (currentWonToday < cap) {
+            sovereignsReward = Math.min(2, cap - currentWonToday);
+            profile.dailySovereignsWonToday = currentWonToday + sovereignsReward;
+            profile.bloodSovereigns = (profile.bloodSovereigns || 0) + sovereignsReward;
+          }
+        } else if (subTier === 'premium') {
+          const cap = 10;
+          if (currentWonToday < cap) {
+            sovereignsReward = Math.min(1, cap - currentWonToday);
+            profile.dailySovereignsWonToday = currentWonToday + sovereignsReward;
+            profile.bloodSovereigns = (profile.bloodSovereigns || 0) + sovereignsReward;
+          }
+        }
       } else {
         goldReward = Math.floor(50 * goldMultiplier);
         dustReward = 5;
@@ -271,8 +303,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const rDefBefore = defProfile.pvpRating || 1000;
             const lpDefBefore = defProfile.pvpLP !== undefined ? defProfile.pvpLP : 0;
 
-            defProfile.pvpRating = Math.max(0, rDefBefore + defenderRatingChange);
-            defProfile.pvpLP = Math.max(0, lpDefBefore + defenderLPChange);
+            const isDefShielded = defProfile.activeShieldUntil && defProfile.activeShieldUntil > Date.now();
+            const actualDefRatingChange = isDefShielded ? 0 : defenderRatingChange;
+            const actualDefLPChange = isDefShielded ? 0 : defenderLPChange;
+
+            defProfile.pvpRating = Math.max(0, rDefBefore + actualDefRatingChange);
+            defProfile.pvpLP = Math.max(0, lpDefBefore + actualDefLPChange);
 
             const defenderRecord = {
               id: recordId,
@@ -285,12 +321,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               attackerRatingBefore: rPlayer,
               defenderRatingBefore: rDefBefore,
               attackerRatingChange: attackerRatingChange,
-              defenderRatingChange: defenderRatingChange,
+              defenderRatingChange: actualDefRatingChange,
               attackerLPBefore: lpPlayer,
               defenderLPBefore: lpDefBefore,
               attackerLPChange: attackerLPChange,
-              defenderLPChange: defenderLPChange,
-              isDefense: true
+              defenderLPChange: actualDefLPChange,
+              isDefense: true,
+              wasShielded: !!isDefShielded
             };
 
             defProfile.pvpHistory = [defenderRecord, ...(defProfile.pvpHistory || [])].slice(0, 30);
@@ -342,6 +379,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       dustReward,
       expReward,
       shardsReward,
+      sovereignsReward: sovereignsReward || 0,
       cardReward: cardRewardStr || undefined,
       leveledUp: levelUpInfo.leveledUp,
       newLevel: levelUpInfo.newLevel

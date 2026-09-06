@@ -112,6 +112,13 @@ export interface PlayerProfile {
   talents?: Record<string, number>;
   activeStance?: string; // slot -> equipment id
   isPremiumBP?: boolean;
+  subscriptionTier?: 'free' | 'premium' | 'ultra';
+  subscriptionExpiresAt?: number; // timestamp ms
+  lastDailySubscriptionClaim?: string; // YYYY-MM-DD
+  shieldsInventory?: { '3h': number; '6h': number; '12h'?: number };
+  activeShieldUntil?: number; // timestamp ms
+  dailySovereignsWonToday?: number;
+  lastSovereignsWonDate?: string; // YYYY-MM-DD
   username?: string;
   isRegistered?: boolean;
   withdrawalRequests?: any[];
@@ -122,7 +129,7 @@ export interface PlayerProfile {
 export interface ShardTransaction {
   id: string;
   timestamp: string; // ISO 8601
-  action: 'BUY_PVE_ENERGY' | 'BUY_ARENA_TICKETS' | 'SUMMON_GACHA' | 'FUSION_TIER_ASCENSION' | 'PURCHASE_EQUIPMENT' | 'ADMIN_ADJUSTMENT' | 'MAIL_CLAIM' | 'SHOP_PURCHASE';
+  action: 'BUY_PVE_ENERGY' | 'BUY_ARENA_TICKETS' | 'SUMMON_GACHA' | 'FUSION_TIER_ASCENSION' | 'PURCHASE_EQUIPMENT' | 'ADMIN_ADJUSTMENT' | 'MAIL_CLAIM' | 'SHOP_PURCHASE' | 'BUY_SUBSCRIPTION' | 'BUY_SHIELD';
   shardsChange: number; // e.g. -50 or +100
   shardsBefore: number;
   shardsAfter: number;

@@ -1,25 +1,50 @@
 import { PlayerProfile } from '../types';
 
+export function getActiveSubscriptionTier(profile: PlayerProfile): 'free' | 'premium' | 'ultra' {
+  if (!profile || !profile.subscriptionExpiresAt) return 'free';
+  if (profile.subscriptionExpiresAt <= Date.now()) return 'free';
+  return profile.subscriptionTier || 'free';
+}
+
+export function getTierLimits(tier: 'free' | 'premium' | 'ultra') {
+  if (tier === 'ultra') {
+    return {
+      pveMax: 20,
+      pveRegenInterval: 20 * 60 * 1000, // 20 minutes
+      pvpMax: 12
+    };
+  }
+  if (tier === 'premium') {
+    return {
+      pveMax: 10,
+      pveRegenInterval: 30 * 60 * 1000, // 30 minutes
+      pvpMax: 8
+    };
+  }
+  return {
+    pveMax: 5,
+    pveRegenInterval: 40 * 60 * 1000, // 40 minutes
+    pvpMax: 5
+  };
+}
+
 export function calculateEnergy(profile: PlayerProfile): PlayerProfile {
   if (!profile) return profile;
   
   const now = Date.now();
-  const pveMax = profile.pveEnergyMax || 10;
-  const pvpMax = profile.pvpEnergyMax || 5;
+  const tier = getActiveSubscriptionTier(profile);
+  const limits = getTierLimits(tier);
+  const pveMax = limits.pveMax;
+  const pvpMax = limits.pvpMax;
+  const pveRegenInterval = limits.pveRegenInterval;
   
   const lastPve = profile.lastPveEnergyRefill ?? profile.lastEnergyRefill ?? now;
   const lastPvp = profile.lastPvpEnergyRefill ?? profile.lastEnergyRefill ?? now;
   
-  const pveRegenInterval = 20 * 60 * 1000; // 20 minutes (1200000 ms)
-  const pvpRegenInterval = 15 * 60 * 1000; // 15 minutes (900000 ms)
-  
   const timePassedPve = Math.max(0, now - lastPve);
-  const timePassedPvp = Math.max(0, now - lastPvp);
   
   let currentPve = profile.pveEnergy !== undefined ? profile.pveEnergy : pveMax;
-  let currentPvp = profile.pvpEnergy !== undefined ? profile.pvpEnergy : pvpMax;
   let newLastPve = lastPve;
-  let newLastPvp = lastPvp;
   
   if (currentPve >= pveMax) {
     newLastPve = now;
@@ -30,23 +55,23 @@ export function calculateEnergy(profile: PlayerProfile): PlayerProfile {
   }
   
   // PVP TICKET NORMALIZATION & RESERVE MIGRATION
-  let dailyEnergy = profile.pvpEnergy !== undefined ? profile.pvpEnergy : 5;
+  let dailyEnergy = profile.pvpEnergy !== undefined ? profile.pvpEnergy : pvpMax;
   let bonusTickets = profile.pvpBonusTickets !== undefined ? profile.pvpBonusTickets : 0;
 
-  // If pvpEnergy exceeded 5 (due to legacy tickets), safely migrate excess to bonusTickets
-  if (dailyEnergy > 5) {
-    bonusTickets += (dailyEnergy - 5);
-    dailyEnergy = 5;
+  // If pvpEnergy exceeded pvpMax (due to subscription tier change or legacy), safely migrate excess to bonusTickets
+  if (dailyEnergy > pvpMax) {
+    bonusTickets += (dailyEnergy - pvpMax);
+    dailyEnergy = pvpMax;
   }
 
-  // Ensure dailyEnergy is strictly bounded [0, 5]
-  dailyEnergy = Math.max(0, Math.min(5, dailyEnergy));
+  // Ensure dailyEnergy is strictly bounded [0, pvpMax]
+  dailyEnergy = Math.max(0, Math.min(pvpMax, dailyEnergy));
   bonusTickets = Math.max(0, bonusTickets);
 
   profile.pveEnergy = currentPve;
   profile.pveEnergyMax = pveMax;
   profile.pvpEnergy = dailyEnergy;
-  profile.pvpEnergyMax = 5;
+  profile.pvpEnergyMax = pvpMax;
   profile.pvpBonusTickets = bonusTickets;
   profile.pvpTickets = dailyEnergy + bonusTickets;
   profile.lastPveEnergyRefill = newLastPve;

@@ -8,12 +8,13 @@ import { CampaignView } from './components/CampaignView';
 import { CollectionDeckView } from './components/CollectionDeckView';
 import { GachaStoreView } from './components/GachaStoreView';
 import { BankView } from './components/BankView';
+import { PremiumPassView } from './components/PremiumPassView';
 import { BattleFieldView } from './components/BattleFieldView';
 import { PvpArenaView } from './components/PvpArenaView';
 import { HeroInventoryView } from './components/HeroInventoryView';
 import { TalentsView } from './components/TalentsView';
 import { CampaignStage } from './types';
-import { Swords, FolderGit, Sparkles, Landmark, Award, Trophy, UserCircle2, Store } from 'lucide-react';
+import { Swords, FolderGit, Sparkles, Landmark, Award, Trophy, UserCircle2, Store, Crown, Flame } from 'lucide-react';
 import { AIRDROP_TASKS } from './data/cards';
 import { LandingPage } from './components/LandingPage';
 import { RegistrationScreen } from './components/RegistrationScreen';
@@ -45,7 +46,7 @@ function MainAppContent() {
   }, [profile?.deck, profile?.collection]);
 
   // Tab states
-  const [activeTab, setActiveTab] = useState<'campaign' | 'pvp' | 'collection' | 'hero' | 'talents' | 'altar' | 'bank'>('campaign');
+  const [activeTab, setActiveTab] = useState<'campaign' | 'pvp' | 'collection' | 'hero' | 'talents' | 'altar' | 'bank' | 'premium'>('campaign');
   const [shopInitialTab, setShopInitialTab] = useState<'cards' | 'equipment' | 'divine'>('cards');
   
   // Active Battle stage state
@@ -315,6 +316,10 @@ function MainAppContent() {
             <div className={activeTab === 'bank' ? 'block' : 'hidden'}>
               <BankView />
             </div>
+
+            <div className={activeTab === 'premium' ? 'block' : 'hidden'}>
+              <PremiumPassView />
+            </div>
           </div>
       </div>
 
@@ -387,6 +392,24 @@ function MainAppContent() {
           >
             <Store className="w-5 h-5 text-purple-400" />
             <span className="text-[10px] font-display font-bold tracking-wider text-purple-300">SHOP</span>
+          </button>
+
+          {/* Premium / VIP Pass Tab */}
+          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('premium'); }}
+            className={`relative flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95 ${
+              activeTab === 'premium'
+                ? 'bg-gradient-to-b from-amber-500/20 via-yellow-500/10 to-black/60 border border-yellow-400/60 shadow-[0_0_16px_rgba(250,204,21,0.4)]'
+                : 'hover:opacity-100 opacity-90'
+            }`}
+          >
+            <Crown className="w-5 h-5 text-yellow-300 drop-shadow-[0_0_8px_rgba(250,204,21,0.7)] animate-pulse" />
+            <span className="text-[10px] font-display font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-amber-300 to-yellow-400">
+              PREMIUM
+            </span>
+            <span className="absolute -top-1.5 -right-1 flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400 shadow-[0_0_6px_rgba(250,204,21,0.9)]"></span>
+            </span>
           </button>
 
           {/* Bank / Treasury Tab */}

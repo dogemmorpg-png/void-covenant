@@ -136,6 +136,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const realPlayers = rows
         .filter(r => r.data && r.data.username && r.data.username.trim() !== '')
         .filter(r => (r.data.pvpLeague || 'Bronze') === playerLeague)
+        .filter(r => !(r.data.activeShieldUntil && r.data.activeShieldUntil > Date.now()))
         .map(r => {
           const data = r.data;
           

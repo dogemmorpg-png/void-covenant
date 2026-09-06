@@ -178,14 +178,54 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
               )}
             </button>
 
-            <div className="flex items-center gap-2">
-              {profile.avatarUrl && (
-                <img src={profile.avatarUrl} alt="Avatar" className="w-8 h-8 rounded-full border border-white/20 object-cover shadow-[0_0_10px_rgba(255,255,255,0.1)]" />
-              )}
-              <span className="font-display font-bold text-white text-sm text-shadow-gold tracking-wide">
-                {profile.username || 'Voidwalker'}
-              </span>
-            </div>
+            {(() => {
+              const isSubActive = profile.subscriptionExpiresAt && profile.subscriptionExpiresAt > Date.now();
+              const tier = isSubActive ? (profile.subscriptionTier || 'free') : 'free';
+              return (
+                <div 
+                  onClick={() => {
+                    if (onNavigateTab) onNavigateTab('premium');
+                  }}
+                  className="flex items-center gap-2 cursor-pointer group" 
+                  title={tier === 'ultra' ? 'Ultra Overlord Pass Active' : tier === 'premium' ? 'Premium Sovereign Pass Active' : 'Click to view Pass Privileges'}
+                >
+                  <div className="relative">
+                    {profile.avatarUrl && (
+                      <img 
+                        src={profile.avatarUrl} 
+                        alt="Avatar" 
+                        className={`w-8 h-8 rounded-full object-cover transition-all duration-300 group-hover:scale-105 ${
+                          tier === 'ultra'
+                            ? 'ring-2 ring-purple-500 shadow-[0_0_14px_rgba(168,85,247,0.8)] border border-rose-400'
+                            : tier === 'premium'
+                            ? 'ring-2 ring-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.7)] border border-yellow-200'
+                            : 'border border-white/20 shadow-[0_0_10px_rgba(255,255,255,0.1)]'
+                        }`} 
+                      />
+                    )}
+                    {tier === 'ultra' && (
+                      <span className="absolute -top-2 -right-1 text-xs select-none filter drop-shadow-[0_0_4px_rgba(168,85,247,0.9)] animate-pulse">
+                        👑
+                      </span>
+                    )}
+                    {tier === 'premium' && (
+                      <span className="absolute -top-1.5 -right-1 text-[10px] select-none filter drop-shadow-[0_0_4px_rgba(245,158,11,0.9)]">
+                        ⚜️
+                      </span>
+                    )}
+                  </div>
+                  <span className={`font-display text-sm tracking-wide transition-colors ${
+                    tier === 'ultra'
+                      ? 'font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-rose-300 to-amber-300 group-hover:brightness-125'
+                      : tier === 'premium'
+                      ? 'font-black text-amber-300 group-hover:text-amber-200 text-shadow-gold'
+                      : 'font-bold text-white group-hover:text-amber-300 text-shadow-gold'
+                  }`}>
+                    {profile.username || 'Voidwalker'}
+                  </span>
+                </div>
+              );
+            })()}
 
             {isAdmin && (
               <button
