@@ -452,75 +452,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const setupPlaybackState = (playedCardId: string | null, playedSlotIndex: number | null, steps: any[]) => {
     const playState = JSON.parse(JSON.stringify(battle)) as BattleState;
 
-    // 1. Player play card logic with Sacrifice visual sync
-    if (playedCardId && playedSlotIndex !== null) {
-      const cardIndex = playState.playerHand.findIndex(c => c.id === playedCardId);
-      if (cardIndex !== -1) {
-        const card = playState.playerHand[cardIndex];
-        const bCard = toBattleCard(card);
-        
-        const sacrificeSkill = bCard.skills.find(s => s.type === 'sacrifice');
-        const activeAlliesCount = playState.playerBoard.filter(c => c !== null && !c.isDead).length;
-        
-        if (sacrificeSkill && activeAlliesCount > 0) {
-          const sacStep = steps.find(s => s.type === 'sacrifice');
-          if (sacStep) {
-            const targetSlot = sacStep.targetSlot;
-            const sacrificedCard = playState.playerBoard[targetSlot];
-            if (sacrificedCard) {
-              sacrificedCard.isDead = true;
-              playState.playerBoard[targetSlot] = null;
-            }
-            playState.playerHeroHealth = Math.min(playState.playerHeroMaxHealth, playState.playerHeroHealth + sacrificeSkill.value);
-            bCard.attack += Math.round(sacrificeSkill.value / 2);
-            bCard.health += sacrificeSkill.value;
-            bCard.maxHealth += sacrificeSkill.value;
-          }
-        }
-        
-        if (playState.playerCreatureBuff && (playState.playerCreatureBuff.atk > 0 || playState.playerCreatureBuff.hp > 0)) {
-          bCard.attack += playState.playerCreatureBuff.atk;
-          bCard.health += playState.playerCreatureBuff.hp;
-          bCard.maxHealth += playState.playerCreatureBuff.hp;
-        }
-
-        playState.playerBoard[playedSlotIndex] = bCard;
-        playState.playerHand.splice(cardIndex, 1);
-      }
-    }
-
-    // 2. Enemy plays card logic
-    const enemyPlayStep = steps.find(s => s.type === 'enemy_play');
-    if (enemyPlayStep) {
-      const enemyCard = JSON.parse(JSON.stringify(enemyPlayStep.card)) as BattleCardState;
-      
-      const enemySacSkill = enemyCard.skills.find(s => s.type === 'sacrifice');
-      const enemyAlliesCount = playState.enemyBoard.filter(c => c !== null && !c.isDead).length;
-      if (enemySacSkill && enemyAlliesCount > 0) {
-        const enemyActiveSlots: number[] = [];
-        playState.enemyBoard.forEach((c, idx) => {
-          if (c && !c.isDead) enemyActiveSlots.push(idx);
-        });
-        if (enemyActiveSlots.length > 0) {
-          const randSlot = enemyActiveSlots[0];
-          const sacrCard = playState.enemyBoard[randSlot];
-          if (sacrCard) {
-            sacrCard.isDead = true;
-            playState.enemyBoard[randSlot] = null;
-          }
-          playState.enemyHeroHealth = Math.min(playState.enemyHeroMaxHealth, playState.enemyHeroHealth + enemySacSkill.value);
-          enemyCard.attack += Math.round(enemySacSkill.value / 2);
-          enemyCard.health += enemySacSkill.value;
-          enemyCard.maxHealth += enemySacSkill.value;
-        }
-      }
-      
-      playState.enemyBoard[enemyPlayStep.slot] = enemyCard;
-      playState.enemyHand.shift();
-      playState.enemyDeckSize = playState.enemyHand.length;
-    }
-
-    // 3. Decrement Delays visually
+    // 1. Decrement Delays visually for creatures currently on the board
     for (let i = 0; i < 5; i++) {
       const pCard = playState.playerBoard[i];
       const eCard = playState.enemyBoard[i];
@@ -547,298 +479,413 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     let stepDescription = '';
 
     const stepDuration = 1100 / speedMultiplier;
+    const impactDelay = 220 / speedMultiplier;
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
 
-    setVisualState(prev => {
-      const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
-      
-      switch (step.type) {
-        case 'sacrifice': {
-          const placingCard = copy.playerBoard[step.slot];
-          const sacrCard = copy.playerBoard[step.targetSlot];
-          
-          stepDescription = `💀 Sacrifice: ${placingCard?.name || 'Card'} destroys ${sacrCard?.name || 'ally'}`;
-          
+    switch (step.type) {
+      case 'sacrifice': {
+        const placingCard = visualState.playerBoard[step.slot];
+        const sacrCard = visualState.playerBoard[step.targetSlot];
+        
+        stepDescription = `💀 Sacrifice: ${placingCard?.name || 'Card'} destroys ${sacrCard?.name || 'ally'}`;
+        
+        audioSystem.playHeal();
+        setAnimatingSlot({ side: 'player', slot: step.slot, type: 'heal' });
+        addFloatingText('💀 SACRIFICE', { side: 'player', slot: step.targetSlot }, 'text-red-500 font-bold scale-110');
+        addFloatingText(`+${step.healAmount} HP 💚`, 'player-hero', 'text-emerald-400 font-black text-sm');
+        addFloatingText(`+${step.buffAttack}⚔️ +${step.buffHealth}❤️`, { side: 'player', slot: step.slot }, 'text-yellow-400 font-bold');
+
+        setVisualState(prev => {
+          const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
           copy.playerBoard[step.targetSlot] = null;
-          if (placingCard) {
-            placingCard.attack += step.buffAttack;
-            placingCard.health += step.buffHealth;
-            placingCard.maxHealth += step.buffHealth;
+          const card = copy.playerBoard[step.slot];
+          if (card) {
+            card.attack += step.buffAttack;
+            card.health += step.buffHealth;
+            card.maxHealth += step.buffHealth;
           }
           copy.playerHeroHealth = Math.min(copy.playerHeroMaxHealth, copy.playerHeroHealth + step.healAmount);
+          return copy;
+        });
+        break;
+      }
 
-          audioSystem.playHeal();
-          setAnimatingSlot({ side: 'player', slot: step.slot, type: 'heal' });
-          addFloatingText('💀 SACRIFICE', { side: 'player', slot: step.targetSlot }, 'text-red-500 font-bold scale-110');
-          addFloatingText(`+${step.healAmount} HP 💚`, 'player-hero', 'text-emerald-400 font-black text-sm');
-          addFloatingText(`+${step.buffAttack}⚔️ +${step.buffHealth}❤️`, { side: 'player', slot: step.slot }, 'text-yellow-400 font-bold');
-          break;
-        }
+      case 'enemy_play': {
+        stepDescription = `😈 Dark Summon: Lord summons ${step.card.name}`;
+        
+        audioSystem.playPlace();
+        setAnimatingSlot({ side: 'enemy', slot: step.slot, type: 'heal' });
+        addFloatingText('SUMMON', { side: 'enemy', slot: step.slot }, 'text-[#ebd09b] font-bold tracking-widest');
 
-        case 'enemy_play': {
-          stepDescription = `😈 Dark Summon: Lord summons ${step.card.name}`;
+        setVisualState(prev => {
+          const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
           copy.enemyBoard[step.slot] = step.card;
+          if (copy.enemyHand.length > 0) {
+            copy.enemyHand.shift();
+          }
+          copy.enemyDeckSize = copy.enemyHand.length;
+          return copy;
+        });
+        break;
+      }
 
-          audioSystem.playPlace();
-          setAnimatingSlot({ side: 'enemy', slot: step.slot, type: 'heal' });
-          addFloatingText('SUMMON', { side: 'enemy', slot: step.slot }, 'text-[#ebd09b] font-bold tracking-widest');
-          break;
-        }
+      case 'attack': {
+        const attackerCard = step.attacker === 'player' ? visualState.playerBoard[step.slot] : visualState.enemyBoard[step.slot];
+        const defenderCard = step.attacker === 'player' ? visualState.enemyBoard[step.targetSlot] : visualState.playerBoard[step.targetSlot];
+        const defSide = step.attacker === 'player' ? 'enemy' : 'player';
+        
+        stepDescription = `🗡️ Duel: ${attackerCard?.name || 'Creature'} deals -${step.damage} damage to ${defenderCard?.name || 'Target'}`;
 
-        case 'attack': {
-          const attackerCard = step.attacker === 'player' ? copy.playerBoard[step.slot] : copy.enemyBoard[step.slot];
-          const defenderCard = step.attacker === 'player' ? copy.enemyBoard[step.targetSlot] : copy.playerBoard[step.targetSlot];
-          const defSide = step.attacker === 'player' ? 'enemy' : 'player';
-          
-          stepDescription = `🗡️ Duel: ${attackerCard?.name || 'Creature'} deals -${step.damage} damage to ${defenderCard?.name || 'Target'}`;
+        audioSystem.playAttack();
+        setAnimatingSlot({ side: step.attacker, slot: step.slot, type: 'strike' });
 
-          audioSystem.playAttack();
-          setAnimatingSlot({ side: step.attacker, slot: step.slot, type: 'strike' });
+        const tHit = setTimeout(() => {
+          setAnimatingSlot({ side: defSide, slot: step.targetSlot, type: 'hit' });
 
-          setTimeout(() => {
-            setAnimatingSlot({ side: defSide, slot: step.targetSlot, type: 'hit' });
-            
-            if (defenderCard) {
+          if (step.barrierBlocked) {
+            setBarrierShatterSlot({ side: defSide, slot: step.targetSlot });
+            const tBar = setTimeout(() => setBarrierShatterSlot(null), 850 / speedMultiplier);
+            timeouts.push(tBar);
+            addFloatingText('✨ BARRIER BLOCKED!', { side: defSide, slot: step.targetSlot }, 'text-amber-300 font-black text-xs scale-125 text-shadow-glow');
+          } else {
+            if (step.armorAbsorbed > 0) {
+              setArmorSparkSlot({ side: defSide, slot: step.targetSlot });
+              const tArm = setTimeout(() => setArmorSparkSlot(null), 500 / speedMultiplier);
+              timeouts.push(tArm);
+              addFloatingText(`🛡️ -${step.armorAbsorbed} ARMOR`, { side: defSide, slot: step.targetSlot }, 'text-cyan-300 font-black text-xs');
+            }
+            if (step.armorBroken) {
+              setArmorBreakSlot({ side: defSide, slot: step.targetSlot });
+              const tBrk = setTimeout(() => setArmorBreakSlot(null), 850 / speedMultiplier);
+              timeouts.push(tBrk);
+              addFloatingText('💥 ARMOR BROKEN!', { side: defSide, slot: step.targetSlot }, 'text-red-400 font-black text-xs scale-110');
+            }
+            if (step.damage > 0) {
+              addFloatingText(`-${step.damage}`, { side: defSide, slot: step.targetSlot }, 'text-red-500 font-black text-sm scale-125 text-shadow-glow');
+            }
+          }
+
+          if (step.vampireHeal > 0) {
+            addFloatingText(`+${step.vampireHeal} 🩸`, { side: step.attacker, slot: step.slot }, 'text-emerald-400 font-extrabold text-xs');
+          }
+
+          // Apply state update deterministically on impact
+          setVisualState(prev => {
+            const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+            const target = step.attacker === 'player' ? copy.enemyBoard[step.targetSlot] : copy.playerBoard[step.targetSlot];
+            const attacker = step.attacker === 'player' ? copy.playerBoard[step.slot] : copy.enemyBoard[step.slot];
+
+            if (target) {
               if (step.barrierBlocked) {
-                defenderCard.barrier = false;
-                defenderCard.ward = false;
-                setBarrierShatterSlot({ side: defSide, slot: step.targetSlot });
-                setTimeout(() => setBarrierShatterSlot(null), 850 / speedMultiplier);
-                addFloatingText('✨ BARRIER BLOCKED!', { side: defSide, slot: step.targetSlot }, 'text-amber-300 font-black text-xs scale-125 text-shadow-glow');
+                target.barrier = false;
+                target.ward = false;
               } else {
-                if (step.armorAbsorbed > 0) {
-                  defenderCard.armor = Math.max(0, (defenderCard.armor || 0) - step.armorAbsorbed);
-                  setArmorSparkSlot({ side: defSide, slot: step.targetSlot });
-                  setTimeout(() => setArmorSparkSlot(null), 500 / speedMultiplier);
-                  addFloatingText(`🛡️ -${step.armorAbsorbed} ARMOR`, { side: defSide, slot: step.targetSlot }, 'text-cyan-300 font-black text-xs');
-                }
                 if (step.armorBroken) {
-                  defenderCard.armor = 0;
-                  setArmorBreakSlot({ side: defSide, slot: step.targetSlot });
-                  setTimeout(() => setArmorBreakSlot(null), 850 / speedMultiplier);
-                  addFloatingText('💥 ARMOR BROKEN!', { side: defSide, slot: step.targetSlot }, 'text-red-400 font-black text-xs scale-110');
+                  target.armor = 0;
+                } else if (step.armorAbsorbed > 0) {
+                  target.armor = Math.max(0, (target.armor || 0) - step.armorAbsorbed);
                 }
-                if (step.damage > 0) {
-                  defenderCard.health = Math.max(0, defenderCard.health - step.damage);
-                  addFloatingText(`-${step.damage}`, { side: defSide, slot: step.targetSlot }, 'text-red-500 font-black text-sm scale-125 text-shadow-glow');
+                if (step.targetHealth !== undefined) {
+                  target.health = Math.max(0, step.targetHealth);
+                } else if (step.damage > 0) {
+                  target.health = Math.max(0, target.health - step.damage);
+                }
+                if (step.targetArmor !== undefined) {
+                  target.armor = step.targetArmor;
                 }
               }
             }
-            if (attackerCard && step.vampireHeal > 0) {
-              attackerCard.health = Math.min(attackerCard.maxHealth, attackerCard.health + step.vampireHeal);
-              addFloatingText(`+${step.vampireHeal} 🩸`, { side: step.attacker, slot: step.slot }, 'text-emerald-400 font-extrabold text-xs');
+
+            if (attacker) {
+              if (step.attackerHealth !== undefined) {
+                attacker.health = Math.min(attacker.maxHealth, step.attackerHealth);
+              } else if (step.vampireHeal > 0) {
+                attacker.health = Math.min(attacker.maxHealth, attacker.health + step.vampireHeal);
+              }
             }
-          }, 180 / speedMultiplier);
-          break;
-        }
 
-        case 'direct_attack': {
-          const attackerCard = step.attacker === 'player' ? copy.playerBoard[step.slot] : copy.enemyBoard[step.slot];
-          stepDescription = `💥 Breakthrough: ${attackerCard?.name || 'Creature'} deals -${step.damage} direct damage to Lord!`;
+            return copy;
+          });
+        }, impactDelay);
+        timeouts.push(tHit);
+        break;
+      }
 
-          setAnimatingSlot({ side: step.attacker, slot: step.slot, type: 'strike' });
+      case 'direct_attack': {
+        const attackerCard = step.attacker === 'player' ? visualState.playerBoard[step.slot] : visualState.enemyBoard[step.slot];
+        stepDescription = `💥 Breakthrough: ${attackerCard?.name || 'Creature'} deals -${step.damage} direct damage to Lord!`;
 
-          setTimeout(() => {
+        audioSystem.playAttack();
+        setAnimatingSlot({ side: step.attacker, slot: step.slot, type: 'strike' });
+
+        const tHit = setTimeout(() => {
+          const targetHeroSide = step.attacker === 'player' ? 'enemy' : 'player';
+          const targetHeroLabel = step.attacker === 'player' ? 'enemy-hero' : 'player-hero';
+
+          setAnimatingSlot({ side: targetHeroSide, slot: -1, type: 'hit' });
+          addFloatingText('BREAKTHROUGH! ⚡', { side: step.attacker, slot: step.slot }, 'text-amber-300 font-black text-xs scale-110');
+          addFloatingText(`💥 -${step.damage}`, targetHeroLabel, 'text-red-500 font-black text-xl scale-125 text-shadow-glow');
+
+          setVisualState(prev => {
+            const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
             if (step.attacker === 'player') {
-              copy.enemyHeroHealth = Math.max(0, copy.enemyHeroHealth - step.damage);
-              addFloatingText(`-${step.damage} 💥`, 'enemy-hero', 'text-red-500 font-black text-xl scale-125 text-shadow-glow');
+              copy.enemyHeroHealth = step.enemyHeroHealth !== undefined 
+                ? step.enemyHeroHealth 
+                : Math.max(0, copy.enemyHeroHealth - step.damage);
             } else {
-              copy.playerHeroHealth = Math.max(0, copy.playerHeroHealth - step.damage);
-              addFloatingText(`-${step.damage} 💥`, 'player-hero', 'text-red-500 font-black text-xl scale-125 text-shadow-glow');
+              copy.playerHeroHealth = step.playerHeroHealth !== undefined 
+                ? step.playerHeroHealth 
+                : Math.max(0, copy.playerHeroHealth - step.damage);
             }
-          }, 180 / speedMultiplier);
-          break;
-        }
+            return copy;
+          });
+        }, impactDelay);
+        timeouts.push(tHit);
+        break;
+      }
 
-        case 'hero_skill': {
-          const casterSide = step.side || 'player';
-          const isPlayerCaster = casterSide === 'player';
-          const targetSide = isPlayerCaster
-            ? (step.stance === 'void_strike' ? 'enemy' : 'player')
-            : (step.stance === 'void_strike' ? 'player' : 'enemy');
-            
-          const targetBoard = targetSide === 'player' ? copy.playerBoard : copy.enemyBoard;
-          const cardName = targetBoard[step.targetSlot]?.name;
-          const casterHeroLabel = isPlayerCaster ? 'player-hero' : 'enemy-hero';
-          const targetHeroLabel = isPlayerCaster ? 'enemy-hero' : 'player-hero';
+      case 'hero_skill': {
+        const casterSide = step.side || 'player';
+        const isPlayerCaster = casterSide === 'player';
+        const targetSide = isPlayerCaster
+          ? (step.stance === 'void_strike' ? 'enemy' : 'player')
+          : (step.stance === 'void_strike' ? 'player' : 'enemy');
+          
+        const targetBoard = targetSide === 'player' ? visualState.playerBoard : visualState.enemyBoard;
+        const cardName = targetBoard[step.targetSlot]?.name;
+        const casterHeroLabel = isPlayerCaster ? 'player-hero' : 'enemy-hero';
+        const targetHeroLabel = isPlayerCaster ? 'enemy-hero' : 'player-hero';
 
-          if (step.stance === 'void_strike') {
-            audioSystem.playAttack();
-            if (step.targetSlot === -1) {
-              stepDescription = `⚡ Void Strike: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} deals -${step.damage} damage to ${isPlayerCaster ? 'Enemy' : 'Player'} Lord directly!`;
+        if (step.stance === 'void_strike') {
+          audioSystem.playAttack();
+          if (step.targetSlot === -1) {
+            stepDescription = `⚡ Void Strike: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} deals -${step.damage} damage to ${isPlayerCaster ? 'Enemy' : 'Player'} Lord directly!`;
+            const tHit = setTimeout(() => {
               setAnimatingSlot({ side: targetSide, slot: -1, type: 'hit' });
-              setTimeout(() => {
+              addFloatingText(`⚡ -${step.damage}`, targetHeroLabel, 'text-cyan-400 font-black text-lg scale-125 text-shadow-glow');
+              addFloatingText('VOID STRIKE ⚡', casterHeroLabel, 'text-cyan-400 font-bold text-xs');
+              
+              setVisualState(prev => {
+                const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
                 if (targetSide === 'player') {
                   copy.playerHeroHealth = Math.max(0, copy.playerHeroHealth - step.damage);
                 } else {
                   copy.enemyHeroHealth = Math.max(0, copy.enemyHeroHealth - step.damage);
                 }
-                addFloatingText(`⚡ -${step.damage}`, targetHeroLabel, 'text-cyan-400 font-black text-lg scale-125 text-shadow-glow');
-                addFloatingText('VOID STRIKE ⚡', casterHeroLabel, 'text-cyan-400 font-bold text-xs');
-              }, 180 / speedMultiplier);
-            } else {
-              stepDescription = `⚡ Void Strike: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} deals -${step.damage} damage to ${cardName || 'target'}`;
+                return copy;
+              });
+            }, impactDelay);
+            timeouts.push(tHit);
+          } else {
+            stepDescription = `⚡ Void Strike: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} deals -${step.damage} damage to ${cardName || 'target'}`;
+            const tHit = setTimeout(() => {
               setAnimatingSlot({ side: targetSide, slot: step.targetSlot, type: 'hit' });
-              setTimeout(() => {
-                const target = targetBoard[step.targetSlot];
+              
+              if (step.barrierBlocked) {
+                setBarrierShatterSlot({ side: targetSide, slot: step.targetSlot });
+                const tBar = setTimeout(() => setBarrierShatterSlot(null), 850 / speedMultiplier);
+                timeouts.push(tBar);
+                addFloatingText('✨ BARRIER BLOCKED!', { side: targetSide, slot: step.targetSlot }, 'text-amber-300 font-black text-xs scale-125 text-shadow-glow');
+              } else {
+                if (step.armorAbsorbed > 0) {
+                  setArmorSparkSlot({ side: targetSide, slot: step.targetSlot });
+                  const tArm = setTimeout(() => setArmorSparkSlot(null), 500 / speedMultiplier);
+                  timeouts.push(tArm);
+                  addFloatingText(`🛡️ -${step.armorAbsorbed} ARMOR`, { side: targetSide, slot: step.targetSlot }, 'text-cyan-300 font-black text-xs');
+                }
+                if (step.armorBroken) {
+                  setArmorBreakSlot({ side: targetSide, slot: step.targetSlot });
+                  const tBrk = setTimeout(() => setArmorBreakSlot(null), 850 / speedMultiplier);
+                  timeouts.push(tBrk);
+                  addFloatingText('💥 ARMOR BROKEN!', { side: targetSide, slot: step.targetSlot }, 'text-red-400 font-black text-xs');
+                }
+                if (step.damage > 0) {
+                  addFloatingText(`⚡ -${step.damage}`, { side: targetSide, slot: step.targetSlot }, 'text-cyan-400 font-black text-sm scale-125');
+                }
+              }
+              addFloatingText('VOID STRIKE ⚡', casterHeroLabel, 'text-cyan-400 font-bold text-xs');
+
+              setVisualState(prev => {
+                const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+                const target = targetSide === 'player' ? copy.playerBoard[step.targetSlot] : copy.enemyBoard[step.targetSlot];
                 if (target) {
                   if (step.barrierBlocked) {
                     target.barrier = false;
                     target.ward = false;
-                    setBarrierShatterSlot({ side: targetSide, slot: step.targetSlot });
-                    setTimeout(() => setBarrierShatterSlot(null), 850 / speedMultiplier);
-                    addFloatingText('✨ BARRIER BLOCKED!', { side: targetSide, slot: step.targetSlot }, 'text-amber-300 font-black text-xs scale-125 text-shadow-glow');
                   } else {
-                    if (step.armorAbsorbed > 0) {
-                      target.armor = Math.max(0, (target.armor || 0) - step.armorAbsorbed);
-                      setArmorSparkSlot({ side: targetSide, slot: step.targetSlot });
-                      setTimeout(() => setArmorSparkSlot(null), 500 / speedMultiplier);
-                      addFloatingText(`🛡️ -${step.armorAbsorbed} ARMOR`, { side: targetSide, slot: step.targetSlot }, 'text-cyan-300 font-black text-xs');
-                    }
-                    if (step.armorBroken) {
-                      target.armor = 0;
-                      setArmorBreakSlot({ side: targetSide, slot: step.targetSlot });
-                      setTimeout(() => setArmorBreakSlot(null), 850 / speedMultiplier);
-                      addFloatingText('💥 ARMOR BROKEN!', { side: targetSide, slot: step.targetSlot }, 'text-red-400 font-black text-xs');
-                    }
-                    target.health = Math.max(0, target.health - step.damage);
-                    if (step.damage > 0) {
-                      addFloatingText(`⚡ -${step.damage}`, { side: targetSide, slot: step.targetSlot }, 'text-cyan-400 font-black text-sm scale-125');
-                    }
+                    if (step.armorBroken) target.armor = 0;
+                    else if (step.armorAbsorbed > 0) target.armor = Math.max(0, (target.armor || 0) - step.armorAbsorbed);
+                    if (step.targetHealth !== undefined) target.health = Math.max(0, step.targetHealth);
+                    else target.health = Math.max(0, target.health - step.damage);
                   }
                 }
-                addFloatingText('VOID STRIKE ⚡', casterHeroLabel, 'text-cyan-400 font-bold text-xs');
-              }, 180 / speedMultiplier);
-            }
-          } else if (step.stance === 'blood_aura') {
-            audioSystem.playHeal();
-            if (step.targetSlot === -1) {
-              stepDescription = `🩸 Blood Aura: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} heals directly for +${step.heal} HP`;
-              setAnimatingSlot({ side: targetSide, slot: -1, type: 'heal' });
-              setTimeout(() => {
-                if (targetSide === 'player') {
-                  copy.playerHeroHealth = Math.min(copy.playerHeroMaxHealth, copy.playerHeroHealth + step.heal);
-                } else {
-                  copy.enemyHeroHealth = Math.min(copy.enemyHeroMaxHealth, copy.enemyHeroHealth + step.heal);
-                }
-                addFloatingText(`🩸 +${step.heal}`, targetHeroLabel, 'text-emerald-400 font-bold');
-                addFloatingText('BLOOD AURA 🩸', casterHeroLabel, 'text-rose-400 font-bold text-xs');
-              }, 180 / speedMultiplier);
-            } else {
-              stepDescription = `🩸 Blood Aura: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} heals ${cardName || 'ally'} for +${step.heal} HP`;
-              setAnimatingSlot({ side: targetSide, slot: step.targetSlot, type: 'heal' });
-              setTimeout(() => {
-                const target = targetBoard[step.targetSlot];
-                if (target) {
-                  target.health = Math.min(target.maxHealth, target.health + step.heal);
-                  if (step.barrier || step.ward) {
-                    target.barrier = true;
-                    target.ward = true;
-                  }
-                  if (step.bonusMaxHp > 0) {
-                    target.maxHealth += step.bonusMaxHp;
-                    target.health += step.bonusMaxHp;
-                  }
-                }
-                addFloatingText(`🩸 +${step.heal}`, { side: targetSide, slot: step.targetSlot }, 'text-emerald-400 font-bold');
-                addFloatingText('BLOOD AURA 🩸', casterHeroLabel, 'text-rose-400 font-bold text-xs');
-              }, 180 / speedMultiplier);
-            }
-          } else if (step.stance === 'warlord_cry') {
-            audioSystem.playPlace();
-            if (step.targetSlot === -1) {
-              stepDescription = `🔥 Warlord's Cry: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} roars, rallying forces!`;
-              setAnimatingSlot({ side: targetSide, slot: -1, type: 'heal' });
-              setTimeout(() => {
-                addFloatingText('🔥 BATTLE ROAR!', casterHeroLabel, 'text-yellow-400 font-black text-sm scale-110');
-                addFloatingText("WARLORD'S CRY 🔥", casterHeroLabel, 'text-yellow-400 font-bold text-xs');
-              }, 180 / speedMultiplier);
-            } else {
-              stepDescription = `🔥 Warlord's Cry: Boosts ${cardName || 'ally'} stats!`;
-              setAnimatingSlot({ side: targetSide, slot: step.targetSlot, type: 'heal' });
-              setTimeout(() => {
-                const target = targetBoard[step.targetSlot];
-                if (target) {
-                  if (step.bonusAtk > 0) target.attack += step.bonusAtk;
-                  if (step.bonusArmor > 0) target.armor = (target.armor || 0) + step.bonusArmor;
-                  if (step.aoeHeal > 0) target.health = Math.min(target.maxHealth, target.health + step.aoeHeal);
-                }
-                addFloatingText('🔥 BUFF', { side: targetSide, slot: step.targetSlot }, 'text-yellow-400 font-bold');
-                addFloatingText("WARLORD'S CRY 🔥", casterHeroLabel, 'text-yellow-400 font-bold text-xs');
-              }, 180 / speedMultiplier);
-            }
+                return copy;
+              });
+            }, impactDelay);
+            timeouts.push(tHit);
           }
-          break;
-        }
-
-        case 'hero_heal': {
-          const isEnemy = step.side === 'enemy';
-          stepDescription = `💚 ${isEnemy ? 'Enemy Commander' : 'Commander'} heals for +${step.heal} HP`;
+        } else if (step.stance === 'blood_aura') {
           audioSystem.playHeal();
+          if (step.targetSlot === -1) {
+            stepDescription = `🩸 Blood Aura: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} heals directly for +${step.heal} HP`;
+            setAnimatingSlot({ side: targetSide, slot: -1, type: 'heal' });
+            addFloatingText(`🩸 +${step.heal}`, targetHeroLabel, 'text-emerald-400 font-bold');
+            addFloatingText('BLOOD AURA 🩸', casterHeroLabel, 'text-rose-400 font-bold text-xs');
+            
+            setVisualState(prev => {
+              const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+              if (targetSide === 'player') {
+                copy.playerHeroHealth = Math.min(copy.playerHeroMaxHealth, copy.playerHeroHealth + step.heal);
+              } else {
+                copy.enemyHeroHealth = Math.min(copy.enemyHeroMaxHealth, copy.enemyHeroHealth + step.heal);
+              }
+              return copy;
+            });
+          } else {
+            stepDescription = `🩸 Blood Aura: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} heals ${cardName || 'ally'} for +${step.heal} HP`;
+            setAnimatingSlot({ side: targetSide, slot: step.targetSlot, type: 'heal' });
+            addFloatingText(`🩸 +${step.heal}`, { side: targetSide, slot: step.targetSlot }, 'text-emerald-400 font-bold');
+            addFloatingText('BLOOD AURA 🩸', casterHeroLabel, 'text-rose-400 font-bold text-xs');
+
+            setVisualState(prev => {
+              const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+              const target = targetSide === 'player' ? copy.playerBoard[step.targetSlot] : copy.enemyBoard[step.targetSlot];
+              if (target) {
+                if (step.targetHealth !== undefined) target.health = step.targetHealth;
+                else target.health = Math.min(target.maxHealth, target.health + step.heal);
+                if (step.barrier || step.ward) {
+                  target.barrier = true;
+                  target.ward = true;
+                }
+                if (step.bonusMaxHp > 0) {
+                  target.maxHealth += step.bonusMaxHp;
+                }
+              }
+              return copy;
+            });
+          }
+        } else if (step.stance === 'warlord_cry') {
+          audioSystem.playPlace();
+          if (step.targetSlot === -1) {
+            stepDescription = `🔥 Warlord's Cry: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} roars, rallying forces!`;
+            setAnimatingSlot({ side: targetSide, slot: -1, type: 'heal' });
+            addFloatingText('🔥 BATTLE ROAR!', casterHeroLabel, 'text-yellow-400 font-black text-sm scale-110');
+            addFloatingText("WARLORD'S CRY 🔥", casterHeroLabel, 'text-yellow-400 font-bold text-xs');
+          } else {
+            stepDescription = `🔥 Warlord's Cry: Boosts ${cardName || 'ally'} stats!`;
+            setAnimatingSlot({ side: targetSide, slot: step.targetSlot, type: 'heal' });
+            addFloatingText('🔥 BUFF', { side: targetSide, slot: step.targetSlot }, 'text-yellow-400 font-bold');
+            addFloatingText("WARLORD'S CRY 🔥", casterHeroLabel, 'text-yellow-400 font-bold text-xs');
+
+            setVisualState(prev => {
+              const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+              const target = targetSide === 'player' ? copy.playerBoard[step.targetSlot] : copy.enemyBoard[step.targetSlot];
+              if (target) {
+                if (step.bonusAtk > 0) target.attack += step.bonusAtk;
+                if (step.bonusArmor > 0) target.armor = (target.armor || 0) + step.bonusArmor;
+                if (step.aoeHeal > 0) target.health = Math.min(target.maxHealth, target.health + step.aoeHeal);
+              }
+              return copy;
+            });
+          }
+        }
+        break;
+      }
+
+      case 'hero_heal': {
+        const isEnemy = step.side === 'enemy';
+        stepDescription = `💚 ${isEnemy ? 'Enemy Commander' : 'Commander'} heals for +${step.heal} HP`;
+        audioSystem.playHeal();
+        if (isEnemy) {
+          addFloatingText(`+${step.heal} HP 💚`, 'enemy-hero', 'text-emerald-400 font-black text-sm');
+        } else {
+          addFloatingText(`+${step.heal} HP 💚`, 'player-hero', 'text-emerald-400 font-black text-sm');
+        }
+        setVisualState(prev => {
+          const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
           if (isEnemy) {
             copy.enemyHeroHealth = Math.min(copy.enemyHeroMaxHealth, copy.enemyHeroHealth + step.heal);
-            addFloatingText(`+${step.heal} HP 💚`, 'enemy-hero', 'text-emerald-400 font-black text-sm');
           } else {
             copy.playerHeroHealth = Math.min(copy.playerHeroMaxHealth, copy.playerHeroHealth + step.heal);
-            addFloatingText(`+${step.heal} HP 💚`, 'player-hero', 'text-emerald-400 font-black text-sm');
           }
-          break;
-        }
+          return copy;
+        });
+        break;
+      }
 
-        case 'dodge': {
-          const isEnemy = step.side === 'enemy';
-          stepDescription = `🛡️ Evaded! ${isEnemy ? 'The Enemy Commander' : 'Your Lord'} dodged the attack!`;
-          setTimeout(() => {
-            addFloatingText('DODGE!', isEnemy ? 'enemy-hero' : 'player-hero', 'text-blue-400 font-black text-lg scale-125 text-shadow-glow');
-          }, 100 / speedMultiplier);
-          break;
-        }
+      case 'dodge': {
+        const isEnemy = step.side === 'enemy';
+        stepDescription = `🛡️ Evaded! ${isEnemy ? 'The Enemy Commander' : 'Your Lord'} dodged the attack!`;
+        audioSystem.playMiss();
+        addFloatingText('DODGE! 🛡️', isEnemy ? 'enemy-hero' : 'player-hero', 'text-blue-400 font-black text-lg scale-125 text-shadow-glow');
+        break;
+      }
 
-        case 'plague': {
-          const sourceCard = step.sourceSide === 'player' ? copy.playerBoard[step.sourceSlot] : copy.enemyBoard[step.sourceSlot];
-          const targetCard = step.sourceSide === 'player' ? copy.enemyBoard[step.targetSlot] : copy.playerBoard[step.targetSlot];
-          
-          stepDescription = `🦠 Plague slime: ${sourceCard?.name || 'Rot'} infects ${targetCard?.name || 'target'} for -${step.damage} HP`;
+      case 'plague': {
+        const sourceCard = step.sourceSide === 'player' ? visualState.playerBoard[step.sourceSlot] : visualState.enemyBoard[step.sourceSlot];
+        const targetCard = step.sourceSide === 'player' ? visualState.enemyBoard[step.targetSlot] : visualState.playerBoard[step.targetSlot];
+        
+        stepDescription = `🦠 Plague slime: ${sourceCard?.name || 'Rot'} infects ${targetCard?.name || 'target'} for -${step.damage} HP`;
 
-          audioSystem.playError();
-          setAnimatingSlot({ side: step.sourceSide, slot: step.sourceSlot, type: 'heal' });
+        audioSystem.playError();
+        setAnimatingSlot({ side: step.sourceSide, slot: step.sourceSlot, type: 'heal' });
 
-          setTimeout(() => {
-            setAnimatingSlot({ side: step.sourceSide === 'player' ? 'enemy' : 'player', slot: step.targetSlot, type: 'hit' });
-            if (targetCard) {
-              targetCard.health = Math.max(0, targetCard.health - step.damage);
+        const tHit = setTimeout(() => {
+          setAnimatingSlot({ side: step.sourceSide === 'player' ? 'enemy' : 'player', slot: step.targetSlot, type: 'hit' });
+          addFloatingText(`🤢 -${step.damage}`, { side: step.sourceSide === 'player' ? 'enemy' : 'player', slot: step.targetSlot }, 'text-emerald-400 font-black text-xs scale-110');
+
+          setVisualState(prev => {
+            const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+            const target = step.sourceSide === 'player' ? copy.enemyBoard[step.targetSlot] : copy.playerBoard[step.targetSlot];
+            if (target) {
+              if (step.targetHealth !== undefined) {
+                target.health = Math.max(0, step.targetHealth);
+              } else {
+                target.health = Math.max(0, target.health - step.damage);
+              }
             }
-            addFloatingText(`🤢 -${step.damage}`, { side: step.sourceSide === 'player' ? 'enemy' : 'player', slot: step.targetSlot }, 'text-emerald-400 font-black text-xs scale-110');
-          }, 180 / speedMultiplier);
-          break;
-        }
+            return copy;
+          });
+        }, impactDelay);
+        timeouts.push(tHit);
+        break;
+      }
 
-        case 'death': {
-          const deadCardName = step.side === 'player' ? copy.playerBoard[step.slot]?.name : copy.enemyBoard[step.slot]?.name;
-          stepDescription = `☠️ Destruction: ${deadCardName || 'Creature'} turns to dust!`;
+      case 'death': {
+        const deadCardName = step.cardName || (step.side === 'player' ? visualState.playerBoard[step.slot]?.name : visualState.enemyBoard[step.slot]?.name);
+        stepDescription = `☠️ Destruction: ${deadCardName || 'Creature'} turns to dust!`;
 
-          audioSystem.playDeath();
-          setAnimatingSlot({ side: step.side, slot: step.slot, type: 'death' });
-          addFloatingText('💀 DESTROYED', { side: step.side, slot: step.slot }, 'text-gray-500 font-bold tracking-widest text-[10px]');
-          
-          if (step.side === 'player') {
-            copy.playerBoard[step.slot] = null;
-          } else {
-            copy.enemyBoard[step.slot] = null;
-          }
-          break;
-        }      }
-
-      return copy;
-    });
+        audioSystem.playDeath();
+        setAnimatingSlot({ side: step.side, slot: step.slot, type: 'death' });
+        addFloatingText('💀 DESTROYED', { side: step.side, slot: step.slot }, 'text-gray-500 font-bold tracking-widest text-[10px]');
+        
+        const tDeath = setTimeout(() => {
+          setVisualState(prev => {
+            const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+            if (step.side === 'player') {
+              copy.playerBoard[step.slot] = null;
+            } else {
+              copy.enemyBoard[step.slot] = null;
+            }
+            return copy;
+          });
+        }, 280 / speedMultiplier);
+        timeouts.push(tDeath);
+        break;
+      }
+    }
 
     setActiveLogStepText(stepDescription);
 
-    const timer = setTimeout(() => {
+    const stepTimer = setTimeout(() => {
       setAnimatingSlot(null);
       setCurrentStepIndex(prev => prev + 1);
     }, stepDuration);
+    timeouts.push(stepTimer);
 
-    return () => clearTimeout(timer);
+    return () => {
+      timeouts.forEach(t => clearTimeout(t));
+    };
   }, [currentStepIndex, animateSequence, isPaused, speedMultiplier]);
 
   // Handle visualizer completion and game-state synchronization
@@ -1209,20 +1256,24 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           {/* 1. ENEMY HERO PORTRAIT (Top-Left corner - large format) */}
           {(() => {
             const isEnemyCasting = currentStep?.type === 'hero_skill' && currentStep.side === 'enemy';
+            const isEnemyHit = animatingSlot?.side === 'enemy' && animatingSlot?.slot === -1 && animatingSlot?.type === 'hit';
             const enemyGlowColor = currentStep?.stance === 'void_strike' 
               ? 'rgba(6, 182, 212, 0.9)' 
               : (currentStep?.stance === 'blood_aura' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(245, 158, 11, 0.9)');
             return (
               <motion.div 
                 animate={{
-                  scale: isEnemyCasting ? [1, 1.14, 1.14, 1] : 1,
-                  rotate: isEnemyCasting ? [0, 4, -4, 4, -4, 0] : 0,
-                  boxShadow: isEnemyCasting 
-                    ? `0 0 30px ${enemyGlowColor}` 
-                    : "0 4px 6px rgba(0, 0, 0, 0.3)"
+                  scale: isEnemyHit ? [1, 1.15, 0.95, 1] : (isEnemyCasting ? [1, 1.14, 1.14, 1] : 1),
+                  rotate: isEnemyHit ? [0, -6, 6, -4, 4, 0] : (isEnemyCasting ? [0, 4, -4, 4, -4, 0] : 0),
+                  boxShadow: isEnemyHit 
+                    ? '0 0 35px rgba(239, 68, 68, 0.95)' 
+                    : (isEnemyCasting 
+                      ? `0 0 30px ${enemyGlowColor}` 
+                      : "0 4px 6px rgba(0, 0, 0, 0.3)"),
+                  borderColor: isEnemyHit ? 'rgba(239, 68, 68, 0.9)' : 'rgba(69, 10, 10, 0.3)'
                 }}
-                transition={{ duration: 0.65 }}
-                className="absolute top-4 left-4 flex items-center gap-3 z-30 bg-black/50 p-2 rounded-2xl border border-red-950/30 backdrop-blur-sm shadow-md"
+                transition={{ duration: 0.45 }}
+                className="absolute top-4 left-4 flex items-center gap-3 z-30 bg-black/50 p-2 rounded-2xl border backdrop-blur-sm shadow-md"
               >
                 <div className="relative">
                   <div className="w-18 h-18 rounded-full border-4 border-red-700/80 bg-[#1c0808] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
@@ -1262,20 +1313,24 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           {/* 2. PLAYER HERO PORTRAIT (Bottom-Left corner - large format) */}
           {(() => {
             const isPlayerCasting = currentStep?.type === 'hero_skill' && (!currentStep.side || currentStep.side === 'player');
+            const isPlayerHit = animatingSlot?.side === 'player' && animatingSlot?.slot === -1 && animatingSlot?.type === 'hit';
             const playerGlowColor = currentStep?.stance === 'void_strike' 
               ? 'rgba(6, 182, 212, 0.9)' 
               : (currentStep?.stance === 'blood_aura' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(245, 158, 11, 0.9)');
             return (
               <motion.div 
                 animate={{
-                  scale: isPlayerCasting ? [1, 1.14, 1.14, 1] : 1,
-                  rotate: isPlayerCasting ? [0, 4, -4, 4, -4, 0] : 0,
-                  boxShadow: isPlayerCasting 
-                    ? `0 0 30px ${playerGlowColor}` 
-                    : "0 4px 6px rgba(0, 0, 0, 0.3)"
+                  scale: isPlayerHit ? [1, 1.15, 0.95, 1] : (isPlayerCasting ? [1, 1.14, 1.14, 1] : 1),
+                  rotate: isPlayerHit ? [0, -6, 6, -4, 4, 0] : (isPlayerCasting ? [0, 4, -4, 4, -4, 0] : 0),
+                  boxShadow: isPlayerHit 
+                    ? '0 0 35px rgba(239, 68, 68, 0.95)' 
+                    : (isPlayerCasting 
+                      ? `0 0 30px ${playerGlowColor}` 
+                      : "0 4px 6px rgba(0, 0, 0, 0.3)"),
+                  borderColor: isPlayerHit ? 'rgba(239, 68, 68, 0.9)' : 'rgba(8, 51, 68, 0.3)'
                 }}
-                transition={{ duration: 0.65 }}
-                className="absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-black/50 p-2 rounded-2xl border border-cyan-950/30 backdrop-blur-sm shadow-md"
+                transition={{ duration: 0.45 }}
+                className="absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-black/50 p-2 rounded-2xl border backdrop-blur-sm shadow-md"
               >
                 <div className="relative">
                   <div className="w-18 h-18 rounded-full border-4 border-cyan-600/80 bg-[#0d161d] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
@@ -1422,15 +1477,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   window.activeStrikeY_enemy = 50;
                 }
               } else if (currentStep.type === 'direct_attack') {
-                // Heroes are absolute positioned at left:16px (X: ~40px). Slots start X: ~200px.
-                // So a direct attack moves the card far left and up/down.
-                const diffX = -130 - (currentStep.slot * 92);
+                // Direct breakthrough strikes straight forward across the opposing slot towards enemy line
                 if (currentStep.attacker === 'player') {
-                  window.activeStrikeX_player = diffX;
-                  window.activeStrikeY_player = -170;
+                  window.activeStrikeX_player = 0;
+                  window.activeStrikeY_player = -65;
                 } else {
-                  window.activeStrikeX_enemy = diffX;
-                  window.activeStrikeY_enemy = 170;
+                  window.activeStrikeX_enemy = 0;
+                  window.activeStrikeY_enemy = 65;
                 }
               }
             }

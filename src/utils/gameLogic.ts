@@ -906,14 +906,17 @@ export function simulateCombatTurn(
           vampireHeal: (vampSkill && totalDamage > 0) ? vampSkill.value : 0,
           barrierBlocked: isBarrierBlocked,
           armorAbsorbed,
-          armorBroken: isArmorBroken
+          armorBroken: isArmorBroken,
+          targetHealth: eCard.health,
+          targetArmor: eCard.armor || 0,
+          attackerHealth: pCard.health
         });
 
         // Check death
         if (eCard.health <= 0) {
           eCard.isDead = true;
           logs.push(`💀 Enemy card ${eCard.name} has been torn to shreds!`);
-          animateSequence.push({ type: 'death', side: 'enemy', slot: i });
+          animateSequence.push({ type: 'death', side: 'enemy', slot: i, cardName: eCard.name });
         }
       } else {
         // Direct damage to Enemy Hero!
@@ -934,7 +937,8 @@ export function simulateCombatTurn(
             type: 'direct_attack',
             attacker: 'player',
             slot: i,
-            damage: totalDamage
+            damage: totalDamage,
+            enemyHeroHealth: state.enemyHeroHealth
           });
         }
       }
@@ -1008,14 +1012,17 @@ export function simulateCombatTurn(
           vampireHeal: vampSkill ? vampSkill.value : 0,
           barrierBlocked: isBarrierBlocked,
           armorAbsorbed,
-          armorBroken: isArmorBroken
+          armorBroken: isArmorBroken,
+          targetHealth: activePCard.health,
+          targetArmor: activePCard.armor || 0,
+          attackerHealth: eCard.health
         });
 
         // Death check
         if (activePCard.health <= 0) {
           activePCard.isDead = true;
           logs.push(`💀 Your card ${activePCard.name} has fallen in battle!`);
-          animateSequence.push({ type: 'death', side: 'player', slot: i });
+          animateSequence.push({ type: 'death', side: 'player', slot: i, cardName: activePCard.name });
         }
       } else {
         // Direct damage to Player Hero!
@@ -1036,7 +1043,8 @@ export function simulateCombatTurn(
             type: 'direct_attack',
             attacker: 'enemy',
             slot: i,
-            damage: totalDamage
+            damage: totalDamage,
+            playerHeroHealth: state.playerHeroHealth
           });
         }
       }
@@ -1068,13 +1076,14 @@ export function simulateCombatTurn(
             sourceSide: 'player',
             sourceSlot: i,
             targetSlot: randomEnemySlot,
-            damage: plagueSkill.value
+            damage: plagueSkill.value,
+            targetHealth: targetEnemy.health
           });
 
           if (targetEnemy.health <= 0) {
             targetEnemy.isDead = true;
             logs.push(`💀 Enemy card ${targetEnemy.name} dissolved in plague slime!`);
-            animateSequence.push({ type: 'death', side: 'enemy', slot: randomEnemySlot });
+            animateSequence.push({ type: 'death', side: 'enemy', slot: randomEnemySlot, cardName: targetEnemy.name });
           }
         }
       }
@@ -1103,13 +1112,14 @@ export function simulateCombatTurn(
             sourceSide: 'enemy',
             sourceSlot: i,
             targetSlot: randomPlayerSlot,
-            damage: plagueSkill.value
+            damage: plagueSkill.value,
+            targetHealth: targetPlayer.health
           });
 
           if (targetPlayer.health <= 0) {
             targetPlayer.isDead = true;
             logs.push(`💀 Your card ${targetPlayer.name} rotted from the plague!`);
-            animateSequence.push({ type: 'death', side: 'player', slot: randomPlayerSlot });
+            animateSequence.push({ type: 'death', side: 'player', slot: randomPlayerSlot, cardName: targetPlayer.name });
           }
         }
       }
