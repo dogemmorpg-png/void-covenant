@@ -1521,7 +1521,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
             <div className="space-y-4 sm:space-y-5">
               
               {/* Category Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-950/80 pb-3">
+              <div className="flex items-center justify-between border-b border-emerald-950/80 pb-3">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-xl bg-emerald-950/60 border border-emerald-500/40 flex items-center justify-center shadow-[0_0_14px_rgba(16,185,129,0.35)]">
                     <Shield className="w-4 h-4 text-emerald-400" />
@@ -1539,21 +1539,6 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       Safeguard your Arena rank, crowns, and kingdom from hostile invasions while you rest.
                     </p>
                   </div>
-                </div>
-
-                {/* Shards balance */}
-                <div className="flex items-center gap-2 self-start sm:self-auto bg-black/60 border border-purple-500/30 px-3 py-1.5 rounded-xl shadow-inner">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-gray-400">YOUR SHARDS:</span>
-                  <div className="flex items-center gap-1 text-sm font-mono font-black text-purple-300">
-                    <img src="/icons/dark_shard.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(168,85,247,0.5)]" />
-                    <span>{profile.darkShards || 0}</span>
-                  </div>
-                  <button
-                    onClick={() => setIsShardsShopOpen(true)}
-                    className="ml-1 text-[9px] font-mono font-bold text-purple-400 hover:text-white bg-purple-950/60 hover:bg-purple-900/80 px-2 py-0.5 rounded border border-purple-500/40 transition-colors cursor-pointer"
-                  >
-                    + GET
-                  </button>
                 </div>
               </div>
 
@@ -1640,7 +1625,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           <span>{item.durationLabel}</span>
                         </div>
                         <p className="text-[10px] text-gray-400 font-sans leading-tight pt-1">
-                          Protects domain from Arena attacks. Stacks if already shielded.
+                          Protects domain from Arena attacks. Activates when no shield is active.
                         </p>
                       </div>
 
@@ -1682,7 +1667,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           <>
                             <span>ACQUIRE FOR</span>
                             <div className="flex items-center gap-1 font-mono font-black text-white">
-                              <img src="/icons/dark_shard.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
+                              <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(244,63,94,0.8)]" />
                               <span>{item.cost}</span>
                             </div>
                           </>
@@ -1710,7 +1695,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                 </div>
                 <div className="text-[10px] font-mono text-gray-400 border-t sm:border-t-0 sm:border-l border-white/10 pt-2 sm:pt-0 sm:pl-3 shrink-0">
                   <span className="block text-white font-bold">SHIELD RULES:</span>
-                  <span>Immunity stops attacks & LP loss. Time stacks continuously.</span>
+                  <span>Immunity stops attacks & LP loss. Cannot activate while a shield is active.</span>
                 </div>
               </div>
 

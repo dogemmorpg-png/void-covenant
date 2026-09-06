@@ -117,7 +117,7 @@ export const PremiumPassView: React.FC = () => {
         {/* Shards quick balance */}
         <div className="inline-flex items-center gap-2 bg-black/60 border border-purple-500/30 px-4 py-1.5 rounded-xl shadow-lg">
           <span className="text-xs text-gray-400 font-mono">Your Balance:</span>
-          <img src="/icons/dark_shard.webp" alt="Shards" className="w-4 h-4 object-contain" />
+          <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
           <span className="font-mono font-black text-sm text-purple-300">{profile.darkShards || 0}</span>
           <button 
             onClick={() => setIsShardsShopOpen(true)}
@@ -285,7 +285,7 @@ export const PremiumPassView: React.FC = () => {
               <div>
                 <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block">Duration Price</span>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <img src="/icons/dark_shard.webp" alt="Shards" className="w-6 h-6 object-contain" />
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain" />
                   <span className="font-mono font-black text-3xl text-amber-300">
                     {PRICES.premium[durationDays]}
                   </span>
@@ -396,7 +396,7 @@ export const PremiumPassView: React.FC = () => {
               <div>
                 <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block">Duration Price</span>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <img src="/icons/dark_shard.webp" alt="Shards" className="w-6 h-6 object-contain" />
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain" />
                   <span className="font-mono font-black text-3xl text-purple-300 text-shadow-glow">
                     {PRICES.ultra[durationDays]}
                   </span>

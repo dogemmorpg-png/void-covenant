@@ -1116,6 +1116,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Invalid shield type.' });
       }
 
+      if (profile.activeShieldUntil && profile.activeShieldUntil > Date.now()) {
+        return res.status(400).json({ error: 'A Peace Shield is already active! You cannot activate another shield until the current one expires.' });
+      }
+
       profile.shieldsInventory = profile.shieldsInventory || { '3h': 0, '6h': 0, '12h': 0 };
       const count = profile.shieldsInventory[shieldType] || 0;
       if (count < 1) {
@@ -1126,7 +1130,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const hours = shieldType === '12h' ? 12 : shieldType === '6h' ? 6 : 3;
       const durationMs = hours * 3600 * 1000;
 
-      profile.activeShieldUntil = Math.max(Date.now(), profile.activeShieldUntil || 0) + durationMs;
+      profile.activeShieldUntil = Date.now() + durationMs;
 
       successMessage = `🛡️ Void Aegis activated! Your territory is immune to Arena attacks for ${hours} hours.`;
       responseData = { activeShieldUntil: profile.activeShieldUntil };

@@ -2099,9 +2099,16 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   Shields in Vault
                 </span>
                 <span className="text-[10px] font-mono text-gray-400">
-                  Select a shield to activate protection
+                  {shieldTimeLeft ? 'Immunity active • Cannot activate another' : 'Select a shield to activate protection'}
                 </span>
               </div>
+
+              {shieldTimeLeft && (
+                <div className="bg-emerald-950/40 border border-emerald-500/30 rounded-xl px-3 py-2 text-[11px] text-emerald-300/90 font-sans flex items-center gap-2">
+                  <Info className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>A shield is currently active. You cannot activate another until current immunity expires.</span>
+                </div>
+              )}
 
               <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
                 {[
@@ -2129,13 +2136,15 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                 ].map((item) => {
                   const count = profile.shieldsInventory?.[item.type] || 0;
                   const isAvailable = count > 0;
+                  const isBlockedByActiveShield = !!shieldTimeLeft;
+                  const canActivate = isAvailable && !isBlockedByActiveShield && !isActivatingShield;
 
                   return (
                     <div 
                       key={item.type} 
                       className={`bg-gradient-to-b from-[#11151f] to-[#0a0c12] border rounded-2xl p-2.5 sm:p-3 text-center flex flex-col justify-between transition-all duration-300 ${
                         isAvailable 
-                          ? `border-white/15 ${item.glow} shadow-lg shadow-black/60 hover:scale-[1.02]` 
+                          ? `border-white/15 ${item.glow} shadow-lg shadow-black/60 ${canActivate ? 'hover:scale-[1.02]' : ''}` 
                           : 'border-white/5 opacity-60'
                       }`}
                     >
@@ -2168,6 +2177,10 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
                         <button
                           onClick={async () => {
+                            if (shieldTimeLeft) {
+                              toast('A Peace Shield is already active!', 'warning');
+                              return;
+                            }
                             setIsActivatingShield(true);
                             try {
                               const res = await activateShield(item.type);
@@ -2183,14 +2196,16 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                               setIsActivatingShield(false);
                             }
                           }}
-                          disabled={!isAvailable || isActivatingShield}
+                          disabled={!canActivate}
                           className={`w-full py-1.5 px-2 rounded-xl font-display font-black text-[10px] tracking-wider uppercase transition-all select-none cursor-pointer ${
-                            isAvailable && !isActivatingShield
+                            canActivate
                               ? 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-black shadow-md shadow-emerald-950/50 hover:scale-105 active:scale-95'
-                              : 'bg-white/5 text-gray-600 border border-white/5 cursor-not-allowed'
+                              : isBlockedByActiveShield && isAvailable
+                                ? 'bg-emerald-950/20 text-emerald-500/50 border border-emerald-500/20 cursor-not-allowed'
+                                : 'bg-white/5 text-gray-600 border border-white/5 cursor-not-allowed'
                           }`}
                         >
-                          {isActivatingShield ? '...' : isAvailable ? 'ACTIVATE' : 'NONE'}
+                          {isActivatingShield ? '...' : isBlockedByActiveShield ? 'SHIELD ACTIVE' : isAvailable ? 'ACTIVATE' : 'NONE'}
                         </button>
                       </div>
                     </div>
