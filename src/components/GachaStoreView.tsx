@@ -16,7 +16,8 @@ import {
   ChevronRight,
   Skull,
   Flame,
-  Sparkles
+  Sparkles,
+  Clock
 } from 'lucide-react';
 import { assetPreloader, getCardImageUrl } from '../utils/assetPreloader';
 
@@ -42,24 +43,26 @@ const renderManaIcon = (cost: number, sizeClass: string = "w-5 h-5") => {
   );
 };
 
-export type ShopCategory = 'boosters' | 'chests' | 'pantheon' | 'demiurge';
+export type ShopCategory = 'boosters' | 'chests' | 'pantheon' | 'demiurge' | 'shields';
 
 interface GachaStoreViewProps {
-  initialTab?: 'cards' | 'equipment' | 'divine';
+  initialTab?: 'cards' | 'equipment' | 'divine' | 'shields';
 }
 
 export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'cards' }) => {
-  const { profile, setProfile, setIsShardsShopOpen } = useGame();
+  const { profile, setProfile, setIsShardsShopOpen, buyShield } = useGame();
   const toast = useToast();
   
   // Map initialTab to sidebar category
   const getCategoryFromTab = (tab?: string): ShopCategory => {
     if (tab === 'equipment') return 'chests';
     if (tab === 'divine') return 'demiurge';
+    if (tab === 'shields') return 'shields';
     return 'boosters';
   };
 
   const [activeCategory, setActiveCategory] = useState<ShopCategory>(getCategoryFromTab(initialTab));
+  const [isBuyingShield, setIsBuyingShield] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialTab) {
@@ -498,6 +501,48 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
               </div>
             </div>
             <ChevronRight className={`w-4 h-4 hidden md:block transition-transform group-hover:translate-x-0.5 ${activeCategory === 'demiurge' ? 'text-rose-300' : 'text-gray-600'}`} />
+          </button>
+
+          {/* 5. Peace Shields */}
+          <button
+            onClick={() => {
+              audioSystem.playClick();
+              setActiveCategory('shields');
+            }}
+            className={`w-full text-left p-2.5 sm:p-3 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between gap-3 shrink-0 md:shrink group relative overflow-hidden ${
+              activeCategory === 'shields'
+                ? 'bg-gradient-to-r from-[#0c291e] via-[#081f17] to-[#05140f] text-white border-emerald-400/80 shadow-[0_0_20px_rgba(16,185,129,0.25)] ring-1 ring-emerald-400/30'
+                : 'bg-[#10141d]/60 text-gray-400 border-white/5 hover:border-emerald-500/40 hover:bg-emerald-950/20 hover:text-emerald-200'
+            }`}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className={`w-12 h-12 rounded-xl p-1 flex items-center justify-center border shrink-0 relative overflow-hidden transition-all group-hover:scale-105 ${
+                activeCategory === 'shields'
+                  ? 'bg-gradient-to-b from-emerald-950 to-black border-emerald-400/80 shadow-[0_0_14px_rgba(16,185,129,0.4)]'
+                  : 'bg-black/60 border-white/10 group-hover:border-emerald-500/40'
+              }`}>
+                <div className={`absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.3),transparent_70%)] ${activeCategory === 'shields' ? 'opacity-100' : 'opacity-20'}`} />
+                <img
+                  src="/icons/shield_indicator.png"
+                  alt="Peace Shields"
+                  className={`w-full h-full object-contain relative z-10 filter ${activeCategory === 'shields' ? 'drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'opacity-80'}`}
+                />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-display font-black text-xs sm:text-sm tracking-wider uppercase text-white group-hover:text-emerald-200 transition-colors">
+                    Peace Shields
+                  </span>
+                  <span className="bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-[8px] font-mono px-1.5 py-0.2 rounded font-black tracking-wider hidden md:inline shadow-[0_0_6px_rgba(16,185,129,0.3)]">
+                    DEFENSE
+                  </span>
+                </div>
+                <div className="text-[10px] text-gray-400 font-mono hidden md:block">
+                  Territory Wards
+                </div>
+              </div>
+            </div>
+            <ChevronRight className={`w-4 h-4 hidden md:block transition-transform group-hover:translate-x-0.5 ${activeCategory === 'shields' ? 'text-emerald-300' : 'text-gray-600'}`} />
           </button>
 
         </div>
@@ -1470,6 +1515,207 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
               </div>
             );
           })()}
+
+          {/* ===================== 5. PEACE SHIELDS (AEGIS ARMORY) ===================== */}
+          {activeCategory === 'shields' && (
+            <div className="space-y-4 sm:space-y-5">
+              
+              {/* Category Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-950/80 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-950/60 border border-emerald-500/40 flex items-center justify-center shadow-[0_0_14px_rgba(16,185,129,0.35)]">
+                    <Shield className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="font-display font-black text-base sm:text-lg text-white tracking-widest text-shadow-gold uppercase">
+                        Peace Shields & Wards
+                      </h2>
+                      <span className="bg-emerald-950/90 border border-emerald-500/60 text-emerald-300 text-[8px] font-mono px-2 py-0.5 rounded font-black tracking-widest uppercase shadow-[0_0_8px_rgba(16,185,129,0.3)]">
+                        TERRITORY DEFENSE
+                      </span>
+                    </div>
+                    <p className="text-[10px] sm:text-xs text-gray-300 font-sans mt-0.5">
+                      Safeguard your Arena rank, crowns, and kingdom from hostile invasions while you rest.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Shards balance */}
+                <div className="flex items-center gap-2 self-start sm:self-auto bg-black/60 border border-purple-500/30 px-3 py-1.5 rounded-xl shadow-inner">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-gray-400">YOUR SHARDS:</span>
+                  <div className="flex items-center gap-1 text-sm font-mono font-black text-purple-300">
+                    <img src="/icons/dark_shard.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(168,85,247,0.5)]" />
+                    <span>{profile.darkShards || 0}</span>
+                  </div>
+                  <button
+                    onClick={() => setIsShardsShopOpen(true)}
+                    className="ml-1 text-[9px] font-mono font-bold text-purple-400 hover:text-white bg-purple-950/60 hover:bg-purple-900/80 px-2 py-0.5 rounded border border-purple-500/40 transition-colors cursor-pointer"
+                  >
+                    + GET
+                  </button>
+                </div>
+              </div>
+
+              {/* Shields Offer Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
+                {[
+                  {
+                    type: '3h' as const,
+                    name: '3-Hour Void Aegis',
+                    subtitle: 'Minor Defense Ward',
+                    durationLabel: '3 Hours Immunity',
+                    cost: 8,
+                    image: '/icons/shield_3h.png',
+                    tag: 'STANDARD',
+                    tagColor: 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300',
+                    borderGlow: 'border-emerald-500/30 hover:border-emerald-500/60 shadow-emerald-950/30',
+                    badge: 'QUICK REST'
+                  },
+                  {
+                    type: '6h' as const,
+                    name: '6-Hour Astral Aegis',
+                    subtitle: 'Greater Defense Ward',
+                    durationLabel: '6 Hours Immunity',
+                    cost: 15,
+                    image: '/icons/shield_6h.png',
+                    tag: 'MOST POPULAR',
+                    tagColor: 'bg-cyan-950/90 border-cyan-500/50 text-cyan-300 shadow-[0_0_8px_rgba(6,182,212,0.3)]',
+                    borderGlow: 'border-cyan-500/35 hover:border-cyan-400/70 shadow-cyan-950/40',
+                    badge: 'NIGHT DEFENSE'
+                  },
+                  {
+                    type: '12h' as const,
+                    name: '12-Hour Supreme Aegis',
+                    subtitle: 'Celestial Citadel Barrier',
+                    durationLabel: '12 Hours Immunity',
+                    cost: 25,
+                    image: '/icons/shield_12h.png',
+                    tag: 'BEST VALUE (-18%)',
+                    tagColor: 'bg-purple-950/90 border-purple-500/60 text-purple-200 shadow-[0_0_10px_rgba(168,85,247,0.4)]',
+                    borderGlow: 'border-purple-500/40 hover:border-purple-400/80 shadow-purple-950/50',
+                    badge: 'MAX PROTECTION'
+                  }
+                ].map((item) => {
+                  const owned = profile.shieldsInventory?.[item.type] || 0;
+                  const canAfford = (profile.darkShards || 0) >= item.cost;
+                  const isPurchasing = isBuyingShield === item.type;
+
+                  return (
+                    <div 
+                      key={item.type}
+                      className={`relative bg-gradient-to-b from-[#131720] via-[#0d1017] to-[#07090d] border ${item.borderGlow} rounded-2xl p-4 flex flex-col justify-between shadow-xl transition-all duration-300 group hover:scale-[1.01]`}
+                    >
+                      {/* Top Header & Tag */}
+                      <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2.5">
+                        <span className={`text-[8px] font-mono font-black px-2 py-0.5 rounded border uppercase tracking-wider ${item.tagColor}`}>
+                          {item.tag}
+                        </span>
+                        <span className="text-[10px] font-mono text-gray-400 font-bold">
+                          {owned} Owned
+                        </span>
+                      </div>
+
+                      {/* Shield Art Icon */}
+                      <div className="flex flex-col items-center justify-center my-3 relative">
+                        <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1.5 flex items-center justify-center relative group-hover:scale-105 transition-transform duration-300">
+                          <img 
+                            src={item.image} 
+                            alt={item.name} 
+                            className="w-full h-full object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.8)]"
+                          />
+                        </div>
+                        <span className="text-[9px] font-mono font-bold text-gray-400 mt-1 uppercase tracking-widest">
+                          {item.badge}
+                        </span>
+                      </div>
+
+                      {/* Description & Duration */}
+                      <div className="space-y-1.5 text-center mb-3">
+                        <h3 className="font-display font-black text-sm text-white group-hover:text-amber-200 transition-colors">
+                          {item.name}
+                        </h3>
+                        <div className="inline-flex items-center gap-1 bg-black/60 border border-white/10 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold text-emerald-400">
+                          <Clock className="w-3 h-3 text-emerald-400" />
+                          <span>{item.durationLabel}</span>
+                        </div>
+                        <p className="text-[10px] text-gray-400 font-sans leading-tight pt-1">
+                          Protects domain from Arena attacks. Stacks if already shielded.
+                        </p>
+                      </div>
+
+                      {/* Purchase Action Button */}
+                      <button
+                        onClick={async () => {
+                          if (!canAfford) {
+                            toast(`Need ${item.cost} Dark Shards. Opening shop...`, 'warning');
+                            setIsShardsShopOpen(true);
+                            return;
+                          }
+                          setIsBuyingShield(item.type);
+                          try {
+                            const res = await buyShield(item.type);
+                            if (res.success) {
+                              toast(res.message, 'success');
+                              audioSystem.playVictory();
+                            } else {
+                              toast(res.message, 'error');
+                            }
+                          } catch (e: any) {
+                            toast(e.message || 'Purchase failed', 'error');
+                          } finally {
+                            setIsBuyingShield(null);
+                          }
+                        }}
+                        disabled={isPurchasing}
+                        className={`w-full py-2.5 px-3 rounded-xl font-display font-black text-xs tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer select-none shadow-lg ${
+                          isPurchasing
+                            ? 'bg-gray-700 text-gray-400 cursor-wait'
+                            : canAfford
+                              ? 'bg-gradient-to-r from-purple-700 via-indigo-600 to-purple-800 hover:from-purple-600 hover:to-indigo-500 text-white shadow-purple-950/60 hover:scale-[1.02] active:scale-95'
+                              : 'bg-purple-950/50 border border-purple-500/30 text-purple-300 hover:bg-purple-900/60'
+                        }`}
+                      >
+                        {isPurchasing ? (
+                          <span>COMMUNING...</span>
+                        ) : (
+                          <>
+                            <span>ACQUIRE FOR</span>
+                            <div className="flex items-center gap-1 font-mono font-black text-white">
+                              <img src="/icons/dark_shard.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
+                              <span>{item.cost}</span>
+                            </div>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Bottom Explanatory Banner & Subscription Tributes */}
+              <div className="bg-gradient-to-r from-amber-950/30 via-purple-950/30 to-black/60 border border-amber-500/25 rounded-2xl p-3 sm:p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                <div className="flex items-start gap-2.5">
+                  <Sparkles className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-display font-bold text-amber-300 block uppercase tracking-wider text-[11px]">
+                      FREE DAILY SUBSCRIPTION SHIELDS
+                    </span>
+                    <p className="text-gray-300 text-[11px] font-sans leading-relaxed mt-0.5">
+                      Lords with active passes collect free shields every day in their Pass Tributes:
+                      <span className="text-amber-200 font-bold ml-1">1x 3-Hour Shield (Premium)</span> or
+                      <span className="text-amber-300 font-bold ml-1">1x 6-Hour Shield (Ultra)</span>.
+                    </p>
+                  </div>
+                </div>
+                <div className="text-[10px] font-mono text-gray-400 border-t sm:border-t-0 sm:border-l border-white/10 pt-2 sm:pt-0 sm:pl-3 shrink-0">
+                  <span className="block text-white font-bold">SHIELD RULES:</span>
+                  <span>Immunity stops attacks & LP loss. Time stacks continuously.</span>
+                </div>
+              </div>
+
+            </div>
+          )}
 
         </div>
 

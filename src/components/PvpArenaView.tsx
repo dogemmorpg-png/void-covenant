@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CampaignStage } from '../types';
-import { Swords, Award, Zap, Trophy, Shield, ShieldCheck, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User, Info, Gift, Sparkles, CheckCircle2, Coins, Lock, Plus } from 'lucide-react';
+import { Swords, Award, Zap, Trophy, Shield, ShieldCheck, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User, Info, Gift, Sparkles, CheckCircle2, Coins, Lock, Plus, Clock, ShoppingBag, ArrowRight } from 'lucide-react';
 import { renderStanceIcon } from './SkillAndStanceIcons';
 import { assetPreloader } from '../utils/assetPreloader';
 import { calculateEquipmentSetBonuses } from '../data/equipment';
@@ -17,6 +17,7 @@ interface PvpArenaViewProps {
   setIsMatching: (val: boolean) => void;
   isModalOpen: boolean;
   setIsModalOpen: (val: boolean) => void;
+  onNavigateToShop?: (tab?: 'cards' | 'equipment' | 'divine' | 'shields') => void;
 }
 
 const LEAGUE_QUICK_RULES: Record<string, { promo: string; safe: string; demo: string }> = {
@@ -50,8 +51,9 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   onStartBattle, 
   isMatching, 
   setIsMatching,
-  isModalOpen,
-  setIsModalOpen
+  isModalOpen, 
+  setIsModalOpen,
+  onNavigateToShop
 }) => {
   const { 
     profile, 
@@ -765,32 +767,6 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               </div>
             </div>
 
-            {/* Peace Shield */}
-            <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[130px] flex flex-col items-center">
-              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-bold block mb-1">PEACE SHIELD</span>
-              <button
-                onClick={() => setIsShieldModalOpen(true)}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold transition-all cursor-pointer ${
-                  shieldTimeLeft 
-                    ? 'bg-emerald-950/80 border border-emerald-500/70 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.35)] animate-pulse'
-                    : 'bg-black/50 border border-white/15 text-gray-400 hover:text-white hover:border-amber-400/50'
-                }`}
-                title="Manage territory defense shields"
-              >
-                {shieldTimeLeft ? (
-                  <>
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>{shieldTimeLeft}</span>
-                  </>
-                ) : (
-                  <>
-                    <Shield className="w-3.5 h-3.5 text-gray-400" />
-                    <span>SHIELD: OFF</span>
-                  </>
-                )}
-              </button>
-            </div>
-
             {/* Daily Sovereigns Won Progress (for subscribers or when > 0) */}
             {((profile.subscriptionExpiresAt && profile.subscriptionExpiresAt > Date.now()) || (profile.dailySovereignsWonToday || 0) > 0) && (
               <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[110px]">
@@ -932,15 +908,84 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   <div className="absolute top-0 right-0 w-48 h-48 bg-rose-500/10 blur-3xl pointer-events-none" />
                   <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-500/5 blur-3xl pointer-events-none" />
                   
-                  {/* Clean Header with Shield Sigil */}
-                  <div className="flex items-center gap-4 text-left relative z-10">
-                    <div className="w-16 h-16 rounded-2xl bg-black/60 border border-rose-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.25)] shrink-0 overflow-hidden group">
-                      <img src="/icons/arena_duel_emblem.png" alt="Arena Sigil" className="w-13 h-13 object-contain group-hover:scale-110 transition-transform duration-300" />
+                  {/* Clean Header with Shield Sigil & Minimalist Peace Shield Indicator */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
+                    <div className="flex items-center gap-3.5 text-left">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black/60 border border-rose-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.25)] shrink-0 overflow-hidden group">
+                        <img src="/icons/arena_duel_emblem.png" alt="Arena Sigil" className="w-11 h-11 sm:w-13 sm:h-13 object-contain group-hover:scale-110 transition-transform duration-300" />
+                      </div>
+                      <div>
+                        <h3 className="font-display font-black text-lg sm:text-xl text-white tracking-widest uppercase text-shadow-gold leading-tight">
+                          READY FOR RANKED DUEL
+                        </h3>
+                        <p className="text-[11px] text-gray-400 font-mono hidden sm:block mt-0.5">
+                          Season 1 Matchmaking • Duel other lords & climb
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-display font-black text-xl text-white tracking-widest uppercase text-shadow-gold">
-                        READY FOR RANKED DUEL
-                      </h3>
+
+                    {/* Minimalist Peace Shield Indicator (Right side of banner) */}
+                    <div
+                      onClick={() => setIsShieldModalOpen(true)}
+                      className={`group flex items-center gap-3 px-3 sm:px-3.5 py-2 rounded-2xl border transition-all duration-300 cursor-pointer select-none self-start sm:self-auto shrink-0 ${
+                        shieldTimeLeft
+                          ? 'bg-gradient-to-r from-emerald-950/90 via-[#0a231b]/90 to-black/90 border-emerald-500/60 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:border-emerald-400 hover:scale-[1.02]'
+                          : 'bg-gradient-to-r from-[#17131e]/90 via-[#100d16]/90 to-black/90 border-white/15 hover:border-purple-400/60 hover:bg-[#1f1828]/90 hover:scale-[1.02]'
+                      }`}
+                      title="Territory Peace Shield Status"
+                    >
+                      <div className={`relative w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 transition-transform group-hover:scale-105 ${
+                        shieldTimeLeft
+                          ? 'bg-emerald-950/90 border-emerald-500/70 shadow-[0_0_12px_rgba(16,185,129,0.4)]'
+                          : 'bg-black/70 border-white/15 group-hover:border-purple-400/50'
+                      }`}>
+                        <img 
+                          src="/icons/shield_indicator.png" 
+                          alt="Peace Shield" 
+                          className={`w-7 h-7 object-contain ${
+                            shieldTimeLeft 
+                              ? 'drop-shadow-[0_0_8px_rgba(16,185,129,0.9)] animate-pulse' 
+                              : 'opacity-70 group-hover:opacity-100 group-hover:brightness-125 transition-all'
+                          }`} 
+                        />
+                        {shieldTimeLeft && (
+                          <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-80"></span>
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,1)]"></span>
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="text-left">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-mono tracking-wider font-bold uppercase text-gray-400">
+                            PEACE SHIELD
+                          </span>
+                          <span className={`text-[8px] font-mono font-black px-1.5 py-0.2 rounded uppercase border ${
+                            shieldTimeLeft
+                              ? 'bg-emerald-950 border-emerald-500/60 text-emerald-300 shadow-[0_0_6px_rgba(16,185,129,0.3)]'
+                              : 'bg-rose-950/80 border-rose-500/40 text-rose-300'
+                          }`}>
+                            {shieldTimeLeft ? 'ACTIVE' : 'OFF'}
+                          </span>
+                        </div>
+
+                        <div className="font-mono font-black text-xs sm:text-sm mt-0.5 flex items-center gap-1">
+                          {shieldTimeLeft ? (
+                            <span className="text-emerald-300 tracking-wider flex items-center gap-1.5">
+                              <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>{shieldTimeLeft}</span>
+                            </span>
+                          ) : (
+                            <span className="text-gray-400 group-hover:text-purple-300 transition-colors flex items-center gap-1 text-[11px] font-display font-bold">
+                              <span>UNPROTECTED</span>
+                              <span className="text-purple-400 text-[10px] font-mono uppercase underline decoration-purple-500/50 ml-1">
+                                ACTIVATE &rarr;
+                              </span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -1964,171 +2009,230 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
       {/* Peace Shield Chamber Modal */}
       {isShieldModalOpen && (
-        <div className="fixed inset-0 z-[95] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-gradient-to-b from-[#161a22] via-[#10131a] to-[#0c0e14] border-2 border-emerald-500/40 rounded-3xl p-6 max-w-lg w-full space-y-5 shadow-[0_0_40px_rgba(0,0,0,0.9)] relative overflow-hidden">
+        <div className="fixed inset-0 z-[95] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fade-in">
+          <div className="bg-gradient-to-b from-[#141822] via-[#0d1017] to-[#07080d] border-2 border-emerald-500/40 rounded-3xl p-5 sm:p-6 max-w-xl w-full space-y-4 sm:space-y-5 shadow-[0_0_50px_rgba(0,0,0,0.95)] relative overflow-hidden">
             
+            {/* Ambient glows */}
+            <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 blur-3xl pointer-events-none" />
+
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                <h3 className="font-display font-black text-base text-white tracking-wider uppercase">
-                  VOID AEGIS DEFENSE SHIELDS
-                </h3>
+            <div className="flex items-center justify-between border-b border-white/10 pb-3 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-950/80 border border-emerald-500/50 flex items-center justify-center p-1.5 shadow-[0_0_15px_rgba(16,185,129,0.35)]">
+                  <img src="/icons/shield_indicator.png" alt="Aegis" className="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <h3 className="font-display font-black text-base sm:text-lg text-white tracking-wider uppercase text-shadow-gold">
+                    PEACE SHIELD CHAMBER
+                  </h3>
+                  <p className="text-[10px] font-mono text-emerald-400/90 tracking-wider">
+                    TERRITORY DEFENSE & RANK PRESERVATION
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setIsShieldModalOpen(false)}
-                className="w-7 h-7 rounded-full bg-black/60 hover:bg-black border border-white/15 text-gray-400 hover:text-white flex items-center justify-center font-bold transition-all cursor-pointer"
+                className="w-8 h-8 rounded-full bg-black/60 hover:bg-black/90 border border-white/15 hover:border-white/40 text-gray-400 hover:text-white flex items-center justify-center font-bold transition-all cursor-pointer text-sm"
               >
                 ✕
               </button>
             </div>
 
-            {/* Current Shield Status */}
-            <div className={`p-4 rounded-2xl border flex items-center justify-between ${
+            {/* Current Protection Status Card */}
+            <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative z-10 transition-all ${
               shieldTimeLeft
-                ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-200'
-                : 'bg-black/50 border-white/10 text-gray-400'
+                ? 'bg-gradient-to-r from-emerald-950/60 via-[#0c241b]/70 to-black/80 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.2)]'
+                : 'bg-gradient-to-r from-[#181216]/80 via-[#120d11]/80 to-black/80 border-rose-500/30'
             }`}>
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  shieldTimeLeft ? 'bg-emerald-900/60 text-emerald-400' : 'bg-white/5 text-gray-500'
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center border shrink-0 ${
+                  shieldTimeLeft 
+                    ? 'bg-emerald-900/60 border-emerald-400/60 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.4)]' 
+                    : 'bg-black/60 border-rose-500/40 text-rose-400'
                 }`}>
-                  {shieldTimeLeft ? <ShieldCheck className="w-6 h-6 animate-pulse" /> : <Shield className="w-6 h-6" />}
+                  {shieldTimeLeft ? (
+                    <ShieldCheck className="w-6 h-6 animate-pulse text-emerald-400" />
+                  ) : (
+                    <Shield className="w-6 h-6 text-rose-400/80" />
+                  )}
                 </div>
                 <div>
-                  <span className="text-[10px] font-mono uppercase tracking-wider block text-gray-400">Territory Status</span>
-                  <span className="font-display font-black text-sm">
-                    {shieldTimeLeft ? 'IMMUNE TO ATTACKS' : 'UNPROTECTED (VULNERABLE)'}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-gray-400 block">
+                      Territory Status:
+                    </span>
+                    <span className={`text-[9px] font-mono font-black px-1.5 py-0.2 rounded uppercase border ${
+                      shieldTimeLeft 
+                        ? 'bg-emerald-950 border-emerald-500/60 text-emerald-300' 
+                        : 'bg-rose-950 border-rose-500/50 text-rose-300'
+                    }`}>
+                      {shieldTimeLeft ? 'PROTECTED' : 'VULNERABLE'}
+                    </span>
+                  </div>
+                  <span className="font-display font-black text-sm text-white block mt-0.5">
+                    {shieldTimeLeft ? 'Immune to Hostile Invasions' : 'Exposed to Enemy Duels'}
                   </span>
                 </div>
               </div>
 
-              {shieldTimeLeft && (
-                <div className="text-right font-mono">
-                  <span className="text-[10px] text-gray-400 uppercase block">Time Remaining</span>
-                  <span className="text-base font-black text-emerald-400">{shieldTimeLeft}</span>
+              {shieldTimeLeft ? (
+                <div className="sm:text-right font-mono bg-black/50 border border-emerald-500/30 px-3 py-1.5 rounded-xl self-stretch sm:self-auto flex sm:flex-col justify-between items-center sm:items-end">
+                  <span className="text-[9px] text-emerald-400/80 uppercase font-bold tracking-wider">Immunity Remaining</span>
+                  <span className="text-base font-black text-emerald-300 flex items-center gap-1 mt-0.5">
+                    <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                    {shieldTimeLeft}
+                  </span>
+                </div>
+              ) : (
+                <div className="text-[10px] font-mono text-rose-400/80 italic hidden sm:block">
+                  No active aegis ward
                 </div>
               )}
             </div>
 
-            <p className="text-xs text-gray-300 font-sans leading-relaxed">
-              While a Void Aegis Shield is active, your domain cannot be attacked by other lords in the Arena. Your LP and rank are completely shielded while you sleep or take a break.
-            </p>
+            {/* Inventory Section (Only Activation) */}
+            <div className="space-y-2.5 relative z-10">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                  Shields in Vault
+                </span>
+                <span className="text-[10px] font-mono text-gray-400">
+                  Select a shield to activate protection
+                </span>
+              </div>
 
-            {/* Inventory Section */}
-            <div className="space-y-2">
-              <span className="text-[11px] font-mono font-bold text-gray-400 uppercase tracking-wider block">
-                Your Shield Inventory
-              </span>
+              <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+                {[
+                  {
+                    type: '3h' as const,
+                    name: '3-Hour Aegis',
+                    duration: '+3 Hours',
+                    icon: '/icons/shield_3h.png',
+                    glow: 'hover:border-emerald-500/60'
+                  },
+                  {
+                    type: '6h' as const,
+                    name: '6-Hour Aegis',
+                    duration: '+6 Hours',
+                    icon: '/icons/shield_6h.png',
+                    glow: 'hover:border-cyan-500/60'
+                  },
+                  {
+                    type: '12h' as const,
+                    name: '12-Hour Aegis',
+                    duration: '+12 Hours',
+                    icon: '/icons/shield_12h.png',
+                    glow: 'hover:border-purple-500/60'
+                  }
+                ].map((item) => {
+                  const count = profile.shieldsInventory?.[item.type] || 0;
+                  const isAvailable = count > 0;
 
-              <div className="grid grid-cols-3 gap-2.5">
-                {(['3h', '6h', '12h'] as const).map((type) => {
-                  const count = profile.shieldsInventory?.[type] || 0;
-                  const label = type === '3h' ? '3 Hours' : type === '6h' ? '6 Hours' : '12 Hours';
                   return (
-                    <div key={type} className="bg-black/40 border border-white/10 rounded-2xl p-3 text-center flex flex-col justify-between">
-                      <div>
-                        <span className="text-xs font-display font-bold text-white block">{label}</span>
-                        <span className="font-mono text-xs font-black text-amber-300 block mt-1">
-                          {count} Owned
+                    <div 
+                      key={item.type} 
+                      className={`bg-gradient-to-b from-[#11151f] to-[#0a0c12] border rounded-2xl p-2.5 sm:p-3 text-center flex flex-col justify-between transition-all duration-300 ${
+                        isAvailable 
+                          ? `border-white/15 ${item.glow} shadow-lg shadow-black/60 hover:scale-[1.02]` 
+                          : 'border-white/5 opacity-60'
+                      }`}
+                    >
+                      {/* Shield Icon */}
+                      <div className="flex flex-col items-center">
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl p-1 flex items-center justify-center mb-1">
+                          <img 
+                            src={item.icon} 
+                            alt={item.name} 
+                            className={`w-full h-full object-contain filter ${
+                              isAvailable ? 'drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]' : 'grayscale opacity-50'
+                            }`} 
+                          />
+                        </div>
+                        <span className="text-xs font-display font-bold text-white block leading-tight">
+                          {item.name}
+                        </span>
+                        <span className="text-[10px] font-mono text-emerald-400 font-bold block mt-0.5">
+                          {item.duration}
                         </span>
                       </div>
-                      <button
-                        onClick={async () => {
-                          setIsActivatingShield(true);
-                          try {
-                            const res = await activateShield(type);
-                            if (res.success) {
-                              toast(res.message, 'success');
-                              audioSystem.playVictory();
-                            } else {
-                              toast(res.message, 'error');
+
+                      {/* Quantity & Activate Button */}
+                      <div className="mt-2.5 pt-2 border-t border-white/10">
+                        <span className={`font-mono text-[11px] font-black block mb-2 ${
+                          isAvailable ? 'text-amber-300' : 'text-gray-500'
+                        }`}>
+                          {count} in Vault
+                        </span>
+
+                        <button
+                          onClick={async () => {
+                            setIsActivatingShield(true);
+                            try {
+                              const res = await activateShield(item.type);
+                              if (res.success) {
+                                toast(res.message, 'success');
+                                audioSystem.playVictory();
+                              } else {
+                                toast(res.message, 'error');
+                              }
+                            } catch (e: any) {
+                              toast(e.message || 'Activation failed', 'error');
+                            } finally {
+                              setIsActivatingShield(false);
                             }
-                          } catch (e: any) {
-                            toast(e.message || 'Activation failed', 'error');
-                          } finally {
-                            setIsActivatingShield(false);
-                          }
-                        }}
-                        disabled={count < 1 || isActivatingShield}
-                        className={`mt-2 py-1.5 px-2 rounded-xl font-display font-black text-[10px] tracking-wider uppercase transition-all cursor-pointer ${
-                          count > 0 && !isActivatingShield
-                            ? 'bg-emerald-600 hover:bg-emerald-500 text-black shadow-md hover:scale-105 active:scale-95'
-                            : 'bg-white/5 text-gray-600 cursor-not-allowed'
-                        }`}
-                      >
-                        ACTIVATE
-                      </button>
+                          }}
+                          disabled={!isAvailable || isActivatingShield}
+                          className={`w-full py-1.5 px-2 rounded-xl font-display font-black text-[10px] tracking-wider uppercase transition-all select-none cursor-pointer ${
+                            isAvailable && !isActivatingShield
+                              ? 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-black shadow-md shadow-emerald-950/50 hover:scale-105 active:scale-95'
+                              : 'bg-white/5 text-gray-600 border border-white/5 cursor-not-allowed'
+                          }`}
+                        >
+                          {isActivatingShield ? '...' : isAvailable ? 'ACTIVATE' : 'NONE'}
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
               </div>
             </div>
 
-            {/* Buy More Shields Section (Dark Shards ONLY) */}
-            <div className="space-y-2 pt-1 border-t border-white/10">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono font-bold text-gray-400 uppercase tracking-wider block">
-                  Purchase Void Shields (Dark Shards)
-                </span>
-                <div className="flex items-center gap-1 text-xs font-mono text-purple-300">
-                  <img src="/icons/dark_shard.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
-                  <span>{profile.darkShards || 0}</span>
+            {/* Prominent "BUY SHIELDS IN SHOP" Banner */}
+            <div className="bg-gradient-to-r from-[#1c1228] via-[#160d20] to-[#0e0714] border border-purple-500/40 hover:border-purple-400/70 rounded-2xl p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl transition-all relative z-10 group">
+              <div className="flex items-center gap-3 text-left">
+                <div className="w-10 h-10 rounded-xl bg-purple-950/80 border border-purple-500/40 flex items-center justify-center text-purple-300 shrink-0 group-hover:scale-105 transition-transform">
+                  <ShoppingBag className="w-5 h-5 text-purple-400" />
+                </div>
+                <div>
+                  <span className="font-display font-black text-xs sm:text-sm text-white block uppercase tracking-wider group-hover:text-purple-200 transition-colors">
+                    NEED MORE DEFENSE SHIELDS?
+                  </span>
+                  <span className="text-[10px] sm:text-[11px] text-gray-300 font-sans block">
+                    Acquire 3h, 6h, and 12h Aegis Wards with Dark Shards in the Shop.
+                  </span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-2.5">
-                {[
-                  { type: '3h' as const, label: '3 Hours', cost: 8 },
-                  { type: '6h' as const, label: '6 Hours', cost: 15 },
-                  { type: '12h' as const, label: '12 Hours', cost: 25 }
-                ].map((item) => (
-                  <div key={item.type} className="bg-black/50 border border-purple-500/20 hover:border-purple-500/50 rounded-2xl p-3 text-center flex flex-col justify-between transition-all">
-                    <div>
-                      <span className="text-xs font-display font-bold text-gray-200 block">{item.label}</span>
-                      <div className="flex items-center justify-center gap-1 font-mono text-xs font-bold text-purple-300 mt-1">
-                        <img src="/icons/dark_shard.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
-                        <span>{item.cost}</span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={async () => {
-                        if ((profile.darkShards || 0) < item.cost) {
-                          toast(`Need ${item.cost} Dark Shards. Opening shop...`, 'warning');
-                          setIsShardsShopOpen(true);
-                          return;
-                        }
-                        setIsBuyingShield(true);
-                        try {
-                          const res = await buyShield(item.type);
-                          if (res.success) {
-                            toast(res.message, 'success');
-                            audioSystem.playVictory();
-                          } else {
-                            toast(res.message, 'error');
-                          }
-                        } catch (e: any) {
-                          toast(e.message || 'Purchase failed', 'error');
-                        } finally {
-                          setIsBuyingShield(false);
-                        }
-                      }}
-                      disabled={isBuyingShield}
-                      className="mt-2 py-1.5 px-2 rounded-xl font-display font-black text-[10px] tracking-wider uppercase bg-purple-600 hover:bg-purple-500 text-white shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                    >
-                      BUY
-                    </button>
-                  </div>
-                ))}
-              </div>
+              <button
+                onClick={() => {
+                  setIsShieldModalOpen(false);
+                  onNavigateToShop?.('shields');
+                }}
+                className="w-full sm:w-auto py-2 px-4 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white font-display font-black text-xs tracking-wider uppercase shadow-lg shadow-purple-950/60 flex items-center justify-center gap-1.5 shrink-0 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                <span>BUY IN SHOP</span>
+                <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              </button>
             </div>
 
-            {/* Subscription Note */}
-            <div className="bg-amber-950/30 border border-amber-500/30 rounded-2xl p-3 flex items-start gap-2.5 text-xs text-amber-200 font-sans">
+            {/* Daily Subscription Pass Tributes Note */}
+            <div className="bg-amber-950/20 border border-amber-500/25 rounded-2xl p-3 flex items-start gap-2.5 text-xs text-amber-200 font-sans relative z-10">
               <Sparkles className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-              <p>
-                <strong className="text-white">Daily Subscriber Free Shields:</strong> Premium Lords receive <strong>1x 3h Shield</strong> daily. Ultra Overlords receive <strong>1x 6h Shield</strong> daily in their Pass Tributes.
-              </p>
+              <div className="text-[11px] leading-relaxed">
+                <strong className="text-white">Daily Pass Shield Tributes:</strong> Premium Lords collect <strong className="text-amber-300">1x 3h Shield</strong> daily. Ultra Overlords collect <strong className="text-amber-300">1x 6h Shield</strong> daily in their Pass Tributes.
+              </div>
             </div>
 
           </div>

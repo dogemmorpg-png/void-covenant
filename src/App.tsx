@@ -47,7 +47,7 @@ function MainAppContent() {
 
   // Tab states
   const [activeTab, setActiveTab] = useState<'campaign' | 'pvp' | 'collection' | 'hero' | 'talents' | 'altar' | 'bank' | 'premium'>('campaign');
-  const [shopInitialTab, setShopInitialTab] = useState<'cards' | 'equipment' | 'divine'>('cards');
+  const [shopInitialTab, setShopInitialTab] = useState<'cards' | 'equipment' | 'divine' | 'shields'>('cards');
   
   // Active Battle stage state
   const [activeBattleStage, setActiveBattleStage] = useState<CampaignStage | null>(null);
@@ -289,6 +289,10 @@ function MainAppContent() {
                 setIsMatching={setIsPvpMatching}
                 isModalOpen={isPvpModalOpen}
                 setIsModalOpen={setIsPvpModalOpen}
+                onNavigateToShop={(tab = 'shields') => {
+                  setShopInitialTab(tab);
+                  setActiveTab('altar');
+                }}
               />
             </div>
 
