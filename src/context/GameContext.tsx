@@ -319,9 +319,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 const challenger = rec.attackerName || 'Challenger';
 
                 if (isWin) {
-                  toast(`🛡️ Защита отражена! ${sign} 👑 против ${challenger}`, 'success', 6000);
+                  toast(`🛡️ Defense Victorious! ${sign} 👑 vs ${challenger}`, 'success', 6000);
                 } else {
-                  toast(`⚔️ Нападение на защиту: ${sign} 👑 от ${challenger}`, 'warning', 6000);
+                  toast(`⚔️ Defense Breached: ${sign} 👑 by ${challenger}`, 'warning', 6000);
                 }
               });
             }
