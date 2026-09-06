@@ -53,7 +53,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   isModalOpen,
   setIsModalOpen
 }) => {
-  const { profile, updateProfile, buyPvpTickets, leagueRewardsConfig } = useGame();
+  const { profile, updateProfile, buyPvpTickets, leagueRewardsConfig, hasNewDefenseAttacks, markDefenseHistoryAsViewed } = useGame();
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState<'duels' | 'rewards' | 'history'>('duels');
@@ -222,6 +222,23 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   useEffect(() => {
     fetchLeaderboard(viewingLeague);
   }, [viewingLeague]);
+
+  // Periodic silent refresh of leaderboard every 12 seconds when page is visible
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!document.hidden) {
+        fetchLeaderboard(viewingLeague, true);
+      }
+    }, 12000);
+    return () => clearInterval(interval);
+  }, [viewingLeague]);
+
+  // If user is actively on history tab, automatically mark new defense attacks as viewed
+  useEffect(() => {
+    if (activeTab === 'history') {
+      markDefenseHistoryAsViewed();
+    }
+  }, [activeTab, profile.pvpHistory, markDefenseHistoryAsViewed]);
 
   // If viewing another league, also ensure own league rank is fetched
   useEffect(() => {
@@ -793,8 +810,11 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               <span>LEAGUE REWARDS</span>
             </button>
             <button
-              onClick={() => setActiveTab('history')}
-              className={`flex-1 py-3 px-2 sm:px-4 rounded-xl text-[11px] sm:text-xs font-display font-black tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer uppercase ${
+              onClick={() => {
+                setActiveTab('history');
+                markDefenseHistoryAsViewed();
+              }}
+              className={`relative flex-1 py-3 px-2 sm:px-4 rounded-xl text-[11px] sm:text-xs font-display font-black tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer uppercase ${
                 activeTab === 'history'
                   ? 'bg-gradient-to-r from-cyan-950/90 via-blue-900/70 to-cyan-950/90 border border-cyan-500/60 text-white shadow-[0_0_20px_rgba(6,182,212,0.35)] scale-[1.01]'
                   : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent'
@@ -802,6 +822,12 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             >
               <History className={`w-4 h-4 ${activeTab === 'history' ? 'text-cyan-400' : 'text-gray-500'}`} />
               <span>HISTORY</span>
+              {hasNewDefenseAttacks && (
+                <span className="relative flex h-2.5 w-2.5 ml-1">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-80"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.95)]"></span>
+                </span>
+              )}
             </button>
           </div>
 

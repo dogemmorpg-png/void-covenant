@@ -25,7 +25,7 @@ import { assetPreloader } from './utils/assetPreloader';
 const bs58 = (bs58Pkg as any).default || bs58Pkg;
 
 function MainAppContent() {
-  const { profile, isLoadingProfile, connectSolanaWallet, registerPlayer, disconnectSolanaWallet, startBattleOnServer, isShardsShopOpen, setIsShardsShopOpen } = useGame();
+  const { profile, isLoadingProfile, connectSolanaWallet, registerPlayer, disconnectSolanaWallet, startBattleOnServer, isShardsShopOpen, setIsShardsShopOpen, hasNewDefenseAttacks } = useGame();
   const { connected, publicKey, signMessage, disconnect } = useWallet();
   const { setVisible } = useWalletModal();
   
@@ -337,7 +337,7 @@ function MainAppContent() {
 
           {/* Arena Tab */}
           <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('pvp'); }}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
+            className={`relative flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
               activeTab === 'pvp'
                 ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
                 : 'text-gray-400 hover:text-white'
@@ -345,6 +345,12 @@ function MainAppContent() {
           >
             <Trophy className="w-5 h-5" />
             <span className="text-[10px] font-display font-bold tracking-wider">ARENA</span>
+            {hasNewDefenseAttacks && activeTab !== 'pvp' && (
+              <span className="absolute top-1 right-2 flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.9)]"></span>
+              </span>
+            )}
           </button>
 
           {/* Collection Tab */}
@@ -410,10 +416,10 @@ function MainAppContent() {
 
 export default function App() {
   return (
-    <GameProvider>
-      <ToastProvider>
+    <ToastProvider>
+      <GameProvider>
         <MainAppContent />
-      </ToastProvider>
-    </GameProvider>
+      </GameProvider>
+    </ToastProvider>
   );
 }

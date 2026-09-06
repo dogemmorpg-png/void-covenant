@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
+import { useToast } from '../components/Toast';
 import { Card, PlayerProfile, CampaignStage, BattlePassTier, CardTemplate, CardTier, Equipment, EquipmentSlot } from '../types';
 import { getStarterDeck, CARD_TEMPLATES, createCardInstance, getCardManaCost, getEvolutionBonusSkill, BATTLE_PASS_TIERS, AIRDROP_TASKS } from '../data/cards';
 import { supabase } from '../utils/supabaseClient';
@@ -63,6 +64,9 @@ interface GameContextType {
   resetAdminLeagueRewards: () => Promise<{ success: boolean; message: string; config?: any[] }>;
   isShardsShopOpen: boolean;
   setIsShardsShopOpen: (open: boolean) => void;
+  refreshProfile: (notifyOnDefense?: boolean) => Promise<PlayerProfile | null>;
+  hasNewDefenseAttacks: boolean;
+  markDefenseHistoryAsViewed: () => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -242,6 +246,148 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Ref to track latest profile for synchronous reads in spend functions
   const profileRef = useRef(profile);
   useEffect(() => { profileRef.current = profile; }, [profile]);
+
+  const toast = useToast();
+
+  // Track last viewed defense history timestamp
+  const [lastViewedDefenseTs, setLastViewedDefenseTs] = useState<number>(() => {
+    const saved = localStorage.getItem('void_covenant_last_viewed_defense_ts');
+    return saved ? parseInt(saved, 10) || 0 : Date.now();
+  });
+
+  // Calculate whether there are new unviewed defense attacks
+  const hasNewDefenseAttacks = React.useMemo(() => {
+    if (!profile.pvpHistory || profile.pvpHistory.length === 0) return false;
+    return profile.pvpHistory.some((r: any) => r.isDefense && r.timestamp > lastViewedDefenseTs);
+  }, [profile.pvpHistory, lastViewedDefenseTs]);
+
+  const markDefenseHistoryAsViewed = useCallback(() => {
+    const now = Date.now();
+    localStorage.setItem('void_covenant_last_viewed_defense_ts', now.toString());
+    setLastViewedDefenseTs(now);
+  }, []);
+
+  // Track known defense IDs to avoid duplicate toasts
+  const knownDefenseIdsRef = useRef<Set<string>>(new Set());
+
+  // Initialize knownDefenseIds when profile is loaded
+  useEffect(() => {
+    if (profile?.pvpHistory) {
+      profile.pvpHistory.forEach((r: any) => {
+        if (r.isDefense && r.id) {
+          knownDefenseIdsRef.current.add(r.id);
+        }
+      });
+    }
+  }, [profile?.solanaAddress]);
+
+  // Refresh profile from authoritative server (silent background fetch)
+  const refreshProfile = useCallback(async (notifyOnDefense = true): Promise<PlayerProfile | null> => {
+    const token = localStorage.getItem('void_covenant_token');
+    if (!token) return null;
+
+    try {
+      const res = await fetch('/api/sync', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({})
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.profile) {
+          let serverProfile = calculateEnergy(data.profile);
+          serverProfile.solBalance = 12.5;
+          const migrated = migrateProfileTo10Cards(serverProfile);
+
+          // Check for new defense attacks
+          const newHistory = migrated.pvpHistory || [];
+          if (notifyOnDefense && knownDefenseIdsRef.current.size > 0 && newHistory.length > 0) {
+            const freshDefenseRecords = newHistory.filter(
+              (r: any) => r.isDefense && r.id && !knownDefenseIdsRef.current.has(r.id)
+            );
+
+            if (freshDefenseRecords.length > 0) {
+              freshDefenseRecords.forEach((rec: any) => {
+                knownDefenseIdsRef.current.add(rec.id);
+                const isWin = rec.winner === 'defender';
+                const lpDelta = rec.defenderLPChange !== undefined ? rec.defenderLPChange : rec.defenderRatingChange;
+                const sign = lpDelta >= 0 ? `+${lpDelta}` : `${lpDelta}`;
+                const challenger = rec.attackerName || 'Challenger';
+
+                if (isWin) {
+                  toast(`🛡️ Защита отражена! ${sign} 👑 против ${challenger}`, 'success', 6000);
+                } else {
+                  toast(`⚔️ Нападение на защиту: ${sign} 👑 от ${challenger}`, 'warning', 6000);
+                }
+              });
+            }
+          }
+
+          // Register all current defense IDs into the set
+          newHistory.forEach((r: any) => {
+            if (r.isDefense && r.id) {
+              knownDefenseIdsRef.current.add(r.id);
+            }
+          });
+
+          // Check if profile actually changed before re-rendering
+          setProfile(prev => {
+            if (
+              prev.pvpLP !== migrated.pvpLP ||
+              prev.pvpRating !== migrated.pvpRating ||
+              prev.pvpLeague !== migrated.pvpLeague ||
+              (prev.pvpHistory?.length || 0) !== (migrated.pvpHistory?.length || 0) ||
+              prev.gold !== migrated.gold ||
+              prev.dust !== migrated.dust ||
+              prev.darkShards !== migrated.darkShards ||
+              prev.level !== migrated.level ||
+              prev.exp !== migrated.exp
+            ) {
+              return migrated;
+            }
+            return prev;
+          });
+
+          return migrated;
+        }
+      }
+    } catch (err) {
+      // Quiet background network glitch - no spam
+    }
+    return null;
+  }, [toast]);
+
+  // Window Focus and Visibility Change listener (instant refresh when returning to tab)
+  useEffect(() => {
+    const handleFocusOrVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        refreshProfile(true);
+      }
+    };
+
+    window.addEventListener('focus', handleFocusOrVisibility);
+    document.addEventListener('visibilitychange', handleFocusOrVisibility);
+
+    return () => {
+      window.removeEventListener('focus', handleFocusOrVisibility);
+      document.removeEventListener('visibilitychange', handleFocusOrVisibility);
+    };
+  }, [refreshProfile]);
+
+  // Background polling interval: every 12 seconds when window is active/visible
+  useEffect(() => {
+    const pollInterval = setInterval(() => {
+      if (!document.hidden && localStorage.getItem('void_covenant_token')) {
+        refreshProfile(true);
+      }
+    }, 12000);
+
+    return () => clearInterval(pollInterval);
+  }, [refreshProfile]);
 
   // Automatically save profile settings to Supabase
   const saveProfile = (newProfile: PlayerProfile) => {
@@ -1426,7 +1572,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         saveAdminLeagueRewards,
         resetAdminLeagueRewards,
         isShardsShopOpen,
-        setIsShardsShopOpen
+        setIsShardsShopOpen,
+        refreshProfile,
+        hasNewDefenseAttacks,
+        markDefenseHistoryAsViewed
       }}
     >
       {children}

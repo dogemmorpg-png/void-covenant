@@ -357,23 +357,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    const newUpdatedAt = new Date().toISOString();
-    let updateQuery = supabase
-      .from('profiles')
-      .update({ data: currentProfile, updated_at: newUpdatedAt })
-      .eq('wallet_address', walletAddress);
-    if (oldUpdatedAt) {
-      updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
-    }
-    const { data: updateResult, error: updateError } = await updateQuery.select('wallet_address');
-    if (updateError || !updateResult || updateResult.length === 0) {
-      console.error('Sync API OCC conflict');
-      return res.status(409).json({ error: 'Conflict: Please try again' });
-    }
+    if (safeProfileData) {
+      const newUpdatedAt = new Date().toISOString();
+      let updateQuery = supabase
+        .from('profiles')
+        .update({ data: currentProfile, updated_at: newUpdatedAt })
+        .eq('wallet_address', walletAddress);
+      if (oldUpdatedAt) {
+        updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
+      }
+      const { data: updateResult, error: updateError } = await updateQuery.select('wallet_address');
+      if (updateError || !updateResult || updateResult.length === 0) {
+        console.error('Sync API OCC conflict');
+        return res.status(409).json({ error: 'Conflict: Please try again' });
+      }
 
-    if (updateError) {
-      console.error('Sync API save error:', updateError);
-      return res.status(500).json({ error: 'Failed to sync profile.' });
+      if (updateError) {
+        console.error('Sync API save error:', updateError);
+        return res.status(500).json({ error: 'Failed to sync profile.' });
+      }
     }
 
     return res.status(200).json({ success: true, profile: currentProfile });
