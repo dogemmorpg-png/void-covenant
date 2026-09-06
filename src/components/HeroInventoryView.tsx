@@ -363,10 +363,10 @@ export const HeroInventoryView: React.FC<HeroInventoryViewProps> = ({ onNavigate
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-1 sm:px-6 space-y-3">
+    <div className="max-w-7xl mx-auto px-4 pt-6 sm:pt-9 pb-6 sm:px-6 space-y-5 sm:space-y-6">
       
       {/* Sub-Tab Switcher at Top */}
-      <div className="flex gap-3 justify-center max-w-sm mx-auto">
+      <div className="flex gap-3 justify-center max-w-sm mx-auto mb-1 sm:mb-2">
         <button 
           onClick={() => setSubTab('equipment')}
           className={`flex-1 py-2 px-5 rounded-xl font-display font-black tracking-widest text-xs transition-all duration-300 uppercase flex items-center justify-center gap-2 cursor-pointer ${

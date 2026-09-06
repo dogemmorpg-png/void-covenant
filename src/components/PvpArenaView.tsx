@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CampaignStage } from '../types';
-import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User, Info, Gift, Sparkles, CheckCircle2, Coins, Lock } from 'lucide-react';
+import { Swords, Award, Zap, Trophy, Shield, Search, RefreshCw, AlertTriangle, History, Crown, Timer, ChevronLeft, ChevronRight, User, Info, Gift, Sparkles, CheckCircle2, Coins, Lock, Plus } from 'lucide-react';
 import { renderStanceIcon } from './SkillAndStanceIcons';
 import { assetPreloader } from '../utils/assetPreloader';
 import { calculateEquipmentSetBonuses } from '../data/equipment';
@@ -730,11 +730,11 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             </div>
 
             {/* Arena Tickets (Prominent counter + Reserve badge + Buy button) */}
-            <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[145px] flex flex-col items-center">
+            <div className="text-center px-3 sm:border-r border-white/10 pb-2 sm:pb-0 min-w-[170px] flex flex-col items-center">
               <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-bold block">ARENA TICKETS</span>
-              <div className="flex items-center justify-center gap-2 mt-0.5">
-                <div className="font-mono text-lg sm:text-xl font-black text-rose-400 flex items-center gap-1.5">
-                  <img src="/icons/ticket.png" alt="Ticket" className="w-5 h-5 object-contain" />
+              <div className="flex items-center justify-center gap-2 mt-1 flex-nowrap">
+                <div className="font-mono text-lg sm:text-xl font-black text-rose-400 flex items-center gap-1.5 shrink-0">
+                  <img src="/icons/ticket.png" alt="Ticket" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(244,63,94,0.4)]" />
                   <span>{profile.pvpEnergy !== undefined ? profile.pvpEnergy : 5}/5</span>
                   {(profile.pvpBonusTickets || 0) > 0 && (
                     <span className="text-[10px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-500/50 px-1.5 py-0.5 rounded-md shadow-sm ml-0.5" title="Purchased tickets reserve">
@@ -744,10 +744,15 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                 </div>
                 <button
                   onClick={() => setIsBuyTicketsModalOpen(true)}
-                  className="py-1 px-3 rounded-lg bg-gradient-to-r from-amber-600 to-rose-600 hover:from-amber-500 hover:to-rose-500 border border-amber-400/50 text-white font-display font-black text-[10px] uppercase transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-[0_0_8px_rgba(245,158,11,0.35)]"
+                  className="flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full bg-gradient-to-r from-[#2a0c14] via-[#1a070c] to-[#0e0306] hover:from-[#3d121e] hover:to-[#1a070c] border border-rose-500/50 hover:border-rose-400 text-rose-200 hover:text-white transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer shadow-[0_0_12px_rgba(225,29,72,0.25)] hover:shadow-[0_0_16px_rgba(244,63,94,0.45)] whitespace-nowrap group shrink-0 select-none"
                   title="Buy Arena Tickets"
                 >
-                  + BUY
+                  <div className="w-4 h-4 rounded-full bg-gradient-to-b from-[#e11d48] to-[#881337] group-hover:from-[#f43f5e] group-hover:to-[#be123c] text-white flex items-center justify-center border border-rose-300/40 shadow-sm transition-all">
+                    <Plus className="w-2.5 h-2.5 stroke-[3] text-white" />
+                  </div>
+                  <span className="text-[10px] font-mono font-bold tracking-wider uppercase text-rose-300 group-hover:text-white">
+                    BUY
+                  </span>
                 </button>
               </div>
             </div>
