@@ -932,7 +932,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                           ? 'bg-gradient-to-r from-emerald-950/90 via-[#0a231b]/90 to-black/90 border-emerald-500/60 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:border-emerald-400 hover:scale-[1.02]'
                           : 'bg-gradient-to-r from-[#17131e]/90 via-[#100d16]/90 to-black/90 border-white/15 hover:border-purple-400/60 hover:bg-[#1f1828]/90 hover:scale-[1.02]'
                       }`}
-                      title="Territory Peace Shield Status"
+                      title="Peace Shield Status"
                     >
                       <div className={`relative w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 transition-transform group-hover:scale-105 ${
                         shieldTimeLeft
@@ -2027,7 +2027,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                     PEACE SHIELD CHAMBER
                   </h3>
                   <p className="text-[10px] font-mono text-emerald-400/90 tracking-wider">
-                    TERRITORY DEFENSE & RANK PRESERVATION
+                    ARENA IMMUNITY & DEFENSE WARDS
                   </p>
                 </div>
               </div>
@@ -2060,7 +2060,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-mono uppercase tracking-wider text-gray-400 block">
-                      Territory Status:
+                      Shield Status:
                     </span>
                     <span className={`text-[9px] font-mono font-black px-1.5 py-0.2 rounded uppercase border ${
                       shieldTimeLeft 
@@ -2071,7 +2071,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                     </span>
                   </div>
                   <span className="font-display font-black text-sm text-white block mt-0.5">
-                    {shieldTimeLeft ? 'Immune to Hostile Invasions' : 'Exposed to Enemy Duels'}
+                    {shieldTimeLeft ? 'Immune to Arena Attacks' : 'Exposed to Enemy Duels'}
                   </span>
                 </div>
               </div>
@@ -2099,16 +2099,9 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   Shields in Vault
                 </span>
                 <span className="text-[10px] font-mono text-gray-400">
-                  {shieldTimeLeft ? 'Immunity active • Cannot activate another' : 'Select a shield to activate protection'}
+                  Select a shield to activate
                 </span>
               </div>
-
-              {shieldTimeLeft && (
-                <div className="bg-emerald-950/40 border border-emerald-500/30 rounded-xl px-3 py-2 text-[11px] text-emerald-300/90 font-sans flex items-center gap-2">
-                  <Info className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>A shield is currently active. You cannot activate another until current immunity expires.</span>
-                </div>
-              )}
 
               <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
                 {[

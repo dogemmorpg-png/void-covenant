@@ -538,7 +538,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   </span>
                 </div>
                 <div className="text-[10px] text-gray-400 font-mono hidden md:block">
-                  Territory Wards
+                  Arena Defense
                 </div>
               </div>
             </div>
@@ -1532,11 +1532,11 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                         Peace Shields & Wards
                       </h2>
                       <span className="bg-emerald-950/90 border border-emerald-500/60 text-emerald-300 text-[8px] font-mono px-2 py-0.5 rounded font-black tracking-widest uppercase shadow-[0_0_8px_rgba(16,185,129,0.3)]">
-                        TERRITORY DEFENSE
+                        PEACE SHIELDS
                       </span>
                     </div>
                     <p className="text-[10px] sm:text-xs text-gray-300 font-sans mt-0.5">
-                      Safeguard your Arena rank, crowns, and kingdom from hostile invasions while you rest.
+                      Prevents Arena attacks and protects your Crowns while you are away.
                     </p>
                   </div>
                 </div>
@@ -1588,7 +1588,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
 
                   return (
                     <div 
-                      key={item.type}
+                      key={item.type} 
                       className={`relative bg-gradient-to-b from-[#131720] via-[#0d1017] to-[#07090d] border ${item.borderGlow} rounded-2xl p-4 flex flex-col justify-between shadow-xl transition-all duration-300 group hover:scale-[1.01]`}
                     >
                       {/* Top Header & Tag */}
@@ -1625,7 +1625,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           <span>{item.durationLabel}</span>
                         </div>
                         <p className="text-[10px] text-gray-400 font-sans leading-tight pt-1">
-                          Protects domain from Arena attacks. Activates when no shield is active.
+                          Protects against Arena attacks and Crowns loss.
                         </p>
                       </div>
 
@@ -1695,7 +1695,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                 </div>
                 <div className="text-[10px] font-mono text-gray-400 border-t sm:border-t-0 sm:border-l border-white/10 pt-2 sm:pt-0 sm:pl-3 shrink-0">
                   <span className="block text-white font-bold">SHIELD RULES:</span>
-                  <span>Immunity stops attacks & LP loss. Cannot activate while a shield is active.</span>
+                  <span>Immunity stops attacks & prevents Crowns loss.</span>
                 </div>
               </div>
 
