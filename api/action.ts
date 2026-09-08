@@ -1053,6 +1053,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (mail.rewards) {
         if (mail.rewards.gold) profile.gold = (profile.gold || 0) + mail.rewards.gold;
         if (mail.rewards.dust) profile.dust = (profile.dust || 0) + mail.rewards.dust;
+        if (mail.rewards.shieldType) {
+          profile.shieldsInventory = profile.shieldsInventory || { '3h': 0, '6h': 0, '12h': 0 };
+          const sType = mail.rewards.shieldType;
+          profile.shieldsInventory[sType] = (profile.shieldsInventory[sType] || 0) + (mail.rewards.shieldCount || 1);
+        }
         if (mail.rewards.darkShards) {
           profile = recordShardTransaction(
             profile,
@@ -1097,6 +1102,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           if (m.rewards.dust) totalDust += m.rewards.dust;
           if (m.rewards.darkShards) totalShards += m.rewards.darkShards;
           if (m.rewards.bloodSovereigns) totalSovereigns += m.rewards.bloodSovereigns;
+          if (m.rewards.shieldType) {
+            profile.shieldsInventory = profile.shieldsInventory || { '3h': 0, '6h': 0, '12h': 0 };
+            const sType = m.rewards.shieldType;
+            profile.shieldsInventory[sType] = (profile.shieldsInventory[sType] || 0) + (m.rewards.shieldCount || 1);
+          }
           return { ...m, isClaimed: true, isRead: true };
         }
         return m;
@@ -1178,7 +1188,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         { tier, durationDays, cost }
       );
 
-      successMessage = `${tier === 'ultra' ? '💎' : '⚜️'} Hail, Lord! You have unlocked the ${tier.toUpperCase()} Pass for ${durationDays} days! Energy & Tickets fully restored!`;
+      // Immediately deliver today's daily tribute mail upon activating or extending pass if not yet delivered today
+      const todayUtc = new Date().toISOString().slice(0, 10);
+      if (profile.lastDailySubscriptionMail !== todayUtc) {
+        const isUltra = tier === 'ultra';
+        const gold = isUltra ? 3000 : 1000;
+        const dust = isUltra ? 400 : 150;
+        const shieldType = isUltra ? '6h' : '3h';
+        const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        const dailyMail = {
+          id: `mail_sub_${todayUtc}_${walletAddress.slice(-4)}_${uniqueSuffix}`,
+          title: isUltra ? '💎 Daily Ultra Overlord Tribute' : '⚜️ Daily Premium Tribute',
+          sender: 'Imperial Treasury',
+          body: `Hail, Lord ${profile.username || 'Voidwalker'}!\n\nYour imperial covenant tribute for ${todayUtc} has arrived at your dominion:\n• +${gold.toLocaleString()} Gold\n• +${dust} Dark Dust\n• 1x ${shieldType} Void Aegis Shield\n\nClaim these resources to fortify your rank in the Abyss!`,
+          rewards: {
+            gold,
+            dust,
+            shieldType,
+            shieldCount: 1
+          },
+          isClaimed: false,
+          isRead: false,
+          createdAt: Date.now()
+        };
+        profile.mailMessages = [dailyMail, ...(profile.mailMessages || [])].slice(0, 50);
+        profile.lastDailySubscriptionMail = todayUtc;
+      }
+
+      successMessage = `${tier === 'ultra' ? '💎' : '⚜️'} Hail, Lord! You have unlocked the ${tier.toUpperCase()} Pass for ${durationDays} days! Energy & Tickets fully restored, and your daily tribute has been sent to your Mail!`;
       responseData = { 
         subscriptionTier: tier, 
         subscriptionExpiresAt: profile.subscriptionExpiresAt,
@@ -1186,7 +1223,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         pveEnergyMax: profile.pveEnergyMax,
         pvpEnergy: profile.pvpEnergy,
         pvpEnergyMax: profile.pvpEnergyMax,
-        pvpTickets: profile.pvpTickets
+        pvpTickets: profile.pvpTickets,
+        mailMessages: profile.mailMessages
       };
     } else if (action === 'claim_daily_subscription') {
       const isSubActive = profile.subscriptionExpiresAt && profile.subscriptionExpiresAt > Date.now();

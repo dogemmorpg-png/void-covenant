@@ -775,10 +775,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const sovReward = targetMail.rewards?.bloodSovereigns || 0;
       const mailCreatedAt = targetMail.createdAt ?? targetMail.date ?? targetMail.timestamp;
 
+      let newShields = { ...(current.shieldsInventory || { '3h': 0, '6h': 0, '12h': 0 }) };
+
       if (targetMail.rewards) {
         if (targetMail.rewards.gold) newGold += targetMail.rewards.gold;
         if (targetMail.rewards.dust) newDust += targetMail.rewards.dust;
         if (targetMail.rewards.darkShards) newShards += targetMail.rewards.darkShards;
+        if (targetMail.rewards.shieldType) {
+          const sType = targetMail.rewards.shieldType;
+          newShields[sType] = (newShields[sType] || 0) + (targetMail.rewards.shieldCount || 1);
+        }
       }
 
       const updatedMessages = (current.mailMessages || []).map(m => m.id === mailId ? { ...m, isClaimed: true, isRead: true } : m);
@@ -787,6 +793,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         gold: newGold,
         dust: newDust,
         darkShards: newShards,
+        shieldsInventory: newShields,
         mailMessages: updatedMessages
       };
 
@@ -826,6 +833,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       let newGold = current.gold || 0;
       let newDust = current.dust || 0;
       let newShards = current.darkShards || 0;
+      let newShields = { ...(current.shieldsInventory || { '3h': 0, '6h': 0, '12h': 0 }) };
       let totalSovereigns = 0;
       let claimedCount = 0;
 
@@ -836,6 +844,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (m.rewards.dust) newDust += m.rewards.dust;
           if (m.rewards.darkShards) newShards += m.rewards.darkShards;
           if (m.rewards.bloodSovereigns) totalSovereigns += m.rewards.bloodSovereigns;
+          if (m.rewards.shieldType) {
+            const sType = m.rewards.shieldType;
+            newShields[sType] = (newShields[sType] || 0) + (m.rewards.shieldCount || 1);
+          }
           return { ...m, isClaimed: true, isRead: true };
         }
         return m;
@@ -846,6 +858,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         gold: newGold,
         dust: newDust,
         darkShards: newShards,
+        shieldsInventory: newShields,
         mailMessages: updatedMessages
       };
 
@@ -1562,6 +1575,33 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updated.pvpEnergyMax = limits.pvpMax;
         updated.lastPvpEnergyRefill = Date.now();
         updated.pvpTickets = updated.pvpEnergy + (updated.pvpBonusTickets || 0);
+
+        // Immediately deliver today's daily tribute mail upon activating or extending pass if not yet delivered today
+        const todayUtc = new Date().toISOString().slice(0, 10);
+        if (updated.lastDailySubscriptionMail !== todayUtc) {
+          const isUltra = tier === 'ultra';
+          const gold = isUltra ? 3000 : 1000;
+          const dust = isUltra ? 400 : 150;
+          const shieldType = isUltra ? '6h' : '3h';
+          const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+          const dailyMail = {
+            id: `mail_sub_${todayUtc}_${(updated.solanaAddress || 'guest').slice(-4)}_${uniqueSuffix}`,
+            title: isUltra ? '💎 Daily Ultra Overlord Tribute' : '⚜️ Daily Premium Tribute',
+            sender: 'Imperial Treasury',
+            body: `Hail, Lord ${updated.username || 'Voidwalker'}!\n\nYour imperial covenant tribute for ${todayUtc} has arrived at your dominion:\n• +${gold.toLocaleString()} Gold\n• +${dust} Dark Dust\n• 1x ${shieldType} Void Aegis Shield\n\nClaim these resources to fortify your rank in the Abyss!`,
+            rewards: {
+              gold,
+              dust,
+              shieldType,
+              shieldCount: 1
+            },
+            isClaimed: false,
+            isRead: false,
+            createdAt: Date.now()
+          };
+          updated.mailMessages = [dailyMail, ...(updated.mailMessages || [])].slice(0, 50);
+          updated.lastDailySubscriptionMail = todayUtc;
+        }
 
         msg = `${tier === 'ultra' ? '💎' : '⚜️'} Hail, Lord! You have unlocked the ${tier.toUpperCase()} Pass for ${durationDays} days! Energy & Tickets fully restored!`;
         success = true;

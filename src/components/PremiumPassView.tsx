@@ -11,21 +11,17 @@ import {
 } from 'lucide-react';
 
 export const PremiumPassView: React.FC = () => {
-  const { profile, buySubscription, claimDailySubscription, setIsShardsShopOpen } = useGame();
+  const { profile, buySubscription, setIsShardsShopOpen } = useGame();
   const toast = useToast();
 
   const [durationDays, setDurationDays] = useState<30 | 90>(30);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isClaiming, setIsClaiming] = useState(false);
 
   const isSubActive = !!(profile.subscriptionExpiresAt && profile.subscriptionExpiresAt > Date.now());
   const activeTier = isSubActive ? (profile.subscriptionTier || 'free') : 'free';
   const remainingDays = isSubActive 
     ? Math.max(1, Math.ceil(((profile.subscriptionExpiresAt || 0) - Date.now()) / (1000 * 60 * 60 * 24)))
     : 0;
-
-  const todayUtc = new Date().toISOString().slice(0, 10);
-  const isDailyClaimed = profile.lastDailySubscriptionClaim === todayUtc;
 
   // Prices in Dark Shards
   const PRICES = {
@@ -65,33 +61,6 @@ export const PremiumPassView: React.FC = () => {
     }
   };
 
-  const handleClaimDaily = async () => {
-    audioSystem.playClick();
-    if (!isSubActive) {
-      toast('Activate Premium or Ultra to unlock daily tributes!', 'warning');
-      return;
-    }
-    if (isDailyClaimed) {
-      toast('You have already claimed today’s tribute! Resets at 00:00 UTC.', 'info');
-      return;
-    }
-
-    setIsClaiming(true);
-    try {
-      const res = await claimDailySubscription();
-      if (res.success) {
-        toast(res.message, 'success');
-        audioSystem.playVictory();
-      } else {
-        toast(res.message, 'error');
-      }
-    } catch (e: any) {
-      toast(e.message || 'Failed to claim daily tribute', 'error');
-    } finally {
-      setIsClaiming(false);
-    }
-  };
-
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-8 animate-fade-in text-white font-sans">
       
@@ -102,128 +71,38 @@ export const PremiumPassView: React.FC = () => {
         <div className="absolute -bottom-24 -right-20 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)] pointer-events-none" />
 
-        <div className="relative z-10 text-center sm:text-left space-y-2.5 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-[11px] font-bold tracking-widest uppercase">
-            <Crown className="w-3.5 h-3.5 text-amber-400" />
-            Imperial Privileges & Pass
-          </div>
-          
-          <h1 className="text-2xl sm:text-4xl font-display font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-amber-300 to-yellow-500 drop-shadow-[0_2px_12px_rgba(245,158,11,0.3)] uppercase">
-            Void Covenant Pass
-          </h1>
-          
-          <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans max-w-2xl">
-            Elevate your dominion over the Abyss: expanded daily PvP tickets, guaranteed Blood Sovereigns on arena wins, daily Peace Shields, accelerated energy recovery, and <span className="text-amber-300 font-semibold drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]">increased seasonal leaderboard rewards (+15% Premium / +25% Ultra)</span>.
-          </p>
-        </div>
-
-        {/* Current Active Subscription Status / Daily Tribute Claim */}
-        <div className="mt-8 pt-6 border-t border-white/10 relative z-10">
-          <div className={`p-4 sm:p-5 rounded-2xl border transition-all ${
-            activeTier === 'ultra'
-              ? 'bg-gradient-to-r from-purple-950/70 via-black/80 to-purple-950/70 border-purple-400/50 shadow-[0_0_25px_rgba(168,85,247,0.2)]'
-              : activeTier === 'premium'
-              ? 'bg-gradient-to-r from-amber-950/70 via-black/80 to-amber-950/70 border-amber-400/50 shadow-[0_0_25px_rgba(245,158,11,0.2)]'
-              : 'bg-black/50 border-white/10'
-          }`}>
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3.5 text-center md:text-left">
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border ${
-                  activeTier === 'ultra'
-                    ? 'bg-purple-900/60 border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.5)]'
-                    : activeTier === 'premium'
-                    ? 'bg-amber-900/60 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.5)]'
-                    : 'bg-white/5 border-white/10'
-                }`}>
-                  {activeTier === 'ultra' ? (
-                    <span className="text-xl">💎</span>
-                  ) : activeTier === 'premium' ? (
-                    <span className="text-xl">⚜️</span>
-                  ) : (
-                    <Shield className="w-5 h-5 text-gray-500" />
-                  )}
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-center md:justify-start gap-2">
-                    <span className="font-display font-black text-sm sm:text-base tracking-wider uppercase">
-                      {activeTier === 'ultra' 
-                        ? 'Ultra Overlord Pass' 
-                        : activeTier === 'premium' 
-                        ? 'Premium Sovereign Pass' 
-                        : 'Standard Lord (Free Tier)'}
-                    </span>
-                    {isSubActive ? (
-                      <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-500/60 text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)]">
-                        ACTIVE
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-mono text-gray-500 px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
-                        INACTIVE
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-xs text-gray-400 font-sans mt-0.5">
-                    {isSubActive ? (
-                      <span>Valid until <strong className="text-gray-200 font-mono">{new Date(profile.subscriptionExpiresAt || 0).toLocaleDateString()}</strong> ({remainingDays} days remaining)</span>
-                    ) : (
-                      <span>Activate Premium or Ultra to maximize battle revenue and protection</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Daily Claim Button & Stipend */}
-              <div className="flex flex-col sm:flex-row items-center gap-3.5 w-full md:w-auto">
-                {isSubActive && (
-                  <div className="text-center md:text-right text-[11px] font-mono text-gray-300">
-                    <span className="text-amber-400 font-bold block mb-1">Daily Tribute:</span>
-                    <div className="inline-flex items-center gap-2 bg-black/50 px-2.5 py-1 rounded-lg border border-white/10">
-                      {/* Gold */}
-                      <span className="inline-flex items-center gap-1 font-bold text-amber-300">
-                        +{activeTier === 'ultra' ? '3,000' : '1,000'}
-                        <img src="/icons/icon_gold.webp" alt="Gold" className="w-3.5 h-3.5 object-contain" />
-                      </span>
-                      <span className="text-gray-600">•</span>
-                      {/* Dust */}
-                      <span className="inline-flex items-center gap-1 font-bold text-cyan-300">
-                        +{activeTier === 'ultra' ? '400' : '150'}
-                        <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 object-contain" />
-                      </span>
-                      <span className="text-gray-600">•</span>
-                      {/* Shield */}
-                      <span className="inline-flex items-center gap-1 font-bold text-gray-200">
-                        1x {activeTier === 'ultra' ? '6h' : '3h'}
-                        <img 
-                          src={activeTier === 'ultra' ? '/icons/shield_6h.png' : '/icons/shield_3h.png'} 
-                          alt="Shield" 
-                          className="w-3.5 h-3.5 object-contain drop-shadow-[0_0_4px_rgba(6,182,212,0.6)]" 
-                        />
-                      </span>
-                    </div>
-                  </div>
-                )}
-                <button
-                  onClick={handleClaimDaily}
-                  disabled={isClaiming || !isSubActive || isDailyClaimed}
-                  className={`w-full sm:w-auto px-5 py-2.5 rounded-xl font-display font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                    isDailyClaimed
-                      ? 'bg-black/60 border border-white/10 text-gray-500 cursor-default'
-                      : isSubActive
-                      ? 'bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-600 hover:from-emerald-500 hover:to-teal-400 text-black font-black shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:scale-105 active:scale-95'
-                      : 'bg-white/5 border border-white/10 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  <Gift className="w-4 h-4" />
-                  {isDailyClaimed 
-                    ? '✓ Tribute Claimed' 
-                    : isSubActive 
-                    ? (isClaiming ? 'Claiming...' : 'Claim Tribute') 
-                    : 'Tribute Locked'}
-                </button>
-              </div>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="text-center sm:text-left space-y-2.5 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-[11px] font-bold tracking-widest uppercase">
+              <Crown className="w-3.5 h-3.5 text-amber-400" />
+              Imperial Privileges & Pass
             </div>
+            
+            <h1 className="text-2xl sm:text-4xl font-display font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-amber-300 to-yellow-500 drop-shadow-[0_2px_12px_rgba(245,158,11,0.3)] uppercase">
+              Void Covenant Pass
+            </h1>
+            
+            <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans max-w-2xl">
+              Elevate your dominion over the Abyss: expanded daily PvP tickets, guaranteed Blood Sovereigns on arena wins, daily Peace Shields, accelerated energy recovery, and <span className="text-amber-300 font-semibold drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]">increased seasonal leaderboard rewards (+15% Premium / +25% Ultra)</span>.
+            </p>
           </div>
+
+          {isSubActive && (
+            <div className="shrink-0 flex sm:flex-col items-center sm:items-end justify-center gap-1.5 p-3.5 px-4 rounded-2xl bg-black/50 border border-amber-500/30 shadow-[0_0_20px_rgba(245,158,11,0.15)] backdrop-blur-md">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">{activeTier === 'ultra' ? '💎' : '⚜️'}</span>
+                <span className="font-display font-black text-xs sm:text-sm tracking-wider uppercase text-amber-300">
+                  {activeTier === 'ultra' ? 'Ultra Overlord' : 'Premium Sovereign'}
+                </span>
+                <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-500/60 text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)]">
+                  ACTIVE
+                </span>
+              </div>
+              <span className="text-[11px] font-mono text-gray-400">
+                Valid until {new Date(profile.subscriptionExpiresAt || 0).toLocaleDateString()} ({remainingDays}d left)
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -395,7 +274,7 @@ export const PremiumPassView: React.FC = () => {
                 </div>
                 <div>
                   <div className="font-bold text-teal-300 text-xs">Daily Stipend: +1,000 Gold & +150 Dust</div>
-                  <div className="text-[11px] text-gray-400">Claimable tribute resource grant every day</div>
+                  <div className="text-[11px] text-gray-400">Delivered directly to your in-game Mailbox every day at 00:00 UTC</div>
                 </div>
               </div>
 
@@ -587,7 +466,7 @@ export const PremiumPassView: React.FC = () => {
                 </div>
                 <div>
                   <div className="font-bold text-teal-300 text-xs">Daily Stipend: +3,000 Gold & +400 Dust</div>
-                  <div className="text-[11px] text-gray-400">Massive daily resource grant claimable every 24 hours</div>
+                  <div className="text-[11px] text-gray-400">Delivered directly to your in-game Mailbox every day at 00:00 UTC</div>
                 </div>
               </div>
 

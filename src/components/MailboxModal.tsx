@@ -360,6 +360,21 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
                           <span className="font-mono text-[9px] text-gray-400 uppercase">SHARDS</span>
                         </div>
                       )}
+
+                      {/* Void Peace Shield */}
+                      {selectedMail.rewards.shieldType && (
+                        <div className="flex flex-col items-center p-3 rounded-2xl bg-white/5 border border-cyan-500/20 shadow-[0_0_12px_rgba(6,182,212,0.15)]">
+                          <img 
+                            src={selectedMail.rewards.shieldType === '6h' ? '/icons/shield_6h.png' : '/icons/shield_3h.png'} 
+                            alt="Shield" 
+                            className="w-8 h-8 object-contain mb-1 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" 
+                          />
+                          <span className="font-mono font-bold text-sm text-cyan-300">
+                            +{selectedMail.rewards.shieldCount || 1}
+                          </span>
+                          <span className="font-mono text-[9px] text-cyan-400/80 uppercase font-bold">{selectedMail.rewards.shieldType} SHIELD</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Claim Button */}

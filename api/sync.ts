@@ -370,6 +370,37 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
+    // Deliver Daily Subscription Mail if due
+    const isSubActive = currentProfile.subscriptionExpiresAt && currentProfile.subscriptionExpiresAt > Date.now();
+    const todayUtc = new Date().toISOString().slice(0, 10);
+    if (isSubActive && currentProfile.lastDailySubscriptionMail !== todayUtc) {
+      const tier = currentProfile.subscriptionTier || 'premium';
+      const isUltra = tier === 'ultra';
+      const gold = isUltra ? 3000 : 1000;
+      const dust = isUltra ? 400 : 150;
+      const shieldType = isUltra ? '6h' : '3h';
+      const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+      const dailyMail = {
+        id: `mail_sub_${todayUtc}_${walletAddress.slice(-4)}_${uniqueSuffix}`,
+        title: isUltra ? '💎 Daily Ultra Overlord Tribute' : '⚜️ Daily Premium Tribute',
+        sender: 'Imperial Treasury',
+        body: `Hail, Lord ${currentProfile.username || 'Voidwalker'}!\n\nYour imperial covenant tribute for ${todayUtc} has arrived at your dominion:\n• +${gold.toLocaleString()} Gold\n• +${dust} Dark Dust\n• 1x ${shieldType} Void Aegis Shield\n\nClaim these resources to fortify your rank in the Abyss!`,
+        rewards: {
+          gold,
+          dust,
+          shieldType,
+          shieldCount: 1
+        },
+        isClaimed: false,
+        isRead: false,
+        createdAt: Date.now()
+      };
+
+      currentProfile.mailMessages = [dailyMail, ...(currentProfile.mailMessages || [])].slice(0, 50);
+      currentProfile.lastDailySubscriptionMail = todayUtc;
+      if (!safeProfileData) safeProfileData = {};
+    }
+
     if (safeProfileData) {
       const newUpdatedAt = new Date().toISOString();
       let updateQuery = supabase

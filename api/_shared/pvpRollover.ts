@@ -332,7 +332,7 @@ export async function checkAndPerformPvpRollover(
       originalLeague: r.data?.pvpLeague || 'Bronze'
     }));
 
-    // 4. Reset daily tickets based on subscription tier (Free: 5, Premium: 8, Ultra: 12), keeping bonus tickets intact
+    // 4. Reset daily tickets based on subscription tier (Free: 5, Premium: 8, Ultra: 12), keeping bonus tickets intact, and deliver daily subscription tribute mail
     players.forEach(p => {
       const isSubActive = p.profile.subscriptionExpiresAt && p.profile.subscriptionExpiresAt > Date.now();
       const tier = isSubActive ? (p.profile.subscriptionTier || 'free') : 'free';
@@ -341,6 +341,32 @@ export async function checkAndPerformPvpRollover(
       p.profile.pvpEnergyMax = pvpMax;
       p.profile.pvpBonusTickets = p.profile.pvpBonusTickets || 0;
       p.profile.pvpTickets = pvpMax + p.profile.pvpBonusTickets;
+
+      // Deliver daily tribute mail if subscription is active
+      if (isSubActive && p.profile.lastDailySubscriptionMail !== todayUtc) {
+        const isUltra = tier === 'ultra';
+        const gold = isUltra ? 3000 : 1000;
+        const dust = isUltra ? 400 : 150;
+        const shieldType = isUltra ? '6h' : '3h';
+        const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        const dailyMail = {
+          id: `mail_sub_${todayUtc}_${p.walletAddress.slice(-4)}_${uniqueSuffix}`,
+          title: isUltra ? '💎 Daily Ultra Overlord Tribute' : '⚜️ Daily Premium Tribute',
+          sender: 'Imperial Treasury',
+          body: `Hail, Lord ${p.profile.username || 'Voidwalker'}!\n\nYour imperial covenant tribute for ${todayUtc} has arrived at your dominion:\n• +${gold.toLocaleString()} Gold\n• +${dust} Dark Dust\n• 1x ${shieldType} Void Aegis Shield\n\nClaim these resources to fortify your rank in the Abyss!`,
+          rewards: {
+            gold,
+            dust,
+            shieldType,
+            shieldCount: 1
+          },
+          isClaimed: false,
+          isRead: false,
+          createdAt: Date.now()
+        };
+        p.profile.mailMessages = [dailyMail, ...(p.profile.mailMessages || [])].slice(0, 50);
+        p.profile.lastDailySubscriptionMail = todayUtc;
+      }
     });
 
     let totalPromoted = 0;

@@ -116,7 +116,8 @@ export interface PlayerProfile {
   isPremiumBP?: boolean;
   subscriptionTier?: 'free' | 'premium' | 'ultra';
   subscriptionExpiresAt?: number; // timestamp ms
-  lastDailySubscriptionClaim?: string; // YYYY-MM-DD
+  lastDailySubscriptionClaim?: string; // YYYY-MM-DD (legacy manual claim)
+  lastDailySubscriptionMail?: string; // YYYY-MM-DD
   shieldsInventory?: { '3h': number; '6h': number; '12h'?: number };
   activeShieldUntil?: number; // timestamp ms
   dailySovereignsWonToday?: number;
@@ -177,6 +178,8 @@ export interface MailMessage {
     dust?: number;
     darkShards?: number;
     bloodSovereigns?: number;
+    shieldType?: '3h' | '6h' | '12h';
+    shieldCount?: number;
     cards?: string[];
     equipment?: string[];
   };
