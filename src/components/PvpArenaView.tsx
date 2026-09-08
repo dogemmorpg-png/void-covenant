@@ -808,18 +808,24 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             </div>
 
             {/* Daily Sovereigns Won Progress (for subscribers or when > 0) */}
-            {(isMySubActive || (profile.dailySovereignsWonToday || 0) > 0) && (
-              <>
-                <div className="hidden sm:block w-px h-8 bg-white/10 shrink-0 self-center" />
-                <div className="text-center px-2 sm:px-3 min-w-[95px] sm:min-w-[105px]">
-                  <span className="text-[10px] font-mono text-amber-400 uppercase tracking-widest font-bold block">DAILY SOV</span>
-                  <div className="font-mono text-sm sm:text-base font-black text-amber-300 flex items-center justify-center gap-1 mt-1">
-                    <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 object-contain shrink-0" />
-                    <span>{profile.dailySovereignsWonToday || 0}/{mySubTier === 'ultra' ? 24 : 10}</span>
+            {(() => {
+              const todayUtc = new Date().toISOString().slice(0, 10);
+              const wonToday = profile.lastSovereignsWonDate === todayUtc ? (profile.dailySovereignsWonToday || 0) : 0;
+              const cap = mySubTier === 'ultra' ? 24 : 10;
+              if (!isMySubActive && wonToday === 0) return null;
+              return (
+                <>
+                  <div className="hidden sm:block w-px h-8 bg-white/10 shrink-0 self-center" />
+                  <div className="text-center px-2 sm:px-3 min-w-[95px] sm:min-w-[105px]">
+                    <span className="text-[10px] font-mono text-amber-400 uppercase tracking-widest font-bold block">DAILY SOV</span>
+                    <div className="font-mono text-sm sm:text-base font-black text-amber-300 flex items-center justify-center gap-1 mt-1">
+                      <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 object-contain shrink-0" />
+                      <span>{wonToday}/{cap}</span>
+                    </div>
                   </div>
-                </div>
-              </>
-            )}
+                </>
+              );
+            })()}
 
             <div className="hidden sm:block w-px h-8 bg-white/10 shrink-0 self-center" />
 

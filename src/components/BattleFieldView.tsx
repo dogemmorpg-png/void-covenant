@@ -417,6 +417,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
   // Track the final target battle state once the calculation resolves
   const [finalBattleState, setFinalBattleState] = useState<BattleState | null>(null);
+  const battleResultSubmittedRef = useRef<boolean>(false);
 
   // Sovereigns earned in this battle (for PvP victory screen)
   const [earnedSovereigns, setEarnedSovereigns] = useState<number>(() => {
@@ -985,6 +986,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
   // Rewards distribution
   const handleBattleWon = async () => {
+    if (battleResultSubmittedRef.current) return;
+    battleResultSubmittedRef.current = true;
     audioSystem.playMagic();
     
     if (battleType === 'pvp') {
@@ -1006,7 +1009,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
   // PVP Specific endings
   const handlePvpWon = async () => {
-    audioSystem.playMagic();
     const res = await submitBattleResult('pvp', 'pvp', 'win');
     if (res.success) {
       if (res.sovereignsReward !== undefined) {
@@ -1021,6 +1023,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   };
 
   const handleBattleLost = async () => {
+    if (battleResultSubmittedRef.current) return;
+    battleResultSubmittedRef.current = true;
     audioSystem.playError();
     const res = await submitBattleResult(battleType, stage.id.toString(), 'loss');
     if (!res.success) {
@@ -2739,7 +2743,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                 {/* Blood Sovereigns (PvP Only - Subscriber Bounty when > 0) */}
                 {battleType === 'pvp' && earnedSovereigns > 0 && (
-                  <div className="bg-gradient-to-b from-amber-950/50 via-black to-black border border-amber-500/50 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.25)] animate-pulse">
+                  <div className="bg-gradient-to-b from-amber-950/50 via-black to-black border border-amber-500/50 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.2)]">
                     <span className="text-amber-400 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
                       +{earnedSovereigns}
                       <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />

@@ -369,6 +369,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
               prev.dust !== migrated.dust ||
               prev.darkShards !== migrated.darkShards ||
               prev.bloodSovereigns !== migrated.bloodSovereigns ||
+              prev.dailySovereignsWonToday !== migrated.dailySovereignsWonToday ||
+              prev.lastSovereignsWonDate !== migrated.lastSovereignsWonDate ||
+              prev.subscriptionTier !== migrated.subscriptionTier ||
+              prev.subscriptionExpiresAt !== migrated.subscriptionExpiresAt ||
+              prev.pvpEnergy !== migrated.pvpEnergy ||
+              prev.pvpBonusTickets !== migrated.pvpBonusTickets ||
               (prev.mailMessages?.length || 0) !== (migrated.mailMessages?.length || 0) ||
               (prev.sovereignTransactions?.length || 0) !== (migrated.sovereignTransactions?.length || 0) ||
               prev.level !== migrated.level ||
