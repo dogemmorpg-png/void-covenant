@@ -82,13 +82,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const walletAddress = decoded.walletAddress;
     try {
       const supabase = getSupabase();
+
+      // Get user's own profile for unclaimed and total earned referral sovereigns
+      const { data: myProfileRows } = await supabase
+        .from('profiles')
+        .select('data')
+        .eq('wallet_address', walletAddress)
+        .limit(1);
+      const myData = myProfileRows?.[0]?.data || {};
+      const unclaimedSovereigns = myData.referralSovereignsUnclaimed || 0;
+      const totalEarnedSovereigns = myData.referralSovereignsTotalEarned || 0;
+
       const { data: refRows, error: refError } = await supabase
         .from('referrals')
         .select('referred_wallet, created_at')
         .eq('referrer_wallet', walletAddress);
 
       if (refError || !refRows || refRows.length === 0) {
-        return res.status(200).json({ referrals: [] });
+        return res.status(200).json({ 
+          referrals: [],
+          unclaimedSovereigns,
+          totalEarnedSovereigns
+        });
       }
 
       const referredWallets = refRows.map((r: any) => r.referred_wallet);
@@ -100,16 +115,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const referrals = refRows.map((r: any) => {
         const matchingProfile = profileRows?.find((p: any) => p.wallet_address === r.referred_wallet);
         const profileData = matchingProfile?.data || {};
+        const isSubActive = profileData.subscriptionExpiresAt && profileData.subscriptionExpiresAt > Date.now();
+        const subTier = isSubActive ? (profileData.subscriptionTier || 'free') : 'free';
         return {
           wallet: r.referred_wallet,
           username: profileData.username || 'Anonymous',
           level: profileData.level || 1,
           avatarUrl: profileData.avatarUrl || '/avatars/knight.webp',
-          joinedAt: r.created_at
+          joinedAt: r.created_at,
+          subscriptionTier: subTier
         };
       });
 
-      return res.status(200).json({ referrals });
+      return res.status(200).json({ 
+        referrals,
+        unclaimedSovereigns,
+        totalEarnedSovereigns
+      });
     } catch (e: any) {
       return res.status(500).json({ error: e.message });
     }
@@ -1215,6 +1237,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         profile.lastDailySubscriptionMail = todayUtc;
       }
 
+      // One-time subscription bounty for referrer: 300 SOV for Premium, 600 SOV for Ultra
+      if (profile.referredBy) {
+        profile.referralSubBountiesAwarded = profile.referralSubBountiesAwarded || {};
+        const bountyTier = tier as 'premium' | 'ultra';
+        if (!profile.referralSubBountiesAwarded[bountyTier]) {
+          profile.referralSubBountiesAwarded[bountyTier] = true;
+          const bountyAmount = bountyTier === 'ultra' ? 600 : 300;
+          try {
+            const { data: refOwnerRows } = await supabase
+              .from('profiles')
+              .select('data')
+              .eq('wallet_address', profile.referredBy)
+              .limit(1);
+            if (refOwnerRows && refOwnerRows.length > 0) {
+              const refData = refOwnerRows[0].data || {};
+              refData.referralSovereignsUnclaimed = Number(((refData.referralSovereignsUnclaimed || 0) + bountyAmount).toFixed(2));
+              refData.referralSovereignsTotalEarned = Number(((refData.referralSovereignsTotalEarned || 0) + bountyAmount).toFixed(2));
+              await supabase
+                .from('profiles')
+                .update({ data: refData, updated_at: new Date().toISOString() })
+                .eq('wallet_address', profile.referredBy);
+            }
+          } catch (refBountyErr) {
+            console.error('Failed to credit referrer subscription bounty:', refBountyErr);
+          }
+        }
+      }
+
       successMessage = `${tier === 'ultra' ? '💎' : '⚜️'} Hail, Lord! You have unlocked the ${tier.toUpperCase()} Pass for ${durationDays} days! Energy & Tickets fully restored, and your daily tribute has been sent to your Mail!`;
       responseData = { 
         subscriptionTier: tier, 
@@ -1305,6 +1355,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       successMessage = `🛡️ Purchased 1x ${shieldType} Void Aegis Shield!`;
       responseData = { shieldsInventory: profile.shieldsInventory, darkShards: profile.darkShards };
+    } else if (action === 'claim_referral_sovereigns') {
+      const unclaimed = profile.referralSovereignsUnclaimed || 0;
+      const wholeUnits = Math.floor(unclaimed);
+      if (wholeUnits < 1) {
+        return res.status(400).json({ error: 'You need at least 1 whole Blood Sovereign to transfer to the Bank.' });
+      }
+
+      profile.referralSovereignsUnclaimed = Number((unclaimed - wholeUnits).toFixed(2));
+      profile.bloodSovereigns = (profile.bloodSovereigns || 0) + wholeUnits;
+      profile = recordSovereignTransaction(
+        profile,
+        'REFERRAL_COMMISSION',
+        wholeUnits,
+        `Transferred ${wholeUnits} Blood Sovereigns from Referral Vault to Bank`,
+        { transferredAmount: wholeUnits, remainingUnclaimed: profile.referralSovereignsUnclaimed }
+      );
+
+      successMessage = `Transferred ${wholeUnits} Blood Sovereigns to your Imperial Bank!`;
+      responseData = {
+        claimedSovereigns: wholeUnits,
+        referralSovereignsUnclaimed: profile.referralSovereignsUnclaimed,
+        bloodSovereigns: profile.bloodSovereigns
+      };
     } else {
       return res.status(400).json({ error: 'Unknown action' });
     }

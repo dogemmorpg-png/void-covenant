@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { LogOut, Copy, X, Trophy, User, Clock, Plus, UserPlus, Send, Mail, ShieldAlert } from 'lucide-react';
+import { LogOut, Copy, X, Trophy, User, Clock, Plus, UserPlus, Send, Mail, ShieldAlert, Sparkles, Crown, Gift, ArrowRight } from 'lucide-react';
 import { audioSystem } from '../utils/AudioSystem';
+import { useToast } from './Toast';
 import { MailboxModal } from './MailboxModal';
 import { AdminPanelModal } from './AdminPanelModal';
 
@@ -11,14 +12,16 @@ interface HeaderHUDProps {
 }
 
 export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
-  const { profile, logoutPlayer, isShardsShopOpen, setIsShardsShopOpen } = useGame();
+  const { profile, logoutPlayer, isShardsShopOpen, setIsShardsShopOpen, claimReferralSovereigns } = useGame();
   const { disconnect } = useWallet();
+  const toast = useToast();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMailboxOpen, setIsMailboxOpen] = useState(false);
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
   const [referralsList, setReferralsList] = useState<any[]>([]);
   const [isLoadingReferrals, setIsLoadingReferrals] = useState(false);
+  const [isClaimingSovereigns, setIsClaimingSovereigns] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
   const isAdmin = 
@@ -32,6 +35,32 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
     navigator.clipboard.writeText(link);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
+  };
+
+  const handleClaimReferralSovereigns = async () => {
+    if (isClaimingSovereigns) return;
+    const unclaimed = profile.referralSovereignsUnclaimed || 0;
+    const wholeUnits = Math.floor(unclaimed);
+    if (wholeUnits < 1) {
+      toast('You need at least 1 whole Blood Sovereign to transfer to your Bank.', 'info');
+      return;
+    }
+
+    setIsClaimingSovereigns(true);
+    audioSystem.playClick();
+    try {
+      const res = await claimReferralSovereigns();
+      if (res.success) {
+        audioSystem.playVictory();
+        toast(res.message || `Transferred ${wholeUnits} Blood Sovereigns to Bank!`, 'success');
+      } else {
+        toast(res.message || 'Failed to transfer sovereigns', 'error');
+      }
+    } catch (e: any) {
+      toast(e.message || 'Transfer failed', 'error');
+    } finally {
+      setIsClaimingSovereigns(false);
+    }
   };
 
   useEffect(() => {
@@ -289,33 +318,110 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
             </div>
 
             {/* Body */}
-            <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+            <div className="p-5 space-y-4 max-h-[78vh] overflow-y-auto">
               
               {/* Reward Overview Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Friend Reward */}
-                <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
-                  <span className="text-[11px] font-sans text-gray-400 font-medium">Friend receives on sign up</span>
-                  <div className="mt-2 flex items-center gap-2">
-                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-7 h-7 object-contain" />
-                    <span className="text-xl font-mono font-bold text-amber-400">+200 Gold</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {/* Friend Starter Bonus */}
+                <div className="bg-black/40 border border-white/5 rounded-2xl p-3.5 flex flex-col justify-between">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-sans text-gray-400 font-semibold uppercase tracking-wider">Friend Bonus</span>
+                    <Gift className="w-3.5 h-3.5 text-amber-400" />
                   </div>
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-6 h-6 object-contain" />
+                    <span className="text-base sm:text-lg font-mono font-bold text-amber-400">+1,000 Gold</span>
+                  </div>
+                  <span className="text-[9px] text-gray-500 font-sans mt-1">Free starter boost (500 without link)</span>
                 </div>
 
-                {/* You Reward */}
-                <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
-                  <span className="text-[11px] font-sans text-gray-400 font-medium">You receive on Level 10</span>
-                  <div className="mt-2 flex items-center gap-2 flex-wrap">
-                    <span className="text-lg font-mono font-bold text-amber-400 flex items-center gap-1">
-                      <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 object-contain" /> +1,000
-                    </span>
-                    <span className="text-gray-500 font-bold">&</span>
-                    <span className="text-lg font-mono font-bold text-[#66fcf1] flex items-center gap-1">
-                      <img src="/icons/icon_dust.webp" alt="Dust" className="w-5 h-5 object-contain" /> +100
-                    </span>
+                {/* 15% Sovereign Share */}
+                <div className="bg-black/40 border border-amber-500/20 rounded-2xl p-3.5 flex flex-col justify-between">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-sans text-amber-400/90 font-semibold uppercase tracking-wider">Lifetime Share</span>
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                   </div>
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <img src="/icons/sovereign.png" alt="SOV" className="w-6 h-6 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.5)]" />
+                    <span className="text-base sm:text-lg font-mono font-bold text-amber-300">15% Sovereigns</span>
+                  </div>
+                  <span className="text-[9px] text-gray-500 font-sans mt-1">From all Arena wins & Leaderboards</span>
+                </div>
+
+                {/* Pass Bounties */}
+                <div className="bg-black/40 border border-fuchsia-500/20 rounded-2xl p-3.5 flex flex-col justify-between">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-sans text-fuchsia-400/90 font-semibold uppercase tracking-wider">Pass Bounty</span>
+                    <Crown className="w-3.5 h-3.5 text-fuchsia-400" />
+                  </div>
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <img src="/icons/sovereign.png" alt="SOV" className="w-6 h-6 object-contain drop-shadow-[0_0_6px_rgba(217,70,239,0.5)]" />
+                    <span className="text-base sm:text-lg font-mono font-bold text-fuchsia-300">300 / 600 SOV</span>
+                  </div>
+                  <span className="text-[9px] text-gray-500 font-sans mt-1">When referral gets Premium or Ultra</span>
                 </div>
               </div>
+
+              {/* Referral Vault Card */}
+              {(() => {
+                const unclaimed = profile.referralSovereignsUnclaimed || 0;
+                const wholeUnits = Math.floor(unclaimed);
+                return (
+                  <div className="bg-gradient-to-r from-amber-950/40 via-black/60 to-purple-950/30 border border-amber-500/40 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg shadow-amber-950/20">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                        <span className="text-[10px] font-sans text-amber-300 uppercase tracking-widest font-bold">
+                          REFERRAL VAULT
+                        </span>
+                      </div>
+                      <div className="mt-1 flex items-baseline gap-2">
+                        <div className="flex items-center gap-1.5">
+                          <img src="/icons/sovereign.png" alt="SOV" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
+                          <span className="text-2xl font-mono font-bold text-amber-300">
+                            {unclaimed.toFixed(2)}
+                          </span>
+                          <span className="text-xs font-mono font-bold text-amber-400/80">SOV</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5 text-[10px] text-gray-400 font-mono">
+                        <span>Total Earned: <strong className="text-amber-300">{(profile.referralSovereignsTotalEarned || 0).toFixed(2)} SOV</strong></span>
+                        <span>•</span>
+                        <span>Recruits: <strong className="text-white">{profile.referralsCount || 0}</strong></span>
+                      </div>
+                    </div>
+
+                    <div className="w-full sm:w-auto flex flex-col items-stretch sm:items-end">
+                      {wholeUnits >= 1 ? (
+                        <button
+                          onClick={handleClaimReferralSovereigns}
+                          disabled={isClaimingSovereigns}
+                          className="w-full sm:w-auto bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-black font-display font-bold px-4 py-2.5 rounded-xl text-xs tracking-wider transition-all shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                          {isClaimingSovereigns ? (
+                            <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Sparkles className="w-4 h-4 text-black" />
+                          )}
+                          TRANSFER {wholeUnits} SOV TO BANK
+                        </button>
+                      ) : (
+                        <div className="flex flex-col items-stretch sm:items-end w-full">
+                          <button
+                            disabled
+                            className="bg-white/5 border border-white/10 text-gray-500 font-display font-bold px-4 py-2.5 rounded-xl text-xs tracking-wider cursor-not-allowed flex items-center justify-center gap-1.5"
+                          >
+                            TRANSFER TO BANK
+                          </button>
+                          <span className="text-[9px] text-gray-500 font-mono text-center sm:text-right mt-1">
+                            Requires ≥ 1 whole SOV to transfer
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Link Copy Box */}
               <div className="space-y-1.5">
@@ -337,10 +443,10 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                     </button>
 
                     <a
-                      href={`https://t.me/share/url?url=${encodeURIComponent(`${window.location.origin}?ref=${profile.solanaAddress || ''}`)}&text=${encodeURIComponent('Join Void Covenant! Sign up with my link to get +200 Gold starter bonus!')}`}
+                      href={`https://t.me/share/url?url=${encodeURIComponent(`${window.location.origin}?ref=${profile.solanaAddress || ''}`)}&text=${encodeURIComponent('Join Void Covenant! Sign up with my link to get +1,000 Gold starter bonus!')}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="bg-[#229ED9]/20 hover:bg-[#229ED9]/30 text-[#229ED9] hover:text-white px-3 py-2 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1 shrink-0"
+                      className="bg-[#229ED9]/20 hover:bg-[#229ED9]/30 text-[#229ED9] hover:text-white px-3 py-2 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center gap-1 shrink-0"
                       title="Share to Telegram"
                     >
                       <Send className="w-3.5 h-3.5" /> Telegram
@@ -349,27 +455,10 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                 </div>
               </div>
 
-              {/* Stats */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-black/30 border border-white/5 rounded-xl p-3 text-center">
-                  <span className="text-[10px] font-sans text-gray-500 uppercase font-semibold">Friends Invited</span>
-                  <span className="text-xl font-mono font-bold text-amber-400 mt-0.5 block">
-                    {profile.referralsCount || 0}
-                  </span>
-                </div>
-                <div className="bg-black/30 border border-white/5 rounded-xl p-3 text-center">
-                  <span className="text-[10px] font-sans text-gray-500 uppercase font-semibold">Total Gold Earned</span>
-                  <span className="text-xl font-mono font-bold text-amber-400 mt-0.5 block flex items-center justify-center gap-1">
-                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 object-contain inline-block" />
-                    {((profile.referralsCount || 0) * 1000).toLocaleString()}
-                  </span>
-                </div>
-              </div>
-
               {/* Friends List */}
               <div className="space-y-2 pt-1">
                 <div className="flex items-center justify-between border-b border-white/5 pb-1">
-                  <span className="text-xs font-display font-bold text-gray-300">Invited Friends List</span>
+                  <span className="text-xs font-display font-bold text-gray-300">Recruited Allies</span>
                   <span className="text-[10px] text-gray-500 font-mono">{referralsList.length} Friends</span>
                 </div>
 
@@ -380,17 +469,17 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                   </div>
                 ) : referralsList.length === 0 ? (
                   <div className="text-center py-6 text-xs text-gray-500 font-sans">
-                    No friends have joined using your link yet.
+                    No friends have joined using your link yet. Share your link to start earning!
                   </div>
                 ) : (
-                  <div className="space-y-2 max-h-[180px] overflow-y-auto pr-1">
+                  <div className="space-y-2 max-h-[190px] overflow-y-auto pr-1">
                     {referralsList.map((ref, idx) => (
                       <div 
                         key={idx} 
-                        className="bg-black/40 border border-white/5 rounded-xl p-2.5 flex items-center justify-between"
+                        className="bg-black/40 border border-white/5 hover:border-white/10 rounded-xl p-2.5 flex items-center justify-between transition-colors"
                       >
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center shrink-0">
                             {ref.avatarUrl ? (
                               <img src={ref.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                             ) : (
@@ -400,19 +489,23 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                           <div>
                             <span className="text-xs font-bold text-white block">{ref.username}</span>
                             <span className="text-[9px] text-gray-500 font-mono flex items-center gap-1">
-                              <Clock className="w-2.5 h-2.5" /> {new Date(ref.joinedAt).toLocaleDateString()}
+                              <Clock className="w-2.5 h-2.5" /> {new Date(ref.joinedAt).toLocaleDateString()} • LVL {ref.level || 1}
                             </span>
                           </div>
                         </div>
 
                         <div>
-                          {ref.level >= 10 ? (
-                            <span className="text-[9px] font-mono font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-2 py-0.5 rounded-md">
-                              LVL {ref.level} • REWARD CLAIMED
+                          {ref.subscriptionTier === 'ultra' ? (
+                            <span className="text-[9px] font-mono font-bold text-fuchsia-300 bg-fuchsia-950/50 border border-fuchsia-500/40 px-2 py-0.5 rounded-md flex items-center gap-1 shadow-[0_0_8px_rgba(217,70,239,0.3)]">
+                              <Crown className="w-2.5 h-2.5 text-fuchsia-400" /> ULTRA PASS
+                            </span>
+                          ) : ref.subscriptionTier === 'premium' ? (
+                            <span className="text-[9px] font-mono font-bold text-amber-300 bg-amber-950/50 border border-amber-500/40 px-2 py-0.5 rounded-md flex items-center gap-1 shadow-[0_0_8px_rgba(245,158,11,0.3)]">
+                              ⚜️ PREMIUM
                             </span>
                           ) : (
-                            <span className="text-[9px] font-mono font-bold text-amber-400 bg-amber-950/40 border border-amber-500/30 px-2 py-0.5 rounded-md">
-                              LVL {ref.level}/10 • IN PROGRESS
+                            <span className="text-[9px] font-mono font-medium text-gray-400 bg-white/5 border border-white/10 px-2 py-0.5 rounded-md">
+                              FREE TIER
                             </span>
                           )}
                         </div>

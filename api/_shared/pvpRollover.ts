@@ -371,6 +371,7 @@ export async function checkAndPerformPvpRollover(
 
     let totalPromoted = 0;
     let totalDemoted = 0;
+    const referrerCommissions = new Map<string, number>();
 
     // 5. Process each league
     for (let leagueIdx = 0; leagueIdx < PVP_LEAGUES.length; leagueIdx++) {
@@ -441,6 +442,17 @@ export async function checkAndPerformPvpRollover(
           }
         }
 
+        // 15% Referral Sovereign Commission (System-funded)
+        if (p.profile.referredBy && sovereignsReward > 0) {
+          const comm = Number((sovereignsReward * 0.15).toFixed(2));
+          if (comm > 0) {
+            referrerCommissions.set(
+              p.profile.referredBy,
+              Number(((referrerCommissions.get(p.profile.referredBy) || 0) + comm).toFixed(2))
+            );
+          }
+        }
+
         // Generate Mail Message for Player Inbox
         const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
         const mailMessage = {
@@ -459,6 +471,43 @@ export async function checkAndPerformPvpRollover(
         };
 
         p.profile.mailMessages = [mailMessage, ...(p.profile.mailMessages || [])].slice(0, 50);
+      }
+    }
+
+    // 4.5. Credit Referrer Commissions (15% system sovereign commission)
+    for (const [refWallet, totalComm] of referrerCommissions.entries()) {
+      if (totalComm <= 0) continue;
+      const activePlayer = players.find(pl => pl.walletAddress === refWallet);
+      if (activePlayer) {
+        activePlayer.profile.referralSovereignsUnclaimed = Number(
+          ((activePlayer.profile.referralSovereignsUnclaimed || 0) + totalComm).toFixed(2)
+        );
+        activePlayer.profile.referralSovereignsTotalEarned = Number(
+          ((activePlayer.profile.referralSovereignsTotalEarned || 0) + totalComm).toFixed(2)
+        );
+      } else {
+        try {
+          const { data: refRows } = await supabase
+            .from('profiles')
+            .select('data')
+            .eq('wallet_address', refWallet)
+            .limit(1);
+          if (refRows && refRows.length > 0) {
+            const refData = refRows[0].data || {};
+            refData.referralSovereignsUnclaimed = Number(
+              ((refData.referralSovereignsUnclaimed || 0) + totalComm).toFixed(2)
+            );
+            refData.referralSovereignsTotalEarned = Number(
+              ((refData.referralSovereignsTotalEarned || 0) + totalComm).toFixed(2)
+            );
+            await supabase
+              .from('profiles')
+              .update({ data: refData, updated_at: new Date().toISOString() })
+              .eq('wallet_address', refWallet);
+          }
+        } catch (refErr) {
+          console.error(`[PVP ROLLOVER] Failed to credit referrer commission to ${refWallet}:`, refErr);
+        }
       }
     }
 

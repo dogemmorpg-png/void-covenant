@@ -177,13 +177,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           
           isReferred = true;
           referrerAddress = referrer;
+
+          // Increment referrer's referralsCount
+          try {
+            const { data: refOwnerRows } = await supabase
+              .from('profiles')
+              .select('data')
+              .eq('wallet_address', referrer)
+              .limit(1);
+            if (refOwnerRows && refOwnerRows.length > 0) {
+              const refOwnerData = refOwnerRows[0].data || {};
+              refOwnerData.referralsCount = (refOwnerData.referralsCount || 0) + 1;
+              await supabase
+                .from('profiles')
+                .update({ data: refOwnerData, updated_at: new Date().toISOString() })
+                .eq('wallet_address', referrer);
+            }
+          } catch (refIncErr) {
+            console.error('Failed to increment referrer count on registration:', refIncErr);
+          }
         }
       }
 
       const starterDeck = generateStarterDeck();
 
       currentProfile = {
-        gold: isReferred ? 700 : 500,
+        gold: isReferred ? 1000 : 500,
         dust: 100,
         darkShards: 0,
         collection: starterDeck.collection,
@@ -206,6 +225,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         battlePassPoints: 40,
         battlePassClaimed: [],
         referralsCount: 0,
+        referralSovereignsUnclaimed: 0,
+        referralSovereignsTotalEarned: 0,
+        referralSubBountiesAwarded: {},
         completedTasks: [],
         solanaAddress: walletAddress,
         solBalance: 12.5,
@@ -341,33 +363,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
       if (safeProfileData.activeStance) currentProfile.activeStance = safeProfileData.activeStance;
-    }
-
-    // Anti-referral exploit: check if player reached Level 10 and has a referrer, and reward hasn't been paid out yet
-    if (currentProfile.referredBy && (currentProfile.level || 1) >= 10 && !currentProfile.referralRewardClaimed) {
-      const { data: refRows } = await supabase
-        .from('profiles')
-        .select('data')
-        .eq('wallet_address', currentProfile.referredBy)
-        .limit(1);
-        
-      if (refRows && refRows.length > 0) {
-        const refRow = refRows[0];
-        const refProfile = refRow.data;
-        
-        // Reward referrer
-        refProfile.referralsCount = (refProfile.referralsCount || 0) + 1;
-        refProfile.gold = (refProfile.gold || 0) + 1000;
-        refProfile.dust = (refProfile.dust || 0) + 100;
-        
-        await supabase
-          .from('profiles')
-          .update({ data: refProfile, updated_at: new Date().toISOString() })
-          .eq('wallet_address', currentProfile.referredBy);
-          
-        // Mark reward as claimed on referred player so they don't get double rewards
-        currentProfile.referralRewardClaimed = true;
-      }
     }
 
     // Deliver Daily Subscription Mail if due

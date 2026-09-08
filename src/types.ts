@@ -129,12 +129,15 @@ export interface PlayerProfile {
   mailMessages?: MailMessage[];
   shardTransactions?: ShardTransaction[];
   sovereignTransactions?: SovereignTransaction[];
+  referralSovereignsUnclaimed?: number;
+  referralSovereignsTotalEarned?: number;
+  referralSubBountiesAwarded?: { premium?: boolean; ultra?: boolean };
 }
 
 export interface SovereignTransaction {
   id: string;
   timestamp: string; // ISO 8601
-  action: 'PVP_VICTORY' | 'LEAGUE_ROLLOVER' | 'MAIL_CLAIM' | 'ADMIN_ADJUSTMENT' | 'WITHDRAWAL';
+  action: 'PVP_VICTORY' | 'LEAGUE_ROLLOVER' | 'MAIL_CLAIM' | 'ADMIN_ADJUSTMENT' | 'WITHDRAWAL' | 'REFERRAL_COMMISSION';
   sovereignsChange: number; // e.g. +400 or -2000
   sovereignsBefore: number;
   sovereignsAfter: number;

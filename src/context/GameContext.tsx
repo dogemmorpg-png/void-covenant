@@ -41,6 +41,7 @@ interface GameContextType {
   claimDailySubscription: () => Promise<{ success: boolean; message: string }>;
   activateShield: (shieldType: '3h' | '6h' | '12h') => Promise<{ success: boolean; message: string }>;
   buyShield: (shieldType: '3h' | '6h' | '12h') => Promise<{ success: boolean; message: string }>;
+  claimReferralSovereigns: () => Promise<{ success: boolean; message: string; claimedSovereigns?: number }>;
   addExp: (amount: number) => void;
   addCampaignStars: (stageId: string, stars: number) => void;
   addEquipment: (equipment: Equipment) => void;
@@ -1613,6 +1614,37 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success, message: msg, profile: updatedProfile };
     }
 
+    if (action === 'claim_referral_sovereigns') {
+      let claimedUnits = 0;
+      let msg = '';
+      let success = false;
+      setProfile(current => {
+        const unclaimed = current.referralSovereignsUnclaimed || 0;
+        const wholeUnits = Math.floor(unclaimed);
+        if (wholeUnits < 1) {
+          msg = 'You need at least 1 whole Blood Sovereign to transfer to the Bank.';
+          success = false;
+          return current;
+        }
+
+        claimedUnits = wholeUnits;
+        let updated = { ...current };
+        updated.referralSovereignsUnclaimed = Number((unclaimed - wholeUnits).toFixed(2));
+        updated = recordSovereignTransaction(
+          updated,
+          'REFERRAL_COMMISSION',
+          wholeUnits,
+          `Transferred ${wholeUnits} Blood Sovereigns from Referral Vault to Bank`,
+          { transferredAmount: wholeUnits, remainingUnclaimed: updated.referralSovereignsUnclaimed }
+        );
+        msg = `Transferred ${wholeUnits} Blood Sovereigns to your Imperial Bank!`;
+        success = true;
+        saveProfile(updated);
+        return updated;
+      });
+      return { success, message: msg, claimedSovereigns: claimedUnits };
+    }
+
     return { success: true, message: 'Action saved locally.' };
   };
 
@@ -1772,6 +1804,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return await submitAction('buy_shield', { shieldType });
   };
 
+  const claimReferralSovereigns = async () => {
+    return await submitAction('claim_referral_sovereigns', {});
+  };
+
   return (
     <GameContext.Provider
       value={{
@@ -1792,6 +1828,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         claimDailySubscription,
         activateShield,
         buyShield,
+        claimReferralSovereigns,
         usePveEnergy,
         usePvpEnergy,
         buyPvpTickets,

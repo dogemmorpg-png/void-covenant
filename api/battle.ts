@@ -267,6 +267,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             );
           }
         }
+
+        // 15% Sovereign Commission to Referrer (System-funded)
+        if (profile.referredBy && sovereignsReward > 0) {
+          const comm = Number((sovereignsReward * 0.15).toFixed(2));
+          if (comm > 0) {
+            try {
+              const { data: refOwnerRows } = await supabase
+                .from('profiles')
+                .select('data')
+                .eq('wallet_address', profile.referredBy)
+                .limit(1);
+              if (refOwnerRows && refOwnerRows.length > 0) {
+                const refOwnerData = refOwnerRows[0].data || {};
+                refOwnerData.referralSovereignsUnclaimed = Number(((refOwnerData.referralSovereignsUnclaimed || 0) + comm).toFixed(2));
+                refOwnerData.referralSovereignsTotalEarned = Number(((refOwnerData.referralSovereignsTotalEarned || 0) + comm).toFixed(2));
+                await supabase
+                  .from('profiles')
+                  .update({ data: refOwnerData, updated_at: new Date().toISOString() })
+                  .eq('wallet_address', profile.referredBy);
+              }
+            } catch (refCommissionErr) {
+              console.error('Failed to credit referrer PvP commission:', refCommissionErr);
+            }
+          }
+        }
       } else {
         goldReward = applyMultiplierWithMinimum(50, goldMultiplier);
         dustReward = 5;
