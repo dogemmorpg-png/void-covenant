@@ -3,7 +3,7 @@ import { useToast } from '../components/Toast';
 import { Card, PlayerProfile, CampaignStage, BattlePassTier, CardTemplate, CardTier, Equipment, EquipmentSlot } from '../types';
 import { getStarterDeck, CARD_TEMPLATES, createCardInstance, getCardManaCost, getEvolutionBonusSkill, BATTLE_PASS_TIERS, AIRDROP_TASKS } from '../data/cards';
 import { supabase } from '../utils/supabaseClient';
-import { calculateEnergy } from '../utils/energyHelper';
+import { calculateEnergy, getTierLimits } from '../utils/energyHelper';
 import { ALL_LEAGUE_REWARDS } from '../data/leagueRewards';
 import { recordShardTransaction } from '../utils/shardLogger';
 import { recordSovereignTransaction } from '../utils/sovereignLogger';
@@ -1446,6 +1446,63 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return updated;
       });
  
+      return { success, message: msg, profile: updatedProfile };
+    }
+
+    if (action === 'buy_subscription') {
+      const { tier, durationDays } = payload || {};
+      const PRICES: Record<string, Record<number, number>> = {
+        premium: { 30: 150, 90: 400 },
+        ultra: { 30: 350, 90: 900 }
+      };
+      const cost = PRICES[tier]?.[durationDays];
+      let msg = '';
+      let success = false;
+      let updatedProfile: any = null;
+
+      setProfile(current => {
+        if ((current.darkShards || 0) < cost) {
+          msg = `Insufficient Dark Shards! Need ${cost} Shards.`;
+          success = false;
+          return current;
+        }
+
+        const durationMs = (durationDays || 30) * 24 * 60 * 60 * 1000;
+        const isCurrentActive = current.subscriptionExpiresAt && current.subscriptionExpiresAt > Date.now();
+        const newExpiresAt = (isCurrentActive && current.subscriptionTier === tier)
+          ? (current.subscriptionExpiresAt || Date.now()) + durationMs
+          : Date.now() + durationMs;
+
+        let updated = recordShardTransaction(
+          current,
+          'BUY_SUBSCRIPTION',
+          -cost,
+          `Purchased ${tier.toUpperCase()} Subscription (${durationDays} Days)`,
+          { tier, durationDays, cost }
+        );
+
+        updated.subscriptionTier = tier;
+        updated.subscriptionExpiresAt = newExpiresAt;
+        updated = calculateEnergy(updated);
+
+        // Instantly restore energy and arena tickets to the new maximum limit!
+        const limits = getTierLimits(tier);
+        updated.pveEnergy = Math.max(updated.pveEnergy || 0, limits.pveMax);
+        updated.pveEnergyMax = limits.pveMax;
+        updated.lastPveEnergyRefill = Date.now();
+
+        updated.pvpEnergy = Math.max(updated.pvpEnergy || 0, limits.pvpMax);
+        updated.pvpEnergyMax = limits.pvpMax;
+        updated.lastPvpEnergyRefill = Date.now();
+        updated.pvpTickets = updated.pvpEnergy + (updated.pvpBonusTickets || 0);
+
+        msg = `${tier === 'ultra' ? '💎' : '⚜️'} Hail, Lord! You have unlocked the ${tier.toUpperCase()} Pass for ${durationDays} days! Energy & Tickets fully restored!`;
+        success = true;
+        updatedProfile = updated;
+        saveProfile(updated);
+        return updated;
+      });
+
       return { success, message: msg, profile: updatedProfile };
     }
 

@@ -595,8 +595,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (updates.pveEnergy !== undefined) targetData.pveEnergy = Number(updates.pveEnergy);
         if (updates.pvpTickets !== undefined) targetData.pvpTickets = Number(updates.pvpTickets);
         if (updates.pvpLeague !== undefined) targetData.pvpLeague = updates.pvpLeague;
-        if (updates.pvpLP !== undefined) targetData.pvpLP = Number(updates.pvpLP);
-        if (updates.subscriptionTier !== undefined) targetData.subscriptionTier = updates.subscriptionTier;
+        if (updates.subscriptionTier !== undefined) {
+          targetData.subscriptionTier = updates.subscriptionTier;
+          if (updates.subscriptionTier === 'ultra' || updates.subscriptionTier === 'premium') {
+            const limits = getTierLimits(updates.subscriptionTier);
+            targetData.pveEnergy = Math.max(targetData.pveEnergy || 0, limits.pveMax);
+            targetData.pveEnergyMax = limits.pveMax;
+            targetData.lastPveEnergyRefill = Date.now();
+            targetData.pvpEnergy = Math.max(targetData.pvpEnergy || 0, limits.pvpMax);
+            targetData.pvpEnergyMax = limits.pvpMax;
+            targetData.lastPvpEnergyRefill = Date.now();
+            targetData.pvpTickets = targetData.pvpEnergy + (targetData.pvpBonusTickets || 0);
+          }
+        }
         if (updates.subscriptionExpiresAt !== undefined) targetData.subscriptionExpiresAt = Number(updates.subscriptionExpiresAt);
         if (updates.role !== undefined) targetData.role = updates.role;
         if (updates.isBanned !== undefined) {
@@ -1148,6 +1159,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       profile.subscriptionTier = tier;
       profile = calculateEnergy(profile);
 
+      // Instantly restore energy and arena tickets to the new maximum limit!
+      const limits = getTierLimits(tier);
+      profile.pveEnergy = Math.max(profile.pveEnergy || 0, limits.pveMax);
+      profile.pveEnergyMax = limits.pveMax;
+      profile.lastPveEnergyRefill = Date.now();
+
+      profile.pvpEnergy = Math.max(profile.pvpEnergy || 0, limits.pvpMax);
+      profile.pvpEnergyMax = limits.pvpMax;
+      profile.lastPvpEnergyRefill = Date.now();
+      profile.pvpTickets = profile.pvpEnergy + (profile.pvpBonusTickets || 0);
+
       profile = recordShardTransaction(
         profile,
         'BUY_SUBSCRIPTION',
@@ -1156,8 +1178,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         { tier, durationDays, cost }
       );
 
-      successMessage = `👑 Hail, Lord! You have unlocked the ${tier.toUpperCase()} Pass for ${durationDays} days!`;
-      responseData = { subscriptionTier: tier, subscriptionExpiresAt: profile.subscriptionExpiresAt };
+      successMessage = `${tier === 'ultra' ? '💎' : '⚜️'} Hail, Lord! You have unlocked the ${tier.toUpperCase()} Pass for ${durationDays} days! Energy & Tickets fully restored!`;
+      responseData = { 
+        subscriptionTier: tier, 
+        subscriptionExpiresAt: profile.subscriptionExpiresAt,
+        pveEnergy: profile.pveEnergy,
+        pveEnergyMax: profile.pveEnergyMax,
+        pvpEnergy: profile.pvpEnergy,
+        pvpEnergyMax: profile.pvpEnergyMax,
+        pvpTickets: profile.pvpTickets
+      };
     } else if (action === 'claim_daily_subscription') {
       const isSubActive = profile.subscriptionExpiresAt && profile.subscriptionExpiresAt > Date.now();
       if (!isSubActive) {
