@@ -129,6 +129,7 @@ export interface PlayerProfile {
   referralSovereignsUnclaimed?: number;
   referralSovereignsTotalEarned?: number;
   referralSubBountiesAwarded?: { premium?: boolean; ultra?: boolean };
+  referralContributions?: Record<string, number>;
 }
 
 export interface SovereignTransaction {

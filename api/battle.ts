@@ -282,6 +282,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 const refOwnerData = refOwnerRows[0].data || {};
                 refOwnerData.referralSovereignsUnclaimed = Number(((refOwnerData.referralSovereignsUnclaimed || 0) + comm).toFixed(2));
                 refOwnerData.referralSovereignsTotalEarned = Number(((refOwnerData.referralSovereignsTotalEarned || 0) + comm).toFixed(2));
+                refOwnerData.referralContributions = refOwnerData.referralContributions || {};
+                refOwnerData.referralContributions[walletAddress] = Number(((refOwnerData.referralContributions[walletAddress] || 0) + comm).toFixed(2));
                 await supabase
                   .from('profiles')
                   .update({ data: refOwnerData, updated_at: new Date().toISOString() })

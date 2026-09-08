@@ -112,18 +112,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .select('wallet_address, data')
         .in('wallet_address', referredWallets);
 
+      const referralContributions = myData.referralContributions || {};
+
       const referrals = refRows.map((r: any) => {
         const matchingProfile = profileRows?.find((p: any) => p.wallet_address === r.referred_wallet);
         const profileData = matchingProfile?.data || {};
         const isSubActive = profileData.subscriptionExpiresAt && profileData.subscriptionExpiresAt > Date.now();
         const subTier = isSubActive ? (profileData.subscriptionTier || 'free') : 'free';
+
+        // Calculate total sovereigns contributed by this referral
+        let contributed = Number((referralContributions[r.referred_wallet] || 0));
+        let subBounty = 0;
+        if (profileData.referralSubBountiesAwarded?.ultra) {
+          subBounty += 600;
+        } else if (profileData.referralSubBountiesAwarded?.premium) {
+          subBounty += 300;
+        }
+        if (contributed < subBounty) {
+          contributed = subBounty;
+        }
+
         return {
           wallet: r.referred_wallet,
           username: profileData.username || 'Anonymous',
           level: profileData.level || 1,
           avatarUrl: profileData.avatarUrl || '/avatars/knight.webp',
           joinedAt: r.created_at,
-          subscriptionTier: subTier
+          subscriptionTier: subTier,
+          sovereignsContributed: Number(contributed.toFixed(2))
         };
       });
 
@@ -1254,6 +1270,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               const refData = refOwnerRows[0].data || {};
               refData.referralSovereignsUnclaimed = Number(((refData.referralSovereignsUnclaimed || 0) + bountyAmount).toFixed(2));
               refData.referralSovereignsTotalEarned = Number(((refData.referralSovereignsTotalEarned || 0) + bountyAmount).toFixed(2));
+              refData.referralContributions = refData.referralContributions || {};
+              refData.referralContributions[walletAddress] = Number(((refData.referralContributions[walletAddress] || 0) + bountyAmount).toFixed(2));
               await supabase
                 .from('profiles')
                 .update({ data: refData, updated_at: new Date().toISOString() })
