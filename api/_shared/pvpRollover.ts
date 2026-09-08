@@ -371,7 +371,7 @@ export async function checkAndPerformPvpRollover(
 
     let totalPromoted = 0;
     let totalDemoted = 0;
-    const referrerCommissions = new Map<string, number>();
+    const referrerCommissions = new Map<string, { totalComm: number; byReferral: Record<string, number> }>();
 
     // 5. Process each league
     for (let leagueIdx = 0; leagueIdx < PVP_LEAGUES.length; leagueIdx++) {
@@ -446,10 +446,10 @@ export async function checkAndPerformPvpRollover(
         if (p.profile.referredBy && sovereignsReward > 0) {
           const comm = Number((sovereignsReward * 0.15).toFixed(2));
           if (comm > 0) {
-            referrerCommissions.set(
-              p.profile.referredBy,
-              Number(((referrerCommissions.get(p.profile.referredBy) || 0) + comm).toFixed(2))
-            );
+            const existing = referrerCommissions.get(p.profile.referredBy) || { totalComm: 0, byReferral: {} };
+            existing.totalComm = Number((existing.totalComm + comm).toFixed(2));
+            existing.byReferral[p.walletAddress] = Number(((existing.byReferral[p.walletAddress] || 0) + comm).toFixed(2));
+            referrerCommissions.set(p.profile.referredBy, existing);
           }
         }
 
@@ -475,16 +475,22 @@ export async function checkAndPerformPvpRollover(
     }
 
     // 4.5. Credit Referrer Commissions (15% system sovereign commission)
-    for (const [refWallet, totalComm] of referrerCommissions.entries()) {
-      if (totalComm <= 0) continue;
+    for (const [refWallet, commData] of referrerCommissions.entries()) {
+      if (commData.totalComm <= 0) continue;
       const activePlayer = players.find(pl => pl.walletAddress === refWallet);
       if (activePlayer) {
         activePlayer.profile.referralSovereignsUnclaimed = Number(
-          ((activePlayer.profile.referralSovereignsUnclaimed || 0) + totalComm).toFixed(2)
+          ((activePlayer.profile.referralSovereignsUnclaimed || 0) + commData.totalComm).toFixed(2)
         );
         activePlayer.profile.referralSovereignsTotalEarned = Number(
-          ((activePlayer.profile.referralSovereignsTotalEarned || 0) + totalComm).toFixed(2)
+          ((activePlayer.profile.referralSovereignsTotalEarned || 0) + commData.totalComm).toFixed(2)
         );
+        activePlayer.profile.referralContributions = activePlayer.profile.referralContributions || {};
+        for (const [referredWallet, amount] of Object.entries(commData.byReferral)) {
+          activePlayer.profile.referralContributions[referredWallet] = Number(
+            ((activePlayer.profile.referralContributions[referredWallet] || 0) + amount).toFixed(2)
+          );
+        }
       } else {
         try {
           const { data: refRows } = await supabase
@@ -495,11 +501,17 @@ export async function checkAndPerformPvpRollover(
           if (refRows && refRows.length > 0) {
             const refData = refRows[0].data || {};
             refData.referralSovereignsUnclaimed = Number(
-              ((refData.referralSovereignsUnclaimed || 0) + totalComm).toFixed(2)
+              ((refData.referralSovereignsUnclaimed || 0) + commData.totalComm).toFixed(2)
             );
             refData.referralSovereignsTotalEarned = Number(
-              ((refData.referralSovereignsTotalEarned || 0) + totalComm).toFixed(2)
+              ((refData.referralSovereignsTotalEarned || 0) + commData.totalComm).toFixed(2)
             );
+            refData.referralContributions = refData.referralContributions || {};
+            for (const [referredWallet, amount] of Object.entries(commData.byReferral)) {
+              refData.referralContributions[referredWallet] = Number(
+                ((refData.referralContributions[referredWallet] || 0) + amount).toFixed(2)
+              );
+            }
             await supabase
               .from('profiles')
               .update({ data: refData, updated_at: new Date().toISOString() })

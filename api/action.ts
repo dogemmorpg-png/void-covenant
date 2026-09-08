@@ -93,35 +93,74 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const unclaimedSovereigns = myData.referralSovereignsUnclaimed || 0;
       const totalEarnedSovereigns = myData.referralSovereignsTotalEarned || 0;
 
-      const { data: refRows, error: refError } = await supabase
-        .from('referrals')
-        .select('referred_wallet, created_at')
-        .eq('referrer_wallet', walletAddress);
+      // 1. Fetch from referrals table
+      let refRows: Array<{ referred_wallet: string; created_at?: string }> = [];
+      try {
+        const { data } = await supabase
+          .from('referrals')
+          .select('referred_wallet, created_at')
+          .eq('referrer_wallet', walletAddress);
+        if (data) refRows = data;
+      } catch (err) {
+        console.error('Failed to fetch from referrals table:', err);
+      }
 
-      if (refError || !refRows || refRows.length === 0) {
-        return res.status(200).json({ 
-          referrals: [],
-          unclaimedSovereigns,
-          totalEarnedSovereigns
+      // 2. Also fetch profiles where data->>referredBy equals walletAddress (for 100% data consistency)
+      let referredProfiles: any[] = [];
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('wallet_address, data, created_at')
+          .filter('data->>referredBy', 'eq', walletAddress);
+        if (data) referredProfiles = data;
+      } catch (err) {
+        console.error('Failed to fetch referred profiles:', err);
+      }
+
+      // 3. Merge both sources by wallet
+      const referredMap = new Map<string, { wallet: string; created_at?: string; profileData: any }>();
+
+      for (const p of referredProfiles) {
+        referredMap.set(p.wallet_address, {
+          wallet: p.wallet_address,
+          created_at: p.created_at || (p.data as any)?.joinedAt,
+          profileData: p.data || {}
         });
       }
 
-      const referredWallets = refRows.map((r: any) => r.referred_wallet);
-      const { data: profileRows } = await supabase
-        .from('profiles')
-        .select('wallet_address, data')
-        .in('wallet_address', referredWallets);
+      if (refRows.length > 0) {
+        const missingWallets = refRows
+          .map(r => r.referred_wallet)
+          .filter(w => !referredMap.has(w));
+
+        if (missingWallets.length > 0) {
+          const { data: missingProfiles } = await supabase
+            .from('profiles')
+            .select('wallet_address, data')
+            .in('wallet_address', missingWallets);
+
+          for (const r of refRows) {
+            if (!referredMap.has(r.referred_wallet)) {
+              const mp = missingProfiles?.find((p: any) => p.wallet_address === r.referred_wallet);
+              referredMap.set(r.referred_wallet, {
+                wallet: r.referred_wallet,
+                created_at: r.created_at,
+                profileData: mp?.data || {}
+              });
+            }
+          }
+        }
+      }
 
       const referralContributions = myData.referralContributions || {};
 
-      const referrals = refRows.map((r: any) => {
-        const matchingProfile = profileRows?.find((p: any) => p.wallet_address === r.referred_wallet);
-        const profileData = matchingProfile?.data || {};
+      const referrals = Array.from(referredMap.values()).map(r => {
+        const profileData = r.profileData || {};
         const isSubActive = profileData.subscriptionExpiresAt && profileData.subscriptionExpiresAt > Date.now();
         const subTier = isSubActive ? (profileData.subscriptionTier || 'free') : 'free';
 
         // Calculate total sovereigns contributed by this referral
-        let contributed = Number((referralContributions[r.referred_wallet] || 0));
+        let contributed = Number((referralContributions[r.wallet] || 0));
         let subBounty = 0;
         if (profileData.referralSubBountiesAwarded?.ultra) {
           subBounty += 600;
@@ -133,7 +172,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
 
         return {
-          wallet: r.referred_wallet,
+          wallet: r.wallet,
           username: profileData.username || 'Anonymous',
           level: profileData.level || 1,
           avatarUrl: profileData.avatarUrl || '/avatars/knight.webp',
