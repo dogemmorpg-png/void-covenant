@@ -49,8 +49,8 @@ interface GameContextType {
   registerPlayer: (username: string, avatarUrl: string) => Promise<{ success: boolean; message: string }>;
   logoutPlayer: () => void;
   resetProfile: () => void;
-  updateProfile: (updates: Partial<PlayerProfile>) => void;
   markMailAsRead: (mailId: string) => Promise<void>;
+  deleteMail: (mailId: string) => Promise<{ success: boolean; message: string }>;
   claimMailReward: (mailId: string) => Promise<{ success: boolean; message: string }>;
   claimAllMailRewards: () => Promise<{ success: boolean; message: string; totalGold?: number; totalDust?: number; totalSovereigns?: number }>;
   fetchAdminOverview: () => Promise<{ success: boolean; message: string; [key: string]: any }>;
@@ -712,6 +712,26 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const deleteMail = async (mailId: string): Promise<{ success: boolean; message: string }> => {
+    setProfile(current => {
+      const updatedMessages = (current.mailMessages || []).filter(m => m.id !== mailId);
+      const updated = { ...current, mailMessages: updatedMessages };
+      saveProfile(updated);
+      return updated;
+    });
+
+    const token = localStorage.getItem('void_covenant_token');
+    if (token) {
+      try {
+        const res = await submitAction('delete_mail', { mailId });
+        return { success: res.success, message: res.message || 'Letter deleted' };
+      } catch (e: any) {
+        return { success: false, message: e.message || 'Failed to delete letter' };
+      }
+    }
+    return { success: true, message: 'Letter deleted' };
+  };
+
   const claimMailReward = async (mailId: string): Promise<{ success: boolean; message: string }> => {
     const token = localStorage.getItem('void_covenant_token');
     if (token) {
@@ -733,6 +753,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       let newDust = current.dust || 0;
       let newShards = current.darkShards || 0;
       const sovReward = targetMail.rewards?.bloodSovereigns || 0;
+      const mailCreatedAt = targetMail.createdAt ?? targetMail.date ?? targetMail.timestamp;
 
       if (targetMail.rewards) {
         if (targetMail.rewards.gold) newGold += targetMail.rewards.gold;
@@ -756,7 +777,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isLeague ? 'LEAGUE_ROLLOVER' : 'MAIL_CLAIM',
           sovReward,
           `Claimed tribute: ${targetMail.title}`,
-          { mailId: targetMail.id }
+          { mailId: targetMail.id, originalCreatedAt: mailCreatedAt },
+          'SUCCESS',
+          mailCreatedAt
         );
       }
 
@@ -1616,6 +1639,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         resetProfile,
         updateProfile,
         markMailAsRead,
+        deleteMail,
         claimMailReward,
         claimAllMailRewards,
         fetchAdminOverview,

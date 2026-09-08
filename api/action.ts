@@ -987,12 +987,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return m;
       });
       successMessage = 'Mail marked as read';
+    } else if (action === 'delete_mail') {
+      const { mailId } = payload || {};
+      if (!mailId) return res.status(400).json({ error: 'Missing mailId' });
+      profile.mailMessages = (profile.mailMessages || []).filter((m: any) => m.id !== mailId);
+      successMessage = 'Letter deleted successfully';
     } else if (action === 'claim_mail') {
       const { mailId } = payload || {};
       if (!mailId) return res.status(400).json({ error: 'Missing mailId' });
       const mail = (profile.mailMessages || []).find((m: any) => m.id === mailId);
       if (!mail) return res.status(404).json({ error: 'Mail not found' });
       if (mail.isClaimed) return res.status(400).json({ error: 'Reward already claimed' });
+
+      const mailCreatedAt = mail.createdAt ?? mail.date ?? mail.timestamp;
 
       if (mail.rewards) {
         if (mail.rewards.gold) profile.gold = (profile.gold || 0) + mail.rewards.gold;
@@ -1013,7 +1020,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             isLeague ? 'LEAGUE_ROLLOVER' : 'MAIL_CLAIM',
             mail.rewards.bloodSovereigns,
             `Claimed tribute: ${mail.title}`,
-            { mailId: mail.id }
+            { mailId: mail.id, originalCreatedAt: mailCreatedAt },
+            'SUCCESS',
+            mailCreatedAt
           );
         }
       }

@@ -10,12 +10,33 @@ interface MailboxModalProps {
 }
 
 export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) => {
-  const { profile, markMailAsRead, claimMailReward, claimAllMailRewards } = useGame();
+  const { profile, markMailAsRead, claimMailReward, claimAllMailRewards, deleteMail } = useGame();
   const toast = useToast();
 
-  const messages: MailMessage[] = profile.mailMessages || [];
+  const getMailTimestamp = (mail: any): number => {
+    if (!mail) return Date.now();
+    const raw = mail.createdAt ?? mail.date ?? mail.timestamp;
+    if (typeof raw === 'number' && !isNaN(raw)) return raw;
+    if (typeof raw === 'string') {
+      const parsed = new Date(raw).getTime();
+      if (!isNaN(parsed)) return parsed;
+    }
+    const matchTimestamp = mail.id?.match(/_(\d{10,13})/);
+    if (matchTimestamp && matchTimestamp[1]) {
+      const num = parseInt(matchTimestamp[1], 10);
+      return num < 10000000000 ? num * 1000 : num;
+    }
+    return Date.now();
+  };
+
+  // Sort messages descending by creation timestamp
+  const messages: MailMessage[] = [...(profile.mailMessages || [])].sort((a, b) => {
+    return getMailTimestamp(b) - getMailTimestamp(a);
+  });
+
   const [selectedMailId, setSelectedMailId] = useState<string | null>(messages[0]?.id || null);
   const [isClaiming, setIsClaiming] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   if (!isOpen) return null;
 
@@ -28,6 +49,28 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
     setSelectedMailId(mail.id);
     if (!mail.isRead) {
       markMailAsRead(mail.id);
+    }
+  };
+
+  const handleDeleteMail = async (mailId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (isDeleting) return;
+    setIsDeleting(true);
+    try {
+      const res = await deleteMail(mailId);
+      if (res.success) {
+        toast(res.message, 'success');
+        if (selectedMailId === mailId) {
+          const remaining = messages.filter(m => m.id !== mailId);
+          setSelectedMailId(remaining[0]?.id || null);
+        }
+      } else {
+        toast(res.message, 'error');
+      }
+    } catch (err: any) {
+      toast(err.message || 'Failed to delete letter', 'error');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -63,17 +106,6 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
     } finally {
       setIsClaiming(false);
     }
-  };
-
-  const getMailTimestamp = (mail: any): number => {
-    if (!mail) return Date.now();
-    const raw = mail.createdAt ?? mail.date ?? mail.timestamp;
-    if (typeof raw === 'number' && !isNaN(raw)) return raw;
-    if (typeof raw === 'string') {
-      const parsed = new Date(raw).getTime();
-      if (!isNaN(parsed)) return parsed;
-    }
-    return Date.now();
   };
 
   const getMailBody = (mail: any): string => {
@@ -209,12 +241,22 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
                       </p>
                     </div>
 
-                    {/* Right Tag */}
-                    {hasRewards && !mail.isClaimed && (
-                      <span className="self-center px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-[9px] font-mono text-amber-300 font-bold">
-                        GIFT
-                      </span>
-                    )}
+                    {/* Right Tag and Delete */}
+                    <div className="flex items-center gap-1.5 self-center">
+                      {hasRewards && !mail.isClaimed && (
+                        <span className="px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-[9px] font-mono text-amber-300 font-bold">
+                          GIFT
+                        </span>
+                      )}
+                      <button
+                        onClick={(e) => handleDeleteMail(mail.id, e)}
+                        disabled={isDeleting}
+                        title="Delete letter"
+                        className="p-1 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-950/40 transition-colors cursor-pointer disabled:opacity-40"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                 );
               })
@@ -231,10 +273,21 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
                     <span className="text-amber-400 font-bold tracking-wider uppercase">
                       FROM: {selectedMail.sender || 'The Void Council'}
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-gray-500" />
-                      {formatDate(getMailTimestamp(selectedMail))}
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-gray-500" />
+                        {formatDate(getMailTimestamp(selectedMail))}
+                      </span>
+                      <button
+                        onClick={(e) => handleDeleteMail(selectedMail.id, e)}
+                        disabled={isDeleting}
+                        title="Delete letter"
+                        className="p-1 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-950/40 transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-sans"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Delete</span>
+                      </button>
+                    </div>
                   </div>
                   <h3 className="font-display font-black text-xl text-white text-shadow-gold">
                     {selectedMail.title}

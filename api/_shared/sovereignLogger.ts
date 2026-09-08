@@ -6,14 +6,24 @@ export function recordSovereignTransaction(
   sovereignsChange: number,
   description: string,
   details?: Record<string, any>,
-  status: 'SUCCESS' | 'FAILED' = 'SUCCESS'
+  status: 'SUCCESS' | 'FAILED' = 'SUCCESS',
+  customTimestamp?: string | number
 ): PlayerProfile {
   const sovereignsBefore = profile.bloodSovereigns || 0;
   const sovereignsAfter = Math.max(0, sovereignsBefore + sovereignsChange);
 
+  let formattedTimestamp = new Date().toISOString();
+  if (customTimestamp) {
+    if (typeof customTimestamp === 'number') {
+      formattedTimestamp = new Date(customTimestamp).toISOString();
+    } else {
+      formattedTimestamp = customTimestamp;
+    }
+  }
+
   const tx: SovereignTransaction = {
     id: `svtx_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
-    timestamp: new Date().toISOString(),
+    timestamp: formattedTimestamp,
     action,
     sovereignsChange,
     sovereignsBefore,

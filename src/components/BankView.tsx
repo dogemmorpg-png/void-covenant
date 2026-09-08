@@ -86,18 +86,55 @@ export const BankView: React.FC = () => {
       type: 'pvp' | 'league' | 'mail';
     }> = [];
 
+    // Helper to get true timestamp from a mail object
+    const getMailTimestamp = (mail: any): number => {
+      const rawTime = mail.createdAt ?? mail.date ?? mail.timestamp;
+      if (typeof rawTime === 'number' && !isNaN(rawTime)) return rawTime;
+      if (typeof rawTime === 'string') {
+        const parsed = new Date(rawTime).getTime();
+        if (!isNaN(parsed)) return parsed;
+      }
+      const matchTimestamp = mail.id?.match(/_(\d{10,13})/);
+      if (matchTimestamp && matchTimestamp[1]) {
+        const num = parseInt(matchTimestamp[1], 10);
+        return num < 10000000000 ? num * 1000 : num;
+      }
+      return Date.now();
+    };
+
+    // Track which mail IDs are already represented by sovereign transactions
+    const recordedMailIds = new Set<string>();
+
     // 1. Explicit sovereign transactions if present
     if (profile.sovereignTransactions && Array.isArray(profile.sovereignTransactions)) {
       profile.sovereignTransactions.forEach((tx: any) => {
         if (tx.sovereignsChange > 0) {
           const isLeague = tx.action === 'LEAGUE_ROLLOVER' || tx.description?.toLowerCase().includes('league') || tx.description?.toLowerCase().includes('pvp season');
           const isPvp = tx.action === 'PVP_VICTORY';
+          
+          let txTime = typeof tx.timestamp === 'string' ? new Date(tx.timestamp).getTime() : tx.timestamp;
+
+          // If this transaction came from a mail message, look up the mail's original date
+          const mailId = tx.details?.mailId;
+          if (mailId) {
+            recordedMailIds.add(mailId);
+            const foundMail = (profile.mailMessages || []).find((m: any) => m.id === mailId);
+            if (foundMail) {
+              txTime = getMailTimestamp(foundMail);
+            } else if (tx.details?.originalCreatedAt) {
+              const origTime = typeof tx.details.originalCreatedAt === 'number' 
+                ? tx.details.originalCreatedAt 
+                : new Date(tx.details.originalCreatedAt).getTime();
+              if (!isNaN(origTime)) txTime = origTime;
+            }
+          }
+
           events.push({
             id: tx.id || `stx_${tx.timestamp}`,
             title: isLeague ? 'League Season Rollover Tribute' : isPvp ? 'PvP Duel Victory Bounty' : 'Imperial Decree Tribute',
             description: tx.description || 'Blood Sovereigns earned and deposited',
             amount: tx.sovereignsChange,
-            timestamp: typeof tx.timestamp === 'string' ? new Date(tx.timestamp).getTime() : tx.timestamp,
+            timestamp: txTime,
             type: isLeague ? 'league' : isPvp ? 'pvp' : 'mail'
           });
         }
@@ -132,18 +169,20 @@ export const BankView: React.FC = () => {
       });
     }
 
-    // 3. Mailbox messages with Blood Sovereigns rewards (claimed or granted)
+    // 3. Mailbox messages with Blood Sovereigns rewards (only if not already logged in sovereignTransactions)
     if (profile.mailMessages && Array.isArray(profile.mailMessages)) {
       profile.mailMessages.forEach((mail: any) => {
         const sovReward = mail.rewards?.bloodSovereigns;
-        if (sovReward && sovReward > 0) {
+        if (sovReward && sovReward > 0 && !recordedMailIds.has(mail.id)) {
           const isLeague = mail.title?.toLowerCase().includes('league') || mail.title?.toLowerCase().includes('pvp season');
+          const mailTimestamp = getMailTimestamp(mail);
+
           events.push({
             id: `mail_sov_${mail.id}`,
             title: isLeague ? 'League Season Rollover Tribute' : mail.title || 'Imperial Decree Tribute',
             description: isLeague ? `${mail.title} - Seasonal rank tribute` : (mail.sender || 'Council of the Void'),
             amount: sovReward,
-            timestamp: mail.createdAt || Date.now(),
+            timestamp: mailTimestamp,
             type: isLeague ? 'league' : 'mail'
           });
         }
