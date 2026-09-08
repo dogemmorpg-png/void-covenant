@@ -323,7 +323,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
             </div>
 
             {/* Body */}
-            <div className="p-5 sm:p-6 space-y-4 overflow-y-auto max-h-[calc(92vh-85px)] scrollbar-thin scrollbar-thumb-amber-500/20">
+            <div className="p-5 sm:p-6 pb-12 sm:pb-16 space-y-4 overflow-y-auto max-h-[calc(92vh-85px)] scrollbar-thin scrollbar-thumb-amber-500/20">
 
               {/* Personal Invitation Link Card */}
               <div className="bg-black/60 border border-white/15 rounded-2xl p-4 space-y-2.5 shadow-md">
@@ -577,7 +577,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-2.5 max-h-[260px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-amber-500/20">
+                  <div className="space-y-2.5 pb-2">
                     {referralsList.map((ref, idx) => {
                       const isUltra = ref.subscriptionTier === 'ultra';
                       const isPremium = ref.subscriptionTier === 'premium';
@@ -653,6 +653,8 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                     })}
                   </div>
                 )}
+                {/* Generous bottom breathing spacer so the last item is never clipped */}
+                <div className="h-6 sm:h-8 shrink-0" />
               </div>
 
             </div>
