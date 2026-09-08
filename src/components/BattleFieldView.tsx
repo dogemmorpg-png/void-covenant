@@ -2737,21 +2737,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               <span className="text-[10px] font-display text-amber-400/90 tracking-widest block uppercase font-bold">REWARD OBTAINED</span>
               <div className={`grid gap-2.5 ${battleType === 'pvp' && earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
                 {/* Gold */}
-                <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center relative overflow-hidden">
-                  {(subGoldBonusPercent > 0 || equipGoldBonus > 0) && (
-                    <div className="flex items-center gap-1 mb-0.5 flex-wrap justify-center">
-                      {subGoldBonusPercent > 0 && (
-                        <span className="text-[7.5px] leading-tight font-black text-amber-300/90 bg-amber-500/20 px-1.5 py-0.5 rounded-full border border-amber-500/30 tracking-tighter">
-                          +{subGoldBonusPercent}% {subTier === 'ultra' ? 'ULTRA' : 'VIP'}
-                        </span>
-                      )}
-                      {equipGoldBonus > 0 && (
-                        <span className="text-[7.5px] leading-tight font-black text-cyan-300/90 bg-cyan-500/20 px-1.5 py-0.5 rounded-full border border-cyan-500/30 tracking-tighter">
-                          +{equipGoldBonus}% GEAR
-                        </span>
-                      )}
-                    </div>
-                  )}
+                <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
                   <span className="text-amber-300 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
                     +{earnedGold}
                     <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.5)]" />
@@ -2821,6 +2807,36 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   </div>
                 )}
               </div>
+
+              {/* Gold Bonus Breakdown Info Strip */}
+              {(subGoldBonusPercent > 0 || equipGoldBonus > 0) && (
+                <div className="flex items-center justify-center gap-1.5 flex-wrap bg-amber-950/20 border border-amber-500/20 rounded-xl px-3 py-1.5 text-[10.5px]">
+                  <span className="text-amber-400/80 font-mono flex items-center gap-1">
+                    <span>✨</span>
+                    <span className="font-bold text-amber-300">Gold Bonus:</span>
+                  </span>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {subGoldBonusPercent > 0 && (
+                      <span className="inline-flex items-center gap-1 font-black text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded-md">
+                        <span>{subTier === 'ultra' ? '👑' : '⚜️'}</span>
+                        <span>+{subGoldBonusPercent}% {subTier === 'ultra' ? 'Ultra' : 'VIP'}</span>
+                      </span>
+                    )}
+                    {subGoldBonusPercent > 0 && equipGoldBonus > 0 && (
+                      <span className="text-gray-500 font-bold">+</span>
+                    )}
+                    {equipGoldBonus > 0 && (
+                      <span className="inline-flex items-center gap-1 font-black text-cyan-300 bg-cyan-500/15 border border-cyan-500/30 px-2 py-0.5 rounded-md">
+                        <span>🛡️</span>
+                        <span>+{equipGoldBonus}% Gear</span>
+                      </span>
+                    )}
+                    <span className="text-gray-400 text-[10px] ml-0.5 font-mono">
+                      (Total +{subGoldBonusPercent + equipGoldBonus}%)
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <button
