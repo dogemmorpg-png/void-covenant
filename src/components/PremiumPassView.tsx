@@ -98,7 +98,7 @@ export const PremiumPassView: React.FC = () => {
             {/* Value Highlights Feature Chips */}
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-black/50 border border-amber-500/25 text-[11px] font-mono font-bold text-amber-300 shadow-inner">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <img src="/icons/league_grandmaster_crest.png" alt="Leaderboard" className="w-4 h-4 object-contain drop-shadow-[0_0_4px_rgba(245,158,11,0.7)] shrink-0" />
                 <span>+15% to +25% Leaderboard Rewards</span>
               </div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-black/50 border border-emerald-500/25 text-[11px] font-mono font-bold text-emerald-300 shadow-inner">
@@ -106,13 +106,13 @@ export const PremiumPassView: React.FC = () => {
                 <span>Up to 24 SOV/Day on Arena Wins</span>
               </div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-black/50 border border-cyan-500/25 text-[11px] font-mono font-bold text-cyan-300 shadow-inner">
-                <Shield className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                <span>Daily Peace Shield in Mailbox</span>
+                <img src="/icons/shield_3h.png" alt="Peace Shield" className="w-4 h-4 object-contain drop-shadow-[0_0_4px_rgba(6,182,212,0.7)] shrink-0" />
+                <span>Daily Peace Shield</span>
               </div>
             </div>
           </div>
 
-          {/* Active Subscription Status Plaque (when active) or Value Guarantee */}
+          {/* Active / Inactive Subscription Status Plaque */}
           {isSubActive ? (
             <div className="shrink-0 flex flex-col items-start lg:items-end justify-center gap-2 p-4 rounded-2xl bg-gradient-to-b from-[#1f1627] to-[#0c0812] border-2 border-amber-500/40 shadow-[0_0_30px_rgba(245,158,11,0.2)] backdrop-blur-md">
               <div className="flex items-center gap-2">
@@ -131,15 +131,18 @@ export const PremiumPassView: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="shrink-0 hidden lg:flex flex-col items-center justify-center p-4 rounded-2xl bg-black/40 border border-amber-500/25 text-center max-w-[210px] space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                <Crown className="w-5 h-5" />
+            <div className="shrink-0 flex flex-col items-start lg:items-end justify-center gap-1.5 p-4 rounded-2xl bg-gradient-to-b from-[#16121a]/90 to-[#0a070e]/90 border border-white/10 shadow-lg backdrop-blur-md">
+              <div className="flex items-center gap-2">
+                <span className="text-base text-gray-400">🛡️</span>
+                <span className="font-display font-bold text-xs sm:text-sm tracking-wider uppercase text-gray-300">
+                  Standard Lord
+                </span>
+                <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-zinc-850/80 border border-zinc-700 text-zinc-400">
+                  INACTIVE
+                </span>
               </div>
-              <div className="text-[11px] font-display font-bold text-amber-200 uppercase tracking-wider">
-                Lower Payout Threshold
-              </div>
-              <p className="text-[10px] text-gray-400 font-sans leading-tight">
-                Withdraw your earned USDT faster with lower minimum thresholds.
+              <p className="text-[11px] text-gray-400 font-sans max-w-[220px] text-left lg:text-right leading-tight">
+                Select a tier below to activate imperial privileges & bonuses
               </p>
             </div>
           )}
