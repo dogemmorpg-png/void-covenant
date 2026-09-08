@@ -141,8 +141,9 @@ export const BankView: React.FC = () => {
       });
     }
 
-    // 2. PvP battles with subscriber sovereign reward
-    if (profile.pvpHistory && Array.isArray(profile.pvpHistory)) {
+    // 2. PvP battles fallback ONLY if profile has no formal sovereignTransactions logged
+    const hasFormalSovereignTx = Boolean(profile.sovereignTransactions && profile.sovereignTransactions.length > 0);
+    if (!hasFormalSovereignTx && profile.pvpHistory && Array.isArray(profile.pvpHistory)) {
       profile.pvpHistory.forEach((rec: any) => {
         const isAttackerWin = rec.winner === 'attacker' && !rec.isDefense;
         if (rec.sovereignsReward && rec.sovereignsReward > 0) {

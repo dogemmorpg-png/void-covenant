@@ -15,6 +15,8 @@ class AudioEngine {
   public playMagic() {}
   public playVictory() {}
   public playClaim() {}
+  public playMiss() {}
+  public playEerieClick() {}
 }
 
 export const audioSystem = new AudioEngine();
