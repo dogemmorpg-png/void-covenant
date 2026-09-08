@@ -161,6 +161,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
   const [editLP, setEditLP] = useState<number>(0);
   const [editIsBanned, setEditIsBanned] = useState<boolean>(false);
   const [editBanReason, setEditBanReason] = useState<string>('');
+  const [editSubTier, setEditSubTier] = useState<'free' | 'premium' | 'ultra'>('free');
+  const [editSubExpiresAt, setEditSubExpiresAt] = useState<number>(0);
   const [isModifyingPlayer, setIsModifyingPlayer] = useState(false);
   const [playerModifyFeedback, setPlayerModifyFeedback] = useState<string | null>(null);
 
@@ -423,6 +425,10 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
     setEditLP(p.pvpLP !== undefined ? p.pvpLP : 0);
     setEditIsBanned(Boolean(p.isBanned));
     setEditBanReason(p.banReason || '');
+    const tier = p.subscriptionTier || 'free';
+    const expiresAt = p.subscriptionExpiresAt ? Number(p.subscriptionExpiresAt) : 0;
+    setEditSubTier(tier);
+    setEditSubExpiresAt(expiresAt);
     setPlayerModifyFeedback(null);
   };
 
@@ -438,6 +444,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
         bloodSovereigns: editSovereigns,
         pvpLeague: editLeague,
         pvpLP: editLP,
+        subscriptionTier: editSubTier,
+        subscriptionExpiresAt: editSubExpiresAt,
         isBanned: editIsBanned,
         banReason: editIsBanned ? (editBanReason.trim() || 'Violating game rules') : null
       });
@@ -690,7 +698,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
           {activeTab === 'overview' && (
             <div className="space-y-6">
               {/* Stat Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                 
                 {/* Card 1: Total Players */}
                 <div className="bg-gradient-to-b from-white/5 to-black/60 border border-white/10 p-4 rounded-2xl relative overflow-hidden">
@@ -706,7 +714,21 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                   </div>
                 </div>
 
-                {/* Card 2: Sovereigns Circulation & USDT Reserve */}
+                {/* Card 2: Active Subscribers */}
+                <div className="bg-gradient-to-b from-purple-950/30 via-indigo-950/20 to-black/60 border border-purple-500/30 p-4 rounded-2xl relative overflow-hidden">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-purple-400/90 block mb-1">Active Subscribers</span>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-3xl font-mono font-black text-purple-300">{overview?.totalSubscribersCount || 0}</span>
+                    <Sparkles className="w-6 h-6 text-purple-400/60" />
+                  </div>
+                  <div className="mt-3 flex items-center gap-3 text-[11px] font-mono text-gray-400 border-t border-purple-500/20 pt-2">
+                    <span className="text-amber-400 font-bold flex items-center gap-1">👑 {overview?.totalPremiumCount || 0} Premium</span>
+                    <span>•</span>
+                    <span className="text-purple-400 font-bold flex items-center gap-1">🔮 {overview?.totalUltraCount || 0} Ultra</span>
+                  </div>
+                </div>
+
+                {/* Card 3: Sovereigns Circulation & USDT Reserve */}
                 <div className="bg-gradient-to-b from-amber-950/30 to-black/60 border border-amber-500/30 p-4 rounded-2xl relative overflow-hidden">
                   <span className="text-[10px] font-mono uppercase tracking-widest text-amber-400/90 block mb-1">Sovereigns in Circulation</span>
                   <div className="flex items-baseline justify-between">
@@ -722,7 +744,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                   </div>
                 </div>
 
-                {/* Card 3: Pending Withdrawals */}
+                {/* Card 4: Pending Withdrawals */}
                 <div className="bg-gradient-to-b from-rose-950/30 to-black/60 border border-rose-500/30 p-4 rounded-2xl relative overflow-hidden">
                   <span className="text-[10px] font-mono uppercase tracking-widest text-rose-400/90 block mb-1">Pending Payouts</span>
                   <div className="flex items-baseline justify-between">
@@ -735,7 +757,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                   </div>
                 </div>
 
-                {/* Card 4: Total Completed Payouts */}
+                {/* Card 5: Total Completed Payouts */}
                 <div className="bg-gradient-to-b from-emerald-950/30 to-black/60 border border-emerald-500/30 p-4 rounded-2xl relative overflow-hidden">
                   <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400/90 block mb-1">Completed Payouts</span>
                   <div className="flex items-baseline justify-between">
@@ -1202,7 +1224,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
                     {/* League Filter Pills */}
                     <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 select-none">
-                      {['all', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Emerald', 'Ruby', 'Diamond', 'Master', 'Grandmaster', 'Void Overlord', 'Banned'].map(l => (
+                      {['all', 'Premium', 'Ultra', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Emerald', 'Ruby', 'Diamond', 'Master', 'Grandmaster', 'Void Overlord', 'Banned'].map(l => (
                         <button
                           key={l}
                           onClick={() => setPlayerLeagueFilter(l)}
@@ -1210,11 +1232,15 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                             playerLeagueFilter === l
                               ? l === 'Banned'
                                 ? 'bg-red-600/30 text-red-300 border border-red-500/80 shadow-[0_0_12px_rgba(220,38,38,0.35)]'
-                                : 'bg-amber-500/20 text-amber-300 border border-amber-500/60 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
+                                : l === 'Ultra'
+                                  ? 'bg-purple-600/30 text-purple-300 border border-purple-500/80 shadow-[0_0_12px_rgba(168,85,247,0.35)]'
+                                  : l === 'Premium'
+                                    ? 'bg-amber-500/30 text-amber-300 border border-amber-500/80 shadow-[0_0_12px_rgba(245,158,11,0.35)]'
+                                    : 'bg-amber-500/20 text-amber-300 border border-amber-500/60 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
                               : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white'
                           }`}
                         >
-                          {l === 'all' ? 'All Leagues' : l === 'Banned' ? '🚫 Banned' : l}
+                          {l === 'all' ? 'All' : l === 'Banned' ? '🚫 Banned' : l === 'Premium' ? '👑 Premium' : l === 'Ultra' ? '🔮 Ultra' : l}
                         </button>
                       ))}
                     </div>
@@ -1243,8 +1269,14 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                       <span className="text-[11px] font-mono uppercase tracking-widest text-gray-400 font-bold">
                         Registered Players Directory ({allPlayers.filter(p => {
                           const isBanned = Boolean(p.profile?.isBanned);
+                          const isSubActive = p.profile?.subscriptionExpiresAt && Number(p.profile?.subscriptionExpiresAt) > Date.now();
+                          const subTier = isSubActive ? (p.profile?.subscriptionTier || 'free') : 'free';
                           if (playerLeagueFilter === 'Banned') {
                             if (!isBanned) return false;
+                          } else if (playerLeagueFilter === 'Premium') {
+                            if (isBanned || subTier !== 'premium') return false;
+                          } else if (playerLeagueFilter === 'Ultra') {
+                            if (isBanned || subTier !== 'ultra') return false;
                           } else if (playerLeagueFilter !== 'all') {
                             if (isBanned) return false;
                             const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
@@ -1274,6 +1306,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                         <thead className="bg-white/5 border-b border-white/10 text-gray-400 uppercase text-[10px] tracking-wider">
                           <tr>
                             <th className="p-4">Player / Account</th>
+                            <th className="p-4">Subscription</th>
                             <th className="p-4">Level & Progress</th>
                             <th className="p-4">PvP League</th>
                             <th className="p-4">Vault Balances</th>
@@ -1284,8 +1317,14 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                         <tbody className="divide-y divide-white/5">
                           {allPlayers.filter(p => {
                             const isBanned = Boolean(p.profile?.isBanned);
+                            const isSubActive = p.profile?.subscriptionExpiresAt && Number(p.profile?.subscriptionExpiresAt) > Date.now();
+                            const subTier = isSubActive ? (p.profile?.subscriptionTier || 'free') : 'free';
                             if (playerLeagueFilter === 'Banned') {
                               if (!isBanned) return false;
+                            } else if (playerLeagueFilter === 'Premium') {
+                              if (isBanned || subTier !== 'premium') return false;
+                            } else if (playerLeagueFilter === 'Ultra') {
+                              if (isBanned || subTier !== 'ultra') return false;
                             } else if (playerLeagueFilter !== 'all') {
                               if (isBanned) return false;
                               const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
@@ -1300,7 +1339,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                             return true;
                           }).length === 0 ? (
                             <tr>
-                              <td colSpan={6} className="p-8 text-center text-gray-500 font-mono">
+                              <td colSpan={7} className="p-8 text-center text-gray-500 font-mono">
                                 No players found matching your criteria.
                               </td>
                             </tr>
@@ -1308,8 +1347,14 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                             allPlayers
                               .filter(p => {
                                 const isBanned = Boolean(p.profile?.isBanned);
+                                const isSubActive = p.profile?.subscriptionExpiresAt && Number(p.profile?.subscriptionExpiresAt) > Date.now();
+                                const subTier = isSubActive ? (p.profile?.subscriptionTier || 'free') : 'free';
                                 if (playerLeagueFilter === 'Banned') {
                                   if (!isBanned) return false;
+                                } else if (playerLeagueFilter === 'Premium') {
+                                  if (isBanned || subTier !== 'premium') return false;
+                                } else if (playerLeagueFilter === 'Ultra') {
+                                  if (isBanned || subTier !== 'ultra') return false;
                                 } else if (playerLeagueFilter !== 'all') {
                                   if (isBanned) return false;
                                   const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
@@ -1407,6 +1452,40 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                                       </div>
                                     </td>
 
+                                    {/* Subscription */}
+                                    <td className="p-4">
+                                      {(() => {
+                                        const isSubActive = prof.subscriptionExpiresAt && Number(prof.subscriptionExpiresAt) > Date.now();
+                                        const tier = isSubActive ? prof.subscriptionTier : 'free';
+                                        if (!isSubActive || tier === 'free') {
+                                          return <span className="text-[11px] text-gray-500 font-mono">Free</span>;
+                                        }
+                                        const daysLeft = Math.max(0, Math.ceil((Number(prof.subscriptionExpiresAt) - Date.now()) / (1000 * 60 * 60 * 24)));
+                                        if (tier === 'ultra') {
+                                          return (
+                                            <div className="flex flex-col gap-0.5">
+                                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-950/80 border border-purple-400/60 text-purple-300 font-mono text-[10px] font-black shadow-[0_0_8px_rgba(168,85,247,0.3)] w-fit">
+                                                🔮 ULTRA
+                                              </span>
+                                              <span className="text-[10px] font-mono text-purple-400/80 font-semibold">
+                                                {daysLeft}d left
+                                              </span>
+                                            </div>
+                                          );
+                                        }
+                                        return (
+                                          <div className="flex flex-col gap-0.5">
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-950/80 border border-amber-400/60 text-amber-300 font-mono text-[10px] font-black shadow-[0_0_8px_rgba(245,158,11,0.3)] w-fit">
+                                              👑 PREMIUM
+                                            </span>
+                                            <span className="text-[10px] font-mono text-amber-400/80 font-semibold">
+                                              {daysLeft}d left
+                                            </span>
+                                          </div>
+                                        );
+                                      })()}
+                                    </td>
+
                                     {/* Level & Progress */}
                                     <td className="p-4">
                                       <div className="flex flex-col gap-0.5">
@@ -1495,6 +1574,15 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           <h3 className={`font-display font-black text-xl tracking-wide ${editIsBanned ? 'text-red-400' : 'text-white'}`}>
                             {selectedPlayer.profile?.username || 'Voidwalker'}
                           </h3>
+                          {editSubExpiresAt > Date.now() && editSubTier !== 'free' && (
+                            <span className={`px-2 py-0.5 rounded font-mono text-[10px] font-black uppercase ${
+                              editSubTier === 'ultra'
+                                ? 'bg-purple-950 border border-purple-500 text-purple-300 shadow-[0_0_8px_rgba(168,85,247,0.4)]'
+                                : 'bg-amber-950 border border-amber-500 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.4)]'
+                            }`}>
+                              {editSubTier === 'ultra' ? '🔮 ULTRA' : '👑 PREMIUM'}
+                            </span>
+                          )}
                           {editIsBanned && (
                             <span className="px-2 py-0.5 rounded bg-red-600 text-white font-mono text-[10px] font-black uppercase">
                               🚫 EXILED / BANNED
@@ -1580,6 +1668,103 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                         </div>
                       </div>
                     )}
+                  </div>
+
+                  {/* SUBSCRIPTION & VIP PRIVILEGES PANEL */}
+                  <div className="p-4 rounded-2xl border bg-white/5 border-white/10 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div>
+                        <h4 className="font-display font-black text-xs tracking-wider uppercase flex items-center gap-1.5 text-purple-400">
+                          <Sparkles className="w-4 h-4" />
+                          SUBSCRIPTION & VIP PRIVILEGES
+                        </h4>
+                        <p className="text-[10px] font-mono text-gray-400 mt-0.5">
+                          Manage active Premium or Ultra subscription tier and remaining validity.
+                        </p>
+                      </div>
+                      {editSubExpiresAt > Date.now() && editSubTier !== 'free' ? (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-950/80 border border-purple-500/50 text-purple-300 font-mono text-[11px] font-bold">
+                          <span>Active: {Math.max(0, Math.ceil((editSubExpiresAt - Date.now()) / 86400000))}d left</span>
+                          <span className="text-gray-400 font-normal">({new Date(editSubExpiresAt).toLocaleDateString()})</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-400 font-mono text-[11px]">
+                          No active subscription
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-white/10">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-mono text-purple-300 uppercase font-bold">Subscription Tier</label>
+                        <select
+                          value={editSubTier}
+                          onChange={(e) => {
+                            const newTier = e.target.value as 'free' | 'premium' | 'ultra';
+                            setEditSubTier(newTier);
+                            if (newTier !== 'free' && (!editSubExpiresAt || editSubExpiresAt <= Date.now())) {
+                              setEditSubExpiresAt(Date.now() + 30 * 86400000);
+                            } else if (newTier === 'free') {
+                              setEditSubExpiresAt(0);
+                            }
+                          }}
+                          className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-sm font-mono font-bold text-purple-200 focus:border-purple-500 focus:outline-none cursor-pointer"
+                        >
+                          <option value="free">Free / None</option>
+                          <option value="premium">👑 Premium Tier</option>
+                          <option value="ultra">🔮 Ultra Tier</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-mono text-purple-300 uppercase font-bold">Duration Quick Adjust</label>
+                        <div className="flex items-center gap-2 pt-0.5 flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const base = (editSubExpiresAt && editSubExpiresAt > Date.now()) ? editSubExpiresAt : Date.now();
+                              setEditSubExpiresAt(base + 30 * 86400000);
+                              if (editSubTier === 'free') setEditSubTier('premium');
+                            }}
+                            className="px-3 py-2 bg-purple-950/60 hover:bg-purple-900 border border-purple-500/50 rounded-xl text-xs font-mono text-purple-300 font-bold transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
+                          >
+                            +30 Days
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const base = (editSubExpiresAt && editSubExpiresAt > Date.now()) ? editSubExpiresAt : Date.now();
+                              setEditSubExpiresAt(base + 90 * 86400000);
+                              if (editSubTier === 'free') setEditSubTier('premium');
+                            }}
+                            className="px-3 py-2 bg-purple-950/60 hover:bg-purple-900 border border-purple-500/50 rounded-xl text-xs font-mono text-purple-300 font-bold transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
+                          >
+                            +90 Days
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const base = (editSubExpiresAt && editSubExpiresAt > Date.now()) ? editSubExpiresAt : Date.now();
+                              setEditSubExpiresAt(base + 365 * 86400000);
+                              if (editSubTier === 'free') setEditSubTier('premium');
+                            }}
+                            className="px-3 py-2 bg-purple-950/60 hover:bg-purple-900 border border-purple-500/50 rounded-xl text-xs font-mono text-purple-300 font-bold transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
+                          >
+                            +365 Days
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditSubTier('free');
+                              setEditSubExpiresAt(0);
+                            }}
+                            className="px-3 py-2 bg-white/5 hover:bg-red-950/40 border border-white/10 hover:border-red-500/40 rounded-xl text-xs font-mono text-gray-400 hover:text-red-400 transition-all cursor-pointer"
+                          >
+                            Revoke
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Resource Modification Controls */}

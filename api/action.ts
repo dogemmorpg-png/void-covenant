@@ -262,6 +262,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         let pendingWithdrawalsUsdt = 0;
         let completedWithdrawalsCount = 0;
         let completedWithdrawalsUsdt = 0;
+        let totalPremiumCount = 0;
+        let totalUltraCount = 0;
 
         const leagueDistribution: Record<string, number> = {
           'Bronze': 0,
@@ -282,6 +284,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           totalDust += d.dust || 0;
           totalShards += d.darkShards || 0;
           totalSovereigns += d.bloodSovereigns || 0;
+
+          // Subscription check
+          const isSubActive = d.subscriptionExpiresAt && Number(d.subscriptionExpiresAt) > now;
+          if (isSubActive) {
+            const tier = d.subscriptionTier || 'free';
+            if (tier === 'ultra') totalUltraCount++;
+            else if (tier === 'premium') totalPremiumCount++;
+          }
 
           const lastActive = d.lastLogin || (p.updated_at ? new Date(p.updated_at).getTime() : 0);
           if (lastActive >= oneDayAgo) active24h++;
@@ -324,6 +334,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             totalPlayers: allProfiles?.length || 0,
             active24h,
             active7d,
+            totalPremiumCount,
+            totalUltraCount,
+            totalSubscribersCount: totalPremiumCount + totalUltraCount,
             totalGold,
             totalDust,
             totalShards,
@@ -583,6 +596,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (updates.pvpTickets !== undefined) targetData.pvpTickets = Number(updates.pvpTickets);
         if (updates.pvpLeague !== undefined) targetData.pvpLeague = updates.pvpLeague;
         if (updates.pvpLP !== undefined) targetData.pvpLP = Number(updates.pvpLP);
+        if (updates.subscriptionTier !== undefined) targetData.subscriptionTier = updates.subscriptionTier;
+        if (updates.subscriptionExpiresAt !== undefined) targetData.subscriptionExpiresAt = Number(updates.subscriptionExpiresAt);
         if (updates.role !== undefined) targetData.role = updates.role;
         if (updates.isBanned !== undefined) {
           targetData.isBanned = Boolean(updates.isBanned);
