@@ -40,11 +40,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const authHeader = req.headers.authorization;
     let requestingWallet: string | null = null;
+    let requestingUsername: string | null = null;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
         const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, JWT_SECRET);
-        requestingWallet = decoded.walletAddress || null;
+        requestingWallet = decoded.walletAddress || decoded.wallet || decoded.sub || null;
+        requestingUsername = decoded.username || null;
       } catch (err) {
         // ignore token error
       }
@@ -73,8 +75,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: 'Database query failed' });
     }
 
-    if (!league && requestingWallet) {
-      const myRow = (rows || []).find(r => r.wallet_address === requestingWallet);
+    if (!league && (requestingWallet || requestingUsername)) {
+      const myRow = (rows || []).find(r => 
+        (requestingWallet && r.wallet_address && r.wallet_address.toLowerCase() === requestingWallet.toLowerCase()) ||
+        (requestingUsername && r.data?.username && r.data.username.trim().toLowerCase() === requestingUsername.trim().toLowerCase())
+      );
       if (myRow && myRow.data?.pvpLeague) {
         playerLeague = myRow.data.pvpLeague;
       }
@@ -99,8 +104,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .sort((a, b) => (b.pvpLP - a.pvpLP) || (b.pvpRating - a.pvpRating));
 
     let myRank: number | null = null;
-    if (requestingWallet) {
-      const myIdx = sorted.findIndex(p => p.walletAddress === requestingWallet);
+    if (requestingWallet || requestingUsername) {
+      const myIdx = sorted.findIndex(p => 
+        (requestingWallet && p.walletAddress && p.walletAddress.toLowerCase() === requestingWallet.toLowerCase()) ||
+        (requestingUsername && p.username && p.username.trim().toLowerCase() === requestingUsername.trim().toLowerCase())
+      );
       if (myIdx !== -1) {
         myRank = myIdx + 1;
       }
