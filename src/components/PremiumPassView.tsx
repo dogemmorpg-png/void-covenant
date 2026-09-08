@@ -6,18 +6,14 @@ import {
   Crown, 
   Sparkles, 
   Gift, 
-  Check, 
   Flame, 
   Shield, 
   Zap, 
   Coins, 
-  ArrowUpRight,
   Clock,
   Swords,
   Gem,
   Award,
-  Lock,
-  ChevronRight,
   Info
 } from 'lucide-react';
 
@@ -113,43 +109,19 @@ export const PremiumPassView: React.FC = () => {
         <div className="absolute -bottom-24 -right-20 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)] pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="text-center md:text-left space-y-2.5 max-w-xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-[11px] font-bold tracking-widest uppercase">
-              <Crown className="w-3.5 h-3.5 text-amber-400" />
-              Imperial Privileges & Pass
-            </div>
-            
-            <h1 className="text-2xl sm:text-4xl font-display font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-amber-300 to-yellow-500 drop-shadow-[0_2px_12px_rgba(245,158,11,0.3)] uppercase">
-              Void Covenant Pass
-            </h1>
-            
-            <p className="text-xs sm:text-sm text-gray-400 leading-relaxed font-sans">
-              Поднимите господство над Ковенантом на новый уровень: увеличенные лимиты дуэлей, гарантированные Соверены в PvP, ускоренный реген ресурсов и защита мирными щитами.
-            </p>
+        <div className="relative z-10 text-center sm:text-left space-y-2.5 max-w-2xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-[11px] font-bold tracking-widest uppercase">
+            <Crown className="w-3.5 h-3.5 text-amber-400" />
+            Imperial Privileges & Pass
           </div>
-
-          {/* Shards Quick Balance Tile */}
-          <div className="bg-[#120f18]/80 backdrop-blur-md border border-purple-500/30 p-4 rounded-2xl flex items-center gap-4 shadow-xl shrink-0">
-            <div className="w-12 h-12 rounded-xl bg-purple-950/60 border border-purple-500/40 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.3)]">
-              <img src="/icons/icon_shards.webp" alt="Shards" className="w-7 h-7 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
-            </div>
-            <div>
-              <div className="text-[10px] uppercase font-mono tracking-wider text-gray-400 font-bold">Ваш Баланс</div>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="font-display font-black text-2xl text-purple-200 tracking-wide">
-                  {profile.darkShards || 0}
-                </span>
-                <span className="text-xs font-mono text-purple-400 font-bold">Осколков</span>
-              </div>
-            </div>
-            <button 
-              onClick={() => setIsShardsShopOpen(true)}
-              className="ml-2 px-3 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-500 hover:from-cyan-500 hover:to-teal-400 text-black font-display font-black text-xs uppercase tracking-wider shadow-[0_0_12px_rgba(6,182,212,0.4)] transition-all cursor-pointer hover:scale-105 active:scale-95"
-            >
-              + Пополнить
-            </button>
-          </div>
+          
+          <h1 className="text-2xl sm:text-4xl font-display font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-amber-300 to-yellow-500 drop-shadow-[0_2px_12px_rgba(245,158,11,0.3)] uppercase">
+            Void Covenant Pass
+          </h1>
+          
+          <p className="text-xs sm:text-sm text-gray-400 leading-relaxed font-sans">
+            Elevate your dominion over the Abyss: amplified PvP ticket pools, guaranteed Blood Sovereigns on battle wins, doubled energy regeneration rates, and daily Peace Shields.
+          </p>
         </div>
 
         {/* Current Active Subscription Status / Daily Tribute Claim */}
@@ -186,38 +158,56 @@ export const PremiumPassView: React.FC = () => {
                         ? 'Ultra Overlord Pass' 
                         : activeTier === 'premium' 
                         ? 'Premium Sovereign Pass' 
-                        : 'Базовый статус (Free)'}
+                        : 'Standard Lord (Free Tier)'}
                     </span>
                     {isSubActive ? (
                       <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-500/60 text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)]">
-                        АКТИВЕН
+                        ACTIVE
                       </span>
                     ) : (
                       <span className="text-[10px] font-mono text-gray-500 px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
-                        БЕЗ ПОДПИСКИ
+                        INACTIVE
                       </span>
                     )}
                   </div>
                   <div className="text-xs text-gray-400 font-sans mt-0.5">
                     {isSubActive ? (
-                      <span>Действует до <strong className="text-gray-200 font-mono">{new Date(profile.subscriptionExpiresAt || 0).toLocaleDateString()}</strong> ({remainingDays} дн. осталось)</span>
+                      <span>Valid until <strong className="text-gray-200 font-mono">{new Date(profile.subscriptionExpiresAt || 0).toLocaleDateString()}</strong> ({remainingDays} days remaining)</span>
                     ) : (
-                      <span>Активируйте Premium или Ultra для максимизации наград и защиты</span>
+                      <span>Activate Premium or Ultra to maximize battle revenue and protection</span>
                     )}
                   </div>
                 </div>
               </div>
 
               {/* Daily Claim Button & Stipend */}
-              <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+              <div className="flex flex-col sm:flex-row items-center gap-3.5 w-full md:w-auto">
                 {isSubActive && (
-                  <div className="text-center md:text-right text-[11px] font-mono text-gray-400">
-                    <span className="text-amber-400 font-bold block">Ежедневная дань:</span>
-                    <span>
-                      {activeTier === 'ultra' 
-                        ? '+3,000 🪙 • +400 🧪 • 1x 6ч 🛡️' 
-                        : '+1,000 🪙 • +150 🧪 • 1x 3ч 🛡️'}
-                    </span>
+                  <div className="text-center md:text-right text-[11px] font-mono text-gray-300">
+                    <span className="text-amber-400 font-bold block mb-1">Daily Tribute:</span>
+                    <div className="inline-flex items-center gap-2 bg-black/50 px-2.5 py-1 rounded-lg border border-white/10">
+                      {/* Gold */}
+                      <span className="inline-flex items-center gap-1 font-bold text-amber-300">
+                        +{activeTier === 'ultra' ? '3,000' : '1,000'}
+                        <img src="/icons/icon_gold.webp" alt="Gold" className="w-3.5 h-3.5 object-contain" />
+                      </span>
+                      <span className="text-gray-600">•</span>
+                      {/* Dust */}
+                      <span className="inline-flex items-center gap-1 font-bold text-cyan-300">
+                        +{activeTier === 'ultra' ? '400' : '150'}
+                        <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 object-contain" />
+                      </span>
+                      <span className="text-gray-600">•</span>
+                      {/* Shield */}
+                      <span className="inline-flex items-center gap-1 font-bold text-gray-200">
+                        1x {activeTier === 'ultra' ? '6h' : '3h'}
+                        <img 
+                          src={activeTier === 'ultra' ? '/icons/shield_6h.png' : '/icons/shield_3h.png'} 
+                          alt="Shield" 
+                          className="w-3.5 h-3.5 object-contain drop-shadow-[0_0_4px_rgba(6,182,212,0.6)]" 
+                        />
+                      </span>
+                    </div>
                   </div>
                 )}
                 <button
@@ -233,10 +223,10 @@ export const PremiumPassView: React.FC = () => {
                 >
                   <Gift className="w-4 h-4" />
                   {isDailyClaimed 
-                    ? '✓ Дань получена' 
+                    ? '✓ Tribute Claimed' 
                     : isSubActive 
-                    ? (isClaiming ? 'Получение...' : 'Забрать дань') 
-                    : 'Дань недоступна'}
+                    ? (isClaiming ? 'Claiming...' : 'Claim Tribute') 
+                    : 'Tribute Locked'}
                 </button>
               </div>
             </div>
@@ -246,7 +236,7 @@ export const PremiumPassView: React.FC = () => {
 
       {/* Duration Selector Tabs */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-        <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">Срок действия:</span>
+        <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">Access Duration:</span>
         <div className="flex items-center p-1 rounded-2xl bg-black/60 border border-white/10">
           <button
             onClick={() => { audioSystem.playClick(); setDurationDays(30); }}
@@ -256,7 +246,7 @@ export const PremiumPassView: React.FC = () => {
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            30 ДНЕЙ
+            30 DAYS
           </button>
 
           <button
@@ -267,9 +257,9 @@ export const PremiumPassView: React.FC = () => {
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            90 ДНЕЙ
+            90 DAYS
             <span className="absolute -top-2.5 -right-2 bg-gradient-to-r from-rose-500 to-amber-500 text-white font-mono text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-md">
-              -15% ВЫГОДА
+              -15% OFF
             </span>
           </button>
         </div>
@@ -301,7 +291,7 @@ export const PremiumPassView: React.FC = () => {
               </div>
               {activeTier === 'premium' && (
                 <span className="text-[10px] font-mono font-black px-2.5 py-1 rounded-full bg-amber-500 text-black shadow-[0_0_12px_rgba(245,158,11,0.6)]">
-                  ВАШ ТЕКУЩИЙ ПЛАН
+                  YOUR ACTIVE PLAN
                 </span>
               )}
             </div>
@@ -312,7 +302,7 @@ export const PremiumPassView: React.FC = () => {
                 PREMIUM PASS
               </h2>
               <p className="text-[11px] text-gray-300 font-sans">
-                Золотой стандарт для активных лордов и подъема в лигах Арены
+                The Sovereign standard. Essential for competitive Arena climbers.
               </p>
             </div>
           </div>
@@ -322,21 +312,21 @@ export const PremiumPassView: React.FC = () => {
             {/* Price Box */}
             <div className="bg-black/60 border border-amber-500/25 rounded-2xl p-4 flex items-center justify-between shadow-inner">
               <div>
-                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block">Стоимость на {durationDays} дней</span>
+                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block">Access Cost ({durationDays} Days)</span>
                 <div className="flex items-center gap-2 mt-1">
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
                   <span className="font-display font-black text-3xl text-amber-300">
                     {PRICES.premium[durationDays]}
                   </span>
-                  <span className="font-mono text-xs text-amber-400/80 font-bold">Осколков</span>
+                  <span className="font-mono text-xs text-amber-400/80 font-bold">SHARDS</span>
                 </div>
               </div>
               <div className="text-right">
                 <span className="text-[11px] font-mono text-gray-400 block">
-                  {durationDays === 30 ? '5 Shards/день' : '4.4 Shards/день'}
+                  {durationDays === 30 ? '5 Shards / day' : '4.4 Shards / day'}
                 </span>
                 <span className="text-[10px] font-mono text-emerald-400 font-bold">
-                  {durationDays === 90 ? 'Экономия 50 Shards' : 'Базовый тариф'}
+                  {durationDays === 90 ? 'Save 50 Shards' : 'Standard Rate'}
                 </span>
               </div>
             </div>
@@ -344,7 +334,7 @@ export const PremiumPassView: React.FC = () => {
             {/* Perks Detailed Grid */}
             <div className="space-y-3 font-sans text-xs">
               <span className="text-[11px] font-mono font-bold text-amber-400/80 uppercase tracking-widest block border-b border-amber-500/20 pb-2">
-                Привилегии Premium Pass:
+                Included Privileges:
               </span>
 
               {/* PvP Tickets */}
@@ -353,8 +343,8 @@ export const PremiumPassView: React.FC = () => {
                   <Swords className="w-3.5 h-3.5 text-amber-400" />
                 </div>
                 <div>
-                  <div className="font-bold text-white text-xs">8 билетов PvP в день</div>
-                  <div className="text-[11px] text-gray-400">+60% больше билетов (вместо 5) для быстрого набора очков рейтинга</div>
+                  <div className="font-bold text-white text-xs">8 Daily PvP Tickets</div>
+                  <div className="text-[11px] text-gray-400">+60% more tickets (up from 5) to accelerate league ranking points</div>
                 </div>
               </div>
 
@@ -364,8 +354,8 @@ export const PremiumPassView: React.FC = () => {
                   <Coins className="w-3.5 h-3.5 text-emerald-400" />
                 </div>
                 <div>
-                  <div className="font-bold text-emerald-300 text-xs">+1 Blood Sovereign за победу в PvP</div>
-                  <div className="text-[11px] text-gray-400">Лимит до 10 Соверенов ежедневно за победные дуэли</div>
+                  <div className="font-bold text-emerald-300 text-xs">+1 Blood Sovereign per PvP Win</div>
+                  <div className="text-[11px] text-gray-400">Claim up to 10 SOV bounty daily from victorious arena battles</div>
                 </div>
               </div>
 
@@ -375,8 +365,8 @@ export const PremiumPassView: React.FC = () => {
                   <Zap className="w-3.5 h-3.5 text-yellow-400" />
                 </div>
                 <div>
-                  <div className="font-bold text-yellow-300 text-xs">+25% Gold Drop во всех боях</div>
-                  <div className="text-[11px] text-gray-400">Повышенная добыча золота в Кампании и PvP дуэлях</div>
+                  <div className="font-bold text-yellow-300 text-xs">+25% Gold Drop from All Battles</div>
+                  <div className="text-[11px] text-gray-400">Permanent bonus gold awarded across Campaign floors and PvP encounters</div>
                 </div>
               </div>
 
@@ -386,8 +376,8 @@ export const PremiumPassView: React.FC = () => {
                   <Clock className="w-3.5 h-3.5 text-purple-400" />
                 </div>
                 <div>
-                  <div className="font-bold text-purple-200 text-xs">10 PvE Энергии (1 за 30 мин)</div>
-                  <div className="text-[11px] text-gray-400">В 2 раза больше запас энергии и ускоренное восстановление</div>
+                  <div className="font-bold text-purple-200 text-xs">10 Max Energy (1 per 30 min)</div>
+                  <div className="text-[11px] text-gray-400">Doubled maximum energy capacity with 25% faster regeneration rate</div>
                 </div>
               </div>
 
@@ -397,8 +387,8 @@ export const PremiumPassView: React.FC = () => {
                   <Shield className="w-3.5 h-3.5 text-cyan-400" />
                 </div>
                 <div>
-                  <div className="font-bold text-cyan-300 text-xs">Ежедневный Щит Мира 3 часа</div>
-                  <div className="text-[11px] text-gray-400">Бесплатный щит от оффлайн-атак в ежедневной дани</div>
+                  <div className="font-bold text-cyan-300 text-xs">Daily 3-Hour Peace Shield</div>
+                  <div className="text-[11px] text-gray-400">Complimentary Aegis shield to protect rank rating against offline raids</div>
                 </div>
               </div>
 
@@ -408,8 +398,8 @@ export const PremiumPassView: React.FC = () => {
                   <Award className="w-3.5 h-3.5 text-amber-400" />
                 </div>
                 <div>
-                  <div className="font-bold text-amber-300 text-xs">Золотой ник, ⚜️ знак и лимит вывода 2,500 SOV</div>
-                  <div className="text-[11px] text-gray-400">Сниженный порог вывода USDT и выделение в Лидерборде</div>
+                  <div className="font-bold text-amber-300 text-xs">Golden Name, ⚜️ Crest & 2,500 SOV Payout</div>
+                  <div className="text-[11px] text-gray-400">Reduced cashout threshold ($25) and distinct leaderboard prestige</div>
                 </div>
               </div>
             </div>
@@ -422,7 +412,7 @@ export const PremiumPassView: React.FC = () => {
                 className="w-full py-4 rounded-2xl font-display font-black text-sm tracking-widest uppercase bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black shadow-[0_0_25px_rgba(245,158,11,0.4)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] hover:scale-[1.02] active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 <Crown className="w-4 h-4" />
-                {activeTier === 'premium' ? `Продлить Premium (${durationDays} дн.)` : `Активировать Premium (${durationDays} дн.)`}
+                {activeTier === 'premium' ? `EXTEND PREMIUM (${durationDays}d)` : `ACTIVATE PREMIUM (${durationDays}d)`}
               </button>
             </div>
 
@@ -452,11 +442,11 @@ export const PremiumPassView: React.FC = () => {
               </div>
               {activeTier === 'ultra' ? (
                 <span className="text-[10px] font-mono font-black px-2.5 py-1 rounded-full bg-purple-500 text-black shadow-[0_0_15px_rgba(168,85,247,0.7)]">
-                  ВАШ ТЕКУЩИЙ ПЛАН
+                  YOUR ACTIVE PLAN
                 </span>
               ) : (
                 <span className="text-[10px] font-mono font-black px-2.5 py-1 rounded-full bg-gradient-to-r from-purple-500 to-rose-500 text-white shadow-[0_0_12px_rgba(168,85,247,0.5)]">
-                  МАКСИМУМ ВЫГОДЫ
+                  MAX VALUE
                 </span>
               )}
             </div>
@@ -467,7 +457,7 @@ export const PremiumPassView: React.FC = () => {
                 ULTRA OVERLORD
               </h2>
               <p className="text-[11px] text-purple-200/80 font-sans">
-                Абсолютное доминирование, максимальный доход Соверенов и лучшая скорость
+                Apex dominance: greatest Sovereign harvest and fastest progression velocity.
               </p>
             </div>
           </div>
@@ -477,21 +467,21 @@ export const PremiumPassView: React.FC = () => {
             {/* Price Box */}
             <div className="bg-black/60 border border-purple-500/30 rounded-2xl p-4 flex items-center justify-between shadow-inner">
               <div>
-                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block">Стоимость на {durationDays} дней</span>
+                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block">Access Cost ({durationDays} Days)</span>
                 <div className="flex items-center gap-2 mt-1">
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
                   <span className="font-display font-black text-3xl text-purple-300">
                     {PRICES.ultra[durationDays]}
                   </span>
-                  <span className="font-mono text-xs text-purple-400 font-bold">Осколков</span>
+                  <span className="font-mono text-xs text-purple-400 font-bold">SHARDS</span>
                 </div>
               </div>
               <div className="text-right">
                 <span className="text-[11px] font-mono text-gray-400 block">
-                  {durationDays === 30 ? '11.6 Shards/день' : '10 Shards/день'}
+                  {durationDays === 30 ? '11.6 Shards / day' : '10 Shards / day'}
                 </span>
                 <span className="text-[10px] font-mono text-purple-300 font-bold">
-                  {durationDays === 90 ? 'Экономия 150 Shards' : 'Премиальный статус'}
+                  {durationDays === 90 ? 'Save 150 Shards' : 'Supreme Status'}
                 </span>
               </div>
             </div>
@@ -499,7 +489,7 @@ export const PremiumPassView: React.FC = () => {
             {/* Perks Detailed Grid */}
             <div className="space-y-3 font-sans text-xs">
               <span className="text-[11px] font-mono font-bold text-purple-400/90 uppercase tracking-widest block border-b border-purple-500/25 pb-2">
-                Все привилегии Premium ПЛЮС:
+                All Premium Privileges PLUS:
               </span>
 
               {/* PvP Tickets */}
@@ -508,8 +498,8 @@ export const PremiumPassView: React.FC = () => {
                   <Swords className="w-3.5 h-3.5 text-purple-300" />
                 </div>
                 <div>
-                  <div className="font-bold text-purple-200 text-xs">12 билетов PvP в день</div>
-                  <div className="text-[11px] text-gray-400">+140% билетов (вместо 5) — гарантированное лидерство в сезонном рейтинге</div>
+                  <div className="font-bold text-purple-200 text-xs">12 Daily PvP Tickets</div>
+                  <div className="text-[11px] text-gray-400">+140% tickets (up from 5) — commanding reach for top seasonal brackets</div>
                 </div>
               </div>
 
@@ -519,8 +509,8 @@ export const PremiumPassView: React.FC = () => {
                   <Coins className="w-3.5 h-3.5 text-emerald-300" />
                 </div>
                 <div>
-                  <div className="font-bold text-emerald-300 text-xs">+2 Blood Sovereigns за победу в PvP</div>
-                  <div className="text-[11px] text-gray-400">Лимит до 24 Соверенов в день (в 2.4 раза больше, чем в Premium!)</div>
+                  <div className="font-bold text-emerald-300 text-xs">+2 Blood Sovereigns per PvP Win</div>
+                  <div className="text-[11px] text-gray-400">Maximum daily cap of 24 SOV (2.4x higher earnings than Premium)</div>
                 </div>
               </div>
 
@@ -530,8 +520,8 @@ export const PremiumPassView: React.FC = () => {
                   <Zap className="w-3.5 h-3.5 text-yellow-300" />
                 </div>
                 <div>
-                  <div className="font-bold text-yellow-300 text-xs">+50% Gold Drop во всех режимах</div>
-                  <div className="text-[11px] text-gray-400">Ультимативный бонус к золоту в Кампании и PvP</div>
+                  <div className="font-bold text-yellow-300 text-xs">+50% Gold Drop from All Battles</div>
+                  <div className="text-[11px] text-gray-400">Supreme gold multiplication multiplier across Campaign and Arena</div>
                 </div>
               </div>
 
@@ -541,8 +531,8 @@ export const PremiumPassView: React.FC = () => {
                   <Clock className="w-3.5 h-3.5 text-purple-300" />
                 </div>
                 <div>
-                  <div className="font-bold text-purple-200 text-xs">20 PvE Энергии (1 за 20 мин)</div>
-                  <div className="text-[11px] text-gray-400">В 4 раза больше запас энергии и в 2 раза более быстрый реген</div>
+                  <div className="font-bold text-purple-200 text-xs">20 Max Energy (1 per 20 min)</div>
+                  <div className="text-[11px] text-gray-400">Quadrupled capacity with 2x faster regeneration speed</div>
                 </div>
               </div>
 
@@ -552,8 +542,8 @@ export const PremiumPassView: React.FC = () => {
                   <Shield className="w-3.5 h-3.5 text-cyan-300" />
                 </div>
                 <div>
-                  <div className="font-bold text-cyan-300 text-xs">Ежедневный Щит Мира 6 часов</div>
-                  <div className="text-[11px] text-gray-400">Мощная оффлайн-защита от нападений и кражи очков в таблице лидеров</div>
+                  <div className="font-bold text-cyan-300 text-xs">Daily 6-Hour Peace Shield</div>
+                  <div className="text-[11px] text-gray-400">Fortified immunity against ladder attacks while resting</div>
                 </div>
               </div>
 
@@ -563,8 +553,8 @@ export const PremiumPassView: React.FC = () => {
                   <Gem className="w-3.5 h-3.5 text-rose-300" />
                 </div>
                 <div>
-                  <div className="font-bold text-rose-300 text-xs">Фиолетовый ник, 💎 кристалл и минимальный вывод 2,000 SOV</div>
-                  <div className="text-[11px] text-gray-400">Самый низкий порог вывода в игре и эксклюзивный статус Ultra Overlord</div>
+                  <div className="font-bold text-rose-300 text-xs">Purple Glow, 💎 Crystal & 2,000 SOV Payout</div>
+                  <div className="text-[11px] text-gray-400">Lowest payout limit ($20) and prominent Apex Overlord distinction</div>
                 </div>
               </div>
             </div>
@@ -577,7 +567,7 @@ export const PremiumPassView: React.FC = () => {
                 className="w-full py-4 rounded-2xl font-display font-black text-sm tracking-widest uppercase bg-gradient-to-r from-purple-600 via-rose-500 to-amber-500 hover:from-purple-500 hover:to-amber-400 text-black shadow-[0_0_25px_rgba(168,85,247,0.45)] hover:shadow-[0_0_35px_rgba(168,85,247,0.7)] hover:scale-[1.02] active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 <Flame className="w-4 h-4" />
-                {activeTier === 'ultra' ? `Продлить Ultra (${durationDays} дн.)` : `Возвыситься до Ultra (${durationDays} дн.)`}
+                {activeTier === 'ultra' ? `EXTEND ULTRA (${durationDays}d)` : `ASCEND TO ULTRA (${durationDays}d)`}
               </button>
             </div>
 
@@ -593,10 +583,10 @@ export const PremiumPassView: React.FC = () => {
         </div>
         <div className="space-y-1 text-center sm:text-left">
           <div className="font-display font-bold text-gray-300 text-xs uppercase tracking-wider">
-            Гарантия продления и безопасность баланса
+            Duration Stacking & Balance Security
           </div>
           <p className="font-sans leading-relaxed text-[11px]">
-            Подписки бесшовно суммируются: при повторной покупке оставшиеся дни прибавляются к текущему сроку. Все заработанные Blood Sovereigns автоматически поступают на ваш внутриигровой счет и доступны для мгновенного запроса вывода в USDT (Solana).
+            Subscriptions stack seamlessly: re-purchasing the same tier adds the full duration to your remaining days. All Blood Sovereigns earned from PvP victories are credited directly to your bank balance and can be withdrawn as real USDT on Solana.
           </p>
         </div>
       </div>
@@ -604,4 +594,5 @@ export const PremiumPassView: React.FC = () => {
     </div>
   );
 };
+
 
