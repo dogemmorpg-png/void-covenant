@@ -722,9 +722,9 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                     <Sparkles className="w-6 h-6 text-purple-400/60" />
                   </div>
                   <div className="mt-3 flex items-center gap-3 text-[11px] font-mono text-gray-400 border-t border-purple-500/20 pt-2">
-                    <span className="text-amber-400 font-bold flex items-center gap-1">👑 {overview?.totalPremiumCount || 0} Premium</span>
+                    <span className="text-amber-400 font-bold flex items-center gap-1">⚜️ {overview?.totalPremiumCount || 0} Premium</span>
                     <span>•</span>
-                    <span className="text-purple-400 font-bold flex items-center gap-1">🔮 {overview?.totalUltraCount || 0} Ultra</span>
+                    <span className="text-purple-400 font-bold flex items-center gap-1">💎 {overview?.totalUltraCount || 0} Ultra</span>
                   </div>
                 </div>
 
@@ -1240,7 +1240,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                               : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white'
                           }`}
                         >
-                          {l === 'all' ? 'All' : l === 'Banned' ? '🚫 Banned' : l === 'Premium' ? '👑 Premium' : l === 'Ultra' ? '🔮 Ultra' : l}
+                          {l === 'all' ? 'All' : l === 'Banned' ? '🚫 Banned' : l === 'Premium' ? '⚜️ Premium' : l === 'Ultra' ? '💎 Ultra' : l}
                         </button>
                       ))}
                     </div>
@@ -1465,7 +1465,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                                           return (
                                             <div className="flex flex-col gap-0.5">
                                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-950/80 border border-purple-400/60 text-purple-300 font-mono text-[10px] font-black shadow-[0_0_8px_rgba(168,85,247,0.3)] w-fit">
-                                                🔮 ULTRA
+                                                💎 ULTRA
                                               </span>
                                               <span className="text-[10px] font-mono text-purple-400/80 font-semibold">
                                                 {daysLeft}d left
@@ -1476,7 +1476,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                                         return (
                                           <div className="flex flex-col gap-0.5">
                                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-950/80 border border-amber-400/60 text-amber-300 font-mono text-[10px] font-black shadow-[0_0_8px_rgba(245,158,11,0.3)] w-fit">
-                                              👑 PREMIUM
+                                              ⚜️ PREMIUM
                                             </span>
                                             <span className="text-[10px] font-mono text-amber-400/80 font-semibold">
                                               {daysLeft}d left
@@ -1580,7 +1580,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                                 ? 'bg-purple-950 border border-purple-500 text-purple-300 shadow-[0_0_8px_rgba(168,85,247,0.4)]'
                                 : 'bg-amber-950 border border-amber-500 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.4)]'
                             }`}>
-                              {editSubTier === 'ultra' ? '🔮 ULTRA' : '👑 PREMIUM'}
+                              {editSubTier === 'ultra' ? '💎 ULTRA' : '⚜️ PREMIUM'}
                             </span>
                           )}
                           {editIsBanned && (
@@ -1711,8 +1711,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-sm font-mono font-bold text-purple-200 focus:border-purple-500 focus:outline-none cursor-pointer"
                         >
                           <option value="free">Free / None</option>
-                          <option value="premium">👑 Premium Tier</option>
-                          <option value="ultra">🔮 Ultra Tier</option>
+                          <option value="premium">⚜️ Premium Tier</option>
+                          <option value="ultra">💎 Ultra Tier</option>
                         </select>
                       </div>
 

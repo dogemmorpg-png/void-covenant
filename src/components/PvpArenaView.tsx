@@ -711,7 +711,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   </h4>
                   {activeOpponent.subscriptionTier === 'ultra' && (
                     <span className="text-[10px] font-mono font-black px-1.5 py-0.2 rounded bg-purple-950/90 border border-purple-400 text-purple-300 shadow-[0_0_8px_rgba(168,85,247,0.4)]">
-                      👑 ULTRA
+                      💎 ULTRA
                     </span>
                   )}
                   {activeOpponent.subscriptionTier === 'premium' && (
@@ -889,7 +889,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   MY RANK
                 </span>
                 {mySubTier === 'ultra' && (
-                  <span className="text-[11px] leading-none" title="Ultra Overlord Pass">👑</span>
+                  <span className="text-[11px] leading-none" title="Ultra Overlord Pass">💎</span>
                 )}
                 {mySubTier === 'premium' && (
                   <span className="text-[11px] leading-none" title="Premium Sovereign Pass">⚜️</span>
@@ -1727,7 +1727,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                           {/* VIP / Ultra Badges */}
                           {subTier === 'ultra' && (
                             <span className="text-[9px] px-1 py-0.2 rounded bg-purple-950/90 border border-purple-400/80 text-purple-300 font-mono font-black shadow-[0_0_8px_rgba(168,85,247,0.5)] shrink-0 flex items-center gap-0.5" title="Ultra Overlord Pass">
-                              👑
+                              💎
                             </span>
                           )}
                           {subTier === 'premium' && (
@@ -1814,7 +1814,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                         </span>
                         {mySubTier === 'ultra' && (
                           <span className="text-[9px] px-1 py-0.2 rounded bg-purple-950/90 border border-purple-400/80 text-purple-300 font-mono font-black shadow-[0_0_8px_rgba(168,85,247,0.5)] shrink-0" title="Ultra Overlord Pass">
-                            👑
+                            💎
                           </span>
                         )}
                         {mySubTier === 'premium' && (

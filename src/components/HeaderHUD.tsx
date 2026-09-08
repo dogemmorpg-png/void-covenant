@@ -205,7 +205,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                     )}
                     {tier === 'ultra' && (
                       <span className="absolute -top-2 -right-1 text-xs select-none filter drop-shadow-[0_0_4px_rgba(168,85,247,0.9)] animate-pulse">
-                        👑
+                        💎
                       </span>
                     )}
                     {tier === 'premium' && (

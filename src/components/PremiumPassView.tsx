@@ -456,7 +456,7 @@ export const PremiumPassView: React.FC = () => {
 
               <div className="flex items-start gap-2.5">
                 <Sparkles className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-                <span><strong className="text-rose-300">Animated Void Frame & 👑 Royal Crown</strong> icon</span>
+                <span><strong className="text-rose-300">Animated Void Frame & 💎 Ultra Diamond</strong> icon</span>
               </div>
             </div>
           </div>
