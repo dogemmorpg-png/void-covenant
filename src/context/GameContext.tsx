@@ -6,6 +6,7 @@ import { supabase } from '../utils/supabaseClient';
 import { calculateEnergy } from '../utils/energyHelper';
 import { ALL_LEAGUE_REWARDS } from '../data/leagueRewards';
 import { recordShardTransaction } from '../utils/shardLogger';
+import { recordSovereignTransaction } from '../utils/sovereignLogger';
 
 interface GameContextType {
   profile: PlayerProfile;
@@ -353,6 +354,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
               prev.gold !== migrated.gold ||
               prev.dust !== migrated.dust ||
               prev.darkShards !== migrated.darkShards ||
+              prev.bloodSovereigns !== migrated.bloodSovereigns ||
+              (prev.mailMessages?.length || 0) !== (migrated.mailMessages?.length || 0) ||
+              (prev.sovereignTransactions?.length || 0) !== (migrated.sovereignTransactions?.length || 0) ||
               prev.level !== migrated.level ||
               prev.exp !== migrated.exp
             ) {
@@ -676,10 +680,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     setProfile(current => {
-      const updated = {
-        ...current,
-        bloodSovereigns: (current.bloodSovereigns || 0) - amountSovereigns,
-        withdrawalRequests: [newRequest, ...(current.withdrawalRequests || [])]
+      let updated = recordSovereignTransaction(
+        current,
+        'WITHDRAWAL',
+        -amountSovereigns,
+        `Withdrawal requested to ${targetAddress.trim()}`,
+        { requestId: newRequest.id, amountUsdt: newRequest.amountUsdt, targetAddress: targetAddress.trim() }
+      );
+      updated = {
+        ...updated,
+        withdrawalRequests: [newRequest, ...(updated.withdrawalRequests || [])]
       };
       saveProfile(updated);
       return updated;
@@ -722,24 +732,34 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       let newGold = current.gold || 0;
       let newDust = current.dust || 0;
       let newShards = current.darkShards || 0;
-      let newSovereigns = current.bloodSovereigns || 0;
+      const sovReward = targetMail.rewards?.bloodSovereigns || 0;
 
       if (targetMail.rewards) {
         if (targetMail.rewards.gold) newGold += targetMail.rewards.gold;
         if (targetMail.rewards.dust) newDust += targetMail.rewards.dust;
         if (targetMail.rewards.darkShards) newShards += targetMail.rewards.darkShards;
-        if (targetMail.rewards.bloodSovereigns) newSovereigns += targetMail.rewards.bloodSovereigns;
       }
 
       const updatedMessages = (current.mailMessages || []).map(m => m.id === mailId ? { ...m, isClaimed: true, isRead: true } : m);
-      const updated = {
+      let updated: PlayerProfile = {
         ...current,
         gold: newGold,
         dust: newDust,
         darkShards: newShards,
-        bloodSovereigns: newSovereigns,
         mailMessages: updatedMessages
       };
+
+      if (sovReward > 0) {
+        const isLeague = targetMail.title?.toLowerCase().includes('league') || targetMail.title?.toLowerCase().includes('pvp season');
+        updated = recordSovereignTransaction(
+          updated,
+          isLeague ? 'LEAGUE_ROLLOVER' : 'MAIL_CLAIM',
+          sovReward,
+          `Claimed tribute: ${targetMail.title}`,
+          { mailId: targetMail.id }
+        );
+      }
+
       saveProfile(updated);
       return updated;
     });
@@ -763,27 +783,39 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       let newGold = current.gold || 0;
       let newDust = current.dust || 0;
       let newShards = current.darkShards || 0;
-      let newSovereigns = current.bloodSovereigns || 0;
+      let totalSovereigns = 0;
+      let claimedCount = 0;
 
       const updatedMessages = (current.mailMessages || []).map(m => {
         if (m.rewards && !m.isClaimed) {
+          claimedCount++;
           if (m.rewards.gold) newGold += m.rewards.gold;
           if (m.rewards.dust) newDust += m.rewards.dust;
           if (m.rewards.darkShards) newShards += m.rewards.darkShards;
-          if (m.rewards.bloodSovereigns) newSovereigns += m.rewards.bloodSovereigns;
+          if (m.rewards.bloodSovereigns) totalSovereigns += m.rewards.bloodSovereigns;
           return { ...m, isClaimed: true, isRead: true };
         }
         return m;
       });
 
-      const updated = {
+      let updated: PlayerProfile = {
         ...current,
         gold: newGold,
         dust: newDust,
         darkShards: newShards,
-        bloodSovereigns: newSovereigns,
         mailMessages: updatedMessages
       };
+
+      if (totalSovereigns > 0) {
+        updated = recordSovereignTransaction(
+          updated,
+          'MAIL_CLAIM',
+          totalSovereigns,
+          `Claimed tributes from ${claimedCount} letters`,
+          { claimedLettersCount: claimedCount }
+        );
+      }
+
       saveProfile(updated);
       return updated;
     });

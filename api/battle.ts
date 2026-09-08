@@ -6,6 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 import { PlayerProfile, CardTemplate } from './_shared/types.js';
 import { generateCampaignStage, createCardInstance } from './_shared/cards.js';
 import { calculateEnergy, processExpGain, getActiveSubscriptionTier } from './_shared/energyHelper.js';
+import { recordSovereignTransaction } from './_shared/sovereignLogger.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
@@ -243,14 +244,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           if (currentWonToday < cap) {
             sovereignsReward = Math.min(2, cap - currentWonToday);
             profile.dailySovereignsWonToday = currentWonToday + sovereignsReward;
-            profile.bloodSovereigns = (profile.bloodSovereigns || 0) + sovereignsReward;
+            profile = recordSovereignTransaction(
+              profile,
+              'PVP_VICTORY',
+              sovereignsReward,
+              `PvP Victory vs ${activeOpponent.username || 'Lord'} (Ultra Subscriber Bounty)`,
+              { opponentWallet: activeOpponent.walletAddress, opponentName: activeOpponent.username }
+            );
           }
         } else if (subTier === 'premium') {
           const cap = 10;
           if (currentWonToday < cap) {
             sovereignsReward = Math.min(1, cap - currentWonToday);
             profile.dailySovereignsWonToday = currentWonToday + sovereignsReward;
-            profile.bloodSovereigns = (profile.bloodSovereigns || 0) + sovereignsReward;
+            profile = recordSovereignTransaction(
+              profile,
+              'PVP_VICTORY',
+              sovereignsReward,
+              `PvP Victory vs ${activeOpponent.username || 'Lord'} (Premium Subscriber Bounty)`,
+              { opponentWallet: activeOpponent.walletAddress, opponentName: activeOpponent.username }
+            );
           }
         }
       } else {

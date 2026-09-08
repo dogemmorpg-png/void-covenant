@@ -9,6 +9,7 @@ import { EQUIPMENT_TEMPLATES, generateEquipmentInstance } from './_shared/equipm
 import { calculateEnergy, processExpGain, getActiveSubscriptionTier, getTierLimits } from './_shared/energyHelper.js';
 import { checkAndPerformPvpRollover, DEFAULT_LEAGUE_REWARDS } from './_shared/pvpRollover.js';
 import { recordShardTransaction } from './_shared/shardLogger.js';
+import { recordSovereignTransaction } from './_shared/sovereignLogger.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
@@ -966,7 +967,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         createdAt: Date.now()
       };
 
-      profile.bloodSovereigns = currentSovereigns - numAmount;
+      profile = recordSovereignTransaction(
+        profile,
+        'WITHDRAWAL',
+        -numAmount,
+        `Withdrawal requested to ${targetAddress.trim()}`,
+        { requestId: newRequest.id, amountUsdt: newRequest.amountUsdt, targetAddress: targetAddress.trim() }
+      );
       profile.withdrawalRequests = [newRequest, ...(profile.withdrawalRequests || [])];
       successMessage = `Successfully requested withdrawal of ${numAmount} SOV ($${(numAmount * 0.01).toFixed(2)} USDT)!`;
       responseData = { request: newRequest };
@@ -999,7 +1006,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             { mailId: mail.id }
           );
         }
-        if (mail.rewards.bloodSovereigns) profile.bloodSovereigns = (profile.bloodSovereigns || 0) + mail.rewards.bloodSovereigns;
+        if (mail.rewards.bloodSovereigns) {
+          const isLeague = mail.title?.toLowerCase().includes('league') || mail.title?.toLowerCase().includes('pvp season');
+          profile = recordSovereignTransaction(
+            profile,
+            isLeague ? 'LEAGUE_ROLLOVER' : 'MAIL_CLAIM',
+            mail.rewards.bloodSovereigns,
+            `Claimed tribute: ${mail.title}`,
+            { mailId: mail.id }
+          );
+        }
       }
 
       profile.mailMessages = profile.mailMessages.map((m: any) => {
@@ -1043,7 +1059,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           { claimedLettersCount: claimedCount }
         );
       }
-      profile.bloodSovereigns = (profile.bloodSovereigns || 0) + totalSovereigns;
+      if (totalSovereigns > 0) {
+        profile = recordSovereignTransaction(
+          profile,
+          'MAIL_CLAIM',
+          totalSovereigns,
+          `Claimed tributes from ${claimedCount} letters`,
+          { claimedLettersCount: claimedCount }
+        );
+      }
 
       successMessage = `Claimed all rewards from ${claimedCount} letter(s)!`;
       responseData = { claimedCount, totalGold, totalDust, totalShards, totalSovereigns };

@@ -90,13 +90,15 @@ export const BankView: React.FC = () => {
     if (profile.sovereignTransactions && Array.isArray(profile.sovereignTransactions)) {
       profile.sovereignTransactions.forEach((tx: any) => {
         if (tx.sovereignsChange > 0) {
+          const isLeague = tx.action === 'LEAGUE_ROLLOVER' || tx.description?.toLowerCase().includes('league') || tx.description?.toLowerCase().includes('pvp season');
+          const isPvp = tx.action === 'PVP_VICTORY';
           events.push({
             id: tx.id || `stx_${tx.timestamp}`,
-            title: tx.action === 'PVP_VICTORY' ? 'PvP Duel Bounty' : tx.action === 'LEAGUE_ROLLOVER' ? 'League Season Tribute' : 'Treasury Grant',
+            title: isLeague ? 'League Season Rollover Tribute' : isPvp ? 'PvP Duel Victory Bounty' : 'Imperial Decree Tribute',
             description: tx.description || 'Blood Sovereigns earned and deposited',
             amount: tx.sovereignsChange,
             timestamp: typeof tx.timestamp === 'string' ? new Date(tx.timestamp).getTime() : tx.timestamp,
-            type: tx.action === 'PVP_VICTORY' ? 'pvp' : tx.action === 'LEAGUE_ROLLOVER' ? 'league' : 'mail'
+            type: isLeague ? 'league' : isPvp ? 'pvp' : 'mail'
           });
         }
       });
@@ -130,7 +132,7 @@ export const BankView: React.FC = () => {
       });
     }
 
-    // 3. Mailbox messages with Blood Sovereigns rewards
+    // 3. Mailbox messages with Blood Sovereigns rewards (claimed or granted)
     if (profile.mailMessages && Array.isArray(profile.mailMessages)) {
       profile.mailMessages.forEach((mail: any) => {
         const sovReward = mail.rewards?.bloodSovereigns;
@@ -138,8 +140,8 @@ export const BankView: React.FC = () => {
           const isLeague = mail.title?.toLowerCase().includes('league') || mail.title?.toLowerCase().includes('pvp season');
           events.push({
             id: `mail_sov_${mail.id}`,
-            title: mail.title || (isLeague ? 'League Season Rollover' : 'Imperial Decree Tribute'),
-            description: isLeague ? 'Awarded for seasonal leaderboard rank' : (mail.sender || 'Council of the Void'),
+            title: isLeague ? 'League Season Rollover Tribute' : mail.title || 'Imperial Decree Tribute',
+            description: isLeague ? `${mail.title} - Seasonal rank tribute` : (mail.sender || 'Council of the Void'),
             amount: sovReward,
             timestamp: mail.createdAt || Date.now(),
             type: isLeague ? 'league' : 'mail'

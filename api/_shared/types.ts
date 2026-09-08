@@ -124,6 +124,19 @@ export interface PlayerProfile {
   withdrawalRequests?: any[];
   mailMessages?: MailMessage[];
   shardTransactions?: ShardTransaction[];
+  sovereignTransactions?: SovereignTransaction[];
+}
+
+export interface SovereignTransaction {
+  id: string;
+  timestamp: string; // ISO 8601
+  action: 'PVP_VICTORY' | 'LEAGUE_ROLLOVER' | 'MAIL_CLAIM' | 'ADMIN_ADJUSTMENT' | 'WITHDRAWAL';
+  sovereignsChange: number; // e.g. +400 or -2000
+  sovereignsBefore: number;
+  sovereignsAfter: number;
+  description: string;
+  details?: Record<string, any>;
+  status: 'SUCCESS' | 'FAILED';
 }
 
 export interface ShardTransaction {
