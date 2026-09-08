@@ -99,7 +99,7 @@ export const PremiumPassView: React.FC = () => {
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-black/50 border border-amber-500/25 text-[11px] font-mono font-bold text-amber-300 shadow-inner">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>+15% to +25% Rollover Sovereigns</span>
+                <span>+15% to +25% Leaderboard Rewards</span>
               </div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-black/50 border border-emerald-500/25 text-[11px] font-mono font-bold text-emerald-300 shadow-inner">
                 <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3.5 h-3.5 object-contain shrink-0" />
@@ -131,15 +131,15 @@ export const PremiumPassView: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="shrink-0 hidden lg:flex flex-col items-center justify-center p-4 rounded-2xl bg-black/40 border border-white/10 text-center max-w-[210px] space-y-2">
+            <div className="shrink-0 hidden lg:flex flex-col items-center justify-center p-4 rounded-2xl bg-black/40 border border-amber-500/25 text-center max-w-[210px] space-y-2">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
                 <Crown className="w-5 h-5" />
               </div>
               <div className="text-[11px] font-display font-bold text-amber-200 uppercase tracking-wider">
-                Unlocks Real USDT Cashouts
+                Lower Payout Threshold
               </div>
               <p className="text-[10px] text-gray-400 font-sans leading-tight">
-                Lowered minimum withdrawal limits and maximum arena bounty yields.
+                Withdraw your earned USDT faster with lower minimum thresholds.
               </p>
             </div>
           )}
@@ -266,11 +266,11 @@ export const PremiumPassView: React.FC = () => {
               {/* 3. Seasonal Leaderboard Bonus */}
               <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
                 <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/league_grandmaster_crest.png" alt="Seasonal Rollover" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
+                  <img src="/icons/league_grandmaster_crest.png" alt="Seasonal Rewards" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-amber-300 text-xs">+15% League Rollover Sovereigns</div>
-                  <div className="text-[11px] text-gray-400">Bonus Blood Sovereigns at season end & daily settlements</div>
+                  <div className="font-bold text-amber-300 text-xs">+15% Season Leaderboard Rewards</div>
+                  <div className="text-[11px] text-gray-400">Bonus Blood Sovereigns on daily & seasonal leaderboard payouts</div>
                 </div>
               </div>
 
@@ -452,11 +452,11 @@ export const PremiumPassView: React.FC = () => {
               {/* 3. Seasonal Leaderboard Bonus */}
               <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
                 <div className="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/league_void_overlord.png" alt="Seasonal Rollover" className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
+                  <img src="/icons/league_void_overlord.png" alt="Seasonal Rewards" className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-purple-200 text-xs">+25% League Rollover Sovereigns</div>
-                  <div className="text-[11px] text-gray-400">Highest seasonal payout bonus on leaderboard rollover</div>
+                  <div className="font-bold text-purple-200 text-xs">+25% Season Leaderboard Rewards</div>
+                  <div className="text-[11px] text-gray-400">Highest payout multiplier on daily & seasonal leaderboard standings</div>
                 </div>
               </div>
 
