@@ -2812,7 +2812,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               {(subGoldBonusPercent > 0 || equipGoldBonus > 0) && (
                 <div className="flex items-center justify-center gap-1.5 flex-wrap bg-amber-950/20 border border-amber-500/20 rounded-xl px-3 py-1.5 text-[10.5px]">
                   <span className="text-amber-400/80 font-mono flex items-center gap-1">
-                    <span>✨</span>
                     <span className="font-bold text-amber-300">Gold Bonus:</span>
                   </span>
                   <div className="flex items-center gap-1.5 flex-wrap">
