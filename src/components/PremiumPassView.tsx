@@ -4,16 +4,9 @@ import { useToast } from './Toast';
 import { audioSystem } from '../utils/AudioSystem';
 import { 
   Crown, 
-  Sparkles, 
   Gift, 
   Flame, 
   Shield, 
-  Zap, 
-  Coins, 
-  Clock,
-  Swords,
-  Gem,
-  Award,
   Info
 } from 'lucide-react';
 
@@ -119,8 +112,8 @@ export const PremiumPassView: React.FC = () => {
             Void Covenant Pass
           </h1>
           
-          <p className="text-xs sm:text-sm text-gray-400 leading-relaxed font-sans">
-            Elevate your dominion over the Abyss: amplified PvP ticket pools, guaranteed Blood Sovereigns on battle wins, doubled energy regeneration rates, and daily Peace Shields.
+          <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans max-w-2xl">
+            Elevate your dominion over the Abyss: expanded daily PvP tickets, guaranteed Blood Sovereigns on arena wins, daily Peace Shields, accelerated energy recovery, and <span className="text-amber-300 font-semibold drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]">increased seasonal leaderboard rewards (+15% Premium / +25% Ultra)</span>.
           </p>
         </div>
 
@@ -318,16 +311,8 @@ export const PremiumPassView: React.FC = () => {
                   <span className="font-display font-black text-3xl text-amber-300">
                     {PRICES.premium[durationDays]}
                   </span>
-                  <span className="font-mono text-xs text-amber-400/80 font-bold">SHARDS</span>
+                  <span className="font-mono text-xs text-amber-400/80 font-bold">DARK SHARDS</span>
                 </div>
-              </div>
-              <div className="text-right">
-                <span className="text-[11px] font-mono text-gray-400 block">
-                  {durationDays === 30 ? '5 Shards / day' : '4.4 Shards / day'}
-                </span>
-                <span className="text-[10px] font-mono text-emerald-400 font-bold">
-                  {durationDays === 90 ? 'Save 50 Shards' : 'Standard Rate'}
-                </span>
               </div>
             </div>
 
@@ -339,8 +324,8 @@ export const PremiumPassView: React.FC = () => {
 
               {/* PvP Tickets */}
               <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <Swords className="w-3.5 h-3.5 text-amber-400" />
+                <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/ticket_variant_3_gold.png" alt="PvP Tickets" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
                 </div>
                 <div>
                   <div className="font-bold text-white text-xs">8 Daily PvP Tickets</div>
@@ -350,8 +335,8 @@ export const PremiumPassView: React.FC = () => {
 
               {/* Blood Sovereigns */}
               <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <Coins className="w-3.5 h-3.5 text-emerald-400" />
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_sovereign.webp" alt="Blood Sovereign" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.6)]" />
                 </div>
                 <div>
                   <div className="font-bold text-emerald-300 text-xs">+1 Blood Sovereign per PvP Win</div>
@@ -359,10 +344,21 @@ export const PremiumPassView: React.FC = () => {
                 </div>
               </div>
 
+              {/* Seasonal Leaderboard Bonus */}
+              <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/league_grandmaster_crest.png" alt="Seasonal Rollover" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
+                </div>
+                <div>
+                  <div className="font-bold text-amber-300 text-xs">+15% Seasonal Rollover Bonus</div>
+                  <div className="text-[11px] text-gray-400">Receive +15% more Blood Sovereigns from final league ranking payouts</div>
+                </div>
+              </div>
+
               {/* Gold Boost */}
               <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-yellow-500/15 border border-yellow-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <Zap className="w-3.5 h-3.5 text-yellow-400" />
+                <div className="w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_gold.webp" alt="Gold Drop" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
                 </div>
                 <div>
                   <div className="font-bold text-yellow-300 text-xs">+25% Gold Drop from All Battles</div>
@@ -372,8 +368,8 @@ export const PremiumPassView: React.FC = () => {
 
               {/* Energy */}
               <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <Clock className="w-3.5 h-3.5 text-purple-400" />
+                <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(168,85,247,0.6)]" />
                 </div>
                 <div>
                   <div className="font-bold text-purple-200 text-xs">10 Max Energy (1 per 30 min)</div>
@@ -383,8 +379,8 @@ export const PremiumPassView: React.FC = () => {
 
               {/* Peace Shield */}
               <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <Shield className="w-3.5 h-3.5 text-cyan-400" />
+                <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/shield_3h.png" alt="Peace Shield" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]" />
                 </div>
                 <div>
                   <div className="font-bold text-cyan-300 text-xs">Daily 3-Hour Peace Shield</div>
@@ -394,8 +390,8 @@ export const PremiumPassView: React.FC = () => {
 
               {/* Bank limit & Badge */}
               <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <Award className="w-3.5 h-3.5 text-amber-400" />
+                <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/crown.png" alt="Sovereign Crest" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
                 </div>
                 <div>
                   <div className="font-bold text-amber-300 text-xs">Golden Name, ⚜️ Crest & 2,500 SOV Payout</div>
@@ -409,10 +405,22 @@ export const PremiumPassView: React.FC = () => {
               <button
                 onClick={() => handleBuy('premium')}
                 disabled={isProcessing}
-                className="w-full py-4 rounded-2xl font-display font-black text-sm tracking-widest uppercase bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black shadow-[0_0_25px_rgba(245,158,11,0.4)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] hover:scale-[1.02] active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
+                className="relative group w-full py-4 px-6 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-amber-700 via-amber-500 to-yellow-500 p-[1.5px] shadow-[0_0_25px_rgba(245,158,11,0.35)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] hover:scale-[1.02] active:scale-[0.98]"
               >
-                <Crown className="w-4 h-4" />
-                {activeTier === 'premium' ? `EXTEND PREMIUM (${durationDays}d)` : `ACTIVATE PREMIUM (${durationDays}d)`}
+                {/* Inner button surface */}
+                <div className="relative rounded-[15px] py-3.5 px-4 bg-gradient-to-b from-[#24180d] via-[#150e07] to-[#0a0603] flex items-center justify-center gap-3 border border-amber-400/40 group-hover:border-amber-300/70 transition-colors">
+                  {/* Subtle radial glow */}
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(245,158,11,0.25),transparent_70%)] pointer-events-none" />
+                  
+                  {/* Top specular highlight rim */}
+                  <div className="absolute top-0 left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-amber-200/70 to-transparent pointer-events-none" />
+
+                  <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.8)] relative z-10 group-hover:scale-110 transition-transform" />
+                  
+                  <span className="relative z-10 font-display font-black text-sm sm:text-base tracking-[0.16em] uppercase text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-200 to-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                    {activeTier === 'premium' ? `EXTEND PREMIUM (${durationDays}d)` : `ACTIVATE PREMIUM (${durationDays}d)`}
+                  </span>
+                </div>
               </button>
             </div>
 
@@ -473,16 +481,8 @@ export const PremiumPassView: React.FC = () => {
                   <span className="font-display font-black text-3xl text-purple-300">
                     {PRICES.ultra[durationDays]}
                   </span>
-                  <span className="font-mono text-xs text-purple-400 font-bold">SHARDS</span>
+                  <span className="font-mono text-xs text-purple-400 font-bold">DARK SHARDS</span>
                 </div>
-              </div>
-              <div className="text-right">
-                <span className="text-[11px] font-mono text-gray-400 block">
-                  {durationDays === 30 ? '11.6 Shards / day' : '10 Shards / day'}
-                </span>
-                <span className="text-[10px] font-mono text-purple-300 font-bold">
-                  {durationDays === 90 ? 'Save 150 Shards' : 'Supreme Status'}
-                </span>
               </div>
             </div>
 
@@ -494,8 +494,8 @@ export const PremiumPassView: React.FC = () => {
 
               {/* PvP Tickets */}
               <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-purple-500/20 border border-purple-400/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <Swords className="w-3.5 h-3.5 text-purple-300" />
+                <div className="w-8 h-8 rounded-lg bg-purple-500/15 border border-purple-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/ticket_variant_2_violet.png" alt="PvP Tickets" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
                 </div>
                 <div>
                   <div className="font-bold text-purple-200 text-xs">12 Daily PvP Tickets</div>
@@ -505,8 +505,8 @@ export const PremiumPassView: React.FC = () => {
 
               {/* Blood Sovereigns */}
               <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <Coins className="w-3.5 h-3.5 text-emerald-300" />
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_sovereign.webp" alt="Blood Sovereign" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.7)]" />
                 </div>
                 <div>
                   <div className="font-bold text-emerald-300 text-xs">+2 Blood Sovereigns per PvP Win</div>
@@ -514,10 +514,21 @@ export const PremiumPassView: React.FC = () => {
                 </div>
               </div>
 
+              {/* Seasonal Leaderboard Bonus */}
+              <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-purple-500/15 border border-purple-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/league_void_overlord.png" alt="Seasonal Rollover" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
+                </div>
+                <div>
+                  <div className="font-bold text-purple-200 text-xs">+25% Seasonal Rollover Bonus</div>
+                  <div className="text-[11px] text-gray-400">Apex multiplier: +25% bonus Blood Sovereigns on leaderboard rollover payouts</div>
+                </div>
+              </div>
+
               {/* Gold Boost */}
               <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-yellow-500/20 border border-yellow-400/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <Zap className="w-3.5 h-3.5 text-yellow-300" />
+                <div className="w-8 h-8 rounded-lg bg-yellow-500/15 border border-yellow-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_gold.webp" alt="Gold Drop" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.7)]" />
                 </div>
                 <div>
                   <div className="font-bold text-yellow-300 text-xs">+50% Gold Drop from All Battles</div>
@@ -527,8 +538,8 @@ export const PremiumPassView: React.FC = () => {
 
               {/* Energy */}
               <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-purple-500/20 border border-purple-400/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <Clock className="w-3.5 h-3.5 text-purple-300" />
+                <div className="w-8 h-8 rounded-lg bg-purple-500/15 border border-purple-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
                 </div>
                 <div>
                   <div className="font-bold text-purple-200 text-xs">20 Max Energy (1 per 20 min)</div>
@@ -538,8 +549,8 @@ export const PremiumPassView: React.FC = () => {
 
               {/* Peace Shield */}
               <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <Shield className="w-3.5 h-3.5 text-cyan-300" />
+                <div className="w-8 h-8 rounded-lg bg-cyan-500/15 border border-cyan-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/shield_6h.png" alt="Peace Shield" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.7)]" />
                 </div>
                 <div>
                   <div className="font-bold text-cyan-300 text-xs">Daily 6-Hour Peace Shield</div>
@@ -549,8 +560,8 @@ export const PremiumPassView: React.FC = () => {
 
               {/* Bank limit & Badge */}
               <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-rose-500/20 border border-rose-400/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <Gem className="w-3.5 h-3.5 text-rose-300" />
+                <div className="w-8 h-8 rounded-lg bg-rose-500/15 border border-rose-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/referral_seal.png" alt="Apex Distinction" className="w-5 h-5 object-contain drop-shadow-[0_0_10px_rgba(217,70,239,0.8)]" />
                 </div>
                 <div>
                   <div className="font-bold text-rose-300 text-xs">Purple Glow, 💎 Crystal & 2,000 SOV Payout</div>
@@ -564,10 +575,22 @@ export const PremiumPassView: React.FC = () => {
               <button
                 onClick={() => handleBuy('ultra')}
                 disabled={isProcessing}
-                className="w-full py-4 rounded-2xl font-display font-black text-sm tracking-widest uppercase bg-gradient-to-r from-purple-600 via-rose-500 to-amber-500 hover:from-purple-500 hover:to-amber-400 text-black shadow-[0_0_25px_rgba(168,85,247,0.45)] hover:shadow-[0_0_35px_rgba(168,85,247,0.7)] hover:scale-[1.02] active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
+                className="relative group w-full py-4 px-6 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-purple-700 via-fuchsia-500 to-rose-500 p-[1.5px] shadow-[0_0_30px_rgba(192,38,211,0.4)] hover:shadow-[0_0_45px_rgba(192,38,211,0.7)] hover:scale-[1.02] active:scale-[0.98]"
               >
-                <Flame className="w-4 h-4" />
-                {activeTier === 'ultra' ? `EXTEND ULTRA (${durationDays}d)` : `ASCEND TO ULTRA (${durationDays}d)`}
+                {/* Inner button surface */}
+                <div className="relative rounded-[15px] py-3.5 px-4 bg-gradient-to-b from-[#220d2a] via-[#14061a] to-[#08020b] flex items-center justify-center gap-3 border border-purple-400/50 group-hover:border-fuchsia-300/80 transition-colors">
+                  {/* Subtle radial glow */}
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(192,38,211,0.3),transparent_70%)] pointer-events-none" />
+                  
+                  {/* Top specular highlight rim */}
+                  <div className="absolute top-0 left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-fuchsia-200/80 to-transparent pointer-events-none" />
+
+                  <span className="text-lg relative z-10 drop-shadow-[0_0_8px_rgba(192,38,211,0.8)] group-hover:scale-110 transition-transform">💎</span>
+                  
+                  <span className="relative z-10 font-display font-black text-sm sm:text-base tracking-[0.16em] uppercase text-transparent bg-clip-text bg-gradient-to-b from-fuchsia-100 via-purple-200 to-rose-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                    {activeTier === 'ultra' ? `EXTEND ULTRA (${durationDays}d)` : `ASCEND TO ULTRA (${durationDays}d)`}
+                  </span>
+                </div>
               </button>
             </div>
 
