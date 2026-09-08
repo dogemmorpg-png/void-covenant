@@ -7,9 +7,18 @@ import {
   Sparkles, 
   Gift, 
   Check, 
-  Flame,
-  Info,
-  ShieldAlert
+  Flame, 
+  Shield, 
+  Zap, 
+  Coins, 
+  ArrowUpRight,
+  Clock,
+  Swords,
+  Gem,
+  Award,
+  Lock,
+  ChevronRight,
+  Info
 } from 'lucide-react';
 
 export const PremiumPassView: React.FC = () => {
@@ -95,394 +104,504 @@ export const PremiumPassView: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-8 animate-fade-in text-white">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-8 animate-fade-in text-white font-sans">
       
-      {/* Header Banner */}
-      <div className="text-center space-y-3 relative">
-        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500/20 via-purple-500/20 to-amber-500/20 border border-amber-500/40 px-5 py-1.5 rounded-full shadow-[0_0_20px_rgba(245,158,11,0.25)]">
-          <Crown className="w-4 h-4 text-amber-400 animate-pulse" />
-          <span className="font-display font-black text-amber-300 text-xs tracking-widest uppercase">
-            IMPERIAL PRIVILEGES & REVENUE PASS
-          </span>
-        </div>
+      {/* Top Hero Showcase Banner */}
+      <div className="relative rounded-3xl overflow-hidden border border-[#c5a880]/25 bg-gradient-to-b from-[#18131e] via-[#0d0a14] to-[#060408] p-6 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.8)]">
+        {/* Background Atmosphere Lights */}
+        <div className="absolute -top-24 -left-20 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -right-20 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)] pointer-events-none" />
 
-        <h1 className="text-3xl sm:text-4xl font-display font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-purple-300 filter drop-shadow-[0_2px_15px_rgba(245,158,11,0.4)]">
-          VOID COVENANT MEMBERSHIP
-        </h1>
-
-        <p className="text-xs sm:text-sm text-gray-400 max-w-2xl mx-auto font-sans leading-relaxed">
-          Unlock maximum PvP earnings, faster energy recharge, daily Peace Shields against offline attacks, and boosted Blood Sovereign rewards.
-        </p>
-
-        {/* Shards quick balance */}
-        <div className="inline-flex items-center gap-2 bg-black/60 border border-purple-500/30 px-4 py-1.5 rounded-xl shadow-lg">
-          <span className="text-xs text-gray-400 font-mono">Your Balance:</span>
-          <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
-          <span className="font-mono font-black text-sm text-purple-300">{profile.darkShards || 0}</span>
-          <button 
-            onClick={() => setIsShardsShopOpen(true)}
-            className="text-[10px] font-mono text-cyan-400 hover:text-cyan-300 ml-1 underline cursor-pointer"
-          >
-            + Get Shards
-          </button>
-        </div>
-      </div>
-
-      {/* Active Subscription Status Banner */}
-      <div className={`rounded-3xl p-5 sm:p-6 border relative overflow-hidden transition-all ${
-        activeTier === 'ultra'
-          ? 'bg-gradient-to-r from-purple-950/60 via-black to-red-950/60 border-purple-500/50 shadow-[0_0_30px_rgba(168,85,247,0.25)]'
-          : activeTier === 'premium'
-          ? 'bg-gradient-to-r from-amber-950/60 via-black to-yellow-950/60 border-amber-500/50 shadow-[0_0_25px_rgba(245,158,11,0.2)]'
-          : 'bg-[#141820]/90 border-white/10'
-      }`}>
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4 text-center md:text-left">
-            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border ${
-              activeTier === 'ultra'
-                ? 'bg-purple-900/40 border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.5)]'
-                : activeTier === 'premium'
-                ? 'bg-amber-900/40 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.5)]'
-                : 'bg-black/50 border-white/10'
-            }`}>
-              {activeTier === 'ultra' ? (
-                <Flame className="w-8 h-8 text-purple-400 animate-pulse" />
-              ) : activeTier === 'premium' ? (
-                <Crown className="w-8 h-8 text-amber-400" />
-              ) : (
-                <ShieldAlert className="w-8 h-8 text-gray-500" />
-              )}
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="text-center md:text-left space-y-2.5 max-w-xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-[11px] font-bold tracking-widest uppercase">
+              <Crown className="w-3.5 h-3.5 text-amber-400" />
+              Imperial Privileges & Pass
             </div>
-
-            <div>
-              <div className="flex items-center justify-center md:justify-start gap-2">
-                <span className="font-display font-black text-lg tracking-wider">
-                  {activeTier === 'ultra' 
-                    ? 'ULTRA OVERLORD STATUS ACTIVE' 
-                    : activeTier === 'premium' 
-                    ? 'PREMIUM SOVEREIGN STATUS ACTIVE' 
-                    : 'STANDARD LORD STATUS (FREE)'}
-                </span>
-                {isSubActive && (
-                  <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/50 text-emerald-400 animate-pulse">
-                    ACTIVE
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-gray-400 font-sans mt-0.5">
-                {isSubActive ? (
-                  <>Expires on <span className="text-white font-mono">{new Date(profile.subscriptionExpiresAt || 0).toLocaleDateString()}</span> ({remainingDays} days remaining)</>
-                ) : (
-                  <>Upgrade to Premium or Ultra to unlock maximum daily earnings and protection.</>
-                )}
-              </p>
-            </div>
+            
+            <h1 className="text-2xl sm:text-4xl font-display font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-amber-300 to-yellow-500 drop-shadow-[0_2px_12px_rgba(245,158,11,0.3)] uppercase">
+              Void Covenant Pass
+            </h1>
+            
+            <p className="text-xs sm:text-sm text-gray-400 leading-relaxed font-sans">
+              Поднимите господство над Ковенантом на новый уровень: увеличенные лимиты дуэлей, гарантированные Соверены в PvP, ускоренный реген ресурсов и защита мирными щитами.
+            </p>
           </div>
 
-          {/* Daily Tribute Claim Button */}
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <button
-              onClick={handleClaimDaily}
-              disabled={isClaiming || !isSubActive || isDailyClaimed}
-              className={`w-full md:w-auto px-6 py-3 rounded-2xl font-display font-black text-xs sm:text-sm tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                isDailyClaimed
-                  ? 'bg-black/60 border border-white/15 text-gray-400 cursor-default'
-                  : isSubActive
-                  ? 'bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-600 hover:from-emerald-500 hover:to-teal-400 text-black font-black shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:scale-105 active:scale-95'
-                  : 'bg-black/40 border border-white/10 text-gray-500 cursor-not-allowed'
-              }`}
+          {/* Shards Quick Balance Tile */}
+          <div className="bg-[#120f18]/80 backdrop-blur-md border border-purple-500/30 p-4 rounded-2xl flex items-center gap-4 shadow-xl shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-purple-950/60 border border-purple-500/40 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+              <img src="/icons/icon_shards.webp" alt="Shards" className="w-7 h-7 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
+            </div>
+            <div>
+              <div className="text-[10px] uppercase font-mono tracking-wider text-gray-400 font-bold">Ваш Баланс</div>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="font-display font-black text-2xl text-purple-200 tracking-wide">
+                  {profile.darkShards || 0}
+                </span>
+                <span className="text-xs font-mono text-purple-400 font-bold">Осколков</span>
+              </div>
+            </div>
+            <button 
+              onClick={() => setIsShardsShopOpen(true)}
+              className="ml-2 px-3 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-500 hover:from-cyan-500 hover:to-teal-400 text-black font-display font-black text-xs uppercase tracking-wider shadow-[0_0_12px_rgba(6,182,212,0.4)] transition-all cursor-pointer hover:scale-105 active:scale-95"
             >
-              <Gift className="w-4 h-4" />
-              {isDailyClaimed 
-                ? '✓ TRIBUTE CLAIMED TODAY' 
-                : isSubActive 
-                ? (isClaiming ? 'CLAIMING...' : 'CLAIM DAILY TRIBUTE') 
-                : 'CLAIM DAILY TRIBUTE (LOCKED)'}
+              + Пополнить
             </button>
           </div>
         </div>
 
-        {/* What daily tribute includes */}
-        <div className="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-gray-400">
-          <div className="flex items-center gap-1.5">
-            <span className="text-amber-400 font-bold">Daily Free Perks:</span>
-            <span>
-              {activeTier === 'ultra' 
-                ? '+3,000 Gold • +400 Dust • 1x 6h Peace Shield' 
-                : activeTier === 'premium' 
-                ? '+1,000 Gold • +150 Dust • 1x 3h Peace Shield' 
-                : 'Free tier does not receive daily pass stipends.'}
-            </span>
+        {/* Current Active Subscription Status / Daily Tribute Claim */}
+        <div className="mt-8 pt-6 border-t border-white/10 relative z-10">
+          <div className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+            activeTier === 'ultra'
+              ? 'bg-gradient-to-r from-purple-950/70 via-black/80 to-purple-950/70 border-purple-400/50 shadow-[0_0_25px_rgba(168,85,247,0.2)]'
+              : activeTier === 'premium'
+              ? 'bg-gradient-to-r from-amber-950/70 via-black/80 to-amber-950/70 border-amber-400/50 shadow-[0_0_25px_rgba(245,158,11,0.2)]'
+              : 'bg-black/50 border-white/10'
+          }`}>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5 text-center md:text-left">
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border ${
+                  activeTier === 'ultra'
+                    ? 'bg-purple-900/60 border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.5)]'
+                    : activeTier === 'premium'
+                    ? 'bg-amber-900/60 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.5)]'
+                    : 'bg-white/5 border-white/10'
+                }`}>
+                  {activeTier === 'ultra' ? (
+                    <span className="text-xl">💎</span>
+                  ) : activeTier === 'premium' ? (
+                    <span className="text-xl">⚜️</span>
+                  ) : (
+                    <Shield className="w-5 h-5 text-gray-500" />
+                  )}
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-center md:justify-start gap-2">
+                    <span className="font-display font-black text-sm sm:text-base tracking-wider uppercase">
+                      {activeTier === 'ultra' 
+                        ? 'Ultra Overlord Pass' 
+                        : activeTier === 'premium' 
+                        ? 'Premium Sovereign Pass' 
+                        : 'Базовый статус (Free)'}
+                    </span>
+                    {isSubActive ? (
+                      <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-500/60 text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)]">
+                        АКТИВЕН
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-mono text-gray-500 px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
+                        БЕЗ ПОДПИСКИ
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-400 font-sans mt-0.5">
+                    {isSubActive ? (
+                      <span>Действует до <strong className="text-gray-200 font-mono">{new Date(profile.subscriptionExpiresAt || 0).toLocaleDateString()}</strong> ({remainingDays} дн. осталось)</span>
+                    ) : (
+                      <span>Активируйте Premium или Ultra для максимизации наград и защиты</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Daily Claim Button & Stipend */}
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                {isSubActive && (
+                  <div className="text-center md:text-right text-[11px] font-mono text-gray-400">
+                    <span className="text-amber-400 font-bold block">Ежедневная дань:</span>
+                    <span>
+                      {activeTier === 'ultra' 
+                        ? '+3,000 🪙 • +400 🧪 • 1x 6ч 🛡️' 
+                        : '+1,000 🪙 • +150 🧪 • 1x 3ч 🛡️'}
+                    </span>
+                  </div>
+                )}
+                <button
+                  onClick={handleClaimDaily}
+                  disabled={isClaiming || !isSubActive || isDailyClaimed}
+                  className={`w-full sm:w-auto px-5 py-2.5 rounded-xl font-display font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    isDailyClaimed
+                      ? 'bg-black/60 border border-white/10 text-gray-500 cursor-default'
+                      : isSubActive
+                      ? 'bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-600 hover:from-emerald-500 hover:to-teal-400 text-black font-black shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:scale-105 active:scale-95'
+                      : 'bg-white/5 border border-white/10 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  <Gift className="w-4 h-4" />
+                  {isDailyClaimed 
+                    ? '✓ Дань получена' 
+                    : isSubActive 
+                    ? (isClaiming ? 'Получение...' : 'Забрать дань') 
+                    : 'Дань недоступна'}
+                </button>
+              </div>
+            </div>
           </div>
-          <span className="text-[11px] text-gray-500">Resets daily at 00:00 UTC</span>
         </div>
       </div>
 
       {/* Duration Selector Tabs */}
-      <div className="flex justify-center items-center gap-3 pt-2">
-        <span className="text-xs font-mono text-gray-400 uppercase tracking-wider mr-2">Billing Duration:</span>
-        <button
-          onClick={() => { audioSystem.playClick(); setDurationDays(30); }}
-          className={`px-5 py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer ${
-            durationDays === 30
-              ? 'bg-amber-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.5)] font-black'
-              : 'bg-[#151a21] border border-white/10 text-gray-400 hover:text-white'
-          }`}
-        >
-          30 DAYS
-        </button>
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">Срок действия:</span>
+        <div className="flex items-center p-1 rounded-2xl bg-black/60 border border-white/10">
+          <button
+            onClick={() => { audioSystem.playClick(); setDurationDays(30); }}
+            className={`px-6 py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer ${
+              durationDays === 30
+                ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.4)] font-black'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            30 ДНЕЙ
+          </button>
 
-        <button
-          onClick={() => { audioSystem.playClick(); setDurationDays(90); }}
-          className={`relative px-5 py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer ${
-            durationDays === 90
-              ? 'bg-gradient-to-r from-purple-500 to-amber-500 text-black shadow-[0_0_20px_rgba(168,85,247,0.5)] font-black'
-              : 'bg-[#151a21] border border-white/10 text-gray-400 hover:text-white'
-          }`}
-        >
-          90 DAYS
-          <span className="absolute -top-2.5 -right-2 bg-gradient-to-r from-red-500 to-amber-500 text-white font-mono text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-md animate-bounce">
-            SAVE 15%
-          </span>
-        </button>
+          <button
+            onClick={() => { audioSystem.playClick(); setDurationDays(90); }}
+            className={`relative px-6 py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer ${
+              durationDays === 90
+                ? 'bg-gradient-to-r from-purple-500 to-amber-500 text-black shadow-[0_0_20px_rgba(168,85,247,0.4)] font-black'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            90 ДНЕЙ
+            <span className="absolute -top-2.5 -right-2 bg-gradient-to-r from-rose-500 to-amber-500 text-white font-mono text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-md">
+              -15% ВЫГОДА
+            </span>
+          </button>
+        </div>
       </div>
 
-      {/* Side-by-Side Comparison Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+      {/* Side-by-Side Premium & Ultra Tier Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 pt-2">
         
-        {/* PREMIUM CARD */}
-        <div className={`rounded-3xl p-6 sm:p-8 flex flex-col justify-between border-2 transition-all relative overflow-hidden ${
+        {/* PREMIUM PASS CARD */}
+        <div className={`rounded-3xl border-2 transition-all flex flex-col justify-between relative overflow-hidden bg-gradient-to-b from-[#17141b] via-[#0f0d14] to-[#070609] ${
           activeTier === 'premium'
-            ? 'bg-gradient-to-b from-[#1c1813] via-[#12151c] to-[#0c0e12] border-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.3)]'
-            : 'bg-[#12151c] border-amber-500/30 hover:border-amber-500/60 shadow-xl'
+            ? 'border-amber-400 shadow-[0_0_35px_rgba(245,158,11,0.35)]'
+            : 'border-amber-500/30 hover:border-amber-500/60 shadow-[0_8px_30px_rgba(0,0,0,0.7)]'
         }`}>
-          {/* Subtle Glow */}
-          <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="space-y-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-amber-400" />
-                  <h3 className="font-display font-black text-2xl text-amber-300 tracking-wider">
-                    PREMIUM PASS
-                  </h3>
-                </div>
-                <p className="text-xs text-gray-400 font-sans mt-1">
-                  The Sovereign standard. Crucial for competitive lords.
-                </p>
+          {/* Header Banner Artwork */}
+          <div className="relative h-44 w-full overflow-hidden border-b border-amber-500/20">
+            <img 
+              src="/pass_premium_crest.jpg" 
+              alt="Premium Crest" 
+              className="w-full h-full object-cover object-center opacity-85 transition-transform duration-700 hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0f0d14] via-[#0f0d14]/40 to-transparent" />
+            
+            {/* Tier Badge Header Overlay */}
+            <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-amber-500/40 text-amber-300 font-display font-black text-xs tracking-wider uppercase">
+                <span>⚜️</span>
+                <span>SOVEREIGN TIER</span>
               </div>
-
               {activeTier === 'premium' && (
-                <span className="text-[10px] font-mono font-black px-2.5 py-1 rounded-full bg-amber-950/80 border border-amber-400 text-amber-300">
-                  CURRENT TIER
+                <span className="text-[10px] font-mono font-black px-2.5 py-1 rounded-full bg-amber-500 text-black shadow-[0_0_12px_rgba(245,158,11,0.6)]">
+                  ВАШ ТЕКУЩИЙ ПЛАН
                 </span>
               )}
             </div>
 
-            {/* Price Box */}
-            <div className="bg-black/50 border border-amber-500/20 rounded-2xl p-4 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block">Duration Price</span>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain" />
-                  <span className="font-mono font-black text-3xl text-amber-300">
-                    {PRICES.premium[durationDays]}
-                  </span>
-                  <span className="font-mono text-xs text-amber-400/80">SHARDS</span>
-                </div>
-              </div>
-              <span className="text-xs font-mono text-gray-400">
-                {durationDays} Days Access
-              </span>
-            </div>
-
-            {/* Perks List */}
-            <div className="space-y-3 font-sans text-xs">
-              <span className="text-[11px] font-mono font-bold text-gray-400 uppercase tracking-wider block border-b border-white/10 pb-2">
-                Included Privileges:
-              </span>
-
-              <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span><strong className="text-white">8 PvP Tickets / Day</strong> (+60% more tickets to climb ranks)</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span><strong className="text-emerald-300">+1 Blood Sovereign / PvP Win</strong> (up to 10 SOV daily)</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span><strong className="text-amber-300">+15% League Rollover Sovereigns</strong> at season end</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                <span><strong className="text-cyan-300">1x 3-Hour Peace Shield</strong> granted daily (protects from attacks)</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                <span><strong className="text-white">10 PvE Energy</strong> (1 energy per 30 minutes)</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
-                <span><strong className="text-yellow-300">+25% Gold Drop</strong> from all battles & campaign</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span><strong className="text-white">Daily Stipend:</strong> +1,000 Gold & +150 Dust</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span><strong className="text-white">Bank Payout Limit:</strong> Lowered to 2,500 SOV ($25)</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span><strong className="text-amber-300">Golden Name & ⚜️ Badge</strong> on leaderboards</span>
-              </div>
+            {/* Title & Slogan */}
+            <div className="absolute bottom-3 left-5 right-5">
+              <h2 className="font-display font-black text-2xl sm:text-3xl text-amber-300 tracking-wider flex items-center gap-2">
+                PREMIUM PASS
+              </h2>
+              <p className="text-[11px] text-gray-300 font-sans">
+                Золотой стандарт для активных лордов и подъема в лигах Арены
+              </p>
             </div>
           </div>
 
-          <div className="pt-6">
-            <button
-              onClick={() => handleBuy('premium')}
-              disabled={isProcessing}
-              className="w-full py-3.5 rounded-2xl font-display font-black text-sm tracking-wider uppercase bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-400 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:scale-[1.02] active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
-            >
-              <Crown className="w-4 h-4" />
-              {activeTier === 'premium' ? `EXTEND PREMIUM (${durationDays}d)` : `ACTIVATE PREMIUM (${durationDays}d)`}
-            </button>
+          <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-6">
+            
+            {/* Price Box */}
+            <div className="bg-black/60 border border-amber-500/25 rounded-2xl p-4 flex items-center justify-between shadow-inner">
+              <div>
+                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block">Стоимость на {durationDays} дней</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
+                  <span className="font-display font-black text-3xl text-amber-300">
+                    {PRICES.premium[durationDays]}
+                  </span>
+                  <span className="font-mono text-xs text-amber-400/80 font-bold">Осколков</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-[11px] font-mono text-gray-400 block">
+                  {durationDays === 30 ? '5 Shards/день' : '4.4 Shards/день'}
+                </span>
+                <span className="text-[10px] font-mono text-emerald-400 font-bold">
+                  {durationDays === 90 ? 'Экономия 50 Shards' : 'Базовый тариф'}
+                </span>
+              </div>
+            </div>
+
+            {/* Perks Detailed Grid */}
+            <div className="space-y-3 font-sans text-xs">
+              <span className="text-[11px] font-mono font-bold text-amber-400/80 uppercase tracking-widest block border-b border-amber-500/20 pb-2">
+                Привилегии Premium Pass:
+              </span>
+
+              {/* PvP Tickets */}
+              <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <Swords className="w-3.5 h-3.5 text-amber-400" />
+                </div>
+                <div>
+                  <div className="font-bold text-white text-xs">8 билетов PvP в день</div>
+                  <div className="text-[11px] text-gray-400">+60% больше билетов (вместо 5) для быстрого набора очков рейтинга</div>
+                </div>
+              </div>
+
+              {/* Blood Sovereigns */}
+              <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <Coins className="w-3.5 h-3.5 text-emerald-400" />
+                </div>
+                <div>
+                  <div className="font-bold text-emerald-300 text-xs">+1 Blood Sovereign за победу в PvP</div>
+                  <div className="text-[11px] text-gray-400">Лимит до 10 Соверенов ежедневно за победные дуэли</div>
+                </div>
+              </div>
+
+              {/* Gold Boost */}
+              <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-yellow-500/15 border border-yellow-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <Zap className="w-3.5 h-3.5 text-yellow-400" />
+                </div>
+                <div>
+                  <div className="font-bold text-yellow-300 text-xs">+25% Gold Drop во всех боях</div>
+                  <div className="text-[11px] text-gray-400">Повышенная добыча золота в Кампании и PvP дуэлях</div>
+                </div>
+              </div>
+
+              {/* Energy */}
+              <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <Clock className="w-3.5 h-3.5 text-purple-400" />
+                </div>
+                <div>
+                  <div className="font-bold text-purple-200 text-xs">10 PvE Энергии (1 за 30 мин)</div>
+                  <div className="text-[11px] text-gray-400">В 2 раза больше запас энергии и ускоренное восстановление</div>
+                </div>
+              </div>
+
+              {/* Peace Shield */}
+              <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <Shield className="w-3.5 h-3.5 text-cyan-400" />
+                </div>
+                <div>
+                  <div className="font-bold text-cyan-300 text-xs">Ежедневный Щит Мира 3 часа</div>
+                  <div className="text-[11px] text-gray-400">Бесплатный щит от оффлайн-атак в ежедневной дани</div>
+                </div>
+              </div>
+
+              {/* Bank limit & Badge */}
+              <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <Award className="w-3.5 h-3.5 text-amber-400" />
+                </div>
+                <div>
+                  <div className="font-bold text-amber-300 text-xs">Золотой ник, ⚜️ знак и лимит вывода 2,500 SOV</div>
+                  <div className="text-[11px] text-gray-400">Сниженный порог вывода USDT и выделение в Лидерборде</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Buy / Extend CTA Button */}
+            <div className="pt-2">
+              <button
+                onClick={() => handleBuy('premium')}
+                disabled={isProcessing}
+                className="w-full py-4 rounded-2xl font-display font-black text-sm tracking-widest uppercase bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black shadow-[0_0_25px_rgba(245,158,11,0.4)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] hover:scale-[1.02] active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
+              >
+                <Crown className="w-4 h-4" />
+                {activeTier === 'premium' ? `Продлить Premium (${durationDays} дн.)` : `Активировать Premium (${durationDays} дн.)`}
+              </button>
+            </div>
+
           </div>
         </div>
 
-        {/* ULTRA CARD */}
-        <div className={`rounded-3xl p-6 sm:p-8 flex flex-col justify-between border-2 transition-all relative overflow-hidden ${
+        {/* ULTRA OVERLORD PASS CARD */}
+        <div className={`rounded-3xl border-2 transition-all flex flex-col justify-between relative overflow-hidden bg-gradient-to-b from-[#1b1122] via-[#100a16] to-[#07040b] ${
           activeTier === 'ultra'
-            ? 'bg-gradient-to-b from-[#211224] via-[#15121f] to-[#0c0a14] border-purple-400 shadow-[0_0_35px_rgba(168,85,247,0.4)]'
-            : 'bg-gradient-to-b from-[#1b1220] to-[#0f0e18] border-purple-500/40 hover:border-purple-400 shadow-2xl'
+            ? 'border-purple-400 shadow-[0_0_40px_rgba(168,85,247,0.45)]'
+            : 'border-purple-500/40 hover:border-purple-400 shadow-[0_8px_30px_rgba(0,0,0,0.8)]'
         }`}>
-          {/* Intense Void Glow */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-rose-600/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="space-y-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <Flame className="w-6 h-6 text-purple-400 animate-pulse" />
-                  <h3 className="font-display font-black text-2xl text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-rose-300 to-amber-300 tracking-wider">
-                    ULTRA OVERLORD
-                  </h3>
-                </div>
-                <p className="text-xs text-gray-400 font-sans mt-1">
-                  Apex dominance. Highest cashout limits & double speed.
-                </p>
+          {/* Header Banner Artwork */}
+          <div className="relative h-44 w-full overflow-hidden border-b border-purple-500/30">
+            <img 
+              src="/pass_ultra_crest.jpg" 
+              alt="Ultra Crest" 
+              className="w-full h-full object-cover object-center opacity-85 transition-transform duration-700 hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#100a16] via-[#100a16]/40 to-transparent" />
+            
+            {/* Tier Badge Header Overlay */}
+            <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-purple-400/50 text-purple-300 font-display font-black text-xs tracking-wider uppercase shadow-[0_0_12px_rgba(168,85,247,0.5)]">
+                <span>💎</span>
+                <span>APEX OVERLORD TIER</span>
               </div>
-
-              <span className="text-[10px] font-mono font-black px-2.5 py-1 rounded-full bg-purple-950/90 border border-purple-400 text-purple-300 shadow-[0_0_10px_rgba(168,85,247,0.4)]">
-                {activeTier === 'ultra' ? 'CURRENT TIER' : 'SUPREME'}
-              </span>
+              {activeTier === 'ultra' ? (
+                <span className="text-[10px] font-mono font-black px-2.5 py-1 rounded-full bg-purple-500 text-black shadow-[0_0_15px_rgba(168,85,247,0.7)]">
+                  ВАШ ТЕКУЩИЙ ПЛАН
+                </span>
+              ) : (
+                <span className="text-[10px] font-mono font-black px-2.5 py-1 rounded-full bg-gradient-to-r from-purple-500 to-rose-500 text-white shadow-[0_0_12px_rgba(168,85,247,0.5)]">
+                  МАКСИМУМ ВЫГОДЫ
+                </span>
+              )}
             </div>
 
-            {/* Price Box */}
-            <div className="bg-black/60 border border-purple-500/30 rounded-2xl p-4 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block">Duration Price</span>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain" />
-                  <span className="font-mono font-black text-3xl text-purple-300 text-shadow-glow">
-                    {PRICES.ultra[durationDays]}
-                  </span>
-                  <span className="font-mono text-xs text-purple-400">SHARDS</span>
-                </div>
-              </div>
-              <span className="text-xs font-mono text-gray-400">
-                {durationDays} Days Supreme Access
-              </span>
-            </div>
-
-            {/* Perks List */}
-            <div className="space-y-3 font-sans text-xs">
-              <span className="text-[11px] font-mono font-bold text-gray-400 uppercase tracking-wider block border-b border-white/10 pb-2">
-                All Premium Perks PLUS:
-              </span>
-
-              <div className="flex items-start gap-2.5">
-                <Sparkles className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                <span><strong className="text-purple-300">12 PvP Tickets / Day</strong> (+140% tickets — maximum league LP!)</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span><strong className="text-emerald-300">+2 Blood Sovereigns / PvP Win</strong> (up to 24 SOV daily!)</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Sparkles className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span><strong className="text-amber-300">+25% League Rollover Sovereigns</strong> (highest seasonal payout!)</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Sparkles className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                <span><strong className="text-cyan-300">1x 6-Hour Peace Shield</strong> granted daily (long immunity!)</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Sparkles className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                <span><strong className="text-white">20 PvE Energy</strong> (1 energy per 20 min — 2x faster regen!)</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Sparkles className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
-                <span><strong className="text-yellow-300">+50% Gold Drop</strong> from all battles & campaign</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Sparkles className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span><strong className="text-white">Daily Stipend:</strong> +3,000 Gold & +400 Dust</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span><strong className="text-emerald-300">Lowest Bank Payout Limit: 2,000 SOV</strong> ($20)</span>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Sparkles className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-                <span><strong className="text-rose-300">Animated Void Frame & 💎 Ultra Diamond</strong> icon</span>
-              </div>
+            {/* Title & Slogan */}
+            <div className="absolute bottom-3 left-5 right-5">
+              <h2 className="font-display font-black text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-rose-200 to-amber-200 tracking-wider flex items-center gap-2">
+                ULTRA OVERLORD
+              </h2>
+              <p className="text-[11px] text-purple-200/80 font-sans">
+                Абсолютное доминирование, максимальный доход Соверенов и лучшая скорость
+              </p>
             </div>
           </div>
 
-          <div className="pt-6">
-            <button
-              onClick={() => handleBuy('ultra')}
-              disabled={isProcessing}
-              className="w-full py-3.5 rounded-2xl font-display font-black text-sm tracking-wider uppercase bg-gradient-to-r from-purple-600 via-rose-500 to-amber-500 hover:from-purple-500 hover:to-amber-400 text-black shadow-[0_0_25px_rgba(168,85,247,0.5)] hover:scale-[1.02] active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
-            >
-              <Flame className="w-4 h-4" />
-              {activeTier === 'ultra' ? `EXTEND ULTRA (${durationDays}d)` : `ASCEND TO ULTRA (${durationDays}d)`}
-            </button>
+          <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-6">
+            
+            {/* Price Box */}
+            <div className="bg-black/60 border border-purple-500/30 rounded-2xl p-4 flex items-center justify-between shadow-inner">
+              <div>
+                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block">Стоимость на {durationDays} дней</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
+                  <span className="font-display font-black text-3xl text-purple-300">
+                    {PRICES.ultra[durationDays]}
+                  </span>
+                  <span className="font-mono text-xs text-purple-400 font-bold">Осколков</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-[11px] font-mono text-gray-400 block">
+                  {durationDays === 30 ? '11.6 Shards/день' : '10 Shards/день'}
+                </span>
+                <span className="text-[10px] font-mono text-purple-300 font-bold">
+                  {durationDays === 90 ? 'Экономия 150 Shards' : 'Премиальный статус'}
+                </span>
+              </div>
+            </div>
+
+            {/* Perks Detailed Grid */}
+            <div className="space-y-3 font-sans text-xs">
+              <span className="text-[11px] font-mono font-bold text-purple-400/90 uppercase tracking-widest block border-b border-purple-500/25 pb-2">
+                Все привилегии Premium ПЛЮС:
+              </span>
+
+              {/* PvP Tickets */}
+              <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-purple-500/20 border border-purple-400/40 flex items-center justify-center shrink-0 mt-0.5">
+                  <Swords className="w-3.5 h-3.5 text-purple-300" />
+                </div>
+                <div>
+                  <div className="font-bold text-purple-200 text-xs">12 билетов PvP в день</div>
+                  <div className="text-[11px] text-gray-400">+140% билетов (вместо 5) — гарантированное лидерство в сезонном рейтинге</div>
+                </div>
+              </div>
+
+              {/* Blood Sovereigns */}
+              <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center shrink-0 mt-0.5">
+                  <Coins className="w-3.5 h-3.5 text-emerald-300" />
+                </div>
+                <div>
+                  <div className="font-bold text-emerald-300 text-xs">+2 Blood Sovereigns за победу в PvP</div>
+                  <div className="text-[11px] text-gray-400">Лимит до 24 Соверенов в день (в 2.4 раза больше, чем в Premium!)</div>
+                </div>
+              </div>
+
+              {/* Gold Boost */}
+              <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-yellow-500/20 border border-yellow-400/40 flex items-center justify-center shrink-0 mt-0.5">
+                  <Zap className="w-3.5 h-3.5 text-yellow-300" />
+                </div>
+                <div>
+                  <div className="font-bold text-yellow-300 text-xs">+50% Gold Drop во всех режимах</div>
+                  <div className="text-[11px] text-gray-400">Ультимативный бонус к золоту в Кампании и PvP</div>
+                </div>
+              </div>
+
+              {/* Energy */}
+              <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-purple-500/20 border border-purple-400/40 flex items-center justify-center shrink-0 mt-0.5">
+                  <Clock className="w-3.5 h-3.5 text-purple-300" />
+                </div>
+                <div>
+                  <div className="font-bold text-purple-200 text-xs">20 PvE Энергии (1 за 20 мин)</div>
+                  <div className="text-[11px] text-gray-400">В 4 раза больше запас энергии и в 2 раза более быстрый реген</div>
+                </div>
+              </div>
+
+              {/* Peace Shield */}
+              <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center shrink-0 mt-0.5">
+                  <Shield className="w-3.5 h-3.5 text-cyan-300" />
+                </div>
+                <div>
+                  <div className="font-bold text-cyan-300 text-xs">Ежедневный Щит Мира 6 часов</div>
+                  <div className="text-[11px] text-gray-400">Мощная оффлайн-защита от нападений и кражи очков в таблице лидеров</div>
+                </div>
+              </div>
+
+              {/* Bank limit & Badge */}
+              <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.02] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-rose-500/20 border border-rose-400/40 flex items-center justify-center shrink-0 mt-0.5">
+                  <Gem className="w-3.5 h-3.5 text-rose-300" />
+                </div>
+                <div>
+                  <div className="font-bold text-rose-300 text-xs">Фиолетовый ник, 💎 кристалл и минимальный вывод 2,000 SOV</div>
+                  <div className="text-[11px] text-gray-400">Самый низкий порог вывода в игре и эксклюзивный статус Ultra Overlord</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Buy / Extend CTA Button */}
+            <div className="pt-2">
+              <button
+                onClick={() => handleBuy('ultra')}
+                disabled={isProcessing}
+                className="w-full py-4 rounded-2xl font-display font-black text-sm tracking-widest uppercase bg-gradient-to-r from-purple-600 via-rose-500 to-amber-500 hover:from-purple-500 hover:to-amber-400 text-black shadow-[0_0_25px_rgba(168,85,247,0.45)] hover:shadow-[0_0_35px_rgba(168,85,247,0.7)] hover:scale-[1.02] active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
+              >
+                <Flame className="w-4 h-4" />
+                {activeTier === 'ultra' ? `Продлить Ultra (${durationDays} дн.)` : `Возвыситься до Ultra (${durationDays} дн.)`}
+              </button>
+            </div>
+
           </div>
         </div>
 
       </div>
 
-      {/* Info footer */}
-      <div className="bg-[#12161f] border border-white/5 rounded-2xl p-4 flex items-center gap-3 text-xs text-gray-400 font-sans">
-        <Info className="w-5 h-5 text-amber-400 shrink-0" />
-        <p>
-          Subscriptions stack seamlessly. Re-purchasing the same tier extends your remaining duration. Blood Sovereigns earned from PvP wins are credited directly to your bank account balance and can be withdrawn as real USDT on Solana.
-        </p>
+      {/* Trust & Mechanics Footer */}
+      <div className="bg-black/50 border border-white/10 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-4 text-xs text-gray-400">
+        <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+          <Info className="w-5 h-5 text-amber-400" />
+        </div>
+        <div className="space-y-1 text-center sm:text-left">
+          <div className="font-display font-bold text-gray-300 text-xs uppercase tracking-wider">
+            Гарантия продления и безопасность баланса
+          </div>
+          <p className="font-sans leading-relaxed text-[11px]">
+            Подписки бесшовно суммируются: при повторной покупке оставшиеся дни прибавляются к текущему сроку. Все заработанные Blood Sovereigns автоматически поступают на ваш внутриигровой счет и доступны для мгновенного запроса вывода в USDT (Solana).
+          </p>
+        </div>
       </div>
 
     </div>
   );
 };
+
