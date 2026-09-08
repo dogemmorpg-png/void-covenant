@@ -422,16 +422,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   // Calculate subscriber & equipment bonuses for battle rewards
   const isSubActive = profile.subscriptionExpiresAt && Number(profile.subscriptionExpiresAt) > Date.now();
   const subTier = isSubActive ? (profile.subscriptionTier || 'free') : 'free';
-  let battleGoldMultiplier = 1;
-  if (subTier === 'ultra') {
-    battleGoldMultiplier += 0.50;
-  } else if (subTier === 'premium') {
-    battleGoldMultiplier += 0.25;
-  }
+  const subGoldBonusPercent = subTier === 'ultra' ? 50 : subTier === 'premium' ? 25 : 0;
   const equipGoldBonus = getEquipmentBonus('goldBonus');
-  if (equipGoldBonus > 0) {
-    battleGoldMultiplier += (equipGoldBonus / 100);
-  }
+  let battleGoldMultiplier = 1 + (subGoldBonusPercent / 100) + (equipGoldBonus / 100);
 
   const applyRewardMultiplier = (baseVal: number, mult: number) => {
     if (mult <= 1 || baseVal <= 0) return Math.round(baseVal);
@@ -2745,10 +2738,19 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               <div className={`grid gap-2.5 ${battleType === 'pvp' && earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
                 {/* Gold */}
                 <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center relative overflow-hidden">
-                  {battleGoldMultiplier > 1 && (
-                    <span className="text-[8px] font-black text-amber-300/90 bg-amber-500/20 px-1.5 py-0.5 rounded-full border border-amber-500/30 mb-0.5 tracking-tighter">
-                      +{Math.round((battleGoldMultiplier - 1) * 100)}% {subTier === 'ultra' ? 'ULTRA' : subTier === 'premium' ? 'VIP' : 'BONUS'}
-                    </span>
+                  {(subGoldBonusPercent > 0 || equipGoldBonus > 0) && (
+                    <div className="flex items-center gap-1 mb-0.5 flex-wrap justify-center">
+                      {subGoldBonusPercent > 0 && (
+                        <span className="text-[7.5px] leading-tight font-black text-amber-300/90 bg-amber-500/20 px-1.5 py-0.5 rounded-full border border-amber-500/30 tracking-tighter">
+                          +{subGoldBonusPercent}% {subTier === 'ultra' ? 'ULTRA' : 'VIP'}
+                        </span>
+                      )}
+                      {equipGoldBonus > 0 && (
+                        <span className="text-[7.5px] leading-tight font-black text-cyan-300/90 bg-cyan-500/20 px-1.5 py-0.5 rounded-full border border-cyan-500/30 tracking-tighter">
+                          +{equipGoldBonus}% GEAR
+                        </span>
+                      )}
+                    </div>
                   )}
                   <span className="text-amber-300 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
                     +{earnedGold}
