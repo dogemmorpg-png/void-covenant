@@ -190,7 +190,21 @@ const migrateProfileTo10Cards = (p: PlayerProfile): PlayerProfile => {
   p.pvpLeague = p.pvpLeague || 'Bronze';
   p.pvpLP = p.pvpLP !== undefined ? p.pvpLP : 0;
   p.bloodSovereigns = p.bloodSovereigns !== undefined ? p.bloodSovereigns : 0;
-  p.mailMessages = p.mailMessages || [];
+  
+  // Ensure mailMessages have strictly unique IDs
+  if (Array.isArray(p.mailMessages)) {
+    const seenMailIds = new Set<string>();
+    p.mailMessages = p.mailMessages.map((m: any, idx: number) => {
+      let mailId = m.id;
+      if (!mailId || seenMailIds.has(mailId)) {
+        mailId = `${mailId || 'mail'}_dup_${idx}_${Math.random().toString(36).substring(2, 6)}`;
+      }
+      seenMailIds.add(mailId);
+      return { ...m, id: mailId };
+    });
+  } else {
+    p.mailMessages = [];
+  }
   
   return p;
 };

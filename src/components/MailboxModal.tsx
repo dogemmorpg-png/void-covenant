@@ -38,6 +38,15 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
   const [isClaiming, setIsClaiming] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Sync selected mail when modal opens or if selected mail is no longer in messages
+  React.useEffect(() => {
+    if (isOpen && messages.length > 0) {
+      if (!selectedMailId || !messages.some(m => m.id === selectedMailId)) {
+        setSelectedMailId(messages[0].id);
+      }
+    }
+  }, [isOpen, messages, selectedMailId]);
+
   if (!isOpen) return null;
 
   const selectedMail = messages.find(m => m.id === selectedMailId) || messages[0] || null;

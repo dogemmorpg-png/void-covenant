@@ -416,8 +416,9 @@ export async function checkAndPerformPvpRollover(
         }
 
         // Generate Mail Message for Player Inbox
+        const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
         const mailMessage = {
-          id: `mail_pvp_${todayUtc}_${p.walletAddress.slice(-4)}_${rank}`,
+          id: `mail_pvp_${todayUtc}_${p.walletAddress.slice(-4)}_${rank}_${uniqueSuffix}`,
           title: `PvP Season Report: ${leagueName} (Rank #${rank})`,
           sender: 'Council of the Void',
           body: `Greetings, Lord ${p.profile.username || 'Voidwalker'}.\n\nThe PvP Arena round for ${todayUtc} has concluded.\nYou finished at Rank #${rank} in the ${leagueName} League.\n\n${promoStatus}\n\nYour imperial tributes and rewards have been attached to this decree.`,

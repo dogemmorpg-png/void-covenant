@@ -198,6 +198,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     } else {
       profile = profileRow.data;
     }
+
+    // Ensure all mail messages have unique IDs
+    if (profile && Array.isArray(profile.mailMessages)) {
+      const seenMailIds = new Set<string>();
+      profile.mailMessages = profile.mailMessages.map((m: any, idx: number) => {
+        let mailId = m.id;
+        if (!mailId || seenMailIds.has(mailId)) {
+          mailId = `${mailId || 'mail'}_dup_${idx}_${Math.random().toString(36).substring(2, 6)}`;
+        }
+        seenMailIds.add(mailId);
+        return { ...m, id: mailId };
+      });
+    }
+
     profile = calculateEnergy(profile);
 
     let successMessage = '';
