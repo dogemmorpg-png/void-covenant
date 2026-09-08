@@ -1136,7 +1136,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: `Insufficient Dark Shards! Need ${cost} Shards, you have ${profile.darkShards || 0}.` });
       }
 
-      profile.darkShards = (profile.darkShards || 0) - cost;
       const durationMs = durationDays * 24 * 60 * 60 * 1000;
       const isCurrentActive = profile.subscriptionExpiresAt && profile.subscriptionExpiresAt > Date.now();
 
@@ -1225,7 +1224,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: `Insufficient Dark Shards! Need ${cost} Shards, you have ${profile.darkShards || 0}.` });
       }
 
-      profile.darkShards = (profile.darkShards || 0) - cost;
       profile.shieldsInventory = profile.shieldsInventory || { '3h': 0, '6h': 0, '12h': 0 };
       profile.shieldsInventory[shieldType] = (profile.shieldsInventory[shieldType] || 0) + 1;
 
