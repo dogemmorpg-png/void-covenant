@@ -418,6 +418,18 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   // Track the final target battle state once the calculation resolves
   const [finalBattleState, setFinalBattleState] = useState<BattleState | null>(null);
 
+  // Sovereigns earned in this battle (for PvP victory screen)
+  const [earnedSovereigns, setEarnedSovereigns] = useState<number>(() => {
+    if (battleType !== 'pvp') return 0;
+    const isSubActive = profile.subscriptionExpiresAt && Number(profile.subscriptionExpiresAt) > Date.now();
+    const subTier = isSubActive ? (profile.subscriptionTier || 'free') : 'free';
+    const todayUtc = new Date().toISOString().slice(0, 10);
+    const currentWonToday = profile.lastSovereignsWonDate === todayUtc ? (profile.dailySovereignsWonToday || 0) : 0;
+    const cap = subTier === 'ultra' ? 24 : subTier === 'premium' ? 10 : 0;
+    const perWin = subTier === 'ultra' ? 2 : subTier === 'premium' ? 1 : 0;
+    return Math.max(0, Math.min(perWin, cap - currentWonToday));
+  });
+
   // Automatically sync visualState with battle when not actively animating combat steps
   useEffect(() => {
     if (!isAnimating) {
@@ -996,7 +1008,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const handlePvpWon = async () => {
     audioSystem.playMagic();
     const res = await submitBattleResult('pvp', 'pvp', 'win');
-    if (!res.success) {
+    if (res.success) {
+      if (res.sovereignsReward !== undefined) {
+        setEarnedSovereigns(res.sovereignsReward);
+      } else if (res.rewards?.sovereigns !== undefined) {
+        setEarnedSovereigns(res.rewards.sovereigns);
+      }
+    } else {
       console.error('Failed to save PVP result:', res.message);
       toast(res.message, 'error');
     }
@@ -2678,7 +2696,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             {/* Rewards Card */}
             <div className="bg-black/60 p-4 rounded-2xl border border-amber-500/25 space-y-3 relative z-10">
               <span className="text-[10px] font-display text-amber-400/90 tracking-widest block uppercase font-bold">REWARD OBTAINED</span>
-              <div className="grid grid-cols-3 gap-2.5">
+              <div className={`grid gap-2.5 ${battleType === 'pvp' && earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
                 {/* Gold */}
                 <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
                   <span className="text-amber-300 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
@@ -2716,6 +2734,17 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain brightness-110 contrast-125" />
                     </span>
                     <span className="text-[9px] text-amber-400/80 font-mono uppercase tracking-wider mt-1 font-bold">Crowns</span>
+                  </div>
+                )}
+
+                {/* Blood Sovereigns (PvP Only - Subscriber Bounty when > 0) */}
+                {battleType === 'pvp' && earnedSovereigns > 0 && (
+                  <div className="bg-gradient-to-b from-amber-950/50 via-black to-black border border-amber-500/50 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.25)] animate-pulse">
+                    <span className="text-amber-400 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
+                      +{earnedSovereigns}
+                      <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
+                    </span>
+                    <span className="text-[9px] text-amber-300 font-mono uppercase tracking-wider mt-1 font-bold">Sovereigns</span>
                   </div>
                 )}
 

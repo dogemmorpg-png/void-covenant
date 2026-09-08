@@ -1315,7 +1315,20 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (res.ok) {
           const data = await res.json();
           if (data.profile) setProfile(migrateProfileTo10Cards(data.profile));
-          return { success: true, message: 'Rewards claimed successfully', rewards: data.rewards };
+          return { 
+            success: true, 
+            message: 'Rewards claimed successfully', 
+            sovereignsReward: data.sovereignsReward || 0,
+            rewards: {
+              gold: data.goldReward,
+              dust: data.dustReward,
+              exp: data.expReward,
+              shards: data.shardsReward,
+              sovereigns: data.sovereignsReward || 0,
+              card: data.cardReward
+            },
+            ...data
+          };
         }
       } catch (err: any) {
         console.warn('Battle API error, using local fallback:', err);
@@ -1323,31 +1336,56 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // Local calculation fallback (100% Guaranteed Success)
-    let rewards: any = { gold: 0, dust: 0, exp: 0, shards: 0 };
+    let rewards: any = { gold: 0, dust: 0, exp: 0, shards: 0, sovereigns: 0 };
     setProfile(current => {
       const updated = { ...current };
       const floorNum = parseInt(stageId) || 1;
 
       if (result === 'win') {
-        rewards.gold = 50 + floorNum * 10;
-        rewards.dust = 10;
-        rewards.exp = 50;
+        if (battleType === 'pvp') {
+          rewards.gold = 300 + Math.floor((updated.pvpLP || 0) / 4);
+          rewards.dust = 30 + Math.floor((updated.pvpLP || 0) / 20);
+          rewards.exp = 0;
+          updated.pvpLP = (updated.pvpLP || 0) + 20;
+
+          // Check daily sovereigns quota
+          const isSubActive = updated.subscriptionExpiresAt && Number(updated.subscriptionExpiresAt) > Date.now();
+          const subTier = isSubActive ? (updated.subscriptionTier || 'free') : 'free';
+          const todayUtc = new Date().toISOString().slice(0, 10);
+          if (updated.lastSovereignsWonDate !== todayUtc) {
+            updated.dailySovereignsWonToday = 0;
+            updated.lastSovereignsWonDate = todayUtc;
+          }
+          const currentWonToday = updated.dailySovereignsWonToday || 0;
+          const cap = subTier === 'ultra' ? 24 : subTier === 'premium' ? 10 : 0;
+          const perWin = subTier === 'ultra' ? 2 : subTier === 'premium' ? 1 : 0;
+          const sovereignsGain = Math.max(0, Math.min(perWin, cap - currentWonToday));
+          if (sovereignsGain > 0) {
+            updated.dailySovereignsWonToday = currentWonToday + sovereignsGain;
+            updated.bloodSovereigns = (updated.bloodSovereigns || 0) + sovereignsGain;
+            rewards.sovereigns = sovereignsGain;
+          }
+        } else {
+          rewards.gold = 50 + floorNum * 10;
+          rewards.dust = 10;
+          rewards.exp = 50;
+
+          if (floorNum >= (updated.pveProgress || 1)) {
+            updated.pveProgress = floorNum + 1;
+          }
+
+          if (stars && stars > 0) {
+            updated.campaignStars = updated.campaignStars || {};
+            const curStars = updated.campaignStars[stageId] || 0;
+            if (stars > curStars) {
+              updated.campaignStars[stageId] = stars;
+            }
+          }
+        }
 
         updated.gold = (updated.gold || 0) + rewards.gold;
         updated.dust = (updated.dust || 0) + rewards.dust;
         updated.exp = (updated.exp || 0) + rewards.exp;
-        
-        if (floorNum >= (updated.pveProgress || 1)) {
-          updated.pveProgress = floorNum + 1;
-        }
-
-        if (stars && stars > 0) {
-          updated.campaignStars = updated.campaignStars || {};
-          const curStars = updated.campaignStars[stageId] || 0;
-          if (stars > curStars) {
-            updated.campaignStars[stageId] = stars;
-          }
-        }
       } else {
         rewards.gold = 20;
         updated.gold = (updated.gold || 0) + rewards.gold;
@@ -1357,7 +1395,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return updated;
     });
 
-    return { success: true, message: 'Rewards claimed successfully!', rewards };
+    return { success: true, message: 'Rewards claimed successfully!', rewards, sovereignsReward: rewards.sovereigns };
   };
 
   const submitAction = async (action: string, payload: any) => {
