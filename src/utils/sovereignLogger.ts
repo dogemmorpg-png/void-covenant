@@ -12,7 +12,7 @@ export function recordSovereignTransaction(
   const sovereignsAfter = Math.max(0, sovereignsBefore + sovereignsChange);
 
   const tx: SovereignTransaction = {
-    id: svtx__,
+    id: `svtx_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
     timestamp: new Date().toISOString(),
     action,
     sovereignsChange,
