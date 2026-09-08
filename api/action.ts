@@ -108,11 +108,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // 2. Also fetch profiles where data->>referredBy equals walletAddress (for 100% data consistency)
       let referredProfiles: any[] = [];
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('profiles')
-          .select('wallet_address, data, created_at')
+          .select('wallet_address, data, updated_at')
           .filter('data->>referredBy', 'eq', walletAddress);
-        if (data) referredProfiles = data;
+        if (error) {
+          console.error('Error in referredProfiles query:', error);
+        } else if (data) {
+          referredProfiles = data;
+        }
       } catch (err) {
         console.error('Failed to fetch referred profiles:', err);
       }
@@ -123,7 +127,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       for (const p of referredProfiles) {
         referredMap.set(p.wallet_address, {
           wallet: p.wallet_address,
-          created_at: p.created_at || (p.data as any)?.joinedAt,
+          created_at: (p.data as any)?.joinedAt || (p.data as any)?.createdAt || p.updated_at,
           profileData: p.data || {}
         });
       }

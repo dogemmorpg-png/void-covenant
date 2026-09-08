@@ -510,7 +510,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                         <div className="text-xs text-white font-mono mt-1 flex items-center gap-2 flex-wrap">
                           <span>Total Earned: <strong className="text-amber-300 font-black">{(profile.referralSovereignsTotalEarned || 0).toFixed(2)} SOV</strong></span>
                           <span className="text-gray-400">•</span>
-                          <span>Allies Recruited: <strong className="text-white font-black">{profile.referralsCount || 0}</strong></span>
+                          <span>Allies Recruited: <strong className="text-white font-black">{referralsList.length > 0 ? referralsList.length : (profile.referralsCount || 0)}</strong></span>
                         </div>
                       </div>
                     </div>
