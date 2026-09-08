@@ -118,7 +118,7 @@ export const PremiumPassView: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="text-xl">{activeTier === 'ultra' ? '💎' : '⚜️'}</span>
                 <span className="font-display font-black text-sm sm:text-base tracking-wider uppercase text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-400">
-                  {activeTier === 'ultra' ? 'Ultra Overlord' : 'Premium Sovereign'}
+                  {activeTier === 'ultra' ? 'Ultra Overlord' : 'Premium Pass'}
                 </span>
                 <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-500/60 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.4)]">
                   ACTIVE
@@ -202,7 +202,7 @@ export const PremiumPassView: React.FC = () => {
             <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-amber-500/40 text-amber-300 font-display font-black text-xs tracking-wider uppercase">
                 <span>⚜️</span>
-                <span>SOVEREIGN TIER</span>
+                <span>PREMIUM TIER</span>
               </div>
               {activeTier === 'premium' && (
                 <span className="text-[10px] font-mono font-black px-2.5 py-1 rounded-full bg-amber-500 text-black shadow-[0_0_12px_rgba(245,158,11,0.6)]">
@@ -217,7 +217,7 @@ export const PremiumPassView: React.FC = () => {
                 PREMIUM PASS
               </h2>
               <p className="text-[11px] text-gray-300 font-sans">
-                The Sovereign standard. Essential for competitive Arena climbers.
+                The gold standard. Essential for competitive Arena climbers.
               </p>
             </div>
           </div>
@@ -239,107 +239,107 @@ export const PremiumPassView: React.FC = () => {
             </div>
 
             {/* Perks Detailed Grid */}
-            <div className="space-y-2 font-sans text-xs">
-              <span className="text-[11px] font-mono font-bold text-amber-400/80 uppercase tracking-widest block border-b border-amber-500/20 pb-1.5">
+            <div className="space-y-3 font-sans">
+              <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-widest block border-b border-amber-500/20 pb-2">
                 Included Privileges (9 Perks):
               </span>
 
               {/* 1. PvP Tickets */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/ticket_variant_3_gold.png" alt="PvP Tickets" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/ticket_variant_3_gold.png" alt="PvP Tickets" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-white text-xs">8 PvP Tickets / Day</div>
-                  <div className="text-[11px] text-gray-400">+60% more tickets to climb ranks</div>
+                  <div className="font-bold text-white text-sm sm:text-[15px] leading-snug">8 PvP Tickets / Day</div>
+                  <div className="text-xs text-gray-300 mt-0.5">+60% more tickets to climb ranks</div>
                 </div>
               </div>
 
               {/* 2. Blood Sovereigns */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/icon_sovereign.webp" alt="Blood Sovereign" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.6)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_sovereign.webp" alt="Blood Sovereign" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.6)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-emerald-300 text-xs">+1 Blood Sovereign / PvP Win</div>
-                  <div className="text-[11px] text-gray-400">Up to 10 SOV daily bounty from arena victories</div>
+                  <div className="font-bold text-emerald-300 text-sm sm:text-[15px] leading-snug">+1 Blood Sovereign / PvP Win</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Up to 10 SOV daily bounty from arena victories</div>
                 </div>
               </div>
 
               {/* 3. Seasonal Leaderboard Bonus */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/league_grandmaster_crest.png" alt="Seasonal Rewards" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/league_grandmaster_crest.png" alt="Seasonal Rewards" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-amber-300 text-xs">+15% Season Leaderboard Rewards</div>
-                  <div className="text-[11px] text-gray-400">Bonus Blood Sovereigns on daily & seasonal leaderboard payouts</div>
+                  <div className="font-bold text-amber-300 text-sm sm:text-[15px] leading-snug">+15% Season Leaderboard Rewards</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Bonus Blood Sovereigns on daily & seasonal leaderboard payouts</div>
                 </div>
               </div>
 
               {/* 4. Peace Shield */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/shield_3h.png" alt="Peace Shield" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/shield_3h.png" alt="Peace Shield" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-cyan-300 text-xs">1x 3-Hour Peace Shield</div>
-                  <div className="text-[11px] text-gray-400">Granted daily to protect from attacks while offline</div>
+                  <div className="font-bold text-cyan-300 text-sm sm:text-[15px] leading-snug">1x 3-Hour Peace Shield</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Granted daily to protect from attacks while offline</div>
                 </div>
               </div>
 
               {/* 5. Energy */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/icon_energy.webp" alt="Energy" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(168,85,247,0.6)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(168,85,247,0.6)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-purple-200 text-xs">10 PvE Energy (1 per 30 minutes)</div>
-                  <div className="text-[11px] text-gray-400">Doubled maximum energy capacity with 25% faster regeneration</div>
+                  <div className="font-bold text-purple-200 text-sm sm:text-[15px] leading-snug">10 PvE Energy (1 per 30 minutes)</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Doubled maximum energy capacity with 25% faster regeneration</div>
                 </div>
               </div>
 
               {/* 6. Gold Boost */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/icon_gold.webp" alt="Gold Drop" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_gold.webp" alt="Gold Drop" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-yellow-300 text-xs">+25% Gold Drop</div>
-                  <div className="text-[11px] text-gray-400">From all battles, campaign floors & encounters</div>
+                  <div className="font-bold text-yellow-300 text-sm sm:text-[15px] leading-snug">+25% Gold Drop</div>
+                  <div className="text-xs text-gray-300 mt-0.5">From all battles, campaign floors & encounters</div>
                 </div>
               </div>
 
               {/* 7. Daily Stipend */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-teal-500/10 border border-teal-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/icon_dust.webp" alt="Daily Stipend" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(20,184,166,0.6)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_dust.webp" alt="Daily Stipend" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(20,184,166,0.6)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-teal-300 text-xs">Daily Stipend: +1,000 Gold & +150 Dust</div>
-                  <div className="text-[11px] text-gray-400">Delivered directly to your in-game Mailbox every day at 00:00 UTC</div>
+                  <div className="font-bold text-teal-300 text-sm sm:text-[15px] leading-snug">Daily Stipend: +1,000 Gold & +150 Dust</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Delivered directly to your in-game Mailbox every day at 00:00 UTC</div>
                 </div>
               </div>
 
               {/* 8. Bank Payout Limit */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/icon_sovereign.webp" alt="Bank Cashout" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_sovereign.webp" alt="Bank Cashout" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-amber-300 text-xs">Bank Payout Limit: Lowered to 2,500 SOV ($25)</div>
-                  <div className="text-[11px] text-gray-400">Reduced cashout threshold to real USDT on Solana</div>
+                  <div className="font-bold text-amber-300 text-sm sm:text-[15px] leading-snug">Bank Payout Limit: Lowered to 2,500 SOV ($25)</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Reduced cashout threshold to real USDT on Solana</div>
                 </div>
               </div>
 
               {/* 9. Visual Prestige */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/crown.png" alt="Sovereign Prestige" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/crown.png" alt="Prestige" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-amber-300 text-xs">Golden Name & ⚜️ Badge</div>
-                  <div className="text-[11px] text-gray-400">Distinct visual flair and prestige on leaderboards</div>
+                  <div className="font-bold text-amber-300 text-sm sm:text-[15px] leading-snug">Golden Name & ⚜️ Badge</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Distinct visual flair and prestige on leaderboards</div>
                 </div>
               </div>
             </div>
@@ -403,7 +403,7 @@ export const PremiumPassView: React.FC = () => {
                 ULTRA OVERLORD
               </h2>
               <p className="text-[11px] text-purple-200/80 font-sans">
-                Apex dominance: greatest Sovereign harvest and fastest progression velocity.
+                Apex dominance: greatest reward yields and fastest progression velocity.
               </p>
             </div>
           </div>
@@ -425,107 +425,107 @@ export const PremiumPassView: React.FC = () => {
             </div>
 
             {/* Perks Detailed Grid */}
-            <div className="space-y-2 font-sans text-xs">
-              <span className="text-[11px] font-mono font-bold text-purple-400/90 uppercase tracking-widest block border-b border-purple-500/25 pb-1.5">
+            <div className="space-y-3 font-sans">
+              <span className="text-xs font-mono font-bold text-purple-400 uppercase tracking-widest block border-b border-purple-500/25 pb-2">
                 All Premium Perks PLUS (9 Upgraded Perks):
               </span>
 
               {/* 1. PvP Tickets */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/ticket_variant_2_violet.png" alt="PvP Tickets" className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-purple-500/15 border border-purple-400/40 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/ticket_variant_2_violet.png" alt="PvP Tickets" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-purple-200 text-xs">12 PvP Tickets / Day</div>
-                  <div className="text-[11px] text-gray-400">+140% tickets — maximum league LP to reach top ranks</div>
+                  <div className="font-bold text-purple-200 text-sm sm:text-[15px] leading-snug">12 PvP Tickets / Day</div>
+                  <div className="text-xs text-gray-300 mt-0.5">+140% tickets — maximum league LP to reach top ranks</div>
                 </div>
               </div>
 
               {/* 2. Blood Sovereigns */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/icon_sovereign.webp" alt="Blood Sovereign" className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.7)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-400/40 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_sovereign.webp" alt="Blood Sovereign" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.7)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-emerald-300 text-xs">+2 Blood Sovereigns / PvP Win</div>
-                  <div className="text-[11px] text-gray-400">Up to 24 SOV daily (2.4x higher earnings than Premium)</div>
+                  <div className="font-bold text-emerald-300 text-sm sm:text-[15px] leading-snug">+2 Blood Sovereigns / PvP Win</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Up to 24 SOV daily (2.4x higher earnings than Premium)</div>
                 </div>
               </div>
 
               {/* 3. Seasonal Leaderboard Bonus */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/league_void_overlord.png" alt="Seasonal Rewards" className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-purple-500/15 border border-purple-400/40 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/league_void_overlord.png" alt="Seasonal Rewards" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-purple-200 text-xs">+25% Season Leaderboard Rewards</div>
-                  <div className="text-[11px] text-gray-400">Highest payout multiplier on daily & seasonal leaderboard standings</div>
+                  <div className="font-bold text-purple-200 text-sm sm:text-[15px] leading-snug">+25% Season Leaderboard Rewards</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Highest payout multiplier on daily & seasonal leaderboard standings</div>
                 </div>
               </div>
 
               {/* 4. Peace Shield */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-cyan-500/15 border border-cyan-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/shield_6h.png" alt="Peace Shield" className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.7)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-cyan-500/15 border border-cyan-400/40 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/shield_6h.png" alt="Peace Shield" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.7)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-cyan-300 text-xs">1x 6-Hour Peace Shield</div>
-                  <div className="text-[11px] text-gray-400">Granted daily for extended immunity against raids</div>
+                  <div className="font-bold text-cyan-300 text-sm sm:text-[15px] leading-snug">1x 6-Hour Peace Shield</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Granted daily for extended immunity against raids</div>
                 </div>
               </div>
 
               {/* 5. Energy */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/icon_energy.webp" alt="Energy" className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-purple-500/15 border border-purple-400/40 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-purple-200 text-xs">20 PvE Energy (1 per 20 min)</div>
-                  <div className="text-[11px] text-gray-400">Quadrupled capacity with 2x faster regeneration speed</div>
+                  <div className="font-bold text-purple-200 text-sm sm:text-[15px] leading-snug">20 PvE Energy (1 per 20 min)</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Quadrupled capacity with 2x faster regeneration speed</div>
                 </div>
               </div>
 
               {/* 6. Gold Boost */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-yellow-500/15 border border-yellow-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/icon_gold.webp" alt="Gold Drop" className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.7)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-yellow-500/15 border border-yellow-400/40 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_gold.webp" alt="Gold Drop" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.7)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-yellow-300 text-xs">+50% Gold Drop</div>
-                  <div className="text-[11px] text-gray-400">Supreme gold multiplication from all battles & campaign</div>
+                  <div className="font-bold text-yellow-300 text-sm sm:text-[15px] leading-snug">+50% Gold Drop</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Supreme gold multiplication from all battles & campaign</div>
                 </div>
               </div>
 
               {/* 7. Daily Stipend */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-teal-500/15 border border-teal-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/icon_dust.webp" alt="Daily Stipend" className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(20,184,166,0.7)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-teal-500/15 border border-teal-400/40 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_dust.webp" alt="Daily Stipend" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(20,184,166,0.7)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-teal-300 text-xs">Daily Stipend: +3,000 Gold & +400 Dust</div>
-                  <div className="text-[11px] text-gray-400">Delivered directly to your in-game Mailbox every day at 00:00 UTC</div>
+                  <div className="font-bold text-teal-300 text-sm sm:text-[15px] leading-snug">Daily Stipend: +3,000 Gold & +400 Dust</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Delivered directly to your in-game Mailbox every day at 00:00 UTC</div>
                 </div>
               </div>
 
               {/* 8. Bank Payout Limit */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/icon_sovereign.webp" alt="Bank Cashout" className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-purple-500/15 border border-purple-400/40 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/icon_sovereign.webp" alt="Bank Cashout" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-purple-200 text-xs">Lowest Bank Payout Limit: 2,000 SOV ($20)</div>
-                  <div className="text-[11px] text-gray-400">Lowest cashout barrier on the platform for instant withdrawals</div>
+                  <div className="font-bold text-purple-200 text-sm sm:text-[15px] leading-snug">Lowest Bank Payout Limit: 2,000 SOV ($20)</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Lowest cashout barrier on the platform for instant withdrawals</div>
                 </div>
               </div>
 
               {/* 9. Visual Prestige */}
-              <div className="flex items-start gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.02] transition-colors">
-                <div className="w-7 h-7 rounded-lg bg-rose-500/15 border border-rose-400/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-                  <img src="/icons/referral_seal.png" alt="Ultra Diamond" className="w-4 h-4 object-contain drop-shadow-[0_0_10px_rgba(217,70,239,0.8)]" />
+              <div className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.03] transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-rose-500/15 border border-rose-400/40 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  <img src="/icons/referral_seal.png" alt="Ultra Diamond" className="w-5 h-5 object-contain drop-shadow-[0_0_10px_rgba(217,70,239,0.8)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-rose-300 text-xs">Animated Void Frame & 💎 Ultra Diamond</div>
-                  <div className="text-[11px] text-gray-400">Luminous cosmic aura, animated avatar frame & apex distinction</div>
+                  <div className="font-bold text-rose-300 text-sm sm:text-[15px] leading-snug">Animated Void Frame & 💎 Ultra Diamond</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Luminous cosmic aura, animated avatar frame & apex distinction</div>
                 </div>
               </div>
             </div>
