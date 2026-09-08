@@ -324,6 +324,43 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
 
             {/* Body */}
             <div className="p-5 sm:p-6 space-y-4 overflow-y-auto max-h-[calc(92vh-85px)] scrollbar-thin scrollbar-thumb-amber-500/20">
+
+              {/* Personal Invitation Link Card */}
+              <div className="bg-black/60 border border-white/15 rounded-2xl p-4 space-y-2.5 shadow-md">
+                <div className="flex items-center justify-between text-xs text-white font-display font-bold tracking-wider uppercase">
+                  <span>YOUR IMPERIAL INVITATION LINK</span>
+                  <span className="text-xs font-mono text-amber-300">Share to recruit</span>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row items-center gap-2.5">
+                  <div className="w-full bg-black/90 border border-white/20 rounded-xl px-4 py-3 font-mono text-xs sm:text-sm text-amber-200 select-all flex items-center gap-2 min-w-0">
+                    <Copy className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span className="truncate font-semibold">{`${window.location.origin}?ref=${profile.solanaAddress || ''}`}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                    <button
+                      onClick={() => {
+                        audioSystem.playClick();
+                        handleCopyLink();
+                      }}
+                      className="grow sm:grow-0 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-black font-display font-bold px-5 py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer uppercase shadow-md shadow-amber-500/20 active:scale-95"
+                    >
+                      {copySuccess ? 'COPIED!' : <><Copy className="w-3.5 h-3.5" /> COPY</>}
+                    </button>
+
+                    <a
+                      href={`https://t.me/share/url?url=${encodeURIComponent(`${window.location.origin}?ref=${profile.solanaAddress || ''}`)}&text=${encodeURIComponent('Join Void Covenant! Sign up with my link to get +1,000 Gold starter bonus!')}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="grow sm:grow-0 bg-[#229ED9] hover:bg-[#229ED9]/90 text-white font-mono font-bold px-5 py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-[#229ED9]/20 active:scale-95"
+                      title="Share to Telegram"
+                    >
+                      <Send className="w-3.5 h-3.5" /> Telegram
+                    </a>
+                  </div>
+                </div>
+              </div>
               
               {/* HERO FEATURE: PASS BOUNTY (MAIN REFERRAL EARNINGS) */}
               <div className="relative overflow-hidden rounded-2xl border-2 border-amber-400/60 bg-gradient-to-b from-[#2a131b] via-[#1a0c14] to-[#12070c] p-4 sm:p-5 shadow-[0_0_35px_rgba(245,158,11,0.25)]">
@@ -364,7 +401,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                           ⚜️ PREMIUM PASS
                         </span>
                         <p className="text-xs text-white font-sans mt-1">
-                          When ally buys 30 or 90 days
+                          When your friend buys a subscription
                         </p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
@@ -373,7 +410,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                           <span className="text-2xl font-mono font-black text-amber-300 text-shadow-gold block leading-none">
                             +300
                           </span>
-                          <span className="text-[10px] font-mono font-bold text-amber-200/90 uppercase">
+                          <span className="text-xs sm:text-sm font-mono font-bold text-amber-200 uppercase mt-0.5 block">
                             SOV ($3.00)
                           </span>
                         </div>
@@ -387,7 +424,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                           👑 ULTRA OVERLORD
                         </span>
                         <p className="text-xs text-white font-sans mt-1">
-                          When ally buys 30 or 90 days
+                          When your friend buys a subscription
                         </p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
@@ -396,7 +433,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                           <span className="text-2xl font-mono font-black text-fuchsia-300 text-shadow-gold block leading-none">
                             +600
                           </span>
-                          <span className="text-[10px] font-mono font-bold text-fuchsia-200/90 uppercase">
+                          <span className="text-xs sm:text-sm font-mono font-bold text-fuchsia-200 uppercase mt-0.5 block">
                             SOV ($6.00)
                           </span>
                         </div>
@@ -435,7 +472,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                       <span className="text-xs font-mono font-bold text-amber-200 uppercase">SHARE</span>
                     </div>
                     <p className="text-xs sm:text-sm text-white font-sans mt-1 leading-relaxed">
-                      Receive <strong>15%</strong> of all Blood Sovereigns your friends earn from Arena wins and daily Leaderboards. Paid by the system, never taken from your friend!
+                      Receive <strong>15%</strong> of all Blood Sovereigns your friends earn from Arena wins and daily Leaderboards.
                     </p>
                   </div>
                 </div>
@@ -511,43 +548,6 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                   </div>
                 );
               })()}
-
-              {/* Personal Invitation Link Card */}
-              <div className="bg-black/60 border border-white/15 rounded-2xl p-4 space-y-2.5 shadow-md">
-                <div className="flex items-center justify-between text-xs text-white font-display font-bold tracking-wider uppercase">
-                  <span>YOUR IMPERIAL INVITATION LINK</span>
-                  <span className="text-xs font-mono text-amber-300">Share to recruit</span>
-                </div>
-                
-                <div className="flex flex-col sm:flex-row items-center gap-2.5">
-                  <div className="w-full bg-black/90 border border-white/20 rounded-xl px-4 py-3 font-mono text-xs sm:text-sm text-amber-200 select-all flex items-center gap-2 min-w-0">
-                    <Copy className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span className="truncate font-semibold">{`${window.location.origin}?ref=${profile.solanaAddress || ''}`}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
-                    <button
-                      onClick={() => {
-                        audioSystem.playClick();
-                        handleCopyLink();
-                      }}
-                      className="grow sm:grow-0 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-black font-display font-bold px-5 py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer uppercase shadow-md shadow-amber-500/20 active:scale-95"
-                    >
-                      {copySuccess ? 'COPIED!' : <><Copy className="w-3.5 h-3.5" /> COPY</>}
-                    </button>
-
-                    <a
-                      href={`https://t.me/share/url?url=${encodeURIComponent(`${window.location.origin}?ref=${profile.solanaAddress || ''}`)}&text=${encodeURIComponent('Join Void Covenant! Sign up with my link to get +1,000 Gold starter bonus!')}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="grow sm:grow-0 bg-[#229ED9] hover:bg-[#229ED9]/90 text-white font-mono font-bold px-5 py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-[#229ED9]/20 active:scale-95"
-                      title="Share to Telegram"
-                    >
-                      <Send className="w-3.5 h-3.5" /> Telegram
-                    </a>
-                  </div>
-                </div>
-              </div>
 
               {/* Recruited Allies Section */}
               <div className="space-y-3 pt-2">
