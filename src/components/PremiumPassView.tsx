@@ -96,17 +96,17 @@ export const PremiumPassView: React.FC = () => {
             </div>
 
             {/* Value Highlights Feature Chips */}
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-black/50 border border-amber-500/25 text-[11px] font-mono font-bold text-amber-300 shadow-inner">
-                <img src="/icons/league_grandmaster_crest.png" alt="Leaderboard" className="w-4 h-4 object-contain drop-shadow-[0_0_4px_rgba(245,158,11,0.7)] shrink-0" />
+            <div className="flex flex-wrap items-center gap-2.5 pt-2">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-black/60 border border-amber-500/35 text-xs sm:text-[13px] font-mono font-bold text-amber-300 shadow-inner">
+                <img src="/icons/league_grandmaster_crest.png" alt="Leaderboard" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.8)] shrink-0" />
                 <span>+15% to +25% Leaderboard Rewards</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-black/50 border border-emerald-500/25 text-[11px] font-mono font-bold text-emerald-300 shadow-inner">
-                <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3.5 h-3.5 object-contain shrink-0" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-black/60 border border-emerald-500/35 text-xs sm:text-[13px] font-mono font-bold text-emerald-300 shadow-inner">
+                <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4.5 h-4.5 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.7)] shrink-0" />
                 <span>Up to 24 SOV/Day on Arena Wins</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-black/50 border border-cyan-500/25 text-[11px] font-mono font-bold text-cyan-300 shadow-inner">
-                <img src="/icons/shield_3h.png" alt="Peace Shield" className="w-4 h-4 object-contain drop-shadow-[0_0_4px_rgba(6,182,212,0.7)] shrink-0" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-black/60 border border-cyan-500/35 text-xs sm:text-[13px] font-mono font-bold text-cyan-300 shadow-inner">
+                <img src="/icons/shield_3h.png" alt="Peace Shield" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.8)] shrink-0" />
                 <span>Daily Peace Shield</span>
               </div>
             </div>
