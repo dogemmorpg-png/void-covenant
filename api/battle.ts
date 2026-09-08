@@ -172,9 +172,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!stage) return res.status(400).json({ error: 'Stage not found' });
 
       if (result === 'win') {
-        const baseGold = stage.rewards.gold || (floorNum * 15 + 30);
-        const baseDust = stage.rewards.dust || (floorNum * 5 + 10);
-        const baseExp = stage.rewards.exp || (floorNum * 20 + 40);
+        const baseGold = stage.goldReward || (floorNum * 15 + 30);
+        const baseDust = stage.dustReward || (floorNum * 5 + 10);
+        const baseExp = floorNum * 20 + 40;
 
         goldReward = applyMultiplierWithMinimum(baseGold, goldMultiplier);
         dustReward = baseDust;
@@ -192,11 +192,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           profile.campaignStars[stageId] = stageStars;
         }
 
-        if (stage.rewards.cardDrop && Math.random() < stage.rewards.cardDrop.chance) {
-          const newCardInstance = createCardInstance(stage.rewards.cardDrop.template, 1);
+        if (stage.cardReward) {
           profile.collection = profile.collection || [];
-          profile.collection.push(newCardInstance);
-          cardRewardStr = newCardInstance.name;
+          profile.collection.push(stage.cardReward);
+          cardRewardStr = stage.cardReward.name;
         }
       } else {
         goldReward = applyMultiplierWithMinimum(5, goldMultiplier);

@@ -419,11 +419,32 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const [finalBattleState, setFinalBattleState] = useState<BattleState | null>(null);
   const battleResultSubmittedRef = useRef<boolean>(false);
 
+  // Calculate subscriber & equipment bonuses for battle rewards
+  const isSubActive = profile.subscriptionExpiresAt && Number(profile.subscriptionExpiresAt) > Date.now();
+  const subTier = isSubActive ? (profile.subscriptionTier || 'free') : 'free';
+  let battleGoldMultiplier = 1;
+  if (subTier === 'ultra') {
+    battleGoldMultiplier += 0.50;
+  } else if (subTier === 'premium') {
+    battleGoldMultiplier += 0.25;
+  }
+  const equipGoldBonus = getEquipmentBonus('goldBonus');
+  if (equipGoldBonus > 0) {
+    battleGoldMultiplier += (equipGoldBonus / 100);
+  }
+
+  const applyRewardMultiplier = (baseVal: number, mult: number) => {
+    if (mult <= 1 || baseVal <= 0) return Math.round(baseVal);
+    return baseVal + Math.max(1, Math.round(baseVal * (mult - 1)));
+  };
+
+  const initialBaseGold = stage.goldReward || (battleType === 'pvp' ? (300 + Math.floor((profile.pvpLP || 0) / 4)) : 100);
+  const [earnedGold, setEarnedGold] = useState<number>(() => applyRewardMultiplier(initialBaseGold, battleGoldMultiplier));
+  const [earnedDust, setEarnedDust] = useState<number>(() => stage.dustReward || (battleType === 'pvp' ? (30 + Math.floor((profile.pvpLP || 0) / 20)) : 10));
+
   // Sovereigns earned in this battle (for PvP victory screen)
   const [earnedSovereigns, setEarnedSovereigns] = useState<number>(() => {
     if (battleType !== 'pvp') return 0;
-    const isSubActive = profile.subscriptionExpiresAt && Number(profile.subscriptionExpiresAt) > Date.now();
-    const subTier = isSubActive ? (profile.subscriptionTier || 'free') : 'free';
     const todayUtc = new Date().toISOString().slice(0, 10);
     const currentWonToday = profile.lastSovereignsWonDate === todayUtc ? (profile.dailySovereignsWonToday || 0) : 0;
     const cap = subTier === 'ultra' ? 24 : subTier === 'premium' ? 10 : 0;
@@ -1001,7 +1022,18 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     else if (hpPercentage >= 0.5) stars = 2;
 
     const res = await submitBattleResult(battleType, stage.id.toString(), 'win', stars);
-    if (!res.success) {
+    if (res.success) {
+      if (res.rewards?.gold !== undefined) {
+        setEarnedGold(res.rewards.gold);
+      } else if (res.goldReward !== undefined) {
+        setEarnedGold(res.goldReward);
+      }
+      if (res.rewards?.dust !== undefined) {
+        setEarnedDust(res.rewards.dust);
+      } else if (res.dustReward !== undefined) {
+        setEarnedDust(res.dustReward);
+      }
+    } else {
       console.error('Failed to save battle result:', res.message);
       toast(res.message, 'error');
     }
@@ -1011,6 +1043,16 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const handlePvpWon = async () => {
     const res = await submitBattleResult('pvp', 'pvp', 'win');
     if (res.success) {
+      if (res.rewards?.gold !== undefined) {
+        setEarnedGold(res.rewards.gold);
+      } else if (res.goldReward !== undefined) {
+        setEarnedGold(res.goldReward);
+      }
+      if (res.rewards?.dust !== undefined) {
+        setEarnedDust(res.rewards.dust);
+      } else if (res.dustReward !== undefined) {
+        setEarnedDust(res.dustReward);
+      }
       if (res.sovereignsReward !== undefined) {
         setEarnedSovereigns(res.sovereignsReward);
       } else if (res.rewards?.sovereigns !== undefined) {
@@ -2702,18 +2744,23 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               <span className="text-[10px] font-display text-amber-400/90 tracking-widest block uppercase font-bold">REWARD OBTAINED</span>
               <div className={`grid gap-2.5 ${battleType === 'pvp' && earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
                 {/* Gold */}
-                <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center relative overflow-hidden">
+                  {battleGoldMultiplier > 1 && (
+                    <span className="text-[8px] font-black text-amber-300/90 bg-amber-500/20 px-1.5 py-0.5 rounded-full border border-amber-500/30 mb-0.5 tracking-tighter">
+                      +{Math.round((battleGoldMultiplier - 1) * 100)}% {subTier === 'ultra' ? 'ULTRA' : subTier === 'premium' ? 'VIP' : 'BONUS'}
+                    </span>
+                  )}
                   <span className="text-amber-300 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
-                    +{stage.goldReward}
+                    +{earnedGold}
                     <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.5)]" />
                   </span>
-                  <span className="text-[9px] text-amber-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Gold</span>
+                  <span className="text-[9px] text-amber-400/70 font-mono uppercase tracking-wider mt-0.5 font-bold">Gold</span>
                 </div>
                 
                 {/* Dust */}
                 <div className="bg-gradient-to-b from-cyan-950/40 via-black to-black border border-cyan-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
                   <span className="text-cyan-300 font-display font-black text-base flex items-center gap-1 text-shadow-cyan">
-                    +{stage.dustReward}
+                    +{earnedDust}
                     <img src="/icons/icon_dust.webp" alt="Dust" className="w-7 h-7 object-contain drop-shadow-[0_0_8px_rgba(102,252,241,0.6)] scale-125" />
                   </span>
                   <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Dust</span>

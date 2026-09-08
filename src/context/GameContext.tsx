@@ -1347,16 +1347,38 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const updated = { ...current };
       const floorNum = parseInt(stageId) || 1;
 
+      const isSubActive = updated.subscriptionExpiresAt && Number(updated.subscriptionExpiresAt) > Date.now();
+      const subTier = isSubActive ? (updated.subscriptionTier || 'free') : 'free';
+      let goldMultiplier = 1;
+      if (subTier === 'ultra') {
+        goldMultiplier += 0.50;
+      } else if (subTier === 'premium') {
+        goldMultiplier += 0.25;
+      }
+
+      let expMultiplier = 1;
+      if (updated.equipped && updated.equipment) {
+        Object.values(updated.equipped).forEach(eqId => {
+          const eq = updated.equipment?.find((e: any) => e.id === eqId);
+          if (eq && eq.bonusType === 'goldBonus') goldMultiplier += (eq.bonusValue / 100);
+          if (eq && eq.bonusType === 'expBonus') expMultiplier += (eq.bonusValue / 100);
+        });
+      }
+
+      const applyMult = (baseVal: number, mult: number) => {
+        if (mult <= 1 || baseVal <= 0) return Math.round(baseVal);
+        return baseVal + Math.max(1, Math.round(baseVal * (mult - 1)));
+      };
+
       if (result === 'win') {
         if (battleType === 'pvp') {
-          rewards.gold = 300 + Math.floor((updated.pvpLP || 0) / 4);
+          const baseGold = 300 + Math.floor((updated.pvpLP || 0) / 4);
+          rewards.gold = applyMult(baseGold, goldMultiplier);
           rewards.dust = 30 + Math.floor((updated.pvpLP || 0) / 20);
           rewards.exp = 0;
           updated.pvpLP = (updated.pvpLP || 0) + 20;
 
           // Check daily sovereigns quota
-          const isSubActive = updated.subscriptionExpiresAt && Number(updated.subscriptionExpiresAt) > Date.now();
-          const subTier = isSubActive ? (updated.subscriptionTier || 'free') : 'free';
           const todayUtc = new Date().toISOString().slice(0, 10);
           if (updated.lastSovereignsWonDate !== todayUtc) {
             updated.dailySovereignsWonToday = 0;
@@ -1372,9 +1394,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             rewards.sovereigns = sovereignsGain;
           }
         } else {
-          rewards.gold = 50 + floorNum * 10;
-          rewards.dust = 10;
-          rewards.exp = 50;
+          const baseGold = 100 + floorNum * 15;
+          rewards.gold = applyMult(baseGold, goldMultiplier);
+          rewards.dust = 10 + floorNum * 3;
+          rewards.exp = applyMult(50, expMultiplier);
 
           if (floorNum >= (updated.pveProgress || 1)) {
             updated.pveProgress = floorNum + 1;
@@ -1393,7 +1416,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updated.dust = (updated.dust || 0) + rewards.dust;
         updated.exp = (updated.exp || 0) + rewards.exp;
       } else {
-        rewards.gold = 20;
+        rewards.gold = applyMult(20, goldMultiplier);
         updated.gold = (updated.gold || 0) + rewards.gold;
       }
 
