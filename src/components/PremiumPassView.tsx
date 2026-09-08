@@ -7,7 +7,9 @@ import {
   Gift, 
   Flame, 
   Shield, 
-  Info
+  Info,
+  Sparkles,
+  Zap
 } from 'lucide-react';
 
 export const PremiumPassView: React.FC = () => {
@@ -65,42 +67,80 @@ export const PremiumPassView: React.FC = () => {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-8 animate-fade-in text-white font-sans">
       
       {/* Top Hero Showcase Banner */}
-      <div className="relative rounded-3xl overflow-hidden border border-[#c5a880]/25 bg-gradient-to-b from-[#18131e] via-[#0d0a14] to-[#060408] p-6 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.8)]">
-        {/* Background Atmosphere Lights */}
-        <div className="absolute -top-24 -left-20 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -right-20 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)] pointer-events-none" />
+      <div className="relative rounded-3xl overflow-hidden border-2 border-[#c5a880]/30 bg-gradient-to-b from-[#1c1524] via-[#100b17] to-[#08050c] p-6 sm:p-9 shadow-[0_12px_45px_rgba(0,0,0,0.85)]">
+        {/* Background Atmospheric Glows & Vignette */}
+        <div className="absolute -top-28 -left-24 w-[28rem] h-[28rem] bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-28 -right-24 w-[28rem] h-[28rem] bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.7)_100%)] pointer-events-none" />
+        
+        {/* Ornate Gold Border Accent Lines */}
+        <div className="absolute top-0 left-12 right-12 h-[1px] bg-gradient-to-r from-transparent via-amber-400/50 to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-12 right-12 h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 to-transparent pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="text-center sm:text-left space-y-2.5 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-[11px] font-bold tracking-widest uppercase">
-              <Crown className="w-3.5 h-3.5 text-amber-400" />
-              Imperial Privileges & Pass
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-4 max-w-2xl text-left">
+            {/* Badge Pill */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-gradient-to-r from-amber-500/15 to-purple-500/15 border border-amber-500/35 text-amber-300 font-mono text-[11px] font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(245,158,11,0.15)]">
+              <Crown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>Imperial Privileges & Covenant Pass</span>
             </div>
             
-            <h1 className="text-2xl sm:text-4xl font-display font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-amber-300 to-yellow-500 drop-shadow-[0_2px_12px_rgba(245,158,11,0.3)] uppercase">
-              Void Covenant Pass
-            </h1>
-            
-            <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans max-w-2xl">
-              Elevate your dominion over the Abyss: expanded daily PvP tickets, guaranteed Blood Sovereigns on arena wins, daily Peace Shields, accelerated energy recovery, and <span className="text-amber-300 font-semibold drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]">increased seasonal leaderboard rewards (+15% Premium / +25% Ultra)</span>.
-            </p>
+            {/* Title with Grand Gothic typography */}
+            <div className="space-y-1.5">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-amber-300 to-yellow-500 drop-shadow-[0_2px_14px_rgba(245,158,11,0.4)] uppercase">
+                Void Covenant Pass
+              </h1>
+              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans max-w-xl">
+                Elevate your dominion over the Abyss with expanded daily PvP tickets, guaranteed Blood Sovereigns on arena victories, daily Peace Shields, and accelerated energy recovery.
+              </p>
+            </div>
+
+            {/* Value Highlights Feature Chips */}
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-black/50 border border-amber-500/25 text-[11px] font-mono font-bold text-amber-300 shadow-inner">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span>+15% to +25% Rollover Sovereigns</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-black/50 border border-emerald-500/25 text-[11px] font-mono font-bold text-emerald-300 shadow-inner">
+                <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3.5 h-3.5 object-contain shrink-0" />
+                <span>Up to 24 SOV/Day on Arena Wins</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-black/50 border border-cyan-500/25 text-[11px] font-mono font-bold text-cyan-300 shadow-inner">
+                <Shield className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span>Daily Peace Shield in Mailbox</span>
+              </div>
+            </div>
           </div>
 
-          {isSubActive && (
-            <div className="shrink-0 flex sm:flex-col items-center sm:items-end justify-center gap-1.5 p-3.5 px-4 rounded-2xl bg-black/50 border border-amber-500/30 shadow-[0_0_20px_rgba(245,158,11,0.15)] backdrop-blur-md">
+          {/* Active Subscription Status Plaque (when active) or Value Guarantee */}
+          {isSubActive ? (
+            <div className="shrink-0 flex flex-col items-start lg:items-end justify-center gap-2 p-4 rounded-2xl bg-gradient-to-b from-[#1f1627] to-[#0c0812] border-2 border-amber-500/40 shadow-[0_0_30px_rgba(245,158,11,0.2)] backdrop-blur-md">
               <div className="flex items-center gap-2">
-                <span className="text-lg">{activeTier === 'ultra' ? '💎' : '⚜️'}</span>
-                <span className="font-display font-black text-xs sm:text-sm tracking-wider uppercase text-amber-300">
+                <span className="text-xl">{activeTier === 'ultra' ? '💎' : '⚜️'}</span>
+                <span className="font-display font-black text-sm sm:text-base tracking-wider uppercase text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-400">
                   {activeTier === 'ultra' ? 'Ultra Overlord' : 'Premium Sovereign'}
                 </span>
-                <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-500/60 text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)]">
+                <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-500/60 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.4)]">
                   ACTIVE
                 </span>
               </div>
-              <span className="text-[11px] font-mono text-gray-400">
-                Valid until {new Date(profile.subscriptionExpiresAt || 0).toLocaleDateString()} ({remainingDays}d left)
-              </span>
+              <div className="text-xs font-mono text-gray-300 flex items-center gap-1.5">
+                <span className="text-amber-400 font-bold">{remainingDays} days remaining</span>
+                <span className="text-gray-500">•</span>
+                <span className="text-gray-400">until {new Date(profile.subscriptionExpiresAt || 0).toLocaleDateString()}</span>
+              </div>
+            </div>
+          ) : (
+            <div className="shrink-0 hidden lg:flex flex-col items-center justify-center p-4 rounded-2xl bg-black/40 border border-white/10 text-center max-w-[210px] space-y-2">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                <Crown className="w-5 h-5" />
+              </div>
+              <div className="text-[11px] font-display font-bold text-amber-200 uppercase tracking-wider">
+                Unlocks Real USDT Cashouts
+              </div>
+              <p className="text-[10px] text-gray-400 font-sans leading-tight">
+                Lowered minimum withdrawal limits and maximum arena bounty yields.
+              </p>
             </div>
           )}
         </div>
@@ -306,22 +346,16 @@ export const PremiumPassView: React.FC = () => {
               <button
                 onClick={() => handleBuy('premium')}
                 disabled={isProcessing}
-                className="relative group w-full py-4 px-6 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-amber-700 via-amber-500 to-yellow-500 p-[1.5px] shadow-[0_0_25px_rgba(245,158,11,0.35)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full font-display font-black tracking-widest py-3.5 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-b from-[#261c10] via-[#150f08] to-[#090603] border-2 border-amber-500/50 hover:border-amber-400 text-amber-300 hover:text-amber-100 shadow-[0_0_15px_rgba(245,158,11,0.15)] hover:shadow-[0_0_25px_rgba(245,158,11,0.35)] select-none"
               >
-                {/* Inner button surface */}
-                <div className="relative rounded-[15px] py-3.5 px-4 bg-gradient-to-b from-[#24180d] via-[#150e07] to-[#0a0603] flex items-center justify-center gap-3 border border-amber-400/40 group-hover:border-amber-300/70 transition-colors">
-                  {/* Subtle radial glow */}
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(245,158,11,0.25),transparent_70%)] pointer-events-none" />
-                  
-                  {/* Top specular highlight rim */}
-                  <div className="absolute top-0 left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-amber-200/70 to-transparent pointer-events-none" />
-
-                  <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.8)] relative z-10 group-hover:scale-110 transition-transform" />
-                  
-                  <span className="relative z-10 font-display font-black text-sm sm:text-base tracking-[0.16em] uppercase text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-200 to-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                    {activeTier === 'premium' ? `EXTEND PREMIUM (${durationDays}d)` : `ACTIVATE PREMIUM (${durationDays}d)`}
-                  </span>
-                </div>
+                <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(245,158,11,0.7)] shrink-0" />
+                <span className="text-xs sm:text-sm uppercase tracking-[0.14em] drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+                  {activeTier === 'premium' ? `EXTEND PREMIUM (${durationDays}D)` : `ACTIVATE PREMIUM (${durationDays}D)`}
+                </span>
+                <span className="flex items-center gap-1.5 bg-black/60 border border-amber-500/40 rounded-full px-3 py-1 font-mono text-xs font-bold text-amber-300 shadow-inner ml-auto shrink-0">
+                  <span>{PRICES.premium[durationDays]}</span>
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow-[0_0_4px_rgba(245,158,11,0.6)]" />
+                </span>
               </button>
             </div>
 
@@ -498,22 +532,16 @@ export const PremiumPassView: React.FC = () => {
               <button
                 onClick={() => handleBuy('ultra')}
                 disabled={isProcessing}
-                className="relative group w-full py-4 px-6 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-purple-700 via-fuchsia-500 to-rose-500 p-[1.5px] shadow-[0_0_30px_rgba(192,38,211,0.4)] hover:shadow-[0_0_45px_rgba(192,38,211,0.7)] hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full font-display font-black tracking-widest py-3.5 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-b from-[#221029] via-[#130718] to-[#08020b] border-2 border-purple-500/60 hover:border-purple-400 text-purple-200 hover:text-white shadow-[0_0_18px_rgba(168,85,247,0.2)] hover:shadow-[0_0_28px_rgba(168,85,247,0.4)] select-none"
               >
-                {/* Inner button surface */}
-                <div className="relative rounded-[15px] py-3.5 px-4 bg-gradient-to-b from-[#220d2a] via-[#14061a] to-[#08020b] flex items-center justify-center gap-3 border border-purple-400/50 group-hover:border-fuchsia-300/80 transition-colors">
-                  {/* Subtle radial glow */}
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(192,38,211,0.3),transparent_70%)] pointer-events-none" />
-                  
-                  {/* Top specular highlight rim */}
-                  <div className="absolute top-0 left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-fuchsia-200/80 to-transparent pointer-events-none" />
-
-                  <span className="text-lg relative z-10 drop-shadow-[0_0_8px_rgba(192,38,211,0.8)] group-hover:scale-110 transition-transform">💎</span>
-                  
-                  <span className="relative z-10 font-display font-black text-sm sm:text-base tracking-[0.16em] uppercase text-transparent bg-clip-text bg-gradient-to-b from-fuchsia-100 via-purple-200 to-rose-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                    {activeTier === 'ultra' ? `EXTEND ULTRA (${durationDays}d)` : `ASCEND TO ULTRA (${durationDays}d)`}
-                  </span>
-                </div>
+                <span className="text-base drop-shadow-[0_0_6px_rgba(168,85,247,0.8)] shrink-0">💎</span>
+                <span className="text-xs sm:text-sm uppercase tracking-[0.14em] drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-rose-200 to-amber-200">
+                  {activeTier === 'ultra' ? `EXTEND ULTRA (${durationDays}D)` : `ASCEND TO ULTRA (${durationDays}D)`}
+                </span>
+                <span className="flex items-center gap-1.5 bg-black/60 border border-purple-500/40 rounded-full px-3 py-1 font-mono text-xs font-bold text-purple-300 shadow-inner ml-auto shrink-0">
+                  <span>{PRICES.ultra[durationDays]}</span>
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow-[0_0_4px_rgba(168,85,247,0.7)]" />
+                </span>
               </button>
             </div>
 
