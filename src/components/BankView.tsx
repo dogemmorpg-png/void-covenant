@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
-import { Landmark, ArrowUpRight, Clock, ShieldCheck, CheckCircle2, AlertCircle, Wallet, Coins, RefreshCw } from 'lucide-react';
+import { Landmark, ArrowUpRight, Clock, ShieldCheck, CheckCircle2, AlertCircle, Wallet, Coins, RefreshCw, TrendingUp, Swords, Trophy, Mail } from 'lucide-react';
 import { audioSystem } from '../utils/AudioSystem';
 
 export const BankView: React.FC = () => {
@@ -74,6 +74,90 @@ export const BankView: React.FC = () => {
   };
 
   const history = profile.withdrawalRequests || [];
+
+  // Compute all incoming sovereign events from PvP wins, mail rewards, and explicit logs
+  const accrualEvents = useMemo(() => {
+    const events: Array<{
+      id: string;
+      title: string;
+      description: string;
+      amount: number;
+      timestamp: number;
+      type: 'pvp' | 'league' | 'mail';
+    }> = [];
+
+    // 1. Explicit sovereign transactions if present
+    if (profile.sovereignTransactions && Array.isArray(profile.sovereignTransactions)) {
+      profile.sovereignTransactions.forEach((tx: any) => {
+        if (tx.sovereignsChange > 0) {
+          events.push({
+            id: tx.id || `stx_${tx.timestamp}`,
+            title: tx.action === 'PVP_VICTORY' ? 'PvP Duel Bounty' : tx.action === 'LEAGUE_ROLLOVER' ? 'League Season Tribute' : 'Treasury Grant',
+            description: tx.description || 'Blood Sovereigns earned and deposited',
+            amount: tx.sovereignsChange,
+            timestamp: typeof tx.timestamp === 'string' ? new Date(tx.timestamp).getTime() : tx.timestamp,
+            type: tx.action === 'PVP_VICTORY' ? 'pvp' : tx.action === 'LEAGUE_ROLLOVER' ? 'league' : 'mail'
+          });
+        }
+      });
+    }
+
+    // 2. PvP battles with subscriber sovereign reward
+    if (profile.pvpHistory && Array.isArray(profile.pvpHistory)) {
+      profile.pvpHistory.forEach((rec: any) => {
+        const isAttackerWin = rec.winner === 'attacker' && !rec.isDefense;
+        if (rec.sovereignsReward && rec.sovereignsReward > 0) {
+          events.push({
+            id: `pvp_sov_${rec.id}`,
+            title: 'PvP Duel Victory Bounty',
+            description: `Victory vs ${rec.defenderName || 'Lord'} (Subscriber Benefit)`,
+            amount: rec.sovereignsReward,
+            timestamp: rec.timestamp || Date.now(),
+            type: 'pvp'
+          });
+        } else if (isAttackerWin && (subTier === 'premium' || subTier === 'ultra')) {
+          // Fallback reconstruction if battle record didn't store sovereignsReward field explicitly
+          const amount = subTier === 'ultra' ? 2 : 1;
+          events.push({
+            id: `pvp_sov_${rec.id}`,
+            title: 'PvP Duel Victory Bounty',
+            description: `Victory vs ${rec.defenderName || 'Lord'} (Daily PvP Quota)`,
+            amount,
+            timestamp: rec.timestamp || Date.now(),
+            type: 'pvp'
+          });
+        }
+      });
+    }
+
+    // 3. Mailbox messages with Blood Sovereigns rewards
+    if (profile.mailMessages && Array.isArray(profile.mailMessages)) {
+      profile.mailMessages.forEach((mail: any) => {
+        const sovReward = mail.rewards?.bloodSovereigns;
+        if (sovReward && sovReward > 0) {
+          const isLeague = mail.title?.toLowerCase().includes('league') || mail.title?.toLowerCase().includes('pvp season');
+          events.push({
+            id: `mail_sov_${mail.id}`,
+            title: mail.title || (isLeague ? 'League Season Rollover' : 'Imperial Decree Tribute'),
+            description: isLeague ? 'Awarded for seasonal leaderboard rank' : (mail.sender || 'Council of the Void'),
+            amount: sovReward,
+            timestamp: mail.createdAt || Date.now(),
+            type: isLeague ? 'league' : 'mail'
+          });
+        }
+      });
+    }
+
+    // Deduplicate by ID and sort descending by timestamp
+    const seen = new Set<string>();
+    const unique = events.filter(e => {
+      if (seen.has(e.id)) return false;
+      seen.add(e.id);
+      return true;
+    });
+
+    return unique.sort((a, b) => b.timestamp - a.timestamp);
+  }, [profile.sovereignTransactions, profile.pvpHistory, profile.mailMessages, subTier]);
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-8 animate-fade-in">
@@ -341,26 +425,67 @@ export const BankView: React.FC = () => {
             )}
           </div>
 
-          {/* Security & Rules Guide */}
-          <div className="bg-gradient-to-b from-[#161b24] to-[#10141a] border border-amber-500/20 rounded-3xl p-6 space-y-3">
-            <h4 className="font-display font-bold text-sm text-amber-300 tracking-wider flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-amber-400" />
-              TREASURY RULES & PROTOCOLS
-            </h4>
-            <div className="space-y-2 text-xs text-gray-300 font-sans leading-relaxed">
-              <div className="flex items-start gap-2">
-                <span className="text-amber-400 font-bold">•</span>
-                <p><strong className="text-white">League Rollover Rewards:</strong> Blood Sovereigns are granted at the end of each PvP season to top-standing lords in Gold, Diamond, Master, and Champion leagues.</p>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="text-emerald-400 font-bold">•</span>
-                <p><strong className="text-white">Guaranteed Liquidity:</strong> Payouts are executed in USDT on Solana or EVM networks directly to your specified address.</p>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="text-cyan-400 font-bold">•</span>
-                <p><strong className="text-white">Fair-Play Anti-Cheat:</strong> All high-tier leaderboard victories undergo server replay verification prior to payout processing.</p>
-              </div>
+          {/* Sovereigns Accrual History */}
+          <div className="bg-[#141820] border border-amber-500/20 rounded-3xl p-6 shadow-xl flex flex-col min-h-[300px]">
+            <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+              <h3 className="font-display font-bold text-base text-amber-300 tracking-wider flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-amber-400" />
+                ACCRUAL & INCOMING HISTORY
+              </h3>
+              <span className="text-[10px] font-mono text-gray-400">
+                {accrualEvents.length} recorded
+              </span>
             </div>
+
+            {accrualEvents.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-2 text-gray-400">
+                <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-9 h-9 object-contain opacity-30 mb-1" />
+                <span className="font-display font-bold text-sm text-gray-300">No Accruals Yet</span>
+                <p className="text-xs text-gray-500 max-w-xs font-sans">
+                  Blood Sovereigns earned from PvP duels, League Rollovers, or Mail Tributes will be recorded here.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2.5 max-h-[320px] overflow-y-auto pr-1">
+                {accrualEvents.map((evt) => (
+                  <div key={evt.id} className="bg-black/40 border border-amber-500/15 hover:border-amber-500/30 rounded-xl p-3 space-y-1.5 transition-colors">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-amber-950/60 border border-amber-500/30 flex items-center justify-center shrink-0">
+                          {evt.type === 'pvp' ? (
+                            <Swords className="w-3.5 h-3.5 text-amber-400" />
+                          ) : evt.type === 'league' ? (
+                            <Trophy className="w-3.5 h-3.5 text-yellow-400" />
+                          ) : (
+                            <Mail className="w-3.5 h-3.5 text-rose-400" />
+                          )}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-display font-bold text-xs text-white leading-tight">{evt.title}</span>
+                          <span className="text-[10px] text-gray-400 font-sans leading-tight">{evt.description}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1 shrink-0 ml-2">
+                        <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3.5 h-3.5 object-contain" />
+                        <span className="font-mono font-black text-amber-300 text-xs">
+                          +{evt.amount} SOV
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center text-[10px] font-mono text-gray-500 pt-1 border-t border-white/5">
+                      <span className="uppercase text-[9px] tracking-wider text-amber-500/80 font-bold">
+                        {evt.type === 'pvp' ? 'PvP Duel Win' : evt.type === 'league' ? 'League Season Rollover' : 'Imperial Tribute'}
+                      </span>
+                      <span>
+                        {new Date(evt.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
         </div>

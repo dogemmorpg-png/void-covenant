@@ -292,7 +292,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         defenderLPBefore: lpOpponent,
         attackerLPChange: attackerLPChange,
         defenderLPChange: defenderLPChange,
-        isDefense: false
+        isDefense: false,
+        sovereignsReward: sovereignsReward > 0 ? sovereignsReward : undefined
       };
 
       profile.pvpHistory = [attackerRecord, ...(profile.pvpHistory || [])].slice(0, 30);
