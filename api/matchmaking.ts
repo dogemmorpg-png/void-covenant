@@ -373,12 +373,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // 5. Lock this active opponent in the database
+    const isOpponentSubActive = opponent.subscriptionExpiresAt && Number(opponent.subscriptionExpiresAt) > Date.now();
+    const opponentSubTier = isOpponentSubActive ? (opponent.subscriptionTier || 'free') : 'free';
+
     profileData.activePvpOpponent = {
       walletAddress: opponent.walletAddress,
       name: opponent.username,
       rating: opponent.pvpRating,
       league: opponent.pvpLeague || 'Bronze',
       lp: opponent.pvpLP !== undefined ? opponent.pvpLP : 0,
+      subscriptionTier: opponentSubTier,
       deck: opponent.deck,
       stance: opponent.activeStance || 'void_strike',
       talents: opponent.talents || {},

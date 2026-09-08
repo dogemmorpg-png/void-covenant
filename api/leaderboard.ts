@@ -83,14 +83,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const sorted = (rows || [])
       .filter(r => r.data && r.data.username && r.data.username.trim() !== '')
       .filter(r => (r.data.pvpLeague || 'Bronze') === playerLeague)
-      .map(r => ({
-        username: r.data.username,
-        pvpRating: r.data.pvpRating || 100,
-        pvpLeague: r.data.pvpLeague || 'Bronze',
-        pvpLP: r.data.pvpLP !== undefined ? r.data.pvpLP : 0,
-        avatarUrl: r.data.avatarUrl || '/avatars/knight.webp',
-        walletAddress: r.wallet_address
-      }))
+      .map(r => {
+        const isSubActive = r.data?.subscriptionExpiresAt && Number(r.data.subscriptionExpiresAt) > Date.now();
+        const subTier = isSubActive ? (r.data.subscriptionTier || 'free') : 'free';
+        return {
+          username: r.data.username,
+          pvpRating: r.data.pvpRating || 100,
+          pvpLeague: r.data.pvpLeague || 'Bronze',
+          pvpLP: r.data.pvpLP !== undefined ? r.data.pvpLP : 0,
+          avatarUrl: r.data.avatarUrl || '/avatars/knight.webp',
+          walletAddress: r.wallet_address,
+          subscriptionTier: subTier
+        };
+      })
       .sort((a, b) => (b.pvpLP - a.pvpLP) || (b.pvpRating - a.pvpRating));
 
     let myRank: number | null = null;

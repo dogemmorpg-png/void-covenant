@@ -687,9 +687,27 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               </div>
 
               <div className="space-y-1 pt-1">
-                <h4 className="text-white font-display font-black text-xl tracking-wide leading-tight">
-                  {activeOpponent.name || activeOpponent.username}
-                </h4>
+                <div className="flex items-center justify-center gap-2 flex-wrap">
+                  <h4 className={`font-display font-black text-xl tracking-wide leading-tight ${
+                    activeOpponent.subscriptionTier === 'ultra'
+                      ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-rose-300 to-amber-200 drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]'
+                      : activeOpponent.subscriptionTier === 'premium'
+                      ? 'text-amber-300 drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]'
+                      : 'text-white'
+                  }`}>
+                    {activeOpponent.name || activeOpponent.username}
+                  </h4>
+                  {activeOpponent.subscriptionTier === 'ultra' && (
+                    <span className="text-[10px] font-mono font-black px-1.5 py-0.2 rounded bg-purple-950/90 border border-purple-400 text-purple-300 shadow-[0_0_8px_rgba(168,85,247,0.4)]">
+                      👑 ULTRA
+                    </span>
+                  )}
+                  {activeOpponent.subscriptionTier === 'premium' && (
+                    <span className="text-[10px] font-mono font-black px-1.5 py-0.2 rounded bg-amber-950/90 border border-amber-400 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.3)]">
+                      ⚜️ VIP
+                    </span>
+                  )}
+                </div>
                 
                 <div className="flex items-center justify-center gap-2 pt-0.5">
                   <span className={`px-2.5 py-0.5 border rounded-full text-[10px] font-display font-bold uppercase tracking-wider inline-flex items-center gap-1.5 ${getLeagueDetails(activeOpponent.league || 'Bronze').color}`}>
@@ -1583,13 +1601,25 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   const player = leaderboard[idx];
                   const isSelf = player && player.walletAddress === (profile.solanaAddress || '');
 
+                  const isMySubActive = profile.subscriptionExpiresAt && Number(profile.subscriptionExpiresAt) > Date.now();
+                  const mySubTier = isMySubActive ? (profile.subscriptionTier || 'free') : 'free';
+                  const subTier = isSelf ? mySubTier : (player?.subscriptionTier || 'free');
+
                   if (player) {
                     return (
                       <div
                         key={player.walletAddress + idx}
                         className={`flex items-center justify-between p-2 px-3 rounded-xl border text-xs transition-all ${
                           isSelf
-                            ? 'bg-cyan-950/30 border-cyan-500/50 text-cyan-300 font-bold shadow-[0_0_12px_rgba(6,182,212,0.15)]'
+                            ? subTier === 'ultra'
+                              ? 'bg-gradient-to-r from-purple-950/40 via-cyan-950/30 to-purple-950/40 border-purple-500/70 text-cyan-300 font-bold shadow-[0_0_15px_rgba(168,85,247,0.3)]'
+                              : subTier === 'premium'
+                              ? 'bg-gradient-to-r from-amber-950/40 via-cyan-950/30 to-amber-950/40 border-amber-500/70 text-cyan-300 font-bold shadow-[0_0_15px_rgba(245,158,11,0.25)]'
+                              : 'bg-cyan-950/30 border-cyan-500/50 text-cyan-300 font-bold shadow-[0_0_12px_rgba(6,182,212,0.15)]'
+                            : subTier === 'ultra'
+                            ? 'bg-gradient-to-r from-purple-950/35 via-black/80 to-purple-950/20 border-purple-500/40 text-purple-200 shadow-[0_0_12px_rgba(168,85,247,0.15)]'
+                            : subTier === 'premium'
+                            ? 'bg-gradient-to-r from-amber-950/30 via-black/80 to-amber-950/15 border-amber-500/35 text-amber-200 shadow-[0_0_10px_rgba(245,158,11,0.12)]'
                             : rank === 1
                             ? 'bg-amber-950/20 border-amber-500/30 text-gray-200'
                             : rank === 2
@@ -1616,7 +1646,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                           </div>
 
                           {/* Avatar */}
-                          <div className="w-6 h-6 rounded-full bg-black/50 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
+                          <div className={`w-6 h-6 rounded-full overflow-hidden shrink-0 flex items-center justify-center border ${
+                            subTier === 'ultra'
+                              ? 'border-purple-400 ring-1 ring-purple-400/60 shadow-[0_0_8px_rgba(168,85,247,0.6)]'
+                              : subTier === 'premium'
+                              ? 'border-amber-400 ring-1 ring-amber-400/60 shadow-[0_0_8px_rgba(245,158,11,0.5)]'
+                              : 'border-white/10 bg-black/50'
+                          }`}>
                             {player.avatarUrl ? (
                               <img src={player.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                             ) : (
@@ -1625,9 +1661,29 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                           </div>
 
                           {/* Username */}
-                          <span className="truncate font-sans font-bold text-xs text-white max-w-[110px]">
+                          <span className={`truncate font-sans font-bold text-xs max-w-[105px] ${
+                            subTier === 'ultra'
+                              ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-rose-300 to-amber-200 drop-shadow-[0_0_8px_rgba(168,85,247,0.7)] font-black'
+                              : subTier === 'premium'
+                              ? 'text-amber-300 drop-shadow-[0_0_6px_rgba(245,158,11,0.7)] font-black'
+                              : isSelf
+                              ? 'text-cyan-300'
+                              : 'text-white'
+                          }`}>
                             {player.username}
                           </span>
+
+                          {/* VIP / Ultra Badges */}
+                          {subTier === 'ultra' && (
+                            <span className="text-[9px] px-1 py-0.2 rounded bg-purple-950/90 border border-purple-400/80 text-purple-300 font-mono font-black shadow-[0_0_8px_rgba(168,85,247,0.5)] shrink-0 flex items-center gap-0.5" title="Ultra Overlord Pass">
+                              👑
+                            </span>
+                          )}
+                          {subTier === 'premium' && (
+                            <span className="text-[9px] px-1 py-0.2 rounded bg-amber-950/90 border border-amber-400/80 text-amber-300 font-mono font-black shadow-[0_0_8px_rgba(245,158,11,0.4)] shrink-0 flex items-center gap-0.5" title="Premium Sovereign Pass">
+                              ⚜️
+                            </span>
+                          )}
 
                           {isSelf && (
                             <span className="text-[8px] font-mono font-black text-cyan-300 bg-cyan-950/60 border border-cyan-500/40 px-1.5 py-0.2 rounded shrink-0">
@@ -1669,30 +1725,64 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             {/* Pinned My Rank Row (ONLY if viewing own league AND player is not in visible top 20 list) */}
             {viewingLeague === (profile.pvpLeague || 'Bronze') && !leaderboard.some(p => p.walletAddress === profile.solanaAddress) && (
               <div className="pt-2 border-t border-cyan-500/30">
-                <div className="flex items-center justify-between p-2 px-3 rounded-xl border bg-cyan-950/40 border-cyan-500/50 text-xs text-cyan-300 font-bold shadow-[0_0_15px_rgba(6,182,212,0.15)]">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="w-6 text-center font-bold font-mono text-xs text-cyan-300">
-                      #{myOwnLeagueRank}
-                    </span>
-                    <div className="w-6 h-6 rounded-full bg-black/50 border border-cyan-400/50 overflow-hidden shrink-0 flex items-center justify-center">
-                      {profile.avatarUrl ? (
-                        <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                      ) : (
-                        <User className="w-3.5 h-3.5 text-cyan-300" />
-                      )}
+                {(() => {
+                  const isMySubActive = profile.subscriptionExpiresAt && Number(profile.subscriptionExpiresAt) > Date.now();
+                  const mySubTier = isMySubActive ? (profile.subscriptionTier || 'free') : 'free';
+                  return (
+                    <div className={`flex items-center justify-between p-2 px-3 rounded-xl border text-xs font-bold transition-all ${
+                      mySubTier === 'ultra'
+                        ? 'bg-gradient-to-r from-purple-950/40 via-cyan-950/40 to-purple-950/40 border-purple-500/70 text-cyan-300 shadow-[0_0_15px_rgba(168,85,247,0.3)]'
+                        : mySubTier === 'premium'
+                        ? 'bg-gradient-to-r from-amber-950/40 via-cyan-950/40 to-amber-950/40 border-amber-500/70 text-cyan-300 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
+                        : 'bg-cyan-950/40 border-cyan-500/50 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
+                    }`}>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="w-6 text-center font-bold font-mono text-xs text-cyan-300">
+                          #{myOwnLeagueRank}
+                        </span>
+                        <div className={`w-6 h-6 rounded-full overflow-hidden shrink-0 flex items-center justify-center border ${
+                          mySubTier === 'ultra'
+                            ? 'border-purple-400 ring-1 ring-purple-400/60 shadow-[0_0_8px_rgba(168,85,247,0.6)]'
+                            : mySubTier === 'premium'
+                            ? 'border-amber-400 ring-1 ring-amber-400/60 shadow-[0_0_8px_rgba(245,158,11,0.5)]'
+                            : 'border-cyan-400/50 bg-black/50'
+                        }`}>
+                          {profile.avatarUrl ? (
+                            <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                          ) : (
+                            <User className="w-3.5 h-3.5 text-cyan-300" />
+                          )}
+                        </div>
+                        <span className={`truncate font-sans font-bold text-xs max-w-[105px] ${
+                          mySubTier === 'ultra'
+                            ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-rose-300 to-amber-200 drop-shadow-[0_0_8px_rgba(168,85,247,0.7)] font-black'
+                            : mySubTier === 'premium'
+                            ? 'text-amber-300 drop-shadow-[0_0_6px_rgba(245,158,11,0.7)] font-black'
+                            : 'text-white'
+                        }`}>
+                          {profile.username || 'You'}
+                        </span>
+                        {mySubTier === 'ultra' && (
+                          <span className="text-[9px] px-1 py-0.2 rounded bg-purple-950/90 border border-purple-400/80 text-purple-300 font-mono font-black shadow-[0_0_8px_rgba(168,85,247,0.5)] shrink-0" title="Ultra Overlord Pass">
+                            👑
+                          </span>
+                        )}
+                        {mySubTier === 'premium' && (
+                          <span className="text-[9px] px-1 py-0.2 rounded bg-amber-950/90 border border-amber-400/80 text-amber-300 font-mono font-black shadow-[0_0_8px_rgba(245,158,11,0.4)] shrink-0" title="Premium Sovereign Pass">
+                            ⚜️
+                          </span>
+                        )}
+                        <span className="text-[8px] font-mono font-black text-cyan-300 bg-cyan-950/80 border border-cyan-500/60 px-1.5 py-0.2 rounded shrink-0">
+                          YOU
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 font-mono font-bold text-xs text-amber-300 shrink-0">
+                        <span>{profile.pvpLP || 0}</span>
+                        <img src="/icons/crown.png" alt="Crown" className="w-4 h-4 object-contain brightness-110 contrast-125" />
+                      </div>
                     </div>
-                    <span className="truncate font-sans font-bold text-xs text-white max-w-[110px]">
-                      {profile.username || 'You'}
-                    </span>
-                    <span className="text-[8px] font-mono font-black text-cyan-300 bg-cyan-950/80 border border-cyan-500/60 px-1.5 py-0.2 rounded shrink-0">
-                      YOU
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 font-mono font-bold text-xs text-amber-300 shrink-0">
-                    <span>{profile.pvpLP || 0}</span>
-                    <img src="/icons/crown.png" alt="Crown" className="w-4 h-4 object-contain brightness-110 contrast-125" />
-                  </div>
-                </div>
+                  );
+                })()}
               </div>
             )}
           </div>
