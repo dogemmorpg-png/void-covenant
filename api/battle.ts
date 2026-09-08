@@ -93,7 +93,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if ((profile.pveEnergy || 0) < stage.energyCost) {
           return res.status(400).json({ error: 'Not enough PvE energy' });
         }
+        const wasMax = (profile.pveEnergy || 0) >= (profile.pveEnergyMax || 5);
         profile.pveEnergy -= stage.energyCost;
+        if (wasMax) profile.lastPveEnergyRefill = Date.now();
       } else if (battleType === 'pvp') {
         if (!profile.activePvpOpponent) {
           return res.status(400).json({ error: 'No active PvP opponent found. Please search first.' });

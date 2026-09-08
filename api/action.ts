@@ -768,9 +768,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if ((profile.pveEnergy || 0) < stage.energyCost) {
         return res.status(400).json({ error: 'Not enough PvE energy' });
       }
+      const wasMax = (profile.pveEnergy || 0) >= (profile.pveEnergyMax || 5);
       profile.pveEnergy -= stage.energyCost;
+      if (wasMax) profile.lastPveEnergyRefill = Date.now();
 
+      const subTier = getActiveSubscriptionTier ? getActiveSubscriptionTier(profile) : 'free';
       let goldMultiplier = 1;
+      if (subTier === 'ultra') {
+        goldMultiplier += 0.50;
+      } else if (subTier === 'premium') {
+        goldMultiplier += 0.25;
+      }
+
       let expMultiplier = 1;
       if (profile.equipped && profile.equipment) {
         Object.values(profile.equipped).forEach(eqId => {

@@ -5,6 +5,7 @@ import { generateCampaignStage } from '../data/cards';
 import { CampaignStage } from '../types';
 import { Skull, Swords, Award, ChevronLeft, ChevronRight, Crown, Star, FastForward, Plus, X } from 'lucide-react';
 import { assetPreloader } from '../utils/assetPreloader';
+import { getActiveSubscriptionTier, getTierLimits } from '../utils/energyHelper';
 
 interface CampaignViewProps {
   onStartBattle: (stage: CampaignStage) => void;
@@ -17,6 +18,11 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
   const [isBuyEnergyModalOpen, setIsBuyEnergyModalOpen] = useState(false);
   const [isPurchasingEnergy, setIsPurchasingEnergy] = useState(false);
   
+  const subTier = getActiveSubscriptionTier(profile);
+  const tierLimits = getTierLimits(subTier);
+  const pveEnergyMax = profile.pveEnergyMax || tierLimits.pveMax;
+  const pveRegenInterval = tierLimits.pveRegenInterval;
+
   const maxFloor = profile.pveProgress || 1;
   const [viewingFloor, setViewingFloor] = useState<number>(maxFloor);
   
@@ -38,9 +44,12 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
 
   const [timeUntilRegen, setTimeUntilRegen] = useState<string>('');
   useEffect(() => {
-    const pveRegenTime = 1200000;
+    const limits = getTierLimits(getActiveSubscriptionTier(profile));
+    const pveRegenTime = limits.pveRegenInterval;
+    const maxEnergy = limits.pveMax;
+
     const updateTimer = () => {
-      if ((profile.pveEnergy || 0) >= (profile.pveEnergyMax || 10)) {
+      if ((profile.pveEnergy || 0) >= maxEnergy) {
         setTimeUntilRegen('');
         return;
       }
@@ -54,7 +63,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [profile.pveEnergy, profile.pveEnergyMax, profile.lastPveEnergyRefill, profile.lastEnergyRefill]);
+  }, [profile.pveEnergy, profile.pveEnergyMax, profile.lastPveEnergyRefill, profile.lastEnergyRefill, profile.subscriptionTier, profile.subscriptionExpiresAt]);
 
   const isBoss = viewingFloor % 10 === 0;
   const stageStars = profile.campaignStars?.[selectedStage.id.toString()] || 0;
@@ -144,7 +153,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                   {profile.pveEnergy || 0}
                 </span>
                 <span className="font-mono text-xs font-bold text-emerald-500/70">
-                  / {profile.pveEnergyMax || 10}
+                  / {pveEnergyMax}
                 </span>
               </div>
               <span className="font-mono text-[11px] text-emerald-300/90 font-bold border-l border-emerald-500/30 pl-2 pr-1">
@@ -365,7 +374,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                 <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Current Energy</span>
                 <span className="font-mono text-base font-black text-emerald-400 flex items-center gap-1 mt-0.5">
                   <img src="/icons/icon_energy.webp" alt="Energy" className="w-4 h-4 object-contain" />
-                  {profile.pveEnergy || 0}/{profile.pveEnergyMax || 10}
+                  {profile.pveEnergy || 0}/{pveEnergyMax}
                 </span>
                 <span className="text-[7.5px] text-gray-500 font-mono mt-0.5">
                   {timeUntilRegen ? `+1 in ${timeUntilRegen}` : 'Full'}
@@ -375,7 +384,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
               <div className="flex flex-col items-center justify-center border-r border-white/10 px-1 text-center">
                 <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Passive Regen</span>
                 <span className="font-mono text-base font-black text-teal-300 flex items-center gap-1 mt-0.5">
-                  +1 / 20m
+                  +1 / {Math.round(pveRegenInterval / 60000)}m
                 </span>
                 <span className="text-[7.5px] text-gray-500 font-mono mt-0.5">Automatic</span>
               </div>
