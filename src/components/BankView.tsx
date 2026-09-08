@@ -216,7 +216,7 @@ export const BankView: React.FC = () => {
           BLOOD SOVEREIGNS
         </h2>
         <p className="text-xs sm:text-sm text-gray-400 font-sans max-w-xl mx-auto leading-relaxed">
-          The sovereign hard currency of Void Covenant. Earned by elite lords in high PvP Leagues and convertible to <span className="text-amber-300 font-bold">real USDT</span> at a fixed rate of <span className="text-emerald-400 font-mono font-bold">100 SOV = 1.00 USDT</span>.
+          Elite reward currency of the Void. Earn Sovereigns in PvP battles and seasonal league rankings, and withdraw them as USDT at a fixed rate of <span className="text-amber-300 font-bold">100 SOV = $1.00</span>.
         </p>
       </div>
 
@@ -254,7 +254,7 @@ export const BankView: React.FC = () => {
             </div>
 
             {/* Quick Specs */}
-            <div className="grid grid-cols-3 gap-2 mt-4 text-center">
+            <div className="grid grid-cols-2 gap-3 mt-4 text-center">
               <div className="bg-black/30 p-2.5 rounded-xl border border-white/5">
                 <span className="text-[9px] font-mono text-gray-400 uppercase block">Min. Payout</span>
                 <span className="text-xs font-mono font-bold text-amber-300">{minWithdrawal} SOV (${minUsdt})</span>
@@ -262,10 +262,6 @@ export const BankView: React.FC = () => {
               <div className="bg-black/30 p-2.5 rounded-xl border border-white/5">
                 <span className="text-[9px] font-mono text-gray-400 uppercase block">Exchange Rate</span>
                 <span className="text-xs font-mono font-bold text-cyan-300">1 SOV = $0.01</span>
-              </div>
-              <div className="bg-black/30 p-2.5 rounded-xl border border-white/5">
-                <span className="text-[9px] font-mono text-gray-400 uppercase block">Network</span>
-                <span className="text-xs font-mono font-bold text-emerald-300">USDT (Solana)</span>
               </div>
             </div>
           </div>
@@ -277,15 +273,6 @@ export const BankView: React.FC = () => {
                 <ArrowUpRight className="w-5 h-5 text-amber-400" />
                 WITHDRAWAL TERMINAL
               </h3>
-              <span className={`text-[10px] font-mono font-black px-2.5 py-0.5 rounded-full uppercase border ${
-                subTier === 'ultra'
-                  ? 'bg-purple-950/70 border-purple-500/60 text-purple-300 shadow-[0_0_8px_rgba(168,85,247,0.3)]'
-                  : subTier === 'premium'
-                  ? 'bg-amber-950/70 border-amber-500/60 text-amber-300'
-                  : 'bg-black/50 border-white/10 text-gray-400'
-              }`}>
-                {subTier.toUpperCase()} LIMIT: {minWithdrawal} SOV
-              </span>
             </div>
 
             <form onSubmit={handleSubmitWithdrawal} className="space-y-4">
@@ -354,7 +341,7 @@ export const BankView: React.FC = () => {
                     type="text"
                     value={targetAddress}
                     onChange={(e) => setTargetAddress(e.target.value)}
-                    placeholder="Solana / EVM Wallet Address"
+                    placeholder="Destination Wallet Address"
                     className="w-full bg-black/60 border border-white/15 focus:border-amber-500 rounded-xl px-4 py-3 text-white font-mono text-xs outline-none transition-colors"
                   />
                   <Wallet className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
