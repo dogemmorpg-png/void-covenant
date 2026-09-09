@@ -889,7 +889,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const goldReward = applyMultiplierWithMinimum(stage.goldReward, goldMultiplier);
       const dustReward = stage.dustReward;
       const shardsReward = stage.shardsReward || 0;
-      const expReward = applyMultiplierWithMinimum(50, expMultiplier);
+      const baseExp = floorNum * 20 + 40;
+      const expReward = applyMultiplierWithMinimum(baseExp, expMultiplier);
 
       profile.gold = (profile.gold || 0) + goldReward;
       profile.dust = (profile.dust || 0) + dustReward;

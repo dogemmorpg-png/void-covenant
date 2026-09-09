@@ -221,9 +221,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (result === 'win') {
         const baseGold = 50;
         const baseDust = 25;
+        const baseExp = 100;
         goldReward = applyMultiplierWithMinimum(baseGold, goldMultiplier);
         dustReward = baseDust;
-        expReward = 0; // EXP is strictly exclusive to PvE Campaign
+        expReward = applyMultiplierWithMinimum(baseExp, expMultiplier);
 
         const gain = Math.round(32 * (1 - expected));
         attackerRatingChange = Math.max(10, Math.min(32, gain));

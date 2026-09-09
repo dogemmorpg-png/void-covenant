@@ -120,7 +120,10 @@ export const HeroInventoryView: React.FC<HeroInventoryViewProps> = ({ onNavigate
   const activeStance = stanceIcons[profile.activeStance || 'void_strike'] || stanceIcons.void_strike;
 
   // EXP & Level Calculations
-  const getRequiredExpForLevel = (level: number) => Math.floor(100 * Math.pow(1.2, level - 1));
+  const getRequiredExpForLevel = (level: number) => {
+    const lvl = Math.max(1, level);
+    return Math.floor(200 * lvl + 15 * Math.pow(lvl, 1.5));
+  };
   const reqExp = getRequiredExpForLevel(profile.level);
   const expPercent = Math.min(100, Math.floor((profile.exp / reqExp) * 100));
 

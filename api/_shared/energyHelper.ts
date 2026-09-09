@@ -80,7 +80,8 @@ export function calculateEnergy(profile: PlayerProfile): PlayerProfile {
 }
 
 export function getRequiredExpForLevel(level: number): number {
-  return Math.floor(100 * Math.pow(1.2, Math.max(1, level) - 1));
+  const lvl = Math.max(1, level);
+  return Math.floor(200 * lvl + 15 * Math.pow(lvl, 1.5));
 }
 
 export function processExpGain(profile: PlayerProfile, expGained: number): { profile: PlayerProfile; leveledUp: boolean } {

@@ -481,7 +481,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getRequiredExpForLevel = (level: number) => {
-    return Math.floor(100 * Math.pow(1.2, level - 1));
+    const lvl = Math.max(1, level);
+    return Math.floor(200 * lvl + 15 * Math.pow(lvl, 1.5));
   };
 
   const addExp = (amount: number) => {
@@ -1390,7 +1391,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const baseDust = 25;
           rewards.gold = applyMult(baseGold, goldMultiplier);
           rewards.dust = baseDust;
-          rewards.exp = 0;
+          rewards.exp = applyMult(100, expMultiplier);
           updated.pvpLP = (updated.pvpLP || 0) + 20;
 
           // Check daily sovereigns quota
@@ -1412,9 +1413,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const floorStep = Math.floor(floorNum / 5);
           const baseGold = 50 + (floorStep * 25);
           const baseDust = 25 + (floorStep * 10);
+          const baseExp = floorNum * 20 + 40;
           rewards.gold = applyMult(baseGold, goldMultiplier);
           rewards.dust = baseDust;
-          rewards.exp = applyMult(50, expMultiplier);
+          rewards.exp = applyMult(baseExp, expMultiplier);
 
           if (floorNum >= (updated.pveProgress || 1)) {
             updated.pveProgress = floorNum + 1;
@@ -1431,7 +1433,22 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         updated.gold = (updated.gold || 0) + rewards.gold;
         updated.dust = (updated.dust || 0) + rewards.dust;
-        updated.exp = (updated.exp || 0) + rewards.exp;
+        if (rewards.exp > 0 && updated.level < 100) {
+          let curExp = (updated.exp || 0) + rewards.exp;
+          let curLevel = updated.level || 1;
+          let curHealth = updated.heroMaxHealth || 30;
+          let req = getRequiredExpForLevel(curLevel);
+          while (curExp >= req && curLevel < 100) {
+            curExp -= req;
+            curLevel++;
+            curHealth += 2;
+            req = getRequiredExpForLevel(curLevel);
+          }
+          if (curLevel >= 100) curExp = 0;
+          updated.exp = curExp;
+          updated.level = curLevel;
+          updated.heroMaxHealth = curHealth;
+        }
       } else {
         rewards.gold = applyMult(20, goldMultiplier);
         rewards.dust = 0;

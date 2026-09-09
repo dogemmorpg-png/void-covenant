@@ -1083,7 +1083,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                         <span className="text-[8px] font-mono text-emerald-400 font-bold tracking-widest bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">WIN</span>
                       </div>
                       
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         {/* Gold */}
                         <div className="bg-black/50 border border-amber-500/20 p-2 rounded-xl text-center flex flex-col items-center justify-center">
                           <span className="text-amber-400 font-display font-bold text-sm block flex items-center gap-1 text-shadow-gold">
@@ -1102,7 +1102,16 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                           <span className="text-[8px] text-cyan-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">Dust</span>
                         </div>
 
-                        {/* Crowns (Clean Card without bright yellow box/glow) */}
+                        {/* EXP */}
+                        <div className="bg-black/50 border border-emerald-500/20 p-2 rounded-xl text-center flex flex-col items-center justify-center">
+                          <span className="text-emerald-400 font-display font-bold text-sm block flex items-center gap-1 text-shadow-emerald">
+                            +100
+                            <img src="/icons/icon_exp.webp" alt="EXP" className="w-4 h-4 object-contain drop-shadow-[0_0_4px_rgba(16,185,129,0.5)]" />
+                          </span>
+                          <span className="text-[8px] text-emerald-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">Hero EXP</span>
+                        </div>
+
+                        {/* Crowns */}
                         <div className="bg-black/50 border border-amber-500/20 p-2 rounded-xl text-center flex flex-col items-center justify-center">
                           <span className="text-amber-400 font-display font-bold text-sm block flex items-center gap-1">
                             +20

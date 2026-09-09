@@ -434,6 +434,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const initialBaseGold = stage.goldReward || (battleType === 'pvp' ? 50 : 50);
   const [earnedGold, setEarnedGold] = useState<number>(() => applyRewardMultiplier(initialBaseGold, battleGoldMultiplier));
   const [earnedDust, setEarnedDust] = useState<number>(() => stage.dustReward || (battleType === 'pvp' ? 25 : 25));
+  const initialBaseExp = battleType === 'pvp' ? 100 : ((stage.id || 1) * 20 + 40);
+  const [earnedExp, setEarnedExp] = useState<number>(() => initialBaseExp);
 
   // Consolation gold on defeat (base 20 + bonuses from subscription & gear)
   const lossBaseGold = 20;
@@ -1030,6 +1032,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       } else if (res.dustReward !== undefined) {
         setEarnedDust(res.dustReward);
       }
+      if (res.rewards?.exp !== undefined) {
+        setEarnedExp(res.rewards.exp);
+      } else if (res.expReward !== undefined) {
+        setEarnedExp(res.expReward);
+      }
     } else {
       console.error('Failed to save battle result:', res.message);
       toast(res.message, 'error');
@@ -1049,6 +1056,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         setEarnedDust(res.rewards.dust);
       } else if (res.dustReward !== undefined) {
         setEarnedDust(res.dustReward);
+      }
+      if (res.rewards?.exp !== undefined) {
+        setEarnedExp(res.rewards.exp);
+      } else if (res.expReward !== undefined) {
+        setEarnedExp(res.expReward);
       }
       if (res.sovereignsReward !== undefined) {
         setEarnedSovereigns(res.sovereignsReward);
@@ -2745,7 +2757,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             {/* Rewards Card */}
             <div className="bg-black/60 p-4 rounded-2xl border border-amber-500/25 space-y-3 relative z-10">
               <span className="text-[10px] font-display text-amber-400/90 tracking-widest block uppercase font-bold">REWARD OBTAINED</span>
-              <div className={`grid gap-2.5 ${battleType === 'pvp' && earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
+              <div className={`grid gap-2.5 ${battleType === 'pvp' ? (earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4') : (stage.shardsReward > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3')}`}>
                 {/* Gold */}
                 <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
                   <span className="text-amber-300 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
@@ -2764,16 +2776,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Dust</span>
                 </div>
 
-                {/* EXP (Strictly PvE Campaign Exclusive) */}
-                {battleType === 'campaign' && (
-                  <div className="bg-gradient-to-b from-emerald-950/40 via-black to-black border border-emerald-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
-                    <span className="text-emerald-300 font-display font-black text-base flex items-center gap-1 text-shadow-emerald">
-                      +50
-                      <img src="/icons/icon_exp.webp" alt="EXP" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
-                    </span>
-                    <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider mt-1 font-bold">EXP</span>
-                  </div>
-                )}
+                {/* EXP (Both PvE and PvP) */}
+                <div className="bg-gradient-to-b from-emerald-950/40 via-black to-black border border-emerald-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                  <span className="text-emerald-300 font-display font-black text-base flex items-center gap-1 text-shadow-emerald">
+                    +{earnedExp}
+                    <img src="/icons/icon_exp.webp" alt="EXP" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
+                  </span>
+                  <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider mt-1 font-bold">EXP</span>
+                </div>
                 
                 {/* Crowns (PvP Only) */}
                 {battleType === 'pvp' && (
