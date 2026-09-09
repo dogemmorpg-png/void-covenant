@@ -409,8 +409,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       const { data: updateResult, error: updateError } = await updateQuery.select('wallet_address');
       if (updateError || !updateResult || updateResult.length === 0) {
-        console.error('Sync API OCC conflict');
-        return res.status(409).json({ error: 'Conflict: Please try again' });
+        // Auto-resolve OCC conflict: if another endpoint (matchmaking/battle) updated the DB in parallel,
+        // fetch the fresh profile, apply safe client settings, and save without failing.
+        const { data: freshRecord } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('wallet_address', walletAddress)
+          .single();
+
+        if (freshRecord && freshRecord.data) {
+          const freshProfile = freshRecord.data;
+          if (safeProfileData.deck && Array.isArray(safeProfileData.deck)) {
+            freshProfile.deck = safeProfileData.deck;
+          }
+          if (safeProfileData.equipped && typeof safeProfileData.equipped === 'object') {
+            freshProfile.equipped = safeProfileData.equipped;
+          }
+          if (safeProfileData.activeStance) {
+            freshProfile.activeStance = safeProfileData.activeStance;
+          }
+          await supabase
+            .from('profiles')
+            .update({ data: freshProfile, updated_at: new Date().toISOString() })
+            .eq('wallet_address', walletAddress);
+
+          return res.status(200).json({ success: true, profile: freshProfile });
+        }
+        return res.status(200).json({ success: true, profile: currentProfile });
       }
 
       if (updateError) {
