@@ -124,3 +124,158 @@ body {
   perspective: 1000px;
   will-change: transform;
 }
+
+/* ==========================================================================
+   HARDWARE-ACCELERATED BATTLE ANIMATIONS (GPU Compositor Thread)
+   Zero JS computation per frame, eliminating all micro-stutters and jank.
+   ========================================================================== */
+
+/* 1. Attacking Card Lunges (Dynamic Displacement via CSS custom variables) */
+@keyframes battle-strike-player {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  18% {
+    transform: translate3d(calc(var(--strike-x, 0px) * -0.06), 8px, 0) scale(1.06) rotate(1deg);
+  }
+  46% {
+    transform: translate3d(var(--strike-x, 0px), var(--strike-y, -65px), 0) scale(1.15) rotate(calc(var(--strike-rot, -3deg)));
+  }
+  68% {
+    transform: translate3d(calc(var(--strike-x, 0px) * 0.9), calc(var(--strike-y, -65px) * 0.88), 0) scale(1.1) rotate(calc(var(--strike-rot, -3deg) * 0.6));
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes battle-strike-enemy {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  18% {
+    transform: translate3d(calc(var(--strike-x, 0px) * -0.06), -8px, 0) scale(1.06) rotate(-1deg);
+  }
+  46% {
+    transform: translate3d(var(--strike-x, 0px), var(--strike-y, 65px), 0) scale(1.15) rotate(calc(var(--strike-rot, 3deg)));
+  }
+  68% {
+    transform: translate3d(calc(var(--strike-x, 0px) * 0.9), calc(var(--strike-y, 65px) * 0.88), 0) scale(1.1) rotate(calc(var(--strike-rot, 3deg) * 0.6));
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+}
+
+.anim-card-strike-player {
+  animation: battle-strike-player var(--anim-duration, 0.72s) cubic-bezier(0.25, 0.1, 0.25, 1) both;
+  will-change: transform;
+  z-index: 40 !important;
+}
+
+.anim-card-strike-enemy {
+  animation: battle-strike-enemy var(--anim-duration, 0.72s) cubic-bezier(0.25, 0.1, 0.25, 1) both;
+  will-change: transform;
+  z-index: 40 !important;
+}
+
+/* 2. Defending Card Recoil & Impact Reaction */
+@keyframes battle-card-recoil {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(-3px, 6px, 0) scale(0.93) rotate(2deg);
+  }
+  65% {
+    transform: translate3d(1px, -2px, 0) scale(1.02) rotate(-1deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+}
+
+.anim-card-recoil {
+  animation: battle-card-recoil var(--recoil-duration, 0.32s) cubic-bezier(0.2, 0.8, 0.25, 1) both;
+  will-change: transform;
+}
+
+/* 3. Hero Portrait Hit Recoil */
+@keyframes battle-hero-recoil {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(0, 7px, 0) scale(0.92) rotate(2.5deg);
+  }
+  65% {
+    transform: translate3d(0, -2px, 0) scale(1.03) rotate(-1deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+}
+
+.anim-hero-recoil {
+  animation: battle-hero-recoil var(--recoil-duration, 0.32s) cubic-bezier(0.2, 0.8, 0.25, 1) both;
+  will-change: transform;
+}
+
+/* 4. Hero Portrait Dodge Evasion */
+@keyframes battle-hero-dodge {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  30% {
+    transform: translate3d(-16px, -2px, 0) scale(1.08) rotate(-3deg);
+  }
+  70% {
+    transform: translate3d(4px, 1px, 0) scale(1.02) rotate(1deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+}
+
+.anim-hero-dodge {
+  animation: battle-hero-dodge var(--dodge-duration, 0.36s) cubic-bezier(0.15, 0.9, 0.25, 1) both;
+  will-change: transform;
+}
+
+/* 5. Hero Casting Concentration */
+@keyframes battle-hero-cast {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  35% {
+    transform: translate3d(0, -8px, 0) scale(1.12);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0) scale(1.07);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.anim-hero-cast {
+  animation: battle-hero-cast var(--cast-duration, 0.6s) ease-in-out both;
+  will-change: transform;
+}
+
+/* 6. Plague Channel Spore Concentration */
+@keyframes battle-plague-channel {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 28px rgba(16, 185, 129, 0.9);
+  }
+}
+
+.anim-plague-channel {
+  animation: battle-plague-channel 0.7s ease-in-out infinite;
+  will-change: transform, box-shadow;
+}

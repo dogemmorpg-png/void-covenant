@@ -1574,29 +1574,15 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             const isEnemyCasting = currentStep?.type === 'hero_skill' && currentStep.side === 'enemy';
             const isEnemyHit = defenderAction?.side === 'enemy' && defenderAction?.slot === -1 && defenderAction?.type === 'hit';
             const isEnemyDodge = defenderAction?.side === 'enemy' && defenderAction?.slot === -1 && defenderAction?.type === 'dodge';
+            const heroAnimClass = isEnemyDodge ? 'anim-hero-dodge' : isEnemyHit ? 'anim-hero-recoil' : isEnemyCasting ? 'anim-hero-cast' : '';
             return (
-              <motion.div 
-                animate={{
-                  scale: isEnemyDodge ? [1, 1.08, 1] : (isEnemyHit ? [1, 0.93, 1.03, 1] : (isEnemyCasting ? [1, 1.12, 1.07, 1] : 1)),
-                  x: isEnemyDodge ? [0, -14, 4, 0] : 0,
-                  y: isEnemyHit ? [0, -6, 2, 0] : (isEnemyCasting ? [0, -8, -4, 0] : 0),
-                  rotate: isEnemyDodge ? [0, -3, 2, 0] : (isEnemyHit ? [0, -2.5, 1, 0] : 0),
-                }}
-                transition={{
-                  scale: (isEnemyHit || isEnemyDodge)
-                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
-                    : (isEnemyCasting ? { times: [0, 0.35, 0.7, 1], duration: Math.max(0.3, 0.6 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
-                  x: isEnemyDodge
-                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.35 / effectiveSpeed), ease: "easeOut" }
-                    : { duration: 0.2 },
-                  y: isEnemyHit 
-                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
-                    : (isEnemyCasting ? { times: [0, 0.35, 0.7, 1], duration: Math.max(0.3, 0.6 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
-                  rotate: (isEnemyHit || isEnemyDodge)
-                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
-                    : { duration: 0.2 }
-                }}
-                className={`absolute top-4 left-4 flex items-center gap-3 z-30 bg-[#100b08]/95 p-2 rounded-2xl border transform-gpu will-change-transform ${
+              <div 
+                style={{
+                  '--recoil-duration': `${Math.max(0.2, 0.32 / effectiveSpeed)}s`,
+                  '--dodge-duration': `${Math.max(0.2, 0.35 / effectiveSpeed)}s`,
+                  '--cast-duration': `${Math.max(0.3, 0.6 / effectiveSpeed)}s`,
+                } as React.CSSProperties}
+                className={`absolute top-4 left-4 flex items-center gap-3 z-30 bg-[#100b08]/95 p-2 rounded-2xl border transform-gpu will-change-transform ${heroAnimClass} ${
                   isEnemyDodge
                     ? 'border-cyan-400 shadow-[0_0_35px_rgba(6,182,212,0.95)]'
                     : isEnemyHit 
@@ -1637,7 +1623,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     </span>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             );
           })()}
 
@@ -1646,29 +1632,15 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             const isPlayerCasting = currentStep?.type === 'hero_skill' && (!currentStep.side || currentStep.side === 'player');
             const isPlayerHit = defenderAction?.side === 'player' && defenderAction?.slot === -1 && defenderAction?.type === 'hit';
             const isPlayerDodge = defenderAction?.side === 'player' && defenderAction?.slot === -1 && defenderAction?.type === 'dodge';
+            const heroAnimClass = isPlayerDodge ? 'anim-hero-dodge' : isPlayerHit ? 'anim-hero-recoil' : isPlayerCasting ? 'anim-hero-cast' : '';
             return (
-              <motion.div 
-                animate={{
-                  scale: isPlayerDodge ? [1, 1.08, 1] : (isPlayerHit ? [1, 0.93, 1.03, 1] : (isPlayerCasting ? [1, 1.12, 1.07, 1] : 1)),
-                  x: isPlayerDodge ? [0, -14, 4, 0] : 0,
-                  y: isPlayerHit ? [0, 6, -2, 0] : (isPlayerCasting ? [0, -8, -4, 0] : 0),
-                  rotate: isPlayerDodge ? [0, 3, -2, 0] : (isPlayerHit ? [0, 2.5, -1, 0] : 0),
-                }}
-                transition={{
-                  scale: (isPlayerHit || isPlayerDodge)
-                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
-                    : (isPlayerCasting ? { times: [0, 0.35, 0.7, 1], duration: Math.max(0.3, 0.6 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
-                  x: isPlayerDodge
-                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.35 / effectiveSpeed), ease: "easeOut" }
-                    : { duration: 0.2 },
-                  y: isPlayerHit 
-                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
-                    : (isPlayerCasting ? { times: [0, 0.35, 0.7, 1], duration: Math.max(0.3, 0.6 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
-                  rotate: (isPlayerHit || isPlayerDodge)
-                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
-                    : { duration: 0.2 }
-                }}
-                className={`absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-[#100b08]/95 p-2 rounded-2xl border transform-gpu will-change-transform ${
+              <div 
+                style={{
+                  '--recoil-duration': `${Math.max(0.2, 0.32 / effectiveSpeed)}s`,
+                  '--dodge-duration': `${Math.max(0.2, 0.35 / effectiveSpeed)}s`,
+                  '--cast-duration': `${Math.max(0.3, 0.6 / effectiveSpeed)}s`,
+                } as React.CSSProperties}
+                className={`absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-[#100b08]/95 p-2 rounded-2xl border transform-gpu will-change-transform ${heroAnimClass} ${
                   isPlayerDodge
                     ? 'border-cyan-400 shadow-[0_0_35px_rgba(6,182,212,0.95)]'
                     : isPlayerHit 
@@ -1709,7 +1681,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     </span>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             );
           })()}
 
@@ -1852,29 +1824,33 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       {card ? (
                         <motion.div
                           key={`enemy-card-${card.id}-${idx}`}
-                          onMouseEnter={() => card && setHoveredCard(card)}
-                          onMouseLeave={() => setHoveredCard(null)}
-                          initial={{ opacity: 0, scale: 0.75, y: -20 }}
-                          animate={{
-                            opacity: isDeath ? 0 : 1,
-                            scale: isActing 
-                              ? [1, 1.06, 1.15, 1.1, 1] 
-                              : (isHit ? [1, 0.94, 1.02, 1] : (isDeath ? 0.35 : (isHeal ? [1, 1.08, 1] : (isSummoning ? [0.75, 1.05, 1] : (isPlagueCasting ? [1, 1.08, 1.04, 1] : 1))))),
-                            y: isActing ? [0, -8, strikeY, strikeY * 0.88, 0] : (isHit ? [0, -6, 2, 0] : 0),
-                            x: isActing ? [0, strikeX * -0.06, strikeX, strikeX * 0.9, 0] : (isHit ? [0, -3, 1, 0] : 0),
-                            rotate: isActing ? (strikeX > 0 ? [0, -2, 5, 2, 0] : strikeX < 0 ? [0, 2, -5, -2, 0] : [0, -1, 3, 1, 0]) : (isHit ? [0, -2, 1, 0] : (isDeath ? 12 : 0))
-                          }}
-                          exit={{ opacity: 0, scale: 0.7, transition: { duration: Math.max(0.2, 0.35 / effectiveSpeed) } }}
-                          transition={{
-                            y: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : { duration: 0.2 }),
-                            x: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : { duration: 0.2 }),
-                            scale: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : (isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : (isSummoning ? { duration: 0.45, ease: "easeOut" } : { duration: 0.2 }))),
-                            rotate: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : { duration: 0.2 }),
-                            opacity: isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : { duration: 0.3 }
-                          }}
-                          style={{ borderColor: isHit ? '#ef4444' : (isPlagueCasting ? '#10b981' : (isPlagueTargeted ? '#84cc16' : (isActing ? '#f59e0b' : (isTargeted ? '#f43f5e' : getTierBorderColor(card.tier))))) }}
-                          className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none transform-gpu will-change-transform bg-[#151a21] text-white cursor-help ${borderGlowClass}`}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: isDeath ? 0 : 1, scale: isDeath ? 0.4 : 1 }}
+                          exit={{ opacity: 0, scale: 0.6, transition: { duration: Math.max(0.2, 0.35 / effectiveSpeed) } }}
+                          transition={{ duration: isDeath ? Math.max(0.2, 0.45 / effectiveSpeed) : 0.25 }}
+                          className="w-full h-full relative"
                         >
+                          <div
+                            onMouseEnter={() => card && setHoveredCard(card)}
+                            onMouseLeave={() => setHoveredCard(null)}
+                            style={{
+                              borderColor: isHit ? '#ef4444' : (isPlagueCasting ? '#10b981' : (isPlagueTargeted ? '#84cc16' : (isActing ? '#f59e0b' : (isTargeted ? '#f43f5e' : getTierBorderColor(card.tier))))),
+                              '--strike-x': `${strikeX}px`,
+                              '--strike-y': `${strikeY}px`,
+                              '--strike-rot': `${strikeX > 0 ? 5 : strikeX < 0 ? -5 : 2}deg`,
+                              '--anim-duration': `${Math.max(0.25, 0.72 / effectiveSpeed)}s`,
+                              '--recoil-duration': `${Math.max(0.18, 0.32 / effectiveSpeed)}s`,
+                            } as React.CSSProperties}
+                            className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none transform-gpu bg-[#151a21] text-white cursor-help ${borderGlowClass} ${
+                              isActing
+                                ? 'anim-card-strike-enemy'
+                                : isHit
+                                  ? 'anim-card-recoil'
+                                  : isPlagueCasting
+                                    ? 'anim-plague-channel'
+                                    : ''
+                            }`}
+                          >
                           {/* Card Background & Artwork inside wrapper for rounded overflow-hidden */}
                           <div className="absolute inset-0 rounded-xl overflow-hidden z-0 pointer-events-none">
                             <div className={`absolute inset-0 opacity-[0.06] bg-gradient-to-br ${getTierBgGradient(card.tier)}`} />
@@ -1957,7 +1933,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                           {/* Persistent Barrier Dome */}
                           {Boolean(card.barrier ?? card.ward) && <BarrierDome />}
-                        </motion.div>
+                        </div>
+                      </motion.div>
                       ) : (
                         // Empty Recessed Slot
                         <div key={`empty-slot-${idx}`} className="w-full h-full rounded-xl border border-amber-950/20 bg-black/45 flex flex-col items-center justify-center relative shadow-[inset_0_4px_10px_rgba(0,0,0,0.8)] group hover:border-[#ebd09b]/15 transition-all duration-300">
@@ -2096,29 +2073,33 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       {card ? (
                         <motion.div
                           key={`player-card-${card.id}-${idx}`}
-                          onMouseEnter={() => card && setHoveredCard(card)}
-                          onMouseLeave={() => setHoveredCard(null)}
-                          initial={{ opacity: 0, scale: 0.75, y: 20 }}
-                          animate={{
-                            opacity: isDeath ? 0 : 1,
-                            scale: isActing 
-                              ? [1, 1.06, 1.15, 1.1, 1] 
-                              : (isHit ? [1, 0.94, 1.02, 1] : (isDeath ? 0.35 : (isHeal ? [1, 1.08, 1] : (isSummoning ? [0.75, 1.05, 1] : (isPlagueCasting ? [1, 1.08, 1.04, 1] : 1))))),
-                            y: isActing ? [0, 8, strikeY, strikeY * 0.88, 0] : (isHit ? [0, 6, -2, 0] : 0),
-                            x: isActing ? [0, strikeX * -0.06, strikeX, strikeX * 0.9, 0] : (isHit ? [0, -3, 1, 0] : 0),
-                            rotate: isActing ? (strikeX > 0 ? [0, 2, -5, -2, 0] : strikeX < 0 ? [0, -2, 5, 2, 0] : [0, 1, -3, -1, 0]) : (isHit ? [0, 2, -1, 0] : (isDeath ? 12 : 0))
-                          }}
-                          exit={{ opacity: 0, scale: 0.7, transition: { duration: Math.max(0.2, 0.35 / effectiveSpeed) } }}
-                          transition={{
-                            y: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : { duration: 0.2 }),
-                            x: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : { duration: 0.2 }),
-                            scale: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : (isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : (isSummoning ? { duration: 0.45, ease: "easeOut" } : { duration: 0.2 }))),
-                            rotate: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : { duration: 0.2 }),
-                            opacity: isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : { duration: 0.3 }
-                          }}
-                          style={{ borderColor: isHit ? '#ef4444' : (isPlagueCasting ? '#10b981' : (isPlagueTargeted ? '#84cc16' : (isActing ? '#f59e0b' : (isTargeted ? '#f43f5e' : getTierBorderColor(card.tier))))) }}
-                          className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none transform-gpu will-change-transform bg-[#151a21] text-white cursor-help ${borderGlowClass}`}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: isDeath ? 0 : 1, scale: isDeath ? 0.4 : 1 }}
+                          exit={{ opacity: 0, scale: 0.6, transition: { duration: Math.max(0.2, 0.35 / effectiveSpeed) } }}
+                          transition={{ duration: isDeath ? Math.max(0.2, 0.45 / effectiveSpeed) : 0.25 }}
+                          className="w-full h-full relative"
                         >
+                          <div
+                            onMouseEnter={() => card && setHoveredCard(card)}
+                            onMouseLeave={() => setHoveredCard(null)}
+                            style={{
+                              borderColor: isHit ? '#ef4444' : (isPlagueCasting ? '#10b981' : (isPlagueTargeted ? '#84cc16' : (isActing ? '#f59e0b' : (isTargeted ? '#f43f5e' : getTierBorderColor(card.tier))))),
+                              '--strike-x': `${strikeX}px`,
+                              '--strike-y': `${strikeY}px`,
+                              '--strike-rot': `${strikeX > 0 ? -5 : strikeX < 0 ? 5 : -2}deg`,
+                              '--anim-duration': `${Math.max(0.25, 0.72 / effectiveSpeed)}s`,
+                              '--recoil-duration': `${Math.max(0.18, 0.32 / effectiveSpeed)}s`,
+                            } as React.CSSProperties}
+                            className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none transform-gpu bg-[#151a21] text-white cursor-help ${borderGlowClass} ${
+                              isActing
+                                ? 'anim-card-strike-player'
+                                : isHit
+                                  ? 'anim-card-recoil'
+                                  : isPlagueCasting
+                                    ? 'anim-plague-channel'
+                                    : ''
+                            }`}
+                          >
                           {/* Card Background & Artwork */}
                           <div className="absolute inset-0 rounded-xl overflow-hidden z-0 pointer-events-none">
                             <div className={`absolute inset-0 opacity-[0.06] bg-gradient-to-br ${getTierBgGradient(card.tier)}`} />
@@ -2201,7 +2182,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                           {/* Persistent Barrier Dome */}
                           {Boolean(card.barrier ?? card.ward) && <BarrierDome />}
-                        </motion.div>
+                        </div>
+                      </motion.div>
                       ) : (
                         // Empty Recessed Slot
                         <div 
