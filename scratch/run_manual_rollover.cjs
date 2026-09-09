@@ -32,7 +32,7 @@ async function runManualRollover() {
     const leaguePlayers = players.filter(p => p.originalLeague === league);
     
     leaguePlayers.forEach(p => {
-      if (p.profile.pvpLP === undefined) p.profile.pvpLP = 0;
+      if (p.profile.pvpLP === undefined) p.profile.pvpLP = 100;
       if (p.profile.pvpRating === undefined) p.profile.pvpRating = 100;
     });
 

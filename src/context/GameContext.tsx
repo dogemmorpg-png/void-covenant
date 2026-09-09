@@ -189,7 +189,7 @@ const migrateProfileTo10Cards = (p: PlayerProfile): PlayerProfile => {
   
   // Ensure league and LP fields are populated
   p.pvpLeague = p.pvpLeague || 'Bronze';
-  p.pvpLP = p.pvpLP !== undefined ? p.pvpLP : 0;
+  p.pvpLP = p.pvpLP !== undefined ? p.pvpLP : 100;
   p.bloodSovereigns = p.bloodSovereigns !== undefined ? p.bloodSovereigns : 0;
   
   // Ensure mailMessages have strictly unique IDs
@@ -235,7 +235,7 @@ const createDefaultProfile = (): PlayerProfile => {
   pveProgress: 1,
   pvpRating: 100,
   pvpLeague: 'Bronze',
-  pvpLP: 0,
+  pvpLP: 100,
   heroMaxHealth: 30,
   level: 1,
   exp: 0,

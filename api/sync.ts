@@ -216,6 +216,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         lastPvpEnergyRefill: Date.now(),
         pveProgress: 1,
         pvpRating: 100,
+        pvpLeague: 'Bronze',
+        pvpLP: 100,
         heroMaxHealth: 30,
         level: 1,
         exp: 0,
