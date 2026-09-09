@@ -431,6 +431,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   // Summoning entrance animation state
   const [summoningCard, setSummoningCard] = useState<{ side: 'player' | 'enemy'; slot: number } | null>(null);
 
+  // Barrier and Armor visual effect states
+  const [barrierShatterSlot, setBarrierShatterSlot] = useState<{ side: 'player' | 'enemy'; slot: number } | null>(null);
+  const [armorSparkSlot, setArmorSparkSlot] = useState<{ side: 'player' | 'enemy'; slot: number } | null>(null);
+  const [armorBreakSlot, setArmorBreakSlot] = useState<{ side: 'player' | 'enemy'; slot: number } | null>(null);
+
   // Floating text array
   const [floatingTexts, setFloatingTexts] = useState<FloatingTextEffect[]>([]);
 

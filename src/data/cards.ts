@@ -1,4 +1,4 @@
-import { Card, CardTemplate, CardTier, CampaignStage, AirdropTask, BattlePassTier } from '../types';
+import { Card, CardTemplate, CardTier, CampaignStage, AirdropTask, BattlePassTier, CardSkill } from '../types';
 
 export const CARD_TEMPLATES: CardTemplate[] = [
   {

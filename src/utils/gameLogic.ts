@@ -453,7 +453,7 @@ export function simulateCombatTurn(
           } else {
             state.playerHeroHealth = Math.max(0, state.playerHeroHealth - damage);
             logs.push(`   Boss deals -${damage} Void Strike damage to your Lord directly!`);
-            animateSequence.push({ type: 'hero_skill', stance: 'void_strike', targetSlot, damage, side: 'enemy' });
+            animateSequence.push({ type: 'hero_skill', stance: 'void_strike', targetSlot: -1, damage, side: 'enemy' });
           }
         }
       } 
