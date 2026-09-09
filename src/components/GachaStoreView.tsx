@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getCardTierStyles } from '../utils/tierStyles';
 import { motion } from 'motion/react';
-import { audioSystem } from '../utils/AudioSystem';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CARD_TEMPLATES, getCardManaCost } from '../data/cards';
@@ -114,7 +113,6 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
         if (data.profile) {
           setProfile(data.profile);
         }
-        audioSystem.playVictory();
         triggerOpeningAnimationBackend('divine_card', [data.newCard], []);
         toast(`✨ Divine entity invoked: ${data.newCard.name}!`, 'success');
       } else {
@@ -159,7 +157,6 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
         if (data.profile) {
           setProfile(data.profile);
         }
-        audioSystem.playVictory();
         triggerOpeningAnimationBackend('divine_equip', [], [data.newEquipment]);
         toast(`🛡️ Divine artifact forged: ${data.newEquipment.name}!`, 'success');
       } else {
@@ -207,7 +204,6 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
         if (data.profile) {
           setProfile(data.profile);
         }
-        audioSystem.playVictory();
         triggerOpeningAnimationBackend('divine_equip', [], data.newEquipments || []);
         toast('✨ All 6 pieces of the Demiurge Set have been forged!', 'success');
       } else {
@@ -231,7 +227,6 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
 
   // Run pack animation
   const triggerOpeningAnimationBackend = (packType: string, newCards: any[], newEquipment: any[]) => {
-    audioSystem.playMagic();
     setOpeningPack(packType);
     setRevealedCards(newCards);
     setRevealedEquipment(newEquipment);
@@ -334,7 +329,6 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
           {/* 1. Card Boosters */}
           <button
             onClick={() => {
-              audioSystem.playClick();
               setActiveCategory('boosters');
             }}
             className={`w-full text-left p-2.5 sm:p-3 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between gap-3 shrink-0 md:shrink group relative overflow-hidden ${
@@ -376,7 +370,6 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
           {/* 2. Relic Chests */}
           <button
             onClick={() => {
-              audioSystem.playClick();
               setActiveCategory('chests');
             }}
             className={`w-full text-left p-2.5 sm:p-3 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between gap-3 shrink-0 md:shrink group relative overflow-hidden ${
@@ -418,7 +411,6 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
           {/* 3. Divine Pantheon */}
           <button
             onClick={() => {
-              audioSystem.playClick();
               setActiveCategory('pantheon');
             }}
             className={`w-full text-left p-2.5 sm:p-3 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between gap-3 shrink-0 md:shrink group relative overflow-hidden ${
@@ -460,7 +452,6 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
           {/* 4. Demiurge Relics */}
           <button
             onClick={() => {
-              audioSystem.playClick();
               setActiveCategory('demiurge');
             }}
             className={`w-full text-left p-2.5 sm:p-3 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between gap-3 shrink-0 md:shrink group relative overflow-hidden ${
@@ -506,7 +497,6 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
           {/* 5. Peace Shields */}
           <button
             onClick={() => {
-              audioSystem.playClick();
               setActiveCategory('shields');
             }}
             className={`w-full text-left p-2.5 sm:p-3 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between gap-3 shrink-0 md:shrink group relative overflow-hidden ${
@@ -1270,7 +1260,6 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           <button
                             key={item.name}
                             onClick={() => {
-                              audioSystem.playClick();
                               setSelectedDemiurgeItemName(item.name);
                             }}
                             className={`p-2.5 rounded-2xl border-2 transition-all flex flex-col items-center justify-between cursor-pointer relative overflow-hidden group ${
@@ -1642,7 +1631,6 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                             const res = await buyShield(item.type);
                             if (res.success) {
                               toast(res.message, 'success');
-                              audioSystem.playVictory();
                             } else {
                               toast(res.message, 'error');
                             }

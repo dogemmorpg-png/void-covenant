@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { LogOut, Copy, X, Trophy, User, Clock, Plus, UserPlus, Send, Mail, ShieldAlert, Sparkles, Crown, Gift, ArrowRight } from 'lucide-react';
-import { audioSystem } from '../utils/AudioSystem';
 import { useToast } from './Toast';
 import { MailboxModal } from './MailboxModal';
 import { AdminPanelModal } from './AdminPanelModal';
@@ -47,11 +46,9 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
     }
 
     setIsClaimingSovereigns(true);
-    audioSystem.playClick();
     try {
       const res = await claimReferralSovereigns();
       if (res.success) {
-        audioSystem.playVictory();
         toast(res.message || `Transferred ${wholeUnits} Blood Sovereigns to Bank!`, 'success');
       } else {
         toast(res.message || 'Failed to transfer sovereigns', 'error');
@@ -111,7 +108,6 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
         {/* Invite Friends Button */}
         <button
           onClick={() => {
-            audioSystem.playClick();
             setIsModalOpen(true);
           }}
           className="bg-amber-950/25 hover:bg-amber-900/35 border border-amber-500/40 hover:border-amber-400/80 rounded-full px-4 py-1.5 flex items-center gap-2.5 text-xs font-display font-bold text-amber-300 hover:text-amber-200 tracking-wider transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer shadow-[0_0_12px_rgba(245,158,11,0.15)]"
@@ -148,7 +144,6 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
             {/* Shards */}
             <div 
               onClick={() => {
-                audioSystem.playClick();
                 setIsShardsShopOpen(true);
               }}
               className="flex items-center gap-1.5 bg-gradient-to-r from-[#1c080d] to-[#120508] hover:from-[#2a0c13] hover:to-[#1a070c] border border-red-500/40 hover:border-red-400/80 rounded-full py-1 pl-2.5 pr-1.5 shadow-[0_0_15px_rgba(221,44,64,0.15)] hover:shadow-[0_0_20px_rgba(221,44,64,0.35)] cursor-pointer transition-all duration-300 group" 
@@ -259,7 +254,6 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
             {isAdmin && (
               <button
                 onClick={() => {
-                  audioSystem.playClick();
                   setIsAdminPanelOpen(true);
                 }}
                 className="px-3 py-1 rounded-full bg-gradient-to-r from-red-950 via-red-900 to-black border border-red-500/80 hover:border-red-400 text-red-400 hover:text-white font-mono text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(220,38,38,0.5)] hover:scale-105 active:scale-95 transition-all cursor-pointer animate-pulse hover:animate-none"
@@ -341,7 +335,6 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                   <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
                     <button
                       onClick={() => {
-                        audioSystem.playClick();
                         handleCopyLink();
                       }}
                       className="grow sm:grow-0 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-black font-display font-bold px-5 py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer uppercase shadow-md shadow-amber-500/20 active:scale-95"

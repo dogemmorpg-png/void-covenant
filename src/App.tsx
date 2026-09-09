@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { GameProvider, useGame } from './context/GameContext';
 import { ToastProvider } from './components/Toast';
-import { audioSystem } from './utils/AudioSystem';
 import { HeaderHUD } from './components/HeaderHUD';
 import { ShardsShopModal } from './components/ShardsShopModal';
 import { CampaignView } from './components/CampaignView';
@@ -336,7 +335,7 @@ function MainAppContent() {
           <div className="max-w-4xl mx-auto flex items-center justify-around gap-2 px-4">
           
           {/* Campaign Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('campaign'); }}
+          <button onClick={() => setActiveTab('campaign')}
             className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               activeTab === 'campaign'
                 ? 'bg-black/50 border border-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
@@ -348,7 +347,7 @@ function MainAppContent() {
           </button>
 
           {/* Arena Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('pvp'); }}
+          <button onClick={() => setActiveTab('pvp')}
             className={`relative flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               activeTab === 'pvp'
                 ? 'bg-black/50 border border-rose-500/40 shadow-[0_0_12px_rgba(244,63,94,0.25)]'
@@ -366,7 +365,7 @@ function MainAppContent() {
           </button>
 
           {/* Collection Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('collection'); }}
+          <button onClick={() => setActiveTab('collection')}
             className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               activeTab === 'collection'
                 ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
@@ -378,7 +377,7 @@ function MainAppContent() {
           </button>
 
           {/* Hero Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('hero'); }}
+          <button onClick={() => setActiveTab('hero')}
             className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               activeTab === 'hero'
                 ? 'text-[#ebd09b] bg-black/40 border border-[#c5a880]/30 shadow-md'
@@ -390,7 +389,7 @@ function MainAppContent() {
           </button>
 
           {/* Shop Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('altar'); }}
+          <button onClick={() => setActiveTab('altar')}
             className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               activeTab === 'altar'
                 ? 'bg-black/50 border border-purple-500/40 shadow-[0_0_12px_rgba(168,85,247,0.25)]'
@@ -402,7 +401,7 @@ function MainAppContent() {
           </button>
 
           {/* Premium / VIP Pass Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('premium'); }}
+          <button onClick={() => setActiveTab('premium')}
             className={`relative flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               activeTab === 'premium'
                 ? 'bg-gradient-to-b from-amber-500/20 via-yellow-500/10 to-black/60 border border-yellow-400/60 shadow-[0_0_16px_rgba(250,204,21,0.4)]'
@@ -420,7 +419,7 @@ function MainAppContent() {
           </button>
 
           {/* Bank / Treasury Tab */}
-          <button onMouseEnter={() => audioSystem.playHover()} onClick={() => { audioSystem.playClick(); setActiveTab('bank'); }}
+          <button onClick={() => setActiveTab('bank')}
             className={`relative flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               activeTab === 'bank'
                 ? 'bg-black/50 border border-amber-500/40 shadow-[0_0_12px_rgba(245,158,11,0.25)]'

@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, CheckCircle, AlertTriangle, Info, AlertCircle, Gift } from 'lucide-react';
-import { audioSystem } from '../utils/AudioSystem';
 
 // Types
 export type ToastType = 'success' | 'error' | 'warning' | 'info' | 'reward';
@@ -78,9 +77,6 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
       const newToast: Toast = { id, message, type, duration };
 
-      if (type === 'error' || type === 'warning') {
-        audioSystem.playError();
-      }
 
       setToasts((prev) => {
         const next = [...prev, newToast];

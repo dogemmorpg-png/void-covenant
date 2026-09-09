@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { getCardTierStyles } from '../utils/tierStyles';
-import { audioSystem } from '../utils/AudioSystem';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { Card, CardTier } from '../types';
@@ -288,7 +287,6 @@ export const CollectionDeckView: React.FC = () => {
     if (!fusionConfirmData) return;
     const res = await fuseCards(fusionConfirmData.card1.id, fusionConfirmData.card2.id);
     if (res.success) {
-      audioSystem.playMagic();
       // Keep isFusingMode(true) open so players can do consecutive fusions!
       setFuseCardId1(null);
       setFuseCardId2(null);

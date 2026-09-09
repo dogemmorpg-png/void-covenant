@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getCardTierStyles } from '../utils/tierStyles';
-import { audioSystem } from '../utils/AudioSystem';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CampaignStage, BattleState, BattleCardState, Equipment } from '../types';
@@ -598,7 +597,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         
         stepDescription = `💀 Sacrifice: ${placingCard?.name || 'Card'} destroys ${sacrCard?.name || 'ally'}`;
         
-        audioSystem.playHeal();
         setActiveSkillVfx({ type: 'sacrifice', side: 'player', slot: step.targetSlot });
         const tVfx = setTimeout(() => setActiveSkillVfx(null), Math.round(650 / effectiveSpeed));
         timeouts.push(tVfx);
@@ -629,7 +627,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       case 'enemy_play': {
         stepDescription = `😈 Dark Summon: Lord summons ${step.card.name}`;
         
-        audioSystem.playPlace();
         setSummoningCard({ side: 'enemy', slot: step.slot });
         const tSummon = setTimeout(() => setSummoningCard(null), Math.round(680 / effectiveSpeed));
         timeouts.push(tSummon);
@@ -659,7 +656,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         
         stepDescription = `🗡️ Duel: ${attackerCard?.name || 'Creature'} deals -${step.damage} damage to ${defenderCard?.name || 'Target'}`;
 
-        audioSystem.playAttack();
         setAttackerAction({ side: step.attacker, slot: step.slot, targetSlot: step.targetSlot });
 
         const tHit = setTimeout(() => {
@@ -766,7 +762,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         const attackerCard = step.attacker === 'player' ? visualState.playerBoard[step.slot] : visualState.enemyBoard[step.slot];
         stepDescription = `💥 Breakthrough: ${attackerCard?.name || 'Creature'} deals -${step.damage} direct damage to Lord!`;
 
-        audioSystem.playAttack();
         setAttackerAction({ side: step.attacker, slot: step.slot, targetSlot: -1, isDirect: true });
 
         const tHit = setTimeout(() => {
@@ -808,7 +803,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         const targetHeroLabel = isPlayerCaster ? 'enemy-hero' : 'player-hero';
 
         if (step.stance === 'void_strike') {
-          audioSystem.playAttack();
           if (step.targetSlot === -1) {
             stepDescription = `⚡ Void Strike: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} deals -${step.damage} damage to ${isPlayerCaster ? 'Enemy' : 'Player'} Lord directly!`;
             const tHit = setTimeout(() => {
@@ -879,7 +873,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             timeouts.push(tHit);
           }
         } else if (step.stance === 'blood_aura') {
-          audioSystem.playHeal();
           if (step.targetSlot === -1) {
             stepDescription = `🩸 Blood Aura: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} heals directly for +${step.heal} HP`;
             setDefenderAction({ side: targetSide, slot: -1, type: 'heal' });
@@ -923,7 +916,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             });
           }
         } else if (step.stance === 'warlord_cry') {
-          audioSystem.playPlace();
           if (step.targetSlot === -1) {
             stepDescription = `🔥 Warlord's Cry: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} roars, rallying forces!`;
             setDefenderAction({ side: targetSide, slot: -1, type: 'heal' });
@@ -957,7 +949,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       case 'hero_heal': {
         const isEnemy = step.side === 'enemy';
         stepDescription = `💚 ${isEnemy ? 'Enemy Commander' : 'Commander'} heals for +${step.heal} HP`;
-        audioSystem.playHeal();
         setDefenderAction({ side: isEnemy ? 'enemy' : 'player', slot: -1, type: 'heal' });
         if (isEnemy) {
           addFloatingText(`+${step.heal} HP 💚`, 'enemy-hero', 'text-emerald-400 font-black text-sm');
@@ -983,11 +974,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         
         stepDescription = `🛡️ Evaded! ${isEnemy ? 'The Enemy Commander' : 'Your Lord'} dodged direct attack from ${attackerCard?.name || 'Creature'}!`;
 
-        audioSystem.playAttack();
         setAttackerAction({ side: attackerSide, slot: step.slot, targetSlot: -1, isDirect: true });
 
         const tHit = setTimeout(() => {
-          audioSystem.playMiss();
           setDefenderAction({ side: step.side, slot: -1, type: 'dodge' });
           addFloatingText('DODGE! 🛡️', isEnemy ? 'enemy-hero' : 'player-hero', 'text-cyan-400 font-black text-lg scale-125 text-shadow-glow');
         }, impactDelay);
@@ -1002,7 +991,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         
         stepDescription = `🦠 Plague: ${sourceCard?.name || 'Carrier'} infests ${targetCard?.name || 'target'} with toxic miasma (-${step.damage} HP)`;
 
-        audioSystem.playMagic();
         setPlagueAction({
           sourceSide: step.sourceSide,
           sourceSlot: step.sourceSlot,
@@ -1013,7 +1001,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         addFloatingText('🦠 MIASMA', { side: step.sourceSide, slot: step.sourceSlot }, 'text-emerald-400 font-black text-[11px] scale-110 tracking-widest');
 
         const tHit = setTimeout(() => {
-          audioSystem.playError();
           setDefenderAction({ side: defSide, slot: step.targetSlot, type: 'hit' });
           setActiveSkillVfx({ type: 'plague', side: defSide, slot: step.targetSlot });
           const tVfx = setTimeout(() => setActiveSkillVfx(null), Math.round(650 / effectiveSpeed));
@@ -1046,7 +1033,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         const deadCardName = step.cardName || (step.side === 'player' ? visualState.playerBoard[step.slot]?.name : visualState.enemyBoard[step.slot]?.name);
         stepDescription = `☠️ Destruction: ${deadCardName || 'Creature'} turns to dust!`;
 
-        audioSystem.playDeath();
         setDefenderAction({ side: step.side, slot: step.slot, type: 'death' });
         addFloatingText('💀 DESTROYED', { side: step.side, slot: step.slot }, 'text-gray-500 font-bold tracking-widest text-[10px]');
         
@@ -1135,10 +1121,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     
     // Check if placeCardLocally did something (mana deducted, card placed)
     if (newBattleState !== battle) {
-      // 1. Play place sound
-      audioSystem.playClick();
-      
-      // 2. Play Sacrifice effects if triggered
+      // 1. Play Sacrifice effects if triggered
       const oldAlliesCount = battle.playerBoard.filter(c => c !== null && !c.isDead).length;
       const newAlliesCount = newBattleState.playerBoard.filter(c => c !== null && !c.isDead).length;
       
@@ -1154,7 +1137,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         
         if (sacrificedSlot !== -1) {
           addFloatingText('💀 SACRIFICE', { side: 'player', slot: sacrificedSlot }, 'text-red-500 font-bold scale-110');
-          audioSystem.playEerieClick();
         }
         
         // Sacrifice heal hero and buff stats
@@ -1191,7 +1173,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const handleBattleWon = async () => {
     if (battleResultSubmittedRef.current) return;
     battleResultSubmittedRef.current = true;
-    audioSystem.playMagic();
     
     if (battleType === 'pvp') {
       await handlePvpWon();
@@ -1259,7 +1240,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const handleBattleLost = async () => {
     if (battleResultSubmittedRef.current) return;
     battleResultSubmittedRef.current = true;
-    audioSystem.playError();
     const res = await submitBattleResult(battleType, stage.id.toString(), 'loss');
     if (res.success) {
       if (res.rewards?.gold !== undefined) {

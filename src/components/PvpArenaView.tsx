@@ -6,7 +6,6 @@ import { Swords, Award, Zap, Trophy, Shield, ShieldCheck, Search, RefreshCw, Ale
 import { renderStanceIcon } from './SkillAndStanceIcons';
 import { assetPreloader } from '../utils/assetPreloader';
 import { calculateEquipmentSetBonuses } from '../data/equipment';
-import { audioSystem } from '../utils/AudioSystem';
 
 import { ALL_LEAGUE_REWARDS, LeagueRewardBracket, LeagueTierRewards } from '../data/leagueRewards';
 export { ALL_LEAGUE_REWARDS };
@@ -2343,7 +2342,6 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                               const res = await activateShield(item.type);
                               if (res.success) {
                                 toast(res.message, 'success');
-                                audioSystem.playVictory();
                               } else {
                                 toast(res.message, 'error');
                               }

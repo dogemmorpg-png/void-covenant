@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
-import { audioSystem } from '../utils/AudioSystem';
 import { 
   Crown, 
   Gift, 
@@ -38,7 +37,6 @@ export const PremiumPassView: React.FC = () => {
   };
 
   const handleBuy = async (tier: 'premium' | 'ultra') => {
-    audioSystem.playClick();
     const cost = PRICES[tier][durationDays];
 
     if ((profile.darkShards || 0) < cost) {
@@ -52,7 +50,6 @@ export const PremiumPassView: React.FC = () => {
       const res = await buySubscription(tier, durationDays);
       if (res.success) {
         toast(res.message, 'success');
-        audioSystem.playVictory();
       } else {
         toast(res.message, 'error');
       }
@@ -154,7 +151,7 @@ export const PremiumPassView: React.FC = () => {
         <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">Access Duration:</span>
         <div className="flex items-center p-1 rounded-2xl bg-black/60 border border-white/10">
           <button
-            onClick={() => { audioSystem.playClick(); setDurationDays(30); }}
+            onClick={() => setDurationDays(30)}
             className={`px-6 py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer ${
               durationDays === 30
                 ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.4)] font-black'
@@ -165,7 +162,7 @@ export const PremiumPassView: React.FC = () => {
           </button>
 
           <button
-            onClick={() => { audioSystem.playClick(); setDurationDays(90); }}
+            onClick={() => setDurationDays(90)}
             className={`relative px-6 py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer ${
               durationDays === 90
                 ? 'bg-gradient-to-r from-purple-500 to-amber-500 text-black shadow-[0_0_20px_rgba(168,85,247,0.4)] font-black'

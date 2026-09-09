@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
 import { Landmark, ArrowUpRight, Clock, ShieldCheck, CheckCircle2, AlertCircle, Wallet, Coins, RefreshCw, TrendingUp, Swords, Trophy, Mail } from 'lucide-react';
-import { audioSystem } from '../utils/AudioSystem';
 
 export const BankView: React.FC = () => {
   const { profile, requestWithdrawal } = useGame();
@@ -22,13 +21,11 @@ export const BankView: React.FC = () => {
   const minUsdt = (minWithdrawal * 0.01).toFixed(2);
 
   const handleQuickPercent = (pct: number) => {
-    audioSystem.playClick();
     const calculated = Math.floor((balance * pct) / 100);
     setWithdrawAmount(calculated > 0 ? calculated.toString() : '');
   };
 
   const handleUseConnectedWallet = () => {
-    audioSystem.playClick();
     if (profile.solanaAddress) {
       setTargetAddress(profile.solanaAddress);
     }
@@ -36,7 +33,6 @@ export const BankView: React.FC = () => {
 
   const handleSubmitWithdrawal = async (e: React.FormEvent) => {
     e.preventDefault();
-    audioSystem.playClick();
     setFeedback(null);
 
     if (numAmount < minWithdrawal) {
