@@ -1040,19 +1040,22 @@ export const CollectionDeckView: React.FC = () => {
                             <span>Turn Delay:</span>
                             <span className="text-blue-400 font-bold">⏳ {nextDelay} turns (Reduced!)</span>
                           </li>
-                          <li className="flex justify-between">
-                            <span>Dark Shards:</span>
-                            <span className="text-purple-300 font-bold font-mono">💎 {getFusionCosts(c1).shardsCost} Shards</span>
-                          </li>
                           {bonusSkill && (
-                            <li className="flex justify-between">
+                            <li className="flex justify-between items-center">
                               <span>New Skill:</span>
-                              <span className="text-cyan-300 font-bold capitalize">{bonusSkill.type}</span>
+                              <span className="text-cyan-300 font-bold capitalize flex items-center gap-1.5">
+                                {renderSkillIcon(bonusSkill.type, "w-4 h-4")}
+                                {bonusSkill.type}
+                              </span>
                             </li>
                           )}
-                          <li className="text-[10px] text-purple-300 border-t border-purple-950 pt-1.5 mt-1">
-                            <img src="/icons/icon_dust.webp" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" /> 
-                            <span className="font-sans">{bonusSkill ? bonusSkill.description : `Unlocks new improved skills of tier ${nextT}!`}</span>
+                          <li className="text-[10px] text-purple-300 border-t border-purple-950/70 pt-2 mt-1 flex items-start gap-2">
+                            <div className="shrink-0 mt-0.5">
+                              {bonusSkill ? renderSkillIcon(bonusSkill.type, "w-5 h-5") : <Sparkles className="w-5 h-5 text-purple-400" />}
+                            </div>
+                            <span className="font-sans leading-relaxed">
+                              {bonusSkill ? bonusSkill.description : `Unlocks new improved skills of tier ${nextT}!`}
+                            </span>
                           </li>
                         </ul>
                       );
