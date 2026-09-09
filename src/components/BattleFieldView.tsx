@@ -1009,10 +1009,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
     setActiveLogStepText(stepDescription);
 
-    // Clear defender shake after impact reaction concludes
+    // Clear defender shake smoothly after impact reaction concludes fully
+    const hitReactionDuration = Math.round(360 / effectiveSpeed);
     const tClearHit = setTimeout(() => {
       setDefenderAction(null);
-    }, Math.round(impactDelay + 240 / effectiveSpeed));
+    }, impactDelay + hitReactionDuration);
     timeouts.push(tClearHit);
 
     // Clear attacker lunge action when returning to slot finishes
@@ -1271,13 +1272,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       {/* Header Bar */}
       <div className="bg-[#120d0a]/95 border border-[#ebd09b]/15 rounded-lg p-1.5 px-3 flex justify-between items-center max-w-7xl mx-auto w-full mb-2 shadow-md h-[40px] shrink-0 z-20">
         <button
-          onClick={async () => {
+          onClick={() => {
             const confirmMsg = battleType === 'pvp'
               ? 'Are you sure you want to surrender? You will lose crowns.'
               : 'Are you sure you want to escape? Energy will not be refunded.';
             if (window.confirm(confirmMsg)) {
               if (battleType === 'pvp') {
-                await submitBattleResult('pvp', 'pvp', 'loss');
+                submitBattleResult('pvp', 'pvp', 'loss').catch(() => {});
               }
               onExitBattle(false);
             }
@@ -1371,24 +1372,38 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 
                 return (
                   <>
+                    {/* Hardware accelerated dual vector glow */}
+                    <line
+                      x1={startX}
+                      y1={startY}
+                      x2={endX}
+                      y2={endY}
+                      stroke={stance === 'void_strike' ? '#06b6d4' : (stance === 'blood_aura' ? '#ef4444' : '#f59e0b')}
+                      strokeWidth="10"
+                      strokeOpacity="0.3"
+                      strokeLinecap="round"
+                    />
                     <line
                       x1={startX}
                       y1={startY}
                       x2={endX}
                       y2={endY}
                       stroke={strokeColor}
-                      strokeWidth="5"
+                      strokeWidth="3.5"
                       strokeLinecap="round"
-                      className="animate-pulse"
-                      style={{ filter: `drop-shadow(0 0 12px ${glowColor})` }}
                     />
                     <circle
                       cx={endX}
                       cy={endY}
-                      r="8"
+                      r="12"
                       fill={stance === 'void_strike' ? '#06b6d4' : (stance === 'blood_aura' ? '#ef4444' : '#f59e0b')}
-                      className="animate-ping"
-                      style={{ filter: `drop-shadow(0 0 14px ${glowColor})` }}
+                      fillOpacity="0.35"
+                    />
+                    <circle
+                      cx={endX}
+                      cy={endY}
+                      r="5"
+                      fill="#ffffff"
                     />
                   </>
                 );
@@ -1401,8 +1416,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-25">
               <defs>
                 <linearGradient id="glowingArrowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#ff4500" stopOpacity="0.85" />
-                  <stop offset="100%" stopColor="#a855f7" stopOpacity="0.25" />
+                  <stop offset="0%" stopColor="#ff4500" stopOpacity="0.9" />
+                  <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.4" />
                 </linearGradient>
               </defs>
               {(() => {
@@ -1432,20 +1447,33 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       y1={startY}
                       x2={endX}
                       y2={endY}
+                      stroke="#ff4500"
+                      strokeWidth="5"
+                      strokeOpacity="0.25"
+                      strokeLinecap="round"
+                    />
+                    <line
+                      x1={startX}
+                      y1={startY}
+                      x2={endX}
+                      y2={endY}
                       stroke="url(#glowingArrowGrad)"
                       strokeWidth="2.5"
                       strokeLinecap="round"
-                      strokeDasharray="4 4"
-                      className="animate-[dash_1.5s_linear_infinite]"
-                      style={{ filter: 'drop-shadow(0 0 5px rgba(255, 69, 0, 0.75))' }}
+                      strokeDasharray="6 4"
                     />
                     <circle
                       cx={endX}
                       cy={endY}
-                      r="4.5"
+                      r="8"
                       fill="#ff4500"
-                      className="animate-ping"
-                      style={{ filter: 'drop-shadow(0 0 8px rgba(255, 69, 0, 1))' }}
+                      fillOpacity="0.3"
+                    />
+                    <circle
+                      cx={endX}
+                      cy={endY}
+                      r="3.5"
+                      fill="#fef08a"
                     />
                   </>
                 );
@@ -1463,8 +1491,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   scale: isEnemyHit ? [1, 1.15, 0.95, 1] : (isEnemyCasting ? [1, 1.14, 1.14, 1] : 1),
                   rotate: isEnemyHit ? [0, -6, 6, -4, 4, 0] : (isEnemyCasting ? [0, 4, -4, 4, -4, 0] : 0),
                 }}
-                transition={{ duration: Math.max(0.28, 0.52 / effectiveSpeed), ease: "easeInOut" }}
-                className={`absolute top-4 left-4 flex items-center gap-3 z-30 bg-black/50 p-2 rounded-2xl border backdrop-blur-sm transform-gpu will-change-transform ${
+                transition={{ duration: Math.max(0.2, 0.34 / effectiveSpeed), ease: "easeInOut" }}
+                className={`absolute top-4 left-4 flex items-center gap-3 z-30 bg-[#100b08]/95 p-2 rounded-2xl border transform-gpu will-change-transform ${
                   isEnemyHit 
                     ? 'border-red-500 shadow-[0_0_35px_rgba(239,68,68,0.95)]' 
                     : isEnemyCasting 
@@ -1517,8 +1545,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   scale: isPlayerHit ? [1, 1.15, 0.95, 1] : (isPlayerCasting ? [1, 1.14, 1.14, 1] : 1),
                   rotate: isPlayerHit ? [0, -6, 6, -4, 4, 0] : (isPlayerCasting ? [0, 4, -4, 4, -4, 0] : 0),
                 }}
-                transition={{ duration: Math.max(0.28, 0.52 / effectiveSpeed), ease: "easeInOut" }}
-                className={`absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-black/50 p-2 rounded-2xl border backdrop-blur-sm transform-gpu will-change-transform ${
+                transition={{ duration: Math.max(0.2, 0.34 / effectiveSpeed), ease: "easeInOut" }}
+                className={`absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-[#100b08]/95 p-2 rounded-2xl border transform-gpu will-change-transform ${
                   isPlayerHit 
                     ? 'border-red-500 shadow-[0_0_35px_rgba(239,68,68,0.95)]' 
                     : isPlayerCasting 
@@ -1677,7 +1705,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   : isActing 
                     ? "border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.9)] ring-2 ring-amber-400/80"
                     : isTargeted
-                      ? "border-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.85)] ring-2 ring-rose-500/80 animate-pulse"
+                      ? "border-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.85)] ring-2 ring-rose-500/80"
                       : isSummoning
                         ? "border-purple-400 shadow-[0_0_25px_rgba(168,85,247,0.85)] ring-2 ring-purple-400/80"
                         : card && card.delay === 0 
@@ -1706,10 +1734,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                             x: isActing ? [0, strikeX * -0.06, strikeX, strikeX * 0.9, 0] : (isHit ? [0, -8, 8, -4, 4, 0] : 0),
                             rotate: isActing ? (strikeX > 0 ? [0, -2, 5, 2, 0] : strikeX < 0 ? [0, 2, -5, -2, 0] : [0, -1, 3, 1, 0]) : (isDeath ? 12 : 0)
                           }}
-                          exit={{ opacity: 0, scale: 0.7, filter: 'grayscale(100%)', transition: { duration: Math.max(0.25, 0.45 / effectiveSpeed) } }}
+                          exit={{ opacity: 0, scale: 0.7, transition: { duration: Math.max(0.2, 0.35 / effectiveSpeed) } }}
                           transition={{
                             y: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : { duration: 0.2 },
-                            x: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : (isHit ? { duration: Math.max(0.15, 0.28 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
+                            x: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : (isHit ? { duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
                             scale: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : (isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : (isSummoning ? { duration: 0.45, ease: "easeOut" } : { duration: 0.2 })),
                             rotate: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : { duration: 0.2 },
                             opacity: isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : { duration: 0.3 }
@@ -1726,7 +1754,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                                   src={card.image} 
                                   alt={card.name} 
                                   decoding="async"
-                                  className={`absolute inset-0 w-full h-full object-cover ${card.delay > 0 ? 'opacity-40 filter saturate-50 brightness-75' : 'opacity-85'}`} 
+                                  className={`absolute inset-0 w-full h-full object-cover ${card.delay > 0 ? 'opacity-40' : 'opacity-85'}`} 
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
                               </>
@@ -1950,7 +1978,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   : isActing 
                     ? "border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.9)] ring-2 ring-amber-400/80"
                     : isTargeted
-                      ? "border-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.85)] ring-2 ring-rose-500/80 animate-pulse"
+                      ? "border-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.85)] ring-2 ring-rose-500/80"
                       : isSummoning
                         ? "border-cyan-400 shadow-[0_0_25px_rgba(102,252,241,0.85)] ring-2 ring-cyan-400/80"
                         : card && card.delay === 0 
@@ -1979,10 +2007,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                             x: isActing ? [0, strikeX * -0.06, strikeX, strikeX * 0.9, 0] : (isHit ? [0, -8, 8, -4, 4, 0] : 0),
                             rotate: isActing ? (strikeX > 0 ? [0, 2, -5, -2, 0] : strikeX < 0 ? [0, -2, 5, 2, 0] : [0, 1, -3, -1, 0]) : (isDeath ? 12 : 0)
                           }}
-                          exit={{ opacity: 0, scale: 0.7, filter: 'grayscale(100%)', transition: { duration: Math.max(0.25, 0.45 / effectiveSpeed) } }}
+                          exit={{ opacity: 0, scale: 0.7, transition: { duration: Math.max(0.2, 0.35 / effectiveSpeed) } }}
                           transition={{
                             y: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : { duration: 0.2 },
-                            x: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : (isHit ? { duration: Math.max(0.15, 0.28 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
+                            x: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : (isHit ? { duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
                             scale: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : (isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : (isSummoning ? { duration: 0.45, ease: "easeOut" } : { duration: 0.2 })),
                             rotate: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : { duration: 0.2 },
                             opacity: isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : { duration: 0.3 }
@@ -1999,7 +2027,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                                   src={card.image} 
                                   alt={card.name} 
                                   decoding="async"
-                                  className={`absolute inset-0 w-full h-full object-cover ${card.delay > 0 ? 'opacity-40 filter saturate-50 brightness-75' : 'opacity-85'}`} 
+                                  className={`absolute inset-0 w-full h-full object-cover ${card.delay > 0 ? 'opacity-40' : 'opacity-85'}`} 
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
                               </>

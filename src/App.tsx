@@ -265,25 +265,28 @@ function MainAppContent() {
           {/* Tab content */}
           <div className="py-3 sm:py-4">
             <div className={activeTab === 'campaign' ? 'block' : 'hidden'}>
-              <CampaignView onStartBattle={async (stage) => {
-                const success = await startBattleOnServer('campaign', stage.id.toString(), stage.energyCost);
-                if (success) {
-                  setActiveBattleType('campaign');
-                  setActiveBattleStage(stage);
-                }
+              <CampaignView onStartBattle={(stage) => {
+                setActiveBattleType('campaign');
+                setActiveBattleStage(stage);
+                startBattleOnServer('campaign', stage.id.toString(), stage.energyCost).then(success => {
+                  if (!success) {
+                    setActiveBattleStage(null);
+                  }
+                }).catch(() => {});
               }} />
             </div>
 
             <div className={activeTab === 'pvp' ? 'block' : 'hidden'}>
               <PvpArenaView 
                 onStartBattle={async (stage, type, opponentPayload) => {
-                  const success = await startBattleOnServer('pvp', stage.id.toString(), 1, opponentPayload);
-                  if (success) {
-                    setActiveBattleType(type);
-                    setActiveBattleStage(stage);
-                    return true;
-                  }
-                  return false;
+                  setActiveBattleType(type);
+                  setActiveBattleStage(stage);
+                  startBattleOnServer('pvp', stage.id.toString(), 1, opponentPayload).then(success => {
+                    if (!success) {
+                      setActiveBattleStage(null);
+                    }
+                  }).catch(() => {});
+                  return true;
                 }}
                 isMatching={isPvpMatching}
                 setIsMatching={setIsPvpMatching}

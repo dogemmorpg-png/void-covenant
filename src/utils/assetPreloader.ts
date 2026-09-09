@@ -62,9 +62,9 @@ export const preloadImage = (url: string): Promise<boolean> => {
 };
 
 /**
- * Preload assets with controlled concurrency (6 parallel streams)
+ * Preload assets with polite concurrency (2 parallel streams to leave 4 sockets free for API)
  */
-export const preloadPool = async (urls: string[], concurrency = 6): Promise<void> => {
+export const preloadPool = async (urls: string[], concurrency = 2): Promise<void> => {
   const pending = urls.filter(u => u && !preloadedUrls.has(u));
   if (pending.length === 0) return;
 
@@ -101,20 +101,20 @@ export const getCardImageUrl = (card: any): string => {
  */
 export const assetPreloader = {
   /**
-   * Preload core UI icons and avatars instantly
+   * Preload core UI icons and avatars gently
    */
   preloadCoreUI: async () => {
-    await preloadPool(CORE_UI_ASSETS, 6);
+    await preloadPool(CORE_UI_ASSETS, 2);
   },
 
   /**
-   * Preload active player deck cards instantly
+   * Preload active player deck cards
    */
   preloadPlayerDeck: async (deckCards: any[]) => {
     if (!deckCards || deckCards.length === 0) return;
     const urls = deckCards.map(getCardImageUrl).filter(Boolean);
     if (urls.length > 0) {
-      await preloadPool(urls, 6);
+      await preloadPool(urls, 2);
     }
   },
 
@@ -125,12 +125,12 @@ export const assetPreloader = {
     if (!creatures || creatures.length === 0) return;
     const urls = creatures.map(getCardImageUrl).filter(Boolean);
     if (urls.length > 0) {
-      await preloadPool(urls, 6);
+      await preloadPool(urls, 2);
     }
   },
 
   /**
-   * Preload all game card images progressively in the background
+   * Preload game cards gently in idle frames with delay (1 image at a time)
    */
   preloadAllGameCardsBackground: () => {
     if (isGlobalPreloadStarted) return;
@@ -140,7 +140,25 @@ export const assetPreloader = {
       .map(c => c.image)
       .filter((img): img is string => typeof img === 'string' && img.startsWith('/cards/'));
     
-    preloadPool(cardUrls, 6);
+    let index = 0;
+    const scheduleNext = () => {
+      if (index >= cardUrls.length) return;
+      const url = cardUrls[index++];
+      const run = async () => {
+        if (url && !preloadedUrls.has(url)) {
+          await preloadImage(url);
+        }
+        setTimeout(scheduleNext, 200);
+      };
+
+      if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(run, { timeout: 500 });
+      } else {
+        setTimeout(run, 200);
+      }
+    };
+
+    setTimeout(scheduleNext, 2000);
   },
 
   /**
