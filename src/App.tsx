@@ -4,6 +4,7 @@ import { ToastProvider } from './components/Toast';
 import { HeaderHUD } from './components/HeaderHUD';
 import { ShardsShopModal } from './components/ShardsShopModal';
 import { GoldShopModal } from './components/GoldShopModal';
+import { DustShopModal } from './components/DustShopModal';
 import { CampaignView } from './components/CampaignView';
 import { CollectionDeckView } from './components/CollectionDeckView';
 import { GachaStoreView } from './components/GachaStoreView';
@@ -26,7 +27,7 @@ import { assetPreloader } from './utils/assetPreloader';
 const bs58 = (bs58Pkg as any).default || bs58Pkg;
 
 function MainAppContent() {
-  const { profile, isLoadingProfile, connectSolanaWallet, registerPlayer, disconnectSolanaWallet, startBattleOnServer, isShardsShopOpen, setIsShardsShopOpen, isGoldShopOpen, setIsGoldShopOpen, hasNewDefenseAttacks } = useGame();
+  const { profile, isLoadingProfile, connectSolanaWallet, registerPlayer, disconnectSolanaWallet, startBattleOnServer, isShardsShopOpen, setIsShardsShopOpen, isGoldShopOpen, setIsGoldShopOpen, isDustShopOpen, setIsDustShopOpen, hasNewDefenseAttacks } = useGame();
   const { connected, publicKey, signMessage, disconnect } = useWallet();
   const { setVisible } = useWalletModal();
   
@@ -442,6 +443,9 @@ function MainAppContent() {
       )}
       {isGoldShopOpen && (
         <GoldShopModal onClose={() => setIsGoldShopOpen(false)} />
+      )}
+      {isDustShopOpen && (
+        <DustShopModal onClose={() => setIsDustShopOpen(false)} />
       )}
     </>
   );

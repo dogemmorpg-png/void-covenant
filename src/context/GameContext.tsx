@@ -72,6 +72,8 @@ interface GameContextType {
   setIsShardsShopOpen: (open: boolean) => void;
   isGoldShopOpen: boolean;
   setIsGoldShopOpen: (open: boolean) => void;
+  isDustShopOpen: boolean;
+  setIsDustShopOpen: (open: boolean) => void;
   refreshProfile: (notifyOnDefense?: boolean) => Promise<PlayerProfile | null>;
   hasNewDefenseAttacks: boolean;
   markDefenseHistoryAsViewed: () => void;
@@ -262,6 +264,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [isShardsShopOpen, setIsShardsShopOpen] = useState(false);
   const [isGoldShopOpen, setIsGoldShopOpen] = useState(false);
+  const [isDustShopOpen, setIsDustShopOpen] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -1585,6 +1588,52 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success, message: msg, profile: updatedProfile };
     }
 
+    if (action === 'buy_dust_pack') {
+      const { packageId } = payload || {};
+      const DUST_RATES: Record<string, { dust: number; shards: number; name: string }> = {
+        'dust_2500': { dust: 2500, shards: 15, name: 'Wisp Orb of Dust' },
+        'dust_10000': { dust: 10000, shards: 55, name: 'Astral Dust Urn' },
+        'dust_25000': { dust: 25000, shards: 120, name: 'Ancient Void Core' },
+        'dust_50000': { dust: 50000, shards: 220, name: 'Primordial Nebula' },
+      };
+      const pack = DUST_RATES[packageId];
+      if (!pack) {
+        return { success: false, message: 'Invalid dust package.' };
+      }
+
+      let msg = '';
+      let success = false;
+      let updatedProfile: any = null;
+
+      setProfile(current => {
+        const currentShards = current.darkShards || 0;
+        if (currentShards < pack.shards) {
+          msg = `Not enough Dark Shards! Need ${pack.shards} shards.`;
+          success = false;
+          return current;
+        }
+
+        success = true;
+        let updated = recordShardTransaction(
+          current,
+          'SHOP_PURCHASE',
+          -pack.shards,
+          `Purchased ${pack.dust.toLocaleString()} Void Dust (${pack.name}) for ${pack.shards} Shards`,
+          { packageId, dustAmount: pack.dust, shardCost: pack.shards }
+        );
+        updated = {
+          ...updated,
+          dust: (updated.dust || 0) + pack.dust
+        };
+        msg = `Successfully purchased ${pack.dust.toLocaleString()} Void Dust!`;
+        updatedProfile = updated;
+        saveProfile(updated);
+        return updated;
+      });
+
+      return { success, message: msg, profile: updatedProfile };
+    }
+
     if (action === 'buy_subscription') {
       const { tier, durationDays } = payload || {};
       const PRICES: Record<string, Record<number, number>> = {
@@ -2025,6 +2074,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsShardsShopOpen,
         isGoldShopOpen,
         setIsGoldShopOpen,
+        isDustShopOpen,
+        setIsDustShopOpen,
         refreshProfile,
         hasNewDefenseAttacks,
         markDefenseHistoryAsViewed

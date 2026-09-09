@@ -23,6 +23,10 @@ const CORE_UI_ASSETS = [
   '/shop/gold_sack_25k.jpg',
   '/shop/gold_chest_50k.png',
   '/shop/gold_vault_100k.png',
+  '/shop/dust_orb_2500.png',
+  '/shop/dust_urn_10000.png',
+  '/shop/dust_core_25000.png',
+  '/shop/dust_nebula_50000.png',
 
   // Core Badges & Icons
   '/icons/crown.png',

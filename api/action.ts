@@ -1012,6 +1012,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       profile.gold = (profile.gold || 0) + pack.gold;
       successMessage = `Successfully purchased ${pack.gold.toLocaleString()} Gold!`;
       responseData = { goldAdded: pack.gold, newGold: profile.gold, shardsSpent: pack.shards, newShards: profile.darkShards };
+    } else if (action === 'buy_dust_pack') {
+      const { packageId } = payload || {};
+      const DUST_RATES: Record<string, { dust: number; shards: number; name: string }> = {
+        'dust_2500': { dust: 2500, shards: 15, name: 'Wisp Orb of Dust' },
+        'dust_10000': { dust: 10000, shards: 55, name: 'Astral Dust Urn' },
+        'dust_25000': { dust: 25000, shards: 120, name: 'Ancient Void Core' },
+        'dust_50000': { dust: 50000, shards: 220, name: 'Primordial Nebula' },
+      };
+      const pack = DUST_RATES[packageId];
+      if (!pack) {
+        return res.status(400).json({ error: 'Invalid dust package' });
+      }
+
+      const currentShards = profile.darkShards || 0;
+      if (currentShards < pack.shards) {
+        return res.status(400).json({ error: `Not enough Dark Shards! Need ${pack.shards}, you have ${currentShards}.` });
+      }
+
+      profile = recordShardTransaction(
+        profile,
+        'SHOP_PURCHASE',
+        -pack.shards,
+        `Purchased ${pack.dust.toLocaleString()} Void Dust (${pack.name}) for ${pack.shards} Shards`,
+        { packageId, dustAmount: pack.dust, shardCost: pack.shards }
+      );
+      profile.dust = (profile.dust || 0) + pack.dust;
+      successMessage = `Successfully purchased ${pack.dust.toLocaleString()} Void Dust!`;
+      responseData = { dustAdded: pack.dust, newDust: profile.dust, shardsSpent: pack.shards, newShards: profile.darkShards };
     } else if (action === 'buy_divine_card') {
       const { baseId } = payload || {};
       const template = CARD_TEMPLATES.find((c: any) => c.baseId === baseId && c.tier === 'divine');

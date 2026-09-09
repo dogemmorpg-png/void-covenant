@@ -11,7 +11,7 @@ interface HeaderHUDProps {
 }
 
 export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
-  const { profile, logoutPlayer, isShardsShopOpen, setIsShardsShopOpen, isGoldShopOpen, setIsGoldShopOpen, claimReferralSovereigns } = useGame();
+  const { profile, logoutPlayer, isShardsShopOpen, setIsShardsShopOpen, isGoldShopOpen, setIsGoldShopOpen, isDustShopOpen, setIsDustShopOpen, claimReferralSovereigns } = useGame();
   const { disconnect } = useWallet();
   const toast = useToast();
 
@@ -137,17 +137,23 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
 
             {/* Dust */}
             <div 
-              className="flex items-center gap-1.5 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-400/50 rounded-full py-1 px-2.5 shadow-inner transition-all duration-300 group cursor-default"
-              title={`Void Dust: ${profile.dust}`}
+              onClick={() => {
+                setIsDustShopOpen(true);
+              }}
+              className="flex items-center gap-1.5 bg-gradient-to-r from-[#081822] to-[#040d13] hover:from-[#0c2433] hover:to-[#06141e] border border-cyan-500/40 hover:border-cyan-400/80 rounded-full py-1 pl-2.5 pr-1.5 shadow-[0_0_15px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.35)] cursor-pointer transition-all duration-300 group select-none"
+              title="Void Dust (Click to Open Dust Sanctum)"
             >
               <img 
                 src="/icons/icon_dust.webp" 
                 alt="Dust" 
                 className="drop-shadow-[0_0_12px_rgba(6,182,212,0.7)] brightness-110 contrast-125 w-8 h-8 object-contain scale-135 group-hover:scale-145 transition-transform duration-300" 
               />
-              <span className="font-mono font-black text-cyan-300 group-hover:text-cyan-200 text-sm tracking-wide transition-colors">
+              <span className="font-mono font-black text-cyan-300 group-hover:text-cyan-200 text-sm tracking-wide transition-colors ml-0.5">
                 {profile.dust}
               </span>
+              <div className="w-5 h-5 rounded-full bg-gradient-to-b from-[#06b6d4] via-[#0891b2] to-[#155e75] group-hover:from-[#22d3ee] group-hover:to-[#0e7490] text-white flex items-center justify-center border border-cyan-300/40 shadow-[0_0_10px_rgba(6,182,212,0.6)] group-hover:shadow-[0_0_14px_rgba(34,211,238,0.9)] group-hover:scale-110 active:scale-95 transition-all duration-300 ml-0.5">
+                <Plus className="w-3 h-3 stroke-[3] text-white drop-shadow-sm" />
+              </div>
             </div> 
 
             {/* Shards */}
