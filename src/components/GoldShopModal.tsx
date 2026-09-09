@@ -56,7 +56,7 @@ export const GoldShopModal: React.FC<GoldShopModalProps> = ({ onClose }) => {
       }}
     >
       {/* Modal Container */}
-      <div className="bg-gradient-to-b from-[#1c1408] via-[#120d04] to-[#0a0702] border-2 border-amber-500/40 max-w-xl w-full rounded-3xl p-5 sm:p-6 shadow-[0_0_60px_rgba(245,158,11,0.22)] relative overflow-hidden flex flex-col space-y-5 animate-in zoom-in-95 duration-200">
+      <div className="bg-gradient-to-b from-[#1c1408] via-[#120d04] to-[#0a0702] border-2 border-amber-500/40 max-w-2xl w-full rounded-3xl p-5 sm:p-6 shadow-[0_0_60px_rgba(245,158,11,0.22)] relative overflow-hidden flex flex-col space-y-5 animate-in zoom-in-95 duration-200">
         
         {/* Top decorative gradient bar */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-yellow-400 to-amber-600" />
@@ -162,14 +162,14 @@ export const GoldShopModal: React.FC<GoldShopModalProps> = ({ onClose }) => {
                 </div>
 
                 {/* Price & Reward Row */}
-                <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5">
+                <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between gap-1.5 sm:gap-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
                     <img 
                       src="/icons/icon_gold.webp" 
                       alt="Gold" 
-                      className="w-6 h-6 sm:w-7 sm:h-7 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.8)] group-hover:scale-110 transition-transform duration-300" 
+                      className="w-5 h-5 sm:w-6 sm:h-6 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.8)] group-hover:scale-110 transition-transform duration-300 shrink-0" 
                     />
-                    <span className="text-lg sm:text-xl font-black text-amber-400 font-mono leading-none tracking-tight">
+                    <span className="text-base sm:text-lg font-black text-amber-400 font-mono leading-none tracking-tight truncate">
                       {pkg.goldAmount.toLocaleString()}
                     </span>
                   </div>
@@ -184,16 +184,16 @@ export const GoldShopModal: React.FC<GoldShopModalProps> = ({ onClose }) => {
                       }
                     }}
                     disabled={isPurchasing}
-                    className="bg-gradient-to-r from-red-900/85 via-red-800/90 to-rose-900/85 hover:from-red-850 hover:via-red-750 hover:to-rose-850 text-white border border-red-500/50 hover:border-red-400/80 font-mono text-xs font-black py-2 px-3 sm:px-3.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 active:scale-95 shadow-[0_0_15px_rgba(225,29,72,0.3)] hover:shadow-[0_0_20px_rgba(244,63,94,0.5)] hover:scale-105"
+                    className="shrink-0 bg-gradient-to-r from-red-900/90 via-red-800 to-rose-900/90 hover:from-red-800 hover:via-red-700 hover:to-rose-800 text-white border border-red-500/50 hover:border-red-400/80 font-mono text-xs font-black py-2 px-2.5 sm:px-3 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 active:scale-95 shadow-[0_0_15px_rgba(225,29,72,0.3)] hover:shadow-[0_0_20px_rgba(244,63,94,0.5)] hover:scale-105"
                     title={`Purchase for ${pkg.shardCost} Shards`}
                   >
                     <img 
                       src="/icons/icon_shards.webp" 
                       alt="Shards" 
-                      className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(244,63,94,0.8)] shrink-0" 
+                      className="w-4 h-4 sm:w-4.5 sm:h-4.5 object-contain drop-shadow-[0_0_6px_rgba(244,63,94,0.8)] shrink-0" 
                     />
-                    <span className="text-sm font-black tracking-tight">{pkg.shardCost}</span>
-                    <span className="text-[10px] text-rose-200 uppercase font-bold tracking-wider opacity-90">
+                    <span className="text-xs sm:text-sm font-black tracking-tight">{pkg.shardCost}</span>
+                    <span className="text-[9px] sm:text-[10px] text-rose-200 uppercase font-bold tracking-wider opacity-90">
                       SHARDS
                     </span>
                   </button>
