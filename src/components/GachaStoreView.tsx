@@ -252,10 +252,10 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
         toast('Insufficient Dark Shards! Opening Abyssal Shop...', 'warning');
         return;
       }
-    } else if (packType === 'bronze' && (profile.gold || 0) < 300) {
+    } else if (packType === 'bronze' && (profile.gold || 0) < 1000) {
       toast('Insufficient Gold!', 'warning');
       return;
-    } else if (packType === 'eq_basic' && (profile.gold || 0) < 500) {
+    } else if (packType === 'eq_basic' && (profile.gold || 0) < 700) {
       toast('Insufficient Gold!', 'warning');
       return;
     }
@@ -637,7 +637,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       className="w-full bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-black font-display font-black tracking-widest py-2.5 px-3 rounded-xl transition-all duration-300 shadow-[0_0_16px_rgba(245,158,11,0.35)] hover:shadow-[0_0_24px_rgba(245,158,11,0.6)] flex items-center justify-center gap-2 text-xs cursor-pointer hover:scale-[1.02] active:scale-95 select-none"
                     >
                       <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain drop-shadow" />
-                      <span className="drop-shadow-sm">300 GOLD</span>
+                      <span className="drop-shadow-sm">1000 GOLD</span>
                     </button>
                   </div>
                 </div>
@@ -896,7 +896,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       className="w-full bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-black font-display font-black tracking-widest py-2.5 px-3 rounded-xl transition-all duration-300 shadow-[0_0_16px_rgba(245,158,11,0.35)] hover:shadow-[0_0_24px_rgba(245,158,11,0.6)] flex items-center justify-center gap-2 text-xs cursor-pointer hover:scale-[1.02] active:scale-95 select-none"
                     >
                       <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain drop-shadow" />
-                      <span className="drop-shadow-sm">500 GOLD</span>
+                      <span className="drop-shadow-sm">700 GOLD</span>
                     </button>
                   </div>
                 </div>
