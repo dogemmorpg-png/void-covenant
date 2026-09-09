@@ -507,12 +507,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     colorClass: string
   ) => {
     const id = `float_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    const xOffset = (Math.random() - 0.5) * 50; // Random horizontal bounce direction
-    const lifespan = Math.max(350, 950 / speedMultiplier);
+    const xOffset = (Math.random() - 0.5) * 40; // Random horizontal bounce direction
+    const lifespan = Math.max(300, Math.round(650 / speedMultiplier));
     
     setFloatingTexts(prev => {
-      // Keep at most 12 floating texts active at any time to avoid DOM buildup on 3x speed
-      const trimmed = prev.length > 12 ? prev.slice(prev.length - 11) : prev;
+      // Keep at most 6 floating texts active at any time to avoid DOM buildup on mobile and high speeds
+      const trimmed = prev.length >= 6 ? prev.slice(prev.length - 5) : prev;
       return [...trimmed, { id, text, target, colorClass, xOffset }];
     });
     setTimeout(() => {
@@ -1262,7 +1262,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               scale: [0.7, 1.45, 1.1] 
             }}
             exit={{ opacity: 0 }}
-            transition={{ duration: Math.max(0.3, 0.85 / effectiveSpeed), ease: "easeOut" }}
+            transition={{ duration: Math.max(0.25, 0.55 / effectiveSpeed), ease: "easeOut" }}
             style={{ textShadow: '0 2px 4px rgba(0,0,0,0.95), 0 0 6px rgba(0,0,0,0.9)' }}
             className={`absolute z-50 pointer-events-none text-center font-mono font-black select-none transform-gpu will-change-transform ${f.colorClass}`}
           >
@@ -1279,18 +1279,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     : null;
 
   return (
-    <div className="h-screen max-h-screen overflow-hidden bg-[#090705]
-      [--dash-offset:16]
-      [&_line]:[stroke-dashoffset:var(--dash-offset)]
-     text-gray-200 p-2 md:p-3 font-sans flex flex-col justify-between select-none relative">
-      
-      <style>{`
-        @keyframes dash {
-          to {
-            stroke-dashoffset: -40;
-          }
-        }
-      `}</style>
+    <div className="h-screen max-h-screen overflow-hidden bg-[#090705] text-gray-200 p-2 md:p-3 font-sans flex flex-col justify-between select-none relative">
       
       {/* Header Bar */}
       <div className="bg-[#120d0a]/95 border border-[#ebd09b]/15 rounded-lg p-1.5 px-3 flex justify-between items-center max-w-7xl mx-auto w-full mb-2 shadow-md h-[40px] shrink-0 z-20">
@@ -1661,7 +1650,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 initial={{ opacity: 0, y: -15, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -15, scale: 0.95 }}
-                className="absolute top-3 left-1/2 -translate-x-1/2 bg-gradient-to-b from-[#1c140e] to-[#0d0906] border-2 border-[#ebd09b]/35 rounded-xl p-2 px-4 flex justify-between items-center gap-4 shadow-[0_8px_30px_rgba(0,0,0,0.9),_0_0_15px_rgba(235,208,155,0.1)] backdrop-blur-md h-[54px] w-[560px] shrink-0 z-35"
+                className="absolute top-3 left-1/2 -translate-x-1/2 bg-gradient-to-b from-[#1c140e] to-[#0d0906] border-2 border-[#ebd09b]/35 rounded-xl p-2 px-4 flex justify-between items-center gap-4 shadow-[0_8px_30px_rgba(0,0,0,0.9),_0_0_15px_rgba(235,208,155,0.1)] h-[54px] w-[95%] max-w-[560px] shrink-0 z-35"
               >
                 {/* Combat Message Announcer */}
                 <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -2259,17 +2248,17 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             <>
               <motion.div
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.6 }}
+                animate={{ opacity: 0.8 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setShowLogDrawer(false)}
-                className="fixed inset-0 bg-black/80 backdrop-blur-sm z-45"
+                className="fixed inset-0 bg-black/85 z-45"
               />
               <motion.div
                 initial={{ x: '100%' }}
                 animate={{ x: 0 }}
                 exit={{ x: '100%' }}
                 transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-                className="fixed right-0 top-0 bottom-0 w-88 sm:w-[420px] bg-gradient-to-b from-[#131822] via-[#0d1017] to-[#0a0d13] border-l border-[#ebd09b]/35 z-50 p-4 sm:p-5 flex flex-col justify-between shadow-[-10px_0_40px_rgba(0,0,0,0.85)] backdrop-blur-md"
+                className="fixed right-0 top-0 bottom-0 w-88 sm:w-[420px] bg-gradient-to-b from-[#131822] via-[#0d1017] to-[#0a0d13] border-l border-[#ebd09b]/35 z-50 p-4 sm:p-5 flex flex-col justify-between shadow-[-10px_0_40px_rgba(0,0,0,0.85)]"
               >
                 {/* Header */}
                 <div className="border-b border-gray-800 pb-3 mb-2 space-y-2.5">
@@ -2504,7 +2493,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="absolute bottom-[175px] left-6 w-[350px] bg-[#0d1117]/98 border-2 border-[#ebd09b]/35 rounded-2xl p-4 z-45 shadow-[0_10px_35px_rgba(0,0,0,0.85)] backdrop-blur-md pointer-events-none text-left flex gap-3.5"
+              className="absolute bottom-[175px] left-6 w-[350px] bg-[#0d1117]/98 border-2 border-[#ebd09b]/35 rounded-2xl p-4 z-45 shadow-[0_10px_35px_rgba(0,0,0,0.85)] pointer-events-none text-left flex gap-3.5"
             >
               {/* Card visual representation inside analyzer */}
               <div 
@@ -2621,7 +2610,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         </AnimatePresence>
 
         {/* PLAYER HAND FAN ZONE - animated interactively using state-driven slide-aside positioning */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex justify-center items-end h-[170px] z-40 select-none pointer-events-none w-[560px]">
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex justify-center items-end h-[170px] z-40 select-none pointer-events-none w-full max-w-[560px] px-2">
           <div className="flex justify-center items-end relative w-full h-full pointer-events-auto">
             {visualState.playerHand.map((card, idx) => {
               const isSelected = selectedHandCardId === card.id;
@@ -2632,7 +2621,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               const offset = idx - middle;
               const rotate = offset * 5; 
               
-              let translateX = offset * 52;
+              // Dynamic card step based on screen width
+              const stepX = typeof window !== 'undefined' && window.innerWidth < 640 ? 38 : 52;
+              let translateX = offset * stepX;
               // Push cards slightly down when not hovered, but raise them so they are readable
               let translateY = Math.abs(offset) * 5 + (isSelected ? -25 : 35);
               let scale = 1.0;
@@ -2642,12 +2633,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               if (hoveredHandCardIndex !== null) {
                 if (hoveredHandCardIndex === idx) {
                   translateY = -75;
-                  scale = 1.5;
+                  scale = 1.45;
                   zIndex = 100;
                 } else if (idx < hoveredHandCardIndex) {
-                  translateX -= 40; // Slide left
+                  translateX -= 35; // Slide left
                 } else if (idx > hoveredHandCardIndex) {
-                  translateX += 40; // Slide right
+                  translateX += 35; // Slide right
                 }
               }
 
@@ -2696,6 +2687,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           <img 
                             src={card.image} 
                             alt={card.name} 
+                            decoding="async"
+                            loading="eager"
                             className={`absolute inset-0 w-full h-full object-cover transition-all ${card.delay > 0 ? 'opacity-40 filter saturate-50 brightness-75' : 'opacity-85'}`} 
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
@@ -2775,7 +2768,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
       {/* VICTORY POPUP MODAL */}
       {battle.phase === 'player_won' && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-md animate-fade-in">
+        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-gradient-to-b from-[#18140f] via-[#0d0a08] to-[#050403] border-2 border-amber-500/50 rounded-3xl p-7 max-w-md w-full text-center space-y-6 shadow-[0_0_50px_rgba(245,158,11,0.25)] relative overflow-hidden">
             
             {/* Ambient Background Flare */}
@@ -2848,60 +2841,36 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               <div className={`grid gap-2.5 ${battleType === 'pvp' ? (earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4') : (stage.shardsReward > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3')}`}>
                 {/* Gold */}
                 <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
-                  <span className="text-amber-300 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
-                    +{earnedGold}
-                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.5)]" />
-                  </span>
-                  <span className="text-[9px] text-amber-400/70 font-mono uppercase tracking-wider mt-0.5 font-bold">Gold</span>
+                  <span className="text-sm font-black font-mono text-yellow-400">+{totalGoldReward}</span>
+                  <span className="text-[9px] text-amber-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Gold</span>
                 </div>
-                
-                {/* Dust */}
-                <div className="bg-gradient-to-b from-cyan-950/40 via-black to-black border border-cyan-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
-                  <span className="text-cyan-300 font-display font-black text-base flex items-center gap-1 text-shadow-cyan">
-                    +{earnedDust}
-                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-7 h-7 object-contain drop-shadow-[0_0_8px_rgba(102,252,241,0.6)] scale-125" />
-                  </span>
-                  <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Dust</span>
+                {/* EXP */}
+                <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                  <span className="text-sm font-black font-mono text-amber-300">+{stage.expReward}</span>
+                  <span className="text-[9px] text-amber-400/70 font-mono uppercase tracking-wider mt-1 font-bold">EXP</span>
                 </div>
-
-                {/* EXP (Both PvE and PvP) */}
-                <div className="bg-gradient-to-b from-emerald-950/40 via-black to-black border border-emerald-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
-                  <span className="text-emerald-300 font-display font-black text-base flex items-center gap-1 text-shadow-emerald">
-                    +{earnedExp}
-                    <img src="/icons/icon_exp.webp" alt="EXP" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
-                  </span>
-                  <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider mt-1 font-bold">EXP</span>
-                </div>
-                
-                {/* Crowns (PvP Only) */}
+                {/* Shards (Campaign only) */}
+                {battleType === 'campaign' && stage.shardsReward > 0 && (
+                  <div className="bg-gradient-to-b from-purple-950/40 via-black to-black border border-purple-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                    <span className="text-sm font-black font-mono text-purple-300">+{stage.shardsReward}</span>
+                    <span className="text-[9px] text-purple-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Shards</span>
+                  </div>
+                )}
+                {/* Sovereign (PvP only) */}
+                {battleType === 'pvp' && earnedSovereigns > 0 && (
+                  <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                    <span className="text-sm font-black font-mono text-amber-300">+{earnedSovereigns}</span>
+                    <span className="text-[9px] text-amber-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Sovereigns</span>
+                  </div>
+                )}
+                {/* Rating (PvP only) */}
                 {battleType === 'pvp' && (
-                  <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/40 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.15)]">
-                    <span className="text-amber-300 font-display font-black text-base flex items-center gap-1.5 text-shadow-gold">
-                      +20
+                  <div className="bg-gradient-to-b from-red-950/40 via-black to-black border border-red-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                    <span className="text-sm font-black font-mono text-red-400 flex items-center justify-center gap-1">
+                      <span>+{earnedRating}</span>
                       <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain brightness-110 contrast-125" />
                     </span>
-                    <span className="text-[9px] text-amber-400/80 font-mono uppercase tracking-wider mt-1 font-bold">Crowns</span>
-                  </div>
-                )}
-
-                {/* Blood Sovereigns (PvP Only - Subscriber Bounty when > 0) */}
-                {battleType === 'pvp' && earnedSovereigns > 0 && (
-                  <div className="bg-gradient-to-b from-amber-950/50 via-black to-black border border-amber-500/50 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.2)]">
-                    <span className="text-amber-400 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
-                      +{earnedSovereigns}
-                      <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
-                    </span>
-                    <span className="text-[9px] text-amber-300 font-mono uppercase tracking-wider mt-1 font-bold">Sovereigns</span>
-                  </div>
-                )}
-
-                {battleType === 'campaign' && stage.shardsReward > 0 && (
-                  <div className="bg-gradient-to-b from-rose-950/40 via-black to-black border border-rose-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
-                    <span className="text-rose-400 font-display font-black text-base flex items-center gap-1 text-shadow-crimson">
-                      +{stage.shardsReward}
-                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.5)]" />
-                    </span>
-                    <span className="text-[9px] text-rose-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Shards</span>
+                    <span className="text-[9px] text-red-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Crowns</span>
                   </div>
                 )}
 
@@ -2958,7 +2927,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
       {/* LOST POPUP MODAL */}
       {battle.phase === 'player_lost' && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-md animate-fade-in">
+        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-gradient-to-b from-[#1c080a] via-[#0e0304] to-[#050102] border-2 border-rose-600/50 rounded-3xl p-7 max-w-md w-full text-center space-y-6 shadow-[0_0_50px_rgba(225,29,72,0.25)] relative overflow-hidden">
             
             {/* Ambient Background Flare */}
@@ -2983,20 +2952,18 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             </div>
 
             <div className="bg-black/60 p-4 rounded-2xl border border-rose-500/25 space-y-3 relative z-10">
-              <span className="text-[10px] font-display text-rose-400/90 tracking-widest block uppercase font-bold">BATTLE CONSEQUENCES</span>
-              <div className="flex justify-center items-center gap-3">
-                <div className="bg-gradient-to-b from-amber-950/30 via-black to-black border border-amber-500/30 px-4 py-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[90px]">
-                  <span className="text-amber-400 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
-                    +{lossEarnedGold}
-                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 object-contain drop-shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
-                  </span>
-                  <span className="text-[9px] text-amber-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Consolation</span>
+              <span className="text-[10px] font-display text-rose-400/90 tracking-widest block uppercase font-bold">DEFEAT OUTCOME</span>
+              <div className={`grid gap-2.5 ${battleType === 'pvp' ? 'grid-cols-2' : 'grid-cols-2'}`}>
+                {/* Gold penalty / consolation */}
+                <div className="bg-gradient-to-b from-rose-950/40 via-black to-black border border-rose-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                  <span className="text-sm font-black font-mono text-rose-400">+{lossGoldReward}</span>
+                  <span className="text-[9px] text-rose-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Gold Looted</span>
                 </div>
-                
+                {/* Crowns lost / zero */}
                 {battleType === 'pvp' && (
-                  <div className="bg-gradient-to-b from-rose-950/40 via-black to-black border border-rose-500/40 px-4 py-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[90px]">
-                    <span className="text-rose-400 font-display font-black text-base flex items-center gap-1.5 text-shadow-crimson">
-                      -15
+                  <div className="bg-gradient-to-b from-rose-950/40 via-black to-black border border-rose-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                    <span className="text-sm font-black font-mono text-rose-400 flex items-center justify-center gap-1">
+                      <span>-15</span>
                       <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain brightness-110 contrast-125" />
                     </span>
                     <span className="text-[9px] text-rose-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Crowns</span>
@@ -3047,7 +3014,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       {/* DETAILED HELP MODAL (FULL RICH TEXT - EXPANDED ZERO-SCROLL AAA GUIDE) */}
       <AnimatePresence>
         {showHelpModal && (
-          <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-2.5 sm:p-4 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-2.5 sm:p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
