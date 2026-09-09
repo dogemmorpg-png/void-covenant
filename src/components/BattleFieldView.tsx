@@ -557,16 +557,16 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     // 3x -> 2.15 (turbo, maintains 25+ frames per action)
     const effectiveSpeed = speedMultiplier === 1 ? 1.0 : (speedMultiplier === 2 ? 1.55 : 2.15);
 
-    // Step-specific calibrated timings
-    let strikeDuration = Math.round(760 / effectiveSpeed);
-    let impactDelay = Math.round(380 / effectiveSpeed);
-    let stepDuration = Math.round(920 / effectiveSpeed);
+    // Step-specific calibrated timings (impact exactly matches 46% strike keyframe at 330ms)
+    let strikeDuration = Math.round(720 / effectiveSpeed);
+    let impactDelay = Math.round(330 / effectiveSpeed);
+    let stepDuration = Math.round(860 / effectiveSpeed);
 
     if (step.type === 'enemy_play') {
-      stepDuration = Math.round(850 / effectiveSpeed);
+      stepDuration = Math.round(800 / effectiveSpeed);
     } else if (step.type === 'hero_skill') {
-      impactDelay = Math.round(360 / effectiveSpeed);
-      stepDuration = Math.round(980 / effectiveSpeed);
+      impactDelay = Math.round(330 / effectiveSpeed);
+      stepDuration = Math.round(920 / effectiveSpeed);
     } else if (step.type === 'plague') {
       impactDelay = Math.round(340 / effectiveSpeed);
       stepDuration = Math.round(880 / effectiveSpeed);
@@ -684,42 +684,64 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             addFloatingText(`+${step.vampireHeal} 🩸`, { side: step.attacker, slot: step.slot }, 'text-emerald-400 font-extrabold text-xs');
           }
 
-          // Apply state update deterministically on impact
+          // Apply state update deterministically on impact with targeted reference preservation
           setVisualState(prev => {
-            const copy = cloneBattleState(prev);
-            const target = step.attacker === 'player' ? copy.enemyBoard[step.targetSlot] : copy.playerBoard[step.targetSlot];
-            const attacker = step.attacker === 'player' ? copy.playerBoard[step.slot] : copy.enemyBoard[step.slot];
+            const isPlayerAttacking = step.attacker === 'player';
+            const targetBoardKey = isPlayerAttacking ? 'enemyBoard' : 'playerBoard';
+            const attackerBoardKey = isPlayerAttacking ? 'playerBoard' : 'enemyBoard';
 
-            if (target) {
+            const prevTarget = prev[targetBoardKey][step.targetSlot];
+            const prevAttacker = prev[attackerBoardKey][step.slot];
+
+            let nextTarget = prevTarget;
+            if (prevTarget) {
+              nextTarget = { ...prevTarget, skills: prevTarget.skills };
               if (step.barrierBlocked) {
-                target.barrier = false;
-                target.ward = false;
+                nextTarget.barrier = false;
+                nextTarget.ward = false;
               } else {
                 if (step.armorBroken) {
-                  target.armor = 0;
+                  nextTarget.armor = 0;
                 } else if (step.armorAbsorbed > 0) {
-                  target.armor = Math.max(0, (target.armor || 0) - step.armorAbsorbed);
+                  nextTarget.armor = Math.max(0, (nextTarget.armor || 0) - step.armorAbsorbed);
                 }
                 if (step.targetHealth !== undefined) {
-                  target.health = Math.max(0, step.targetHealth);
+                  nextTarget.health = Math.max(0, step.targetHealth);
                 } else if (step.damage > 0) {
-                  target.health = Math.max(0, target.health - step.damage);
+                  nextTarget.health = Math.max(0, nextTarget.health - step.damage);
                 }
                 if (step.targetArmor !== undefined) {
-                  target.armor = step.targetArmor;
+                  nextTarget.armor = step.targetArmor;
                 }
               }
             }
 
-            if (attacker) {
+            let nextAttacker = prevAttacker;
+            if (prevAttacker && (step.attackerHealth !== undefined || step.vampireHeal > 0)) {
+              nextAttacker = { ...prevAttacker, skills: prevAttacker.skills };
               if (step.attackerHealth !== undefined) {
-                attacker.health = Math.min(attacker.maxHealth, step.attackerHealth);
+                nextAttacker.health = Math.min(nextAttacker.maxHealth, step.attackerHealth);
               } else if (step.vampireHeal > 0) {
-                attacker.health = Math.min(attacker.maxHealth, attacker.health + step.vampireHeal);
+                nextAttacker.health = Math.min(nextAttacker.maxHealth, nextAttacker.health + step.vampireHeal);
               }
             }
 
-            return copy;
+            const nextPlayerBoard = [...prev.playerBoard];
+            const nextEnemyBoard = [...prev.enemyBoard];
+
+            if (isPlayerAttacking) {
+              nextEnemyBoard[step.targetSlot] = nextTarget;
+              nextPlayerBoard[step.slot] = nextAttacker;
+            } else {
+              nextPlayerBoard[step.targetSlot] = nextTarget;
+              nextEnemyBoard[step.slot] = nextAttacker;
+            }
+
+            return {
+              ...prev,
+              playerBoard: nextPlayerBoard,
+              enemyBoard: nextEnemyBoard
+            };
           });
         }, impactDelay);
         timeouts.push(tHit);
@@ -742,17 +764,17 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           addFloatingText(`💥 -${step.damage}`, targetHeroLabel, 'text-red-500 font-black text-xl scale-125 text-shadow-glow');
 
           setVisualState(prev => {
-            const copy = cloneBattleState(prev);
             if (step.attacker === 'player') {
-              copy.enemyHeroHealth = step.enemyHeroHealth !== undefined 
+              const newEnemyHealth = step.enemyHeroHealth !== undefined 
                 ? step.enemyHeroHealth 
-                : Math.max(0, copy.enemyHeroHealth - step.damage);
+                : Math.max(0, prev.enemyHeroHealth - step.damage);
+              return { ...prev, enemyHeroHealth: newEnemyHealth };
             } else {
-              copy.playerHeroHealth = step.playerHeroHealth !== undefined 
+              const newPlayerHealth = step.playerHeroHealth !== undefined 
                 ? step.playerHeroHealth 
-                : Math.max(0, copy.playerHeroHealth - step.damage);
+                : Math.max(0, prev.playerHeroHealth - step.damage);
+              return { ...prev, playerHeroHealth: newPlayerHealth };
             }
-            return copy;
           });
         }, impactDelay);
         timeouts.push(tHit);
@@ -1240,8 +1262,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               scale: [0.7, 1.45, 1.1] 
             }}
             exit={{ opacity: 0 }}
-            transition={{ duration: Math.max(0.3, 0.85 / speedMultiplier), ease: "easeOut" }}
-            className={`absolute z-50 pointer-events-none text-center font-mono font-black select-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] ${f.colorClass}`}
+            transition={{ duration: Math.max(0.3, 0.85 / effectiveSpeed), ease: "easeOut" }}
+            style={{ textShadow: '0 2px 4px rgba(0,0,0,0.95), 0 0 6px rgba(0,0,0,0.9)' }}
+            className={`absolute z-50 pointer-events-none text-center font-mono font-black select-none transform-gpu will-change-transform ${f.colorClass}`}
           >
             {f.text}
           </motion.div>
@@ -1828,9 +1851,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                           <div className="w-full bg-black/50 h-1 rounded-full overflow-hidden z-10 border border-black/30 relative mb-1.5 shrink-0">
                             <motion.div
-                              className="bg-red-500 h-full rounded-full"
-                              animate={{ width: `${(card.health / card.maxHealth) * 100}%` }}
-                              transition={{ duration: Math.max(0.12, 0.35 / effectiveSpeed) }}
+                              className="bg-red-500 h-full w-full rounded-full origin-left transform-gpu will-change-transform"
+                              animate={{ scaleX: Math.max(0, card.health / card.maxHealth) }}
+                              transition={{ duration: Math.max(0.12, 0.28 / effectiveSpeed), ease: "easeOut" }}
                             />
                           </div>
 
@@ -1861,110 +1884,75 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     </AnimatePresence>
 
                     {/* Skill Overlay Animations with Dedicated Lifecycles */}
+                    {/* Consolidated Overlay Layer for High Performance */}
                     <AnimatePresence>
                       {barrierShatterSlot?.side === side && barrierShatterSlot?.slot === idx && (
-                        <BarrierShatterOverlay />
+                        <BarrierShatterOverlay key="barrier" />
                       )}
-                    </AnimatePresence>
-                    <AnimatePresence>
                       {armorSparkSlot?.side === side && armorSparkSlot?.slot === idx && (
-                        <ArmorSparkOverlay />
+                        <ArmorSparkOverlay key="armor-spark" />
                       )}
-                    </AnimatePresence>
-                    <AnimatePresence>
                       {armorBreakSlot?.side === side && armorBreakSlot?.slot === idx && (
-                        <ArmorBreakOverlay />
+                        <ArmorBreakOverlay key="armor-break" />
                       )}
-                    </AnimatePresence>
-                    <AnimatePresence>
                       {isHit && (
                         <motion.div
+                          key="hit-flash"
                           initial={{ opacity: 0.8 }}
                           animate={{ opacity: 0 }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.15, 0.35 / effectiveSpeed) }}
+                          transition={{ duration: Math.max(0.15, 0.32 / effectiveSpeed) }}
                           className="absolute inset-0 bg-red-600/40 z-30 pointer-events-none rounded-xl"
                         />
                       )}
-                    </AnimatePresence>
-                    <AnimatePresence>
                       {isHeal && (
                         <motion.div
+                          key="heal-flash"
                           initial={{ opacity: 0.8 }}
                           animate={{ opacity: 0 }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.18, 0.45 / effectiveSpeed) }}
+                          transition={{ duration: Math.max(0.18, 0.42 / effectiveSpeed) }}
                           className="absolute inset-0 bg-emerald-500/35 z-30 pointer-events-none rounded-xl"
                         />
                       )}
-                    </AnimatePresence>
-                    <AnimatePresence>
-                      {activeSkillVfx?.type === 'plague' && activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
+                      {activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
                         <motion.div
+                          key={`skill-vfx-${activeSkillVfx.type}`}
                           initial={{ opacity: 0, scale: 0.85 }}
                           animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.03, 1.03, 0.9] }}
                           exit={{ opacity: 0 }}
                           transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
-                          className="absolute inset-0 bg-black/55 border-2 border-emerald-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_25px_rgba(16,185,129,0.85)] overflow-hidden"
+                          className={`absolute inset-0 bg-black/55 border-2 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none overflow-hidden ${
+                            activeSkillVfx.type === 'plague' ? 'border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.85)]' :
+                            activeSkillVfx.type === 'void_strike' ? 'border-cyan-500 shadow-[0_0_25px_rgba(6,182,212,0.85)]' :
+                            activeSkillVfx.type === 'blood_aura' ? 'border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.85)]' :
+                            activeSkillVfx.type === 'warlord_cry' ? 'border-amber-500 shadow-[0_0_25px_rgba(245,158,11,0.85)]' :
+                            'border-purple-500 shadow-[0_0_25px_rgba(168,85,247,0.85)]'
+                          }`}
                         >
-                          <img src="/icons/plague_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
-                          <span className="relative text-[8.5px] font-mono font-black text-emerald-400 tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border border-emerald-500/40 z-10 animate-pulse">PLAGUE INFECT</span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    <AnimatePresence>
-                      {activeSkillVfx?.type === 'void_strike' && activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.03, 1.03, 0.9] }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
-                          className="absolute inset-0 bg-black/55 border-2 border-cyan-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_25px_rgba(6,182,212,0.85)] overflow-hidden"
-                        >
-                          <img src="/icons/void_strike_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-90" />
-                          <span className="relative text-[9px] font-mono font-black text-cyan-300 tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border border-cyan-500/40 z-10 animate-pulse">VOID STRIKE</span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    <AnimatePresence>
-                      {activeSkillVfx?.type === 'blood_aura' && activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.03, 1.03, 0.9] }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
-                          className="absolute inset-0 bg-black/55 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_25px_rgba(239,68,68,0.85)] overflow-hidden"
-                        >
-                          <img src="/icons/blood_aura_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-90" />
-                          <span className="relative text-[9px] font-mono font-black text-red-300 tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border border-red-500/40 z-10 animate-pulse">BLOOD AURA</span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    <AnimatePresence>
-                      {activeSkillVfx?.type === 'warlord_cry' && activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.03, 1.03, 0.9] }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
-                          className="absolute inset-0 bg-black/55 border-2 border-amber-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_25px_rgba(245,158,11,0.85)] overflow-hidden"
-                        >
-                          <img src="/icons/warlord_cry_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-90" />
-                          <span className="relative text-[9px] font-mono font-black text-amber-300 tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border border-amber-500/40 z-10 animate-pulse">WARLORD CRY</span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    <AnimatePresence>
-                      {activeSkillVfx?.type === 'hex' && activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.03, 1.03, 0.9] }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
-                          className="absolute inset-0 bg-black/55 border-2 border-purple-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_25px_rgba(168,85,247,0.85)] overflow-hidden"
-                        >
-                          <img src="/icons/hex_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-90" />
-                          <span className="relative text-[9px] font-mono font-black text-purple-300 tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border border-purple-500/40 z-10 animate-pulse">HEX CURSED</span>
+                          <img 
+                            src={
+                              activeSkillVfx.type === 'plague' ? '/icons/plague_fx.webp' :
+                              activeSkillVfx.type === 'void_strike' ? '/icons/void_strike_fx.webp' :
+                              activeSkillVfx.type === 'blood_aura' ? '/icons/blood_aura_fx.webp' :
+                              activeSkillVfx.type === 'warlord_cry' ? '/icons/warlord_cry_fx.webp' :
+                              '/icons/hex_fx.webp'
+                            } 
+                            className="absolute inset-0 w-full h-full object-cover opacity-90" 
+                          />
+                          <span className={`relative text-[9px] font-mono font-black tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border z-10 ${
+                            activeSkillVfx.type === 'plague' ? 'text-emerald-400 border-emerald-500/40' :
+                            activeSkillVfx.type === 'void_strike' ? 'text-cyan-300 border-cyan-500/40' :
+                            activeSkillVfx.type === 'blood_aura' ? 'text-red-300 border-red-500/40' :
+                            activeSkillVfx.type === 'warlord_cry' ? 'text-amber-300 border-amber-500/40' :
+                            'text-purple-300 border-purple-500/40'
+                          }`}>
+                            {activeSkillVfx.type === 'plague' ? 'PLAGUE INFECT' :
+                             activeSkillVfx.type === 'void_strike' ? 'VOID STRIKE' :
+                             activeSkillVfx.type === 'blood_aura' ? 'BLOOD AURA' :
+                             activeSkillVfx.type === 'warlord_cry' ? 'WARLORD CRY' :
+                             'HEX CURSED'}
+                          </span>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -2101,9 +2089,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                           <div className="w-full bg-black/50 h-1 rounded-full overflow-hidden z-10 border border-black/30 relative mb-1.5 shrink-0">
                             <motion.div
-                              className="bg-emerald-500 h-full rounded-full"
-                              animate={{ width: `${(card.health / card.maxHealth) * 100}%` }}
-                              transition={{ duration: Math.max(0.12, 0.35 / effectiveSpeed) }}
+                              className="bg-emerald-500 h-full w-full rounded-full origin-left transform-gpu will-change-transform"
+                              animate={{ scaleX: Math.max(0, card.health / card.maxHealth) }}
+                              transition={{ duration: Math.max(0.12, 0.28 / effectiveSpeed), ease: "easeOut" }}
                             />
                           </div>
 
@@ -2143,61 +2131,40 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       )}
                     </AnimatePresence>
 
-                    {/* Skill Overlay Animations with Dedicated Lifecycles */}
+                    {/* Consolidated Overlay Layer for High Performance */}
                     <AnimatePresence>
                       {barrierShatterSlot?.side === side && barrierShatterSlot?.slot === idx && (
-                        <BarrierShatterOverlay />
+                        <BarrierShatterOverlay key="barrier" />
                       )}
-                    </AnimatePresence>
-                    <AnimatePresence>
                       {armorSparkSlot?.side === side && armorSparkSlot?.slot === idx && (
-                        <ArmorSparkOverlay />
+                        <ArmorSparkOverlay key="armor-spark" />
                       )}
-                    </AnimatePresence>
-                    <AnimatePresence>
                       {armorBreakSlot?.side === side && armorBreakSlot?.slot === idx && (
-                        <ArmorBreakOverlay />
+                        <ArmorBreakOverlay key="armor-break" />
                       )}
-                    </AnimatePresence>
-                    <AnimatePresence>
                       {isHit && (
                         <motion.div
+                          key="hit-flash"
                           initial={{ opacity: 0.8 }}
                           animate={{ opacity: 0 }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.15, 0.35 / effectiveSpeed) }}
+                          transition={{ duration: Math.max(0.15, 0.32 / effectiveSpeed) }}
                           className="absolute inset-0 bg-red-600/40 z-30 pointer-events-none rounded-xl"
                         />
                       )}
-                    </AnimatePresence>
-                    <AnimatePresence>
                       {isHeal && (
                         <motion.div
+                          key="heal-flash"
                           initial={{ opacity: 0.8 }}
                           animate={{ opacity: 0 }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.18, 0.45 / effectiveSpeed) }}
+                          transition={{ duration: Math.max(0.18, 0.42 / effectiveSpeed) }}
                           className="absolute inset-0 bg-emerald-500/35 z-30 pointer-events-none rounded-xl"
                         />
                       )}
-                    </AnimatePresence>
-                    <AnimatePresence>
-                      {activeSkillVfx?.type === 'plague' && activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.03, 1.03, 0.9] }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
-                          className="absolute inset-0 bg-black/55 border-2 border-emerald-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_25px_rgba(16,185,129,0.85)] overflow-hidden"
-                        >
-                          <img src="/icons/plague_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
-                          <span className="relative text-[8.5px] font-mono font-black text-emerald-400 tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border border-emerald-500/40 z-10 animate-pulse">PLAGUE INFECT</span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    <AnimatePresence>
                       {activeSkillVfx?.type === 'sacrifice' && activeSkillVfx?.side === 'player' && activeSkillVfx?.slot === idx && (
                         <motion.div
+                          key="skill-vfx-sacrifice"
                           initial={{ opacity: 0, scale: 0.85 }}
                           animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.05, 1.05, 0.9] }}
                           exit={{ opacity: 0 }}
@@ -2208,60 +2175,44 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           <span className="relative text-[8.5px] font-mono font-black text-red-400 tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border border-red-500/40 z-10 animate-pulse">SACRIFICED</span>
                         </motion.div>
                       )}
-                    </AnimatePresence>
-                    <AnimatePresence>
-                      {activeSkillVfx?.type === 'void_strike' && activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
+                      {activeSkillVfx?.type !== 'sacrifice' && activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
                         <motion.div
+                          key={`skill-vfx-${activeSkillVfx.type}`}
                           initial={{ opacity: 0, scale: 0.85 }}
                           animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.03, 1.03, 0.9] }}
                           exit={{ opacity: 0 }}
                           transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
-                          className="absolute inset-0 bg-black/55 border-2 border-cyan-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_25px_rgba(6,182,212,0.85)] overflow-hidden"
+                          className={`absolute inset-0 bg-black/55 border-2 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none overflow-hidden ${
+                            activeSkillVfx.type === 'plague' ? 'border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.85)]' :
+                            activeSkillVfx.type === 'void_strike' ? 'border-cyan-500 shadow-[0_0_25px_rgba(6,182,212,0.85)]' :
+                            activeSkillVfx.type === 'blood_aura' ? 'border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.85)]' :
+                            activeSkillVfx.type === 'warlord_cry' ? 'border-amber-500 shadow-[0_0_25px_rgba(245,158,11,0.85)]' :
+                            'border-purple-500 shadow-[0_0_25px_rgba(168,85,247,0.85)]'
+                          }`}
                         >
-                          <img src="/icons/void_strike_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-90" />
-                          <span className="relative text-[9px] font-mono font-black text-cyan-300 tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border border-cyan-500/40 z-10 animate-pulse">VOID STRIKE</span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    <AnimatePresence>
-                      {activeSkillVfx?.type === 'blood_aura' && activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.03, 1.03, 0.9] }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
-                          className="absolute inset-0 bg-black/55 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_25px_rgba(239,68,68,0.85)] overflow-hidden"
-                        >
-                          <img src="/icons/blood_aura_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-90" />
-                          <span className="relative text-[9px] font-mono font-black text-red-300 tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border border-red-500/40 z-10 animate-pulse">BLOOD AURA</span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    <AnimatePresence>
-                      {activeSkillVfx?.type === 'warlord_cry' && activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.03, 1.03, 0.9] }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
-                          className="absolute inset-0 bg-black/55 border-2 border-amber-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_25px_rgba(245,158,11,0.85)] overflow-hidden"
-                        >
-                          <img src="/icons/warlord_cry_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-90" />
-                          <span className="relative text-[9px] font-mono font-black text-amber-300 tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border border-amber-500/40 z-10 animate-pulse">WARLORD CRY</span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    <AnimatePresence>
-                      {activeSkillVfx?.type === 'hex' && activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.03, 1.03, 0.9] }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
-                          className="absolute inset-0 bg-black/55 border-2 border-purple-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_25px_rgba(168,85,247,0.85)] overflow-hidden"
-                        >
-                          <img src="/icons/hex_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-90" />
-                          <span className="relative text-[9px] font-mono font-black text-purple-300 tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border border-purple-500/40 z-10 animate-pulse">HEX CURSED</span>
+                          <img 
+                            src={
+                              activeSkillVfx.type === 'plague' ? '/icons/plague_fx.webp' :
+                              activeSkillVfx.type === 'void_strike' ? '/icons/void_strike_fx.webp' :
+                              activeSkillVfx.type === 'blood_aura' ? '/icons/blood_aura_fx.webp' :
+                              activeSkillVfx.type === 'warlord_cry' ? '/icons/warlord_cry_fx.webp' :
+                              '/icons/hex_fx.webp'
+                            } 
+                            className="absolute inset-0 w-full h-full object-cover opacity-90" 
+                          />
+                          <span className={`relative text-[9px] font-mono font-black tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border z-10 ${
+                            activeSkillVfx.type === 'plague' ? 'text-emerald-400 border-emerald-500/40' :
+                            activeSkillVfx.type === 'void_strike' ? 'text-cyan-300 border-cyan-500/40' :
+                            activeSkillVfx.type === 'blood_aura' ? 'text-red-300 border-red-500/40' :
+                            activeSkillVfx.type === 'warlord_cry' ? 'text-amber-300 border-amber-500/40' :
+                            'text-purple-300 border-purple-500/40'
+                          }`}>
+                            {activeSkillVfx.type === 'plague' ? 'PLAGUE INFECT' :
+                             activeSkillVfx.type === 'void_strike' ? 'VOID STRIKE' :
+                             activeSkillVfx.type === 'blood_aura' ? 'BLOOD AURA' :
+                             activeSkillVfx.type === 'warlord_cry' ? 'WARLORD CRY' :
+                             'HEX CURSED'}
+                          </span>
                         </motion.div>
                       )}
                     </AnimatePresence>
