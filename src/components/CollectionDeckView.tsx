@@ -4,7 +4,7 @@ import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { Card, CardTier } from '../types';
 import { CARD_TEMPLATES, getCardManaCost, getEvolutionBonusSkill } from '../data/cards';
-import { Swords, Star, Plus, Minus, ArrowRight, Skull, Shield, Zap, Sparkles, AlertCircle, Crown, ShieldAlert, Bug, Flame, Droplet, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Swords, Star, Plus, Minus, ArrowRight, Skull, Shield, Zap, Sparkles, AlertCircle, Crown, ShieldAlert, Bug, Flame, Droplet, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { assetPreloader, getCardImageUrl } from '../utils/assetPreloader';
 import { SanctuaryEmblem, FusionAltarEmblem, BaseCardSlotEmblem, SacrificeSlotEmblem } from './CardsViewCustomIcons';
 
@@ -513,13 +513,17 @@ export const CollectionDeckView: React.FC = () => {
       );
     }
     return (
-      <div className={`relative w-24 h-32 rounded-xl p-1.5 flex flex-col justify-between cursor-default border overflow-hidden ${getCardTierStyles(card.tier, false, true)} shadow-lg`}>
+      <div 
+        onClick={onClear}
+        className={`relative w-24 h-32 rounded-xl p-1.5 flex flex-col justify-between cursor-pointer border overflow-hidden ${getCardTierStyles(card.tier, false, true)} shadow-lg group hover:ring-2 hover:ring-red-500/70 transition-all select-none`}
+        title="Click anywhere to remove card"
+      >
         {/* Card Image */}
         <img 
           src={getCardImageUrl(card)} 
           alt={card.name} 
           decoding="async" 
-          className="absolute inset-0 w-full h-full object-cover z-0 opacity-80" 
+          className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 group-hover:scale-105 transition-transform duration-200" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/10 z-0 pointer-events-none" />
         
@@ -549,17 +553,15 @@ export const CollectionDeckView: React.FC = () => {
           <span className="text-emerald-400">❤️{card.health}</span>
         </div>
 
-        {/* LARGE CLOSE BUTTON */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClear();
-          }}
-          className="absolute -top-1.5 -right-1.5 bg-black hover:bg-red-950 border border-red-500/50 text-red-500 hover:text-red-300 rounded-full w-6 h-6 flex items-center justify-center text-[10px] z-20 cursor-pointer shadow-md font-bold transition-all hover:scale-110 active:scale-90"
-          title="Remove from Altar"
-        >
-          ✕
-        </button>
+        {/* FULL CARD HOVER REMOVE OVERLAY */}
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-all duration-200 flex flex-col items-center justify-center z-30 border-2 border-red-500/90 rounded-xl">
+          <div className="bg-red-600/90 text-white rounded-full p-2 shadow-[0_0_15px_rgba(239,68,68,0.85)] transform group-hover:scale-110 transition-transform duration-200">
+            <X className="w-5 h-5 stroke-[2.5]" />
+          </div>
+          <span className="text-[9px] font-mono font-bold text-red-200 uppercase tracking-wider mt-1.5 drop-shadow">
+            Remove
+          </span>
+        </div>
       </div>
     );
   };
