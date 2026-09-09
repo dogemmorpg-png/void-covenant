@@ -184,21 +184,17 @@ export const GoldShopModal: React.FC<GoldShopModalProps> = ({ onClose }) => {
                       }
                     }}
                     disabled={isPurchasing}
-                    className={`font-mono text-xs font-black py-2 px-3 sm:px-3.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 active:scale-95 shadow-md ${
-                      !hasEnough
-                        ? 'bg-gradient-to-r from-red-900/70 to-red-800/80 hover:from-red-800 hover:to-red-700 text-rose-200 border border-red-500/40 hover:scale-105'
-                        : 'bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-400 text-black shadow-[0_0_15px_rgba(245,158,11,0.35)] hover:scale-105'
-                    }`}
-                    title={!hasEnough ? 'Click to open Dark Shards Shop' : `Purchase for ${pkg.shardCost} Shards`}
+                    className="bg-gradient-to-r from-red-900/85 via-red-800/90 to-rose-900/85 hover:from-red-850 hover:via-red-750 hover:to-rose-850 text-white border border-red-500/50 hover:border-red-400/80 font-mono text-xs font-black py-2 px-3 sm:px-3.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 active:scale-95 shadow-[0_0_15px_rgba(225,29,72,0.3)] hover:shadow-[0_0_20px_rgba(244,63,94,0.5)] hover:scale-105"
+                    title={`Purchase for ${pkg.shardCost} Shards`}
                   >
                     <img 
                       src="/icons/icon_shards.webp" 
                       alt="Shards" 
-                      className="w-3.5 h-3.5 object-contain" 
+                      className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(244,63,94,0.8)] shrink-0" 
                     />
-                    <span>{pkg.shardCost}</span>
-                    <span className="text-[10px] uppercase font-bold opacity-90">
-                      {!hasEnough ? 'GET' : 'SHARDS'}
+                    <span className="text-sm font-black tracking-tight">{pkg.shardCost}</span>
+                    <span className="text-[10px] text-rose-200 uppercase font-bold tracking-wider opacity-90">
+                      SHARDS
                     </span>
                   </button>
                 </div>
