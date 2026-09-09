@@ -210,6 +210,19 @@ interface FloatingTextEffect {
   xOffset?: number;
 }
 
+// Lightweight immutable clone for BattleState without JSON.stringify overhead
+const cloneBattleState = (state: BattleState): BattleState => {
+  return {
+    ...state,
+    playerBoard: state.playerBoard.map(c => c ? { ...c, skills: [...c.skills] } : null),
+    enemyBoard: state.enemyBoard.map(c => c ? { ...c, skills: [...c.skills] } : null),
+    playerHand: state.playerHand.map(c => ({ ...c, skills: [...c.skills] })),
+    enemyHand: state.enemyHand.map(c => ({ ...c, skills: [...c.skills] })),
+    playerDeckQueue: state.playerDeckQueue ? [...state.playerDeckQueue] : [],
+    combatLog: [...state.combatLog]
+  };
+};
+
 // Card tier helper functions for pristine styling
 const getTierBorderColor = (tier: string) => {
   switch (tier?.toLowerCase()) {
@@ -462,11 +475,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   useEffect(() => {
     const logContainer = document.getElementById('combat-log-scroll');
     if (logContainer) {
-      logContainer.scrollTop = logContainer.scrollHeight;
+      requestAnimationFrame(() => {
+        logContainer.scrollTop = logContainer.scrollHeight;
+      });
     }
-  }, [battle.combatLog, visualState.combatLog]);
+  }, [battle.combatLog.length, visualState.combatLog.length]);
 
-  // Method to easily spawn floating numbers/texts
+  // Method to easily spawn floating numbers/texts (optimized with speed scaling and garbage control)
   const addFloatingText = (
     text: string, 
     target: 'player-hero' | 'enemy-hero' | { side: 'player' | 'enemy'; slot: number }, 
@@ -474,16 +489,22 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   ) => {
     const id = `float_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const xOffset = (Math.random() - 0.5) * 50; // Random horizontal bounce direction
-    setFloatingTexts(prev => [...prev, { id, text, target, colorClass, xOffset }]);
+    const lifespan = Math.max(350, 950 / speedMultiplier);
+    
+    setFloatingTexts(prev => {
+      // Keep at most 12 floating texts active at any time to avoid DOM buildup on 3x speed
+      const trimmed = prev.length > 12 ? prev.slice(prev.length - 11) : prev;
+      return [...trimmed, { id, text, target, colorClass, xOffset }];
+    });
     setTimeout(() => {
       setFloatingTexts(prev => prev.filter(f => f.id !== id));
-    }, 1000);
+    }, lifespan);
   };
 
 
   // Setup the visual starting state before playing steps
   const setupPlaybackState = (playedCardId: string | null, playedSlotIndex: number | null, steps: any[]) => {
-    const playState = JSON.parse(JSON.stringify(battle)) as BattleState;
+    const playState = cloneBattleState(battle);
 
     // 1. Decrement Delays visually for creatures currently on the board
     for (let i = 0; i < 5; i++) {
@@ -529,7 +550,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         addFloatingText(`+${step.buffAttack}⚔️ +${step.buffHealth}❤️`, { side: 'player', slot: step.slot }, 'text-yellow-400 font-bold');
 
         setVisualState(prev => {
-          const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+          const copy = cloneBattleState(prev);
           copy.playerBoard[step.targetSlot] = null;
           const card = copy.playerBoard[step.slot];
           if (card) {
@@ -551,7 +572,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         addFloatingText('SUMMON', { side: 'enemy', slot: step.slot }, 'text-[#ebd09b] font-bold tracking-widest');
 
         setVisualState(prev => {
-          const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+          const copy = cloneBattleState(prev);
           copy.enemyBoard[step.slot] = step.card;
           if (copy.enemyHand.length > 0) {
             copy.enemyHand.shift();
@@ -604,7 +625,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
           // Apply state update deterministically on impact
           setVisualState(prev => {
-            const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+            const copy = cloneBattleState(prev);
             const target = step.attacker === 'player' ? copy.enemyBoard[step.targetSlot] : copy.playerBoard[step.targetSlot];
             const attacker = step.attacker === 'player' ? copy.playerBoard[step.slot] : copy.enemyBoard[step.slot];
 
@@ -660,7 +681,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           addFloatingText(`💥 -${step.damage}`, targetHeroLabel, 'text-red-500 font-black text-xl scale-125 text-shadow-glow');
 
           setVisualState(prev => {
-            const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+            const copy = cloneBattleState(prev);
             if (step.attacker === 'player') {
               copy.enemyHeroHealth = step.enemyHeroHealth !== undefined 
                 ? step.enemyHeroHealth 
@@ -699,7 +720,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               addFloatingText('VOID STRIKE ⚡', casterHeroLabel, 'text-cyan-400 font-bold text-xs');
               
               setVisualState(prev => {
-                const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+                const copy = cloneBattleState(prev);
                 if (targetSide === 'player') {
                   copy.playerHeroHealth = Math.max(0, copy.playerHeroHealth - step.damage);
                 } else {
@@ -739,7 +760,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               addFloatingText('VOID STRIKE ⚡', casterHeroLabel, 'text-cyan-400 font-bold text-xs');
 
               setVisualState(prev => {
-                const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+                const copy = cloneBattleState(prev);
                 const target = targetSide === 'player' ? copy.playerBoard[step.targetSlot] : copy.enemyBoard[step.targetSlot];
                 if (target) {
                   if (step.barrierBlocked) {
@@ -766,7 +787,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             addFloatingText('BLOOD AURA 🩸', casterHeroLabel, 'text-rose-400 font-bold text-xs');
             
             setVisualState(prev => {
-              const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+              const copy = cloneBattleState(prev);
               if (targetSide === 'player') {
                 copy.playerHeroHealth = Math.min(copy.playerHeroMaxHealth, copy.playerHeroHealth + step.heal);
               } else {
@@ -781,7 +802,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             addFloatingText('BLOOD AURA 🩸', casterHeroLabel, 'text-rose-400 font-bold text-xs');
 
             setVisualState(prev => {
-              const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+              const copy = cloneBattleState(prev);
               const target = targetSide === 'player' ? copy.playerBoard[step.targetSlot] : copy.enemyBoard[step.targetSlot];
               if (target) {
                 if (step.targetHealth !== undefined) target.health = step.targetHealth;
@@ -811,7 +832,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             addFloatingText("WARLORD'S CRY 🔥", casterHeroLabel, 'text-yellow-400 font-bold text-xs');
 
             setVisualState(prev => {
-              const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+              const copy = cloneBattleState(prev);
               const target = targetSide === 'player' ? copy.playerBoard[step.targetSlot] : copy.enemyBoard[step.targetSlot];
               if (target) {
                 if (step.bonusAtk > 0) target.attack += step.bonusAtk;
@@ -835,7 +856,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           addFloatingText(`+${step.heal} HP 💚`, 'player-hero', 'text-emerald-400 font-black text-sm');
         }
         setVisualState(prev => {
-          const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+          const copy = cloneBattleState(prev);
           if (isEnemy) {
             copy.enemyHeroHealth = Math.min(copy.enemyHeroMaxHealth, copy.enemyHeroHealth + step.heal);
           } else {
@@ -868,7 +889,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           addFloatingText(`🤢 -${step.damage}`, { side: step.sourceSide === 'player' ? 'enemy' : 'player', slot: step.targetSlot }, 'text-emerald-400 font-black text-xs scale-110');
 
           setVisualState(prev => {
-            const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+            const copy = cloneBattleState(prev);
             const target = step.sourceSide === 'player' ? copy.enemyBoard[step.targetSlot] : copy.playerBoard[step.targetSlot];
             if (target) {
               if (step.targetHealth !== undefined) {
@@ -894,7 +915,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         
         const tDeath = setTimeout(() => {
           setVisualState(prev => {
-            const copy = JSON.parse(JSON.stringify(prev)) as BattleState;
+            const copy = cloneBattleState(prev);
             if (step.side === 'player') {
               copy.playerBoard[step.slot] = null;
             } else {
@@ -1118,7 +1139,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               scale: [0.7, 1.45, 1.1] 
             }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.85, ease: "easeOut" }}
+            transition={{ duration: Math.max(0.3, 0.85 / speedMultiplier), ease: "easeOut" }}
             className={`absolute z-50 pointer-events-none text-center font-mono font-black select-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] ${f.colorClass}`}
           >
             {f.text}
@@ -1351,7 +1372,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       : "0 4px 6px rgba(0, 0, 0, 0.3)"),
                   borderColor: isEnemyHit ? 'rgba(239, 68, 68, 0.9)' : 'rgba(69, 10, 10, 0.3)'
                 }}
-                transition={{ duration: 0.45 }}
+                transition={{ duration: Math.max(0.18, 0.45 / speedMultiplier) }}
                 className="absolute top-4 left-4 flex items-center gap-3 z-30 bg-black/50 p-2 rounded-2xl border backdrop-blur-sm shadow-md"
               >
                 <div className="relative">
@@ -1408,7 +1429,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       : "0 4px 6px rgba(0, 0, 0, 0.3)"),
                   borderColor: isPlayerHit ? 'rgba(239, 68, 68, 0.9)' : 'rgba(8, 51, 68, 0.3)'
                 }}
-                transition={{ duration: 0.45 }}
+                transition={{ duration: Math.max(0.18, 0.45 / speedMultiplier) }}
                 className="absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-black/50 p-2 rounded-2xl border backdrop-blur-sm shadow-md"
               >
                 <div className="relative">
@@ -1604,10 +1625,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           borderColor: isHit ? "#ef4444" : getTierBorderColor(card.tier)
                         }}
                         transition={{
-                          y: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : { type: "spring", stiffness: 350, damping: 12 },
-                          x: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : (isHit ? { duration: 0.25 } : { type: "spring", stiffness: 350, damping: 12 }),
-                          scale: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : { duration: 0.2 },
-                          rotate: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : { duration: 0.2 }
+                          y: isActing ? { times: [0, 0.2, 0.45, 1], duration: Math.max(0.25, 0.7 / speedMultiplier) } : { type: "spring", stiffness: 350, damping: 12 },
+                          x: isActing ? { times: [0, 0.2, 0.45, 1], duration: Math.max(0.25, 0.7 / speedMultiplier) } : (isHit ? { duration: Math.max(0.12, 0.25 / speedMultiplier) } : { type: "spring", stiffness: 350, damping: 12 }),
+                          scale: isActing ? { times: [0, 0.2, 0.45, 1], duration: Math.max(0.25, 0.7 / speedMultiplier) } : { duration: Math.max(0.1, 0.2 / speedMultiplier) },
+                          rotate: isActing ? { times: [0, 0.2, 0.45, 1], duration: Math.max(0.25, 0.7 / speedMultiplier) } : { duration: Math.max(0.1, 0.2 / speedMultiplier) }
                         }}
                         className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none transition-all bg-[#151a21] text-white cursor-help shadow-lg`}
                       >
@@ -1674,7 +1695,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           <motion.div
                             className="bg-red-500 h-full rounded-full"
                             animate={{ width: `${(card.health / card.maxHealth) * 100}%` }}
-                            transition={{ duration: 0.3 }}
+                            transition={{ duration: Math.max(0.08, 0.28 / speedMultiplier) }}
                           />
                         </div>
 
@@ -1725,7 +1746,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 0.8 }}
                           animate={{ opacity: 0 }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.3 }}
+                          transition={{ duration: Math.max(0.12, 0.3 / speedMultiplier) }}
                           className="absolute inset-0 bg-red-600/40 z-30 pointer-events-none rounded-xl"
                         />
                       )}
@@ -1736,7 +1757,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 0.8 }}
                           animate={{ opacity: 0 }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.4 }}
+                          transition={{ duration: Math.max(0.15, 0.4 / speedMultiplier) }}
                           className="absolute inset-0 bg-emerald-500/35 z-30 pointer-events-none rounded-xl"
                         />
                       )}
@@ -1750,7 +1771,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.85 }}
+                          transition={{ duration: Math.max(0.25, 0.75 / speedMultiplier) }}
                           className="absolute inset-0 bg-black/45 border-2 border-emerald-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(16,185,129,0.7)] overflow-hidden"
                         >
                           <img src="/icons/plague_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-80" />
@@ -1768,7 +1789,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.85 }}
+                          transition={{ duration: Math.max(0.25, 0.75 / speedMultiplier) }}
                           className="absolute inset-0 bg-black/45 border-2 border-cyan-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(6,182,212,0.7)] overflow-hidden"
                         >
                           <img src="/icons/void_strike_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
@@ -1786,7 +1807,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.85 }}
+                          transition={{ duration: Math.max(0.25, 0.75 / speedMultiplier) }}
                           className="absolute inset-0 bg-black/45 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(239,68,68,0.7)] overflow-hidden"
                         >
                           <img src="/icons/blood_aura_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
@@ -1804,7 +1825,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.85 }}
+                          transition={{ duration: Math.max(0.25, 0.75 / speedMultiplier) }}
                           className="absolute inset-0 bg-black/45 border-2 border-amber-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(245,158,11,0.7)] overflow-hidden"
                         >
                           <img src="/icons/warlord_cry_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
@@ -1825,7 +1846,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.85 }}
+                          transition={{ duration: Math.max(0.25, 0.75 / speedMultiplier) }}
                           className="absolute inset-0 bg-black/45 border-2 border-purple-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(168,85,247,0.7)] overflow-hidden"
                         >
                           <img src="/icons/hex_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
@@ -1877,10 +1898,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           borderColor: isHit ? "#ef4444" : getTierBorderColor(card.tier)
                         }}
                         transition={{
-                          y: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : { type: "spring", stiffness: 350, damping: 12 },
-                          x: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : (isHit ? { duration: 0.25 } : { type: "spring", stiffness: 350, damping: 12 }),
-                          scale: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : { duration: 0.2 },
-                          rotate: isActing ? { times: [0, 0.2, 0.45, 1], duration: 0.7 } : { duration: 0.2 }
+                          y: isActing ? { times: [0, 0.2, 0.45, 1], duration: Math.max(0.25, 0.7 / speedMultiplier) } : { type: "spring", stiffness: 350, damping: 12 },
+                          x: isActing ? { times: [0, 0.2, 0.45, 1], duration: Math.max(0.25, 0.7 / speedMultiplier) } : (isHit ? { duration: Math.max(0.12, 0.25 / speedMultiplier) } : { type: "spring", stiffness: 350, damping: 12 }),
+                          scale: isActing ? { times: [0, 0.2, 0.45, 1], duration: Math.max(0.25, 0.7 / speedMultiplier) } : { duration: Math.max(0.1, 0.2 / speedMultiplier) },
+                          rotate: isActing ? { times: [0, 0.2, 0.45, 1], duration: Math.max(0.25, 0.7 / speedMultiplier) } : { duration: Math.max(0.1, 0.2 / speedMultiplier) }
                         }}
                         className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none transition-all bg-[#151a21] text-white cursor-help shadow-lg`}
                       >
@@ -1947,7 +1968,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           <motion.div
                             className="bg-emerald-500 h-full rounded-full"
                             animate={{ width: `${(card.health / card.maxHealth) * 100}%` }}
-                            transition={{ duration: 0.3 }}
+                            transition={{ duration: Math.max(0.08, 0.28 / speedMultiplier) }}
                           />
                         </div>
 
@@ -2007,7 +2028,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 0.8 }}
                           animate={{ opacity: 0 }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.3 }}
+                          transition={{ duration: Math.max(0.12, 0.3 / speedMultiplier) }}
                           className="absolute inset-0 bg-red-600/40 z-30 pointer-events-none rounded-xl"
                         />
                       )}
@@ -2018,7 +2039,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 0.8 }}
                           animate={{ opacity: 0 }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.4 }}
+                          transition={{ duration: Math.max(0.15, 0.4 / speedMultiplier) }}
                           className="absolute inset-0 bg-emerald-500/35 z-30 pointer-events-none rounded-xl"
                         />
                       )}
@@ -2032,7 +2053,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.85 }}
+                          transition={{ duration: Math.max(0.25, 0.75 / speedMultiplier) }}
                           className="absolute inset-0 bg-black/45 border-2 border-emerald-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(16,185,129,0.7)] overflow-hidden"
                         >
                           <img src="/icons/plague_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-80" />
@@ -2048,7 +2069,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 1, scale: 1 }}
                           animate={{ opacity: 0, scale: 1.35 }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.85 }}
+                          transition={{ duration: Math.max(0.25, 0.75 / speedMultiplier) }}
                           className="absolute inset-0 bg-black/45 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(239,68,68,0.7)] overflow-hidden"
                         >
                           <img src="/icons/sacrifice_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
@@ -2065,7 +2086,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.85 }}
+                          transition={{ duration: Math.max(0.25, 0.75 / speedMultiplier) }}
                           className="absolute inset-0 bg-black/45 border-2 border-cyan-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(6,182,212,0.7)] overflow-hidden"
                         >
                           <img src="/icons/void_strike_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
@@ -2082,7 +2103,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.85 }}
+                          transition={{ duration: Math.max(0.25, 0.75 / speedMultiplier) }}
                           className="absolute inset-0 bg-black/45 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(239,68,68,0.7)] overflow-hidden"
                         >
                           <img src="/icons/blood_aura_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
@@ -2099,7 +2120,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.85 }}
+                          transition={{ duration: Math.max(0.25, 0.75 / speedMultiplier) }}
                           className="absolute inset-0 bg-black/45 border-2 border-amber-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(245,158,11,0.7)] overflow-hidden"
                         >
                           <img src="/icons/warlord_cry_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
@@ -2120,7 +2141,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: [0, 0.95, 0.95, 0], scale: [0.9, 1.02, 1.02, 0.9] }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.85 }}
+                          transition={{ duration: Math.max(0.25, 0.75 / speedMultiplier) }}
                           className="absolute inset-0 bg-black/45 border-2 border-purple-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_20px_rgba(168,85,247,0.7)] overflow-hidden"
                         >
                           <img src="/icons/hex_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-85" />
