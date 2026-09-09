@@ -1015,10 +1015,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     } else if (action === 'buy_dust_pack') {
       const { packageId } = payload || {};
       const DUST_RATES: Record<string, { dust: number; shards: number; name: string }> = {
-        'dust_2500': { dust: 2500, shards: 15, name: 'Wisp Orb of Dust' },
-        'dust_10000': { dust: 10000, shards: 55, name: 'Astral Dust Urn' },
+        'dust_2500': { dust: 2500, shards: 15, name: 'Gothic Vial of Dust' },
+        'dust_10000': { dust: 10000, shards: 55, name: 'Astral Reliquary Urn' },
         'dust_25000': { dust: 25000, shards: 120, name: 'Ancient Void Core' },
-        'dust_50000': { dust: 50000, shards: 220, name: 'Primordial Nebula' },
+        'dust_50000': { dust: 50000, shards: 220, name: 'Primordial Chalice' },
       };
       const pack = DUST_RATES[packageId];
       if (!pack) {
