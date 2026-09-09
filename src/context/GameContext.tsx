@@ -1468,14 +1468,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     if (token) {
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
         const res = await fetch('/api/action', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ action, payload })
+          body: JSON.stringify({ action, payload }),
+          signal: controller.signal
         });
+        clearTimeout(timeoutId);
         if (res.ok) {
           const data = await res.json();
           if (data.profile) setProfile(migrateProfileTo10Cards(data.profile));
@@ -1665,6 +1669,101 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return updated;
       });
       return { success, message: msg, claimedSovereigns: claimedUnits };
+    }
+
+    if (action === 'activate_shield') {
+      const { shieldType } = payload || {};
+      if (!shieldType || !['3h', '6h', '12h'].includes(shieldType)) {
+        return { success: false, message: 'Invalid shield type.' };
+      }
+
+      let msg = '';
+      let success = false;
+      let updatedProfile: any = null;
+
+      setProfile(current => {
+        if (current.activeShieldUntil && current.activeShieldUntil > Date.now()) {
+          msg = 'A Peace Shield is already active!';
+          success = false;
+          return current;
+        }
+
+        const inv = current.shieldsInventory || { '3h': 0, '6h': 0, '12h': 0 };
+        const count = inv[shieldType as '3h' | '6h' | '12h'] || 0;
+        if (count < 1) {
+          msg = `You do not have any ${shieldType} Void Shields in your inventory.`;
+          success = false;
+          return current;
+        }
+
+        const hours = shieldType === '12h' ? 12 : shieldType === '6h' ? 6 : 3;
+        const durationMs = hours * 3600 * 1000;
+        const newInv = { ...inv, [shieldType]: count - 1 };
+
+        const updated = {
+          ...current,
+          shieldsInventory: newInv,
+          activeShieldUntil: Date.now() + durationMs
+        };
+
+        msg = `🛡️ Void Aegis activated! Your territory is immune to Arena attacks for ${hours} hours.`;
+        success = true;
+        updatedProfile = updated;
+        saveProfile(updated);
+        return updated;
+      });
+
+      return { success, message: msg, profile: updatedProfile };
+    }
+
+    if (action === 'buy_shield') {
+      const { shieldType } = payload || {};
+      if (!shieldType || !['3h', '6h', '12h'].includes(shieldType)) {
+        return { success: false, message: 'Invalid shield type.' };
+      }
+
+      const SHIELD_PRICES: Record<string, number> = {
+        '3h': 8,
+        '6h': 15,
+        '12h': 25
+      };
+      const cost = SHIELD_PRICES[shieldType];
+
+      let msg = '';
+      let success = false;
+      let updatedProfile: any = null;
+
+      setProfile(current => {
+        if ((current.darkShards || 0) < cost) {
+          msg = `Insufficient Dark Shards! Need ${cost} Shards, you have ${current.darkShards || 0}.`;
+          success = false;
+          return current;
+        }
+
+        const inv = current.shieldsInventory || { '3h': 0, '6h': 0, '12h': 0 };
+        const newInv = { ...inv, [shieldType]: (inv[shieldType as '3h' | '6h' | '12h'] || 0) + 1 };
+
+        let updated = recordShardTransaction(
+          current,
+          'BUY_SHIELD',
+          -cost,
+          `Purchased ${shieldType} Void Aegis for ${cost} Dark Shards`,
+          { shieldType, cost }
+        );
+
+        updated = {
+          ...updated,
+          shieldsInventory: newInv
+        };
+
+        msg = `🛡️ Purchased 1x ${shieldType} Void Aegis Shield!`;
+        success = true;
+        updatedProfile = updated;
+        saveProfile(updated);
+        return updated;
+      });
+
+      return { success, message: msg, profile: updatedProfile };
     }
 
     return { success: true, message: 'Action saved locally.' };

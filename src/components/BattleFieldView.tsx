@@ -1018,9 +1018,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           setActiveSkillVfx({ type: 'plague', side: defSide, slot: step.targetSlot });
           const tVfx = setTimeout(() => setActiveSkillVfx(null), Math.round(650 / effectiveSpeed));
           timeouts.push(tVfx);
-
-          addFloatingText(`🤢 -${step.damage}`, { side: defSide, slot: step.targetSlot }, 'text-lime-400 font-black text-sm scale-125 drop-shadow-[0_0_8px_rgba(77,240,48,0.9)]');
-
+          // Trigger hit reaction and dedicated visual plague effect
+          // (dedicated PLAGUE INFECT banner and green miasma already render cleanly without floating emoji)
           setVisualState(prev => {
             const copy = cloneBattleState(prev);
             const target = step.sourceSide === 'player' ? copy.enemyBoard[step.targetSlot] : copy.playerBoard[step.targetSlot];
