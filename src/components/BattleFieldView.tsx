@@ -2867,7 +2867,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 {battleType === 'pvp' && (
                   <div className="bg-gradient-to-b from-red-950/40 via-black to-black border border-red-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
                     <span className="text-sm font-black font-mono text-red-400 flex items-center justify-center gap-1">
-                      <span>+{earnedRating}</span>
+                      <span>+20</span>
                       <img src="/icons/crown.png" alt="Crown" className="w-5 h-5 object-contain brightness-110 contrast-125" />
                     </span>
                     <span className="text-[9px] text-red-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Crowns</span>
