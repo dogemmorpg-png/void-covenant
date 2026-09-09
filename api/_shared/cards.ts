@@ -1546,9 +1546,10 @@ export const generateCampaignStage = (floor: number): import('./types').Campaign
   // Health scales by 5 per floor
   const enemyHeroHealth = 20 + Math.floor((floor - 1) * 5);
   
-  // Rewards
-  const goldReward = 100 + (floor * 15);
-  const dustReward = 10 + (floor * 3);
+  // Rewards: Floor 1-4: 50 Gold, 25 Dust. Every 5 floors (5, 10, 15...) +25 Gold, +10 Dust
+  const floorStep = Math.floor(floor / 5);
+  const goldReward = 50 + (floorStep * 25);
+  const dustReward = 25 + (floorStep * 10);
   const shardsReward = 0;
   
   // Pick permitted card tiers based on floor

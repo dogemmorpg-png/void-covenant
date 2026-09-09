@@ -881,10 +881,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      const goldReward = Math.floor(stage.goldReward * goldMultiplier);
+      const applyMultiplierWithMinimum = (baseVal: number, mult: number) => {
+        if (mult <= 1 || baseVal <= 0) return Math.round(baseVal);
+        return baseVal + Math.max(1, Math.round(baseVal * (mult - 1)));
+      };
+
+      const goldReward = applyMultiplierWithMinimum(stage.goldReward, goldMultiplier);
       const dustReward = stage.dustReward;
       const shardsReward = stage.shardsReward || 0;
-      const expReward = Math.floor(50 * expMultiplier);
+      const expReward = applyMultiplierWithMinimum(50, expMultiplier);
 
       profile.gold = (profile.gold || 0) + goldReward;
       profile.dust = (profile.dust || 0) + dustReward;

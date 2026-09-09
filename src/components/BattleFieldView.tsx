@@ -431,9 +431,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     return baseVal + Math.max(1, Math.round(baseVal * (mult - 1)));
   };
 
-  const initialBaseGold = stage.goldReward || (battleType === 'pvp' ? (300 + Math.floor((profile.pvpLP || 0) / 4)) : 100);
+  const initialBaseGold = stage.goldReward || (battleType === 'pvp' ? 50 : 50);
   const [earnedGold, setEarnedGold] = useState<number>(() => applyRewardMultiplier(initialBaseGold, battleGoldMultiplier));
-  const [earnedDust, setEarnedDust] = useState<number>(() => stage.dustReward || (battleType === 'pvp' ? (30 + Math.floor((profile.pvpLP || 0) / 20)) : 10));
+  const [earnedDust, setEarnedDust] = useState<number>(() => stage.dustReward || (battleType === 'pvp' ? 25 : 25));
+
+  // Consolation gold on defeat (base 20 + bonuses from subscription & gear)
+  const lossBaseGold = 20;
+  const [lossEarnedGold, setLossEarnedGold] = useState<number>(() => applyRewardMultiplier(lossBaseGold, battleGoldMultiplier));
 
   // Sovereigns earned in this battle (for PvP victory screen)
   const [earnedSovereigns, setEarnedSovereigns] = useState<number>(() => {
@@ -1062,7 +1066,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     battleResultSubmittedRef.current = true;
     audioSystem.playError();
     const res = await submitBattleResult(battleType, stage.id.toString(), 'loss');
-    if (!res.success) {
+    if (res.success) {
+      if (res.rewards?.gold !== undefined) {
+        setLossEarnedGold(res.rewards.gold);
+      } else if (res.goldReward !== undefined) {
+        setLossEarnedGold(res.goldReward);
+      }
+    } else {
       console.error('Failed to save loss result:', res.message);
       toast(res.message, 'error');
     }
@@ -2879,7 +2889,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               <div className="flex justify-center items-center gap-3">
                 <div className="bg-gradient-to-b from-amber-950/30 via-black to-black border border-amber-500/30 px-4 py-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[90px]">
                   <span className="text-amber-400 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
-                    +20
+                    +{lossEarnedGold}
                     <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 object-contain drop-shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
                   </span>
                   <span className="text-[9px] text-amber-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Consolation</span>
@@ -2895,6 +2905,35 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   </div>
                 )}
               </div>
+
+              {/* Gold Bonus Breakdown Info Strip on Defeat */}
+              {(subGoldBonusPercent > 0 || equipGoldBonus > 0) && (
+                <div className="flex items-center justify-center gap-1.5 flex-wrap bg-amber-950/20 border border-amber-500/20 rounded-xl px-3 py-1.5 text-[10.5px]">
+                  <span className="text-amber-400/80 font-mono flex items-center gap-1">
+                    <span className="font-bold text-amber-300">Gold Bonus:</span>
+                  </span>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {subGoldBonusPercent > 0 && (
+                      <span className="inline-flex items-center gap-1 font-black text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded-md">
+                        <span>{subTier === 'ultra' ? '👑' : '⚜️'}</span>
+                        <span>+{subGoldBonusPercent}% {subTier === 'ultra' ? 'Ultra' : 'VIP'}</span>
+                      </span>
+                    )}
+                    {subGoldBonusPercent > 0 && equipGoldBonus > 0 && (
+                      <span className="text-gray-500 font-bold">+</span>
+                    )}
+                    {equipGoldBonus > 0 && (
+                      <span className="inline-flex items-center gap-1 font-black text-cyan-300 bg-cyan-500/15 border border-cyan-500/30 px-2 py-0.5 rounded-md">
+                        <span>🛡️</span>
+                        <span>+{equipGoldBonus}% Gear</span>
+                      </span>
+                    )}
+                    <span className="text-gray-400 text-[10px] ml-0.5 font-mono">
+                      (Total +{subGoldBonusPercent + equipGoldBonus}%)
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <button

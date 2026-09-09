@@ -1386,9 +1386,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (result === 'win') {
         if (battleType === 'pvp') {
-          const baseGold = 300 + Math.floor((updated.pvpLP || 0) / 4);
+          const baseGold = 50;
+          const baseDust = 25;
           rewards.gold = applyMult(baseGold, goldMultiplier);
-          rewards.dust = 30 + Math.floor((updated.pvpLP || 0) / 20);
+          rewards.dust = baseDust;
           rewards.exp = 0;
           updated.pvpLP = (updated.pvpLP || 0) + 20;
 
@@ -1408,9 +1409,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             rewards.sovereigns = sovereignsGain;
           }
         } else {
-          const baseGold = 100 + floorNum * 15;
+          const floorStep = Math.floor(floorNum / 5);
+          const baseGold = 50 + (floorStep * 25);
+          const baseDust = 25 + (floorStep * 10);
           rewards.gold = applyMult(baseGold, goldMultiplier);
-          rewards.dust = 10 + floorNum * 3;
+          rewards.dust = baseDust;
           rewards.exp = applyMult(50, expMultiplier);
 
           if (floorNum >= (updated.pveProgress || 1)) {
@@ -1431,6 +1434,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updated.exp = (updated.exp || 0) + rewards.exp;
       } else {
         rewards.gold = applyMult(20, goldMultiplier);
+        rewards.dust = 0;
+        rewards.exp = 0;
         updated.gold = (updated.gold || 0) + rewards.gold;
       }
 

@@ -172,8 +172,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!stage) return res.status(400).json({ error: 'Stage not found' });
 
       if (result === 'win') {
-        const baseGold = stage.goldReward || (floorNum * 15 + 30);
-        const baseDust = stage.dustReward || (floorNum * 5 + 10);
+        const baseGold = stage.goldReward;
+        const baseDust = stage.dustReward;
         const baseExp = floorNum * 20 + 40;
 
         goldReward = applyMultiplierWithMinimum(baseGold, goldMultiplier);
@@ -198,8 +198,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           cardRewardStr = stage.cardReward.name;
         }
       } else {
-        goldReward = applyMultiplierWithMinimum(5, goldMultiplier);
-        dustReward = 2;
+        goldReward = applyMultiplierWithMinimum(20, goldMultiplier);
+        dustReward = 0;
         expReward = applyMultiplierWithMinimum(10, expMultiplier);
       }
 
@@ -219,8 +219,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       let defenderLPChange = 0;
 
       if (result === 'win') {
-        const baseGold = 300 + Math.floor((profile.pvpLP || 0) / 4);
-        const baseDust = 30 + Math.floor((profile.pvpLP || 0) / 20);
+        const baseGold = 50;
+        const baseDust = 25;
         goldReward = applyMultiplierWithMinimum(baseGold, goldMultiplier);
         dustReward = baseDust;
         expReward = 0; // EXP is strictly exclusive to PvE Campaign
@@ -295,8 +295,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
         }
       } else {
-        goldReward = applyMultiplierWithMinimum(50, goldMultiplier);
-        dustReward = 5;
+        goldReward = applyMultiplierWithMinimum(20, goldMultiplier);
+        dustReward = 0;
         expReward = 0; // EXP is strictly exclusive to PvE Campaign
 
         const loss = Math.round(32 * expected);
