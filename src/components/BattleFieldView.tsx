@@ -2841,7 +2841,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               <div className={`grid gap-2.5 ${battleType === 'pvp' ? (earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4') : (stage.shardsReward > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3')}`}>
                 {/* Gold */}
                 <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
-                  <span className="text-sm font-black font-mono text-yellow-400">+{totalGoldReward}</span>
+                  <span className="text-sm font-black font-mono text-yellow-400">+{earnedGold}</span>
                   <span className="text-[9px] text-amber-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Gold</span>
                 </div>
                 {/* EXP */}
@@ -2956,7 +2956,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               <div className={`grid gap-2.5 ${battleType === 'pvp' ? 'grid-cols-2' : 'grid-cols-2'}`}>
                 {/* Gold penalty / consolation */}
                 <div className="bg-gradient-to-b from-rose-950/40 via-black to-black border border-rose-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
-                  <span className="text-sm font-black font-mono text-rose-400">+{lossGoldReward}</span>
+                  <span className="text-sm font-black font-mono text-rose-400">+{lossEarnedGold}</span>
                   <span className="text-[9px] text-rose-400/70 font-mono uppercase tracking-wider mt-1 font-bold">Gold Looted</span>
                 </div>
                 {/* Crowns lost / zero */}
