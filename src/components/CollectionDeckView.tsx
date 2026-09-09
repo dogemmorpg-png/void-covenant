@@ -248,7 +248,7 @@ export const CollectionDeckView: React.FC = () => {
   const [sortBy, setSortBy] = useState<'level' | 'attack' | 'health' | 'name'>('level');
   const [showFusableOnly, setShowFusableOnly] = useState(false);
   const [page, setPage] = useState(1);
-  const CARDS_PER_PAGE = 30;
+  const CARDS_PER_PAGE = 50;
   const gridContainerRef = React.useRef<HTMLDivElement>(null);
 
   // Reset page on filter or sort change
