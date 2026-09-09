@@ -805,7 +805,10 @@ export function simulateCombatTurn(
         animateSequence.push({
           type: 'enemy_play',
           slot: chosenSlot,
-          card: enemyCard
+          card: {
+            ...enemyCard,
+            skills: enemyCard.skills.map(s => ({ ...s }))
+          }
         });
       }
     } else {
@@ -926,6 +929,7 @@ export function simulateCombatTurn(
           animateSequence.push({
             type: 'dodge',
             side: 'enemy',
+            attacker: 'player',
             slot: i
           });
         } else {
@@ -1032,6 +1036,7 @@ export function simulateCombatTurn(
           animateSequence.push({
             type: 'dodge',
             side: 'player',
+            attacker: 'enemy',
             slot: i
           });
         } else {

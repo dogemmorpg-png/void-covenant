@@ -418,7 +418,15 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const [defenderAction, setDefenderAction] = useState<{
     side: 'player' | 'enemy';
     slot: number; // -1 for hero
-    type: 'hit' | 'heal' | 'death';
+    type: 'hit' | 'heal' | 'death' | 'dodge';
+  } | null>(null);
+
+  // Dedicated Plague casting state (spores / miasma channel without melee lunge)
+  const [plagueAction, setPlagueAction] = useState<{
+    sourceSide: 'player' | 'enemy';
+    sourceSlot: number;
+    targetSide: 'player' | 'enemy';
+    targetSlot: number;
   } | null>(null);
 
   // Dedicated Skill Visual Effect lifecycle (ensures VFX play full duration without getting cut off)
@@ -574,7 +582,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       stepDuration = Math.round(850 / effectiveSpeed);
     } else if (step.type === 'death') {
       stepDuration = Math.round(720 / effectiveSpeed);
-    } else if (step.type === 'dodge' || step.type === 'hero_heal') {
+    } else if (step.type === 'dodge') {
+      impactDelay = Math.round(330 / effectiveSpeed);
+      stepDuration = Math.round(860 / effectiveSpeed);
+    } else if (step.type === 'hero_heal') {
       stepDuration = Math.round(750 / effectiveSpeed);
     }
 
@@ -627,7 +638,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
         setVisualState(prev => {
           const copy = cloneBattleState(prev);
-          copy.enemyBoard[step.slot] = step.card;
+          copy.enemyBoard[step.slot] = {
+            ...step.card,
+            skills: step.card.skills ? step.card.skills.map((s: any) => ({ ...s })) : []
+          };
           if (copy.enemyHand.length > 0) {
             copy.enemyHand.shift();
           }
@@ -964,9 +978,20 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
       case 'dodge': {
         const isEnemy = step.side === 'enemy';
-        stepDescription = `🛡️ Evaded! ${isEnemy ? 'The Enemy Commander' : 'Your Lord'} dodged the attack!`;
-        audioSystem.playMiss();
-        addFloatingText('DODGE! 🛡️', isEnemy ? 'enemy-hero' : 'player-hero', 'text-blue-400 font-black text-lg scale-125 text-shadow-glow');
+        const attackerSide = step.attacker || (isEnemy ? 'player' : 'enemy');
+        const attackerCard = attackerSide === 'player' ? visualState.playerBoard[step.slot] : visualState.enemyBoard[step.slot];
+        
+        stepDescription = `🛡️ Evaded! ${isEnemy ? 'The Enemy Commander' : 'Your Lord'} dodged direct attack from ${attackerCard?.name || 'Creature'}!`;
+
+        audioSystem.playAttack();
+        setAttackerAction({ side: attackerSide, slot: step.slot, targetSlot: -1, isDirect: true });
+
+        const tHit = setTimeout(() => {
+          audioSystem.playMiss();
+          setDefenderAction({ side: step.side, slot: -1, type: 'dodge' });
+          addFloatingText('DODGE! 🛡️', isEnemy ? 'enemy-hero' : 'player-hero', 'text-cyan-400 font-black text-lg scale-125 text-shadow-glow');
+        }, impactDelay);
+        timeouts.push(tHit);
         break;
       }
 
@@ -975,18 +1000,26 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         const targetCard = step.sourceSide === 'player' ? visualState.enemyBoard[step.targetSlot] : visualState.playerBoard[step.targetSlot];
         const defSide = step.sourceSide === 'player' ? 'enemy' : 'player';
         
-        stepDescription = `🦠 Plague slime: ${sourceCard?.name || 'Rot'} infects ${targetCard?.name || 'target'} for -${step.damage} HP`;
+        stepDescription = `🦠 Plague: ${sourceCard?.name || 'Carrier'} infests ${targetCard?.name || 'target'} with toxic miasma (-${step.damage} HP)`;
 
-        audioSystem.playError();
-        setAttackerAction({ side: step.sourceSide, slot: step.sourceSlot, targetSlot: step.targetSlot });
+        audioSystem.playMagic();
+        setPlagueAction({
+          sourceSide: step.sourceSide,
+          sourceSlot: step.sourceSlot,
+          targetSide: defSide,
+          targetSlot: step.targetSlot
+        });
+
+        addFloatingText('🦠 MIASMA', { side: step.sourceSide, slot: step.sourceSlot }, 'text-emerald-400 font-black text-[11px] scale-110 tracking-widest');
 
         const tHit = setTimeout(() => {
+          audioSystem.playError();
           setDefenderAction({ side: defSide, slot: step.targetSlot, type: 'hit' });
           setActiveSkillVfx({ type: 'plague', side: defSide, slot: step.targetSlot });
           const tVfx = setTimeout(() => setActiveSkillVfx(null), Math.round(650 / effectiveSpeed));
           timeouts.push(tVfx);
 
-          addFloatingText(`🤢 -${step.damage}`, { side: defSide, slot: step.targetSlot }, 'text-emerald-400 font-black text-xs scale-110');
+          addFloatingText(`🤢 -${step.damage}`, { side: defSide, slot: step.targetSlot }, 'text-lime-400 font-black text-sm scale-125 drop-shadow-[0_0_8px_rgba(77,240,48,0.9)]');
 
           setVisualState(prev => {
             const copy = cloneBattleState(prev);
@@ -1002,6 +1035,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           });
         }, impactDelay);
         timeouts.push(tHit);
+
+        const tPlagueEnd = setTimeout(() => {
+          setPlagueAction(null);
+        }, Math.round(750 / effectiveSpeed));
+        timeouts.push(tPlagueEnd);
         break;
       }
 
@@ -1050,6 +1088,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       setDefenderAction(null);
       setActiveSkillVfx(null);
       setSummoningCard(null);
+      setPlagueAction(null);
       setCurrentStepIndex(prev => prev + 1);
     }, stepDuration);
     timeouts.push(stepTimer);
@@ -1080,6 +1119,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       setDefenderAction(null);
       setActiveSkillVfx(null);
       setSummoningCard(null);
+      setPlagueAction(null);
     }
   }, [currentStepIndex, animateSequence, finalBattleState]);
 
@@ -1423,8 +1463,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             </svg>
           )}
 
-          {/* Glowing Targeting Arrow Overlay during combat strikes */}
-          {isAnimating && currentStep && (currentStep.type === 'attack' || currentStep.type === 'direct_attack') && attackerAction !== null && (
+          {/* Glowing Targeting Arrow Overlay during combat strikes & direct dodge attempts */}
+          {isAnimating && currentStep && (currentStep.type === 'attack' || currentStep.type === 'direct_attack' || currentStep.type === 'dodge') && attackerAction !== null && (
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-25">
               <defs>
                 <linearGradient id="glowingArrowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -1433,7 +1473,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 </linearGradient>
               </defs>
               {(() => {
-                const side = currentStep.attacker;
+                const side = currentStep.attacker || (currentStep.side === 'enemy' ? 'player' : 'enemy');
                 const slot = currentStep.slot;
                 
                 // Attacker slot positions X/Y percentages
@@ -1443,7 +1483,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 let endX = '50%';
                 let endY = '50%';
                 
-                if (currentStep.type === 'direct_attack') {
+                if (currentStep.type === 'direct_attack' || currentStep.type === 'dodge') {
                   // Targeted Hero Portrait in the left-hand panel
                   endX = '55px'; 
                   endY = side === 'player' ? '46px' : 'calc(100% - 46px)';
@@ -1493,34 +1533,98 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             </svg>
           )}
 
+          {/* Dedicated Plague Miasma Stream Overlay (End-of-Turn Affliction) */}
+          {plagueAction !== null && (
+            <svg className="absolute inset-0 w-full h-full pointer-events-none z-25">
+              <defs>
+                <linearGradient id="plagueMiasmaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.95" />
+                  <stop offset="50%" stopColor="#4ade80" stopOpacity="1" />
+                  <stop offset="100%" stopColor="#84cc16" stopOpacity="0.9" />
+                </linearGradient>
+                <filter id="plagueHazeGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#10b981" />
+                </filter>
+              </defs>
+              {(() => {
+                const sX = `${20 * plagueAction.sourceSlot + 10}%`;
+                const sY = plagueAction.sourceSide === 'player' ? '70%' : '30%';
+                const tX = `${20 * plagueAction.targetSlot + 10}%`;
+                const tY = plagueAction.targetSide === 'player' ? '70%' : '30%';
+                return (
+                  <g>
+                    {/* Outer toxic haze */}
+                    <line
+                      x1={sX}
+                      y1={sY}
+                      x2={tX}
+                      y2={tY}
+                      stroke="#10b981"
+                      strokeWidth="7"
+                      strokeOpacity="0.35"
+                      strokeLinecap="round"
+                    />
+                    {/* Streaming toxic vein */}
+                    <line
+                      x1={sX}
+                      y1={sY}
+                      x2={tX}
+                      y2={tY}
+                      stroke="url(#plagueMiasmaGrad)"
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      strokeDasharray="8 5"
+                    />
+                    {/* Infected Target focal glow */}
+                    <circle
+                      cx={tX}
+                      cy={tY}
+                      r="10"
+                      fill="#10b981"
+                      fillOpacity="0.75"
+                      filter="url(#plagueHazeGlow)"
+                    />
+                  </g>
+                );
+              })()}
+            </svg>
+          )}
+
           {/* 1. ENEMY HERO PORTRAIT (Top-Left corner - large format) */}
           {(() => {
             const isEnemyCasting = currentStep?.type === 'hero_skill' && currentStep.side === 'enemy';
             const isEnemyHit = defenderAction?.side === 'enemy' && defenderAction?.slot === -1 && defenderAction?.type === 'hit';
+            const isEnemyDodge = defenderAction?.side === 'enemy' && defenderAction?.slot === -1 && defenderAction?.type === 'dodge';
             return (
               <motion.div 
                 animate={{
-                  scale: isEnemyHit ? [1, 0.93, 1.03, 1] : (isEnemyCasting ? [1, 1.12, 1.07, 1] : 1),
+                  scale: isEnemyDodge ? [1, 1.08, 1] : (isEnemyHit ? [1, 0.93, 1.03, 1] : (isEnemyCasting ? [1, 1.12, 1.07, 1] : 1)),
+                  x: isEnemyDodge ? [0, -14, 4, 0] : 0,
                   y: isEnemyHit ? [0, -6, 2, 0] : (isEnemyCasting ? [0, -8, -4, 0] : 0),
-                  rotate: isEnemyHit ? [0, -2.5, 1, 0] : 0,
+                  rotate: isEnemyDodge ? [0, -3, 2, 0] : (isEnemyHit ? [0, -2.5, 1, 0] : 0),
                 }}
                 transition={{
-                  scale: isEnemyHit 
+                  scale: (isEnemyHit || isEnemyDodge)
                     ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
                     : (isEnemyCasting ? { times: [0, 0.35, 0.7, 1], duration: Math.max(0.3, 0.6 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
+                  x: isEnemyDodge
+                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.35 / effectiveSpeed), ease: "easeOut" }
+                    : { duration: 0.2 },
                   y: isEnemyHit 
                     ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
                     : (isEnemyCasting ? { times: [0, 0.35, 0.7, 1], duration: Math.max(0.3, 0.6 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
-                  rotate: isEnemyHit 
+                  rotate: (isEnemyHit || isEnemyDodge)
                     ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
                     : { duration: 0.2 }
                 }}
                 className={`absolute top-4 left-4 flex items-center gap-3 z-30 bg-[#100b08]/95 p-2 rounded-2xl border transform-gpu will-change-transform ${
-                  isEnemyHit 
-                    ? 'border-red-500 shadow-[0_0_35px_rgba(239,68,68,0.95)]' 
-                    : isEnemyCasting 
-                      ? 'border-red-500/80 shadow-[0_0_30px_rgba(239,68,68,0.6)]' 
-                      : 'border-red-950/30 shadow-md'
+                  isEnemyDodge
+                    ? 'border-cyan-400 shadow-[0_0_35px_rgba(6,182,212,0.95)]'
+                    : isEnemyHit 
+                      ? 'border-red-500 shadow-[0_0_35px_rgba(239,68,68,0.95)]' 
+                      : isEnemyCasting 
+                        ? 'border-red-500/80 shadow-[0_0_30px_rgba(239,68,68,0.6)]' 
+                        : 'border-red-950/30 shadow-md'
                 }`}
               >
                 <div className="relative">
@@ -1562,30 +1666,37 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           {(() => {
             const isPlayerCasting = currentStep?.type === 'hero_skill' && (!currentStep.side || currentStep.side === 'player');
             const isPlayerHit = defenderAction?.side === 'player' && defenderAction?.slot === -1 && defenderAction?.type === 'hit';
+            const isPlayerDodge = defenderAction?.side === 'player' && defenderAction?.slot === -1 && defenderAction?.type === 'dodge';
             return (
               <motion.div 
                 animate={{
-                  scale: isPlayerHit ? [1, 0.93, 1.03, 1] : (isPlayerCasting ? [1, 1.12, 1.07, 1] : 1),
+                  scale: isPlayerDodge ? [1, 1.08, 1] : (isPlayerHit ? [1, 0.93, 1.03, 1] : (isPlayerCasting ? [1, 1.12, 1.07, 1] : 1)),
+                  x: isPlayerDodge ? [0, -14, 4, 0] : 0,
                   y: isPlayerHit ? [0, 6, -2, 0] : (isPlayerCasting ? [0, -8, -4, 0] : 0),
-                  rotate: isPlayerHit ? [0, 2.5, -1, 0] : 0,
+                  rotate: isPlayerDodge ? [0, 3, -2, 0] : (isPlayerHit ? [0, 2.5, -1, 0] : 0),
                 }}
                 transition={{
-                  scale: isPlayerHit 
+                  scale: (isPlayerHit || isPlayerDodge)
                     ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
                     : (isPlayerCasting ? { times: [0, 0.35, 0.7, 1], duration: Math.max(0.3, 0.6 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
+                  x: isPlayerDodge
+                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.35 / effectiveSpeed), ease: "easeOut" }
+                    : { duration: 0.2 },
                   y: isPlayerHit 
                     ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
                     : (isPlayerCasting ? { times: [0, 0.35, 0.7, 1], duration: Math.max(0.3, 0.6 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
-                  rotate: isPlayerHit 
+                  rotate: (isPlayerHit || isPlayerDodge)
                     ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
                     : { duration: 0.2 }
                 }}
                 className={`absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-[#100b08]/95 p-2 rounded-2xl border transform-gpu will-change-transform ${
-                  isPlayerHit 
-                    ? 'border-red-500 shadow-[0_0_35px_rgba(239,68,68,0.95)]' 
-                    : isPlayerCasting 
-                      ? 'border-cyan-500/80 shadow-[0_0_30px_rgba(6,182,212,0.6)]' 
-                      : 'border-cyan-950/30 shadow-md'
+                  isPlayerDodge
+                    ? 'border-cyan-400 shadow-[0_0_35px_rgba(6,182,212,0.95)]'
+                    : isPlayerHit 
+                      ? 'border-red-500 shadow-[0_0_35px_rgba(239,68,68,0.95)]' 
+                      : isPlayerCasting 
+                        ? 'border-cyan-500/80 shadow-[0_0_30px_rgba(6,182,212,0.6)]' 
+                        : 'border-cyan-950/30 shadow-md'
                 }`}
               >
                 <div className="relative">
@@ -1728,6 +1839,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 const isDeath = defenderAction?.side === 'enemy' && defenderAction?.slot === idx && defenderAction?.type === 'death';
                 const isHeal = defenderAction?.side === 'enemy' && defenderAction?.slot === idx && defenderAction?.type === 'heal';
                 const isSummoning = summoningCard?.side === 'enemy' && summoningCard?.slot === idx;
+                const isPlagueCasting = plagueAction?.sourceSide === 'enemy' && plagueAction?.sourceSlot === idx;
+                const isPlagueTargeted = plagueAction?.targetSide === 'enemy' && plagueAction?.targetSlot === idx;
                 const side = 'enemy';
 
                 // Calculate strike displacement towards target cleanly
@@ -1736,15 +1849,19 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                 const borderGlowClass = isHit 
                   ? "border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.95)] ring-2 ring-red-500" 
-                  : isActing 
-                    ? "border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.9)] ring-2 ring-amber-400/80"
-                    : isTargeted
-                      ? "border-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.85)] ring-2 ring-rose-500/80"
-                      : isSummoning
-                        ? "border-purple-400 shadow-[0_0_25px_rgba(168,85,247,0.85)] ring-2 ring-purple-400/80"
-                        : card && card.delay === 0 
-                          ? "shadow-[0_0_15px_rgba(220,38,64,0.4)]" 
-                          : "shadow-[0_4px_10px_rgba(0,0,0,0.4)]";
+                  : isPlagueCasting
+                    ? "border-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.95)] ring-2 ring-emerald-400/80"
+                    : isPlagueTargeted
+                      ? "border-lime-500 shadow-[0_0_25px_rgba(132,204,22,0.9)] ring-2 ring-lime-500/80"
+                      : isActing 
+                        ? "border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.9)] ring-2 ring-amber-400/80"
+                        : isTargeted
+                          ? "border-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.85)] ring-2 ring-rose-500/80"
+                          : isSummoning
+                            ? "border-purple-400 shadow-[0_0_25px_rgba(168,85,247,0.85)] ring-2 ring-purple-400/80"
+                            : card && card.delay === 0 
+                              ? "shadow-[0_0_15px_rgba(220,38,64,0.4)]" 
+                              : "shadow-[0_4px_10px_rgba(0,0,0,0.4)]";
 
                 return (
                   <div key={idx} className="relative aspect-[13/18] max-h-[190px] max-w-[140px] mx-auto w-full shrink-0">
@@ -1763,7 +1880,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                             opacity: isDeath ? 0 : 1,
                             scale: isActing 
                               ? [1, 1.06, 1.15, 1.1, 1] 
-                              : (isHit ? [1, 0.94, 1.02, 1] : (isDeath ? 0.35 : (isHeal ? [1, 1.08, 1] : (isSummoning ? [0.75, 1.05, 1] : 1)))),
+                              : (isHit ? [1, 0.94, 1.02, 1] : (isDeath ? 0.35 : (isHeal ? [1, 1.08, 1] : (isSummoning ? [0.75, 1.05, 1] : (isPlagueCasting ? [1, 1.08, 1.04, 1] : 1))))),
                             y: isActing ? [0, -8, strikeY, strikeY * 0.88, 0] : (isHit ? [0, -6, 2, 0] : 0),
                             x: isActing ? [0, strikeX * -0.06, strikeX, strikeX * 0.9, 0] : (isHit ? [0, -3, 1, 0] : 0),
                             rotate: isActing ? (strikeX > 0 ? [0, -2, 5, 2, 0] : strikeX < 0 ? [0, 2, -5, -2, 0] : [0, -1, 3, 1, 0]) : (isHit ? [0, -2, 1, 0] : (isDeath ? 12 : 0))
@@ -1776,7 +1893,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                             rotate: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : { duration: 0.2 }),
                             opacity: isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : { duration: 0.3 }
                           }}
-                          style={{ borderColor: isHit ? '#ef4444' : (isActing ? '#f59e0b' : (isTargeted ? '#f43f5e' : getTierBorderColor(card.tier))) }}
+                          style={{ borderColor: isHit ? '#ef4444' : (isPlagueCasting ? '#10b981' : (isPlagueTargeted ? '#84cc16' : (isActing ? '#f59e0b' : (isTargeted ? '#f43f5e' : getTierBorderColor(card.tier))))) }}
                           className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none transform-gpu will-change-transform bg-[#151a21] text-white cursor-help ${borderGlowClass}`}
                         >
                           {/* Card Background & Artwork inside wrapper for rounded overflow-hidden */}
@@ -1966,6 +2083,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 const isDeath = defenderAction?.side === 'player' && defenderAction?.slot === idx && defenderAction?.type === 'death';
                 const isHeal = defenderAction?.side === 'player' && defenderAction?.slot === idx && defenderAction?.type === 'heal';
                 const isSummoning = summoningCard?.side === 'player' && summoningCard?.slot === idx;
+                const isPlagueCasting = plagueAction?.sourceSide === 'player' && plagueAction?.sourceSlot === idx;
+                const isPlagueTargeted = plagueAction?.targetSide === 'player' && plagueAction?.targetSlot === idx;
                 const side = 'player';
 
                 // Calculate strike displacement towards target cleanly
@@ -1974,15 +2093,19 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                 const borderGlowClass = isHit 
                   ? "border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.95)] ring-2 ring-red-500" 
-                  : isActing 
-                    ? "border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.9)] ring-2 ring-amber-400/80"
-                    : isTargeted
-                      ? "border-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.85)] ring-2 ring-rose-500/80"
-                      : isSummoning
-                        ? "border-cyan-400 shadow-[0_0_25px_rgba(102,252,241,0.85)] ring-2 ring-cyan-400/80"
-                        : card && card.delay === 0 
-                          ? "shadow-[0_0_15px_rgba(102,252,241,0.4)]" 
-                          : "shadow-[0_4px_10px_rgba(0,0,0,0.4)]";
+                  : isPlagueCasting
+                    ? "border-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.95)] ring-2 ring-emerald-400/80"
+                    : isPlagueTargeted
+                      ? "border-lime-500 shadow-[0_0_25px_rgba(132,204,22,0.9)] ring-2 ring-lime-500/80"
+                      : isActing 
+                        ? "border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.9)] ring-2 ring-amber-400/80"
+                        : isTargeted
+                          ? "border-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.85)] ring-2 ring-rose-500/80"
+                          : isSummoning
+                            ? "border-cyan-400 shadow-[0_0_25px_rgba(102,252,241,0.85)] ring-2 ring-cyan-400/80"
+                            : card && card.delay === 0 
+                              ? "shadow-[0_0_15px_rgba(102,252,241,0.4)]" 
+                              : "shadow-[0_4px_10px_rgba(0,0,0,0.4)]";
 
                 return (
                   <div key={idx} className="relative aspect-[13/18] max-h-[190px] max-w-[140px] mx-auto w-full shrink-0">
@@ -2001,7 +2124,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                             opacity: isDeath ? 0 : 1,
                             scale: isActing 
                               ? [1, 1.06, 1.15, 1.1, 1] 
-                              : (isHit ? [1, 0.94, 1.02, 1] : (isDeath ? 0.35 : (isHeal ? [1, 1.08, 1] : (isSummoning ? [0.75, 1.05, 1] : 1)))),
+                              : (isHit ? [1, 0.94, 1.02, 1] : (isDeath ? 0.35 : (isHeal ? [1, 1.08, 1] : (isSummoning ? [0.75, 1.05, 1] : (isPlagueCasting ? [1, 1.08, 1.04, 1] : 1))))),
                             y: isActing ? [0, 8, strikeY, strikeY * 0.88, 0] : (isHit ? [0, 6, -2, 0] : 0),
                             x: isActing ? [0, strikeX * -0.06, strikeX, strikeX * 0.9, 0] : (isHit ? [0, -3, 1, 0] : 0),
                             rotate: isActing ? (strikeX > 0 ? [0, 2, -5, -2, 0] : strikeX < 0 ? [0, -2, 5, 2, 0] : [0, 1, -3, -1, 0]) : (isHit ? [0, 2, -1, 0] : (isDeath ? 12 : 0))
@@ -2014,7 +2137,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                             rotate: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : { duration: 0.2 }),
                             opacity: isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : { duration: 0.3 }
                           }}
-                          style={{ borderColor: isHit ? '#ef4444' : (isActing ? '#f59e0b' : (isTargeted ? '#f43f5e' : getTierBorderColor(card.tier))) }}
+                          style={{ borderColor: isHit ? '#ef4444' : (isPlagueCasting ? '#10b981' : (isPlagueTargeted ? '#84cc16' : (isActing ? '#f59e0b' : (isTargeted ? '#f43f5e' : getTierBorderColor(card.tier))))) }}
                           className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none transform-gpu will-change-transform bg-[#151a21] text-white cursor-help ${borderGlowClass}`}
                         >
                           {/* Card Background & Artwork */}
