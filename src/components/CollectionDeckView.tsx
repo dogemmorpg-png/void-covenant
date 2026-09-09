@@ -4,7 +4,7 @@ import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { Card, CardTier } from '../types';
 import { CARD_TEMPLATES, getCardManaCost, getEvolutionBonusSkill } from '../data/cards';
-import { Swords, Star, Plus, Minus, ArrowRight, Skull, Shield, Zap, Sparkles, AlertCircle, Crown, ShieldAlert, Bug, Flame, Droplet } from 'lucide-react';
+import { Swords, Star, Plus, Minus, ArrowRight, Skull, Shield, Zap, Sparkles, AlertCircle, Crown, ShieldAlert, Bug, Flame, Droplet, ChevronLeft, ChevronRight } from 'lucide-react';
 import { assetPreloader, getCardImageUrl } from '../utils/assetPreloader';
 import { SanctuaryEmblem, FusionAltarEmblem, BaseCardSlotEmblem, SacrificeSlotEmblem } from './CardsViewCustomIcons';
 
@@ -120,6 +120,114 @@ const renderSkillIcon = (type: string, sizeClass: string = "w-4 h-4") => {
   }
 };
 
+interface CollectionCardItemProps {
+  card: Card;
+  isSelected: boolean;
+  isInDeck?: boolean;
+  isFusionMode?: boolean;
+  onSelect: (cardId: string) => void;
+  onToggleDeck?: (cardId: string) => void;
+}
+
+const CollectionCardItem = React.memo<CollectionCardItemProps>(({
+  card,
+  isSelected,
+  isInDeck = false,
+  isFusionMode = false,
+  onSelect,
+  onToggleDeck,
+}) => {
+  return (
+    <div
+      onClick={() => onSelect(card.id)}
+      className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer overflow-hidden group border transform-gpu ${getCardTierStyles(card.tier, isSelected, true)}`}
+    >
+      <img 
+        src={getCardImageUrl(card)} 
+        alt={card.name} 
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 w-full h-full object-cover z-0 opacity-85 group-hover:scale-105 transition-transform duration-200" 
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 pointer-events-none" />
+
+      {/* Level & Mana Badges */}
+      <div className="absolute top-1.5 right-1.5 z-10 bg-black/80 border border-[#c5a880]/30 rounded-full w-[18px] h-[18px] flex items-center justify-center text-[8px] font-mono font-bold text-[#ebd09b] shadow">
+        L{card.level}
+      </div>
+      <div className="absolute top-1.5 right-[26px] z-10">
+        {renderManaIcon(getCardManaCost(card), "w-[18px] h-[18px]")}
+      </div>
+
+      {/* Quick add/remove toggle button (Sanctuary mode only) */}
+      {!isFusionMode && onToggleDeck && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleDeck(card.id);
+          }}
+          className={`absolute top-1.5 left-1.5 z-20 rounded-full w-[18px] h-[18px] flex items-center justify-center border shadow-md transition-all hover:scale-110 active:scale-95 cursor-pointer ${
+            isInDeck
+              ? 'bg-[#4e0707] hover:bg-[#880d1e] border-[#dd2c40]/60 text-white'
+              : 'bg-emerald-950/80 hover:bg-emerald-900 border-emerald-500/60 text-emerald-400'
+          }`}
+          title={isInDeck ? "Remove from deck" : "Add to deck"}
+        >
+          {isInDeck ? (
+            <Minus className="w-2.5 h-2.5" />
+          ) : (
+            <Plus className="w-2.5 h-2.5" />
+          )}
+        </button>
+      )}
+
+      <div className="text-center mt-3 relative z-10">
+        {!card.image.startsWith('/cards/') && (
+          <div className="flex justify-center mb-1">
+            {renderCardIcon(card.image, `w-4 h-4 ${getCardIconColor(card.color)} opacity-60`)}
+          </div>
+        )}
+        <span className="text-[10px] font-display font-bold text-white block truncate leading-none text-shadow-gold drop-shadow-md">
+          {card.name}
+        </span>
+        <span className={`text-[7px] uppercase font-mono font-bold tracking-wider drop-shadow-md ${
+          card.tier === 'bronze' ? 'text-amber-400' :
+          card.tier === 'silver' ? 'text-slate-300' :
+          card.tier === 'gold' ? 'text-[#ebd09b]' :
+          card.tier === 'divine' ? 'text-rose-500 font-black' :
+          'text-purple-400'
+        }`}>
+          {card.tier}
+        </span>
+      </div>
+
+      <div className="relative z-10 mt-auto">
+        {/* Card Skills Indicator */}
+        <div className="flex justify-center gap-1 my-1">
+          {card.skills.map((s, idx) => (
+            <div 
+              key={idx} 
+              className={`w-1.5 h-1.5 rounded-full border border-black shadow-sm ${
+                s.type === 'hex' ? 'bg-purple-500' :
+                s.type === 'vampirism' ? 'bg-red-500' :
+                s.type === 'plague' ? 'bg-green-500' : 'bg-blue-500'
+              }`}
+              title={s.description}
+            />
+          ))}
+        </div>
+
+        {/* Stats */}
+        <div className="flex justify-between items-center text-[9px] font-mono font-bold pt-1 border-t border-white/10 bg-black/75 rounded px-1 -mx-1">
+          <span className="text-red-400">⚔️{card.attack}</span>
+          <span className="text-blue-400" title="Turn Delay">⏳{card.delay}</span>
+          <span className="text-emerald-400">❤️{card.health}</span>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 export const CollectionDeckView: React.FC = () => {
   const { profile, fuseCards, toggleDeckCard } = useGame();
   const toast = useToast();
@@ -139,56 +247,116 @@ export const CollectionDeckView: React.FC = () => {
   const [tierFilter, setTierFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'level' | 'attack' | 'health' | 'name'>('level');
   const [showFusableOnly, setShowFusableOnly] = useState(false);
+  const [page, setPage] = useState(1);
+  const CARDS_PER_PAGE = 30;
+  const gridContainerRef = React.useRef<HTMLDivElement>(null);
+
+  // Reset page on filter or sort change
+  useEffect(() => {
+    setPage(1);
+  }, [tierFilter, sortBy, showFusableOnly, isFusingMode, fuseCardId1]);
+
+  // Fast duplicate lookup map to prevent O(N^2) checks across large collections
+  const duplicateKeysSet = React.useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const card of profile.collection) {
+      const key = `${card.baseId}_${card.level}_${card.tier}`;
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    const dupes = new Set<string>();
+    counts.forEach((count, key) => {
+      if (count > 1) dupes.add(key);
+    });
+    return dupes;
+  }, [profile.collection]);
+
+  // Filtered & sorted collection with useMemo
+  const tierWeight = React.useMemo(() => ({ divine: 5, legendary: 4, gold: 3, silver: 2, bronze: 1 }), []);
+  
+  const filteredCollection = React.useMemo(() => {
+    return profile.collection
+      .filter(card => {
+        if (tierFilter !== 'all' && card.tier !== tierFilter) return false;
+        
+        if (showFusableOnly) {
+          if (card.level === 5 && (card.tier === 'legendary' || card.tier === 'divine')) return false;
+          const key = `${card.baseId}_${card.level}_${card.tier}`;
+          if (!duplicateKeysSet.has(key)) return false;
+        }
+        
+        return true;
+      })
+      .sort((a, b) => {
+        const tierDiff = (tierWeight[b.tier as keyof typeof tierWeight] || 0) - (tierWeight[a.tier as keyof typeof tierWeight] || 0);
+        if (tierDiff !== 0) return tierDiff;
+
+        if (sortBy === 'level') return b.level - a.level;
+        if (sortBy === 'attack') return b.attack - a.attack;
+        if (sortBy === 'health') return b.health - a.health;
+        return a.name.localeCompare(b.name);
+      });
+  }, [profile.collection, tierFilter, showFusableOnly, sortBy, duplicateKeysSet, tierWeight]);
+
+  // Fusion candidate cards computed efficiently with useMemo
+  const fusionCandidates = React.useMemo(() => {
+    if (!isFusingMode) return [];
+    if (fuseCardId1) {
+      const card1 = profile.collection.find(x => x.id === fuseCardId1);
+      if (!card1) return [];
+      return profile.collection.filter(c => 
+        c.baseId === card1.baseId && 
+        c.id !== fuseCardId1 && 
+        c.level === card1.level && 
+        c.tier === card1.tier
+      );
+    }
+    return filteredCollection.filter(card => {
+      if (card.level === 5 && (card.tier === 'legendary' || card.tier === 'divine')) return false;
+      const key = `${card.baseId}_${card.level}_${card.tier}`;
+      return duplicateKeysSet.has(key);
+    });
+  }, [isFusingMode, fuseCardId1, profile.collection, filteredCollection, duplicateKeysSet]);
+
+  const currentCardList = isFusingMode ? fusionCandidates : filteredCollection;
+  const totalPages = Math.max(1, Math.ceil(currentCardList.length / CARDS_PER_PAGE));
+  const safePage = Math.min(page, totalPages);
+
+  const paginatedCards = React.useMemo(() => {
+    const startIndex = (safePage - 1) * CARDS_PER_PAGE;
+    return currentCardList.slice(startIndex, startIndex + CARDS_PER_PAGE);
+  }, [currentCardList, safePage]);
+
+  // Keep page within bounds if list shrinks
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
+
+  // Scroll to top of cards grid when page changes
+  useEffect(() => {
+    if (gridContainerRef.current) {
+      gridContainerRef.current.scrollTop = 0;
+    }
+  }, [safePage]);
 
   // Currently selected card object
-  const selectedCard = profile.collection.find(c => c.id === selectedCardId) || null;
+  const selectedCard = React.useMemo(() => {
+    return profile.collection.find(c => c.id === selectedCardId) || null;
+  }, [profile.collection, selectedCardId]);
 
-  // Preload full player collection immediately
-  useEffect(() => {
-    if (profile?.collection && profile.collection.length > 0) {
-      assetPreloader.preloadBattleCreatures(profile.collection);
-    }
-  }, [profile?.collection]);
-
-  // Filtered & sorted collection
-  const tierWeight = { divine: 5, legendary: 4, gold: 3, silver: 2, bronze: 1 };
-  const filteredCollection = profile.collection
-    .filter(card => {
-      if (tierFilter !== 'all' && card.tier !== tierFilter) return false;
-      
-      if (showFusableOnly) {
-        // Cannot fuse L5 Legendary (cannot ascend) or L5 Divine (max level)
-        if (card.level === 5 && (card.tier === 'legendary' || card.tier === 'divine')) return false;
-        
-        // Must have at least one identical clone
-        const hasDuplicate = profile.collection.some(c => 
-          c.id !== card.id && 
-          c.baseId === card.baseId && 
-          c.level === card.level && 
-          c.tier === card.tier
-        );
-        if (!hasDuplicate) return false;
-      }
-      
-      return true;
-    })
-    .sort((a, b) => {
-      const tierDiff = (tierWeight[b.tier as keyof typeof tierWeight] || 0) - (tierWeight[a.tier as keyof typeof tierWeight] || 0);
-      if (tierDiff !== 0) return tierDiff;
-
-      if (sortBy === 'level') return b.level - a.level;
-      if (sortBy === 'attack') return b.attack - a.attack;
-      if (sortBy === 'health') return b.health - a.health;
-      return a.name.localeCompare(b.name);
-    });
+  // Selection handler
+  const handleSelectCard = React.useCallback((cardId: string) => {
+    setSelectedCardId(cardId);
+  }, []);
 
   // Deck Toggle Handler
-  const handleToggleDeck = (cardId: string) => {
+  const handleToggleDeck = React.useCallback((cardId: string) => {
     const res = toggleDeckCard(cardId);
     if (!res.success) {
       toast(res.message, 'warning');
     }
-  };
+  }, [toggleDeckCard, toast]);
 
   // Start Fusing Wizard
   const startFusing = (card: Card) => {
@@ -206,7 +374,7 @@ export const CollectionDeckView: React.FC = () => {
   };
 
   // Handle card clicks when Fusion Altar mode is active
-  const handleCardClickInFusion = (cardId: string) => {
+  const handleCardClickInFusion = React.useCallback((cardId: string) => {
     if (!fuseCardId1) {
       const card = profile.collection.find(c => c.id === cardId);
       if (card && card.level === 5 && card.tier === 'legendary') {
@@ -244,7 +412,7 @@ export const CollectionDeckView: React.FC = () => {
       
       setFuseCardId2(cardId);
     }
-  };
+  }, [fuseCardId1, profile.collection, toast]);
 
   const getFusionCosts = (card: Card | null | undefined) => {
     if (!card) return { goldCost: 0, dustCost: 0, shardsCost: 0, isLevelUpgrade: true };
@@ -638,166 +806,129 @@ export const CollectionDeckView: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[350px] overflow-y-auto pr-1">
-                {(fuseCardId1
-                  ? profile.collection.filter(c => {
-                      const card1 = profile.collection.find(x => x.id === fuseCardId1);
-                      if (!card1) return false;
-                      return c.baseId === card1.baseId && c.id !== fuseCardId1 && c.level === card1.level && c.tier === card1.tier;
-                    })
-                  : filteredCollection.filter(card => {
-                      if (card.level === 5 && (card.tier === 'legendary' || card.tier === 'divine')) return false;
-                      const hasDuplicate = profile.collection.some(c => 
-                        c.id !== card.id && 
-                        c.baseId === card.baseId && 
-                        c.level === card.level && 
-                        c.tier === card.tier
-                      );
-                      return hasDuplicate;
-                    })
-                ).map(card => {
+              <div ref={gridContainerRef} className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[350px] overflow-y-auto pr-1">
+                {paginatedCards.map(card => {
                   const isSelected = fuseCardId1 === card.id || fuseCardId2 === card.id;
                   return (
-                    <div
+                    <CollectionCardItem
                       key={card.id}
-                      onClick={() => handleCardClickInFusion(card.id)}
-                      className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer border overflow-hidden group transform-gpu ${getCardTierStyles(card.tier, isSelected, true)}`}
-                    >
-                      <img 
-                        src={getCardImageUrl(card)} 
-                        alt={card.name} 
-                        className="absolute inset-0 w-full h-full object-cover z-0 opacity-85 group-hover:scale-105 transition-transform duration-200" 
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20 z-0 pointer-events-none" />
-
-                      {/* Level & Mana Badges */}
-                      <div className="absolute top-1.5 right-1.5 z-10 bg-black/80 border border-[#c5a880]/40 rounded-full w-[18px] h-[18px] flex items-center justify-center text-[8px] font-mono font-bold text-[#ebd09b] shadow">
-                        L{card.level}
-                      </div>
-                      <div className="absolute top-1.5 right-[26px] z-10">
-                        {renderManaIcon(getCardManaCost(card), "w-[18px] h-[18px]")}
-                      </div>
-                      
-                      <div className="text-center mt-2 relative z-10 drop-shadow-md">
-                        <span className="text-[9px] font-display font-bold text-white block truncate leading-none">{card.name}</span>
-                        <span className={`text-[7px] uppercase font-mono font-bold tracking-wider ${
-                          card.tier === 'bronze' ? 'text-amber-400' :
-                          card.tier === 'silver' ? 'text-slate-300' :
-                          card.tier === 'gold' ? 'text-[#ebd09b]' :
-                          'text-purple-400'
-                        }`}>
-                          {card.tier}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center text-[9px] font-mono font-bold pt-1.5 border-t border-white/10">
-                        <span className="text-red-400">⚔️{card.attack}</span>
-                        <span className="text-blue-400" title="Turn Delay">⏳{card.delay}</span>
-                        <span className="text-emerald-400">❤️{card.health}</span>
-                      </div>
-                    </div>
+                      card={card}
+                      isSelected={isSelected}
+                      isFusionMode={true}
+                      onSelect={handleCardClickInFusion}
+                    />
                   );
                 })}
               </div>
               
-              {fuseCardId1 && profile.collection.filter(c => {
-                const card1 = profile.collection.find(x => x.id === fuseCardId1);
-                if (!card1) return false;
-                return c.baseId === card1.baseId && c.id !== fuseCardId1 && c.level === card1.level && c.tier === card1.tier;
-              }).length === 0 && (
+              {fuseCardId1 && fusionCandidates.length === 0 && (
                 <div className="text-center py-6 text-gray-500 text-xs">
                   😭 You do not have other identical cards of the same level (L{profile.collection.find(x => x.id === fuseCardId1)?.level}) and tier for fusion.
                   <p className="mt-1">You need a copy of this creature with identical stats!</p>
                 </div>
               )}
+
+              {!fuseCardId1 && fusionCandidates.length === 0 && (
+                <div className="text-center py-6 text-gray-500 text-xs font-mono">
+                  No fusable duplicate creatures found matching current filters.
+                </div>
+              )}
+
+              {/* Pagination & Count Controls */}
+              <div className="flex items-center justify-between pt-3 border-t border-[#c5a880]/15 text-xs text-stone-400 select-none">
+                <span className="font-mono text-[11px] text-gray-400">
+                  {currentCardList.length === 0
+                    ? '0 cards'
+                    : `Showing ${(safePage - 1) * CARDS_PER_PAGE + 1}–${Math.min(currentCardList.length, safePage * CARDS_PER_PAGE)} of ${currentCardList.length} cards`}
+                </span>
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => setPage(p => Math.max(1, p - 1))}
+                      disabled={safePage <= 1}
+                      className="px-2.5 py-1 rounded bg-[#0b0c10] border border-[#c5a880]/30 text-[#ebd09b] disabled:opacity-25 disabled:cursor-not-allowed hover:bg-[#ebd09b]/10 transition-colors flex items-center gap-1 font-mono text-[11px] cursor-pointer"
+                      title="Previous page"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      <span>Prev</span>
+                    </button>
+                    <span className="font-mono text-[11px] px-2 text-[#ebd09b] font-bold">
+                      {safePage} / {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                      disabled={safePage >= totalPages}
+                      className="px-2.5 py-1 rounded bg-[#0b0c10] border border-[#c5a880]/30 text-[#ebd09b] disabled:opacity-25 disabled:cursor-not-allowed hover:bg-[#ebd09b]/10 transition-colors flex items-center gap-1 font-mono text-[11px] cursor-pointer"
+                      title="Next page"
+                    >
+                      <span>Next</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             /* Normal grid mode */
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[350px] overflow-y-auto pr-1">
-              {filteredCollection.map(card => {
-                const isSelected = selectedCardId === card.id;
-                const isInDeck = (profile?.deck || []).includes(card.id);
-                
-                return (
-                  <div
-                    key={card.id}
-                    onClick={() => setSelectedCardId(card.id)}
-                    className={`relative aspect-[3/4.2] rounded-xl p-2 flex flex-col justify-between cursor-pointer overflow-hidden group border ${getCardTierStyles(card.tier, isSelected, true)}`}
-                  >
-                    <img 
-                      src={getCardImageUrl(card)} 
-                      alt={card.name} 
-                      className="absolute inset-0 w-full h-full object-cover z-0 opacity-85 group-hover:scale-105 transition-transform duration-200" 
+            <div>
+              <div ref={gridContainerRef} className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[350px] overflow-y-auto pr-1">
+                {paginatedCards.map(card => {
+                  const isSelected = selectedCardId === card.id;
+                  const isInDeck = (profile?.deck || []).includes(card.id);
+                  
+                  return (
+                    <CollectionCardItem
+                      key={card.id}
+                      card={card}
+                      isSelected={isSelected}
+                      isInDeck={isInDeck}
+                      isFusionMode={false}
+                      onSelect={handleSelectCard}
+                      onToggleDeck={handleToggleDeck}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 pointer-events-none" />
+                  );
+                })}
+              </div>
 
-                    {/* Level & Mana Badges */}
-                    <div className="absolute top-1.5 right-1.5 z-10 bg-black/70 border border-[#c5a880]/30 rounded-full w-[18px] h-[18px] flex items-center justify-center text-[8px] font-mono font-bold text-[#ebd09b]">
-                      L{card.level}
-                    </div>
-                    <div className="absolute top-1.5 right-[26px] z-10">
-                      {renderManaIcon(getCardManaCost(card), "w-[18px] h-[18px]")}
-                    </div>
+              {filteredCollection.length === 0 && (
+                <div className="text-center py-10 text-gray-500 text-xs font-mono">
+                  No creatures found matching your filter criteria.
+                </div>
+              )}
 
-                    {/* Quick add/remove toggle button */}
+              {/* Pagination & Count Controls */}
+              <div className="flex items-center justify-between pt-3 mt-3 border-t border-[#c5a880]/15 text-xs text-stone-400 select-none">
+                <span className="font-mono text-[11px] text-gray-400">
+                  {currentCardList.length === 0
+                    ? '0 cards'
+                    : `Showing ${(safePage - 1) * CARDS_PER_PAGE + 1}–${Math.min(currentCardList.length, safePage * CARDS_PER_PAGE)} of ${currentCardList.length} cards`}
+                </span>
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-1.5">
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleDeck(card.id);
-                      }}
-                      className={`absolute top-1.5 left-1.5 z-20 rounded-full w-[18px] h-[18px] flex items-center justify-center border shadow-md transition-all hover:scale-110 active:scale-95 cursor-pointer ${
-                        isInDeck
-                          ? 'bg-[#4e0707] hover:bg-[#880d1e] border-[#dd2c40]/60 text-white'
-                          : 'bg-emerald-950/80 hover:bg-emerald-900 border-emerald-500/60 text-emerald-400'
-                      }`}
-                      title={isInDeck ? "Remove from deck" : "Add to deck"}
+                      onClick={() => setPage(p => Math.max(1, p - 1))}
+                      disabled={safePage <= 1}
+                      className="px-2.5 py-1 rounded bg-[#0b0c10] border border-[#c5a880]/30 text-[#ebd09b] disabled:opacity-25 disabled:cursor-not-allowed hover:bg-[#ebd09b]/10 transition-colors flex items-center gap-1 font-mono text-[11px] cursor-pointer"
+                      title="Previous page"
                     >
-                      {isInDeck ? (
-                        <Minus className="w-2.5 h-2.5" />
-                      ) : (
-                        <Plus className="w-2.5 h-2.5" />
-                      )}
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      <span>Prev</span>
                     </button>
-
-                    <div className="text-center mt-4 relative z-10">
-                      {!card.image.startsWith('/cards/') && (
-                        <div className="flex justify-center mb-1">
-                          {renderCardIcon(card.image, `w-4 h-4 ${getCardIconColor(card.color)} opacity-60`)}
-                        </div>
-                      )}
-                      <span className="text-[10px] font-display font-bold text-white block truncate leading-none text-shadow-gold drop-shadow-md">
-                        {card.name}
-                      </span>
-                      <span className={`text-[7px] uppercase font-mono font-bold tracking-wider drop-shadow-md ${getDeckTierTextColor(card.tier)}`}>
-                        {card.tier}
-                      </span>
-                    </div>
-
-                    <div className="relative z-10 mt-auto">
-                      {/* Card Skills Indicator */}
-                      <div className="flex justify-center gap-1 my-1">
-                        {card.skills.map((s, idx) => (
-                          <div 
-                            key={idx} 
-                            className={`w-1.5 h-1.5 rounded-full border border-black shadow-sm ${
-                              s.type === 'hex' ? 'bg-purple-500' :
-                              s.type === 'vampirism' ? 'bg-red-500' :
-                              s.type === 'plague' ? 'bg-green-500' : 'bg-blue-500'
-                            }`}
-                            title={s.description}
-                          />
-                        ))}
-                      </div>
-
-                      {/* Stats */}
-                      <div className="flex justify-between items-center text-[9px] font-mono font-bold pt-1 border-t border-white/10/80 bg-black/50 backdrop-blur-sm rounded px-1 -mx-1">
-                        <span className="text-red-400">⚔️{card.attack}</span>
-                        <span className="text-blue-400" title="Turn Delay">⏳{card.delay}</span>
-                        <span className="text-emerald-400">❤️{card.health}</span>
-                      </div>
-                    </div>
+                    <span className="font-mono text-[11px] px-2 text-[#ebd09b] font-bold">
+                      {safePage} / {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                      disabled={safePage >= totalPages}
+                      className="px-2.5 py-1 rounded bg-[#0b0c10] border border-[#c5a880]/30 text-[#ebd09b] disabled:opacity-25 disabled:cursor-not-allowed hover:bg-[#ebd09b]/10 transition-colors flex items-center gap-1 font-mono text-[11px] cursor-pointer"
+                      title="Next page"
+                    >
+                      <span>Next</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                );
-              })}
+                )}
+              </div>
             </div>
           )}
         </div>
