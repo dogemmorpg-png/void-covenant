@@ -434,7 +434,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   const initialBaseGold = stage.goldReward || (battleType === 'pvp' ? 50 : 50);
   const [earnedGold, setEarnedGold] = useState<number>(() => applyRewardMultiplier(initialBaseGold, battleGoldMultiplier));
   const [earnedDust, setEarnedDust] = useState<number>(() => stage.dustReward || (battleType === 'pvp' ? 25 : 25));
-  const initialBaseExp = battleType === 'pvp' ? 100 : ((stage.id || 1) * 20 + 40);
+  const initialBaseExp = battleType === 'pvp' ? 100 : ((stage.id || 1) * 16 + 32);
   const [earnedExp, setEarnedExp] = useState<number>(() => initialBaseExp);
 
   // Consolation gold on defeat (base 20 + bonuses from subscription & gear)

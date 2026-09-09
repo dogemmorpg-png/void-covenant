@@ -269,7 +269,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                   <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-emerald-500/20 hover:border-emerald-400/50 hover:bg-emerald-500/[0.06] transition-all cursor-default group">
                     <div className="flex items-center gap-1.5">
                       <img src="/icons/icon_exp.webp" alt="EXP" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.7)] group-hover:scale-110 transition-transform" />
-                      <span className="font-mono font-black text-emerald-400 text-base leading-none">+{selectedStage.id * 20 + 40}</span>
+                      <span className="font-mono font-black text-emerald-400 text-base leading-none">+{selectedStage.id * 16 + 32}</span>
                     </div>
                     <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider font-semibold mt-1">Hero EXP</span>
                   </div>

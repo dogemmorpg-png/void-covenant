@@ -174,7 +174,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (result === 'win') {
         const baseGold = stage.goldReward;
         const baseDust = stage.dustReward;
-        const baseExp = floorNum * 20 + 40;
+        const baseExp = floorNum * 16 + 32;
 
         goldReward = applyMultiplierWithMinimum(baseGold, goldMultiplier);
         dustReward = baseDust;
