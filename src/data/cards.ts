@@ -1483,6 +1483,78 @@ export function getEvolutionBonusSkill(existingSkills: CardSkill[], nextTier: Ca
   return null;
 }
 
+export interface FusionCost {
+  goldCost: number;
+  dustCost: number;
+  shardsCost: number;
+  isLevelUpgrade: boolean;
+}
+
+const LEVEL_UP_COSTS: Record<CardTier, Record<number, { gold: number; dust: number; shards: number }>> = {
+  bronze: {
+    1: { gold: 400, dust: 150, shards: 0 },
+    2: { gold: 800, dust: 300, shards: 0 },
+    3: { gold: 1050, dust: 500, shards: 0 },
+    4: { gold: 1600, dust: 800, shards: 0 },
+  },
+  silver: {
+    1: { gold: 1000, dust: 400, shards: 0 },
+    2: { gold: 2000, dust: 800, shards: 0 },
+    3: { gold: 2800, dust: 1250, shards: 0 },
+    4: { gold: 4000, dust: 2000, shards: 0 },
+  },
+  gold: {
+    1: { gold: 2500, dust: 1200, shards: 0 },
+    2: { gold: 5000, dust: 2400, shards: 0 },
+    3: { gold: 7000, dust: 3600, shards: 0 },
+    4: { gold: 9500, dust: 5000, shards: 0 },
+  },
+  legendary: {
+    1: { gold: 6000, dust: 3500, shards: 10 },
+    2: { gold: 12000, dust: 7000, shards: 20 },
+    3: { gold: 18000, dust: 10500, shards: 30 },
+    4: { gold: 25000, dust: 15000, shards: 50 },
+  },
+  divine: {
+    1: { gold: 15000, dust: 8000, shards: 25 },
+    2: { gold: 30000, dust: 16000, shards: 50 },
+    3: { gold: 45000, dust: 25000, shards: 75 },
+    4: { gold: 65000, dust: 38000, shards: 100 },
+  },
+};
+
+const TIER_ASCENSION_COSTS: Record<string, { gold: number; dust: number; shards: number }> = {
+  bronze: { gold: 2000, dust: 1000, shards: 10 },
+  silver: { gold: 5000, dust: 2500, shards: 25 },
+  gold: { gold: 10000, dust: 6000, shards: 40 },
+};
+
+export function getFusionCosts(card: { level: number; tier: CardTier } | null | undefined): FusionCost {
+  if (!card) {
+    return { goldCost: 0, dustCost: 0, shardsCost: 0, isLevelUpgrade: true };
+  }
+
+  const isLevelUpgrade = card.level < 5;
+  if (isLevelUpgrade) {
+    const tierCosts = LEVEL_UP_COSTS[card.tier] || LEVEL_UP_COSTS.bronze;
+    const cost = tierCosts[card.level] || tierCosts[1];
+    return {
+      goldCost: cost.gold,
+      dustCost: cost.dust,
+      shardsCost: cost.shards,
+      isLevelUpgrade: true,
+    };
+  }
+
+  const ascensionCost = TIER_ASCENSION_COSTS[card.tier] || { gold: 10000, dust: 6000, shards: 40 };
+  return {
+    goldCost: ascensionCost.gold,
+    dustCost: ascensionCost.dust,
+    shardsCost: ascensionCost.shards,
+    isLevelUpgrade: false,
+  };
+}
+
 // Helper to create a unique card instance from template
 export function createCardInstance(template: CardTemplate, level: number = 1): Card {
   const levelMultiplier = 1 + (level - 1) * 0.15; // +15% stats per level

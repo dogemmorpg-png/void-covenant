@@ -3,7 +3,7 @@ import { getCardTierStyles } from '../utils/tierStyles';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { Card, CardTier } from '../types';
-import { CARD_TEMPLATES, getCardManaCost, getEvolutionBonusSkill } from '../data/cards';
+import { CARD_TEMPLATES, getCardManaCost, getEvolutionBonusSkill, getFusionCosts } from '../data/cards';
 import { Swords, Star, Plus, Minus, ArrowRight, Skull, Shield, Zap, Sparkles, AlertCircle, Crown, ShieldAlert, Bug, Flame, Droplet, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { assetPreloader, getCardImageUrl } from '../utils/assetPreloader';
 import { SanctuaryEmblem, FusionAltarEmblem, BaseCardSlotEmblem, SacrificeSlotEmblem } from './CardsViewCustomIcons';
@@ -413,32 +413,6 @@ export const CollectionDeckView: React.FC = () => {
       setFuseCardId2(cardId);
     }
   }, [fuseCardId1, profile.collection, toast]);
-
-  const getFusionCosts = (card: Card | null | undefined) => {
-    if (!card) return { goldCost: 0, dustCost: 0, shardsCost: 0, isLevelUpgrade: true };
-    const isLevelUpgrade = card.level < 5;
-    if (isLevelUpgrade) {
-      return {
-        goldCost: card.level * 150,
-        dustCost: card.level * 20,
-        shardsCost: 0,
-        isLevelUpgrade: true
-      };
-    }
-    let goldCost = 500;
-    let dustCost = 100;
-    let shardsCost = 5;
-    if (card.tier === 'silver') {
-      goldCost = 1000;
-      dustCost = 200;
-      shardsCost = 15;
-    } else if (card.tier === 'gold') {
-      goldCost = 2000;
-      dustCost = 400;
-      shardsCost = 30;
-    }
-    return { goldCost, dustCost, shardsCost, isLevelUpgrade: false };
-  };
 
   // Execute fusion
   const executeFusionRitual = () => {

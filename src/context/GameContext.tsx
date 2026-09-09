@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { useToast } from '../components/Toast';
 import { Card, PlayerProfile, CampaignStage, BattlePassTier, CardTemplate, CardTier, Equipment, EquipmentSlot } from '../types';
-import { getStarterDeck, CARD_TEMPLATES, createCardInstance, getCardManaCost, getEvolutionBonusSkill, BATTLE_PASS_TIERS, AIRDROP_TASKS } from '../data/cards';
+import { getStarterDeck, CARD_TEMPLATES, createCardInstance, getCardManaCost, getEvolutionBonusSkill, getFusionCosts, BATTLE_PASS_TIERS, AIRDROP_TASKS } from '../data/cards';
 import { supabase } from '../utils/supabaseClient';
 import { calculateEnergy, getTierLimits } from '../utils/energyHelper';
 import { ALL_LEAGUE_REWARDS } from '../data/leagueRewards';
@@ -1191,27 +1191,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return current;
       }
 
-      const isLevelUpgrade = card1.level < 5;
-      
-      let goldCost = isLevelUpgrade ? card1.level * 150 : 500;
-      let dustCost = isLevelUpgrade ? card1.level * 20 : 100;
-      let shardsCost = 0;
-
-      if (!isLevelUpgrade) {
-        if (card1.tier === 'bronze') {
-          goldCost = 500;
-          dustCost = 100;
-          shardsCost = 5;
-        } else if (card1.tier === 'silver') {
-          goldCost = 1000;
-          dustCost = 200;
-          shardsCost = 15;
-        } else if (card1.tier === 'gold') {
-          goldCost = 2000;
-          dustCost = 400;
-          shardsCost = 30;
-        }
-      }
+      const { goldCost, dustCost, shardsCost, isLevelUpgrade } = getFusionCosts(card1);
 
       if ((current.gold || 0) < goldCost) {
         errorMsg = `Not enough gold. Required: ${goldCost}`;

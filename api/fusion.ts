@@ -3,7 +3,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
 const jwt = (jwtPkg as any).default || jwtPkg;
 import { createClient } from '@supabase/supabase-js';
-import { CARD_TEMPLATES, getEvolutionBonusSkill, getCardManaCost } from './_shared/cards.js';
+import { CARD_TEMPLATES, getEvolutionBonusSkill, getCardManaCost, getFusionCosts } from './_shared/cards.js';
 import { Card, CardTier, PlayerProfile } from './_shared/types.js';
 import { calculateEnergy } from './_shared/energyHelper.js';
 import { recordShardTransaction } from './_shared/shardLogger.js';
@@ -145,33 +145,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Cards must be the same tier.' });
     }
 
-    const isLevelUpgrade = card1.level < 5;
-    
-    let goldCost = isLevelUpgrade ? card1.level * 150 : 500;
-    let dustCost = isLevelUpgrade ? card1.level * 20 : 100;
-    let shardsCost = 0;
-
-    if (isLevelUpgrade && card1.tier === 'divine') {
-      goldCost = card1.level * 250;
-      dustCost = card1.level * 40;
-      shardsCost = card1.level * 5;
-    }
-
-    if (!isLevelUpgrade) {
-      if (card1.tier === 'bronze') {
-        goldCost = 500;
-        dustCost = 100;
-        shardsCost = 5;
-      } else if (card1.tier === 'silver') {
-        goldCost = 1000;
-        dustCost = 200;
-        shardsCost = 15;
-      } else if (card1.tier === 'gold') {
-        goldCost = 2000;
-        dustCost = 400;
-        shardsCost = 30;
-      }
-    }
+    const { goldCost, dustCost, shardsCost, isLevelUpgrade } = getFusionCosts(card1);
     
     if ((profile.gold || 0) < goldCost) {
       return res.status(400).json({ error: `Not enough gold. Required: ${goldCost}` });
