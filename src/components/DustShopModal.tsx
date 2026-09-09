@@ -65,11 +65,11 @@ export const DustShopModal: React.FC<DustShopModalProps> = ({ onClose }) => {
         {/* Header */}
         <div className="flex justify-between items-center border-b border-white/10 pb-3.5 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-black/70 border border-cyan-500/50 flex items-center justify-center shadow-inner relative">
+            <div className="w-10 h-10 rounded-2xl bg-black/70 border border-cyan-500/50 flex items-center justify-center shadow-inner relative overflow-hidden">
               <img 
                 src="/icons/icon_dust.webp" 
                 alt="Void Dust Sanctum" 
-                className="w-7 h-7 object-contain drop-shadow-[0_0_12px_rgba(6,182,212,0.9)]" 
+                className="w-8 h-8 scale-130 object-contain drop-shadow-[0_0_12px_rgba(6,182,212,0.9)]" 
               />
               <Sparkles className="w-3.5 h-3.5 text-cyan-300 absolute -top-1 -right-1 animate-pulse" />
             </div>
@@ -103,7 +103,7 @@ export const DustShopModal: React.FC<DustShopModalProps> = ({ onClose }) => {
 
             {/* Current Dust */}
             <div className="flex items-center gap-1.5 bg-cyan-950/40 border border-cyan-500/40 rounded-full py-1 px-2.5 shadow-sm">
-              <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 object-contain" />
+              <img src="/icons/icon_dust.webp" alt="Dust" className="w-5 h-5 scale-135 object-contain" />
               <span className="font-mono font-bold text-cyan-300 text-xs">{(profile.dust || 0).toLocaleString()}</span>
             </div>
 
@@ -167,7 +167,7 @@ export const DustShopModal: React.FC<DustShopModalProps> = ({ onClose }) => {
                     <img 
                       src="/icons/icon_dust.webp" 
                       alt="Dust" 
-                      className="w-5 h-5 sm:w-6 sm:h-6 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] group-hover:scale-110 transition-transform duration-300 shrink-0" 
+                      className="w-7 h-7 sm:w-8 sm:h-8 scale-135 object-contain drop-shadow-[0_0_10px_rgba(6,182,212,0.9)] group-hover:scale-145 transition-transform duration-300 shrink-0" 
                     />
                     <span className="text-base sm:text-lg font-black text-cyan-300 font-mono leading-none tracking-tight truncate">
                       {pkg.dustAmount.toLocaleString()}

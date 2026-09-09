@@ -1,4 +1,4 @@
-﻿export interface GoldPackage {
+export interface GoldPackage {
   id: string;
   name: string;
   goldAmount: number;
@@ -15,35 +15,35 @@ export const GOLD_PACKAGES: GoldPackage[] = [
     name: 'Pouch of Gold',
     goldAmount: 5000,
     shardCost: 20,
-    image: '/shop/gold_pouch_5k.jpg',
-    description: 'A leather pouch filled with minted gold coins.'
+    image: '/shop/gold_pouch_5k_v2.png',
+    description: 'A rustic leather pouch spilling ancient minted gold coins.'
   },
   {
     id: 'gold_25k',
     name: 'Sack of Gold',
     goldAmount: 25000,
     shardCost: 80,
-    image: '/shop/gold_sack_25k.jpg',
+    image: '/shop/gold_sack_25k_v2.png',
     badge: 'POPULAR',
     popular: true,
-    description: 'A heavy sack bursting with ancient gold coins and void essence.'
+    description: 'A heavy velvet sack bursting with gold bars, coins, and jewels.'
   },
   {
     id: 'gold_50k',
-    name: 'Gilded Void Chest',
+    name: 'Gilded Treasure Chest',
     goldAmount: 50000,
     shardCost: 150,
-    image: '/shop/gold_chest_50k.png',
+    image: '/shop/gold_chest_50k_v2.png',
     badge: 'BEST VALUE',
-    description: 'An ornate gothic treasure chest filled to the brim with gold.'
+    description: 'An ornate gothic chest overflowing with pure gold goblets and bullion.'
   },
   {
     id: 'gold_100k',
-    name: 'Overlord Vault',
+    name: 'Overlord Treasury Vault',
     goldAmount: 100000,
     shardCost: 275,
-    image: '/shop/gold_vault_100k.png',
+    image: '/shop/gold_vault_100k_v2.png',
     badge: 'SUPREME',
-    description: 'An immense hoard of pure gold from the Nether vaults.'
+    description: 'A colossal imperial vault with mountains of pure gold ingots.'
   }
 ];

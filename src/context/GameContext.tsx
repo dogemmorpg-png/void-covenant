@@ -1547,8 +1547,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const GOLD_RATES: Record<string, { gold: number; shards: number; name: string }> = {
         'gold_5k': { gold: 5000, shards: 20, name: 'Pouch of Gold' },
         'gold_25k': { gold: 25000, shards: 80, name: 'Sack of Gold' },
-        'gold_50k': { gold: 50000, shards: 150, name: 'Gilded Void Chest' },
-        'gold_100k': { gold: 100000, shards: 275, name: 'Overlord Vault' },
+        'gold_50k': { gold: 50000, shards: 150, name: 'Gilded Treasure Chest' },
+        'gold_100k': { gold: 100000, shards: 275, name: 'Overlord Treasury Vault' },
       };
       const pack = GOLD_RATES[packageId];
       if (!pack) {
