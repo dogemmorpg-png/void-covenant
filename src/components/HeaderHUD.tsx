@@ -11,7 +11,7 @@ interface HeaderHUDProps {
 }
 
 export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
-  const { profile, logoutPlayer, isShardsShopOpen, setIsShardsShopOpen, claimReferralSovereigns } = useGame();
+  const { profile, logoutPlayer, isShardsShopOpen, setIsShardsShopOpen, isGoldShopOpen, setIsGoldShopOpen, claimReferralSovereigns } = useGame();
   const { disconnect } = useWallet();
   const toast = useToast();
 
@@ -121,9 +121,18 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
           {/* Resources Group */}
           <div className="flex items-center justify-center gap-1.5 sm:gap-2 flex-nowrap shrink-0">
             {/* Gold */}
-            <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors cursor-default py-1 px-2.5 shadow-inner" title="Gold (For basic packs and upgrades)">
-              <img src="/icons/icon_gold.webp" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 object-contain" />
-              <span className="font-mono font-bold text-amber-400 text-sm">{profile.gold}</span>
+            <div 
+              onClick={() => {
+                setIsGoldShopOpen(true);
+              }}
+              className="flex items-center gap-1.5 bg-gradient-to-r from-[#1c1608] to-[#120e04] hover:from-[#2a200a] hover:to-[#1a1405] border border-amber-500/40 hover:border-amber-400/80 rounded-full py-1 pl-2.5 pr-1.5 shadow-[0_0_15px_rgba(245,158,11,0.15)] hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] cursor-pointer transition-all duration-300 group select-none" 
+              title="Gold (Click to Open Gold Shop)"
+            >
+              <img src="/icons/icon_gold.webp" alt="Gold" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 object-contain scale-105 group-hover:scale-120 transition-transform duration-300" />
+              <span className="font-mono font-black text-amber-400 group-hover:text-amber-300 text-sm tracking-wide transition-colors ml-0.5">{profile.gold}</span>
+              <div className="w-5 h-5 rounded-full bg-gradient-to-b from-[#d97706] via-[#b45309] to-[#78350f] group-hover:from-[#f59e0b] group-hover:to-[#92400e] text-white flex items-center justify-center border border-amber-300/40 shadow-[0_0_10px_rgba(217,119,6,0.6)] group-hover:shadow-[0_0_14px_rgba(245,158,11,0.9)] group-hover:scale-110 active:scale-95 transition-all duration-300 ml-0.5">
+                <Plus className="w-3 h-3 stroke-[3] text-white drop-shadow-sm" />
+              </div>
             </div>
 
             {/* Dust */}

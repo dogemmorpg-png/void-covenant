@@ -19,6 +19,10 @@ const CORE_UI_ASSETS = [
   '/shop/dark_shard_chest.png',
   '/shop/abyssal_treasury.png',
   '/shop/void_overlord_vault.png',
+  '/shop/gold_pouch_5k.jpg',
+  '/shop/gold_sack_25k.jpg',
+  '/shop/gold_chest_50k.png',
+  '/shop/gold_vault_100k.png',
 
   // Core Badges & Icons
   '/icons/crown.png',

@@ -984,6 +984,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       successMessage = `Restored +${energyCount} PvE Energy for ${shardCost} Shards!`;
       responseData = { energyCount, shardCost, newEnergy: profile.pveEnergy };
+    } else if (action === 'buy_gold_pack') {
+      const { packageId } = payload || {};
+      const GOLD_RATES: Record<string, { gold: number; shards: number; name: string }> = {
+        'gold_5k': { gold: 5000, shards: 20, name: 'Pouch of Gold' },
+        'gold_25k': { gold: 25000, shards: 80, name: 'Sack of Gold' },
+        'gold_50k': { gold: 50000, shards: 150, name: 'Gilded Void Chest' },
+        'gold_100k': { gold: 100000, shards: 275, name: 'Overlord Vault' },
+      };
+      const pack = GOLD_RATES[packageId];
+      if (!pack) {
+        return res.status(400).json({ error: 'Invalid gold package' });
+      }
+
+      const currentShards = profile.darkShards || 0;
+      if (currentShards < pack.shards) {
+        return res.status(400).json({ error: `Not enough Dark Shards! Need ${pack.shards}, you have ${currentShards}.` });
+      }
+
+      profile = recordShardTransaction(
+        profile,
+        'SHOP_PURCHASE',
+        -pack.shards,
+        `Purchased ${pack.gold.toLocaleString()} Gold (${pack.name}) for ${pack.shards} Shards`,
+        { packageId, goldAmount: pack.gold, shardCost: pack.shards }
+      );
+      profile.gold = (profile.gold || 0) + pack.gold;
+      successMessage = `Successfully purchased ${pack.gold.toLocaleString()} Gold!`;
+      responseData = { goldAdded: pack.gold, newGold: profile.gold, shardsSpent: pack.shards, newShards: profile.darkShards };
     } else if (action === 'buy_divine_card') {
       const { baseId } = payload || {};
       const template = CARD_TEMPLATES.find((c: any) => c.baseId === baseId && c.tier === 'divine');

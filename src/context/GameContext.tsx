@@ -70,6 +70,8 @@ interface GameContextType {
   resetAdminLeagueRewards: () => Promise<{ success: boolean; message: string; config?: any[] }>;
   isShardsShopOpen: boolean;
   setIsShardsShopOpen: (open: boolean) => void;
+  isGoldShopOpen: boolean;
+  setIsGoldShopOpen: (open: boolean) => void;
   refreshProfile: (notifyOnDefense?: boolean) => Promise<PlayerProfile | null>;
   hasNewDefenseAttacks: boolean;
   markDefenseHistoryAsViewed: () => void;
@@ -259,6 +261,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<PlayerProfile>(createDefaultProfile);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [isShardsShopOpen, setIsShardsShopOpen] = useState(false);
+  const [isGoldShopOpen, setIsGoldShopOpen] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -1536,6 +1539,52 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success, message: msg, profile: updatedProfile };
     }
 
+    if (action === 'buy_gold_pack') {
+      const { packageId } = payload || {};
+      const GOLD_RATES: Record<string, { gold: number; shards: number; name: string }> = {
+        'gold_5k': { gold: 5000, shards: 20, name: 'Pouch of Gold' },
+        'gold_25k': { gold: 25000, shards: 80, name: 'Sack of Gold' },
+        'gold_50k': { gold: 50000, shards: 150, name: 'Gilded Void Chest' },
+        'gold_100k': { gold: 100000, shards: 275, name: 'Overlord Vault' },
+      };
+      const pack = GOLD_RATES[packageId];
+      if (!pack) {
+        return { success: false, message: 'Invalid gold package.' };
+      }
+
+      let msg = '';
+      let success = false;
+      let updatedProfile: any = null;
+
+      setProfile(current => {
+        const currentShards = current.darkShards || 0;
+        if (currentShards < pack.shards) {
+          msg = `Not enough Dark Shards! Need ${pack.shards} shards.`;
+          success = false;
+          return current;
+        }
+
+        success = true;
+        let updated = recordShardTransaction(
+          current,
+          'SHOP_PURCHASE',
+          -pack.shards,
+          `Purchased ${pack.gold.toLocaleString()} Gold (${pack.name}) for ${pack.shards} Shards`,
+          { packageId, goldAmount: pack.gold, shardCost: pack.shards }
+        );
+        updated = {
+          ...updated,
+          gold: (updated.gold || 0) + pack.gold
+        };
+        msg = `Successfully purchased ${pack.gold.toLocaleString()} Gold!`;
+        updatedProfile = updated;
+        saveProfile(updated);
+        return updated;
+      });
+
+      return { success, message: msg, profile: updatedProfile };
+    }
+
     if (action === 'buy_subscription') {
       const { tier, durationDays } = payload || {};
       const PRICES: Record<string, Record<number, number>> = {
@@ -1974,6 +2023,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         resetAdminLeagueRewards,
         isShardsShopOpen,
         setIsShardsShopOpen,
+        isGoldShopOpen,
+        setIsGoldShopOpen,
         refreshProfile,
         hasNewDefenseAttacks,
         markDefenseHistoryAsViewed
