@@ -1488,10 +1488,21 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             return (
               <motion.div 
                 animate={{
-                  scale: isEnemyHit ? [1, 1.15, 0.95, 1] : (isEnemyCasting ? [1, 1.14, 1.14, 1] : 1),
-                  rotate: isEnemyHit ? [0, -6, 6, -4, 4, 0] : (isEnemyCasting ? [0, 4, -4, 4, -4, 0] : 0),
+                  scale: isEnemyHit ? [1, 0.93, 1.03, 1] : (isEnemyCasting ? [1, 1.12, 1.07, 1] : 1),
+                  y: isEnemyHit ? [0, -6, 2, 0] : (isEnemyCasting ? [0, -8, -4, 0] : 0),
+                  rotate: isEnemyHit ? [0, -2.5, 1, 0] : 0,
                 }}
-                transition={{ duration: Math.max(0.2, 0.34 / effectiveSpeed), ease: "easeInOut" }}
+                transition={{
+                  scale: isEnemyHit 
+                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
+                    : (isEnemyCasting ? { times: [0, 0.35, 0.7, 1], duration: Math.max(0.3, 0.6 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
+                  y: isEnemyHit 
+                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
+                    : (isEnemyCasting ? { times: [0, 0.35, 0.7, 1], duration: Math.max(0.3, 0.6 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
+                  rotate: isEnemyHit 
+                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
+                    : { duration: 0.2 }
+                }}
                 className={`absolute top-4 left-4 flex items-center gap-3 z-30 bg-[#100b08]/95 p-2 rounded-2xl border transform-gpu will-change-transform ${
                   isEnemyHit 
                     ? 'border-red-500 shadow-[0_0_35px_rgba(239,68,68,0.95)]' 
@@ -1542,10 +1553,21 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             return (
               <motion.div 
                 animate={{
-                  scale: isPlayerHit ? [1, 1.15, 0.95, 1] : (isPlayerCasting ? [1, 1.14, 1.14, 1] : 1),
-                  rotate: isPlayerHit ? [0, -6, 6, -4, 4, 0] : (isPlayerCasting ? [0, 4, -4, 4, -4, 0] : 0),
+                  scale: isPlayerHit ? [1, 0.93, 1.03, 1] : (isPlayerCasting ? [1, 1.12, 1.07, 1] : 1),
+                  y: isPlayerHit ? [0, 6, -2, 0] : (isPlayerCasting ? [0, -8, -4, 0] : 0),
+                  rotate: isPlayerHit ? [0, 2.5, -1, 0] : 0,
                 }}
-                transition={{ duration: Math.max(0.2, 0.34 / effectiveSpeed), ease: "easeInOut" }}
+                transition={{
+                  scale: isPlayerHit 
+                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
+                    : (isPlayerCasting ? { times: [0, 0.35, 0.7, 1], duration: Math.max(0.3, 0.6 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
+                  y: isPlayerHit 
+                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
+                    : (isPlayerCasting ? { times: [0, 0.35, 0.7, 1], duration: Math.max(0.3, 0.6 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
+                  rotate: isPlayerHit 
+                    ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.2, 0.32 / effectiveSpeed), ease: "easeOut" } 
+                    : { duration: 0.2 }
+                }}
                 className={`absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-[#100b08]/95 p-2 rounded-2xl border transform-gpu will-change-transform ${
                   isPlayerHit 
                     ? 'border-red-500 shadow-[0_0_35px_rgba(239,68,68,0.95)]' 
@@ -1729,17 +1751,17 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                             opacity: isDeath ? 0 : 1,
                             scale: isActing 
                               ? [1, 1.06, 1.15, 1.1, 1] 
-                              : (isDeath ? 0.35 : (isHeal ? [1, 1.08, 1] : (isSummoning ? [0.75, 1.05, 1] : 1))),
-                            y: isActing ? [0, -8, strikeY, strikeY * 0.88, 0] : 0,
-                            x: isActing ? [0, strikeX * -0.06, strikeX, strikeX * 0.9, 0] : (isHit ? [0, -8, 8, -4, 4, 0] : 0),
-                            rotate: isActing ? (strikeX > 0 ? [0, -2, 5, 2, 0] : strikeX < 0 ? [0, 2, -5, -2, 0] : [0, -1, 3, 1, 0]) : (isDeath ? 12 : 0)
+                              : (isHit ? [1, 0.94, 1.02, 1] : (isDeath ? 0.35 : (isHeal ? [1, 1.08, 1] : (isSummoning ? [0.75, 1.05, 1] : 1)))),
+                            y: isActing ? [0, -8, strikeY, strikeY * 0.88, 0] : (isHit ? [0, -6, 2, 0] : 0),
+                            x: isActing ? [0, strikeX * -0.06, strikeX, strikeX * 0.9, 0] : (isHit ? [0, -3, 1, 0] : 0),
+                            rotate: isActing ? (strikeX > 0 ? [0, -2, 5, 2, 0] : strikeX < 0 ? [0, 2, -5, -2, 0] : [0, -1, 3, 1, 0]) : (isHit ? [0, -2, 1, 0] : (isDeath ? 12 : 0))
                           }}
                           exit={{ opacity: 0, scale: 0.7, transition: { duration: Math.max(0.2, 0.35 / effectiveSpeed) } }}
                           transition={{
-                            y: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : { duration: 0.2 },
-                            x: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : (isHit ? { duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
-                            scale: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : (isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : (isSummoning ? { duration: 0.45, ease: "easeOut" } : { duration: 0.2 })),
-                            rotate: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : { duration: 0.2 },
+                            y: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : { duration: 0.2 }),
+                            x: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : { duration: 0.2 }),
+                            scale: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : (isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : (isSummoning ? { duration: 0.45, ease: "easeOut" } : { duration: 0.2 }))),
+                            rotate: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : { duration: 0.2 }),
                             opacity: isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : { duration: 0.3 }
                           }}
                           style={{ borderColor: isHit ? '#ef4444' : (isActing ? '#f59e0b' : (isTargeted ? '#f43f5e' : getTierBorderColor(card.tier))) }}
@@ -2002,17 +2024,17 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                             opacity: isDeath ? 0 : 1,
                             scale: isActing 
                               ? [1, 1.06, 1.15, 1.1, 1] 
-                              : (isDeath ? 0.35 : (isHeal ? [1, 1.08, 1] : (isSummoning ? [0.75, 1.05, 1] : 1))),
-                            y: isActing ? [0, 8, strikeY, strikeY * 0.88, 0] : 0,
-                            x: isActing ? [0, strikeX * -0.06, strikeX, strikeX * 0.9, 0] : (isHit ? [0, -8, 8, -4, 4, 0] : 0),
-                            rotate: isActing ? (strikeX > 0 ? [0, 2, -5, -2, 0] : strikeX < 0 ? [0, -2, 5, 2, 0] : [0, 1, -3, -1, 0]) : (isDeath ? 12 : 0)
+                              : (isHit ? [1, 0.94, 1.02, 1] : (isDeath ? 0.35 : (isHeal ? [1, 1.08, 1] : (isSummoning ? [0.75, 1.05, 1] : 1)))),
+                            y: isActing ? [0, 8, strikeY, strikeY * 0.88, 0] : (isHit ? [0, 6, -2, 0] : 0),
+                            x: isActing ? [0, strikeX * -0.06, strikeX, strikeX * 0.9, 0] : (isHit ? [0, -3, 1, 0] : 0),
+                            rotate: isActing ? (strikeX > 0 ? [0, 2, -5, -2, 0] : strikeX < 0 ? [0, -2, 5, 2, 0] : [0, 1, -3, -1, 0]) : (isHit ? [0, 2, -1, 0] : (isDeath ? 12 : 0))
                           }}
                           exit={{ opacity: 0, scale: 0.7, transition: { duration: Math.max(0.2, 0.35 / effectiveSpeed) } }}
                           transition={{
-                            y: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : { duration: 0.2 },
-                            x: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : (isHit ? { duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeInOut" } : { duration: 0.2 }),
-                            scale: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : (isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : (isSummoning ? { duration: 0.45, ease: "easeOut" } : { duration: 0.2 })),
-                            rotate: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : { duration: 0.2 },
+                            y: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : { duration: 0.2 }),
+                            x: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed), ease: [0.25, 0.1, 0.25, 1] } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : { duration: 0.2 }),
+                            scale: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : (isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : (isSummoning ? { duration: 0.45, ease: "easeOut" } : { duration: 0.2 }))),
+                            rotate: isActing ? { times: [0, 0.18, 0.46, 0.68, 1], duration: Math.max(0.25, 0.72 / effectiveSpeed) } : (isHit ? { times: [0, 0.25, 0.65, 1], duration: Math.max(0.18, 0.32 / effectiveSpeed), ease: "easeOut" } : { duration: 0.2 }),
                             opacity: isDeath ? { duration: Math.max(0.2, 0.45 / effectiveSpeed) } : { duration: 0.3 }
                           }}
                           style={{ borderColor: isHit ? '#ef4444' : (isActing ? '#f59e0b' : (isTargeted ? '#f43f5e' : getTierBorderColor(card.tier))) }}
