@@ -15,7 +15,7 @@ export const DUST_PACKAGES: DustPackage[] = [
     name: 'Gothic Vial of Dust',
     dustAmount: 2500,
     shardCost: 15,
-    image: '/shop/dust_orb_2500.png',
+    image: '/shop/dust_vial_2500.png',
     description: 'An enchanted glass vial infused with swirling cyan void stardust.'
   },
   {
@@ -23,7 +23,7 @@ export const DUST_PACKAGES: DustPackage[] = [
     name: 'Astral Reliquary Urn',
     dustAmount: 10000,
     shardCost: 55,
-    image: '/shop/dust_urn_10000.png',
+    image: '/shop/dust_reliquary_urn_10000.png',
     badge: 'POPULAR',
     popular: true,
     description: 'A carved silver urn overflowing with luminous cosmic dust.'
@@ -33,7 +33,7 @@ export const DUST_PACKAGES: DustPackage[] = [
     name: 'Ancient Void Core',
     dustAmount: 25000,
     shardCost: 120,
-    image: '/shop/dust_core_25000.png',
+    image: '/shop/dust_astrolabe_core_25000.png',
     badge: 'BEST VALUE',
     description: 'A runic astrolabe nexus pulsating with concentrated void dust.'
   },
@@ -42,7 +42,7 @@ export const DUST_PACKAGES: DustPackage[] = [
     name: 'Primordial Chalice',
     dustAmount: 50000,
     shardCost: 220,
-    image: '/shop/dust_nebula_50000.png',
+    image: '/shop/dust_primordial_chalice_50000.png',
     badge: 'SUPREME',
     description: 'A supreme starlight chalice releasing a boundless nebula storm.'
   }
