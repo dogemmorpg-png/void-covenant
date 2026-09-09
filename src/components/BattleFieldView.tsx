@@ -134,13 +134,7 @@ const BarrierDome: React.FC = () => (
 );
 
 const BarrierShatterOverlay: React.FC = () => (
-  <motion.div
-    initial={{ opacity: 1, scale: 0.95 }}
-    animate={{ opacity: 0, scale: 1.35 }}
-    exit={{ opacity: 0 }}
-    transition={{ duration: 0.6, ease: "easeOut" }}
-    className="absolute -inset-2 z-40 flex items-center justify-center pointer-events-none rounded-xl overflow-visible"
-  >
+  <div className="absolute -inset-2 z-40 flex items-center justify-center pointer-events-none rounded-xl overflow-visible anim-barrier-shatter">
     {/* Golden Shockwave Expanding */}
     <div className="absolute inset-0 rounded-xl border-2 border-amber-300 shadow-[0_0_30px_rgba(251,191,36,1)]" />
     
@@ -155,7 +149,7 @@ const BarrierShatterOverlay: React.FC = () => (
       <polygon points="75,75 66,67 74,62" fill="#fbbf24" />
       <polygon points="25,25 34,33 25,37" fill="#f59e0b" />
     </svg>
-  </motion.div>
+  </div>
 );
 
 const ArmorBadge: React.FC<{ armor: number }> = ({ armor }) => (
@@ -171,27 +165,15 @@ const ArmorBadge: React.FC<{ armor: number }> = ({ armor }) => (
 );
 
 const ArmorSparkOverlay: React.FC = () => (
-  <motion.div
-    initial={{ opacity: 1, scale: 0.8 }}
-    animate={{ opacity: 0, scale: 1.25 }}
-    exit={{ opacity: 0 }}
-    transition={{ duration: 0.4 }}
-    className="absolute inset-0 z-35 flex items-center justify-center pointer-events-none rounded-xl overflow-hidden bg-slate-300/30"
-  >
+  <div className="absolute inset-0 z-35 flex items-center justify-center pointer-events-none rounded-xl overflow-hidden bg-slate-300/30 anim-armor-spark">
     <div className="w-16 h-16 rounded-full border-4 border-slate-200 shadow-[0_0_25px_rgba(241,245,249,1)] animate-ping" />
-  </motion.div>
+  </div>
 );
 
 const ArmorBreakOverlay: React.FC = () => (
-  <motion.div
-    initial={{ opacity: 1, scale: 0.9 }}
-    animate={{ opacity: 0, scale: 1.3 }}
-    exit={{ opacity: 0 }}
-    transition={{ duration: 0.55 }}
-    className="absolute inset-0 z-35 flex items-center justify-center pointer-events-none rounded-xl overflow-hidden bg-cyan-950/40 border-2 border-cyan-400 shadow-[0_0_20px_rgba(56,189,248,0.8)]"
-  >
+  <div className="absolute inset-0 z-35 flex items-center justify-center pointer-events-none rounded-xl overflow-hidden bg-cyan-950/40 border-2 border-cyan-400 shadow-[0_0_20px_rgba(56,189,248,0.8)] anim-armor-break">
     <div className="w-12 h-12 rounded-full border-2 border-dashed border-cyan-300 shadow-[0_0_20px_rgba(56,189,248,1)] animate-ping" />
-  </motion.div>
+  </div>
 );
 
 interface BattleFieldViewProps {
@@ -515,16 +497,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
   ) => {
     const id = `float_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const xOffset = (Math.random() - 0.5) * 40; // Random horizontal bounce direction
-    const lifespan = Math.max(300, Math.round(650 / speedMultiplier));
     
     setFloatingTexts(prev => {
-      // Keep at most 6 floating texts active at any time to avoid DOM buildup on mobile and high speeds
-      const trimmed = prev.length >= 6 ? prev.slice(prev.length - 5) : prev;
+      // Keep at most 5 floating texts active at any time to avoid DOM buildup on mobile and high speeds
+      const trimmed = prev.length >= 5 ? prev.slice(prev.length - 4) : prev;
       return [...trimmed, { id, text, target, colorClass, xOffset }];
     });
-    setTimeout(() => {
-      setFloatingTexts(prev => prev.filter(f => f.id !== id));
-    }, lifespan);
   };
 
 
@@ -1074,6 +1052,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       setActiveSkillVfx(null);
       setSummoningCard(null);
       setPlagueAction(null);
+      setFloatingTexts([]);
       setCurrentStepIndex(prev => prev + 1);
     }, stepDuration);
     timeouts.push(stepTimer);
@@ -1105,6 +1084,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       setActiveSkillVfx(null);
       setSummoningCard(null);
       setPlagueAction(null);
+      setFloatingTexts([]);
     }
   }, [currentStepIndex, animateSequence, finalBattleState]);
 
@@ -1271,22 +1251,17 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       .map(f => {
         const xOffset = f.xOffset || 0;
         return (
-          <motion.div
+          <div
             key={f.id}
-            initial={{ opacity: 1, y: 15, x: 0, scale: 0.7 }}
-            animate={{ 
-              opacity: [1, 1, 0], 
-              y: [15, -30, -55], 
-              x: [0, xOffset, xOffset * 1.3], 
-              scale: [0.7, 1.45, 1.1] 
-            }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: Math.max(0.25, 0.55 / effectiveSpeed), ease: "easeOut" }}
-            style={{ textShadow: '0 2px 4px rgba(0,0,0,0.95), 0 0 6px rgba(0,0,0,0.9)' }}
-            className={`absolute z-50 pointer-events-none text-center font-mono font-black select-none transform-gpu will-change-transform ${f.colorClass}`}
+            style={{
+              '--float-x': `${xOffset}px`,
+              '--float-duration': `${Math.max(0.3, 0.58 / effectiveSpeed)}s`,
+              textShadow: '0 2px 4px rgba(0,0,0,0.95), 0 0 6px rgba(0,0,0,0.9)',
+            } as React.CSSProperties}
+            className={`absolute z-50 pointer-events-none text-center font-mono font-black select-none transform-gpu will-change-transform anim-floating-text ${f.colorClass}`}
           >
             {f.text}
-          </motion.div>
+          </div>
         );
       });
   };
@@ -1521,9 +1496,6 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   <stop offset="50%" stopColor="#4ade80" stopOpacity="1" />
                   <stop offset="100%" stopColor="#84cc16" stopOpacity="0.9" />
                 </linearGradient>
-                <filter id="plagueHazeGlow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#10b981" />
-                </filter>
               </defs>
               {(() => {
                 const sX = `${20 * plagueAction.sourceSlot + 10}%`;
@@ -1554,14 +1526,27 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       strokeLinecap="round"
                       strokeDasharray="8 5"
                     />
-                    {/* Infected Target focal glow */}
+                    {/* Infected Target focal glow (Hardware-accelerated concentric vectors) */}
                     <circle
                       cx={tX}
                       cy={tY}
-                      r="10"
+                      r="16"
                       fill="#10b981"
-                      fillOpacity="0.75"
-                      filter="url(#plagueHazeGlow)"
+                      fillOpacity="0.3"
+                    />
+                    <circle
+                      cx={tX}
+                      cy={tY}
+                      r="9"
+                      fill="#34d399"
+                      fillOpacity="0.85"
+                    />
+                    <circle
+                      cx={tX}
+                      cy={tY}
+                      r="4"
+                      fill="#ffffff"
+                      fillOpacity="0.95"
                     />
                   </g>
                 );
@@ -1911,10 +1896,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           </div>
 
                           <div className="w-full bg-black/50 h-1 rounded-full overflow-hidden z-10 border border-black/30 relative mb-1.5 shrink-0">
-                            <motion.div
-                              className="bg-red-500 h-full w-full rounded-full origin-left transform-gpu will-change-transform"
-                              animate={{ scaleX: Math.max(0, card.health / card.maxHealth) }}
-                              transition={{ duration: Math.max(0.12, 0.28 / effectiveSpeed), ease: "easeOut" }}
+                            <div
+                              className="bg-red-500 h-full w-full rounded-full origin-left transform-gpu will-change-transform transition-transform ease-out"
+                              style={{
+                                transform: `scaleX(${Math.max(0, card.health / card.maxHealth)})`,
+                                transitionDuration: `${Math.max(0.12, 0.28 / effectiveSpeed)}s`
+                              }}
                             />
                           </div>
 
@@ -1958,33 +1945,21 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         <ArmorBreakOverlay key="armor-break" />
                       )}
                       {isHit && (
-                        <motion.div
-                          key="hit-flash"
-                          initial={{ opacity: 0.8 }}
-                          animate={{ opacity: 0 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.15, 0.32 / effectiveSpeed) }}
-                          className="absolute inset-0 bg-red-600/40 z-30 pointer-events-none rounded-xl"
+                        <div
+                          style={{ '--flash-duration': `${Math.max(0.15, 0.32 / effectiveSpeed)}s` } as React.CSSProperties}
+                          className="absolute inset-0 bg-red-600/40 z-30 pointer-events-none rounded-xl anim-hit-flash"
                         />
                       )}
                       {isHeal && (
-                        <motion.div
-                          key="heal-flash"
-                          initial={{ opacity: 0.8 }}
-                          animate={{ opacity: 0 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.18, 0.42 / effectiveSpeed) }}
-                          className="absolute inset-0 bg-emerald-500/35 z-30 pointer-events-none rounded-xl"
+                        <div
+                          style={{ '--flash-duration': `${Math.max(0.18, 0.42 / effectiveSpeed)}s` } as React.CSSProperties}
+                          className="absolute inset-0 bg-emerald-500/35 z-30 pointer-events-none rounded-xl anim-heal-flash"
                         />
                       )}
                       {activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
-                        <motion.div
-                          key={`skill-vfx-${activeSkillVfx.type}`}
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.03, 1.03, 0.9] }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
-                          className={`absolute inset-0 bg-black/55 border-2 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none overflow-hidden ${
+                        <div
+                          style={{ '--skill-duration': `${Math.max(0.35, 0.65 / effectiveSpeed)}s` } as React.CSSProperties}
+                          className={`absolute inset-0 bg-black/55 border-2 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none overflow-hidden anim-skill-vfx ${
                             activeSkillVfx.type === 'plague' ? 'border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.85)]' :
                             activeSkillVfx.type === 'void_strike' ? 'border-cyan-500 shadow-[0_0_25px_rgba(6,182,212,0.85)]' :
                             activeSkillVfx.type === 'blood_aura' ? 'border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.85)]' :
@@ -2015,7 +1990,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                              activeSkillVfx.type === 'warlord_cry' ? 'WARLORD CRY' :
                              'HEX CURSED'}
                           </span>
-                        </motion.div>
+                        </div>
                       )}
                     </AnimatePresence>
                   </div>
@@ -2160,10 +2135,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           </div>
 
                           <div className="w-full bg-black/50 h-1 rounded-full overflow-hidden z-10 border border-black/30 relative mb-1.5 shrink-0">
-                            <motion.div
-                              className="bg-emerald-500 h-full w-full rounded-full origin-left transform-gpu will-change-transform"
-                              animate={{ scaleX: Math.max(0, card.health / card.maxHealth) }}
-                              transition={{ duration: Math.max(0.12, 0.28 / effectiveSpeed), ease: "easeOut" }}
+                            <div
+                              className="bg-emerald-500 h-full w-full rounded-full origin-left transform-gpu will-change-transform transition-transform ease-out"
+                              style={{
+                                transform: `scaleX(${Math.max(0, card.health / card.maxHealth)})`,
+                                transitionDuration: `${Math.max(0.12, 0.28 / effectiveSpeed)}s`
+                              }}
                             />
                           </div>
 
@@ -2216,46 +2193,30 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         <ArmorBreakOverlay key="armor-break" />
                       )}
                       {isHit && (
-                        <motion.div
-                          key="hit-flash"
-                          initial={{ opacity: 0.8 }}
-                          animate={{ opacity: 0 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.15, 0.32 / effectiveSpeed) }}
-                          className="absolute inset-0 bg-red-600/40 z-30 pointer-events-none rounded-xl"
+                        <div
+                          style={{ '--flash-duration': `${Math.max(0.15, 0.32 / effectiveSpeed)}s` } as React.CSSProperties}
+                          className="absolute inset-0 bg-red-600/40 z-30 pointer-events-none rounded-xl anim-hit-flash"
                         />
                       )}
                       {isHeal && (
-                        <motion.div
-                          key="heal-flash"
-                          initial={{ opacity: 0.8 }}
-                          animate={{ opacity: 0 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.18, 0.42 / effectiveSpeed) }}
-                          className="absolute inset-0 bg-emerald-500/35 z-30 pointer-events-none rounded-xl"
+                        <div
+                          style={{ '--flash-duration': `${Math.max(0.18, 0.42 / effectiveSpeed)}s` } as React.CSSProperties}
+                          className="absolute inset-0 bg-emerald-500/35 z-30 pointer-events-none rounded-xl anim-heal-flash"
                         />
                       )}
                       {activeSkillVfx?.type === 'sacrifice' && activeSkillVfx?.side === 'player' && activeSkillVfx?.slot === idx && (
-                        <motion.div
-                          key="skill-vfx-sacrifice"
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.05, 1.05, 0.9] }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
-                          className="absolute inset-0 bg-black/55 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_25px_rgba(239,68,68,0.85)] overflow-hidden"
+                        <div
+                          style={{ '--skill-duration': `${Math.max(0.35, 0.65 / effectiveSpeed)}s` } as React.CSSProperties}
+                          className="absolute inset-0 bg-black/55 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_25px_rgba(239,68,68,0.85)] overflow-hidden anim-skill-vfx"
                         >
                           <img src="/icons/sacrifice_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-90" />
                           <span className="relative text-[8.5px] font-mono font-black text-red-400 tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border border-red-500/40 z-10 animate-pulse">SACRIFICED</span>
-                        </motion.div>
+                        </div>
                       )}
                       {activeSkillVfx?.type !== 'sacrifice' && activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
-                        <motion.div
-                          key={`skill-vfx-${activeSkillVfx.type}`}
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.03, 1.03, 0.9] }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
-                          className={`absolute inset-0 bg-black/55 border-2 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none overflow-hidden ${
+                        <div
+                          style={{ '--skill-duration': `${Math.max(0.35, 0.65 / effectiveSpeed)}s` } as React.CSSProperties}
+                          className={`absolute inset-0 bg-black/55 border-2 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none overflow-hidden anim-skill-vfx ${
                             activeSkillVfx.type === 'plague' ? 'border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.85)]' :
                             activeSkillVfx.type === 'void_strike' ? 'border-cyan-500 shadow-[0_0_25px_rgba(6,182,212,0.85)]' :
                             activeSkillVfx.type === 'blood_aura' ? 'border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.85)]' :
@@ -2286,7 +2247,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                              activeSkillVfx.type === 'warlord_cry' ? 'WARLORD CRY' :
                              'HEX CURSED'}
                           </span>
-                        </motion.div>
+                        </div>
                       )}
                     </AnimatePresence>
                   </div>
@@ -2736,11 +2697,15 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     rotate: hoveredHandCardIndex === idx ? 0 : rotate,
                     zIndex: zIndex
                   }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 22
-                  }}
+                  transition={
+                    isAnimating
+                      ? { duration: 0 }
+                      : {
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 22
+                        }
+                  }
                   onClick={() => {
                     if (!isSimulating) {
                       setSelectedHandCardId(isSelected ? null : card.id);
