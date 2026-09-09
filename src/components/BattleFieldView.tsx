@@ -572,15 +572,16 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     if (step.type === 'enemy_play') {
       stepDuration = Math.round(800 / effectiveSpeed);
     } else if (step.type === 'hero_skill') {
-      impactDelay = Math.round(330 / effectiveSpeed);
-      stepDuration = Math.round(920 / effectiveSpeed);
+      const isTargetingBoard = step.targetSlot !== undefined && step.targetSlot >= 0;
+      impactDelay = isTargetingBoard ? Math.round(280 / effectiveSpeed) : Math.round(180 / effectiveSpeed);
+      stepDuration = isTargetingBoard ? Math.round(750 / effectiveSpeed) : Math.round(520 / effectiveSpeed);
     } else if (step.type === 'plague') {
       impactDelay = Math.round(340 / effectiveSpeed);
       stepDuration = Math.round(880 / effectiveSpeed);
     } else if (step.type === 'sacrifice') {
       stepDuration = Math.round(850 / effectiveSpeed);
     } else if (step.type === 'death') {
-      stepDuration = Math.round(440 / effectiveSpeed);
+      stepDuration = Math.round(420 / effectiveSpeed);
     } else if (step.type === 'dodge') {
       impactDelay = Math.round(330 / effectiveSpeed);
       stepDuration = Math.round(860 / effectiveSpeed);
@@ -1345,8 +1346,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           {/* Wooden Table Board Divider */}
           <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#ebd09b]/15 to-transparent -translate-y-1/2 pointer-events-none z-10" />
 
-          {/* Glowing Lord casting lasers / energy beams */}
-          {isAnimating && currentStep && currentStep.type === 'hero_skill' && (
+          {/* Glowing Lord casting lasers / energy beams only when targeting a board creature */}
+          {isAnimating && currentStep && currentStep.type === 'hero_skill' && currentStep.targetSlot !== undefined && currentStep.targetSlot >= 0 && (
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-25">
               <defs>
                 <linearGradient id="voidStrikeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -1820,14 +1821,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       {renderFloatingTextsFor({ side: 'enemy', slot: idx })}
                     </div>
                     
-                    <AnimatePresence>
+                    <AnimatePresence mode="popLayout">
                       {card ? (
                         <motion.div
                           key={`enemy-card-${card.id}-${idx}`}
                           initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: isDeath ? 0 : 1, scale: isDeath ? 0.4 : 1 }}
-                          exit={{ opacity: 0, scale: 0.5, transition: { duration: Math.max(0.12, 0.2 / effectiveSpeed) } }}
-                          transition={{ duration: isDeath ? Math.max(0.12, 0.24 / effectiveSpeed) : 0.2 }}
+                          animate={{ opacity: isDeath ? 0 : 1, scale: isDeath ? 0.35 : 1 }}
+                          exit={{ opacity: 0, scale: 0.35, transition: { duration: Math.max(0.1, 0.16 / effectiveSpeed), ease: "easeOut" } }}
+                          transition={{ duration: isDeath ? Math.max(0.1, 0.18 / effectiveSpeed) : 0.2 }}
                           className="w-full h-full relative"
                         >
                           <div
@@ -1841,7 +1842,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                               '--anim-duration': `${Math.max(0.25, 0.72 / effectiveSpeed)}s`,
                               '--recoil-duration': `${Math.max(0.18, 0.32 / effectiveSpeed)}s`,
                             } as React.CSSProperties}
-                            className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none transform-gpu bg-[#151a21] text-white cursor-help ${borderGlowClass} ${
+                            className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none bg-[#151a21] text-white cursor-help ${borderGlowClass} ${
                               isActing
                                 ? 'anim-card-strike-enemy'
                                 : isHit
@@ -2069,14 +2070,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       {renderFloatingTextsFor({ side: 'player', slot: idx })}
                     </div>
                     
-                    <AnimatePresence>
+                    <AnimatePresence mode="popLayout">
                       {card ? (
                         <motion.div
                           key={`player-card-${card.id}-${idx}`}
                           initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: isDeath ? 0 : 1, scale: isDeath ? 0.4 : 1 }}
-                          exit={{ opacity: 0, scale: 0.5, transition: { duration: Math.max(0.12, 0.2 / effectiveSpeed) } }}
-                          transition={{ duration: isDeath ? Math.max(0.12, 0.24 / effectiveSpeed) : 0.2 }}
+                          animate={{ opacity: isDeath ? 0 : 1, scale: isDeath ? 0.35 : 1 }}
+                          exit={{ opacity: 0, scale: 0.35, transition: { duration: Math.max(0.1, 0.16 / effectiveSpeed), ease: "easeOut" } }}
+                          transition={{ duration: isDeath ? Math.max(0.1, 0.18 / effectiveSpeed) : 0.2 }}
                           className="w-full h-full relative"
                         >
                           <div
@@ -2090,7 +2091,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                               '--anim-duration': `${Math.max(0.25, 0.72 / effectiveSpeed)}s`,
                               '--recoil-duration': `${Math.max(0.18, 0.32 / effectiveSpeed)}s`,
                             } as React.CSSProperties}
-                            className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none transform-gpu bg-[#151a21] text-white cursor-help ${borderGlowClass} ${
+                            className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none bg-[#151a21] text-white cursor-help ${borderGlowClass} ${
                               isActing
                                 ? 'anim-card-strike-player'
                                 : isHit

@@ -196,7 +196,7 @@ body {
 }
 
 .anim-card-recoil {
-  animation: battle-card-recoil var(--recoil-duration, 0.32s) cubic-bezier(0.2, 0.8, 0.25, 1) both;
+  animation: battle-card-recoil var(--recoil-duration, 0.32s) cubic-bezier(0.2, 0.8, 0.25, 1);
   will-change: transform;
 }
 
@@ -217,7 +217,7 @@ body {
 }
 
 .anim-hero-recoil {
-  animation: battle-hero-recoil var(--recoil-duration, 0.32s) cubic-bezier(0.2, 0.8, 0.25, 1) both;
+  animation: battle-hero-recoil var(--recoil-duration, 0.32s) cubic-bezier(0.2, 0.8, 0.25, 1);
   will-change: transform;
 }
 
@@ -238,7 +238,7 @@ body {
 }
 
 .anim-hero-dodge {
-  animation: battle-hero-dodge var(--dodge-duration, 0.36s) cubic-bezier(0.15, 0.9, 0.25, 1) both;
+  animation: battle-hero-dodge var(--dodge-duration, 0.36s) cubic-bezier(0.15, 0.9, 0.25, 1);
   will-change: transform;
 }
 
