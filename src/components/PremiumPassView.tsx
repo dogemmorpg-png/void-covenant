@@ -169,34 +169,45 @@ export const PremiumPassView: React.FC = () => {
       {/* Duration Selector Tabs */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
         <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">Access Duration:</span>
-        <div className="inline-flex p-1 rounded-2xl bg-black/70 border border-[#c5a880]/30 shadow-[0_4px_20px_rgba(0,0,0,0.6)]">
+        <div className="inline-flex p-1.5 rounded-2xl bg-black/80 border border-[#c5a880]/30 shadow-[0_4px_25px_rgba(0,0,0,0.7)] gap-2">
+          {/* 30 Days Tab */}
           <button
             onClick={() => setDurationDays(30)}
-            className={`px-7 py-2.5 rounded-xl font-display font-black text-xs tracking-wider transition-all duration-200 cursor-pointer ${
+            className={`px-5 py-2.5 rounded-xl transition-all duration-200 text-left cursor-pointer flex flex-col justify-center min-w-[130px] sm:min-w-[145px] ${
               durationDays === 30
-                ? 'bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.4)]'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-gradient-to-b from-[#261c30] to-[#120a18] border border-amber-400/80 shadow-[0_0_18px_rgba(245,158,11,0.25)] text-white'
+                : 'bg-transparent border border-transparent text-gray-400 hover:text-gray-200 hover:bg-white/[0.04]'
             }`}
           >
-            30 DAYS
+            <div className="font-display font-black text-xs sm:text-sm tracking-wider text-white">
+              30 DAYS
+            </div>
+            <div className="text-[10px] font-mono text-gray-400 mt-0.5">
+              Standard Access
+            </div>
           </button>
 
+          {/* 90 Days Tab (Discount + Divine Bonus prominent) */}
           <button
             onClick={() => setDurationDays(90)}
-            className={`px-7 py-2.5 rounded-xl font-display font-black text-xs tracking-wider transition-all duration-200 cursor-pointer flex items-center gap-2.5 ${
+            className={`relative px-5 py-2.5 rounded-xl transition-all duration-200 text-left cursor-pointer flex flex-col justify-center min-w-[185px] sm:min-w-[215px] ${
               durationDays === 90
-                ? 'bg-gradient-to-r from-purple-500 via-rose-500 to-amber-500 text-black shadow-[0_0_20px_rgba(168,85,247,0.4)]'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-gradient-to-b from-[#34112c] via-[#200a1b] to-[#11040f] border-2 border-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.35)] text-white'
+                : 'bg-rose-950/25 border border-rose-500/40 text-gray-300 hover:border-rose-500/70 hover:bg-rose-950/40'
             }`}
           >
-            <span>90 DAYS</span>
-            <span className={`text-[10px] font-mono font-black px-2 py-0.5 rounded-md transition-colors ${
-              durationDays === 90 
-                ? 'bg-black/70 text-amber-300' 
-                : 'bg-rose-950/80 border border-rose-500/40 text-rose-300'
-            }`}>
-              -15% + DIVINE
-            </span>
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-display font-black text-xs sm:text-sm tracking-wider text-white">
+                90 DAYS
+              </span>
+              <span className="text-[9px] font-mono font-black text-rose-300 bg-rose-950/90 border border-rose-500/60 px-2 py-0.5 rounded-full shadow-sm">
+                -15% DISCOUNT
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono font-bold text-amber-300 mt-0.5">
+              <Sparkles className="w-3 h-3 text-amber-400 shrink-0 animate-pulse" />
+              <span>+ DIVINE RELIC BONUS</span>
+            </div>
           </button>
         </div>
       </div>
