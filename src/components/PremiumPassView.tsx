@@ -11,6 +11,22 @@ import {
   Zap
 } from 'lucide-react';
 
+const formatEquipStat = (type?: string, value?: number) => {
+  if (!type || value === undefined) return null;
+  switch (type) {
+    case 'delayReduction':
+      return { label: `-${value} Turn Delay`, color: 'text-cyan-300 bg-cyan-950/50 border-cyan-500/40' };
+    case 'dodge':
+      return { label: `+${value}% Dodge`, color: 'text-blue-300 bg-blue-950/50 border-blue-500/40' };
+    case 'goldBonus':
+      return { label: `+${value}% Gold Bonus`, color: 'text-amber-300 bg-amber-950/50 border-amber-500/40' };
+    case 'maxHealth':
+      return { label: `+${value} Max HP`, color: 'text-emerald-300 bg-emerald-950/50 border-emerald-500/40' };
+    default:
+      return { label: `+${value} ${type}`, color: 'text-purple-300 bg-purple-950/50 border-purple-500/40' };
+  }
+};
+
 export const PremiumPassView: React.FC = () => {
   const { profile, buySubscription, setIsShardsShopOpen } = useGame();
   const toast = useToast();
@@ -153,12 +169,12 @@ export const PremiumPassView: React.FC = () => {
       {/* Duration Selector Tabs */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
         <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">Access Duration:</span>
-        <div className="flex items-center p-1 rounded-2xl bg-black/60 border border-white/10">
+        <div className="inline-flex p-1 rounded-2xl bg-black/70 border border-[#c5a880]/30 shadow-[0_4px_20px_rgba(0,0,0,0.6)]">
           <button
             onClick={() => setDurationDays(30)}
-            className={`px-6 py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer ${
+            className={`px-7 py-2.5 rounded-xl font-display font-black text-xs tracking-wider transition-all duration-200 cursor-pointer ${
               durationDays === 30
-                ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.4)] font-black'
+                ? 'bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.4)]'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
@@ -167,17 +183,19 @@ export const PremiumPassView: React.FC = () => {
 
           <button
             onClick={() => setDurationDays(90)}
-            className={`relative px-6 py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer ${
+            className={`px-7 py-2.5 rounded-xl font-display font-black text-xs tracking-wider transition-all duration-200 cursor-pointer flex items-center gap-2.5 ${
               durationDays === 90
-                ? 'bg-gradient-to-r from-purple-500 to-amber-500 text-black shadow-[0_0_20px_rgba(168,85,247,0.4)] font-black'
+                ? 'bg-gradient-to-r from-purple-500 via-rose-500 to-amber-500 text-black shadow-[0_0_20px_rgba(168,85,247,0.4)]'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            90 DAYS
-            <span className="absolute -top-2.5 -right-2 bg-gradient-to-r from-rose-500 to-amber-500 text-white font-mono text-[9px] font-black px-2 py-0.5 rounded-full shadow-md flex items-center gap-1">
-              <span>-15% OFF</span>
-              <span>•</span>
-              <span>👑 DIVINE BONUS</span>
+            <span>90 DAYS</span>
+            <span className={`text-[10px] font-mono font-black px-2 py-0.5 rounded-md transition-colors ${
+              durationDays === 90 
+                ? 'bg-black/70 text-amber-300' 
+                : 'bg-rose-950/80 border border-rose-500/40 text-rose-300'
+            }`}>
+              -15% + DIVINE
             </span>
           </button>
         </div>
@@ -243,23 +261,25 @@ export const PremiumPassView: React.FC = () => {
 
             {/* 90-Day Exclusive Covenant Bonus Banner */}
             {durationDays === 90 && (
-              <div className="relative overflow-hidden p-3.5 rounded-2xl bg-gradient-to-r from-amber-950/80 via-[#241306] to-black border-2 border-amber-500/60 shadow-[0_0_20px_rgba(245,158,11,0.25)] flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400 flex items-center justify-center shrink-0 text-xl shadow-[0_0_12px_rgba(245,158,11,0.4)]">
-                  🎁
+              <div className="relative rounded-2xl bg-gradient-to-br from-[#2a1708] via-[#140b04] to-black border border-amber-500/40 p-3.5 shadow-[0_4px_20px_rgba(0,0,0,0.5)] flex items-center gap-3.5">
+                <div className="relative w-12 h-12 rounded-xl bg-black/70 border border-amber-500/40 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+                  <img 
+                    src="/icons/equipment/items/blade_of_the_demiurge.png" 
+                    alt="Demiurge Relic" 
+                    className="w-9 h-9 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" 
+                  />
+                  <span className="absolute -bottom-1 -right-1 bg-gradient-to-r from-rose-600 to-amber-600 text-white font-mono text-[8px] font-black px-1 rounded shadow">
+                    DIVINE
+                  </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-mono font-black uppercase tracking-wider text-amber-400">
-                      90-Day Covenant Bonus
-                    </span>
-                    <span className="text-[9px] font-mono font-black px-1.5 py-0.5 rounded bg-rose-500/30 text-rose-300 border border-rose-500/50">
-                      DIVINE
-                    </span>
+                  <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400">
+                    90-Day Covenant Bonus
                   </div>
-                  <div className="text-xs font-display font-black text-white mt-0.5 truncate">
+                  <div className="font-display font-black text-white text-sm tracking-wide mt-0.5">
                     +1 Random Divine Demiurge Relic
                   </div>
-                  <div className="text-[10px] text-amber-200/70 font-sans">
+                  <div className="text-[11px] text-gray-400 font-sans mt-0.5">
                     Forged directly into your Armory upon activation
                   </div>
                 </div>
@@ -454,23 +474,25 @@ export const PremiumPassView: React.FC = () => {
 
             {/* 90-Day Supreme Covenant Bonus Banner */}
             {durationDays === 90 && (
-              <div className="relative overflow-hidden p-3.5 rounded-2xl bg-gradient-to-r from-purple-950/90 via-[#260f33] to-black border-2 border-purple-400/70 shadow-[0_0_25px_rgba(168,85,247,0.3)] flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/25 border border-purple-300 flex items-center justify-center shrink-0 text-xl shadow-[0_0_15px_rgba(168,85,247,0.5)]">
-                  👑
+              <div className="relative rounded-2xl bg-gradient-to-br from-[#250d2e] via-[#120517] to-black border border-purple-400/50 p-3.5 shadow-[0_4px_25px_rgba(0,0,0,0.5)] flex items-center gap-3.5">
+                <div className="relative w-12 h-12 rounded-xl bg-black/70 border border-purple-400/50 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(168,85,247,0.35)]">
+                  <img 
+                    src="/icons/equipment/items/crown_of_the_demiurge.png" 
+                    alt="Demiurge Relic" 
+                    className="w-9 h-9 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" 
+                  />
+                  <span className="absolute -bottom-1 -right-1 bg-gradient-to-r from-rose-600 to-purple-600 text-white font-mono text-[8px] font-black px-1 rounded shadow">
+                    2x DIVINE
+                  </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-mono font-black uppercase tracking-wider text-purple-300">
-                      90-Day Supreme Bonus
-                    </span>
-                    <span className="text-[9px] font-mono font-black px-1.5 py-0.5 rounded bg-gradient-to-r from-rose-500/40 to-purple-500/40 text-rose-200 border border-rose-400/60">
-                      2x DIVINE
-                    </span>
+                  <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-purple-300">
+                    90-Day Supreme Bonus
                   </div>
-                  <div className="text-xs font-display font-black text-amber-300 mt-0.5 truncate">
+                  <div className="font-display font-black text-amber-300 text-sm tracking-wide mt-0.5">
                     +2 Unique Divine Demiurge Relics
                   </div>
-                  <div className="text-[10px] text-purple-200/70 font-sans">
+                  <div className="text-[11px] text-gray-400 font-sans mt-0.5">
                     Two distinct celestial relics forged into your Armory
                   </div>
                 </div>
@@ -623,62 +645,79 @@ export const PremiumPassView: React.FC = () => {
 
       {/* 90-Day Divine Relic Celebration Modal */}
       {awardedBonusItems && awardedBonusItems.length > 0 && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-          <div className="relative w-full max-w-lg rounded-3xl bg-gradient-to-b from-[#1c1228] via-[#120a1c] to-[#0a0510] border-2 border-amber-500/60 p-6 sm:p-8 shadow-[0_0_60px_rgba(245,158,11,0.35)] text-center space-y-6">
-            {/* Radiant aura */}
-            <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-amber-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-fade-in">
+          <div className="relative w-full max-w-lg rounded-3xl bg-gradient-to-b from-[#180e22] via-[#0f0817] to-[#08040d] border border-[#c5a880]/40 p-6 sm:p-8 shadow-[0_0_60px_rgba(0,0,0,0.9)] text-center space-y-6">
+            
+            {/* Subtle atmospheric glow */}
+            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-64 h-32 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
 
+            {/* Header */}
             <div className="space-y-2 relative z-10">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/20 border border-amber-400 text-amber-300 text-xs font-mono font-black uppercase tracking-wider shadow-[0_0_15px_rgba(245,158,11,0.4)]">
-                <span>👑</span>
-                <span>COSMIC FORGE BLESSING</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c5a880]/10 border border-[#c5a880]/30 text-[#ebd09b] text-[10px] font-mono font-black tracking-widest uppercase shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>90-DAY COVENANT PRIVILEGE</span>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-400 tracking-wider">
-                Divine Relics Bestowed!
+              <h3 className="text-2xl sm:text-3xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-[#ebd09b] via-[#c5a880] to-[#8c6d48] tracking-wider uppercase">
+                Divine Relics Unlocked
               </h3>
-              <p className="text-xs text-gray-300 font-sans">
-                For pledging to a 90-day covenant, ancient cosmic entities have forged celestial relic(s) directly into your Armory!
+              <p className="text-xs text-gray-400 font-sans max-w-sm mx-auto">
+                Celestial relics from the Set of the Demiurge have been forged and granted to your Armory.
               </p>
             </div>
 
             {/* Relics Showcase */}
-            <div className={`grid gap-3 relative z-10 ${awardedBonusItems.length > 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
-              {awardedBonusItems.map((item, idx) => (
-                <div key={item.id || idx} className="rounded-2xl bg-black/60 border border-rose-500/40 p-4 flex flex-col items-center text-center space-y-3 shadow-[0_0_20px_rgba(225,29,72,0.2)]">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-b from-rose-500/20 to-purple-900/40 border border-rose-400/80 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.4)]">
-                    {item.icon ? (
-                      <img src={item.icon} alt={item.name} className="w-12 h-12 object-contain drop-shadow-[0_0_10px_rgba(244,63,94,0.8)]" />
-                    ) : (
-                      <span className="text-2xl">👑</span>
-                    )}
-                  </div>
-                  <div>
-                    <div className="text-[10px] font-mono uppercase tracking-widest text-rose-400 font-bold">
-                      {item.slot} • DIVINE
-                    </div>
-                    <div className="font-display font-black text-sm text-white mt-0.5">
-                      {item.name}
-                    </div>
-                    <div className="text-[11px] text-amber-300/90 font-mono mt-1">
-                      {item.bonusType}: +{item.bonusValue}{item.bonusType === 'delayReduction' ? ' turn' : item.bonusType === 'dodge' ? '%' : ''}
-                      {item.secondaryBonusType && (
-                        <span className="text-teal-300"> • {item.secondaryBonusType}: +{item.secondaryBonusValue}{item.secondaryBonusType === 'dodge' ? '%' : ''}</span>
+            <div className={`grid gap-3.5 relative z-10 ${awardedBonusItems.length > 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
+              {awardedBonusItems.map((item, idx) => {
+                const stat1 = formatEquipStat(item.bonusType, item.bonusValue);
+                const stat2 = formatEquipStat(item.secondaryBonusType, item.secondaryBonusValue);
+
+                return (
+                  <div 
+                    key={item.id || idx} 
+                    className="rounded-2xl bg-black/60 border border-rose-500/30 p-4 flex flex-col items-center text-center space-y-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative overflow-hidden"
+                  >
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-b from-rose-950/40 via-black to-black border border-rose-500/50 flex items-center justify-center shadow-[0_0_15px_rgba(244,63,94,0.3)]">
+                      {item.icon ? (
+                        <img src={item.icon} alt={item.name} className="w-12 h-12 object-contain drop-shadow-[0_0_8px_rgba(244,63,94,0.7)]" />
+                      ) : (
+                        <Sparkles className="w-7 h-7 text-rose-400" />
                       )}
                     </div>
-                    <div className="text-[10px] font-mono text-purple-300/80 mt-1">
-                      Set of the Demiurge
+                    <div>
+                      <div className="text-[10px] font-mono uppercase tracking-widest text-rose-400 font-bold">
+                        {item.slot} • DIVINE
+                      </div>
+                      <div className="font-display font-black text-sm text-white mt-0.5 tracking-wide">
+                        {item.name}
+                      </div>
+                      <div className="flex flex-wrap items-center justify-center gap-1.5 mt-2">
+                        {stat1 && (
+                          <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${stat1.color}`}>
+                            {stat1.label}
+                          </span>
+                        )}
+                        {stat2 && (
+                          <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${stat2.color}`}>
+                            {stat2.label}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[10px] font-mono text-purple-300/70 mt-1.5">
+                        Set of the Demiurge
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
+            {/* Action button */}
             <div className="pt-2 relative z-10">
               <button
                 onClick={() => setAwardedBonusItems(null)}
-                className="w-full py-3.5 px-6 rounded-2xl font-display font-black text-sm tracking-wider uppercase bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-black shadow-[0_0_25px_rgba(245,158,11,0.5)] hover:shadow-[0_0_35px_rgba(245,158,11,0.7)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                className="w-full py-3.5 px-6 rounded-2xl font-display font-black text-xs sm:text-sm tracking-widest uppercase bg-gradient-to-r from-amber-600 via-[#e5c158] to-amber-600 hover:from-amber-500 hover:to-amber-400 text-black shadow-[0_0_25px_rgba(229,193,88,0.35)] hover:shadow-[0_0_35px_rgba(229,193,88,0.5)] hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer border border-amber-300/60"
               >
-                CLAIM TO ARMORY
+                EQUIP IN ARMORY
               </button>
             </div>
           </div>
