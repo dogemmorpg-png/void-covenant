@@ -1435,31 +1435,6 @@ export const CollectionDeckView: React.FC = () => {
                           ? '✦ Legendary & Divine: Maximum 1 copy of this card per deck' 
                           : '✦ Bronze, Silver & Gold: Maximum 2 copies of this card per deck'}
                       </div>
-
-                      {/* Dismantle Card Button */}
-                      <div className="pt-2 border-t border-white/10">
-                        {selectedCard.tier === 'divine' ? (
-                          <div className="bg-rose-950/20 border border-rose-500/30 rounded-xl py-2 px-3 text-center">
-                            <span className="text-[10.5px] font-mono text-rose-400/90 font-bold flex items-center justify-center gap-1.5">
-                              <Crown className="w-3.5 h-3.5 text-rose-400" />
-                              <span>DIVINE ENTITY · CANNOT BE DISMANTLED</span>
-                            </span>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => handleStartDismantle(selectedCard)}
-                            className="w-full bg-gradient-to-r from-[#1b1526] via-[#28153c] to-[#1b1526] hover:from-[#2e1742] hover:via-[#3d1a5c] hover:to-[#2e1742] border border-cyan-500/40 hover:border-cyan-400/80 text-cyan-200 hover:text-white font-display font-black py-2 px-4 rounded-xl transition-all shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.35)] flex items-center justify-center gap-2 cursor-pointer group active:scale-98"
-                          >
-                            <span className="text-xs tracking-widest uppercase">DESTROY</span>
-                            <span className="text-sm font-mono font-black text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]">+{getDismantleDustYield(selectedCard.tier)}</span>
-                            <img 
-                              src="/icons/icon_dust.webp" 
-                              alt="Void Dust" 
-                              className="w-7 h-7 sm:w-8 sm:h-8 object-contain drop-shadow-[0_0_10px_rgba(6,182,212,0.8)] group-hover:scale-110 transition-transform -my-1" 
-                            />
-                          </button>
-                        )}
-                      </div>
                     </div>
                   );
                 })()}
@@ -1468,6 +1443,31 @@ export const CollectionDeckView: React.FC = () => {
                 <p className="text-[11px] text-gray-400 italic font-sans leading-relaxed border-l-2 border-[#c5a880]/30 pl-3">
                   {CARD_TEMPLATES.find(t => t.baseId === selectedCard.baseId)?.description}
                 </p>
+
+                {/* Dismantle Card Button (Placed beneath creature description) */}
+                <div className="pt-2 border-t border-white/10">
+                  {selectedCard.tier === 'divine' ? (
+                    <div className="bg-rose-950/20 border border-rose-500/30 rounded-xl py-2 px-3 text-center">
+                      <span className="text-[10.5px] font-mono text-rose-400/90 font-bold flex items-center justify-center gap-1.5">
+                        <Crown className="w-3.5 h-3.5 text-rose-400" />
+                        <span>DIVINE ENTITY · CANNOT BE DISMANTLED</span>
+                      </span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleStartDismantle(selectedCard)}
+                      className="w-full bg-gradient-to-r from-[#1b1526] via-[#28153c] to-[#1b1526] hover:from-[#2e1742] hover:via-[#3d1a5c] hover:to-[#2e1742] border border-cyan-500/40 hover:border-cyan-400/80 text-cyan-200 hover:text-white font-display font-black py-2 px-4 rounded-xl transition-all shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.35)] flex items-center justify-center gap-2 cursor-pointer group active:scale-98"
+                    >
+                      <span className="text-xs tracking-widest uppercase">DESTROY</span>
+                      <span className="text-sm font-mono font-black text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]">+{getDismantleDustYield(selectedCard.tier)}</span>
+                      <img 
+                        src="/icons/icon_dust.webp" 
+                        alt="Void Dust" 
+                        className="w-7 h-7 sm:w-8 sm:h-8 object-contain drop-shadow-[0_0_10px_rgba(6,182,212,0.8)] group-hover:scale-110 transition-transform -my-1" 
+                      />
+                    </button>
+                  )}
+                </div>
             </div>
           ) : (
             <div className="text-center py-20 text-gray-500 flex flex-col items-center justify-center">
@@ -1566,14 +1566,19 @@ export const CollectionDeckView: React.FC = () => {
 
                 {/* Reward Yield Box */}
                 <div className="bg-black/60 rounded-xl p-3.5 border border-cyan-500/30 mb-4 text-center">
-                  <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block mb-1">
+                  <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block mb-1.5">
                     Essence Reclaimed
                   </span>
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="font-mono text-xl font-black text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.7)]">
+                  <div className="flex items-center justify-center gap-3">
+                    <span className="font-mono text-2xl font-black text-cyan-300 drop-shadow-[0_0_12px_rgba(6,182,212,0.7)]">
                       +{dustYield}
                     </span>
                     <span className="text-xs font-mono font-bold text-gray-300">VOID DUST</span>
+                    <img 
+                      src="/icons/icon_dust.webp" 
+                      alt="Void Dust" 
+                      className="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow-[0_0_12px_rgba(6,182,212,0.85)]" 
+                    />
                   </div>
                 </div>
 
