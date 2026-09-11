@@ -130,8 +130,8 @@ export const TalentsView: React.FC = () => {
           </p>
         </div>
         
-        <div className="flex gap-4 items-center z-10 w-full md:w-auto">
-          <div className="bg-black/80 border border-gray-700/50 rounded-2xl p-4 text-center min-w-[140px] shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] relative overflow-hidden flex-1 md:flex-none">
+        <div className="flex gap-4 items-stretch z-10 w-full md:w-auto">
+          <div className="bg-black/80 border border-gray-700/50 rounded-2xl p-4 text-center min-w-[140px] shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] relative overflow-hidden flex-1 md:flex-none flex flex-col justify-center">
             <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
             <span className="block text-[11px] text-gray-500 font-bold tracking-widest uppercase mb-1">Unspent Points</span>
             <span className="block text-4xl font-display font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
@@ -141,14 +141,31 @@ export const TalentsView: React.FC = () => {
           <button 
             onClick={handleReset}
             disabled={isResetting}
-            className="h-full px-5 py-4 bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/40 hover:border-cyan-400/80 rounded-2xl text-cyan-300 text-sm font-bold transition-all flex flex-col items-center justify-center gap-1.5 group/btn backdrop-blur-md cursor-pointer active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.15)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-gradient-to-b from-[#1b1222] via-[#140c1a] to-black/90 hover:from-[#2a1333] hover:via-[#1e0e26] hover:to-black/95 border border-rose-500/40 hover:border-rose-400/80 rounded-2xl p-3.5 px-5 text-center min-w-[140px] shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] relative overflow-hidden flex-1 md:flex-none flex flex-col items-center justify-center gap-1.5 transition-all duration-300 cursor-pointer group/btn active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(244,63,94,0.15)] hover:shadow-[0_0_25px_rgba(244,63,94,0.35)]"
             title="Reset all talents for 15 Dark Shards"
           >
-            <LucideIcons.RefreshCw className={`w-5 h-5 text-cyan-400 transition-transform duration-500 ${isResetting ? 'animate-spin' : 'group-hover/btn:-rotate-180'}`} />
-            <span className="text-[10px] font-mono flex items-center gap-1 font-bold text-cyan-200">
-              <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.7)]" />
-              <span>{isResetting ? 'Resetting...' : '15 Shards'}</span>
-            </span>
+            <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-rose-500 to-transparent group-hover/btn:via-rose-400 transition-all duration-300"></div>
+            
+            <div className="flex items-center justify-center gap-1.5 text-rose-300 group-hover/btn:text-white transition-colors">
+              <LucideIcons.RotateCcw className={`w-3.5 h-3.5 text-rose-400 group-hover/btn:text-rose-300 transition-transform duration-500 ${isResetting ? 'animate-spin' : 'group-hover/btn:-rotate-180'}`} />
+              <span className="font-display font-black text-xs tracking-widest uppercase">
+                {isResetting ? 'RESETTING...' : 'RESET'}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-center gap-2 bg-black/60 border border-rose-500/30 group-hover/btn:border-rose-400/60 px-3 py-1 rounded-xl shadow-inner transition-colors w-full">
+              <img 
+                src="/icons/icon_shards.webp" 
+                alt="Shards" 
+                className="w-6 h-6 sm:w-7 sm:h-7 object-contain drop-shadow-[0_0_10px_rgba(239,68,68,0.9)] brightness-110 contrast-125 group-hover/btn:scale-110 transition-transform" 
+              />
+              <span className="font-mono font-black text-base text-rose-100 group-hover/btn:text-white drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]">
+                15
+              </span>
+              <span className="text-[10px] font-bold text-rose-300/80 uppercase tracking-wider">
+                SHARDS
+              </span>
+            </div>
           </button>
         </div>
       </div>
