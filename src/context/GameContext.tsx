@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { useToast } from '../components/Toast';
 import { Card, PlayerProfile, CampaignStage, BattlePassTier, CardTemplate, CardTier, Equipment, EquipmentSlot } from '../types';
-import { getStarterDeck, CARD_TEMPLATES, createCardInstance, getCardManaCost, getEvolutionBonusSkill, getFusionCosts, BATTLE_PASS_TIERS, AIRDROP_TASKS } from '../data/cards';
+import { getStarterDeck, CARD_TEMPLATES, createCardInstance, getCardManaCost, getEvolutionBonusSkill, getFusionCosts, BATTLE_PASS_TIERS, AIRDROP_TASKS, canAddCardToBattleDeck, sanitizeDeck } from '../data/cards';
 import { supabase } from '../utils/supabaseClient';
 import { calculateEnergy, getTierLimits } from '../utils/energyHelper';
 import { ALL_LEAGUE_REWARDS } from '../data/leagueRewards';
@@ -186,10 +186,8 @@ const migrateProfileTo10Cards = (p: PlayerProfile): PlayerProfile => {
     });
   }
   
-  // Ensure deck has exactly 10 cards
-  if (p.deck.length < 10) {
-    p.deck = p.collection.slice(0, 10).map(c => c.id);
-  }
+  // Ensure deck has valid cards and respects duplicate limits (max 1 for Legendary/Divine, max 2 for others)
+  p.deck = sanitizeDeck(p.deck, p.collection);
   
   // Ensure league and LP fields are populated
   p.pvpLeague = p.pvpLeague || 'Bronze';
@@ -1274,10 +1272,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       let updatedDeck = [...current.deck];
       if (updatedDeck.includes(cardId1) || updatedDeck.includes(cardId2)) {
         updatedDeck = updatedDeck.filter(id => id !== cardId1 && id !== cardId2);
-        if (updatedDeck.length < 5 && newCard) {
-          updatedDeck.push(newCard.id);
+        if (newCard) {
+          const check = canAddCardToBattleDeck(newCard, updatedDeck, newCollection);
+          if (check.allowed) {
+            updatedDeck.push(newCard.id);
+          }
         }
       }
+      updatedDeck = sanitizeDeck(updatedDeck, newCollection);
 
       let updated = {
         ...current,
@@ -1847,7 +1849,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: true, message: 'Action saved locally.' };
   };
 
-  // Add / Remove card in the battle deck (max 5 cards in deck)
+  // Add / Remove card in the battle deck (max 10 cards in deck, duplicate limits enforced)
   const toggleDeckCard = (cardId: string): { success: boolean; message: string } => {
     // Self-heal ghost cards
     const validDeck = profile.deck.filter(id => profile.collection.some(c => c.id === id));
@@ -1866,9 +1868,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       saveProfile(updated);
       return { success: true, message: 'Card removed from battle deck.' };
     } else {
-      // Add to deck. Check max 10 limit.
-      if (validDeck.length >= 10) {
-        return { success: false, message: 'Maximum 10 cards in deck. Remove a card first.' };
+      const cardToAdd = profile.collection.find(c => c.id === cardId);
+      if (!cardToAdd) {
+        return { success: false, message: 'Card not found in collection.' };
+      }
+
+      const check = canAddCardToBattleDeck(cardToAdd, validDeck, profile.collection);
+      if (!check.allowed) {
+        return { success: false, message: check.message };
       }
       
       const updated = {

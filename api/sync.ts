@@ -2,7 +2,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
-import { CARD_TEMPLATES, createCardInstance, getCardManaCost } from './_shared/cards.js';
+import { CARD_TEMPLATES, createCardInstance, getCardManaCost, sanitizeDeck } from './_shared/cards.js';
 import { checkAndPerformPvpRollover } from './_shared/pvpRollover.js';
 import { calculateEnergy } from './_shared/energyHelper.js';
 
@@ -14,12 +14,16 @@ function generateStarterDeck() {
   const bronzePool = CARD_TEMPLATES.filter(c => c.tier === 'bronze');
   const collection: any[] = [];
   const deck: string[] = [];
+  const counts: Record<string, number> = {};
   
-  for (let i = 0; i < 10; i++) {
+  while (deck.length < 10) {
     const template = bronzePool[Math.floor(Math.random() * bronzePool.length)];
-    const instance = createCardInstance(template, 1);
-    collection.push(instance);
-    deck.push(instance.id);
+    if ((counts[template.baseId] || 0) < 2) {
+      counts[template.baseId] = (counts[template.baseId] || 0) + 1;
+      const instance = createCardInstance(template, 1);
+      collection.push(instance);
+      deck.push(instance.id);
+    }
   }
   
   return { collection, deck };
@@ -282,7 +286,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const ownedCardIds = new Set((currentProfile.collection || []).map((c: any) => c.id));
         const validDeck = safeProfileData.deck.filter((id: any) => typeof id === 'string' && ownedCardIds.has(id)).slice(0, 10);
         if (validDeck.length > 0) {
-          currentProfile.deck = validDeck;
+          currentProfile.deck = sanitizeDeck(validDeck, currentProfile.collection || []);
         }
       }
       if (safeProfileData.equipped && typeof safeProfileData.equipped === 'object') {
@@ -420,7 +424,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (freshRecord && freshRecord.data) {
           const freshProfile = freshRecord.data;
           if (safeProfileData.deck && Array.isArray(safeProfileData.deck)) {
-            freshProfile.deck = safeProfileData.deck;
+            freshProfile.deck = sanitizeDeck(safeProfileData.deck, freshProfile.collection || []);
           }
           if (safeProfileData.equipped && typeof safeProfileData.equipped === 'object') {
             freshProfile.equipped = safeProfileData.equipped;

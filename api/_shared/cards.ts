@@ -1597,15 +1597,101 @@ export function createCardInstance(template: CardTemplate, level: number = 1): C
   };
 }
 
-// Generate the initial starter deck for a new player
+// Duplicate limits for battle decks:
+// Bronze, Silver, Gold: Maximum 2 copies per card (by baseId)
+// Legendary, Divine: Maximum 1 copy per card (by baseId)
+export function getMaxAllowedDeckCopies(tier: CardTier): number {
+  if (tier === 'legendary' || tier === 'divine') {
+    return 1;
+  }
+  return 2;
+}
+
+export function getDeckCopiesCount(deck: string[], collection: Card[], baseId: string): number {
+  return deck.reduce((count, cardId) => {
+    const card = collection.find(c => c.id === cardId);
+    return (card && card.baseId === baseId) ? count + 1 : count;
+  }, 0);
+}
+
+export function canAddCardToBattleDeck(
+  cardToAdd: Card,
+  deck: string[],
+  collection: Card[]
+): { allowed: boolean; message: string } {
+  if (deck.includes(cardToAdd.id)) {
+    return { allowed: false, message: 'This card is already in your battle deck.' };
+  }
+  if (deck.length >= 10) {
+    return { allowed: false, message: 'Maximum 10 cards in deck. Remove a card first.' };
+  }
+  const maxAllowed = getMaxAllowedDeckCopies(cardToAdd.tier);
+  const currentCopies = getDeckCopiesCount(deck, collection, cardToAdd.baseId);
+  if (currentCopies >= maxAllowed) {
+    if (maxAllowed === 1) {
+      return {
+        allowed: false,
+        message: `Limit: Only 1 copy of ${cardToAdd.tier.toUpperCase()} cards allowed in battle deck.`
+      };
+    }
+    return {
+      allowed: false,
+      message: `Limit: Maximum ${maxAllowed} copies of "${cardToAdd.name}" allowed in battle deck.`
+    };
+  }
+  return { allowed: true, message: 'Card added to battle deck!' };
+}
+
+export function sanitizeDeck(deck: string[], collection: Card[]): string[] {
+  const sanitized: string[] = [];
+  const baseCounts: Record<string, number> = {};
+
+  // 1. Keep valid cards up to max allowed copies
+  for (const cardId of deck) {
+    if (sanitized.length >= 10) break;
+    const card = collection.find(c => c.id === cardId);
+    if (!card) continue;
+    if (sanitized.includes(cardId)) continue;
+
+    const maxAllowed = getMaxAllowedDeckCopies(card.tier);
+    const count = baseCounts[card.baseId] || 0;
+    if (count < maxAllowed) {
+      baseCounts[card.baseId] = count + 1;
+      sanitized.push(cardId);
+    }
+  }
+
+  // 2. Backfill if under 10 cards and collection has cards available
+  if (sanitized.length < 10 && collection.length >= 10) {
+    for (const card of collection) {
+      if (sanitized.length >= 10) break;
+      if (sanitized.includes(card.id)) continue;
+
+      const maxAllowed = getMaxAllowedDeckCopies(card.tier);
+      const count = baseCounts[card.baseId] || 0;
+      if (count < maxAllowed) {
+        baseCounts[card.baseId] = count + 1;
+        sanitized.push(card.id);
+      }
+    }
+  }
+
+  return sanitized;
+}
+
+// Generate the initial starter deck for a new player (5 unique cards x 2 copies each = 10 cards)
 export function getStarterDeck(): Card[] {
-  // 5 starter cards
   const templates = [
     CARD_TEMPLATES.find(c => c.baseId === 'skeleton_warrior')!,
     CARD_TEMPLATES.find(c => c.baseId === 'skeleton_warrior')!,
     CARD_TEMPLATES.find(c => c.baseId === 'plague_rat')!,
+    CARD_TEMPLATES.find(c => c.baseId === 'plague_rat')!,
     CARD_TEMPLATES.find(c => c.baseId === 'cursed_witch')!,
-    CARD_TEMPLATES.find(c => c.baseId === 'dark_acolyte')!
+    CARD_TEMPLATES.find(c => c.baseId === 'cursed_witch')!,
+    CARD_TEMPLATES.find(c => c.baseId === 'dark_acolyte')!,
+    CARD_TEMPLATES.find(c => c.baseId === 'dark_acolyte')!,
+    CARD_TEMPLATES.find(c => c.baseId === 'bone_archer')!,
+    CARD_TEMPLATES.find(c => c.baseId === 'bone_archer')!
   ];
   
   return templates.map(t => createCardInstance(t, 1));

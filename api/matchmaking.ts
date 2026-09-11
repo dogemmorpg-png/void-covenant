@@ -303,7 +303,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (!pool || pool.length === 0) return [];
         const picked: any[] = [];
         for (let i = 0; i < count; i++) {
-          const available = pool.filter(c => (usedCount[c.baseId] || 0) < 2);
+          const available = pool.filter(c => {
+            const maxAllowed = (c.tier === 'legendary' || c.tier === 'divine') ? 1 : 2;
+            return (usedCount[c.baseId] || 0) < maxAllowed;
+          });
           const choice = available.length > 0
             ? available[Math.floor(Math.random() * available.length)]
             : pool[Math.floor(Math.random() * pool.length)];

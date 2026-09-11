@@ -3,8 +3,8 @@ import { getCardTierStyles } from '../utils/tierStyles';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { Card, CardTier } from '../types';
-import { CARD_TEMPLATES, getCardManaCost, getEvolutionBonusSkill, getFusionCosts } from '../data/cards';
-import { Swords, Star, Plus, Minus, ArrowRight, Skull, Shield, Zap, Sparkles, AlertCircle, Crown, ShieldAlert, Bug, Flame, Droplet, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { CARD_TEMPLATES, getCardManaCost, getEvolutionBonusSkill, getFusionCosts, getMaxAllowedDeckCopies } from '../data/cards';
+import { Swords, Star, Plus, Minus, ArrowRight, Skull, Shield, Zap, Sparkles, AlertCircle, AlertTriangle, Crown, ShieldAlert, Bug, Flame, Droplet, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { assetPreloader, getCardImageUrl } from '../utils/assetPreloader';
 import { SanctuaryEmblem, FusionAltarEmblem, BaseCardSlotEmblem, SacrificeSlotEmblem } from './CardsViewCustomIcons';
 
@@ -125,6 +125,8 @@ interface CollectionCardItemProps {
   isSelected: boolean;
   isInDeck?: boolean;
   isFusionMode?: boolean;
+  deckCopiesCount?: number;
+  maxDeckCopies?: number;
   onSelect: (cardId: string) => void;
   onToggleDeck?: (cardId: string) => void;
 }
@@ -134,9 +136,13 @@ const CollectionCardItem = React.memo<CollectionCardItemProps>(({
   isSelected,
   isInDeck = false,
   isFusionMode = false,
+  deckCopiesCount = 0,
+  maxDeckCopies = 2,
   onSelect,
   onToggleDeck,
 }) => {
+  const isLimitReached = !isInDeck && deckCopiesCount >= maxDeckCopies;
+
   return (
     <div
       onClick={() => onSelect(card.id)}
@@ -169,16 +175,45 @@ const CollectionCardItem = React.memo<CollectionCardItemProps>(({
           className={`absolute top-1.5 left-1.5 z-20 rounded-full w-[18px] h-[18px] flex items-center justify-center border shadow-md transition-all hover:scale-110 active:scale-95 cursor-pointer ${
             isInDeck
               ? 'bg-[#4e0707] hover:bg-[#880d1e] border-[#dd2c40]/60 text-white'
+              : isLimitReached
+              ? 'bg-[#2a1708]/95 hover:bg-[#3d220c] border-amber-600/60 text-amber-400 opacity-90'
               : 'bg-emerald-950/80 hover:bg-emerald-900 border-emerald-500/60 text-emerald-400'
           }`}
-          title={isInDeck ? "Remove from deck" : "Add to deck"}
+          title={
+            isInDeck 
+              ? "Remove from deck" 
+              : isLimitReached 
+              ? `Deck limit reached (${deckCopiesCount}/${maxDeckCopies} in battle deck)` 
+              : "Add to deck"
+          }
         >
           {isInDeck ? (
             <Minus className="w-2.5 h-2.5" />
+          ) : isLimitReached ? (
+            <AlertCircle className="w-2.5 h-2.5" />
           ) : (
             <Plus className="w-2.5 h-2.5" />
           )}
         </button>
+      )}
+
+      {/* Deck duplicate status badge */}
+      {!isFusionMode && deckCopiesCount > 0 && (
+        <div className="absolute top-1.5 left-[23px] z-20 pointer-events-none">
+          {isInDeck ? (
+            <span className="bg-red-950/85 border border-red-500/50 text-red-300 text-[7px] font-mono font-black px-1 py-0.5 rounded leading-none shadow">
+              DECK
+            </span>
+          ) : isLimitReached ? (
+            <span className="bg-amber-950/90 border border-amber-500/60 text-amber-300 text-[7px] font-mono font-black px-1 py-0.5 rounded leading-none shadow">
+              MAX
+            </span>
+          ) : (
+            <span className="bg-black/80 border border-stone-600 text-stone-300 text-[7px] font-mono font-black px-1 py-0.5 rounded leading-none shadow">
+              1/2
+            </span>
+          )}
+        </div>
       )}
 
       <div className="text-center mt-3 relative z-10">
@@ -236,6 +271,18 @@ export const CollectionDeckView: React.FC = () => {
   const [selectedCardId, setSelectedCardId] = useState<string | null>(
     profile.collection.length > 0 ? profile.collection[0].id : null
   );
+
+  // Memoized deck copies count per baseId
+  const deckBaseCounts = React.useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const cardId of (profile?.deck || [])) {
+      const card = profile?.collection.find(c => c.id === cardId);
+      if (card) {
+        counts[card.baseId] = (counts[card.baseId] || 0) + 1;
+      }
+    }
+    return counts;
+  }, [profile?.deck, profile?.collection]);
   
   // Fusing lab states
   const [isFusingMode, setIsFusingMode] = useState(false);
@@ -590,7 +637,9 @@ export const CollectionDeckView: React.FC = () => {
                 <h3 className="font-display font-black text-white text-base tracking-widest text-shadow-gold flex items-center gap-2">
                   ⚔️ COMBAT DECK ({profile.deck.length}/10)
                 </h3>
-                <p className="text-[10px] text-gray-400 font-sans mt-0.5">Cards that will fight in the campaign and arena.</p>
+                <p className="text-[10px] text-gray-400 font-sans mt-0.5">
+                  Cards that fight in campaign & arena. <span className="text-[#ebd09b]/80 font-mono text-[9px]">(Limits: Max 2 Bronze–Gold · Max 1 Legendary/Divine)</span>
+                </p>
               </div>
               {profile.deck.length < 10 && (
                 <span className="text-[10px] bg-[#4e0707] text-[#dd2c40] font-mono font-bold py-1 px-2.5 rounded-full border border-[#dd2c40]/30 animate-pulse">
@@ -649,6 +698,12 @@ export const CollectionDeckView: React.FC = () => {
                               <span className="text-gray-400">L{card.level}</span>
                               <span className="text-gray-600">•</span>
                               <span className={getDeckTierTextColor(card.tier)}>{card.tier}</span>
+                              {(deckBaseCounts[card.baseId] || 0) > 1 && (
+                                <>
+                                  <span className="text-gray-600">•</span>
+                                  <span className="text-amber-400 font-mono text-[8px] bg-black/60 px-1 py-0.5 rounded border border-amber-500/40 font-bold" title="2 copies in deck">2x</span>
+                                </>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -851,6 +906,8 @@ export const CollectionDeckView: React.FC = () => {
                 {paginatedCards.map(card => {
                   const isSelected = selectedCardId === card.id;
                   const isInDeck = (profile?.deck || []).includes(card.id);
+                  const baseIdCopiesInDeck = deckBaseCounts[card.baseId] || 0;
+                  const maxAllowed = getMaxAllowedDeckCopies(card.tier);
                   
                   return (
                     <CollectionCardItem
@@ -859,6 +916,8 @@ export const CollectionDeckView: React.FC = () => {
                       isSelected={isSelected}
                       isInDeck={isInDeck}
                       isFusionMode={false}
+                      deckCopiesCount={baseIdCopiesInDeck}
+                      maxDeckCopies={maxAllowed}
                       onSelect={handleSelectCard}
                       onToggleDeck={handleToggleDeck}
                     />
@@ -1199,6 +1258,71 @@ export const CollectionDeckView: React.FC = () => {
                     )}
                   </div>
                 </div>
+
+                {/* Battle Deck Management & Limits */}
+                {(() => {
+                  const isInDeck = (profile.deck || []).includes(selectedCard.id);
+                  const baseIdCopiesInDeck = deckBaseCounts[selectedCard.baseId] || 0;
+                  const maxAllowed = getMaxAllowedDeckCopies(selectedCard.tier);
+                  const isLimitReached = !isInDeck && baseIdCopiesInDeck >= maxAllowed;
+                  const isDeckFull = !isInDeck && (profile.deck || []).length >= 10;
+
+                  return (
+                    <div className="space-y-2 pt-2 border-t border-[#c5a880]/15">
+                      <div className="flex items-center justify-between text-[11px] font-mono">
+                        <span className="text-gray-400">Combat Deck:</span>
+                        <span className={`font-bold ${
+                          isInDeck ? 'text-emerald-400' :
+                          isLimitReached ? 'text-amber-400' : 'text-[#ebd09b]'
+                        }`}>
+                          {isInDeck 
+                            ? `In Deck (${baseIdCopiesInDeck}/${maxAllowed})` 
+                            : `${baseIdCopiesInDeck}/${maxAllowed} in deck`}
+                        </span>
+                      </div>
+
+                      {isInDeck ? (
+                        <button
+                          onClick={() => handleToggleDeck(selectedCard.id)}
+                          className="w-full bg-[#4e0707] hover:bg-[#880d1e] border border-[#dd2c40]/60 text-white font-display font-black text-xs py-2.5 px-4 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                        >
+                          <Minus className="w-4 h-4" />
+                          <span>REMOVE FROM COMBAT DECK</span>
+                        </button>
+                      ) : isLimitReached ? (
+                        <button
+                          onClick={() => handleToggleDeck(selectedCard.id)}
+                          className="w-full bg-[#2a1708] hover:bg-[#3d220c] border border-amber-600/50 text-amber-300 font-display font-black text-xs py-2.5 px-4 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                          <span>DECK LIMIT REACHED ({baseIdCopiesInDeck}/{maxAllowed})</span>
+                        </button>
+                      ) : isDeckFull ? (
+                        <button
+                          onClick={() => handleToggleDeck(selectedCard.id)}
+                          className="w-full bg-stone-900 border border-stone-700/60 text-stone-400 font-display font-black text-xs py-2.5 px-4 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          <AlertTriangle className="w-4 h-4 text-stone-400 shrink-0" />
+                          <span>COMBAT DECK FULL (10/10)</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleToggleDeck(selectedCard.id)}
+                          className="w-full bg-gradient-to-r from-emerald-950 to-[#122e20] hover:from-emerald-900 hover:to-[#1a442e] border border-emerald-500/60 text-emerald-300 font-display font-black text-xs py-2.5 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>ADD TO COMBAT DECK</span>
+                        </button>
+                      )}
+
+                      <div className="text-[10px] font-mono text-gray-500 text-center">
+                        {maxAllowed === 1 
+                          ? '✦ Legendary & Divine: Max 1 copy per deck' 
+                          : '✦ Bronze, Silver & Gold: Max 2 copies per deck'}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* Lore description */}
                 <p className="text-[11px] text-gray-400 italic font-sans leading-relaxed border-l-2 border-[#c5a880]/30 pl-3">

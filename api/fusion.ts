@@ -3,7 +3,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
 const jwt = (jwtPkg as any).default || jwtPkg;
 import { createClient } from '@supabase/supabase-js';
-import { CARD_TEMPLATES, getEvolutionBonusSkill, getCardManaCost, getFusionCosts } from './_shared/cards.js';
+import { CARD_TEMPLATES, getEvolutionBonusSkill, getCardManaCost, getFusionCosts, sanitizeDeck } from './_shared/cards.js';
 import { Card, CardTier, PlayerProfile } from './_shared/types.js';
 import { calculateEnergy } from './_shared/energyHelper.js';
 import { recordShardTransaction } from './_shared/shardLogger.js';
@@ -235,6 +235,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       } else if (profile.deck.includes(card2.id) && profile.deck.includes(card1.id)) {
         profile.deck = profile.deck.filter((id: string) => id !== card2.id);
       }
+      profile.deck = sanitizeDeck(profile.deck, profile.collection || []);
     }
 
     profile = calculateEnergy(profile);
