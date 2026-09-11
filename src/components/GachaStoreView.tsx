@@ -617,14 +617,14 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
                           Common (Bronze):
                         </span>
-                        <span className="text-amber-400 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-600/40">95%</span>
+                        <span className="text-amber-400 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-600/40">90%</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-300 flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
                           Rare (Silver):
                         </span>
-                        <span className="text-slate-200 font-bold text-xs bg-slate-900/60 px-1.5 py-0.5 rounded border border-slate-500/40">5%</span>
+                        <span className="text-slate-200 font-bold text-xs bg-slate-900/60 px-1.5 py-0.5 rounded border border-slate-500/40">10%</span>
                       </div>
                     </div>
 
@@ -698,7 +698,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
                           Bronze Cards:
                         </span>
-                        <span className="text-amber-400 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-600/40">40%</span>
+                        <span className="text-amber-400 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-600/40">35%</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-300 flex items-center gap-1.5">
@@ -712,7 +712,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                           Gold Cards:
                         </span>
-                        <span className="text-amber-400 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/40">10%</span>
+                        <span className="text-amber-400 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/40">15%</span>
                       </div>
                     </div>
 
@@ -791,14 +791,14 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
                           Silver Cards:
                         </span>
-                        <span className="text-slate-200 font-bold text-xs bg-slate-900/60 px-1.5 py-0.5 rounded border border-slate-500/40">40%</span>
+                        <span className="text-slate-200 font-bold text-xs bg-slate-900/60 px-1.5 py-0.5 rounded border border-slate-500/40">30%</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-300 flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                           Gold Cards:
                         </span>
-                        <span className="text-amber-400 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/40">45%</span>
+                        <span className="text-amber-400 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/40">55%</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-300 flex items-center gap-1.5">

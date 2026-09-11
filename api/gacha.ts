@@ -26,7 +26,7 @@ function generateRandomCards(packType: string, numCards: number) {
     let cardTemplate;
 
     if (packType === 'bronze') {
-      if (rand < 95) {
+      if (rand < 90) {
         const bronzePool = pool.filter(c => c.tier === 'bronze');
         cardTemplate = bronzePool[Math.floor(Math.random() * bronzePool.length)];
       } else {
@@ -34,10 +34,10 @@ function generateRandomCards(packType: string, numCards: number) {
         cardTemplate = silverPool[Math.floor(Math.random() * silverPool.length)];
       }
     } else if (packType === 'obsidian') {
-      if (rand < 40) {
+      if (rand < 35) {
         const bronzePool = pool.filter(c => c.tier === 'bronze');
         cardTemplate = bronzePool[Math.floor(Math.random() * bronzePool.length)];
-      } else if (rand < 90) {
+      } else if (rand < 85) {
         const silverPool = pool.filter(c => c.tier === 'silver');
         cardTemplate = silverPool[Math.floor(Math.random() * silverPool.length)];
       } else {
@@ -45,7 +45,7 @@ function generateRandomCards(packType: string, numCards: number) {
         cardTemplate = goldPool[Math.floor(Math.random() * goldPool.length)];
       }
     } else {
-      if (rand < 40) {
+      if (rand < 30) {
         const silverPool = pool.filter(c => c.tier === 'silver');
         cardTemplate = silverPool[Math.floor(Math.random() * silverPool.length)];
       } else if (rand < 85) {
