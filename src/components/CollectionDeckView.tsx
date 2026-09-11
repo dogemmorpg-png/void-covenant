@@ -589,39 +589,114 @@ export const CollectionDeckView: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
-      {/* GOTHIC SUB-TABS */}
-      <div className="flex gap-2 border-b border-white/10 pb-px mb-2">
-        <button
-          onClick={() => {
-            setIsFusingMode(false);
-            setFuseCardId1(null);
-            setFuseCardId2(null);
-          }}
-          className={`flex items-center gap-2 py-3 px-6 rounded-t-xl font-display font-black text-xs tracking-widest transition-all cursor-pointer border-t border-x ${
-            !isFusingMode
-              ? 'bg-[#151a21] border-t-2 border-x border-[#ebd09b] border-x-white/10 text-[#ebd09b] shadow-[0_-4px_15px_rgba(197,168,128,0.15)] z-10 translate-y-[2px] border-b-[#151a21]'
-              : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'
-          }`}
-        >
-          <SanctuaryEmblem className="w-4 h-4 shrink-0" />
-          <span>CREATURE SANCTUARY</span>
-        </button>
-        <button
-          onClick={() => {
-            setIsFusingMode(true);
-            setFuseCardId1(null);
-            setFuseCardId2(null);
-            setSelectedCardId(null);
-          }}
-          className={`flex items-center gap-2 py-3 px-6 rounded-t-xl font-display font-black text-xs tracking-widest transition-all cursor-pointer border-t border-x ${
-            isFusingMode
-              ? 'bg-[#151a21] border-t-2 border-x border-purple-500 border-x-white/10 text-purple-300 shadow-[0_-4px_15px_rgba(168,85,247,0.25)] z-10 translate-y-[2px] border-b-[#151a21]'
-              : 'border-transparent text-gray-400 hover:text-purple-400 hover:bg-purple-950/10'
-          }`}
-        >
-          <FusionAltarEmblem className="w-4 h-4 shrink-0" />
-          <span>FUSION ALTAR</span>
-        </button>
+      {/* GOTHIC SECTION SWITCHER */}
+      <div className="bg-[#0c1015] border border-[#c5a880]/25 rounded-2xl p-2 shadow-2xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {/* Sanctuary Tab */}
+          <button
+            onClick={() => {
+              setIsFusingMode(false);
+              setFuseCardId1(null);
+              setFuseCardId2(null);
+            }}
+            className={`relative flex items-center justify-between px-5 py-3.5 rounded-xl font-display transition-all duration-200 cursor-pointer overflow-hidden group select-none ${
+              !isFusingMode
+                ? 'bg-gradient-to-r from-[#2a2013] via-[#3d2e1b] to-[#1f170d] text-[#ebd09b] border-2 border-[#c5a880] shadow-[0_0_25px_rgba(197,168,128,0.25)]'
+                : 'bg-[#121720]/80 hover:bg-[#18202c] text-gray-400 hover:text-gray-200 border border-white/5 hover:border-white/15'
+            }`}
+          >
+            {/* Active Glow Accent */}
+            {!isFusingMode && (
+              <div className="absolute inset-0 bg-gradient-to-r from-[#ebd09b]/10 via-transparent to-transparent pointer-events-none" />
+            )}
+
+            <div className="flex items-center gap-3.5 z-10">
+              <div className={`p-2 rounded-lg border transition-all ${
+                !isFusingMode 
+                  ? 'bg-black/60 border-[#c5a880]/60 text-[#ebd09b] shadow-[0_0_12px_rgba(197,168,128,0.3)]' 
+                  : 'bg-black/40 border-white/5 text-gray-500 group-hover:text-gray-300 group-hover:border-white/20'
+              }`}>
+                <SanctuaryEmblem className="w-5 h-5 shrink-0" />
+              </div>
+              <div className="text-left">
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm font-black tracking-widest leading-none ${!isFusingMode ? 'text-white drop-shadow' : 'text-gray-300'}`}>
+                    CREATURE SANCTUARY
+                  </span>
+                  {!isFusingMode && (
+                    <span className="w-2 h-2 rounded-full bg-[#ebd09b] shadow-[0_0_8px_#ebd09b] animate-pulse" />
+                  )}
+                </div>
+                <span className="text-[10px] font-mono text-gray-400 block mt-1">
+                  Combat Deck ({profile.deck.length}/10) · Collection ({profile.collection.length})
+                </span>
+              </div>
+            </div>
+
+            <div className="hidden md:flex items-center z-10">
+              <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border ${
+                !isFusingMode 
+                  ? 'bg-black/50 text-[#ebd09b] border-[#c5a880]/40' 
+                  : 'text-gray-500 border-transparent group-hover:text-gray-400'
+              }`}>
+                {!isFusingMode ? 'ACTIVE HALL' : 'ENTER'}
+              </span>
+            </div>
+          </button>
+
+          {/* Fusion Altar Tab */}
+          <button
+            onClick={() => {
+              setIsFusingMode(true);
+              setFuseCardId1(null);
+              setFuseCardId2(null);
+              setSelectedCardId(null);
+            }}
+            className={`relative flex items-center justify-between px-5 py-3.5 rounded-xl font-display transition-all duration-200 cursor-pointer overflow-hidden group select-none ${
+              isFusingMode
+                ? 'bg-gradient-to-r from-[#2c123b] via-[#3f1655] to-[#1e0a29] text-purple-200 border-2 border-purple-500 shadow-[0_0_25px_rgba(168,85,247,0.3)]'
+                : 'bg-[#121720]/80 hover:bg-[#1b1526] text-gray-400 hover:text-purple-300 border border-white/5 hover:border-purple-500/30'
+            }`}
+          >
+            {/* Active Glow Accent */}
+            {isFusingMode && (
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-transparent to-transparent pointer-events-none" />
+            )}
+
+            <div className="flex items-center gap-3.5 z-10">
+              <div className={`p-2 rounded-lg border transition-all ${
+                isFusingMode 
+                  ? 'bg-black/60 border-purple-500/60 text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.4)]' 
+                  : 'bg-black/40 border-white/5 text-gray-500 group-hover:text-purple-400 group-hover:border-purple-500/30'
+              }`}>
+                <FusionAltarEmblem className="w-5 h-5 shrink-0" />
+              </div>
+              <div className="text-left">
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm font-black tracking-widest leading-none ${isFusingMode ? 'text-white drop-shadow' : 'text-gray-300'}`}>
+                    FUSION ALTAR
+                  </span>
+                  {isFusingMode && (
+                    <span className="w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_8px_#c084fc] animate-pulse" />
+                  )}
+                </div>
+                <span className="text-[10px] font-mono text-gray-400 block mt-1">
+                  Card Fusion · Tier Evolution · Skill Awakening
+                </span>
+              </div>
+            </div>
+
+            <div className="hidden md:flex items-center z-10">
+              <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border ${
+                isFusingMode 
+                  ? 'bg-black/50 text-purple-300 border-purple-500/50' 
+                  : 'text-gray-500 border-transparent group-hover:text-purple-300'
+              }`}>
+                {isFusingMode ? 'ACTIVE HALL' : 'ENTER'}
+              </span>
+            </div>
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -638,7 +713,7 @@ export const CollectionDeckView: React.FC = () => {
                   ⚔️ COMBAT DECK ({profile.deck.length}/10)
                 </h3>
                 <p className="text-[10px] text-gray-400 font-sans mt-0.5">
-                  Cards that fight in campaign & arena. <span className="text-[#ebd09b]/80 font-mono text-[9px]">(Limits: Max 2 Bronze–Gold · Max 1 Legendary/Divine)</span>
+                  Cards that fight in campaign & arena. <span className="text-[#ebd09b]/90 font-mono text-[9.5px] font-medium bg-black/40 px-2 py-0.5 rounded border border-[#c5a880]/20 ml-1">Limit: max 2 copies per card (max 1 for Legendary & Divine)</span>
                 </p>
               </div>
               {profile.deck.length < 10 && (
@@ -1315,10 +1390,10 @@ export const CollectionDeckView: React.FC = () => {
                         </button>
                       )}
 
-                      <div className="text-[10px] font-mono text-gray-500 text-center">
+                      <div className="text-[10px] font-mono text-gray-400 text-center bg-black/40 py-1.5 px-2 rounded-lg border border-white/5">
                         {maxAllowed === 1 
-                          ? '✦ Legendary & Divine: Max 1 copy per deck' 
-                          : '✦ Bronze, Silver & Gold: Max 2 copies per deck'}
+                          ? '✦ Legendary & Divine: Maximum 1 copy of this card per deck' 
+                          : '✦ Bronze, Silver & Gold: Maximum 2 copies of this card per deck'}
                       </div>
                     </div>
                   );

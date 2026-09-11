@@ -1630,7 +1630,7 @@ export function canAddCardToBattleDeck(
     if (maxAllowed === 1) {
       return {
         allowed: false,
-        message: `Limit: Only 1 copy of ${cardToAdd.tier.toUpperCase()} cards allowed in battle deck.`
+        message: `Limit: Only 1 copy of "${cardToAdd.name}" (${cardToAdd.tier.toUpperCase()}) allowed in battle deck.`
       };
     }
     return {
