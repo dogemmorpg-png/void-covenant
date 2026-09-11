@@ -351,7 +351,7 @@ export async function checkAndPerformPvpRollover(
       p.profile.pvpTickets = pvpMax + p.profile.pvpBonusTickets;
 
       // Deliver daily tribute mail if subscription is active
-      if (isSubActive && p.profile.lastDailySubscriptionMail !== todayUtc) {
+      if (isSubActive && (p.profile.lastDailySubscriptionMail !== todayUtc || force)) {
         const isUltra = tier === 'ultra';
         const gold = isUltra ? 3000 : 1000;
         const dust = isUltra ? 400 : 150;
@@ -478,10 +478,10 @@ export async function checkAndPerformPvpRollover(
           createdAt: Date.now()
         };
 
-        // Idempotency: prevent duplicate mail/rewards if player already received rollover decree for todayUtc
-        const alreadyReceivedToday = (p.profile.mailMessages || []).some((m: any) =>
+        // Idempotency: prevent duplicate mail/rewards if player already received rollover decree for todayUtc (unless manually forced by admin)
+        const alreadyReceivedToday = !force && ((p.profile.mailMessages || []).some((m: any) =>
           m.id && m.id.startsWith(`mail_pvp_${todayUtc}_`)
-        ) || p.profile.lastPvpRolloverDate === todayUtc;
+        ) || p.profile.lastPvpRolloverDate === todayUtc);
 
         if (!alreadyReceivedToday) {
           p.profile.mailMessages = [mailMessage, ...(p.profile.mailMessages || [])].slice(0, 50);
