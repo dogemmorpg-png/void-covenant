@@ -1448,10 +1448,15 @@ export const CollectionDeckView: React.FC = () => {
                         ) : (
                           <button
                             onClick={() => handleStartDismantle(selectedCard)}
-                            className="w-full bg-gradient-to-r from-[#1b1526] via-[#241738] to-[#1b1526] hover:from-[#2e1742] hover:via-[#3d1a5c] hover:to-[#2e1742] border border-cyan-500/40 hover:border-cyan-400/80 text-cyan-200 hover:text-white font-display font-black text-xs py-2.5 px-4 rounded-xl transition-all shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.35)] flex items-center justify-center gap-2 cursor-pointer group active:scale-98"
+                            className="w-full bg-gradient-to-r from-[#1b1526] via-[#28153c] to-[#1b1526] hover:from-[#2e1742] hover:via-[#3d1a5c] hover:to-[#2e1742] border border-cyan-500/40 hover:border-cyan-400/80 text-cyan-200 hover:text-white font-display font-black py-2 px-4 rounded-xl transition-all shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.35)] flex items-center justify-center gap-2 cursor-pointer group active:scale-98"
                           >
-                            <img src="/icons/icon_dust.webp" alt="Void Dust" className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.6)] group-hover:scale-110 transition-transform" />
-                            <span>DISMANTLE INTO +{getDismantleDustYield(selectedCard.tier)} VOID DUST</span>
+                            <span className="text-xs tracking-widest uppercase">DESTROY</span>
+                            <span className="text-sm font-mono font-black text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]">+{getDismantleDustYield(selectedCard.tier)}</span>
+                            <img 
+                              src="/icons/icon_dust.webp" 
+                              alt="Void Dust" 
+                              className="w-7 h-7 sm:w-8 sm:h-8 object-contain drop-shadow-[0_0_10px_rgba(6,182,212,0.8)] group-hover:scale-110 transition-transform -my-1" 
+                            />
                           </button>
                         )}
                       </div>
