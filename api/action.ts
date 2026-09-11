@@ -1323,16 +1323,52 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       profile.lastPvpEnergyRefill = Date.now();
       profile.pvpTickets = profile.pvpEnergy + (profile.pvpBonusTickets || 0);
 
+      const todayUtc = new Date().toISOString().slice(0, 10);
+
+      // Bonus Demiurge Divine Relics for 90-day subscription:
+      // 1 random Divine item for Premium, 2 unique random Divine items for Ultra
+      let bonusEquipments: any[] = [];
+      if (durationDays === 90) {
+        const demiurgeTemplates = EQUIPMENT_TEMPLATES.filter(
+          (e: any) => e.tier === 'divine' && e.setId === 'demiurge'
+        );
+        if (demiurgeTemplates.length > 0) {
+          const bonusCount = tier === 'ultra' ? 2 : 1;
+          // Shuffle templates to ensure unique items without duplicates
+          const shuffled = [...demiurgeTemplates].sort(() => 0.5 - Math.random());
+          const selected = shuffled.slice(0, bonusCount);
+          profile.equipment = profile.equipment || [];
+          for (const tmpl of selected) {
+            const inst = generateEquipmentInstance(tmpl);
+            profile.equipment.push(inst);
+            bonusEquipments.push(inst);
+          }
+
+          // Deliver celebratory decree into mailbox
+          const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+          const bonusMail = {
+            id: `mail_bonus_sub90_${todayUtc}_${walletAddress.slice(-4)}_${uniqueSuffix}`,
+            title: `⚡ Divine Demiurge Relic Decree (90-Day ${tier.toUpperCase()})`,
+            sender: 'Demiurge Celestial Vault',
+            body: `Hail, Lord ${profile.username || 'Voidwalker'}!\n\nFor committing to a 90-day covenant of the ${tier.toUpperCase()} Pass, ancient cosmic entities have forged celestial relics directly into your Armory:\n\n${bonusEquipments.map((e: any) => `• 👑 ${e.name} (${e.slot.toUpperCase()})`).join('\n')}\n\nEquip them in your Armory to channel primordial power!`,
+            rewards: {},
+            isClaimed: true,
+            isRead: false,
+            createdAt: Date.now()
+          };
+          profile.mailMessages = [bonusMail, ...(profile.mailMessages || [])].slice(0, 50);
+        }
+      }
+
       profile = recordShardTransaction(
         profile,
         'BUY_SUBSCRIPTION',
         -cost,
-        `Purchased ${tier.toUpperCase()} Subscription (${durationDays} Days)`,
-        { tier, durationDays, cost }
+        `Purchased ${tier.toUpperCase()} Subscription (${durationDays} Days)${bonusEquipments.length > 0 ? ` + ${bonusEquipments.length} Divine Relic(s)` : ''}`,
+        { tier, durationDays, cost, bonusEquipments: bonusEquipments.map(e => e.name) }
       );
 
       // Immediately deliver today's daily tribute mail upon activating or extending pass if not yet delivered today
-      const todayUtc = new Date().toISOString().slice(0, 10);
       if (profile.lastDailySubscriptionMail !== todayUtc) {
         const isUltra = tier === 'ultra';
         const gold = isUltra ? 3000 : 1000;
@@ -1388,7 +1424,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
 
-      successMessage = `${tier === 'ultra' ? '💎' : '⚜️'} Hail, Lord! You have unlocked the ${tier.toUpperCase()} Pass for ${durationDays} days! Energy & Tickets fully restored, and your daily tribute has been sent to your Mail!`;
+      const bonusText = bonusEquipments.length > 0 
+        ? ` BONUS: ${bonusEquipments.length}x Divine Demiurge Relic(s) forged into your Armory!` 
+        : '';
+      successMessage = `${tier === 'ultra' ? '💎' : '⚜️'} Hail, Lord! You have unlocked the ${tier.toUpperCase()} Pass for ${durationDays} days! Energy & Tickets fully restored, and your daily tribute has been sent to your Mail!${bonusText}`;
       responseData = { 
         subscriptionTier: tier, 
         subscriptionExpiresAt: profile.subscriptionExpiresAt,
@@ -1397,7 +1436,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         pvpEnergy: profile.pvpEnergy,
         pvpEnergyMax: profile.pvpEnergyMax,
         pvpTickets: profile.pvpTickets,
-        mailMessages: profile.mailMessages
+        mailMessages: profile.mailMessages,
+        equipment: profile.equipment,
+        bonusEquipments
       };
     } else if (action === 'claim_daily_subscription') {
       const isSubActive = profile.subscriptionExpiresAt && profile.subscriptionExpiresAt > Date.now();
