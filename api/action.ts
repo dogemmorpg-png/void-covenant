@@ -4,7 +4,7 @@ import * as jwtPkg from 'jsonwebtoken';
 const jwt = (jwtPkg as any).default || jwtPkg;
 import { createClient } from '@supabase/supabase-js';
 import { PlayerProfile } from './_shared/types.js';
-import { CARD_TEMPLATES, createCardInstance, generateCampaignStage, AIRDROP_TASKS } from './_shared/cards.js';
+import { CARD_TEMPLATES, createCardInstance, generateCampaignStage, AIRDROP_TASKS, sanitizeDeck } from './_shared/cards.js';
 import { EQUIPMENT_TEMPLATES, generateEquipmentInstance } from './_shared/equipment.js';
 import { calculateEnergy, processExpGain, getActiveSubscriptionTier, getTierLimits } from './_shared/energyHelper.js';
 import { checkAndPerformPvpRollover, DEFAULT_LEAGUE_REWARDS } from './_shared/pvpRollover.js';
