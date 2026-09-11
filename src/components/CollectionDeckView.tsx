@@ -264,13 +264,15 @@ const CollectionCardItem = React.memo<CollectionCardItemProps>(({
 });
 
 export const CollectionDeckView: React.FC = () => {
-  const { profile, fuseCards, toggleDeckCard } = useGame();
+  const { profile, fuseCards, dismantleCard, toggleDeckCard } = useGame();
   const toast = useToast();
   
   // States
   const [selectedCardId, setSelectedCardId] = useState<string | null>(
     profile.collection.length > 0 ? profile.collection[0].id : null
   );
+  const [dismantleConfirmCard, setDismantleConfirmCard] = useState<Card | null>(null);
+  const [isDismantling, setIsDismantling] = useState(false);
 
   // Memoized deck copies count per baseId
   const deckBaseCounts = React.useMemo(() => {
@@ -489,6 +491,44 @@ export const CollectionDeckView: React.FC = () => {
     } else {
       toast(`Ritual error: ${res.message}`, 'warning');
       setFusionConfirmData(null);
+    }
+  };
+
+  const getDismantleDustYield = (tier: CardTier): number => {
+    switch (tier) {
+      case 'bronze': return 100;
+      case 'silver': return 200;
+      case 'gold': return 500;
+      case 'legendary': return 1000;
+      default: return 0;
+    }
+  };
+
+  const handleStartDismantle = (card: Card) => {
+    if (card.tier === 'divine') {
+      toast('Divine cards are primordial gods and cannot be dismantled!', 'warning');
+      return;
+    }
+    setDismantleConfirmCard(card);
+  };
+
+  const confirmDismantle = async () => {
+    if (!dismantleConfirmCard) return;
+    setIsDismantling(true);
+    try {
+      const cardToDismantle = dismantleConfirmCard;
+      const res = await dismantleCard(cardToDismantle.id);
+      if (res.success) {
+        toast(`✨ Dismantled ${cardToDismantle.name} into +${res.dustAwarded || getDismantleDustYield(cardToDismantle.tier)} Void Dust!`, 'success');
+        setDismantleConfirmCard(null);
+        setSelectedCardId(null);
+      } else {
+        toast(res.message || 'Failed to dismantle card.', 'error');
+      }
+    } catch (err: any) {
+      toast(err.message || 'Error occurred while dismantling card.', 'error');
+    } finally {
+      setIsDismantling(false);
     }
   };
 
@@ -1395,6 +1435,26 @@ export const CollectionDeckView: React.FC = () => {
                           ? '✦ Legendary & Divine: Maximum 1 copy of this card per deck' 
                           : '✦ Bronze, Silver & Gold: Maximum 2 copies of this card per deck'}
                       </div>
+
+                      {/* Dismantle Card Button */}
+                      <div className="pt-2 border-t border-white/10">
+                        {selectedCard.tier === 'divine' ? (
+                          <div className="bg-rose-950/20 border border-rose-500/30 rounded-xl py-2 px-3 text-center">
+                            <span className="text-[10.5px] font-mono text-rose-400/90 font-bold flex items-center justify-center gap-1.5">
+                              <Crown className="w-3.5 h-3.5 text-rose-400" />
+                              <span>DIVINE ENTITY · CANNOT BE DISMANTLED</span>
+                            </span>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => handleStartDismantle(selectedCard)}
+                            className="w-full bg-gradient-to-r from-[#1b1526] via-[#241738] to-[#1b1526] hover:from-[#2e1742] hover:via-[#3d1a5c] hover:to-[#2e1742] border border-cyan-500/40 hover:border-cyan-400/80 text-cyan-200 hover:text-white font-display font-black text-xs py-2.5 px-4 rounded-xl transition-all shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.35)] flex items-center justify-center gap-2 cursor-pointer group active:scale-98"
+                          >
+                            <img src="/icons/icon_dust.webp" alt="Void Dust" className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.6)] group-hover:scale-110 transition-transform" />
+                            <span>DISMANTLE INTO +{getDismantleDustYield(selectedCard.tier)} VOID DUST</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   );
                 })()}
@@ -1460,6 +1520,85 @@ export const CollectionDeckView: React.FC = () => {
                   </button>
                   <button onClick={confirmFusionRitual} className="flex-1 bg-gradient-to-r from-purple-900 to-[#4e0707] hover:from-purple-600 hover:to-red-700 border border-purple-500/50 text-white font-display font-black tracking-widest py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(168,85,247,0.4)] cursor-pointer active:scale-98">
                     CONFIRM
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Dismantle Confirm Modal */}
+      {dismantleConfirmCard && (() => {
+        const c = dismantleConfirmCard;
+        const dustYield = getDismantleDustYield(c.tier);
+        const isInDeck = (profile.deck || []).includes(c.id);
+
+        return (
+          <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in duration-200">
+            <div className="bg-[#12161f] border-2 border-cyan-500/50 rounded-2xl p-6 max-w-sm w-full shadow-[0_0_50px_rgba(6,182,212,0.25)] relative overflow-hidden">
+              {/* Background ambient glow */}
+              <div className="absolute inset-0 bg-gradient-to-b from-cyan-950/30 via-transparent to-transparent pointer-events-none" />
+              
+              <div className="text-center relative z-10">
+                {/* Dust Icon with pulse glow */}
+                <div className="relative inline-block mb-3">
+                  <div className="absolute inset-0 bg-cyan-400/20 rounded-full blur-xl animate-pulse pointer-events-none" />
+                  <img 
+                    src="/icons/icon_dust.webp" 
+                    alt="Void Dust" 
+                    className="w-14 h-14 object-contain mx-auto relative drop-shadow-[0_0_20px_rgba(6,182,212,0.8)]" 
+                  />
+                </div>
+
+                <h2 className="text-lg font-display font-black text-white uppercase tracking-widest mb-1 text-shadow-gold">
+                  Dismantle Creature
+                </h2>
+
+                <p className="text-gray-300 font-sans text-xs mb-4 leading-relaxed">
+                  Sacrifice <span className="text-white font-bold">{c.name}</span> (Level {c.level}) back into the ether of the Abyss? The card will be permanently destroyed.
+                </p>
+
+                {/* Reward Yield Box */}
+                <div className="bg-black/60 rounded-xl p-3.5 border border-cyan-500/30 mb-4 text-center">
+                  <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block mb-1">
+                    Essence Reclaimed
+                  </span>
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="font-mono text-xl font-black text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.7)]">
+                      +{dustYield}
+                    </span>
+                    <span className="text-xs font-mono font-bold text-gray-300">VOID DUST</span>
+                  </div>
+                </div>
+
+                {isInDeck && (
+                  <div className="mb-4 bg-amber-950/40 border border-amber-600/40 rounded-xl p-2.5 flex items-center gap-2 text-left">
+                    <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span className="text-[10.5px] font-sans text-amber-200 leading-tight">
+                      This card is currently in your combat deck. Dismantling will remove it from the active battle roster.
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex gap-3">
+                  <button 
+                    onClick={() => setDismantleConfirmCard(null)} 
+                    disabled={isDismantling}
+                    className="flex-1 bg-[#0b0c10] hover:bg-gray-800 border border-gray-700/50 text-gray-400 font-mono text-xs py-3 rounded-xl transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    CANCEL
+                  </button>
+                  <button 
+                    onClick={confirmDismantle} 
+                    disabled={isDismantling}
+                    className="flex-1 bg-gradient-to-r from-cyan-950 via-[#0a2e38] to-cyan-900 hover:from-cyan-800 hover:via-[#104b5c] hover:to-cyan-800 border border-cyan-400/60 hover:border-cyan-300 text-cyan-200 hover:text-white font-display font-black tracking-widest text-xs py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(6,182,212,0.35)] cursor-pointer active:scale-98 disabled:opacity-50 flex items-center justify-center gap-1.5"
+                  >
+                    {isDismantling ? (
+                      <span>DISMANTLING...</span>
+                    ) : (
+                      <span>DISMANTLE</span>
+                    )}
                   </button>
                 </div>
               </div>

@@ -1542,6 +1542,53 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         referralSovereignsUnclaimed: profile.referralSovereignsUnclaimed,
         bloodSovereigns: profile.bloodSovereigns
       };
+    } else if (action === 'dismantle_card') {
+      const { cardId } = payload || {};
+      if (!cardId) {
+        return res.status(400).json({ error: 'Card ID is required.' });
+      }
+
+      profile.collection = profile.collection || [];
+      const cardIndex = profile.collection.findIndex((c: any) => c.id === cardId);
+      if (cardIndex === -1) {
+        return res.status(400).json({ error: 'Card not found in your collection.' });
+      }
+
+      const card = profile.collection[cardIndex];
+      if (card.tier === 'divine') {
+        return res.status(400).json({ error: 'Divine entities cannot be dismantled into dust!' });
+      }
+
+      const DUST_YIELDS: Record<string, number> = {
+        bronze: 100,
+        silver: 200,
+        gold: 500,
+        legendary: 1000
+      };
+
+      const dustYield = DUST_YIELDS[card.tier];
+      if (!dustYield) {
+        return res.status(400).json({ error: `Cannot dismantle card of tier ${card.tier}.` });
+      }
+
+      // Remove card from collection
+      profile.collection.splice(cardIndex, 1);
+
+      // Also remove from combat deck if present
+      profile.deck = (profile.deck || []).filter((id: string) => id !== cardId);
+      profile.deck = sanitizeDeck(profile.deck, profile.collection);
+
+      // Award dust
+      profile.dust = (profile.dust || 0) + dustYield;
+
+      successMessage = `Dismantled ${card.name} (${card.tier.toUpperCase()}) for +${dustYield} Void Dust!`;
+      responseData = {
+        dismantledCardId: cardId,
+        dustAwarded: dustYield,
+        newDust: profile.dust,
+        collectionCount: profile.collection.length,
+        deck: profile.deck
+      };
     } else {
       return res.status(400).json({ error: 'Unknown action' });
     }

@@ -32,6 +32,7 @@ interface GameContextType {
   connectSolanaWallet: (address: string) => Promise<void>;
   disconnectSolanaWallet: () => void;
   fuseCards: (cardId1: string, cardId2: string) => Promise<{ success: boolean; message: string; newCard?: Card }>;
+  dismantleCard: (cardId: string) => Promise<{ success: boolean; message: string; dustAwarded?: number }>;
   submitBattleResult: (battleType: 'campaign' | 'pvp', stageId: string, result: 'win' | 'loss', stars?: number) => Promise<{ success: boolean; message: string; rewards?: any }>;
   submitAction: (action: string, payload: any) => Promise<{ success: boolean; message: string; data?: any }>;
   addCardToCollection: (cardTemplate: CardTemplate, level?: number) => Card;
@@ -1846,7 +1847,66 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success, message: msg, profile: updatedProfile };
     }
 
+    if (action === 'dismantle_card') {
+      const { cardId } = payload || {};
+      let msg = '';
+      let success = false;
+      let dustAwarded = 0;
+
+      setProfile(current => {
+        const cardIndex = (current.collection || []).findIndex(c => c.id === cardId);
+        if (cardIndex === -1) {
+          msg = 'Card not found in collection.';
+          success = false;
+          return current;
+        }
+
+        const card = current.collection[cardIndex];
+        if (card.tier === 'divine') {
+          msg = 'Divine entities cannot be dismantled into dust!';
+          success = false;
+          return current;
+        }
+
+        const DUST_YIELDS: Record<string, number> = {
+          bronze: 100,
+          silver: 200,
+          gold: 500,
+          legendary: 1000
+        };
+
+        const yieldAmount = DUST_YIELDS[card.tier];
+        if (!yieldAmount) {
+          msg = `Cannot dismantle card of tier ${card.tier}.`;
+          success = false;
+          return current;
+        }
+
+        const newCollection = current.collection.filter(c => c.id !== cardId);
+        const newDeck = sanitizeDeck((current.deck || []).filter(id => id !== cardId), newCollection);
+
+        dustAwarded = yieldAmount;
+        const updated = {
+          ...current,
+          collection: newCollection,
+          deck: newDeck,
+          dust: (current.dust || 0) + yieldAmount
+        };
+
+        msg = `Dismantled ${card.name} (${card.tier.toUpperCase()}) for +${yieldAmount} Void Dust!`;
+        success = true;
+        saveProfile(updated);
+        return updated;
+      });
+
+      return { success, message: msg, dustAwarded };
+    }
+
     return { success: true, message: 'Action saved locally.' };
+  };
+
+  const dismantleCard = async (cardId: string): Promise<{ success: boolean; message: string; dustAwarded?: number }> => {
+    return await submitAction('dismantle_card', { cardId });
   };
 
   // Add / Remove card in the battle deck (max 10 cards in deck, duplicate limits enforced)
@@ -2045,6 +2105,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         connectSolanaWallet,
         disconnectSolanaWallet,
         fuseCards,
+        dismantleCard,
         submitBattleResult,
         submitAction,
         addCardToCollection,
