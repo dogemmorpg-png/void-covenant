@@ -1589,6 +1589,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         collectionCount: profile.collection.length,
         deck: profile.deck
       };
+    } else if (action === 'reset_talents') {
+      const resetCost = 15;
+      const currentShards = profile.darkShards || 0;
+      if (currentShards < resetCost) {
+        return res.status(400).json({ error: `Not enough Dark Shards! Need ${resetCost} Shards, you have ${currentShards}.` });
+      }
+
+      profile = recordShardTransaction(
+        profile,
+        'SHOP_PURCHASE',
+        -resetCost,
+        'Reset Commander Talents',
+        { resetCost }
+      );
+
+      profile.talents = {};
+
+      successMessage = 'Commander Talents reset successfully!';
+      responseData = {
+        talents: profile.talents,
+        darkShards: profile.darkShards
+      };
     } else {
       return res.status(400).json({ error: 'Unknown action' });
     }

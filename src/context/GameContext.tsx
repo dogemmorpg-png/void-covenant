@@ -33,6 +33,7 @@ interface GameContextType {
   disconnectSolanaWallet: () => void;
   fuseCards: (cardId1: string, cardId2: string) => Promise<{ success: boolean; message: string; newCard?: Card }>;
   dismantleCard: (cardId: string) => Promise<{ success: boolean; message: string; dustAwarded?: number }>;
+  resetTalents: () => Promise<{ success: boolean; message: string }>;
   submitBattleResult: (battleType: 'campaign' | 'pvp', stageId: string, result: 'win' | 'loss', stars?: number) => Promise<{ success: boolean; message: string; rewards?: any }>;
   submitAction: (action: string, payload: any) => Promise<{ success: boolean; message: string; data?: any }>;
   addCardToCollection: (cardTemplate: CardTemplate, level?: number) => Card;
@@ -1902,11 +1903,48 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success, message: msg, dustAwarded };
     }
 
+    if (action === 'reset_talents') {
+      const resetCost = 15;
+      let msg = '';
+      let success = false;
+
+      setProfile(current => {
+        const shards = current.darkShards || 0;
+        if (shards < resetCost) {
+          msg = `Not enough Dark Shards! Need ${resetCost} Shards.`;
+          success = false;
+          return current;
+        }
+
+        let updated = recordShardTransaction(
+          current,
+          'SHOP_PURCHASE',
+          -resetCost,
+          'Reset Commander Talents',
+          { resetCost }
+        );
+        updated = {
+          ...updated,
+          talents: {}
+        };
+        msg = 'Commander Talents reset successfully!';
+        success = true;
+        saveProfile(updated);
+        return updated;
+      });
+
+      return { success, message: msg };
+    }
+
     return { success: true, message: 'Action saved locally.' };
   };
 
   const dismantleCard = async (cardId: string): Promise<{ success: boolean; message: string; dustAwarded?: number }> => {
     return await submitAction('dismantle_card', { cardId });
+  };
+
+  const resetTalents = async (): Promise<{ success: boolean; message: string }> => {
+    return await submitAction('reset_talents', {});
   };
 
   // Add / Remove card in the battle deck (max 10 cards in deck, duplicate limits enforced)
@@ -2106,6 +2144,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         disconnectSolanaWallet,
         fuseCards,
         dismantleCard,
+        resetTalents,
         submitBattleResult,
         submitAction,
         addCardToCollection,

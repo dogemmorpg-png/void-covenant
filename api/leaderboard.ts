@@ -63,18 +63,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data: rows, error } = await supabase
       .from('profiles')
       .select('wallet_address, data')
+      .not('wallet_address', 'like', '__SYSTEM_%')
       .neq('wallet_address', 'system_pvp_state')
       .limit(500);
 
     if (error) {
       console.error('Failed to query profiles:', error);
-      return res.status(500).json({ error: 'Database query failed' });
+      return res.status(200).json({ success: true, leaderboard: [], myRank: null });
     }
 
     if (!league && (requestingWallet || requestingUsername)) {
       const myRow = (rows || []).find(r => 
-        (requestingWallet && r.wallet_address && r.wallet_address.toLowerCase() === requestingWallet.toLowerCase()) ||
-        (requestingUsername && r.data?.username && r.data.username.trim().toLowerCase() === requestingUsername.trim().toLowerCase())
+        (requestingWallet && r?.wallet_address && r.wallet_address.toLowerCase() === requestingWallet.toLowerCase()) ||
+        (requestingUsername && r?.data?.username && r.data.username.trim().toLowerCase() === requestingUsername.trim().toLowerCase())
       );
       if (myRow && myRow.data?.pvpLeague) {
         playerLeague = myRow.data.pvpLeague;
@@ -82,16 +83,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const sorted = (rows || [])
-      .filter(r => r.data && r.data.username && r.data.username.trim() !== '')
+      .filter(r => r?.data && r.data.username && typeof r.data.username === 'string' && r.data.username.trim() !== '')
       .filter(r => (r.data.pvpLeague || 'Bronze') === playerLeague)
       .map(r => {
         const isSubActive = r.data?.subscriptionExpiresAt && Number(r.data.subscriptionExpiresAt) > Date.now();
         const subTier = isSubActive ? (r.data.subscriptionTier || 'free') : 'free';
         return {
           username: r.data.username,
-          pvpRating: r.data.pvpRating || 100,
+          pvpRating: Number(r.data.pvpRating) || 100,
           pvpLeague: r.data.pvpLeague || 'Bronze',
-          pvpLP: r.data.pvpLP !== undefined ? r.data.pvpLP : 0,
+          pvpLP: r.data.pvpLP !== undefined ? Number(r.data.pvpLP) : 0,
           avatarUrl: r.data.avatarUrl || '/avatars/knight.webp',
           walletAddress: r.wallet_address,
           subscriptionTier: subTier

@@ -21,9 +21,10 @@ const getPos = (tier: number, col: number) => {
 };
 
 export const TalentsView: React.FC = () => {
-  const { profile, updateProfile, spendShards } = useGame();
+  const { profile, updateProfile, resetTalents, setIsShardsShopOpen } = useGame();
   const toast = useToast();
   const [activeTab, setActiveTab] = useState<TalentStance>(profile?.activeStance || 'void_strike');
+  const [isResetting, setIsResetting] = useState(false);
 
   if (!profile) return null;
 
@@ -71,22 +72,31 @@ export const TalentsView: React.FC = () => {
     toast('Combat Stance updated!', 'success');
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
+    if (isResetting) return;
     if (spentPoints === 0) {
       toast('You have not spent any points yet.', 'info');
       return;
     }
     if ((profile.darkShards || 0) < 15) {
       toast('Not enough Dark Shards to reset talents. Costs 15 Shards.', 'warning');
+      if (setIsShardsShopOpen) setIsShardsShopOpen(true);
       return;
     }
-    const spentSuccess = spendShards(15, 'Reset Commander Talents');
-    if (!spentSuccess) {
-      toast('Not enough Dark Shards to reset talents. Costs 15 Shards.', 'warning');
-      return;
+
+    setIsResetting(true);
+    try {
+      const res = await resetTalents();
+      if (res.success) {
+        toast('Talents reset successfully.', 'success');
+      } else {
+        toast(res.message || 'Failed to reset talents.', 'error');
+      }
+    } catch (err: any) {
+      toast(err.message || 'Error resetting talents.', 'error');
+    } finally {
+      setIsResetting(false);
     }
-    updateProfile({ talents: {} });
-    toast('Talents reset successfully.', 'success');
   };
 
   const activeNodes = TALENT_TREES.filter(t => t.stance === activeTab);
@@ -130,13 +140,14 @@ export const TalentsView: React.FC = () => {
           </div>
           <button 
             onClick={handleReset}
-            className="h-full px-5 py-4 bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/40 hover:border-cyan-400/80 rounded-2xl text-cyan-300 text-sm font-bold transition-all flex flex-col items-center justify-center gap-1.5 group/btn backdrop-blur-md cursor-pointer active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.15)]"
+            disabled={isResetting}
+            className="h-full px-5 py-4 bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/40 hover:border-cyan-400/80 rounded-2xl text-cyan-300 text-sm font-bold transition-all flex flex-col items-center justify-center gap-1.5 group/btn backdrop-blur-md cursor-pointer active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.15)] disabled:opacity-50 disabled:cursor-not-allowed"
             title="Reset all talents for 15 Dark Shards"
           >
-            <LucideIcons.RefreshCw className="w-5 h-5 group-hover/btn:-rotate-180 transition-transform duration-500 text-cyan-400" />
+            <LucideIcons.RefreshCw className={`w-5 h-5 text-cyan-400 transition-transform duration-500 ${isResetting ? 'animate-spin' : 'group-hover/btn:-rotate-180'}`} />
             <span className="text-[10px] font-mono flex items-center gap-1 font-bold text-cyan-200">
               <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.7)]" />
-              <span>15 Shards</span>
+              <span>{isResetting ? 'Resetting...' : '15 Shards'}</span>
             </span>
           </button>
         </div>
