@@ -58,8 +58,8 @@ function generateRandomCards(packType: string, numCards: number) {
     }
 
     let rollLevel = 1;
-    if (packType === 'obsidian' && Math.random() < 0.3) rollLevel = 2;
-    if (packType === 'abyssal' && Math.random() < 0.4) rollLevel = 2;
+    if (packType === 'obsidian' && Math.random() < 0.25) rollLevel = 2;
+    if (packType === 'abyssal' && Math.random() < 0.3) rollLevel = 2;
 
     const newCardInstance = createCardInstance(cardTemplate, rollLevel);
     selectedTemplates.push(newCardInstance);

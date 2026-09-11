@@ -608,6 +608,10 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
 
                     {/* Clean Drop Rates Box */}
                     <div className="bg-black/65 border border-white/10 rounded-xl p-2.5 text-[11px] font-mono space-y-1.5 shadow-inner">
+                      <div className="flex justify-between items-center text-[10px] text-gray-400 uppercase tracking-wider font-bold border-b border-white/10 pb-1">
+                        <span>Rarity Rates</span>
+                        <span className="text-gray-500">100%</span>
+                      </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-300 flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
@@ -622,12 +626,14 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                         </span>
                         <span className="text-slate-200 font-bold text-xs bg-slate-900/60 px-1.5 py-0.5 rounded border border-slate-500/40">5%</span>
                       </div>
-                      <div className="flex justify-between items-center border-t border-white/10 pt-1.5 text-gray-400 text-[10.5px]">
-                        <span className="flex items-center gap-1 text-amber-300/80">
-                          <Sparkles className="w-3 h-3 text-amber-400" /> Guaranteed:
-                        </span>
-                        <span className="text-white font-bold bg-white/5 px-1.5 py-0.5 rounded border border-white/10">Level 1 Card</span>
-                      </div>
+                    </div>
+
+                    {/* Standard Tier Banner */}
+                    <div className="bg-black/40 border border-white/10 rounded-xl px-2.5 py-1.5 flex items-center justify-between text-[10.5px] font-mono shadow-sm">
+                      <span className="text-gray-400">Guaranteed Level:</span>
+                      <span className="text-stone-300 font-bold bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                        Level 1
+                      </span>
                     </div>
                   </div>
 
@@ -681,8 +687,19 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       <p className="text-[9.5px] text-gray-400 font-sans mt-0.5 leading-tight">Infused with dark void mana for higher tier warriors</p>
                     </div>
 
-                    {/* Clean Drop Rates Box */}
+                    {/* Clean Drop Rates Box (100% Total) */}
                     <div className="bg-black/65 border border-white/10 rounded-xl p-2.5 text-[11px] font-mono space-y-1.5 shadow-inner">
+                      <div className="flex justify-between items-center text-[10px] text-gray-400 uppercase tracking-wider font-bold border-b border-white/10 pb-1">
+                        <span>Rarity Rates</span>
+                        <span className="text-gray-500">100%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-300 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
+                          Bronze Cards:
+                        </span>
+                        <span className="text-amber-400 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-600/40">40%</span>
+                      </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-300 flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
@@ -697,12 +714,19 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                         </span>
                         <span className="text-amber-400 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/40">10%</span>
                       </div>
-                      <div className="flex justify-between items-center border-t border-white/10 pt-1.5 text-gray-400 text-[10.5px]">
-                        <span className="flex items-center gap-1 text-cyan-300/80">
-                          <Sparkles className="w-3 h-3 text-cyan-400" /> Level 2 Chance:
+                    </div>
+
+                    {/* Separate Level 2 Upgrade Chance Banner */}
+                    <div className="bg-cyan-950/30 border border-cyan-500/30 rounded-xl px-2.5 py-1.5 flex items-center justify-between text-[10.5px] font-mono shadow-sm">
+                      <div className="flex items-center gap-1.5 text-cyan-200">
+                        <span className="text-[8.5px] uppercase font-bold tracking-wider bg-cyan-900/60 border border-cyan-400/40 px-1.5 py-0.5 rounded text-cyan-300">
+                          BONUS ROLL
                         </span>
-                        <span className="text-cyan-300 font-bold bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-500/40">30%</span>
+                        <span>Level 2 Chance:</span>
                       </div>
+                      <span className="text-cyan-300 font-bold text-xs bg-cyan-950/90 px-2 py-0.5 rounded border border-cyan-400/50 shadow">
+                        25%
+                      </span>
                     </div>
                   </div>
 
@@ -756,8 +780,19 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       <p className="text-[9.5px] text-gray-400 font-sans mt-0.5 leading-tight">High rate for Gold & Legendary primordial entities</p>
                     </div>
 
-                    {/* Clean Drop Rates Box */}
+                    {/* Clean Drop Rates Box (100% Total) */}
                     <div className="bg-black/65 border border-white/10 rounded-xl p-2.5 text-[11px] font-mono space-y-1.5 shadow-inner">
+                      <div className="flex justify-between items-center text-[10px] text-gray-400 uppercase tracking-wider font-bold border-b border-white/10 pb-1">
+                        <span>Rarity Rates</span>
+                        <span className="text-gray-500">100%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-300 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                          Silver Cards:
+                        </span>
+                        <span className="text-slate-200 font-bold text-xs bg-slate-900/60 px-1.5 py-0.5 rounded border border-slate-500/40">40%</span>
+                      </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-300 flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
@@ -772,12 +807,19 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                         </span>
                         <span className="text-purple-300 font-bold text-xs bg-purple-950/60 px-1.5 py-0.5 rounded border border-purple-500/40">15%</span>
                       </div>
-                      <div className="flex justify-between items-center border-t border-white/10 pt-1.5 text-gray-400 text-[10.5px]">
-                        <span className="flex items-center gap-1 text-rose-300/80">
-                          <Sparkles className="w-3 h-3 text-rose-400" /> Level 2 Chance:
+                    </div>
+
+                    {/* Separate Level 2 Upgrade Chance Banner */}
+                    <div className="bg-rose-950/30 border border-rose-500/30 rounded-xl px-2.5 py-1.5 flex items-center justify-between text-[10.5px] font-mono shadow-sm">
+                      <div className="flex items-center gap-1.5 text-rose-200">
+                        <span className="text-[8.5px] uppercase font-bold tracking-wider bg-rose-900/60 border border-rose-400/40 px-1.5 py-0.5 rounded text-rose-300">
+                          BONUS ROLL
                         </span>
-                        <span className="text-rose-300 font-bold bg-rose-950/80 px-1.5 py-0.5 rounded border border-rose-500/40">40%</span>
+                        <span>Level 2 Chance:</span>
                       </div>
+                      <span className="text-rose-300 font-bold text-xs bg-rose-950/90 px-2 py-0.5 rounded border border-rose-400/50 shadow">
+                        30%
+                      </span>
                     </div>
                   </div>
 
