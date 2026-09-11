@@ -289,11 +289,16 @@ export async function checkAndPerformPvpRollover(
     lastRolloverCheckTime = Date.now();
 
     // 1. Fetch system state
-    const { data: stateRows } = await supabase
+    const { data: stateRows, error: stateError } = await supabase
       .from('profiles')
       .select('data')
       .eq('wallet_address', 'system_pvp_state')
       .limit(1);
+
+    if (stateError) {
+      console.error('[PVP ROLLOVER] Database error fetching system_pvp_state, aborting to prevent duplicate runs:', stateError);
+      return { rolledOver: false, reason: 'db_state_fetch_error' };
+    }
 
     const systemState = (stateRows && stateRows.length > 0) ? stateRows[0].data : null;
     const lastRolloverDate = systemState?.lastRolloverDate;
@@ -302,6 +307,9 @@ export async function checkAndPerformPvpRollover(
       cachedRolloverDate = todayUtc;
       return { rolledOver: false, reason: 'already_completed_today', roundDate: lastRolloverDate };
     }
+
+    // Set lock immediately to block concurrent calls within the same process
+    cachedRolloverDate = todayUtc;
 
     // 2. Fetch custom rewards configuration if set by admin
     const { data: configRows } = await supabase
@@ -470,7 +478,17 @@ export async function checkAndPerformPvpRollover(
           createdAt: Date.now()
         };
 
-        p.profile.mailMessages = [mailMessage, ...(p.profile.mailMessages || [])].slice(0, 50);
+        // Idempotency: prevent duplicate mail/rewards if player already received rollover decree for todayUtc
+        const alreadyReceivedToday = (p.profile.mailMessages || []).some((m: any) =>
+          m.id && m.id.startsWith(`mail_pvp_${todayUtc}_`)
+        ) || p.profile.lastPvpRolloverDate === todayUtc;
+
+        if (!alreadyReceivedToday) {
+          p.profile.mailMessages = [mailMessage, ...(p.profile.mailMessages || [])].slice(0, 50);
+          p.profile.lastPvpRolloverDate = todayUtc;
+        } else {
+          console.log(`[PVP ROLLOVER] Player ${p.walletAddress} already received rollover decree for ${todayUtc}, skipping duplicate mail.`);
+        }
       }
     }
 
