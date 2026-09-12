@@ -898,6 +898,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
             addFloatingText(`🩸 +${step.heal}`, { side: targetSide, slot: step.targetSlot }, 'text-emerald-400 font-bold');
             addFloatingText('BLOOD AURA 🩸', casterHeroLabel, 'text-rose-400 font-bold text-xs');
+            if (step.frenzyAtk > 0) {
+              addFloatingText(`+${step.frenzyAtk}⚔️ FRENZY`, { side: targetSide, slot: step.targetSlot }, 'text-rose-400 font-black text-xs');
+            }
 
             setVisualState(prev => {
               const copy = cloneBattleState(prev);
@@ -911,6 +914,9 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 }
                 if (step.bonusMaxHp > 0) {
                   target.maxHealth += step.bonusMaxHp;
+                }
+                if (step.frenzyAtk > 0) {
+                  target.attack += step.frenzyAtk;
                 }
               }
               return copy;

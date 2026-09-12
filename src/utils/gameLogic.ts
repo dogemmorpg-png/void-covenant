@@ -117,15 +117,13 @@ export function simulateCombatTurn(
              targets.push(remaining[Math.floor(Math.random() * remaining.length)]);
           }
           if (s.singularity) {
-             // Ultimate: hits target and adjacent enemies for 50% damage
-             // Wait, for simplicity, let's just hit all active enemies for 50% if singularity is on? Or actually just adjacent.
-             // adjacent to target[0]
+             // Ultimate: strikes 1 adjacent enemy for 50% damage
              const mainTarget = targets[0];
-             [mainTarget - 1, mainTarget + 1].forEach(adj => {
-               if (activeEnemies.includes(adj) && !targets.includes(adj)) {
-                 targets.push(adj);
-               }
-             });
+             const possibleAdj = [mainTarget - 1, mainTarget + 1].filter(adj => activeEnemies.includes(adj) && !targets.includes(adj));
+             if (possibleAdj.length > 0) {
+               const chosenAdj = possibleAdj[Math.floor(Math.random() * possibleAdj.length)];
+               targets.push(chosenAdj);
+             }
           }
           
           let totalLeech = 0;
@@ -203,47 +201,58 @@ export function simulateCombatTurn(
         
         if (activeAllies.length > 0) {
           const s = stats as any;
-          const triggers = s.doubleTrigger ? 2 : 1;
-          for (let t = 0; t < triggers; t++) {
-            // find lowest health ally
-            const currentActiveAllies = [];
-            for (let i = 0; i < 5; i++) if (state.playerBoard[i] && !state.playerBoard[i].isDead) currentActiveAllies.push(i);
-            if (currentActiveAllies.length === 0) break;
+          // Find lowest health ally
+          const currentActiveAllies = [...activeAllies];
+          currentActiveAllies.sort((a, b) => (state.playerBoard[a]!.health / state.playerBoard[a]!.maxHealth) - (state.playerBoard[b]!.health / state.playerBoard[b]!.maxHealth));
+          const targetSlot = currentActiveAllies[0];
+          const targetCard = state.playerBoard[targetSlot]!;
+          const heal = s.baseHealing;
+          let cleansed = false;
 
-            currentActiveAllies.sort((a, b) => (state.playerBoard[a]!.health / state.playerBoard[a]!.maxHealth) - (state.playerBoard[b]!.health / state.playerBoard[b]!.maxHealth));
-            const targetSlot = currentActiveAllies[0];
-            const targetCard = state.playerBoard[targetSlot]!;
-            const heal = s.baseHealing;
-              let cleansed = false;
-              if (targetCard.health >= targetCard.maxHealth && s.overflowPercent > 0) {
-              const lordHeal = Math.max(1, Math.floor(heal * (s.overflowPercent / 100)));
-              state.playerHeroHealth = Math.min(state.playerHeroMaxHealth, state.playerHeroHealth + lordHeal);
-                animateSequence.push({ type: 'hero_heal', heal: lordHeal });
-              logs.push(`🩸 Blood Aura healed Hero for ${lordHeal} HP (Overflow).`);
-            } else {
-              targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + heal);
-              logs.push(`🩸 Blood Aura healed ${targetCard.name} for ${heal} HP.`);
-              
-              if (s.cleanseChance > 0 && Math.random() * 100 < s.cleanseChance) {
-                if (targetCard.hexedAmount > 0) {
-                   targetCard.hexedAmount = 0;
-                     cleansed = true;
-                   logs.push(`🩸 Blood Aura cleansed Hex from ${targetCard.name}!`);
-                }
+          if (targetCard.health >= targetCard.maxHealth && s.overflowPercent > 0) {
+            const lordHeal = Math.max(1, Math.floor(heal * (s.overflowPercent / 100)));
+            state.playerHeroHealth = Math.min(state.playerHeroMaxHealth, state.playerHeroHealth + lordHeal);
+            animateSequence.push({ type: 'hero_heal', heal: lordHeal });
+            logs.push(`🩸 Blood Aura healed Hero for ${lordHeal} HP (Overflow).`);
+          } else {
+            targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + heal);
+            logs.push(`🩸 Blood Aura healed ${targetCard.name} for ${heal} HP.`);
+            
+            if (s.cleanseChance > 0 && Math.random() * 100 < s.cleanseChance) {
+              if (targetCard.hexedAmount > 0) {
+                targetCard.hexedAmount = 0;
+                cleansed = true;
+                logs.push(`🩸 Blood Aura cleansed Hex from ${targetCard.name}!`);
               }
             }
-            if (s.ward && !targetCard.barrier && !targetCard.ward) {
-              targetCard.barrier = true;
-              targetCard.ward = true;
-              logs.push(`🩸 Blood Aura granted Barrier to ${targetCard.name}!`);
-            }
-            if (s.bonusMaxHp > 0) {
-              targetCard.maxHealth += s.bonusMaxHp;
-              targetCard.health += s.bonusMaxHp; // also heal the amount it expanded
-              logs.push(`🩸 Blood Aura expanded ${targetCard.name}'s max HP by ${s.bonusMaxHp}!`);
-            }
-            animateSequence.push({ type: 'hero_skill', stance: 'blood_aura', targetSlot: targetSlot, heal: heal, barrier: s.ward, ward: s.ward, bonusMaxHp: s.bonusMaxHp, cleanse: cleansed });
           }
+          if (s.ward && !targetCard.barrier && !targetCard.ward) {
+            targetCard.barrier = true;
+            targetCard.ward = true;
+            logs.push(`🩸 Blood Aura granted Barrier to ${targetCard.name}!`);
+          }
+          if (s.bonusMaxHp > 0) {
+            targetCard.maxHealth += s.bonusMaxHp;
+            targetCard.health += s.bonusMaxHp; // also heal the amount it expanded
+            logs.push(`🩸 Blood Aura expanded ${targetCard.name}'s max HP by ${s.bonusMaxHp}!`);
+          }
+          if (s.frenzyAtk > 0) {
+            targetCard.attack += s.frenzyAtk;
+            targetCard.buffs = targetCard.buffs || [];
+            targetCard.buffs.push({ type: 'attack', amount: s.frenzyAtk, turnsRemaining: s.frenzyDuration });
+            logs.push(`🩸 Crimson Pact infuses ${targetCard.name} with +${s.frenzyAtk} ATK for ${s.frenzyDuration} turns!`);
+          }
+          animateSequence.push({ 
+            type: 'hero_skill', 
+            stance: 'blood_aura', 
+            targetSlot: targetSlot, 
+            heal: heal, 
+            barrier: s.ward, 
+            ward: s.ward, 
+            bonusMaxHp: s.bonusMaxHp, 
+            frenzyAtk: s.frenzyAtk || 0,
+            cleanse: cleansed 
+          });
         }
       }
       else if (stance === 'warlord_cry') {
@@ -259,23 +268,19 @@ export function simulateCombatTurn(
           
           if (s.bonusAtk > 0) {
             targetCard.attack += s.bonusAtk;
-            if (!s.permanent) {
-              targetCard.buffs.push({ type: 'attack', amount: s.bonusAtk, turnsRemaining: s.durationTurns });
-            }
+            targetCard.buffs.push({ type: 'attack', amount: s.bonusAtk, turnsRemaining: s.durationTurns });
             logs.push(`🔥 Warlord's Cry boosts ${targetCard.name}'s ATK by ${s.bonusAtk}!`);
           }
           if (s.bonusArmor > 0) {
             targetCard.armor = (targetCard.armor || 0) + s.bonusArmor;
-            if (!s.permanent) {
-              targetCard.buffs.push({ type: 'armor', amount: s.bonusArmor, turnsRemaining: s.durationTurns });
-            }
+            targetCard.buffs.push({ type: 'armor', amount: s.bonusArmor, turnsRemaining: s.durationTurns });
             logs.push(`🔥 Warlord's Cry grants ${targetCard.name} ${s.bonusArmor} Armor!`);
           }
           let delayReduced = false;
-            if (s.momentumChance > 0 && Math.random() * 100 < s.momentumChance) {
-             targetCard.delay = Math.max(0, targetCard.delay - 1);
-               delayReduced = true;
-             logs.push(`🔥 Warlord's Cry reduced ${targetCard.name}'s Delay by 1!`);
+          if (s.momentumChance > 0 && Math.random() * 100 < s.momentumChance) {
+            targetCard.delay = Math.max(0, targetCard.delay - 1);
+            delayReduced = true;
+            logs.push(`🔥 Warlord's Cry reduced ${targetCard.name}'s Delay by 1!`);
           }
           if (s.aoeHeal > 0) {
             targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + s.aoeHeal);
@@ -283,12 +288,12 @@ export function simulateCombatTurn(
           }
           animateSequence.push({ type: 'hero_skill', stance: 'warlord_cry', targetSlot: targetSlot, bonusAtk: s.bonusAtk, bonusArmor: s.bonusArmor, aoeHeal: s.aoeHeal, delayReduced });
         } else {
-          // Rally cards in hand if board is empty
-          if (state.playerHand.length > 0) {
-            state.playerHand.forEach(c => {
-              if (c.delay > 0) c.delay = Math.max(0, c.delay - 1);
-            });
-            logs.push(`🔥 Commander roars with Warlord's Cry! Rallied forces in hand (-1 Delay)!`);
+          // Rally 1 random card in hand if board is empty
+          const delayedCards = state.playerHand.filter(c => c.delay > 0);
+          if (delayedCards.length > 0) {
+            const randomCard = delayedCards[Math.floor(Math.random() * delayedCards.length)];
+            randomCard.delay = Math.max(0, randomCard.delay - 1);
+            logs.push(`🔥 Commander roars with Warlord's Cry! Rallied ${randomCard.name} in hand (-1 Delay)!`);
           } else {
             logs.push(`🔥 Commander roars with Warlord's Cry!`);
           }
@@ -333,11 +338,11 @@ export function simulateCombatTurn(
             }
             if (s.singularity) {
               const mainTarget = targets[0];
-              [mainTarget - 1, mainTarget + 1].forEach(adj => {
-                if (activePlayers.includes(adj) && !targets.includes(adj)) {
-                  targets.push(adj);
-                }
-              });
+              const possibleAdj = [mainTarget - 1, mainTarget + 1].filter(adj => activePlayers.includes(adj) && !targets.includes(adj));
+              if (possibleAdj.length > 0) {
+                const chosenAdj = possibleAdj[Math.floor(Math.random() * possibleAdj.length)];
+                targets.push(chosenAdj);
+              }
             }
 
             let totalLeech = 0;
@@ -463,18 +468,13 @@ export function simulateCombatTurn(
 
         if (isPvp && stats) {
           const s = stats as any;
-          const triggers = s.doubleTrigger ? 2 : 1;
-          for (let t = 0; t < triggers; t++) {
-            const currentActive = [];
-            for (let i = 0; i < 5; i++) if (state.enemyBoard[i] && !state.enemyBoard[i].isDead) currentActive.push(i);
-            if (currentActive.length === 0) {
-              const heal = s.baseHealing;
-              state.enemyHeroHealth = Math.min(state.enemyHeroMaxHealth, state.enemyHeroHealth + heal);
-              logs.push(`🩸 Enemy Blood Aura healed Enemy Lord for +${heal} HP.`);
-              animateSequence.push({ type: 'hero_skill', stance: 'blood_aura', targetSlot: -1, heal, side: 'enemy' });
-              break;
-            }
-
+          if (activeEnemies.length === 0) {
+            const heal = s.baseHealing;
+            state.enemyHeroHealth = Math.min(state.enemyHeroMaxHealth, state.enemyHeroHealth + heal);
+            logs.push(`🩸 Enemy Blood Aura healed Enemy Lord for +${heal} HP.`);
+            animateSequence.push({ type: 'hero_skill', stance: 'blood_aura', targetSlot: -1, heal, side: 'enemy' });
+          } else {
+            const currentActive = [...activeEnemies];
             currentActive.sort((a, b) => (state.enemyBoard[a]!.health / state.enemyBoard[a]!.maxHealth) - (state.enemyBoard[b]!.health / state.enemyBoard[b]!.maxHealth));
             const targetSlot = currentActive[0];
             const targetCard = state.enemyBoard[targetSlot]!;
@@ -508,6 +508,12 @@ export function simulateCombatTurn(
               targetCard.health += s.bonusMaxHp;
               logs.push(`🩸 Enemy Blood Aura expanded ${targetCard.name}'s max HP by +${s.bonusMaxHp}!`);
             }
+            if (s.frenzyAtk > 0) {
+              targetCard.attack += s.frenzyAtk;
+              targetCard.buffs = targetCard.buffs || [];
+              targetCard.buffs.push({ type: 'attack', amount: s.frenzyAtk, turnsRemaining: s.frenzyDuration });
+              logs.push(`🩸 Enemy Crimson Pact infuses ${targetCard.name} with +${s.frenzyAtk} ATK for ${s.frenzyDuration} turns!`);
+            }
             animateSequence.push({
               type: 'hero_skill',
               stance: 'blood_aura',
@@ -516,6 +522,7 @@ export function simulateCombatTurn(
               barrier: s.ward,
               ward: s.ward,
               bonusMaxHp: s.bonusMaxHp,
+              frenzyAtk: s.frenzyAtk || 0,
               cleanse: cleansed,
               side: 'enemy'
             });
@@ -551,16 +558,12 @@ export function simulateCombatTurn(
             targetCard.buffs = targetCard.buffs || [];
             if (s.bonusAtk > 0) {
               targetCard.attack += s.bonusAtk;
-              if (!s.permanent) {
-                targetCard.buffs.push({ type: 'attack', amount: s.bonusAtk, turnsRemaining: s.durationTurns });
-              }
+              targetCard.buffs.push({ type: 'attack', amount: s.bonusAtk, turnsRemaining: s.durationTurns });
               logs.push(`🔥 Enemy Warlord's Cry boosts ${targetCard.name}'s ATK by +${s.bonusAtk}!`);
             }
             if (s.bonusArmor > 0) {
               targetCard.armor = (targetCard.armor || 0) + s.bonusArmor;
-              if (!s.permanent) {
-                targetCard.buffs.push({ type: 'armor', amount: s.bonusArmor, turnsRemaining: s.durationTurns });
-              }
+              targetCard.buffs.push({ type: 'armor', amount: s.bonusArmor, turnsRemaining: s.durationTurns });
               logs.push(`🔥 Enemy Warlord's Cry grants ${targetCard.name} +${s.bonusArmor} Armor!`);
             }
             let delayReduced = false;
@@ -604,12 +607,12 @@ export function simulateCombatTurn(
             }
           }
         } else {
-          // Fallback if no creatures on board: Roar and reduce delay of cards in enemy hand
-          if (state.enemyHand.length > 0) {
-            state.enemyHand.forEach(c => {
-              if (c.delay > 0) c.delay = Math.max(0, c.delay - 1);
-            });
-            logs.push(`🔥 Boss roars with Warlord's Cry! Rallied forces in hand (-1 Delay)!`);
+          // Fallback if no creatures on board: Roar and reduce delay of 1 random card in enemy hand
+          const delayedEnemyCards = state.enemyHand.filter(c => c.delay > 0);
+          if (delayedEnemyCards.length > 0) {
+            const randomCard = delayedEnemyCards[Math.floor(Math.random() * delayedEnemyCards.length)];
+            randomCard.delay = Math.max(0, randomCard.delay - 1);
+            logs.push(`🔥 Boss roars with Warlord's Cry! Rallied ${randomCard.name} in hand (-1 Delay)!`);
           } else {
             logs.push(`🔥 Boss roars with Warlord's Cry!`);
           }

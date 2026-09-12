@@ -21,13 +21,13 @@ export const TALENT_TREES: TalentNode[] = [
   {
     id: 'void_base', stance: 'void_strike', tier: 1, col: 0,
     name: 'Void Attunement', icon: 'Zap',
-    description: (lvl) => `+${lvl * 1.5}% chance to trigger Void Strike (Base: 25%).`,
+    description: (lvl) => `+${lvl}% chance to trigger Void Strike (Base: 15%).`,
     maxLevel: 20, cost: 1
   },
   {
     id: 'void_dmg', stance: 'void_strike', tier: 2, col: -1,
     name: 'Dark Matter', icon: 'Swords',
-    description: (lvl) => `Void Strike base damage increased by +${lvl}.`,
+    description: (lvl) => `Void Strike base damage increased by +${(lvl * 0.7).toFixed(1)} (Total: +${Math.round(lvl * 0.7)}).`,
     maxLevel: 10, cost: 1, requires: ['void_base']
   },
   {
@@ -45,7 +45,7 @@ export const TALENT_TREES: TalentNode[] = [
   {
     id: 'void_execute', stance: 'void_strike', tier: 4, col: -1,
     name: 'Execute', icon: 'Skull',
-    description: (lvl) => `Deals +${lvl * 2} bonus damage if the target is below 50% HP.`,
+    description: (lvl) => `Deals +${lvl} bonus damage if the target is below 50% HP.`,
     maxLevel: 3, cost: 5, requires: ['void_pierce']
   },
   {
@@ -57,7 +57,7 @@ export const TALENT_TREES: TalentNode[] = [
   {
     id: 'void_ultimate', stance: 'void_strike', tier: 5, col: 0,
     name: 'Singularity', icon: 'Eclipse',
-    description: () => `Void Strike affects ALL enemies on the board.`,
+    description: () => `Void Strike also strikes 1 adjacent enemy for 50% damage.`,
     maxLevel: 1, cost: 10, requires: ['void_base', 'void_dmg', 'void_chain', 'void_pierce', 'void_execute', 'void_leech'], requireMax: true
   },
 
@@ -67,13 +67,13 @@ export const TALENT_TREES: TalentNode[] = [
   {
     id: 'blood_base', stance: 'blood_aura', tier: 1, col: 0,
     name: 'Blood Attunement', icon: 'Activity',
-    description: (lvl) => `+${lvl * 1.5}% chance to trigger Blood Aura (Base: 25%).`,
+    description: (lvl) => `+${lvl}% chance to trigger Blood Aura (Base: 15%).`,
     maxLevel: 20, cost: 1
   },
   {
     id: 'blood_heal', stance: 'blood_aura', tier: 2, col: -1,
     name: 'Vitality', icon: 'Heart',
-    description: (lvl) => `Base healing amount increased by +${lvl}.`,
+    description: (lvl) => `Base healing amount increased by +${(lvl * 0.7).toFixed(1)} (Total: +${Math.round(lvl * 0.7)}).`,
     maxLevel: 10, cost: 1, requires: ['blood_base']
   },
   {
@@ -103,7 +103,7 @@ export const TALENT_TREES: TalentNode[] = [
   {
     id: 'blood_ultimate', stance: 'blood_aura', tier: 5, col: 0,
     name: 'Crimson Pact', icon: 'Infinity',
-    description: () => `Blood Aura triggers twice, healing two targets simultaneously.`,
+    description: () => `The healed target also gains +3 Attack for 2 turns.`,
     maxLevel: 1, cost: 10, requires: ['blood_base', 'blood_heal', 'blood_cleanse', 'blood_ward', 'blood_overflow', 'blood_shield'], requireMax: true
   },
 
@@ -113,19 +113,19 @@ export const TALENT_TREES: TalentNode[] = [
   {
     id: 'war_base', stance: 'warlord_cry', tier: 1, col: 0,
     name: 'Warlord Attunement', icon: 'Flame',
-    description: (lvl) => `+${lvl * 1.5}% chance to trigger Warlord's Cry (Base: 25%).`,
+    description: (lvl) => `+${lvl}% chance to trigger Warlord's Cry (Base: 15%).`,
     maxLevel: 20, cost: 1
   },
   {
     id: 'war_atk', stance: 'warlord_cry', tier: 2, col: -1,
     name: 'Battle Fervor', icon: 'Axe',
-    description: (lvl) => `The Attack buff is increased by +${lvl}.`,
+    description: (lvl) => `The Attack buff is increased by +${(lvl * 0.6).toFixed(1)} (Total: +${Math.round(lvl * 0.6)}).`,
     maxLevel: 10, cost: 1, requires: ['war_base']
   },
   {
     id: 'war_armor', stance: 'warlord_cry', tier: 2, col: 1,
     name: 'Phalanx', icon: 'Shield',
-    description: (lvl) => `Also grants the target +${lvl} Armor.`,
+    description: (lvl) => `Also grants the target +${(lvl * 0.5).toFixed(1)} Armor (Total: +${Math.round(lvl * 0.5)}).`,
     maxLevel: 10, cost: 1, requires: ['war_base']
   },
   {
@@ -149,7 +149,7 @@ export const TALENT_TREES: TalentNode[] = [
   {
     id: 'war_ultimate', stance: 'warlord_cry', tier: 5, col: 0,
     name: 'Unstoppable Force', icon: 'Mountain',
-    description: () => `The Attack and Armor buffs become permanent for the rest of the battle.`,
+    description: () => `The Attack and Armor buffs last for 3 turns.`,
     maxLevel: 1, cost: 10, requires: ['war_base', 'war_atk', 'war_armor', 'war_duration', 'war_momentum', 'war_heal'], requireMax: true
   }
 ];
@@ -159,35 +159,38 @@ export function getTalentStats(talents: Record<string, number> = {}, stance: Tal
   
   if (stance === 'void_strike') {
     return {
-      triggerChance: 25 + (getLvl('void_base') * 1.5),
-      baseDamage: 1 + getLvl('void_dmg'),
+      triggerChance: 15 + getLvl('void_base'),
+      baseDamage: 1 + Math.round(getLvl('void_dmg') * 0.7),
       chainChance: getLvl('void_chain') * 3,
       pierce: getLvl('void_pierce') > 0,
-      executeDamage: getLvl('void_execute') * 2,
+      executeDamage: getLvl('void_execute'),
       leechPercent: getLvl('void_leech') * 15,
       singularity: getLvl('void_ultimate') > 0,
     };
   }
   if (stance === 'blood_aura') {
     return {
-      triggerChance: 25 + (getLvl('blood_base') * 1.5),
-      baseHealing: 1 + getLvl('blood_heal'),
+      triggerChance: 15 + getLvl('blood_base'),
+      baseHealing: 1 + Math.round(getLvl('blood_heal') * 0.7),
       cleanseChance: getLvl('blood_cleanse') * 3,
       ward: getLvl('blood_ward') > 0,
       overflowPercent: getLvl('blood_overflow') * 33,
       bonusMaxHp: getLvl('blood_shield'),
-      doubleTrigger: getLvl('blood_ultimate') > 0,
+      frenzyAtk: getLvl('blood_ultimate') > 0 ? 3 : 0,
+      frenzyDuration: 2,
     };
   }
   if (stance === 'warlord_cry') {
+    const isUlt = getLvl('war_ultimate') > 0;
+    const isDuration = getLvl('war_duration') > 0;
     return {
-      triggerChance: 25 + (getLvl('war_base') * 1.5),
-      bonusAtk: 1 + getLvl('war_atk'),
-      bonusArmor: getLvl('war_armor'),
-      durationTurns: getLvl('war_duration') > 0 ? 2 : 1,
+      triggerChance: 15 + getLvl('war_base'),
+      bonusAtk: 1 + Math.round(getLvl('war_atk') * 0.6),
+      bonusArmor: Math.round(getLvl('war_armor') * 0.5),
+      durationTurns: isUlt ? 3 : (isDuration ? 2 : 1),
       momentumChance: getLvl('war_momentum') * 33,
       aoeHeal: getLvl('war_heal'),
-      permanent: getLvl('war_ultimate') > 0,
+      permanent: false,
     };
   }
   return null;
