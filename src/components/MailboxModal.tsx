@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { MailMessage } from '../types';
-import { Mail, MailOpen, Gift, Check, Trash2, X, Sparkles, AlertCircle, Clock, ChevronRight } from 'lucide-react';
+import { Mail, MailOpen, Gift, Check, Trash2, X, Sparkles, AlertCircle, Clock, ChevronRight, Loader2 } from 'lucide-react';
 
 interface MailboxModalProps {
   isOpen: boolean;
@@ -55,8 +55,12 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
   const unclaimedCount = messages.filter(m => m.rewards && !m.isClaimed).length;
 
   const handleSelectMail = (mail: MailMessage) => {
+    if (isClaiming) return;
     setSelectedMailId(mail.id);
-    if (!mail.isRead) {
+    // Only mark read if the letter has NO unclaimed rewards.
+    // Letters with unclaimed rewards get marked read atomically when claimed,
+    // avoiding race conditions with concurrent read_mail and claim_mail actions.
+    if (!mail.isRead && (!mail.rewards || mail.isClaimed)) {
       markMailAsRead(mail.id);
     }
   };
@@ -388,10 +392,19 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
                         <button
                           onClick={() => handleClaimSingle(selectedMail.id)}
                           disabled={isClaiming}
-                          className="w-full py-3.5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-400 text-black font-display font-black text-sm rounded-2xl shadow-[0_0_25px_rgba(245,158,11,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                          className="w-full py-3.5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-400 text-black font-display font-black text-sm rounded-2xl shadow-[0_0_25px_rgba(245,158,11,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
                         >
-                          <Gift className="w-5 h-5 text-black" />
-                          <span>CLAIM TRIBUTES & REWARDS</span>
+                          {isClaiming ? (
+                            <>
+                              <Loader2 className="w-5 h-5 text-black animate-spin" />
+                              <span>CLAIMING REWARDS...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Gift className="w-5 h-5 text-black" />
+                              <span>CLAIM TRIBUTES & REWARDS</span>
+                            </>
+                          )}
                         </button>
                       )}
                     </div>

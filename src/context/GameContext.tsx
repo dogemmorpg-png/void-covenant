@@ -196,13 +196,15 @@ const migrateProfileTo10Cards = (p: PlayerProfile): PlayerProfile => {
   p.pvpLP = p.pvpLP !== undefined ? p.pvpLP : 100;
   p.bloodSovereigns = p.bloodSovereigns !== undefined ? p.bloodSovereigns : 0;
   
-  // Ensure mailMessages have strictly unique IDs
+  // Ensure mailMessages have strictly unique IDs deterministically
   if (Array.isArray(p.mailMessages)) {
     const seenMailIds = new Set<string>();
     p.mailMessages = p.mailMessages.map((m: any, idx: number) => {
       let mailId = m.id;
       if (!mailId || seenMailIds.has(mailId)) {
-        mailId = `${mailId || 'mail'}_dup_${idx}_${Math.random().toString(36).substring(2, 6)}`;
+        const base = mailId ? mailId.replace(/_dup_\d+(_\d+)?$/, '') : 'mail';
+        const stableTime = m.createdAt || m.date || 0;
+        mailId = `${base}_dup_${idx}_${stableTime}`;
       }
       seenMailIds.add(mailId);
       return { ...m, id: mailId };
@@ -383,6 +385,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
               prev.pvpEnergy !== migrated.pvpEnergy ||
               prev.pvpBonusTickets !== migrated.pvpBonusTickets ||
               (prev.mailMessages?.length || 0) !== (migrated.mailMessages?.length || 0) ||
+              (prev.mailMessages || []).filter((m: any) => m.rewards && !m.isClaimed).length !== (migrated.mailMessages || []).filter((m: any) => m.rewards && !m.isClaimed).length ||
+              (prev.mailMessages || []).filter((m: any) => !m.isRead).length !== (migrated.mailMessages || []).filter((m: any) => !m.isRead).length ||
               (prev.sovereignTransactions?.length || 0) !== (migrated.sovereignTransactions?.length || 0) ||
               prev.level !== migrated.level ||
               prev.exp !== migrated.exp
@@ -729,9 +733,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const markMailAsRead = async (mailId: string): Promise<void> => {
     setProfile(current => {
       const updatedMessages = (current.mailMessages || []).map(m => m.id === mailId ? { ...m, isRead: true } : m);
-      const updated = { ...current, mailMessages: updatedMessages };
-      saveProfile(updated);
-      return updated;
+      return { ...current, mailMessages: updatedMessages };
     });
 
     const token = localStorage.getItem('void_covenant_token');
@@ -743,9 +745,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const deleteMail = async (mailId: string): Promise<{ success: boolean; message: string }> => {
     setProfile(current => {
       const updatedMessages = (current.mailMessages || []).filter(m => m.id !== mailId);
-      const updated = { ...current, mailMessages: updatedMessages };
-      saveProfile(updated);
-      return updated;
+      return { ...current, mailMessages: updatedMessages };
     });
 
     const token = localStorage.getItem('void_covenant_token');
@@ -818,7 +818,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         );
       }
 
-      saveProfile(updated);
       return updated;
     });
 
@@ -880,7 +879,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         );
       }
 
-      saveProfile(updated);
       return updated;
     });
 

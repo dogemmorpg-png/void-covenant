@@ -255,13 +255,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       currentProfile = migrateProfileCards(profileRow.data);
     }
 
-    // Ensure all mail messages have unique IDs
+    // Ensure all mail messages have unique IDs deterministically
     if (currentProfile && Array.isArray(currentProfile.mailMessages)) {
       const seenMailIds = new Set<string>();
       currentProfile.mailMessages = currentProfile.mailMessages.map((m: any, idx: number) => {
         let mailId = m.id;
         if (!mailId || seenMailIds.has(mailId)) {
-          mailId = `${mailId || 'mail'}_dup_${idx}_${Math.random().toString(36).substring(2, 6)}`;
+          const base = mailId ? mailId.replace(/_dup_\d+(_\d+)?$/, '') : 'mail';
+          const stableTime = m.createdAt || m.date || 0;
+          mailId = `${base}_dup_${idx}_${stableTime}`;
         }
         seenMailIds.add(mailId);
         return { ...m, id: mailId };

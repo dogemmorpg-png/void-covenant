@@ -280,13 +280,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       profile = profileRow.data;
     }
 
-    // Ensure all mail messages have unique IDs
+    // Ensure all mail messages have unique IDs deterministically
     if (profile && Array.isArray(profile.mailMessages)) {
       const seenMailIds = new Set<string>();
       profile.mailMessages = profile.mailMessages.map((m: any, idx: number) => {
         let mailId = m.id;
         if (!mailId || seenMailIds.has(mailId)) {
-          mailId = `${mailId || 'mail'}_dup_${idx}_${Math.random().toString(36).substring(2, 6)}`;
+          const base = mailId ? mailId.replace(/_dup_\d+(_\d+)?$/, '') : 'mail';
+          const stableTime = m.createdAt || m.date || 0;
+          mailId = `${base}_dup_${idx}_${stableTime}`;
         }
         seenMailIds.add(mailId);
         return { ...m, id: mailId };
@@ -1189,7 +1191,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!mailId) return res.status(400).json({ error: 'Missing mailId' });
       const mail = (profile.mailMessages || []).find((m: any) => m.id === mailId);
       if (!mail) return res.status(404).json({ error: 'Mail not found' });
-      if (mail.isClaimed) return res.status(400).json({ error: 'Reward already claimed' });
+      if (mail.isClaimed) {
+        return res.status(200).json({
+          success: true,
+          message: 'Tributes already claimed',
+          profile,
+          alreadyClaimed: true
+        });
+      }
 
       const mailCreatedAt = mail.createdAt ?? mail.date ?? mail.timestamp;
 
@@ -1221,6 +1230,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             'SUCCESS',
             mailCreatedAt
           );
+        }
+        if (mail.rewards.cards && Array.isArray(mail.rewards.cards) && mail.rewards.cards.length > 0) {
+          profile.collection = [...(profile.collection || []), ...mail.rewards.cards];
         }
       }
 

@@ -14,10 +14,13 @@ export function recordSovereignTransaction(
 
   let formattedTimestamp = new Date().toISOString();
   if (customTimestamp) {
-    if (typeof customTimestamp === 'number') {
-      formattedTimestamp = new Date(customTimestamp).toISOString();
-    } else {
-      formattedTimestamp = customTimestamp;
+    try {
+      const d = typeof customTimestamp === 'number' ? new Date(customTimestamp) : new Date(String(customTimestamp));
+      if (!isNaN(d.getTime())) {
+        formattedTimestamp = d.toISOString();
+      }
+    } catch {
+      formattedTimestamp = new Date().toISOString();
     }
   }
 
