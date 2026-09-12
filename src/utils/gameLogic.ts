@@ -217,13 +217,13 @@ export function simulateCombatTurn(
           } else {
             targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + heal);
             logs.push(`🩸 Blood Aura healed ${targetCard.name} for ${heal} HP.`);
-            
-            if (s.cleanseChance > 0 && Math.random() * 100 < s.cleanseChance) {
-              if (targetCard.hexedAmount > 0) {
-                targetCard.hexedAmount = 0;
-                cleansed = true;
-                logs.push(`🩸 Blood Aura cleansed Hex from ${targetCard.name}!`);
-              }
+          }
+
+          if (s.cleanseChance > 0 && Math.random() * 100 < s.cleanseChance) {
+            if (targetCard.hexedAmount > 0) {
+              targetCard.hexedAmount = 0;
+              cleansed = true;
+              logs.push(`🩸 Blood Aura cleansed Hex from ${targetCard.name}!`);
             }
           }
           if (s.ward && !targetCard.barrier && !targetCard.ward) {
@@ -489,12 +489,13 @@ export function simulateCombatTurn(
             } else {
               targetCard.health = Math.min(targetCard.maxHealth, targetCard.health + heal);
               logs.push(`🩸 Enemy Blood Aura healed ${targetCard.name} for +${heal} HP.`);
-              if (s.cleanseChance > 0 && Math.random() * 100 < s.cleanseChance) {
-                if (targetCard.hexedAmount > 0) {
-                  targetCard.hexedAmount = 0;
-                  cleansed = true;
-                  logs.push(`🩸 Enemy Blood Aura cleansed Hex from ${targetCard.name}!`);
-                }
+            }
+
+            if (s.cleanseChance > 0 && Math.random() * 100 < s.cleanseChance) {
+              if (targetCard.hexedAmount > 0) {
+                targetCard.hexedAmount = 0;
+                cleansed = true;
+                logs.push(`🩸 Enemy Blood Aura cleansed Hex from ${targetCard.name}!`);
               }
             }
 
@@ -628,37 +629,6 @@ export function simulateCombatTurn(
           });
         }
       }
-    }
-  }
-
-  // Process expiring buffs on Player and Enemy Board
-  for (let i = 0; i < 5; i++) {
-    const card = state.playerBoard[i];
-    if (card && card.buffs && card.buffs.length > 0) {
-      card.buffs = card.buffs.filter(buff => {
-        buff.turnsRemaining -= 1;
-        if (buff.turnsRemaining <= 0) {
-          if (buff.type === 'attack') card.attack = Math.max(0, card.attack - buff.amount);
-          if (buff.type === 'armor') card.armor = Math.max(0, (card.armor || 0) - buff.amount);
-          logs.push(`⏳ ${card.name}'s Warlord buff (+${buff.amount} ${buff.type}) has expired.`);
-          return false;
-        }
-        return true;
-      });
-    }
-
-    const enemyCard = state.enemyBoard[i];
-    if (enemyCard && enemyCard.buffs && enemyCard.buffs.length > 0) {
-      enemyCard.buffs = enemyCard.buffs.filter(buff => {
-        buff.turnsRemaining -= 1;
-        if (buff.turnsRemaining <= 0) {
-          if (buff.type === 'attack') enemyCard.attack = Math.max(0, enemyCard.attack - buff.amount);
-          if (buff.type === 'armor') enemyCard.armor = Math.max(0, (enemyCard.armor || 0) - buff.amount);
-          logs.push(`⏳ Enemy ${enemyCard.name}'s Warlord buff (+${buff.amount} ${buff.type}) has expired.`);
-          return false;
-        }
-        return true;
-      });
     }
   }
 
@@ -1173,6 +1143,37 @@ export function simulateCombatTurn(
     
     state.enemyMaxMana = Math.min(10, state.enemyMaxMana + 1);
     state.enemyMana = state.enemyMaxMana;
+
+    // Process expiring buffs at the end of the round
+    for (let i = 0; i < 5; i++) {
+      const card = state.playerBoard[i];
+      if (card && card.buffs && card.buffs.length > 0) {
+        card.buffs = card.buffs.filter(buff => {
+          buff.turnsRemaining -= 1;
+          if (buff.turnsRemaining <= 0) {
+            if (buff.type === 'attack') card.attack = Math.max(0, card.attack - buff.amount);
+            if (buff.type === 'armor') card.armor = Math.max(0, (card.armor || 0) - buff.amount);
+            logs.push(`⏳ ${card.name}'s buff (+${buff.amount} ${buff.type}) has expired.`);
+            return false;
+          }
+          return true;
+        });
+      }
+
+      const enemyCard = state.enemyBoard[i];
+      if (enemyCard && enemyCard.buffs && enemyCard.buffs.length > 0) {
+        enemyCard.buffs = enemyCard.buffs.filter(buff => {
+          buff.turnsRemaining -= 1;
+          if (buff.turnsRemaining <= 0) {
+            if (buff.type === 'attack') enemyCard.attack = Math.max(0, enemyCard.attack - buff.amount);
+            if (buff.type === 'armor') enemyCard.armor = Math.max(0, (enemyCard.armor || 0) - buff.amount);
+            logs.push(`⏳ Enemy ${enemyCard.name}'s buff (+${buff.amount} ${buff.type}) has expired.`);
+            return false;
+          }
+          return true;
+        });
+      }
+    }
   }
 
   state.combatLog = [...currentState.combatLog, ...logs];
