@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { ChevronDown, Swords, Sparkles, Trophy, Gem, Twitter, MessageCircle, Send } from 'lucide-react';
+import { ChevronDown, Twitter, Send } from 'lucide-react';
 
 interface LandingPageProps {
   onConnectWallet: () => void;
@@ -19,53 +19,6 @@ const particles = Array.from({ length: 40 }, (_, i) => ({
 }));
 
 const runeSymbols = ['ᚱ', 'ᛉ', 'ᛟ', 'ᚦ', 'ᛊ', 'ᚨ', 'ᛗ'];
-
-const features = [
-  {
-    icon: '⚔️',
-    title: 'Strategic Card Combat',
-    desc: 'Deploy dark creatures, unleash devastating skills, and crush your enemies in tactical turn-based battles.',
-  },
-  {
-    icon: <img src="/icons/icon_dust.webp" alt="Dust" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />,
-    title: 'Dark Summoning Altar',
-    desc: 'Open booster packs to summon powerful entities from Bronze to Legendary tier.',
-  },
-  {
-    icon: '🏆',
-    title: 'PvP Arena',
-    desc: 'Challenge other players in ranked matches. Climb the leagues from Recruit to Abyss Master.',
-  },
-  {
-    icon: <img src="/icons/icon_shards.webp" alt="Shards" className="drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] brightness-110 contrast-125 w-7 h-7 inline-block align-text-bottom mx-1" />,
-    title: 'Blockchain Airdrop',
-    desc: 'Connect your Solana wallet, complete quests, and earn $VOID tokens before the listing.',
-  },
-];
-
-const steps = [
-  {
-    num: 1,
-    title: 'Connect Wallet',
-    desc: 'Link your Solana wallet to create your dark covenant.',
-  },
-  {
-    num: 2,
-    title: 'Build Your Deck',
-    desc: 'Collect, fuse, and upgrade cards to forge an unstoppable army.',
-  },
-  {
-    num: 3,
-    title: 'Conquer the Abyss',
-    desc: 'Battle through campaigns, dominate the arena, and claim legendary rewards.',
-  },
-];
-
-const tokenStats = [
-  { label: 'Total Supply', value: '1,000,000,000' },
-  { label: 'Airdrop Allocation', value: '15%' },
-  { label: 'Listing', value: 'Coming Soon' },
-];
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isConnecting }) => {
   return (
@@ -440,7 +393,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
                 </div>
 
                 <p className="text-sm text-gray-300 font-sans leading-relaxed">
-                  Your triumphs echo into eternity. Rulers of the highest arena divisions harvest daily Sovereign tribute dividends directly to their Solana wallets. Power in the Void yields tangible supremacy.
+                  Your triumphs echo into eternity. Rulers of the highest arena divisions harvest daily Sovereign tribute dividends directly to their decentralized wallets. Power in the Void yields tangible supremacy.
                 </p>
 
                 <div className="pt-2 border-t border-white/10 space-y-2 text-xs font-mono text-gray-400">
@@ -450,7 +403,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                    <span>Gasless, instant Solana wallet authentication</span>
+                    <span>Gasless, instant Web3 wallet authentication</span>
                   </div>
                 </div>
               </div>
@@ -598,7 +551,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
                 Connect Wallet
               </h3>
               <p className="text-sm text-gray-400 font-sans leading-relaxed">
-                Connect your Solana wallet in one click. Instant cryptographic login, zero friction, and secure decentralized identity.
+                Connect your Web3 wallet in one click. Instant cryptographic login, zero friction, and secure decentralized identity.
               </p>
             </motion.div>
 
@@ -710,18 +663,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             >
               <Send className="w-4 h-4 text-gray-400 hover:text-amber-300 transition-colors" />
             </a>
-            <a
-              href="#"
-              className="w-10 h-10 rounded-full bg-white/5 border border-[#c5a880]/20 flex items-center justify-center hover:border-[#c5a880]/60 hover:bg-white/10 transition-all duration-300"
-              aria-label="Discord"
-            >
-              <MessageCircle className="w-4 h-4 text-gray-400 hover:text-amber-300 transition-colors" />
-            </a>
           </div>
-
-          <p className="text-xs text-gray-500 font-mono tracking-widest uppercase">
-            Powered by Solana Blockchain • Instant On-Chain Verification
-          </p>
 
           <p className="text-xs text-gray-600 font-display tracking-widest">
             VOID COVENANT © 2024–2026 • DARK TACTICAL TCG
