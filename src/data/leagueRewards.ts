@@ -273,3 +273,18 @@ export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
     ]
   }
 ];
+
+export const LEAGUE_PROMOTION_CONFIG: Record<string, { promoteTop: number; demoteRankAbove: number; capacity?: number }> = {
+  'Divine': { promoteTop: 0, demoteRankAbove: 1, capacity: 2 },
+  'Void Overlord': { promoteTop: 1, demoteRankAbove: 7, capacity: 10 },
+  'Grandmaster': { promoteTop: 3, demoteRankAbove: 20, capacity: 30 },
+  'Master': { promoteTop: 7, demoteRankAbove: 30, capacity: 50 },
+  'Diamond': { promoteTop: 15, demoteRankAbove: 80, capacity: 150 },
+  'Ruby': { promoteTop: 20, demoteRankAbove: 100, capacity: 250 },
+  'Emerald': { promoteTop: 25, demoteRankAbove: 100, capacity: 350 },
+  'Sapphire': { promoteTop: 25, demoteRankAbove: 100, capacity: 400 },
+  'Platinum': { promoteTop: 30, demoteRankAbove: 100, capacity: 500 },
+  'Gold': { promoteTop: 40, demoteRankAbove: 120 },
+  'Silver': { promoteTop: 50, demoteRankAbove: 150 },
+  'Bronze': { promoteTop: 60, demoteRankAbove: 999999 }
+};

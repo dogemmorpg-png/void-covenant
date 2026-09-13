@@ -7,7 +7,7 @@ import { renderStanceIcon } from './SkillAndStanceIcons';
 import { assetPreloader } from '../utils/assetPreloader';
 import { calculateEquipmentSetBonuses } from '../data/equipment';
 
-import { ALL_LEAGUE_REWARDS, LeagueRewardBracket, LeagueTierRewards } from '../data/leagueRewards';
+import { ALL_LEAGUE_REWARDS, LeagueRewardBracket, LeagueTierRewards, LEAGUE_PROMOTION_CONFIG } from '../data/leagueRewards';
 export { ALL_LEAGUE_REWARDS };
 export type { LeagueRewardBracket, LeagueTierRewards };
 
@@ -21,8 +21,8 @@ interface PvpArenaViewProps {
 }
 
 const LEAGUE_QUICK_RULES: Record<string, { promo: string; safe: string; demo: string }> = {
-  'Divine': { promo: '👑 Apex Crown', safe: '#1: Safe Godhood', demo: '#2: Demote to Overlord' },
-  'Void Overlord': { promo: '#1: Promote to Divine', safe: '2–7: Safe', demo: '8–10: Demote' },
+  'Divine': { promo: 'No Promote', safe: '#1: Safe', demo: '#2: Demote' },
+  'Void Overlord': { promo: 'Top 1: Promote', safe: '2–7: Safe', demo: '8–10: Demote' },
   'Grandmaster': { promo: 'Top 3: Promote', safe: '4–20: Safe', demo: '21–30: Demote' },
   'Master': { promo: 'Top 7: Promote', safe: '8–30: Safe', demo: '31–50: Demote' },
   'Diamond': { promo: 'Top 15: Promote', safe: '16–80: Safe', demo: '81–150: Demote' },
@@ -33,7 +33,7 @@ const LEAGUE_QUICK_RULES: Record<string, { promo: string; safe: string; demo: st
   'Gold': { promo: 'Top 40: Promote', safe: '41–120: Safe', demo: '121+: Demote' },
   'Silver': { promo: 'Top 50: Promote', safe: '51–150: Safe', demo: '151+: Demote' },
   'Bronze': { promo: 'Top 60: Promote', safe: '61+: Safe', demo: 'No Demote' },
-  'More Leagues Soon': { promo: '✨ Expansion', safe: 'Higher Realms', demo: 'Coming Soon' }
+  'More Leagues Soon': { promo: 'Expansion', safe: 'Higher Realms', demo: 'Coming Soon' }
 };
 
 const LEAGUE_TABLE_DATA = [
@@ -1606,7 +1606,6 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
               const rules = LEAGUE_QUICK_RULES[viewingLeague] || { promo: 'Promote', safe: 'Safe', demo: 'Demote' };
               const isDivine = viewingLeague === 'Divine';
-              const isOverlord = viewingLeague === 'Void Overlord';
               const isBronze = viewingLeague === 'Bronze';
 
               return (
@@ -1615,8 +1614,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   className="bg-black/70 border border-white/10 hover:border-amber-500/40 rounded-xl py-2 px-3 flex items-center justify-between text-xs font-mono shadow-inner cursor-pointer transition-all hover:bg-black/90 group"
                   title="Click to view full League rules table"
                 >
-                  <span className={`flex items-center gap-1 font-bold ${isDivine ? 'text-amber-300' : isOverlord ? 'text-rose-400' : 'text-emerald-400'}`}>
-                    <span className="text-xs leading-none">{isDivine ? '✨' : isOverlord ? '👑' : '▲'}</span>
+                  <span className={`flex items-center gap-1 font-bold ${isDivine ? 'text-amber-300' : 'text-emerald-400'}`}>
+                    <span className="text-xs leading-none">{isDivine ? '👑' : '▲'}</span>
                     <span>{rules.promo}</span>
                   </span>
                   <span className="text-gray-600 font-bold">•</span>
@@ -1687,131 +1686,147 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               </div>
             ) : (
               <div className="space-y-1.5 max-h-[310px] overflow-y-auto pr-1">
-                {Array.from({ length: Math.max(10, leaderboard.length) }).map((_, idx) => {
-                  const rank = idx + 1;
-                  const player = leaderboard[idx];
-                  const isSelf = Boolean(
-                    player && (
-                      (profile.solanaAddress && player.walletAddress && player.walletAddress.toLowerCase() === profile.solanaAddress.toLowerCase()) ||
-                      (profile.username && player.username && player.username.trim().toLowerCase() === profile.username.trim().toLowerCase())
-                    )
-                  );
-                  const subTier = isSelf ? mySubTier : (player?.subscriptionTier || 'free');
+                {(() => {
+                  const leagueConfig = LEAGUE_PROMOTION_CONFIG[viewingLeague] || { promoteTop: 20, demoteRankAbove: 100, capacity: 10 };
+                  const leagueCap = leagueConfig.capacity || 10;
+                  const totalSlots = leagueCap < 10 
+                    ? Math.min(leagueCap, Math.max(leagueCap, leaderboard.length)) 
+                    : Math.max(10, leaderboard.length);
 
-                  if (player) {
-                    return (
-                      <div
-                        key={player.walletAddress + idx}
-                        className={`flex items-center justify-between p-2 px-3 rounded-xl border text-xs transition-all ${
-                          isSelf
-                            ? subTier === 'ultra'
-                              ? 'bg-gradient-to-r from-purple-950/40 via-cyan-950/30 to-purple-950/40 border-purple-500/70 text-cyan-300 font-bold shadow-[0_0_15px_rgba(168,85,247,0.3)]'
+                  return Array.from({ length: totalSlots }).map((_, idx) => {
+                    const rank = idx + 1;
+                    const player = leaderboard[idx];
+                    const isPromo = leagueConfig.promoteTop > 0 && rank <= leagueConfig.promoteTop;
+                    const isDemo = rank > leagueConfig.demoteRankAbove;
+                    const isSelf = Boolean(
+                      player && (
+                        (profile.solanaAddress && player.walletAddress && player.walletAddress.toLowerCase() === profile.solanaAddress.toLowerCase()) ||
+                        (profile.username && player.username && player.username.trim().toLowerCase() === profile.username.trim().toLowerCase())
+                      )
+                    );
+                    const subTier = isSelf ? mySubTier : (player?.subscriptionTier || 'free');
+
+                    if (player) {
+                      return (
+                        <div
+                          key={player.walletAddress + idx}
+                          className={`flex items-center justify-between p-2 px-3 rounded-xl border text-xs transition-all ${
+                            isSelf
+                              ? subTier === 'ultra'
+                                ? 'bg-gradient-to-r from-purple-950/40 via-cyan-950/30 to-purple-950/40 border-purple-500/70 text-cyan-300 font-bold shadow-[0_0_15px_rgba(168,85,247,0.3)]'
+                                : subTier === 'premium'
+                                ? 'bg-gradient-to-r from-amber-950/40 via-cyan-950/30 to-amber-950/40 border-amber-500/70 text-cyan-300 font-bold shadow-[0_0_15px_rgba(245,158,11,0.25)]'
+                                : 'bg-cyan-950/30 border-cyan-500/50 text-cyan-300 font-bold shadow-[0_0_12px_rgba(6,182,212,0.15)]'
+                              : subTier === 'ultra'
+                              ? 'bg-gradient-to-r from-purple-950/35 via-black/80 to-purple-950/20 border-purple-500/40 text-purple-200 shadow-[0_0_12px_rgba(168,85,247,0.15)]'
                               : subTier === 'premium'
-                              ? 'bg-gradient-to-r from-amber-950/40 via-cyan-950/30 to-amber-950/40 border-amber-500/70 text-cyan-300 font-bold shadow-[0_0_15px_rgba(245,158,11,0.25)]'
-                              : 'bg-cyan-950/30 border-cyan-500/50 text-cyan-300 font-bold shadow-[0_0_12px_rgba(6,182,212,0.15)]'
-                            : subTier === 'ultra'
-                            ? 'bg-gradient-to-r from-purple-950/35 via-black/80 to-purple-950/20 border-purple-500/40 text-purple-200 shadow-[0_0_12px_rgba(168,85,247,0.15)]'
-                            : subTier === 'premium'
-                            ? 'bg-gradient-to-r from-amber-950/30 via-black/80 to-amber-950/15 border-amber-500/35 text-amber-200 shadow-[0_0_10px_rgba(245,158,11,0.12)]'
-                            : rank === 1
-                            ? 'bg-amber-950/20 border-amber-500/30 text-gray-200'
-                            : rank === 2
-                            ? 'bg-slate-900/30 border-slate-700/30 text-gray-200'
-                            : rank === 3
-                            ? 'bg-amber-950/10 border-amber-700/20 text-gray-200'
-                            : 'bg-black/40 border-white/5 text-gray-300'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 min-w-0">
-                          {/* Clean Rank Number with Zone Marker */}
-                          <div className="flex items-center gap-0.5 shrink-0">
-                            <span className={`w-6 text-center font-bold font-mono text-xs ${
-                              rank === 1 ? 'text-amber-400 font-black' :
-                              rank === 2 ? 'text-slate-300 font-bold' :
-                              rank === 3 ? 'text-amber-600 font-bold' : 
-                              rank <= 20 ? 'text-emerald-400 font-bold' : 'text-gray-500'
+                              ? 'bg-gradient-to-r from-amber-950/30 via-black/80 to-amber-950/15 border-amber-500/35 text-amber-200 shadow-[0_0_10px_rgba(245,158,11,0.12)]'
+                              : isDemo
+                              ? 'bg-rose-950/20 border-rose-500/25 text-gray-200'
+                              : rank === 1
+                              ? 'bg-amber-950/20 border-amber-500/30 text-gray-200'
+                              : rank === 2
+                              ? 'bg-slate-900/30 border-slate-700/30 text-gray-200'
+                              : rank === 3
+                              ? 'bg-amber-950/10 border-amber-700/20 text-gray-200'
+                              : 'bg-black/40 border-white/5 text-gray-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            {/* Clean Rank Number with Zone Marker */}
+                            <div className="flex items-center gap-0.5 shrink-0">
+                              <span className={`w-6 text-center font-bold font-mono text-xs ${
+                                isDemo ? 'text-rose-400 font-bold' :
+                                rank === 1 ? 'text-amber-400 font-black' :
+                                rank === 2 ? 'text-slate-300 font-bold' :
+                                rank === 3 ? 'text-amber-600 font-bold' : 
+                                isPromo ? 'text-emerald-400 font-bold' : 'text-gray-500'
+                              }`}>
+                                #{rank}
+                              </span>
+                              {isPromo && (
+                                <span className="text-[8px] text-emerald-400/90 font-black" title="Promotion Zone">▲</span>
+                              )}
+                              {isDemo && (
+                                <span className="text-[8px] text-rose-400/90 font-black" title="Demotion Zone">▼</span>
+                              )}
+                            </div>
+
+                            {/* Avatar */}
+                            <div className={`w-6 h-6 rounded-full overflow-hidden shrink-0 flex items-center justify-center border ${
+                              subTier === 'ultra'
+                                ? 'border-purple-400 ring-1 ring-purple-400/60 shadow-[0_0_8px_rgba(168,85,247,0.6)]'
+                                : subTier === 'premium'
+                                ? 'border-amber-400 ring-1 ring-amber-400/60 shadow-[0_0_8px_rgba(245,158,11,0.5)]'
+                                : 'border-white/10 bg-black/50'
                             }`}>
+                              {player.avatarUrl ? (
+                                <img src={player.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                              ) : (
+                                <User className="w-3.5 h-3.5 text-gray-500" />
+                              )}
+                            </div>
+
+                            {/* Username */}
+                            <span className={`truncate font-sans font-bold text-xs max-w-[105px] ${
+                              subTier === 'ultra'
+                                ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-rose-300 to-amber-200 drop-shadow-[0_0_8px_rgba(168,85,247,0.7)] font-black'
+                                : subTier === 'premium'
+                                ? 'text-amber-300 drop-shadow-[0_0_6px_rgba(245,158,11,0.7)] font-black'
+                                : isSelf
+                                ? 'text-cyan-300'
+                                : 'text-white'
+                            }`}>
+                              {player.username}
+                            </span>
+
+                            {/* VIP / Ultra Badges */}
+                            {subTier === 'ultra' && (
+                              <span className="text-[9px] px-1 py-0.2 rounded bg-purple-950/90 border border-purple-400/80 text-purple-300 font-mono font-black shadow-[0_0_8px_rgba(168,85,247,0.5)] shrink-0 flex items-center gap-0.5" title="Ultra Overlord Pass">
+                                💎
+                              </span>
+                            )}
+                            {subTier === 'premium' && (
+                              <span className="text-[9px] px-1 py-0.2 rounded bg-amber-950/90 border border-amber-400/80 text-amber-300 font-mono font-black shadow-[0_0_8px_rgba(245,158,11,0.4)] shrink-0 flex items-center gap-0.5" title="Premium Sovereign Pass">
+                                ⚜️
+                              </span>
+                            )}
+
+                            {isSelf && (
+                              <span className="text-[8px] font-mono font-black text-cyan-300 bg-cyan-950/60 border border-cyan-500/40 px-1.5 py-0.2 rounded shrink-0">
+                                YOU
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Crowns Score */}
+                          <div className="flex items-center gap-1.5 font-mono font-bold text-xs text-amber-300 shrink-0">
+                            <span>{player.pvpLP !== undefined ? player.pvpLP : (player.pvpRating || 0)}</span>
+                            <img src="/icons/crown.png" alt="Crown" className="w-4 h-4 object-contain brightness-110 contrast-125" />
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      // Placeholder row for empty slots
+                      return (
+                        <div
+                          key={`empty-${idx}`}
+                          className="flex items-center justify-between p-2 px-3 rounded-xl border border-white/5 bg-black/20 text-xs opacity-35"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="w-6 text-center font-mono text-xs text-gray-600">
                               #{rank}
                             </span>
-                            {rank <= 20 && (
-                              <span className="text-[8px] text-emerald-400/80 font-black" title="Promotion Zone">▲</span>
-                            )}
+                            <span className="font-mono text-xs text-gray-600">
+                              —
+                            </span>
                           </div>
-
-                          {/* Avatar */}
-                          <div className={`w-6 h-6 rounded-full overflow-hidden shrink-0 flex items-center justify-center border ${
-                            subTier === 'ultra'
-                              ? 'border-purple-400 ring-1 ring-purple-400/60 shadow-[0_0_8px_rgba(168,85,247,0.6)]'
-                              : subTier === 'premium'
-                              ? 'border-amber-400 ring-1 ring-amber-400/60 shadow-[0_0_8px_rgba(245,158,11,0.5)]'
-                              : 'border-white/10 bg-black/50'
-                          }`}>
-                            {player.avatarUrl ? (
-                              <img src={player.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                            ) : (
-                              <User className="w-3.5 h-3.5 text-gray-500" />
-                            )}
-                          </div>
-
-                          {/* Username */}
-                          <span className={`truncate font-sans font-bold text-xs max-w-[105px] ${
-                            subTier === 'ultra'
-                              ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-rose-300 to-amber-200 drop-shadow-[0_0_8px_rgba(168,85,247,0.7)] font-black'
-                              : subTier === 'premium'
-                              ? 'text-amber-300 drop-shadow-[0_0_6px_rgba(245,158,11,0.7)] font-black'
-                              : isSelf
-                              ? 'text-cyan-300'
-                              : 'text-white'
-                          }`}>
-                            {player.username}
-                          </span>
-
-                          {/* VIP / Ultra Badges */}
-                          {subTier === 'ultra' && (
-                            <span className="text-[9px] px-1 py-0.2 rounded bg-purple-950/90 border border-purple-400/80 text-purple-300 font-mono font-black shadow-[0_0_8px_rgba(168,85,247,0.5)] shrink-0 flex items-center gap-0.5" title="Ultra Overlord Pass">
-                              💎
-                            </span>
-                          )}
-                          {subTier === 'premium' && (
-                            <span className="text-[9px] px-1 py-0.2 rounded bg-amber-950/90 border border-amber-400/80 text-amber-300 font-mono font-black shadow-[0_0_8px_rgba(245,158,11,0.4)] shrink-0 flex items-center gap-0.5" title="Premium Sovereign Pass">
-                              ⚜️
-                            </span>
-                          )}
-
-                          {isSelf && (
-                            <span className="text-[8px] font-mono font-black text-cyan-300 bg-cyan-950/60 border border-cyan-500/40 px-1.5 py-0.2 rounded shrink-0">
-                              YOU
-                            </span>
-                          )}
+                          <span className="font-mono text-xs text-gray-700 font-bold">—</span>
                         </div>
-
-                        {/* Crowns Score */}
-                        <div className="flex items-center gap-1.5 font-mono font-bold text-xs text-amber-300 shrink-0">
-                          <span>{player.pvpLP !== undefined ? player.pvpLP : (player.pvpRating || 0)}</span>
-                          <img src="/icons/crown.png" alt="Crown" className="w-4 h-4 object-contain brightness-110 contrast-125" />
-                        </div>
-                      </div>
-                    );
-                  } else {
-                    // Placeholder row for empty slots
-                    return (
-                      <div
-                        key={`empty-${idx}`}
-                        className="flex items-center justify-between p-2 px-3 rounded-xl border border-white/5 bg-black/20 text-xs opacity-35"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <span className="w-6 text-center font-mono text-xs text-gray-600">
-                            #{rank}
-                          </span>
-                          <span className="font-mono text-xs text-gray-600">
-                            —
-                          </span>
-                        </div>
-                        <span className="font-mono text-xs text-gray-700 font-bold">—</span>
-                      </div>
-                    );
-                  }
-                })}
+                      );
+                    }
+                  });
+                })()}
               </div>
             )}
 
