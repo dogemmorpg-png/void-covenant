@@ -42,7 +42,7 @@ const LEAGUE_TABLE_DATA = [
   { name: 'Diamond', icon: '/icons/league_diamond.png', capacity: '150 Seats', color: 'text-cyan-300', promo: 'Top 15 (#1–#15)', safe: 'Ranks #16 – #80', demo: 'Ranks #81 – #150' },
   { name: 'Ruby', icon: '/icons/league_ruby_crest.png', capacity: '~250 Seats', color: 'text-red-400', promo: 'Top 20 (#1–#20)', safe: 'Ranks #21 – #100', demo: 'Ranks #101+' },
   { name: 'Emerald', icon: '/icons/league_emerald_crest.png', capacity: '~350 Seats', color: 'text-emerald-400', promo: 'Top 25 (#1–#25)', safe: 'Ranks #26 – #100', demo: 'Ranks #101+' },
-  { name: 'Sapphire', icon: '/icons/league_sapphire.png', capacity: '~400 Seats', color: 'text-blue-400', promo: 'Top 25 (#1–#25)', safe: 'Ranks #26 – #100', demo: 'Ranks #101+' },
+  { name: 'Sapphire', icon: '/icons/league_sapphire.png?v=2', capacity: '~400 Seats', color: 'text-blue-400', promo: 'Top 25 (#1–#25)', safe: 'Ranks #26 – #100', demo: 'Ranks #101+' },
   { name: 'Platinum', icon: '/icons/league_platinum.png', capacity: '~500 Seats', color: 'text-indigo-300', promo: 'Top 30 (#1–#30)', safe: 'Ranks #31 – #100', demo: 'Ranks #101+' },
   { name: 'Gold', icon: '/icons/league_gold.png', capacity: 'Open Tier', color: 'text-yellow-400', promo: 'Top 40 (#1–#40)', safe: 'Ranks #41 – #120', demo: 'Ranks #121+' },
   { name: 'Silver', icon: '/icons/league_silver.png', capacity: 'Open Tier', color: 'text-gray-300', promo: 'Top 50 (#1–#50)', safe: 'Ranks #51 – #150', demo: 'Ranks #151+' },
@@ -158,7 +158,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       return {
         name: 'Sapphire',
         badge: '🔹',
-        icon: '/icons/league_sapphire.png',
+        icon: '/icons/league_sapphire.png?v=2',
         color: 'text-blue-400 border-blue-500/30 bg-blue-950/20',
         glow: 'shadow-[0_0_15px_rgba(59,130,246,0.3)]',
         accent: 'text-blue-400'

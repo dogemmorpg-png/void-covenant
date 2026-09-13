@@ -155,7 +155,7 @@ export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
   {
     name: 'Sapphire',
     badge: '🔹',
-    icon: '/icons/league_sapphire.png',
+    icon: '/icons/league_sapphire.png?v=2',
     tierIndex: 4,
     color: 'text-blue-400',
     accent: 'text-blue-400 border-blue-500/30 bg-blue-950/20',
