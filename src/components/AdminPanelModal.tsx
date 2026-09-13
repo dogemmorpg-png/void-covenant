@@ -40,6 +40,7 @@ export const getNormalizedLeague = (leagueRaw: any): string => {
   if (/diamond/i.test(l)) return 'Diamond';
   if (/ruby/i.test(l)) return 'Ruby';
   if (/emerald/i.test(l)) return 'Emerald';
+  if (/sapphire/i.test(l)) return 'Sapphire';
   if (/platinum/i.test(l)) return 'Platinum';
   if (/gold/i.test(l)) return 'Gold';
   if (/silver/i.test(l)) return 'Silver';
@@ -79,6 +80,11 @@ export const getLeagueBadgeStyle = (leagueRaw: any) => {
       return {
         badge: '❇️ EMERALD',
         className: 'bg-emerald-950/70 border border-emerald-500/60 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.35)]'
+      };
+    case 'Sapphire':
+      return {
+        badge: '🔹 SAPPHIRE',
+        className: 'bg-blue-950/70 border border-blue-500/60 text-blue-300 shadow-[0_0_10px_rgba(59,130,246,0.35)]'
       };
     case 'Platinum':
       return {
@@ -816,8 +822,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                   PVP LEAGUE POPULATION DISTRIBUTION
                 </h3>
 
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                  {['Bronze', 'Silver', 'Gold', 'Platinum', 'Emerald', 'Ruby', 'Diamond', 'Master', 'Grandmaster', 'Void Overlord'].map(league => {
+                <div className="grid grid-cols-2 sm:grid-cols-5 md:grid-cols-6 gap-3">
+                  {['Bronze', 'Silver', 'Gold', 'Platinum', 'Sapphire', 'Emerald', 'Ruby', 'Diamond', 'Master', 'Grandmaster', 'Void Overlord'].map(league => {
                     const count = overview?.leagueDistribution?.[league] || 0;
                     const total = overview?.totalPlayers || 1;
                     const pct = Math.round((count / total) * 100);
@@ -1055,6 +1061,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                       <option value="Silver">Silver League</option>
                       <option value="Gold">Gold League</option>
                       <option value="Platinum">Platinum League</option>
+                      <option value="Sapphire">Sapphire League</option>
                       <option value="Emerald">Emerald League</option>
                       <option value="Ruby">Ruby League</option>
                       <option value="Diamond">Diamond League</option>
@@ -1224,7 +1231,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
                     {/* League Filter Pills */}
                     <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 select-none">
-                      {['all', 'Premium', 'Ultra', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Emerald', 'Ruby', 'Diamond', 'Master', 'Grandmaster', 'Void Overlord', 'Banned'].map(l => (
+                      {['all', 'Premium', 'Ultra', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Sapphire', 'Emerald', 'Ruby', 'Diamond', 'Master', 'Grandmaster', 'Void Overlord', 'Banned'].map(l => (
                         <button
                           key={l}
                           onClick={() => setPlayerLeagueFilter(l)}
@@ -1828,6 +1835,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           <option value="Silver">🥈 Silver League</option>
                           <option value="Gold">🥇 Gold League</option>
                           <option value="Platinum">🔮 Platinum League</option>
+                          <option value="Sapphire">🔹 Sapphire League</option>
                           <option value="Emerald">❇️ Emerald League</option>
                           <option value="Ruby">🩸 Ruby League</option>
                           <option value="Diamond">💎 Diamond League</option>

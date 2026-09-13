@@ -277,7 +277,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           botBronzeCount = 5; botSilverCount = 4; botGoldCount = 1; botLegendaryCount = 0;
         } else if (league.includes('gold')) {
           botBronzeCount = 3; botSilverCount = 4; botGoldCount = 3; botLegendaryCount = 0;
-        } else if (league.includes('platinum') || league.includes('emerald')) {
+        } else if (league.includes('platinum') || league.includes('sapphire') || league.includes('emerald')) {
           botBronzeCount = 2; botSilverCount = 3; botGoldCount = 4; botLegendaryCount = 1;
         } else {
           botBronzeCount = 0; botSilverCount = 2; botGoldCount = 5; botLegendaryCount = 3;

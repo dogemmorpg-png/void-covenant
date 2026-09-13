@@ -27,6 +27,7 @@ const LEAGUE_QUICK_RULES: Record<string, { promo: string; safe: string; demo: st
   'Diamond': { promo: 'Top 15: Promote', safe: '16–80: Safe', demo: '81–150: Demote' },
   'Ruby': { promo: 'Top 20: Promote', safe: '21–100: Safe', demo: '101+: Demote' },
   'Emerald': { promo: 'Top 25: Promote', safe: '26–100: Safe', demo: '101+: Demote' },
+  'Sapphire': { promo: 'Top 25: Promote', safe: '26–100: Safe', demo: '101+: Demote' },
   'Platinum': { promo: 'Top 30: Promote', safe: '31–100: Safe', demo: '101+: Demote' },
   'Gold': { promo: 'Top 40: Promote', safe: '41–120: Safe', demo: '121+: Demote' },
   'Silver': { promo: 'Top 50: Promote', safe: '51–150: Safe', demo: '151+: Demote' },
@@ -41,6 +42,7 @@ const LEAGUE_TABLE_DATA = [
   { name: 'Diamond', icon: '/icons/league_diamond.png', capacity: '150 Seats', color: 'text-cyan-300', promo: 'Top 15 (#1–#15)', safe: 'Ranks #16 – #80', demo: 'Ranks #81 – #150' },
   { name: 'Ruby', icon: '/icons/league_ruby_crest.png', capacity: '~250 Seats', color: 'text-red-400', promo: 'Top 20 (#1–#20)', safe: 'Ranks #21 – #100', demo: 'Ranks #101+' },
   { name: 'Emerald', icon: '/icons/league_emerald_crest.png', capacity: '~350 Seats', color: 'text-emerald-400', promo: 'Top 25 (#1–#25)', safe: 'Ranks #26 – #100', demo: 'Ranks #101+' },
+  { name: 'Sapphire', icon: '/icons/league_sapphire.png', capacity: '~400 Seats', color: 'text-blue-400', promo: 'Top 25 (#1–#25)', safe: 'Ranks #26 – #100', demo: 'Ranks #101+' },
   { name: 'Platinum', icon: '/icons/league_platinum.png', capacity: '~500 Seats', color: 'text-indigo-300', promo: 'Top 30 (#1–#30)', safe: 'Ranks #31 – #100', demo: 'Ranks #101+' },
   { name: 'Gold', icon: '/icons/league_gold.png', capacity: 'Open Tier', color: 'text-yellow-400', promo: 'Top 40 (#1–#40)', safe: 'Ranks #41 – #120', demo: 'Ranks #121+' },
   { name: 'Silver', icon: '/icons/league_silver.png', capacity: 'Open Tier', color: 'text-gray-300', promo: 'Top 50 (#1–#50)', safe: 'Ranks #51 – #150', demo: 'Ranks #151+' },
@@ -151,6 +153,15 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         color: 'text-indigo-300 border-indigo-500/30 bg-indigo-950/20',
         glow: '',
         accent: 'text-indigo-400'
+      };
+    } else if (name.startsWith('Sapphire')) {
+      return {
+        name: 'Sapphire',
+        badge: '🔹',
+        icon: '/icons/league_sapphire.png',
+        color: 'text-blue-400 border-blue-500/30 bg-blue-950/20',
+        glow: 'shadow-[0_0_15px_rgba(59,130,246,0.3)]',
+        accent: 'text-blue-400'
       };
     } else if (name.startsWith('Emerald')) {
       return {
@@ -485,6 +496,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       'Silver',
       'Gold',
       'Platinum',
+      'Sapphire',
       'Emerald',
       'Ruby',
       'Diamond',
@@ -509,6 +521,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       'Silver',
       'Gold',
       'Platinum',
+      'Sapphire',
       'Emerald',
       'Ruby',
       'Diamond',

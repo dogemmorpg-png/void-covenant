@@ -6,6 +6,7 @@ export const PVP_LEAGUES = [
   'Silver',
   'Gold',
   'Platinum',
+  'Sapphire',
   'Emerald',
   'Ruby',
   'Diamond',
@@ -21,6 +22,7 @@ export const LEAGUE_PROMOTION_CONFIG: Record<string, { promoteTop: number; demot
   'Diamond': { promoteTop: 15, demoteRankAbove: 80, capacity: 150 },
   'Ruby': { promoteTop: 20, demoteRankAbove: 100, capacity: 250 },
   'Emerald': { promoteTop: 25, demoteRankAbove: 100, capacity: 350 },
+  'Sapphire': { promoteTop: 25, demoteRankAbove: 100, capacity: 400 },
   'Platinum': { promoteTop: 30, demoteRankAbove: 100, capacity: 500 },
   'Gold': { promoteTop: 40, demoteRankAbove: 120 },
   'Silver': { promoteTop: 50, demoteRankAbove: 150 },
@@ -32,7 +34,7 @@ export const DEFAULT_LEAGUE_REWARDS = [
     name: 'Void Overlord',
     badge: '👑',
     icon: '/icons/league_void_overlord.png',
-    tierIndex: 9,
+    tierIndex: 10,
     capacity: 10,
     brackets: [
       { rankLabel: 'Rank #1', sovereigns: 600, gold: 7500, dust: 750 },
@@ -46,7 +48,7 @@ export const DEFAULT_LEAGUE_REWARDS = [
     name: 'Grandmaster',
     badge: '⚜️',
     icon: '/icons/league_grandmaster_crest.png',
-    tierIndex: 8,
+    tierIndex: 9,
     capacity: 30,
     brackets: [
       { rankLabel: 'Rank #1', sovereigns: 150, gold: 3500, dust: 350, isPromotion: true },
@@ -61,7 +63,7 @@ export const DEFAULT_LEAGUE_REWARDS = [
     name: 'Master',
     badge: '⚔️',
     icon: '/icons/league_master_crest.png',
-    tierIndex: 7,
+    tierIndex: 8,
     capacity: 50,
     brackets: [
       { rankLabel: 'Rank #1', sovereigns: 60, gold: 2400, dust: 240, isPromotion: true },
@@ -77,7 +79,7 @@ export const DEFAULT_LEAGUE_REWARDS = [
     name: 'Diamond',
     badge: '💎',
     icon: '/icons/league_diamond.png',
-    tierIndex: 6,
+    tierIndex: 7,
     capacity: 150,
     brackets: [
       { rankLabel: 'Rank #1', sovereigns: 35, gold: 1600, dust: 160, isPromotion: true },
@@ -93,7 +95,7 @@ export const DEFAULT_LEAGUE_REWARDS = [
     name: 'Ruby',
     badge: '🩸',
     icon: '/icons/league_ruby_crest.png',
-    tierIndex: 5,
+    tierIndex: 6,
     brackets: [
       { rankLabel: 'Rank #1', sovereigns: 20, gold: 1200, dust: 120, isPromotion: true },
       { rankLabel: 'Rank #2', sovereigns: 14, gold: 1000, dust: 100, isPromotion: true },
@@ -108,7 +110,7 @@ export const DEFAULT_LEAGUE_REWARDS = [
     name: 'Emerald',
     badge: '❇️',
     icon: '/icons/league_emerald_crest.png',
-    tierIndex: 4,
+    tierIndex: 5,
     brackets: [
       { rankLabel: 'Rank #1', sovereigns: 10, gold: 900, dust: 90, isPromotion: true },
       { rankLabel: 'Rank #2', sovereigns: 7, gold: 750, dust: 75, isPromotion: true },
@@ -117,6 +119,21 @@ export const DEFAULT_LEAGUE_REWARDS = [
       { rankLabel: 'Ranks #26 – #50', sovereigns: 2, gold: 400, dust: 40 },
       { rankLabel: 'Ranks #51 – #100', sovereigns: 1, gold: 280, dust: 28, isSafe: true },
       { rankLabel: 'Ranks #101+', sovereigns: 0, gold: 200, dust: 20, isDemotion: true }
+    ]
+  },
+  {
+    name: 'Sapphire',
+    badge: '🔹',
+    icon: '/icons/league_sapphire.png',
+    tierIndex: 4,
+    brackets: [
+      { rankLabel: 'Rank #1', sovereigns: 7, gold: 800, dust: 80, isPromotion: true },
+      { rankLabel: 'Rank #2', sovereigns: 5, gold: 680, dust: 68, isPromotion: true },
+      { rankLabel: 'Rank #3', sovereigns: 3, gold: 580, dust: 58, isPromotion: true },
+      { rankLabel: 'Ranks #4 – #25', sovereigns: 3, gold: 480, dust: 48, isPromotion: true },
+      { rankLabel: 'Ranks #26 – #50', sovereigns: 2, gold: 360, dust: 36 },
+      { rankLabel: 'Ranks #51 – #100', sovereigns: 1, gold: 250, dust: 25, isSafe: true },
+      { rankLabel: 'Ranks #101+', sovereigns: 0, gold: 180, dust: 18, isDemotion: true }
     ]
   },
   {

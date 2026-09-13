@@ -353,6 +353,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           'Silver': 0,
           'Gold': 0,
           'Platinum': 0,
+          'Sapphire': 0,
           'Emerald': 0,
           'Ruby': 0,
           'Diamond': 0,
@@ -388,6 +389,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           else if (/diamond/i.test(rawLeague)) normLeague = 'Diamond';
           else if (/ruby/i.test(rawLeague)) normLeague = 'Ruby';
           else if (/emerald/i.test(rawLeague)) normLeague = 'Emerald';
+          else if (/sapphire/i.test(rawLeague)) normLeague = 'Sapphire';
           else if (/platinum/i.test(rawLeague)) normLeague = 'Platinum';
           else if (/gold/i.test(rawLeague)) normLeague = 'Gold';
           else if (/silver/i.test(rawLeague)) normLeague = 'Silver';
