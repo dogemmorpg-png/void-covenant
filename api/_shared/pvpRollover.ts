@@ -124,7 +124,7 @@ export const DEFAULT_LEAGUE_REWARDS = [
   {
     name: 'Sapphire',
     badge: '🔹',
-    icon: '/icons/league_sapphire.png',
+    icon: '/icons/league_sapphire.png?v=2',
     tierIndex: 4,
     brackets: [
       { rankLabel: 'Rank #1', sovereigns: 7, gold: 800, dust: 80, isPromotion: true },
