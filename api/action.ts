@@ -1133,6 +1133,43 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       successMessage = '✨ The Complete Demiurge Relic Set has been forged!';
       responseData = { newEquipments, profile };
+    } else if (action === 'buy_level_boost') {
+      const { targetLevel } = payload || {};
+      const numLevel = Number(targetLevel);
+      const LEVEL_BOOST_CONFIG: Record<number, { costShards: number; name: string }> = {
+        50: { costShards: 250, name: 'Instant Level 50 Ascension' },
+        100: { costShards: 700, name: 'Instant Level 100 Supreme Godhood' }
+      };
+
+      const config = LEVEL_BOOST_CONFIG[numLevel];
+      if (!config) {
+        return res.status(400).json({ error: 'Invalid level boost package.' });
+      }
+
+      const currentLevel = profile.level || 1;
+      if (currentLevel >= numLevel) {
+        return res.status(400).json({ error: `Your character is already level ${currentLevel} (target: ${numLevel})!` });
+      }
+
+      const currentShards = profile.darkShards || 0;
+      if (currentShards < config.costShards) {
+        return res.status(400).json({ error: `Not enough Dark Shards! Need ${config.costShards}, you have ${currentShards}.` });
+      }
+
+      profile = recordShardTransaction(
+        profile,
+        'SHOP_PURCHASE',
+        -config.costShards,
+        `Ascension boost to Level ${numLevel} (${config.name})`,
+        { targetLevel: numLevel, previousLevel: currentLevel, costShards: config.costShards }
+      );
+
+      profile.level = numLevel;
+      profile.exp = 0;
+      profile.heroMaxHealth = Math.max(profile.heroMaxHealth || 30, 30 + (numLevel - 1) * 2);
+
+      successMessage = `⚡ Ascension complete! You have reached Level ${numLevel}!`;
+      responseData = { newLevel: numLevel, newHeroMaxHealth: profile.heroMaxHealth, newShards: profile.darkShards, profile };
     } else if (action === 'withdrawal') {
       const { amountSovereigns, targetAddress } = payload || {};
       const numAmount = parseInt(amountSovereigns, 10);

@@ -43,6 +43,7 @@ interface GameContextType {
   claimDailySubscription: () => Promise<{ success: boolean; message: string }>;
   activateShield: (shieldType: '3h' | '6h' | '12h') => Promise<{ success: boolean; message: string }>;
   buyShield: (shieldType: '3h' | '6h' | '12h') => Promise<{ success: boolean; message: string }>;
+  buyLevelBoost: (targetLevel: 50 | 100) => Promise<{ success: boolean; message: string; [key: string]: any }>;
   claimReferralSovereigns: () => Promise<{ success: boolean; message: string; claimedSovereigns?: number }>;
   addExp: (amount: number) => void;
   addCampaignStars: (stageId: string, stars: number) => void;
@@ -1846,6 +1847,60 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success, message: msg, profile: updatedProfile };
     }
 
+    if (action === 'buy_level_boost') {
+      const { targetLevel } = payload || {};
+      const numLevel = Number(targetLevel);
+      const LEVEL_BOOST_CONFIG: Record<number, { costShards: number; name: string }> = {
+        50: { costShards: 250, name: 'Instant Level 50 Ascension' },
+        100: { costShards: 700, name: 'Instant Level 100 Supreme Godhood' }
+      };
+      const config = LEVEL_BOOST_CONFIG[numLevel];
+      if (!config) return { success: false, message: 'Invalid level boost package.' };
+
+      let msg = '';
+      let success = false;
+      let updatedProfile: any = null;
+
+      setProfile(current => {
+        const currentLevel = current.level || 1;
+        if (currentLevel >= numLevel) {
+          msg = `Character is already level ${currentLevel} (target: ${numLevel})!`;
+          success = false;
+          return current;
+        }
+
+        const currentShards = current.darkShards || 0;
+        if (currentShards < config.costShards) {
+          msg = `Not enough Dark Shards! Need ${config.costShards}, you have ${currentShards}.`;
+          success = false;
+          return current;
+        }
+
+        let updated = recordShardTransaction(
+          current,
+          'SHOP_PURCHASE',
+          -config.costShards,
+          `Ascension boost to Level ${numLevel} (${config.name})`,
+          { targetLevel: numLevel, previousLevel: currentLevel, costShards: config.costShards }
+        );
+
+        updated = {
+          ...updated,
+          level: numLevel,
+          exp: 0,
+          heroMaxHealth: Math.max(current.heroMaxHealth || 30, 30 + (numLevel - 1) * 2)
+        };
+
+        msg = `⚡ Ascension complete! You have reached Level ${numLevel}!`;
+        success = true;
+        updatedProfile = updated;
+        saveProfile(updated);
+        return updated;
+      });
+
+      return { success, message: msg, profile: updatedProfile };
+    }
+
     if (action === 'dismantle_card') {
       const { cardId } = payload || {};
       let msg = '';
@@ -2106,6 +2161,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return await submitAction('buy_shield', { shieldType });
   };
 
+  const buyLevelBoost = async (targetLevel: 50 | 100) => {
+    return await submitAction('buy_level_boost', { targetLevel });
+  };
+
   const claimReferralSovereigns = async () => {
     return await submitAction('claim_referral_sovereigns', {});
   };
@@ -2130,6 +2189,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         claimDailySubscription,
         activateShield,
         buyShield,
+        buyLevelBoost,
         claimReferralSovereigns,
         usePveEnergy,
         usePvpEnergy,
