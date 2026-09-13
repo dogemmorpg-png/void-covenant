@@ -233,169 +233,498 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
         </motion.div>
       </section>
 
-      {/* ============ FEATURES SECTION ============ */}
-      <section className="relative py-24 px-6">
+      {/* ============ PROLOGUE / LORE INTRO ============ */}
+      <section className="relative py-28 px-6 overflow-hidden border-t border-[#c5a880]/15">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(197,168,128,0.04),transparent_70%)] pointer-events-none" />
+
+        <div className="max-w-4xl mx-auto text-center relative z-10 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.8 }}
+          >
+            <span className="font-mono text-xs uppercase tracking-[0.35em] text-[#c5a880]/80 block mb-2">
+              — The Ancient Prophecy —
+            </span>
+            <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-white tracking-[0.2em] uppercase">
+              The Abyss Awakens
+            </h2>
+          </motion.div>
+
+          <motion.div
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="w-32 h-px bg-gradient-to-r from-transparent via-[#c5a880]/50 to-transparent mx-auto"
+          />
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="text-base sm:text-lg md:text-xl text-gray-300 font-serif italic leading-relaxed max-w-3xl mx-auto"
+          >
+            “Beyond the dying stars of the mortal spheres lies the Nether Realm — an eternal abyss where fallen kings, forgotten gods, and ancient eldritch nightmares lie slumbering in iron seals.”
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="text-sm sm:text-base text-gray-400 font-sans leading-relaxed max-w-2xl mx-auto pt-2"
+          >
+            You are an exiled warlord called to forge a blood covenant. Through the ritual altar, you bind shadows to your will, wield devastating relics of forgotten eras, and clash against rival summoners in ruthless tactical supremacy.
+          </motion.p>
+        </div>
+
+        {/* Panoramic Concept Artwork Display */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 40 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 1 }}
+          className="max-w-5xl mx-auto mt-16 relative rounded-3xl overflow-hidden border border-[#c5a880]/25 shadow-[0_20px_80px_rgba(0,0,0,0.9)] group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0b0c10] via-transparent to-transparent z-10 pointer-events-none opacity-80" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,#0b0c10_95%)] z-10 pointer-events-none" />
+          
+          <img
+            src="/landing_void_realm.jpg"
+            alt="The Nether Realm of the Void"
+            className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-1000"
+          />
+
+          <div className="absolute bottom-6 left-6 sm:bottom-10 sm:left-10 z-20 max-w-md">
+            <span className="font-mono text-[11px] text-[#c5a880] tracking-widest uppercase block mb-1">Sanctuary of the Void</span>
+            <h3 className="font-display font-black text-xl sm:text-2xl text-white tracking-wider uppercase drop-shadow-md">
+              A Shattered Cosmic Nether
+            </h3>
+            <p className="text-xs sm:text-sm text-gray-300 mt-1 font-sans leading-snug drop-shadow">
+              Endless citadel spires adrift in cosmic storms, where every step demands sacrifice and tactical mastery.
+            </p>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* ============ THE THREE PILLARS (GAMEPLAY HOOKS) ============ */}
+      <section className="relative py-28 px-6 bg-gradient-to-b from-[#0b0c10] via-[#0e1017] to-[#0b0c10] border-t border-b border-white/5">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
-            <h2 className="font-display font-black text-3xl md:text-5xl text-white tracking-[0.2em] mb-4">
-              FORGED IN DARKNESS
+            <span className="font-mono text-xs uppercase tracking-[0.35em] text-[#c5a880]/80 block mb-2">
+              — The Laws of the Covenant —
+            </span>
+            <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-white tracking-[0.2em] uppercase">
+              Three Pillars of Sovereignty
             </h2>
-            <div className="w-32 h-px bg-gradient-to-r from-transparent via-[#c5a880]/40 to-transparent mx-auto" />
+            <div className="w-32 h-px bg-gradient-to-r from-transparent via-[#c5a880]/40 to-transparent mx-auto mt-4" />
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((f, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.6, delay: i * 0.12 }}
-                className="bg-white/5 backdrop-blur-sm border border-[#c5a880]/10 rounded-2xl p-6 hover:border-[#c5a880]/30 hover:bg-white/[0.07] transition-all duration-300 group"
-              >
-                <div className="text-4xl mb-4">{f.icon}</div>
-                <h3 className="font-display font-bold text-lg text-[#ebd09b] mb-3 tracking-wide">
-                  {f.title}
-                </h3>
-                <p className="text-sm text-gray-400 leading-relaxed">{f.desc}</p>
-              </motion.div>
-            ))}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            {/* Pillar 1: Tactical Depth */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="bg-gradient-to-b from-black/80 via-[#10131b]/60 to-black/90 border border-[#c5a880]/20 hover:border-[#c5a880]/60 rounded-3xl p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden group transition-all duration-500 hover:-translate-y-2"
+            >
+              <div className="absolute top-0 right-0 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-purple-500/20 transition-colors" />
+
+              <div className="space-y-5 relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-950 via-black to-black border border-purple-500/50 flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.35)] group-hover:scale-110 transition-transform">
+                  <span className="text-2xl">⚔️</span>
+                </div>
+
+                <div>
+                  <span className="font-mono text-[10px] text-purple-400 font-bold uppercase tracking-widest block mb-1">Pillar I</span>
+                  <h3 className="font-display font-black text-2xl text-white tracking-wide uppercase group-hover:text-[#ebd09b] transition-colors">
+                    Dark Tactical Sorcery
+                  </h3>
+                </div>
+
+                <p className="text-sm text-gray-300 font-sans leading-relaxed">
+                  No mindless brawling. Every duel is a deadly game of chess where positioning, mana management, turn delays, and creature sacrifices decide the fate of kingdoms.
+                </p>
+
+                <div className="pt-2 border-t border-white/10 space-y-2 text-xs font-mono text-gray-400">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                    <span>Dynamic Stances: Aggressive, Defensive, Strategic</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                    <span>Calculated turn delays and ritual spells</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-4 border-t border-white/5 font-mono text-[11px] text-[#c5a880]/70 uppercase tracking-wider">
+                Turn-Based Mind Games
+              </div>
+            </motion.div>
+
+            {/* Pillar 2: High-Stakes PvP */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.7, delay: 0.25 }}
+              className="bg-gradient-to-b from-black/80 via-[#180f12]/60 to-black/90 border border-rose-500/30 hover:border-rose-500/70 rounded-3xl p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden group transition-all duration-500 hover:-translate-y-2"
+            >
+              <div className="absolute top-0 right-0 w-48 h-48 bg-rose-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-rose-500/20 transition-colors" />
+
+              <div className="space-y-5 relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-950 via-black to-black border border-rose-500/50 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.35)] group-hover:scale-110 transition-transform">
+                  <span className="text-2xl">🏆</span>
+                </div>
+
+                <div>
+                  <span className="font-mono text-[10px] text-rose-400 font-bold uppercase tracking-widest block mb-1">Pillar II</span>
+                  <h3 className="font-display font-black text-2xl text-white tracking-wide uppercase group-hover:text-rose-200 transition-colors">
+                    The Colosseum of Gods
+                  </h3>
+                </div>
+
+                <p className="text-sm text-gray-300 font-sans leading-relaxed">
+                  Fight your way through seven ruthless ranked leagues. From bloodied Initiates to the Void Overlords and the two-seat apex of the Divine League, where only the strongest survive the daily culling.
+                </p>
+
+                <div className="pt-2 border-t border-white/10 space-y-2 text-xs font-mono text-gray-400">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                    <span>Real-time ranking ladder with daily promotions</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                    <span>Aegis Peace Shields to guard hard-won Crowns</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-4 border-t border-white/5 font-mono text-[11px] text-rose-300/80 uppercase tracking-wider">
+                Unforgiving Arena Ladder
+              </div>
+            </motion.div>
+
+            {/* Pillar 3: Web3 Sovereignty */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.7, delay: 0.4 }}
+              className="bg-gradient-to-b from-black/80 via-[#18130a]/60 to-black/90 border border-amber-500/30 hover:border-amber-400/70 rounded-3xl p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden group transition-all duration-500 hover:-translate-y-2"
+            >
+              <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-amber-500/20 transition-colors" />
+
+              <div className="space-y-5 relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-950 via-black to-black border border-amber-500/50 flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.35)] group-hover:scale-110 transition-transform">
+                  <span className="text-2xl">⚜️</span>
+                </div>
+
+                <div>
+                  <span className="font-mono text-[10px] text-amber-400 font-bold uppercase tracking-widest block mb-1">Pillar III</span>
+                  <h3 className="font-display font-black text-2xl text-white tracking-wide uppercase group-hover:text-amber-200 transition-colors">
+                    Sovereign Domination
+                  </h3>
+                </div>
+
+                <p className="text-sm text-gray-300 font-sans leading-relaxed">
+                  Your triumphs echo into eternity. Rulers of the highest arena divisions harvest daily Sovereign tribute dividends directly to their Solana wallets. Power in the Void yields tangible supremacy.
+                </p>
+
+                <div className="pt-2 border-t border-white/10 space-y-2 text-xs font-mono text-gray-400">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    <span>Daily Sovereign dividends for elite conquerors</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    <span>Gasless, instant Solana wallet authentication</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-4 border-t border-white/5 font-mono text-[11px] text-amber-300/80 uppercase tracking-wider">
+                True Spoils of War
+              </div>
+            </motion.div>
+
           </div>
         </div>
       </section>
 
-      {/* ============ HOW TO PLAY SECTION ============ */}
-      <section className="relative py-24 px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0d0e14] to-transparent" />
-        <div className="max-w-5xl mx-auto relative z-10">
+      {/* ============ ATMOSPHERIC DUAL SHOWCASE (CINEMATIC WORLD) ============ */}
+      <section className="relative py-28 px-6 overflow-hidden">
+        <div className="max-w-6xl mx-auto space-y-24">
+          
+          {/* Feature 1: The Clash of Wills */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.8 }}
+              className="lg:col-span-6 space-y-6"
+            >
+              <span className="font-mono text-xs uppercase tracking-[0.3em] text-purple-400 font-bold block">
+                — Clash of Shadows —
+              </span>
+              <h2 className="font-display font-black text-3xl sm:text-4xl text-white tracking-wide uppercase leading-tight">
+                Every Card is an Oath Bound in Blood
+              </h2>
+              <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-sans">
+                You do not simply play spells. You forge unholy pacts with ancient Horrors, Death Knights, Seraphs of the Apocalypse, and Primordial Dragons. Sacrifice footmen to empower dreadlords, trigger turn-reversal counters, and turn absolute defeat into overwhelming victory.
+              </p>
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <div className="bg-black/50 border border-white/10 rounded-2xl p-4">
+                  <span className="font-display font-black text-2xl text-purple-300 block">100+</span>
+                  <span className="text-xs text-gray-400 font-mono">Dark Fantasy Entities</span>
+                </div>
+                <div className="bg-black/50 border border-white/10 rounded-2xl p-4">
+                  <span className="font-display font-black text-2xl text-amber-300 block">6</span>
+                  <span className="text-xs text-gray-400 font-mono">Creature Factions</span>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.8 }}
+              className="lg:col-span-6 relative rounded-3xl overflow-hidden border-2 border-purple-500/30 shadow-[0_10px_50px_rgba(168,85,247,0.2)] group"
+            >
+              <img
+                src="/landing_warlord_duel.jpg"
+                alt="Clash of Dark Fantasy Warlords"
+                className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+            </motion.div>
+          </div>
+
+          {/* Feature 2: The Altar of the Nether */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center lg:flex-row-reverse">
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.8 }}
+              className="lg:col-span-6 space-y-6 lg:order-2"
+            >
+              <span className="font-mono text-xs uppercase tracking-[0.3em] text-amber-400 font-bold block">
+                — Primordial Awakening —
+              </span>
+              <h2 className="font-display font-black text-3xl sm:text-4xl text-white tracking-wide uppercase leading-tight">
+                Summon From the Nether Altar
+              </h2>
+              <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-sans">
+                Burn Void Dust and offerings to manifest sealed booster tomes and ancient relics. Assemble the fabled 6-piece Demiurge Relic set, awaken dormant socket runes, and customize your combat stance to outmaneuver any challenger.
+              </p>
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <div className="bg-black/50 border border-white/10 rounded-2xl p-4">
+                  <span className="font-display font-black text-2xl text-rose-400 block">Demiurge</span>
+                  <span className="text-xs text-gray-400 font-mono">Sacred Equipment Set</span>
+                </div>
+                <div className="bg-black/50 border border-white/10 rounded-2xl p-4">
+                  <span className="font-display font-black text-2xl text-emerald-400 block">3 Trees</span>
+                  <span className="text-xs text-gray-400 font-mono">Hero Combat Talents</span>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.8 }}
+              className="lg:col-span-6 relative rounded-3xl overflow-hidden border-2 border-amber-500/30 shadow-[0_10px_50px_rgba(245,158,11,0.2)] group lg:order-1"
+            >
+              <img
+                src="/landing_cards_altar.jpg"
+                alt="Ancient Dark Altar of Summoning"
+                className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+            </motion.div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ============ HOW TO BEGIN (THE PATH OF THE INITIATE) ============ */}
+      <section className="relative py-28 px-6 bg-[#080a0e] border-t border-white/5">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
-            <h2 className="font-display font-black text-3xl md:text-5xl text-white tracking-[0.2em] mb-4">
-              PATH TO POWER
+            <span className="font-mono text-xs uppercase tracking-[0.35em] text-[#c5a880]/80 block mb-2">
+              — The Ritual of Descent —
+            </span>
+            <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-white tracking-[0.2em] uppercase">
+              How to Enter the Abyss
             </h2>
-            <div className="w-32 h-px bg-gradient-to-r from-transparent via-[#c5a880]/40 to-transparent mx-auto" />
+            <div className="w-32 h-px bg-gradient-to-r from-transparent via-[#c5a880]/40 to-transparent mx-auto mt-4" />
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            {/* Connecting line (desktop only) */}
-            <div className="hidden md:block absolute top-12 left-[20%] right-[20%] h-px bg-gradient-to-r from-[#c5a880]/20 via-[#c5a880]/30 to-[#c5a880]/20" />
+            {/* Step 1 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="bg-black/60 border border-white/10 rounded-2xl p-8 text-center relative flex flex-col items-center group hover:border-[#c5a880]/50 transition-colors"
+            >
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-b from-[#1c1208] to-black border border-amber-500/40 flex items-center justify-center font-display font-black text-2xl text-[#ebd09b] mb-6 shadow-[0_0_15px_rgba(245,158,11,0.2)] group-hover:scale-110 transition-transform">
+                I
+              </div>
+              <h3 className="font-display font-black text-lg text-white uppercase tracking-wider mb-2">
+                Connect Wallet
+              </h3>
+              <p className="text-sm text-gray-400 font-sans leading-relaxed">
+                Connect your Solana wallet in one click. Instant cryptographic login, zero friction, and secure decentralized identity.
+              </p>
+            </motion.div>
 
-            {steps.map((s, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.6, delay: i * 0.15 }}
-                className="flex flex-col items-center text-center"
-              >
-                <div className="w-24 h-24 rounded-full border-2 border-[#c5a880]/40 bg-[#0b0c10] flex items-center justify-center mb-6 relative">
-                  <span className="font-display font-black text-3xl text-[#ebd09b]">{s.num}</span>
-                  <div
-                    className="absolute inset-0 -m-1 rounded-full border border-[#c5a880]/10"
-                    style={{ animation: 'landingRingPulse 4s ease-in-out infinite' }}
-                  />
-                </div>
-                <h3 className="font-display font-bold text-xl text-[#ebd09b] mb-3 tracking-wider">{s.title}</h3>
-                <p className="text-sm text-gray-400 leading-relaxed max-w-xs">{s.desc}</p>
-              </motion.div>
-            ))}
+            {/* Step 2 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.25 }}
+              className="bg-black/60 border border-white/10 rounded-2xl p-8 text-center relative flex flex-col items-center group hover:border-purple-500/50 transition-colors"
+            >
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-b from-[#180824] to-black border border-purple-500/40 flex items-center justify-center font-display font-black text-2xl text-purple-300 mb-6 shadow-[0_0_15px_rgba(168,85,247,0.2)] group-hover:scale-110 transition-transform">
+                II
+              </div>
+              <h3 className="font-display font-black text-lg text-white uppercase tracking-wider mb-2">
+                Awaken Your Army
+              </h3>
+              <p className="text-sm text-gray-400 font-sans leading-relaxed">
+                Receive starter battle cards, open booster packs at the Altar, and configure your hero's combat stance for battle.
+              </p>
+            </motion.div>
+
+            {/* Step 3 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="bg-black/60 border border-white/10 rounded-2xl p-8 text-center relative flex flex-col items-center group hover:border-rose-500/50 transition-colors"
+            >
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-b from-[#24080e] to-black border border-rose-500/40 flex items-center justify-center font-display font-black text-2xl text-rose-300 mb-6 shadow-[0_0_15px_rgba(244,63,94,0.2)] group-hover:scale-110 transition-transform">
+                III
+              </div>
+              <h3 className="font-display font-black text-lg text-white uppercase tracking-wider mb-2">
+                Conquer the Leagues
+              </h3>
+              <p className="text-sm text-gray-400 font-sans leading-relaxed">
+                Defeat abyss commanders in the campaign or enter the Arena to challenge real players and claim daily Sovereign spoils.
+              </p>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ============ TOKENOMICS SECTION ============ */}
-      <section className="relative py-24 px-6">
-        <div className="max-w-4xl mx-auto">
+      {/* ============ FINAL EPIC CALL TO ACTION ============ */}
+      <section className="relative py-32 px-6 overflow-hidden border-t border-[#c5a880]/20 text-center">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(197,168,128,0.08),transparent_70%)] pointer-events-none" />
+
+        <div className="max-w-3xl mx-auto relative z-10 space-y-8">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-12"
+            className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#1c1208] to-black border-2 border-[#c5a880]/60 flex items-center justify-center shadow-[0_0_25px_rgba(197,168,128,0.4)]"
           >
-            <h2 className="font-display font-black text-3xl md:text-5xl text-white tracking-[0.2em] mb-4">
-              $VOID TOKEN
+            <span className="font-display font-black text-2xl text-[#c5a880]">Ω</span>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="space-y-3"
+          >
+            <h2 className="font-display font-black text-3xl sm:text-5xl md:text-6xl text-white tracking-[0.2em] uppercase leading-tight">
+              The Covenant Awaits
             </h2>
-            <div className="w-32 h-px bg-gradient-to-r from-transparent via-[#c5a880]/40 to-transparent mx-auto mb-6" />
-            <p className="text-gray-400 text-base md:text-lg max-w-xl mx-auto leading-relaxed">
-              The lifeblood of the covenant. Earn through gameplay, stake for rewards, trade on DEX.
+            <p className="text-base sm:text-lg text-gray-400 font-serif italic max-w-xl mx-auto">
+              Darkness will claim the hesitant. Step through the void gate and claim your rightful throne.
             </p>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="grid grid-cols-1 sm:grid-cols-3 gap-6"
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="pt-4"
           >
-            {tokenStats.map((s, i) => (
-              <div
-                key={i}
-                className="relative rounded-2xl p-6 text-center bg-[#0b0c10] overflow-hidden group"
-              >
-                {/* Gradient border effect */}
-                <div className="absolute inset-0 rounded-2xl border border-transparent bg-clip-border"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(78,7,7,0.4), rgba(197,168,128,0.2), rgba(78,7,7,0.4))',
-                    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                    WebkitMaskComposite: 'xor',
-                    maskComposite: 'exclude',
-                    padding: '1px',
-                  }}
-                />
-                <p className="text-xs text-gray-500 font-mono tracking-widest uppercase mb-2">{s.label}</p>
-                <p className="font-display font-black text-2xl md:text-3xl text-[#ebd09b]">{s.value}</p>
-              </div>
-            ))}
+            <button
+              onClick={onConnectWallet}
+              disabled={isConnecting}
+              className="px-12 py-4 bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-black font-display font-black text-sm sm:text-base tracking-[0.3em] uppercase rounded-xl transition-all duration-300 shadow-[0_0_35px_rgba(245,158,11,0.4)] hover:shadow-[0_0_50px_rgba(245,158,11,0.7)] cursor-pointer hover:scale-105 active:scale-95"
+            >
+              {isConnecting ? 'CONNECTING...' : 'ENTER THE VOID'}
+            </button>
           </motion.div>
         </div>
       </section>
 
       {/* ============ FOOTER ============ */}
-      <footer className="border-t border-[#c5a880]/10 py-12 px-6">
+      <footer className="border-t border-white/10 py-12 px-6 bg-black/80">
         <div className="max-w-4xl mx-auto flex flex-col items-center gap-6">
           {/* Social Links */}
           <div className="flex items-center gap-6">
             <a
               href="#"
-              className="w-10 h-10 rounded-full bg-white/5 border border-[#c5a880]/10 flex items-center justify-center hover:border-[#c5a880]/40 hover:bg-white/10 transition-all duration-300"
+              className="w-10 h-10 rounded-full bg-white/5 border border-[#c5a880]/20 flex items-center justify-center hover:border-[#c5a880]/60 hover:bg-white/10 transition-all duration-300"
               aria-label="Twitter / X"
             >
-              <Twitter className="w-4 h-4 text-gray-400" />
+              <Twitter className="w-4 h-4 text-gray-400 hover:text-amber-300 transition-colors" />
             </a>
             <a
               href="#"
-              className="w-10 h-10 rounded-full bg-white/5 border border-[#c5a880]/10 flex items-center justify-center hover:border-[#c5a880]/40 hover:bg-white/10 transition-all duration-300"
+              className="w-10 h-10 rounded-full bg-white/5 border border-[#c5a880]/20 flex items-center justify-center hover:border-[#c5a880]/60 hover:bg-white/10 transition-all duration-300"
               aria-label="Telegram"
             >
-              <Send className="w-4 h-4 text-gray-400" />
+              <Send className="w-4 h-4 text-gray-400 hover:text-amber-300 transition-colors" />
             </a>
             <a
               href="#"
-              className="w-10 h-10 rounded-full bg-white/5 border border-[#c5a880]/10 flex items-center justify-center hover:border-[#c5a880]/40 hover:bg-white/10 transition-all duration-300"
+              className="w-10 h-10 rounded-full bg-white/5 border border-[#c5a880]/20 flex items-center justify-center hover:border-[#c5a880]/60 hover:bg-white/10 transition-all duration-300"
               aria-label="Discord"
             >
-              <MessageCircle className="w-4 h-4 text-gray-400" />
+              <MessageCircle className="w-4 h-4 text-gray-400 hover:text-amber-300 transition-colors" />
             </a>
           </div>
 
-          <p className="text-xs text-gray-600 font-mono tracking-wider">Built on Solana</p>
+          <p className="text-xs text-gray-500 font-mono tracking-widest uppercase">
+            Powered by Solana Blockchain • Instant On-Chain Verification
+          </p>
 
           <p className="text-xs text-gray-600 font-display tracking-widest">
-            VOID COVENANT © 2024–2025
+            VOID COVENANT © 2024–2026 • DARK TACTICAL TCG
           </p>
         </div>
       </footer>
