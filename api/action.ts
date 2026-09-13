@@ -359,7 +359,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           'Diamond': 0,
           'Master': 0,
           'Grandmaster': 0,
-          'Void Overlord': 0
+          'Void Overlord': 0,
+          'Divine': 0
         };
 
         allProfiles?.forEach((p: any) => {
@@ -383,7 +384,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
           const rawLeague = d.pvpLeague || d.league || 'Bronze';
           let normLeague = 'Bronze';
-          if (/overlord|void/i.test(rawLeague)) normLeague = 'Void Overlord';
+          if (/divine|god/i.test(rawLeague)) normLeague = 'Divine';
+          else if (/overlord|void/i.test(rawLeague)) normLeague = 'Void Overlord';
           else if (/grandmaster|gm/i.test(rawLeague)) normLeague = 'Grandmaster';
           else if (/master/i.test(rawLeague)) normLeague = 'Master';
           else if (/diamond/i.test(rawLeague)) normLeague = 'Diamond';

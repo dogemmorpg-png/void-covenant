@@ -26,6 +26,23 @@ export interface LeagueTierRewards {
 
 export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
   {
+    name: 'Divine',
+    badge: '✨',
+    icon: '/icons/league_divine.png',
+    tierIndex: 11,
+    capacity: 2,
+    color: 'text-amber-300',
+    accent: 'text-amber-200 border-amber-400/50 bg-gradient-to-r from-amber-950/60 via-yellow-950/40 to-black',
+    border: 'border-amber-400/70',
+    bgGradient: 'from-amber-950/60 via-yellow-950/40 to-black',
+    summary: 'The Sacred Pantheon of Immortals. 2 Apex Seats.',
+    promotionZone: 'Rank #1 Retains Godhood • Rank #2 Demotes to Void Overlord',
+    brackets: [
+      { rankLabel: 'Rank #1', sovereigns: 1500, gold: 15000, dust: 1500, isSafe: true },
+      { rankLabel: 'Rank #2', sovereigns: 800, gold: 9000, dust: 900, isDemotion: true }
+    ]
+  },
+  {
     name: 'Void Overlord',
     badge: '👑',
     icon: '/icons/league_void_overlord.png',
@@ -36,9 +53,9 @@ export const ALL_LEAGUE_REWARDS: LeagueTierRewards[] = [
     border: 'border-rose-500/50',
     bgGradient: 'from-red-950/40 via-purple-950/30 to-black',
     summary: 'The apex of realm domination. 10 Elite Seats.',
-    promotionZone: 'Top 7 Retain • Bottom 3 Demote to GM',
+    promotionZone: 'Rank #1 Ascends to Divine • Ranks 2-7 Retain • Ranks 8-10 Demote to GM',
     brackets: [
-      { rankLabel: 'Rank #1', sovereigns: 600, gold: 7500, dust: 750 },
+      { rankLabel: 'Rank #1', sovereigns: 600, gold: 7500, dust: 750, isPromotion: true },
       { rankLabel: 'Rank #2', sovereigns: 400, gold: 5000, dust: 500 },
       { rankLabel: 'Rank #3', sovereigns: 300, gold: 4000, dust: 400 },
       { rankLabel: 'Ranks #4 – #7', sovereigns: 180, gold: 3000, dust: 300, isSafe: true },

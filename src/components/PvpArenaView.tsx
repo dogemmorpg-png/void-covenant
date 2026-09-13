@@ -21,7 +21,8 @@ interface PvpArenaViewProps {
 }
 
 const LEAGUE_QUICK_RULES: Record<string, { promo: string; safe: string; demo: string }> = {
-  'Void Overlord': { promo: '10 Seats', safe: '1–7: Safe', demo: '8–10: Demote' },
+  'Divine': { promo: '👑 Apex Crown', safe: '#1: Safe Godhood', demo: '#2: Demote to Overlord' },
+  'Void Overlord': { promo: '#1: Promote to Divine', safe: '2–7: Safe', demo: '8–10: Demote' },
   'Grandmaster': { promo: 'Top 3: Promote', safe: '4–20: Safe', demo: '21–30: Demote' },
   'Master': { promo: 'Top 7: Promote', safe: '8–30: Safe', demo: '31–50: Demote' },
   'Diamond': { promo: 'Top 15: Promote', safe: '16–80: Safe', demo: '81–150: Demote' },
@@ -36,7 +37,8 @@ const LEAGUE_QUICK_RULES: Record<string, { promo: string; safe: string; demo: st
 };
 
 const LEAGUE_TABLE_DATA = [
-  { name: 'Void Overlord', icon: '/icons/league_void_overlord.png', capacity: '10 Seats', color: 'text-rose-400', promo: '', safe: 'Ranks #1 – #7', demo: 'Ranks #8 – #10' },
+  { name: 'Divine', icon: '/icons/league_divine.png', capacity: '2 Seats', color: 'text-amber-300', promo: '', safe: 'Rank #1 (Godhood)', demo: 'Rank #2' },
+  { name: 'Void Overlord', icon: '/icons/league_void_overlord.png', capacity: '10 Seats', color: 'text-rose-400', promo: 'Rank #1', safe: 'Ranks #2 – #7', demo: 'Ranks #8 – #10' },
   { name: 'Grandmaster', icon: '/icons/league_grandmaster_crest.png', capacity: '30 Seats', color: 'text-amber-300', promo: 'Top 3 (#1–#3)', safe: 'Ranks #4 – #20', demo: 'Ranks #21 – #30' },
   { name: 'Master', icon: '/icons/league_master_crest.png', capacity: '50 Seats', color: 'text-purple-300', promo: 'Top 7 (#1–#7)', safe: 'Ranks #8 – #30', demo: 'Ranks #31 – #50' },
   { name: 'Diamond', icon: '/icons/league_diamond.png', capacity: '150 Seats', color: 'text-cyan-300', promo: 'Top 15 (#1–#15)', safe: 'Ranks #16 – #80', demo: 'Ranks #81 – #150' },
@@ -216,6 +218,15 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
         color: 'text-rose-400 border-rose-500/40 bg-rose-950/30',
         glow: 'shadow-[0_0_25px_rgba(244,63,94,0.4)]',
         accent: 'text-rose-500'
+      };
+    } else if (name.startsWith('Divine')) {
+      return {
+        name: 'Divine',
+        badge: '✨',
+        icon: '/icons/league_divine.png',
+        color: 'text-amber-200 border-amber-400/50 bg-gradient-to-r from-amber-950/60 via-yellow-950/40 to-black',
+        glow: 'shadow-[0_0_30px_rgba(245,158,11,0.5)]',
+        accent: 'text-amber-300'
       };
     } else {
       return {
@@ -503,6 +514,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       'Master',
       'Grandmaster',
       'Void Overlord',
+      'Divine',
       'More Leagues Soon'
     ];
     const idx = LEAGUES.indexOf(viewingLeague);
@@ -528,6 +540,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
       'Master',
       'Grandmaster',
       'Void Overlord',
+      'Divine',
       'More Leagues Soon'
     ];
     const idx = LEAGUES.indexOf(selectedRewardLeague);
@@ -1592,6 +1605,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               }
 
               const rules = LEAGUE_QUICK_RULES[viewingLeague] || { promo: 'Promote', safe: 'Safe', demo: 'Demote' };
+              const isDivine = viewingLeague === 'Divine';
               const isOverlord = viewingLeague === 'Void Overlord';
               const isBronze = viewingLeague === 'Bronze';
 
@@ -1601,8 +1615,8 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   className="bg-black/70 border border-white/10 hover:border-amber-500/40 rounded-xl py-2 px-3 flex items-center justify-between text-xs font-mono shadow-inner cursor-pointer transition-all hover:bg-black/90 group"
                   title="Click to view full League rules table"
                 >
-                  <span className={`flex items-center gap-1 font-bold ${isOverlord ? 'text-amber-300' : 'text-emerald-400'}`}>
-                    <span className="text-xs leading-none">{isOverlord ? '👑' : '▲'}</span>
+                  <span className={`flex items-center gap-1 font-bold ${isDivine ? 'text-amber-300' : isOverlord ? 'text-rose-400' : 'text-emerald-400'}`}>
+                    <span className="text-xs leading-none">{isDivine ? '✨' : isOverlord ? '👑' : '▲'}</span>
                     <span>{rules.promo}</span>
                   </span>
                   <span className="text-gray-600 font-bold">•</span>

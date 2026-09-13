@@ -34,6 +34,7 @@ export const getNormalizedLeague = (leagueRaw: any): string => {
   if (!leagueRaw || typeof leagueRaw !== 'string') return 'Bronze';
   const l = leagueRaw.trim();
   if (!l) return 'Bronze';
+  if (/divine|god/i.test(l)) return 'Divine';
   if (/overlord|void/i.test(l)) return 'Void Overlord';
   if (/grandmaster|gm/i.test(l)) return 'Grandmaster';
   if (/master/i.test(l)) return 'Master';
@@ -51,6 +52,11 @@ export const getNormalizedLeague = (leagueRaw: any): string => {
 export const getLeagueBadgeStyle = (leagueRaw: any) => {
   const norm = getNormalizedLeague(leagueRaw);
   switch (norm) {
+    case 'Divine':
+      return {
+        badge: '✨ DIVINE',
+        className: 'bg-gradient-to-r from-amber-950/90 via-yellow-900/90 to-amber-950/90 border border-amber-400/80 text-amber-200 shadow-[0_0_15px_rgba(245,158,11,0.5)]'
+      };
     case 'Void Overlord':
       return {
         badge: '👑 VOID OVERLORD',
@@ -823,7 +829,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                 </h3>
 
                 <div className="grid grid-cols-2 sm:grid-cols-5 md:grid-cols-6 gap-3">
-                  {['Bronze', 'Silver', 'Gold', 'Platinum', 'Sapphire', 'Emerald', 'Ruby', 'Diamond', 'Master', 'Grandmaster', 'Void Overlord'].map(league => {
+                  {['Bronze', 'Silver', 'Gold', 'Platinum', 'Sapphire', 'Emerald', 'Ruby', 'Diamond', 'Master', 'Grandmaster', 'Void Overlord', 'Divine'].map(league => {
                     const count = overview?.leagueDistribution?.[league] || 0;
                     const total = overview?.totalPlayers || 1;
                     const pct = Math.round((count / total) * 100);
@@ -1068,6 +1074,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                       <option value="Master">Master League</option>
                       <option value="Grandmaster">Grandmaster League</option>
                       <option value="Void Overlord">Void Overlord League</option>
+                      <option value="Divine">Divine League</option>
                     </select>
                   )}
 
@@ -1231,7 +1238,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
                     {/* League Filter Pills */}
                     <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 select-none">
-                      {['all', 'Premium', 'Ultra', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Sapphire', 'Emerald', 'Ruby', 'Diamond', 'Master', 'Grandmaster', 'Void Overlord', 'Banned'].map(l => (
+                      {['all', 'Premium', 'Ultra', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Sapphire', 'Emerald', 'Ruby', 'Diamond', 'Master', 'Grandmaster', 'Void Overlord', 'Divine', 'Banned'].map(l => (
                         <button
                           key={l}
                           onClick={() => setPlayerLeagueFilter(l)}
@@ -1842,6 +1849,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           <option value="Master">⚔️ Master League</option>
                           <option value="Grandmaster">⚜️ Grandmaster League</option>
                           <option value="Void Overlord">👑 Void Overlord League</option>
+                          <option value="Divine">✨ Divine League</option>
                         </select>
                       </div>
 

@@ -12,11 +12,13 @@ export const PVP_LEAGUES = [
   'Diamond',
   'Master',
   'Grandmaster',
-  'Void Overlord'
+  'Void Overlord',
+  'Divine'
 ];
 
 export const LEAGUE_PROMOTION_CONFIG: Record<string, { promoteTop: number; demoteRankAbove: number; capacity?: number }> = {
-  'Void Overlord': { promoteTop: 0, demoteRankAbove: 7, capacity: 10 },
+  'Divine': { promoteTop: 0, demoteRankAbove: 1, capacity: 2 },
+  'Void Overlord': { promoteTop: 1, demoteRankAbove: 7, capacity: 10 },
   'Grandmaster': { promoteTop: 3, demoteRankAbove: 20, capacity: 30 },
   'Master': { promoteTop: 7, demoteRankAbove: 30, capacity: 50 },
   'Diamond': { promoteTop: 15, demoteRankAbove: 80, capacity: 150 },
@@ -31,13 +33,24 @@ export const LEAGUE_PROMOTION_CONFIG: Record<string, { promoteTop: number; demot
 
 export const DEFAULT_LEAGUE_REWARDS = [
   {
+    name: 'Divine',
+    badge: '✨',
+    icon: '/icons/league_divine.png',
+    tierIndex: 11,
+    capacity: 2,
+    brackets: [
+      { rankLabel: 'Rank #1', sovereigns: 1500, gold: 15000, dust: 1500, isSafe: true },
+      { rankLabel: 'Rank #2', sovereigns: 800, gold: 9000, dust: 900, isDemotion: true }
+    ]
+  },
+  {
     name: 'Void Overlord',
     badge: '👑',
     icon: '/icons/league_void_overlord.png',
     tierIndex: 10,
     capacity: 10,
     brackets: [
-      { rankLabel: 'Rank #1', sovereigns: 600, gold: 7500, dust: 750 },
+      { rankLabel: 'Rank #1', sovereigns: 600, gold: 7500, dust: 750, isPromotion: true },
       { rankLabel: 'Rank #2', sovereigns: 400, gold: 5000, dust: 500 },
       { rankLabel: 'Rank #3', sovereigns: 300, gold: 4000, dust: 400 },
       { rankLabel: 'Ranks #4 – #7', sovereigns: 180, gold: 3000, dust: 300, isSafe: true },
