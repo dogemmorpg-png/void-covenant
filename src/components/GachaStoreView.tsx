@@ -587,12 +587,16 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   : 'bg-black/60 border-white/10 group-hover:border-amber-500/40'
               }`}>
                 <div className={`absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.35),transparent_70%)] ${activeCategory === 'level_boost' ? 'opacity-100' : 'opacity-20'}`} />
-                <Zap className={`w-6 h-6 relative z-10 filter ${activeCategory === 'level_boost' ? 'text-amber-300 drop-shadow-[0_0_8px_rgba(245,158,11,0.9)]' : 'text-amber-500/80'}`} />
+                <img
+                  src="/shop/ascension_sigil.png"
+                  alt="Ascension"
+                  className={`w-9 h-9 object-contain relative z-10 transition-transform ${activeCategory === 'level_boost' ? 'scale-110 drop-shadow-[0_0_8px_rgba(245,158,11,0.9)]' : 'opacity-80 group-hover:opacity-100'}`}
+                />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
                   <span className="font-display font-black text-xs sm:text-sm tracking-wider uppercase text-white group-hover:text-amber-200 transition-colors">
-                    Быстрая прокачка
+                    Instant Ascension
                   </span>
                   <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-black text-[8px] font-mono px-1.5 py-0.2 rounded font-black tracking-wider hidden md:inline shadow-[0_0_8px_rgba(245,158,11,0.4)]">
                     VIP BOOST
@@ -1807,28 +1811,32 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
           {activeCategory === 'level_boost' && (
             <div className="space-y-4 sm:space-y-5 animate-fade-in">
               {/* Category Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-500/20 pb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500/30 to-orange-500/20 border border-amber-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.35)]">
-                    <Zap className="w-4 h-4 text-amber-300 animate-pulse" />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-500/20 pb-3.5">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/20 via-black to-amber-950/50 border border-amber-400/50 flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.3)] shrink-0 overflow-hidden">
+                    <img
+                      src="/shop/ascension_sigil.png"
+                      alt="Ascension Sigil"
+                      className="w-9 h-9 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]"
+                    />
                   </div>
                   <div>
-                    <h2 className="font-display font-black text-base sm:text-xl text-white tracking-widest text-shadow-gold uppercase flex items-center gap-2">
-                      <span>Быстрая прокачка</span>
+                    <h2 className="font-display font-black text-lg sm:text-xl text-white tracking-widest text-shadow-gold uppercase flex items-center gap-2">
+                      <span>Instant Ascension</span>
                       <span className="text-amber-400 text-[9px] sm:text-xs font-mono tracking-normal border border-amber-500/40 bg-amber-950/60 px-2 py-0.5 rounded-full font-bold hidden sm:inline">
-                        INSTANT ASCENSION
+                        VIP TRANSCENDENCE
                       </span>
                     </h2>
-                    <p className="text-[10px] sm:text-xs text-gray-300 font-sans leading-none mt-0.5">
-                      Мгновенное возвышение героя до 50 или 100 уровня со всеми очками талантов и запасом HP
+                    <p className="text-[11px] sm:text-xs text-gray-300 font-sans leading-relaxed mt-0.5">
+                      Transcend mortal limits. Instantly elevate your hero to Level 50 or 100 with all skill points and permanent health.
                     </p>
                   </div>
                 </div>
                 
                 {/* Current Hero Level indicator */}
-                <div className="flex items-center gap-2 self-start sm:self-auto bg-black/60 border border-amber-500/30 px-3 py-1.5 rounded-xl font-mono text-xs">
-                  <span className="text-gray-400 text-[10px] uppercase font-bold">Текущий уровень:</span>
-                  <span className="text-amber-300 font-black text-sm">Lvl {profile.level || 1}</span>
+                <div className="flex items-center gap-2 self-start sm:self-auto bg-black/60 border border-amber-500/30 px-3.5 py-1.5 rounded-xl font-mono text-xs shrink-0">
+                  <span className="text-gray-400 text-[10px] uppercase font-bold tracking-wider">CURRENT LEVEL:</span>
+                  <span className="text-amber-300 font-black text-sm drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]">LVL {profile.level || 1}</span>
                 </div>
               </div>
 
@@ -1858,51 +1866,50 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                         <div className="flex items-center justify-between">
                           <span className="bg-amber-950/80 border border-amber-500/50 text-amber-300 text-[9px] sm:text-[10px] font-mono px-2.5 py-0.5 rounded-full font-black tracking-wider uppercase shadow-[0_0_8px_rgba(245,158,11,0.3)] flex items-center gap-1.5">
                             <Sparkles className="w-3 h-3 text-amber-400" />
-                            ASCENDANT LORD
+                            ASCENDANT CHAMPION
                           </span>
                           <span className="text-[11px] font-mono text-gray-400 font-bold">
-                            ЭТАП I
+                            STAGE I
                           </span>
                         </div>
 
-                        {/* Title & Level Badge */}
-                        <div className="flex items-center gap-3.5">
-                          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-b from-amber-500/20 via-black to-black border-2 border-amber-400/60 flex flex-col items-center justify-center shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.3)] group-hover:scale-105 transition-transform">
-                            <span className="text-[10px] font-mono text-amber-400/80 font-bold uppercase leading-none">LVL</span>
-                            <span className="text-2xl sm:text-3xl font-display font-black text-white leading-none mt-0.5 text-shadow-gold">
-                              50
-                            </span>
+                        {/* Title & Bespoke Crest Artwork */}
+                        <div className="flex items-center gap-4">
+                          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-b from-amber-500/15 via-black to-black border-2 border-amber-400/60 p-1.5 flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.3)] group-hover:scale-105 group-hover:border-amber-400 transition-all">
+                            <img
+                              src="/shop/level_50_sigil.png"
+                              alt="Level 50 Sigil"
+                              className="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(245,158,11,0.8)]"
+                            />
                           </div>
-                          <div>
+                          <div className="min-w-0">
+                            <div className="text-[10px] font-mono text-amber-400/80 font-bold uppercase tracking-wider">MID-GAME SURGE</div>
                             <h3 className="font-display font-black text-lg sm:text-xl text-white uppercase tracking-wider group-hover:text-amber-200 transition-colors">
-                              Мгновенный 50 Уровень
+                              Instant Level 50
                             </h3>
-                            <p className="text-xs text-gray-300 font-sans leading-relaxed">
-                              Моментальный прыжок в средний и поздний эндгейм без рутинного гринда.
+                            <p className="text-xs text-gray-300 font-sans leading-relaxed mt-0.5">
+                              Skip the early progression grind and surge directly into the mid-game.
                             </p>
                           </div>
                         </div>
 
-                        {/* Benefits list */}
-                        <div className="bg-black/50 border border-white/10 rounded-2xl p-3 sm:p-3.5 space-y-2 font-sans text-xs">
-                          <div className="text-[10px] font-mono uppercase text-gray-400 font-bold tracking-wider mb-1">
-                            ЧТО ВЫ ПОЛУЧАЕТЕ:
+                        {/* Benefits list (Honest and accurate - no false equipment/card promises) */}
+                        <div className="bg-black/55 border border-amber-500/20 rounded-2xl p-3.5 space-y-2.5 font-sans text-xs">
+                          <div className="text-[10px] font-mono uppercase text-amber-400/90 font-bold tracking-wider mb-1 flex items-center justify-between">
+                            <span>ASCENSION EMPOWERMENTS:</span>
+                            <span className="text-emerald-400 font-bold">GUARANTEED</span>
                           </div>
-                          <div className="flex items-center gap-2 text-amber-200">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                            <span>Уровень героя становится ровно <strong className="text-white font-mono">50</strong></span>
+                          <div className="flex items-start gap-2.5 text-amber-100">
+                            <Sparkles className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                            <span>Hero Level immediately ascends to <strong className="text-white font-mono font-bold">Level 50</strong></span>
                           </div>
-                          <div className="flex items-center gap-2 text-amber-200">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                            <span><strong className="text-amber-300 font-mono">+49 очков талантов</strong> для любых веток навыков</span>
+                          <div className="flex items-start gap-2.5 text-amber-100">
+                            <Sparkles className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                            <span><strong className="text-amber-300 font-mono font-bold">+49 Talent Points</strong> granted to unlock skill trees</span>
                           </div>
-                          <div className="flex items-center gap-2 text-amber-200">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                            <span>Базовое здоровье возрастает до <strong className="text-white font-mono">128 HP</strong></span>
-                          </div>
-                          <div className="flex items-center gap-2 text-amber-200">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                            <span>Полный доступ к мидгейм-снаряжению и мощным колодам</span>
+                          <div className="flex items-start gap-2.5 text-amber-100">
+                            <Sparkles className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                            <span>Permanent Base Health increased to <strong className="text-white font-mono font-bold">128 HP</strong></span>
                           </div>
                         </div>
                       </div>
@@ -1911,7 +1918,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       <div className="mt-4 pt-3 border-t border-white/10 relative z-10">
                         {isAlreadyReached ? (
                           <div className="w-full py-3 px-4 rounded-2xl bg-white/5 border border-white/10 text-gray-400 font-display font-black text-xs uppercase tracking-widest text-center">
-                            ✓ УЖЕ ДОСТИГНУТ 50+ УРОВЕНЬ
+                            ✓ ALREADY LEVEL 50+
                           </div>
                         ) : (
                           <button
@@ -1926,10 +1933,10 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                             }`}
                           >
                             {isProcessing ? (
-                              <span>ВОЗВЫШЕНИЕ...</span>
+                              <span>ASCENDING...</span>
                             ) : (
                               <>
-                                <span>ПОЛУЧИТЬ 50 УРОВЕНЬ ЗА</span>
+                                <span>ASCEND TO LEVEL 50 FOR</span>
                                 <div className="flex items-center gap-1 font-mono font-black text-base text-black">
                                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(244,63,94,0.8)]" />
                                   <span className={canAfford ? 'text-black' : 'text-amber-300'}>{cost}</span>
@@ -1959,7 +1966,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                     }`}>
                       {/* Ambient glows */}
                       <div className="absolute top-0 right-0 w-52 h-52 bg-rose-500/15 rounded-full blur-3xl pointer-events-none" />
-                      <div className="absolute bottom-0 left-0 w-40 h-40 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
+                      <div className="absolute bottom-0 left-0 w-40 h-40 bg-purple-600/15 rounded-full blur-2xl pointer-events-none" />
 
                       <div className="space-y-4 relative z-10">
                         {/* Header Pill */}
@@ -1969,49 +1976,47 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                             SUPREME GODHOOD
                           </span>
                           <span className="text-[11px] font-mono text-rose-300 font-bold flex items-center gap-1">
-                            <span>🔥</span> МАКСИМАЛЬНАЯ МОЩЬ
+                            <span>🔥</span> MAXIMUM APEX
                           </span>
                         </div>
 
-                        {/* Title & Level Badge */}
-                        <div className="flex items-center gap-3.5">
-                          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-b from-rose-900/60 via-purple-950/80 to-black border-2 border-rose-400/80 flex flex-col items-center justify-center shrink-0 shadow-[0_0_25px_rgba(244,63,94,0.45)] group-hover:scale-105 transition-transform">
-                            <span className="text-[10px] font-mono text-rose-300 font-bold uppercase leading-none">LVL</span>
-                            <span className="text-2xl sm:text-3xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-200 via-amber-200 to-yellow-400 leading-none mt-0.5 drop-shadow-[0_2px_8px_rgba(244,63,94,0.8)]">
-                              100
-                            </span>
+                        {/* Title & Bespoke Crown Artwork */}
+                        <div className="flex items-center gap-4">
+                          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-b from-rose-900/40 via-purple-950/60 to-black border-2 border-rose-400/80 p-1.5 flex items-center justify-center shrink-0 shadow-[0_0_25px_rgba(244,63,94,0.4)] group-hover:scale-105 group-hover:border-rose-400 transition-all">
+                            <img
+                              src="/shop/level_100_sigil.png"
+                              alt="Level 100 Sigil"
+                              className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(244,63,94,0.8)]"
+                            />
                           </div>
-                          <div>
+                          <div className="min-w-0">
+                            <div className="text-[10px] font-mono text-rose-400 font-bold uppercase tracking-wider">ENDGAME PINNACLE</div>
                             <h3 className="font-display font-black text-lg sm:text-xl text-transparent bg-clip-text bg-gradient-to-r from-white via-rose-100 to-amber-200 uppercase tracking-wider group-hover:from-rose-200 group-hover:to-amber-300 transition-all">
-                              Мгновенный 100 Уровень
+                              Instant Level 100
                             </h3>
-                            <p className="text-xs text-gray-300 font-sans leading-relaxed">
-                              Предельная вершина могущества. Доминация в PvP Арене и Кампании с первого дня.
+                            <p className="text-xs text-gray-300 font-sans leading-relaxed mt-0.5">
+                              Attain maximum power and total mastery over the Abyss from day one.
                             </p>
                           </div>
                         </div>
 
-                        {/* Benefits list */}
-                        <div className="bg-black/60 border border-rose-500/25 rounded-2xl p-3 sm:p-3.5 space-y-2 font-sans text-xs shadow-inner">
+                        {/* Benefits list (Honest and accurate - no false equipment/card promises) */}
+                        <div className="bg-black/60 border border-rose-500/25 rounded-2xl p-3.5 space-y-2.5 font-sans text-xs shadow-inner">
                           <div className="text-[10px] font-mono uppercase text-rose-400 font-bold tracking-wider mb-1 flex items-center justify-between">
-                            <span>ЧТО ВЫ ПОЛУЧАЕТЕ:</span>
-                            <span className="text-amber-300 font-bold">ENDGAME APEX</span>
+                            <span>SUPREME EMPOWERMENTS:</span>
+                            <span className="text-amber-300 font-bold">MAX LEVEL CAP</span>
                           </div>
-                          <div className="flex items-center gap-2 text-rose-100">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                            <span>Уровень героя взлетает до максимума — <strong className="text-white font-mono">100 LVL</strong></span>
+                          <div className="flex items-start gap-2.5 text-rose-100">
+                            <Crown className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                            <span>Hero Level immediately ascends to maximum <strong className="text-white font-mono font-bold">Level 100</strong></span>
                           </div>
-                          <div className="flex items-center gap-2 text-rose-100">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                            <span><strong className="text-amber-300 font-mono">+99 очков талантов</strong> (полное раскрытие всех веток)</span>
+                          <div className="flex items-start gap-2.5 text-rose-100">
+                            <Crown className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                            <span><strong className="text-amber-300 font-mono font-bold">+99 Talent Points</strong> granted (full potential across all trees)</span>
                           </div>
-                          <div className="flex items-center gap-2 text-rose-100">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                            <span>Колоссальный запас базового HP: <strong className="text-white font-mono">228 HP</strong></span>
-                          </div>
-                          <div className="flex items-center gap-2 text-rose-100">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                            <span>Экипировка абсолютных реликвий Демиурга и триумф в PvP</span>
+                          <div className="flex items-start gap-2.5 text-rose-100">
+                            <Crown className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                            <span>Permanent Base Health increased to <strong className="text-white font-mono font-bold">228 HP</strong></span>
                           </div>
                         </div>
                       </div>
@@ -2020,7 +2025,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       <div className="mt-4 pt-3 border-t border-white/10 relative z-10">
                         {isMaxLevel ? (
                           <div className="w-full py-3 px-4 rounded-2xl bg-white/5 border border-white/10 text-gray-400 font-display font-black text-xs uppercase tracking-widest text-center">
-                            ✓ ДОСТИГНУТ МАКСИМАЛЬНЫЙ УРОВЕНЬ (100)
+                            ✓ MAX LEVEL REACHED (100)
                           </div>
                         ) : (
                           <button
@@ -2035,10 +2040,10 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                             }`}
                           >
                             {isProcessing ? (
-                              <span>ВОЗВЫШЕНИЕ...</span>
+                              <span>ASCENDING...</span>
                             ) : (
                               <>
-                                <span>ПОЛУЧИТЬ 100 УРОВЕНЬ ЗА</span>
+                                <span>ASCEND TO LEVEL 100 FOR</span>
                                 <div className="flex items-center gap-1 font-mono font-black text-base text-white">
                                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(244,63,94,0.8)]" />
                                   <span className={canAfford ? 'text-white' : 'text-rose-300'}>{cost}</span>
@@ -2055,10 +2060,10 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
               </div>
 
               {/* Bottom Note */}
-              <div className="bg-gradient-to-r from-amber-950/30 via-black to-black border border-amber-500/20 rounded-2xl p-3 sm:p-3.5 flex items-center gap-3 text-xs text-gray-300">
-                <span className="text-amber-400 text-base shrink-0">💡</span>
+              <div className="bg-gradient-to-r from-amber-950/30 via-black to-black border border-amber-500/20 rounded-2xl p-3.5 sm:p-4 flex items-center gap-3.5 text-xs text-gray-300 shadow-lg">
+                <span className="text-amber-400 text-lg shrink-0">💡</span>
                 <p className="font-sans leading-relaxed">
-                  После мгновенного возвышения перейдите во вкладку <strong className="text-amber-300">«Таланты»</strong> для распределения свободных очков навыков и создания мощнейших боевых стоек.
+                  After ascending, visit the <strong className="text-amber-300">Talents</strong> tab in your hero sanctum to allocate your newly acquired skill points across your combat stances.
                 </p>
               </div>
 
