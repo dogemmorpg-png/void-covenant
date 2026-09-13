@@ -1841,7 +1841,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
               </div>
 
               {/* 2 Boost Cards Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-3.5">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 sm:gap-4">
                 
                 {/* 1. Level 50 Ascension */}
                 {(() => {
@@ -1852,7 +1852,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   const isProcessing = isBuyingLevelBoost === 50;
 
                   return (
-                    <div className={`rounded-2xl border-2 p-3 sm:p-3.5 flex flex-col justify-between relative overflow-hidden transition-all duration-300 ${
+                    <div className={`rounded-2xl border-2 p-3.5 sm:p-4 flex flex-col justify-between relative overflow-hidden transition-all duration-300 ${
                       isAlreadyReached 
                         ? 'bg-[#0d0f14]/80 border-white/10 opacity-75'
                         : 'bg-gradient-to-b from-[#1c1208] via-[#120b05] to-[#0a0603] border-amber-500/50 hover:border-amber-400 shadow-[0_10px_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_35px_rgba(245,158,11,0.25)] group'
@@ -1861,71 +1861,71 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       <div className="absolute top-0 right-0 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
                       <div className="absolute bottom-0 left-0 w-32 h-32 bg-orange-600/10 rounded-full blur-xl pointer-events-none" />
 
-                      <div className="space-y-2.5 relative z-10">
+                      <div className="space-y-3 relative z-10">
                         {/* Top Tier Tag */}
-                        <div className="flex items-center justify-between text-[8.5px] sm:text-[9px] font-mono font-bold tracking-wider text-amber-400/90 uppercase px-0.5">
+                        <div className="flex items-center justify-between text-[10px] sm:text-[10.5px] font-mono font-bold tracking-wider text-amber-400/90 uppercase px-0.5">
                           <span className="flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                             ASCENDANT CHAMPION
                           </span>
-                          <span className="bg-amber-950/80 border border-amber-500/40 px-1.5 py-0.2 rounded text-[7.5px] text-amber-300">
+                          <span className="bg-amber-950/80 border border-amber-500/40 px-2 py-0.5 rounded text-[8.5px] sm:text-[9px] text-amber-300">
                             STAGE I
                           </span>
                         </div>
 
-                        {/* Title & Bespoke Crest Artwork */}
-                        <div className="flex items-center gap-3">
-                          <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-xl bg-gradient-to-b from-amber-500/15 via-black to-black border-2 border-amber-400/60 p-1 flex items-center justify-center shrink-0 shadow-[0_0_18px_rgba(245,158,11,0.3)] group-hover:scale-105 group-hover:border-amber-400 transition-all">
+                        {/* Title & Bespoke Crest Artwork (~25% larger: w-20 h-20 sm:w-22 sm:h-22) */}
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-xl bg-gradient-to-b from-amber-500/15 via-black to-black border-2 border-amber-400/60 p-1 flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.35)] group-hover:scale-105 group-hover:border-amber-400 transition-all">
                             <img
                               src="/shop/level_50_sigil.png"
                               alt="Level 50 Sigil"
-                              className="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(245,158,11,0.8)]"
+                              className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(245,158,11,0.85)]"
                             />
                           </div>
                           <div className="min-w-0">
-                            <div className="text-[9px] font-mono text-amber-400/80 font-bold uppercase tracking-wider">MID-GAME SURGE</div>
-                            <h3 className="font-display font-black text-base sm:text-lg text-white uppercase tracking-wider group-hover:text-amber-200 transition-colors leading-snug">
+                            <div className="text-[10px] sm:text-[10.5px] font-mono text-amber-400/90 font-bold uppercase tracking-wider">MID-GAME SURGE</div>
+                            <h3 className="font-display font-black text-lg sm:text-xl text-white uppercase tracking-wider group-hover:text-amber-200 transition-colors leading-tight">
                               Instant Level 50
                             </h3>
-                            <p className="text-[10px] text-gray-400 font-sans leading-tight mt-0.5">
+                            <p className="text-[11px] sm:text-xs text-gray-300 font-sans leading-snug mt-1">
                               Skip early progression and surge directly into mid-game content.
                             </p>
                           </div>
                         </div>
 
                         {/* Structured Hero Progression Breakdown */}
-                        <div className="bg-black/65 border border-white/10 rounded-xl p-2 sm:p-2.5 text-[11px] font-mono space-y-1 shadow-inner">
-                          <div className="flex justify-between items-center text-[9px] text-gray-400 uppercase tracking-wider font-bold border-b border-white/10 pb-1">
+                        <div className="bg-black/65 border border-white/10 rounded-xl p-2.5 sm:p-3 text-xs font-mono space-y-1.5 shadow-inner">
+                          <div className="flex justify-between items-center text-[10px] sm:text-[10.5px] text-gray-400 uppercase tracking-wider font-bold border-b border-white/10 pb-1.5">
                             <span className="flex items-center gap-1.5 text-amber-400">
                               <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                               Hero Progression
                             </span>
-                            <span className="text-amber-400 font-bold text-[8px] bg-amber-950/80 border border-amber-500/40 px-1.5 py-0.2 rounded">INSTANT</span>
+                            <span className="text-amber-400 font-bold text-[9px] bg-amber-950/80 border border-amber-500/40 px-2 py-0.5 rounded">INSTANT</span>
                           </div>
                           <div className="flex justify-between items-center py-0.5">
-                            <span className="text-gray-300 flex items-center gap-1.5 text-[10.5px]">
+                            <span className="text-gray-300 flex items-center gap-1.5 text-xs sm:text-[12.5px]">
                               <span className="w-1.5 h-1.5 rounded-full bg-amber-500/80" />
                               Hero Level:
                             </span>
-                            <span className="text-white font-bold text-xs bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/40">
+                            <span className="text-white font-bold text-xs sm:text-[13px] bg-amber-950/60 px-2.5 py-0.5 rounded border border-amber-500/40">
                               Level 50
                             </span>
                           </div>
                           <div className="flex justify-between items-center py-0.5">
-                            <span className="text-gray-300 flex items-center gap-1.5 text-[10.5px]">
+                            <span className="text-gray-300 flex items-center gap-1.5 text-xs sm:text-[12.5px]">
                               <span className="w-1.5 h-1.5 rounded-full bg-amber-500/80" />
                               Talent Points:
                             </span>
-                            <span className="text-amber-300 font-bold text-xs bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/40">
+                            <span className="text-amber-300 font-bold text-xs sm:text-[13px] bg-amber-950/60 px-2.5 py-0.5 rounded border border-amber-500/40">
                               +49 Points
                             </span>
                           </div>
                           <div className="flex justify-between items-center py-0.5">
-                            <span className="text-gray-300 flex items-center gap-1.5 text-[10.5px]">
+                            <span className="text-gray-300 flex items-center gap-1.5 text-xs sm:text-[12.5px]">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />
                               Base Health:
                             </span>
-                            <span className="text-emerald-300 font-bold text-xs bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/40">
+                            <span className="text-emerald-300 font-bold text-xs sm:text-[13px] bg-emerald-950/60 px-2.5 py-0.5 rounded border border-emerald-500/40">
                               128 HP
                             </span>
                           </div>
@@ -1933,16 +1933,16 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       </div>
 
                       {/* Buy Button */}
-                      <div className="mt-2.5 pt-2 border-t border-white/10 relative z-10">
+                      <div className="mt-3 pt-2.5 border-t border-white/10 relative z-10">
                         {isAlreadyReached ? (
-                          <div className="w-full py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-display font-black text-xs uppercase tracking-widest text-center">
+                          <div className="w-full py-2.5 px-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-display font-black text-xs sm:text-sm uppercase tracking-widest text-center">
                             ✓ ALREADY LEVEL 50+
                           </div>
                         ) : (
                           <button
                             onClick={() => handleBuyLevelBoost(50)}
                             disabled={isProcessing}
-                            className={`w-full py-2 px-3 rounded-xl font-display font-black text-xs sm:text-sm tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer select-none shadow-xl ${
+                            className={`w-full py-2.5 px-3 rounded-xl font-display font-black text-xs sm:text-sm tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer select-none shadow-xl ${
                               isProcessing
                                 ? 'bg-gray-700 text-gray-400 cursor-wait'
                                 : canAfford
@@ -1977,7 +1977,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   const isProcessing = isBuyingLevelBoost === 100;
 
                   return (
-                    <div className={`rounded-2xl border-2 p-3 sm:p-3.5 flex flex-col justify-between relative overflow-hidden transition-all duration-300 ${
+                    <div className={`rounded-2xl border-2 p-3.5 sm:p-4 flex flex-col justify-between relative overflow-hidden transition-all duration-300 ${
                       isMaxLevel 
                         ? 'bg-[#0d0f14]/80 border-white/10 opacity-75'
                         : 'bg-gradient-to-b from-[#240b15] via-[#15070d] to-[#0b0307] border-rose-500/60 hover:border-rose-400 shadow-[0_10px_35px_rgba(0,0,0,0.85)] hover:shadow-[0_0_45px_rgba(244,63,94,0.35)] group'
@@ -1986,71 +1986,71 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       <div className="absolute top-0 right-0 w-44 h-44 bg-rose-500/15 rounded-full blur-2xl pointer-events-none" />
                       <div className="absolute bottom-0 left-0 w-36 h-36 bg-purple-600/15 rounded-full blur-xl pointer-events-none" />
 
-                      <div className="space-y-2.5 relative z-10">
+                      <div className="space-y-3 relative z-10">
                         {/* Top Tier Tag */}
-                        <div className="flex items-center justify-between text-[8.5px] sm:text-[9px] font-mono font-bold tracking-wider text-rose-400/90 uppercase px-0.5">
+                        <div className="flex items-center justify-between text-[10px] sm:text-[10.5px] font-mono font-bold tracking-wider text-rose-400/90 uppercase px-0.5">
                           <span className="flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
                             SUPREME GODHOOD
                           </span>
-                          <span className="bg-rose-950/80 border border-rose-500/40 px-1.5 py-0.2 rounded text-[7.5px] text-rose-300">
+                          <span className="bg-rose-950/80 border border-rose-500/40 px-2 py-0.5 rounded text-[8.5px] sm:text-[9px] text-rose-300">
                             MAXIMUM APEX
                           </span>
                         </div>
 
-                        {/* Title & Bespoke Crown Artwork */}
-                        <div className="flex items-center gap-3">
-                          <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-xl bg-gradient-to-b from-rose-900/40 via-purple-950/60 to-black border-2 border-rose-400/80 p-1 flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(244,63,94,0.4)] group-hover:scale-105 group-hover:border-rose-400 transition-all">
+                        {/* Title & Bespoke Crown Artwork (~25% larger: w-20 h-20 sm:w-22 sm:h-22) */}
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-xl bg-gradient-to-b from-rose-900/40 via-purple-950/60 to-black border-2 border-rose-400/80 p-1 flex items-center justify-center shrink-0 shadow-[0_0_22px_rgba(244,63,94,0.45)] group-hover:scale-105 group-hover:border-rose-400 transition-all">
                             <img
                               src="/shop/level_100_sigil.png"
                               alt="Level 100 Sigil"
-                              className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(244,63,94,0.8)]"
+                              className="w-full h-full object-contain filter drop-shadow-[0_0_14px_rgba(244,63,94,0.85)]"
                             />
                           </div>
                           <div className="min-w-0">
-                            <div className="text-[9px] font-mono text-rose-400 font-bold uppercase tracking-wider">ENDGAME PINNACLE</div>
-                            <h3 className="font-display font-black text-base sm:text-lg text-transparent bg-clip-text bg-gradient-to-r from-white via-rose-100 to-amber-200 uppercase tracking-wider group-hover:from-rose-200 group-hover:to-amber-300 transition-all leading-snug">
+                            <div className="text-[10px] sm:text-[10.5px] font-mono text-rose-400 font-bold uppercase tracking-wider">ENDGAME PINNACLE</div>
+                            <h3 className="font-display font-black text-lg sm:text-xl text-transparent bg-clip-text bg-gradient-to-r from-white via-rose-100 to-amber-200 uppercase tracking-wider group-hover:from-rose-200 group-hover:to-amber-300 transition-all leading-tight">
                               Instant Level 100
                             </h3>
-                            <p className="text-[10px] text-gray-400 font-sans leading-tight mt-0.5">
+                            <p className="text-[11px] sm:text-xs text-gray-300 font-sans leading-snug mt-1">
                               Attain maximum power and total mastery over the Abyss from day one.
                             </p>
                           </div>
                         </div>
 
                         {/* Structured Supreme Ascension Breakdown */}
-                        <div className="bg-black/65 border border-white/10 rounded-xl p-2 sm:p-2.5 text-[11px] font-mono space-y-1 shadow-inner">
-                          <div className="flex justify-between items-center text-[9px] text-gray-400 uppercase tracking-wider font-bold border-b border-white/10 pb-1">
+                        <div className="bg-black/65 border border-white/10 rounded-xl p-2.5 sm:p-3 text-xs font-mono space-y-1.5 shadow-inner">
+                          <div className="flex justify-between items-center text-[10px] sm:text-[10.5px] text-gray-400 uppercase tracking-wider font-bold border-b border-white/10 pb-1.5">
                             <span className="flex items-center gap-1.5 text-rose-400">
                               <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
                               Supreme Ascension
                             </span>
-                            <span className="text-rose-300 font-bold text-[8px] bg-rose-950/80 border border-rose-500/40 px-1.5 py-0.2 rounded">MAX CAP</span>
+                            <span className="text-rose-300 font-bold text-[9px] bg-rose-950/80 border border-rose-500/40 px-2 py-0.5 rounded">MAX CAP</span>
                           </div>
                           <div className="flex justify-between items-center py-0.5">
-                            <span className="text-gray-300 flex items-center gap-1.5 text-[10.5px]">
+                            <span className="text-gray-300 flex items-center gap-1.5 text-xs sm:text-[12.5px]">
                               <span className="w-1.5 h-1.5 rounded-full bg-rose-500/80" />
                               Hero Level:
                             </span>
-                            <span className="text-white font-bold text-xs bg-rose-950/60 px-2 py-0.5 rounded border border-rose-500/40 shadow">
+                            <span className="text-white font-bold text-xs sm:text-[13px] bg-rose-950/60 px-2.5 py-0.5 rounded border border-rose-500/40 shadow">
                               Level 100 (MAX)
                             </span>
                           </div>
                           <div className="flex justify-between items-center py-0.5">
-                            <span className="text-gray-300 flex items-center gap-1.5 text-[10.5px]">
+                            <span className="text-gray-300 flex items-center gap-1.5 text-xs sm:text-[12.5px]">
                               <span className="w-1.5 h-1.5 rounded-full bg-rose-500/80" />
                               Talent Points:
                             </span>
-                            <span className="text-amber-300 font-bold text-xs bg-rose-950/60 px-2 py-0.5 rounded border border-rose-500/40 shadow">
+                            <span className="text-amber-300 font-bold text-xs sm:text-[13px] bg-rose-950/60 px-2.5 py-0.5 rounded border border-rose-500/40 shadow">
                               +99 Points (Full Trees)
                             </span>
                           </div>
                           <div className="flex justify-between items-center py-0.5">
-                            <span className="text-gray-300 flex items-center gap-1.5 text-[10.5px]">
+                            <span className="text-gray-300 flex items-center gap-1.5 text-xs sm:text-[12.5px]">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />
                               Base Health:
                             </span>
-                            <span className="text-emerald-300 font-bold text-xs bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/40 shadow">
+                            <span className="text-emerald-300 font-bold text-xs sm:text-[13px] bg-emerald-950/60 px-2.5 py-0.5 rounded border border-emerald-500/40 shadow">
                               228 HP
                             </span>
                           </div>
@@ -2058,16 +2058,16 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       </div>
 
                       {/* Buy Button */}
-                      <div className="mt-2.5 pt-2 border-t border-white/10 relative z-10">
+                      <div className="mt-3 pt-2.5 border-t border-white/10 relative z-10">
                         {isMaxLevel ? (
-                          <div className="w-full py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-display font-black text-xs uppercase tracking-widest text-center">
+                          <div className="w-full py-2.5 px-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-display font-black text-xs sm:text-sm uppercase tracking-widest text-center">
                             ✓ MAX LEVEL REACHED (100)
                           </div>
                         ) : (
                           <button
                             onClick={() => handleBuyLevelBoost(100)}
                             disabled={isProcessing}
-                            className={`w-full py-2 px-3 rounded-xl font-display font-black text-xs sm:text-sm tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer select-none shadow-xl ${
+                            className={`w-full py-2.5 px-3 rounded-xl font-display font-black text-xs sm:text-sm tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer select-none shadow-xl ${
                               isProcessing
                                 ? 'bg-gray-700 text-gray-400 cursor-wait'
                                 : canAfford
@@ -2096,9 +2096,9 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
               </div>
 
               {/* Bottom Note */}
-              <div className="bg-gradient-to-r from-amber-950/20 via-[#0a0705] to-black border border-amber-500/30 rounded-xl px-3 py-2 sm:px-3.5 sm:py-2.5 flex items-center gap-2.5 shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.9)] shrink-0" />
-                <p className="font-mono text-[10.5px] sm:text-[11px] text-gray-300 leading-tight">
+              <div className="bg-gradient-to-r from-amber-950/20 via-[#0a0705] to-black border border-amber-500/30 rounded-xl px-3.5 py-2.5 sm:px-4 sm:py-3 flex items-center gap-2.5 shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.9)] shrink-0" />
+                <p className="font-mono text-xs sm:text-[12.5px] text-gray-300 leading-normal">
                   <span className="text-amber-400 font-bold uppercase tracking-wider mr-1.5">SANCTUM NOTICE:</span>
                   After ascending, visit the <strong className="text-amber-200">Talents</strong> tab to allocate your unassigned skill points across combat stances.
                 </p>
