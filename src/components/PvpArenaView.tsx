@@ -21,7 +21,7 @@ interface PvpArenaViewProps {
 }
 
 const LEAGUE_QUICK_RULES: Record<string, { promo: string; safe: string; demo: string }> = {
-  'Divine': { promo: 'No Promote', safe: '#1: Safe', demo: '#2: Demote' },
+  'Divine': { promo: '#1: Retains Godhood', safe: '', demo: '#2: Demote' },
   'Void Overlord': { promo: 'Top 1: Promote', safe: '2–7: Safe', demo: '8–10: Demote' },
   'Grandmaster': { promo: 'Top 3: Promote', safe: '4–20: Safe', demo: '21–30: Demote' },
   'Master': { promo: 'Top 7: Promote', safe: '8–30: Safe', demo: '31–50: Demote' },
@@ -1608,14 +1608,34 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
               const isDivine = viewingLeague === 'Divine';
               const isBronze = viewingLeague === 'Bronze';
 
+              if (isDivine) {
+                return (
+                  <div 
+                    onClick={() => setIsLeagueRulesModalOpen(true)}
+                    className="bg-black/70 border border-white/10 hover:border-amber-500/40 rounded-xl py-2 px-6 flex items-center justify-center gap-6 sm:gap-8 text-xs font-mono shadow-inner cursor-pointer transition-all hover:bg-black/90 group"
+                    title="Click to view full League rules table"
+                  >
+                    <span className="flex items-center gap-1.5 font-bold text-amber-300">
+                      <span className="text-xs leading-none">👑</span>
+                      <span>{rules.promo}</span>
+                    </span>
+                    <span className="text-gray-600 font-bold">•</span>
+                    <span className="flex items-center gap-1.5 font-bold text-rose-400">
+                      <span className="text-xs leading-none">▼</span>
+                      <span>{rules.demo}</span>
+                    </span>
+                  </div>
+                );
+              }
+
               return (
                 <div 
                   onClick={() => setIsLeagueRulesModalOpen(true)}
                   className="bg-black/70 border border-white/10 hover:border-amber-500/40 rounded-xl py-2 px-3 flex items-center justify-between text-xs font-mono shadow-inner cursor-pointer transition-all hover:bg-black/90 group"
                   title="Click to view full League rules table"
                 >
-                  <span className={`flex items-center gap-1 font-bold ${isDivine ? 'text-amber-300' : 'text-emerald-400'}`}>
-                    <span className="text-xs leading-none">{isDivine ? '👑' : '▲'}</span>
+                  <span className="flex items-center gap-1 font-bold text-emerald-400">
+                    <span className="text-xs leading-none">▲</span>
                     <span>{rules.promo}</span>
                   </span>
                   <span className="text-gray-600 font-bold">•</span>
