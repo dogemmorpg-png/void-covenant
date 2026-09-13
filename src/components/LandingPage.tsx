@@ -1,6 +1,20 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { ChevronDown, Twitter, Send } from 'lucide-react';
+import { 
+  ChevronDown, 
+  Twitter, 
+  Send, 
+  Shield, 
+  Sparkles, 
+  Coins, 
+  Trophy, 
+  Users, 
+  Zap, 
+  Flame, 
+  Swords, 
+  Wallet,
+  CheckCircle2
+} from 'lucide-react';
 
 interface LandingPageProps {
   onConnectWallet: () => void;
@@ -185,212 +199,310 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
           />
         </motion.div>
       </section>
+      {/* =========================================================================
+          2. GAME OVERVIEW / WHAT IS VOID COVENANT
+         ========================================================================= */}
+      <section className="relative py-20 px-6 border-t border-[#c5a880]/15 bg-gradient-to-b from-[#07080b] via-[#0d1017] to-[#07080b]">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            <motion.div 
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+              className="lg:col-span-7 space-y-6"
+            >
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-xs font-bold uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Real Strategy • Real Earnings</span>
+              </div>
 
-      {/* ============ PROLOGUE / LORE INTRO ============ */}
-      <section className="relative py-28 px-6 overflow-hidden border-t border-[#c5a880]/15">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(197,168,128,0.04),transparent_70%)] pointer-events-none" />
+              <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-white tracking-wide uppercase leading-tight">
+                Dark Tactical Card RPG Meets Web3 Economy
+              </h2>
 
-        <div className="max-w-4xl mx-auto text-center relative z-10 space-y-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.8 }}
-          >
-            <span className="font-mono text-xs uppercase tracking-[0.35em] text-[#c5a880]/80 block mb-2">
-              — The Ancient Prophecy —
-            </span>
-            <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-white tracking-[0.2em] uppercase">
-              The Abyss Awakens
-            </h2>
-          </motion.div>
+              <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
+                Void Covenant delivers deep turn-based tactical battles directly in your browser or Telegram. Assemble customized decks, equip your warlord with artifact sets, and dominate 12 competitive leagues where your tactical supremacy generates daily withdrawable cash rewards.
+              </p>
 
-          <motion.div
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="w-32 h-px bg-gradient-to-r from-transparent via-[#c5a880]/50 to-transparent mx-auto"
-          />
+              {/* 3 Key Pillars */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-amber-500/30 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400 mb-3">
+                    <Zap className="w-4 h-4" />
+                  </div>
+                  <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">Instant Access</h4>
+                  <p className="text-xs text-gray-400 mt-1">Play directly in browser or Telegram. One-click Web3 login with zero installations.</p>
+                </div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-base sm:text-lg md:text-xl text-gray-300 font-serif italic leading-relaxed max-w-3xl mx-auto"
-          >
-            “Beyond the dying stars of the mortal spheres lies the Nether Realm — an eternal abyss where fallen kings, forgotten gods, and ancient eldritch nightmares lie slumbering in iron seals.”
-          </motion.p>
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-purple-500/30 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 mb-3">
+                    <Swords className="w-4 h-4" />
+                  </div>
+                  <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">Tactical Depth</h4>
+                  <p className="text-xs text-gray-400 mt-1">99 unique creatures, turn delay timers, 4 skill effects, and 3 hero combat stances.</p>
+                </div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-sm sm:text-base text-gray-400 font-sans leading-relaxed max-w-2xl mx-auto pt-2"
-          >
-            You are an exiled warlord called to forge a blood covenant. Through the ritual altar, you bind shadows to your will, wield devastating relics of forgotten eras, and clash against rival summoners in ruthless tactical supremacy.
-          </motion.p>
-        </div>
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-emerald-500/30 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-3">
+                    <Coins className="w-4 h-4" />
+                  </div>
+                  <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">Real Payouts</h4>
+                  <p className="text-xs text-gray-400 mt-1">Convert Blood Sovereigns directly to USDT and withdraw straight to your wallet.</p>
+                </div>
+              </div>
+            </motion.div>
 
-        {/* Panoramic Concept Artwork Display */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 40 }}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 1 }}
-          className="max-w-5xl mx-auto mt-16 relative rounded-3xl overflow-hidden border border-[#c5a880]/25 shadow-[0_20px_80px_rgba(0,0,0,0.9)] group"
-        >
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0b0c10] via-transparent to-transparent z-10 pointer-events-none opacity-80" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,#0b0c10_95%)] z-10 pointer-events-none" />
-          
-          <img
-            src="/landing_void_realm.jpg"
-            alt="The Nether Realm of the Void"
-            className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-1000"
-          />
+            {/* Visual banner */}
+            <motion.div 
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+              className="lg:col-span-5 relative"
+            >
+              <div className="relative rounded-2xl overflow-hidden border border-[#c5a880]/30 shadow-[0_15px_50px_rgba(0,0,0,0.8)] group">
+                <img 
+                  src="/landing_void_realm.jpg" 
+                  alt="Void Covenant Realm" 
+                  className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#07080b] via-transparent to-transparent opacity-80" />
+                <div className="absolute bottom-4 left-4 right-4 p-3 bg-black/60 backdrop-blur-md rounded-xl border border-white/10">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] font-mono text-[#c5a880] uppercase tracking-wider">Current Season</span>
+                      <p className="text-xs font-bold text-white uppercase">The Abyssal Awakening</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-wider">12 Leagues Active</span>
+                      <p className="text-xs font-mono font-bold text-amber-300">Daily Dividends</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
 
-          <div className="absolute bottom-6 left-6 sm:bottom-10 sm:left-10 z-20 max-w-md">
-            <span className="font-mono text-[11px] text-[#c5a880] tracking-widest uppercase block mb-1">Sanctuary of the Void</span>
-            <h3 className="font-display font-black text-xl sm:text-2xl text-white tracking-wider uppercase drop-shadow-md">
-              A Shattered Cosmic Nether
-            </h3>
-            <p className="text-xs sm:text-sm text-gray-300 mt-1 font-sans leading-snug drop-shadow">
-              Endless citadel spires adrift in cosmic storms, where every step demands sacrifice and tactical mastery.
-            </p>
           </div>
-        </motion.div>
+        </div>
       </section>
 
-      {/* ============ PLAY-TO-EARN / WAYS TO EARN ============ */}
-      <section className="relative py-24 px-6 bg-gradient-to-b from-[#0b0c10] via-[#0f121a] to-[#0b0c10] border-t border-b border-white/5">
-        <div className="max-w-6xl mx-auto">
+
+      {/* =========================================================================
+          3. PLAY-TO-EARN CORE (The Blood Sovereign Economy & Real Earnings)
+         ========================================================================= */}
+      <section className="relative py-28 px-6 bg-[#090c12] border-t border-b border-[#c5a880]/15 overflow-hidden">
+        {/* Background glow effects */}
+        <div className="absolute top-1/4 -left-48 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-6xl mx-auto relative z-10 space-y-16">
+          
+          {/* Section Header */}
           <motion.div
             initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
+            viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center max-w-3xl mx-auto space-y-3"
           >
-            <span className="bg-amber-950/80 border border-amber-500/50 text-amber-300 font-mono text-[11px] px-3 py-1 rounded-full font-black tracking-widest uppercase inline-block mb-3 shadow-[0_0_12px_rgba(245,158,11,0.25)]">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-950/70 border border-amber-500/40 text-amber-300 font-mono text-xs font-black tracking-widest uppercase shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+              <img src="/icons/icon_sovereign.webp" alt="Sovereigns" className="w-4 h-4 inline-block" />
               PLAY TO EARN ECONOMY
             </span>
-            <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-white tracking-[0.15em] uppercase">
-              How Players Earn in Void Covenant
+            <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-white tracking-wide uppercase leading-tight">
+              Real Value. Transparent Payouts.
             </h2>
-            <p className="text-gray-400 text-sm sm:text-base max-w-2xl mx-auto mt-3 font-sans leading-relaxed">
-              Every battle, quest, and rank promotion provides real in-game value. Here are the 4 core ways players profit:
+            <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+              Unlike speculative reward models, Void Covenant features a hard currency called <strong className="text-amber-300">Blood Sovereigns</strong> with a guaranteed exchange rate. You earn through proven gameplay skill and ecosystem contribution.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Central Exchange Rate Spotlight Banner */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="rounded-3xl border-2 border-amber-500/30 bg-gradient-to-r from-[#17120a] via-[#11161d] to-[#0d1612] p-6 sm:p-10 shadow-[0_15px_60px_rgba(0,0,0,0.85)] relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-400/5 rounded-full blur-2xl pointer-events-none" />
             
-            {/* 1. Daily Sovereign Arena Dividends */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+              
+              <div className="md:col-span-7 space-y-4">
+                <span className="font-mono text-xs text-amber-400 font-bold uppercase tracking-wider block">
+                  HARD CONVERTIBLE CURRENCY
+                </span>
+                <div className="flex flex-wrap items-baseline gap-3">
+                  <span className="font-display font-black text-3xl sm:text-5xl text-white tracking-wider">
+                    100 SOVEREIGNS
+                  </span>
+                  <span className="font-display font-bold text-2xl sm:text-4xl text-emerald-400">
+                    = $1.00 USDT
+                  </span>
+                </div>
+                <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                  Earn Blood Sovereigns directly through competitive PvP arena play, daily league rollover dividends, and referral commissions. Request on-chain withdrawals to your Web3 wallet anytime with zero hidden conversions.
+                </p>
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <div className="flex items-center gap-2 text-xs font-mono text-gray-300 bg-black/50 px-3 py-1.5 rounded-lg border border-white/10">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span>Direct Wallet Withdrawal</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs font-mono text-gray-300 bg-black/50 px-3 py-1.5 rounded-lg border border-white/10">
+                    <CheckCircle2 className="w-4 h-4 text-amber-400" />
+                    <span>Fixed $0.01 USDT Rate</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="md:col-span-5 flex justify-center">
+                <div className="relative rounded-2xl overflow-hidden border border-amber-500/40 shadow-2xl max-w-xs w-full">
+                  <img 
+                    src="/landing_p2e_treasury.jpg" 
+                    alt="Treasury Vault" 
+                    className="w-full h-auto object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
+                    <div className="flex items-center gap-2">
+                      <img src="/icons/icon_sovereign.webp" alt="Sovereigns" className="w-6 h-6" />
+                      <div>
+                        <p className="text-[10px] font-mono text-amber-300 uppercase">The Imperial Bank</p>
+                        <p className="text-xs font-bold text-white uppercase">Guaranteed In-Game Liquidity</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </motion.div>
+
+          {/* 3 Concrete Ways to Earn */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            {/* Earning Pillar 1 */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="bg-gradient-to-b from-[#1c1409] via-black to-black border border-amber-500/40 rounded-2xl p-6 flex flex-col justify-between shadow-xl relative overflow-hidden group hover:border-amber-400 transition-all"
+              className="bg-gradient-to-b from-[#1c1409] to-[#0c0d12] border border-amber-500/30 hover:border-amber-400/60 rounded-2xl p-6 flex flex-col justify-between shadow-xl transition-all group"
             >
               <div className="space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-amber-950/80 border border-amber-500/50 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(245,158,11,0.3)] group-hover:scale-110 transition-transform">
-                  👑
+                <div className="w-12 h-12 rounded-xl bg-amber-950/80 border border-amber-500/50 flex items-center justify-center text-amber-400 text-xl shadow-[0_0_15px_rgba(245,158,11,0.2)] group-hover:scale-105 transition-transform">
+                  <Trophy className="w-6 h-6" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-wider block">Daily Payouts</span>
-                  <h3 className="font-display font-black text-lg text-white uppercase mt-0.5">
-                    PvP Arena Dividends
+                  <span className="text-[11px] font-mono text-amber-400 font-bold uppercase tracking-wider block">1. Competitive Ladder</span>
+                  <h3 className="font-display font-black text-xl text-white uppercase mt-1">
+                    Daily League Dividends
                   </h3>
                 </div>
-                <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
-                  Climb 7 competitive leagues. Top players in Overlord and Divine leagues receive direct daily <strong className="text-amber-300">Sovereign</strong> token rewards automatically every 24 hours.
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                  Climb across 12 competitive PvP leagues (Bronze up to Divine). Every 24 hours, the season pool delivers automated Blood Sovereign payouts straight to your mailbox:
                 </p>
+                <div className="bg-black/60 rounded-xl p-3 border border-white/10 space-y-1.5 font-mono text-xs">
+                  <div className="flex justify-between items-center text-amber-300">
+                    <span>👑 Divine Rank #1:</span>
+                    <strong className="font-bold">1,500 Sov ($15.00/day)</strong>
+                  </div>
+                  <div className="flex justify-between items-center text-rose-300">
+                    <span>⚔️ Overlord Rank #1:</span>
+                    <strong>600 Sov ($6.00/day)</strong>
+                  </div>
+                  <div className="flex justify-between items-center text-gray-300">
+                    <span>💎 Diamond – Master:</span>
+                    <span>Daily Sov + Gold + Dust</span>
+                  </div>
+                </div>
               </div>
-              <div className="mt-5 pt-3 border-t border-white/10 text-[11px] font-mono text-amber-300 font-bold flex items-center gap-1.5">
-                <span>⚡ Daily passive token yield</span>
+              <div className="mt-5 pt-3 border-t border-white/10 flex items-center text-[11px] font-mono text-amber-400 font-bold gap-1.5">
+                <span>⚡ Automated 24h Rollover Dividends</span>
               </div>
             </motion.div>
 
-            {/* 2. Referral & Passive Guild Dividends */}
+            {/* Earning Pillar 2 */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-gradient-to-b from-[#091b1a] via-black to-black border border-emerald-500/40 rounded-2xl p-6 flex flex-col justify-between shadow-xl relative overflow-hidden group hover:border-emerald-400 transition-all"
+              className="bg-gradient-to-b from-[#1a0f1c] to-[#0c0d12] border border-purple-500/30 hover:border-purple-400/60 rounded-2xl p-6 flex flex-col justify-between shadow-xl transition-all group"
             >
               <div className="space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-950/80 border border-emerald-500/50 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform">
-                  🤝
+                <div className="w-12 h-12 rounded-xl bg-purple-950/80 border border-purple-500/50 flex items-center justify-center text-purple-400 text-xl shadow-[0_0_15px_rgba(168,85,247,0.2)] group-hover:scale-105 transition-transform">
+                  <Swords className="w-6 h-6" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider block">Referral Network</span>
-                  <h3 className="font-display font-black text-lg text-white uppercase mt-0.5">
-                    Invite & Affiliate Bounties
+                  <span className="text-[11px] font-mono text-purple-400 font-bold uppercase tracking-wider block">2. Arena Duels</span>
+                  <h3 className="font-display font-black text-xl text-white uppercase mt-1">
+                    PvP Victory Bounties
                   </h3>
                 </div>
-                <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
-                  Invite other warriors with your personal link. Earn instant gold, rare cards, and <strong className="text-emerald-300">permanent commissions</strong> whenever your invited players purchase passes or trade.
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                  Put your battle deck to the test against real players in ranked duels. Pass holders earn direct Blood Sovereigns on top of Gold and Crowns for every victory:
                 </p>
+                <div className="bg-black/60 rounded-xl p-3 border border-white/10 space-y-1.5 font-mono text-xs">
+                  <div className="flex justify-between items-center text-purple-300">
+                    <span>⚡ Ultra Pass:</span>
+                    <strong>+2 Sov/win (up to 24/day)</strong>
+                  </div>
+                  <div className="flex justify-between items-center text-purple-300">
+                    <span>⚡ Premium Pass:</span>
+                    <strong>+1 Sov/win (up to 10/day)</strong>
+                  </div>
+                  <div className="flex justify-between items-center text-gray-300">
+                    <span>🛡️ Protection:</span>
+                    <span>Free Daily Arena Shields</span>
+                  </div>
+                </div>
               </div>
-              <div className="mt-5 pt-3 border-t border-white/10 text-[11px] font-mono text-emerald-300 font-bold flex items-center gap-1.5">
-                <span>⚡ Lifetime referral shares</span>
+              <div className="mt-5 pt-3 border-t border-white/10 flex items-center text-[11px] font-mono text-purple-300 font-bold gap-1.5">
+                <span>⚡ Direct Rewards For Arena Mastery</span>
               </div>
             </motion.div>
 
-            {/* 3. Rare Relic & Card Trading */}
+            {/* Earning Pillar 3 */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="bg-gradient-to-b from-[#1d0924] via-black to-black border border-purple-500/40 rounded-2xl p-6 flex flex-col justify-between shadow-xl relative overflow-hidden group hover:border-purple-400 transition-all"
+              className="bg-gradient-to-b from-[#091b16] to-[#0c0d12] border border-emerald-500/30 hover:border-emerald-400/60 rounded-2xl p-6 flex flex-col justify-between shadow-xl transition-all group"
             >
               <div className="space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-purple-950/80 border border-purple-500/50 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(168,85,247,0.3)] group-hover:scale-110 transition-transform">
-                  🃏
+                <div className="w-12 h-12 rounded-xl bg-emerald-950/80 border border-emerald-500/50 flex items-center justify-center text-emerald-400 text-xl shadow-[0_0_15px_rgba(16,185,129,0.2)] group-hover:scale-105 transition-transform">
+                  <Users className="w-6 h-6" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-mono text-purple-400 font-bold uppercase tracking-wider block">Card & Relic Forge</span>
-                  <h3 className="font-display font-black text-lg text-white uppercase mt-0.5">
-                    Card & Gear Trading
+                  <span className="text-[11px] font-mono text-emerald-400 font-bold uppercase tracking-wider block">3. Referral Network</span>
+                  <h3 className="font-display font-black text-xl text-white uppercase mt-1">
+                    Affiliate Commissions
                   </h3>
                 </div>
-                <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
-                  Summon rare creatures and legendary equipment sets from chest packs. Upgrade cards with Void Dust and trade them on the open player marketplace for real value.
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                  Expand your covenant by inviting fellow tacticians with your unique referral link. Earn passive Sovereign shares from your recruits' in-game progress:
                 </p>
-              </div>
-              <div className="mt-5 pt-3 border-t border-white/10 text-[11px] font-mono text-purple-300 font-bold flex items-center gap-1.5">
-                <span>⚡ 100% Player-owned assets</span>
-              </div>
-            </motion.div>
-
-            {/* 4. Campaign & Season Battle Passes */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="bg-gradient-to-b from-[#22090e] via-black to-black border border-rose-500/40 rounded-2xl p-6 flex flex-col justify-between shadow-xl relative overflow-hidden group hover:border-rose-400 transition-all"
-            >
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-rose-950/80 border border-rose-500/50 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(244,63,94,0.3)] group-hover:scale-110 transition-transform">
-                  💎
+                <div className="bg-black/60 rounded-xl p-3 border border-white/10 space-y-1.5 font-mono text-xs">
+                  <div className="flex justify-between items-center text-emerald-300">
+                    <span>🤝 Pass Purchases:</span>
+                    <strong>Instant Sovereign Bonus</strong>
+                  </div>
+                  <div className="flex justify-between items-center text-emerald-300">
+                    <span>📈 Lifetime Share:</span>
+                    <strong>Passive Revenue Share</strong>
+                  </div>
+                  <div className="flex justify-between items-center text-gray-300">
+                    <span>🎁 Recruits Gain:</span>
+                    <span>Bonus Starter Gold & Cards</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-[10px] font-mono text-rose-400 font-bold uppercase tracking-wider block">Battle Passes & Quests</span>
-                  <h3 className="font-display font-black text-lg text-white uppercase mt-0.5">
-                    Daily Season Tributes
-                  </h3>
-                </div>
-                <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
-                  Complete daily battle missions and level up the Sovereign Pass. Receive daily bags of Dark Shards, gold vaults, energy boosters, and high-value drops without tedious grinding.
-                </p>
               </div>
-              <div className="mt-5 pt-3 border-t border-white/10 text-[11px] font-mono text-rose-300 font-bold flex items-center gap-1.5">
-                <span>⚡ Daily login & mission rewards</span>
+              <div className="mt-5 pt-3 border-t border-white/10 flex items-center text-[11px] font-mono text-emerald-400 font-bold gap-1.5">
+                <span>⚡ Lifetime Passive Sovereign Yield</span>
               </div>
             </motion.div>
 
@@ -398,11 +510,27 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
         </div>
       </section>
 
-      {/* ============ GAMEPLAY & VISUAL SHOWCASE ============ */}
-      <section className="relative py-24 px-6 overflow-hidden">
-        <div className="max-w-6xl mx-auto space-y-24">
-          
-          {/* Section 1: Tactical Card Battles */}
+
+      {/* =========================================================================
+          4. CORE GAMEPLAY MECHANICS (Honest, In-Depth, No AI Slop)
+         ========================================================================= */}
+      <section className="relative py-28 px-6 bg-[#07080b]">
+        <div className="max-w-6xl mx-auto space-y-28">
+
+          {/* Section Heading */}
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <span className="text-purple-400 font-mono text-xs font-black tracking-widest uppercase block">
+              CORE GAMEPLAY SYSTEMS
+            </span>
+            <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-white tracking-wide uppercase leading-tight">
+              Tactical Warfare In Every Turn
+            </h2>
+            <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+              Master deep turn-based mechanics where calculated positioning and card synergies triumph over blind luck.
+            </p>
+          </div>
+
+          {/* Feature 1: Turn-Based Combat & Delay Timers */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -411,28 +539,49 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
               transition={{ duration: 0.6 }}
               className="lg:col-span-6 space-y-5"
             >
-              <span className="text-purple-400 font-mono text-xs font-black tracking-widest uppercase block">
-                TACTICAL COMBAT
-              </span>
-              <h2 className="font-display font-black text-3xl sm:text-4xl text-white tracking-wide uppercase leading-tight">
-                Turn-Based Strategy Where Skill Beats Luck
-              </h2>
-              <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-sans">
-                Build your battle deck from over 100 creatures: demons, undead, vampires, and eldritch abominations. Control turn delays, deploy lethal battlefield spells, and switch between Aggressive, Defensive, and Strategic stances to counter opponent strategies.
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 font-mono text-xs font-bold uppercase">
+                <Swords className="w-3.5 h-3.5" />
+                <span>Turn Timers & Positioning</span>
+              </div>
+              <h3 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-wider">
+                99 Unique Cards & Turn Delay Mechanics
+              </h3>
+              <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                Every unit in your deck has a specific <strong className="text-amber-300">Turn Delay</strong> (1, 2, or 3 turns) before attacking. Powerful creatures require patience to awaken, while nimble skirmishers strike immediately. You must anticipate your opponent’s countdowns and counter their board before their leviathans unleash destruction.
               </p>
-              
-              <div className="grid grid-cols-3 gap-3 pt-2">
-                <div className="bg-black/60 border border-white/10 rounded-xl p-3 text-center">
-                  <span className="font-display font-black text-xl text-purple-300 block">100+</span>
-                  <span className="text-[11px] text-gray-400 font-mono">Unique Cards</span>
+
+              {/* 4 Skill Badges */}
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <div className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/10 rounded-xl">
+                  <img src="/icons/icon_vampirism.webp" alt="Vampirism" className="w-8 h-8 rounded-lg" />
+                  <div>
+                    <h5 className="font-display font-bold text-xs text-white uppercase">Vampirism</h5>
+                    <p className="text-[11px] text-gray-400">Heals creature on attack</p>
+                  </div>
                 </div>
-                <div className="bg-black/60 border border-white/10 rounded-xl p-3 text-center">
-                  <span className="font-display font-black text-xl text-amber-300 block">3 Stances</span>
-                  <span className="text-[11px] text-gray-400 font-mono">Combat Styles</span>
+
+                <div className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/10 rounded-xl">
+                  <img src="/icons/icon_hex.webp" alt="Hex" className="w-8 h-8 rounded-lg" />
+                  <div>
+                    <h5 className="font-display font-bold text-xs text-white uppercase">Hex</h5>
+                    <p className="text-[11px] text-gray-400">Amplifies enemy incoming damage</p>
+                  </div>
                 </div>
-                <div className="bg-black/60 border border-white/10 rounded-xl p-3 text-center">
-                  <span className="font-display font-black text-xl text-emerald-300 block">Instant</span>
-                  <span className="text-[11px] text-gray-400 font-mono">Browser Battles</span>
+
+                <div className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/10 rounded-xl">
+                  <img src="/icons/icon_plague.webp" alt="Plague" className="w-8 h-8 rounded-lg" />
+                  <div>
+                    <h5 className="font-display font-bold text-xs text-white uppercase">Plague</h5>
+                    <p className="text-[11px] text-gray-400">Deals poison damage every turn</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/10 rounded-xl">
+                  <img src="/icons/icon_sacrifice.webp" alt="Sacrifice" className="w-8 h-8 rounded-lg" />
+                  <div>
+                    <h5 className="font-display font-bold text-xs text-white uppercase">Sacrifice</h5>
+                    <p className="text-[11px] text-gray-400">Martyrs allies to heal hero</p>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -442,17 +591,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="lg:col-span-6 rounded-3xl overflow-hidden border border-purple-500/30 shadow-[0_0_40px_rgba(168,85,247,0.2)]"
+              className="lg:col-span-6 rounded-2xl overflow-hidden border border-purple-500/30 shadow-[0_0_40px_rgba(168,85,247,0.25)]"
             >
               <img
                 src="/landing_warlord_duel.jpg"
-                alt="Tactical Battles in Void Covenant"
+                alt="Tactical Card Duel"
                 className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700"
               />
             </motion.div>
           </div>
 
-          {/* Section 2: Vault Treasury & In-game Economy */}
+          {/* Feature 2: 12 PvP Leagues & Strategic Peace Shields */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center lg:flex-row-reverse">
             <motion.div
               initial={{ opacity: 0, x: 30 }}
@@ -461,164 +610,414 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
               transition={{ duration: 0.6 }}
               className="lg:col-span-6 space-y-5 lg:order-2"
             >
-              <span className="text-amber-400 font-mono text-xs font-black tracking-widest uppercase block">
-                ECONOMY & TREASURY
-              </span>
-              <h2 className="font-display font-black text-3xl sm:text-4xl text-white tracking-wide uppercase leading-tight">
-                Real In-Game Currencies & Sovereign Rewards
-              </h2>
-              <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-sans">
-                Accumulate Gold for card upgrades, Void Dust to forge high-tier booster packs, and Dark Shards to acquire VIP level surge tributes and arena shields. Everything you earn directly empowers your deck and boosts your daily ranking dividends.
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-xs font-bold uppercase">
+                <Trophy className="w-3.5 h-3.5" />
+                <span>Competitive Hierarchy</span>
+              </div>
+              <h3 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-wider">
+                12 Ranked Leagues & Peace Shields
+              </h3>
+              <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                Climb from Bronze all the way to the apex <strong className="text-amber-300">Divine League</strong> (only 2 immortal seats in the entire realm). Daily promotions and demotions ensure fierce competition for high-tier dividend brackets.
+              </p>
+              <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                Defend your hard-earned rank while resting! Activate <strong className="text-cyan-300">Peace Shields (3h, 6h, 12h)</strong> to make your profile unassailable by rival summoners, securing your crowns and daily sovereign dividend qualification.
               </p>
 
-              <div className="grid grid-cols-3 gap-3 pt-2">
-                <div className="bg-black/60 border border-white/10 rounded-xl p-3 text-center">
-                  <span className="font-display font-black text-xl text-yellow-400 block">Gold</span>
-                  <span className="text-[11px] text-gray-400 font-mono">Upgrades & Packs</span>
-                </div>
-                <div className="bg-black/60 border border-white/10 rounded-xl p-3 text-center">
-                  <span className="font-display font-black text-xl text-cyan-400 block">Void Dust</span>
-                  <span className="text-[11px] text-gray-400 font-mono">Altar Summoning</span>
-                </div>
-                <div className="bg-black/60 border border-white/10 rounded-xl p-3 text-center">
-                  <span className="font-display font-black text-xl text-rose-400 block">Dark Shards</span>
-                  <span className="text-[11px] text-gray-400 font-mono">VIP Relics & Shields</span>
-                </div>
+              {/* League Badge Chips */}
+              <div className="flex flex-wrap gap-2 pt-2">
+                <span className="px-2.5 py-1 rounded bg-amber-950/60 border border-amber-500/40 text-[11px] font-mono text-amber-300 font-bold flex items-center gap-1">
+                  ✨ Divine (Top 2)
+                </span>
+                <span className="px-2.5 py-1 rounded bg-rose-950/60 border border-rose-500/40 text-[11px] font-mono text-rose-300 font-bold flex items-center gap-1">
+                  👑 Overlord (Top 10)
+                </span>
+                <span className="px-2.5 py-1 rounded bg-purple-950/60 border border-purple-500/40 text-[11px] font-mono text-purple-300 font-bold flex items-center gap-1">
+                  ⚜️ Grandmaster (Top 30)
+                </span>
+                <span className="px-2.5 py-1 rounded bg-white/5 border border-white/10 text-[11px] font-mono text-gray-300">
+                  Master • Diamond • Ruby • Emerald • Sapphire • Platinum • Gold • Silver • Bronze
+                </span>
               </div>
             </motion.div>
 
+            {/* Visual Shields & Arena UI Graphic */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="lg:col-span-6 rounded-3xl overflow-hidden border border-amber-500/30 shadow-[0_0_40px_rgba(245,158,11,0.2)] lg:order-1"
+              className="lg:col-span-6 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-[#18110a] via-[#10131b] to-black p-6 sm:p-8 shadow-2xl lg:order-1"
             >
-              <img
-                src="/landing_p2e_treasury.jpg"
-                alt="Void Covenant Rewards & Treasury"
-                className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700"
-              />
+              <div className="space-y-6">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <div className="flex items-center gap-3">
+                    <img src="/icons/league_divine.png" alt="Divine League" className="w-12 h-12 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
+                    <div>
+                      <h4 className="font-display font-black text-lg text-amber-300 uppercase">Divine Pantheon</h4>
+                      <p className="text-xs text-gray-400 font-mono">Apex Tier • 1,500 Sov/Day</p>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-mono text-xs font-bold">
+                    2 Seats Only
+                  </span>
+                </div>
+
+                {/* Tactical Shields Showcase */}
+                <div>
+                  <h5 className="font-mono text-xs text-cyan-300 font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-cyan-400" />
+                    Tactical Peace Shields
+                  </h5>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-black/50 border border-cyan-500/30 rounded-xl p-3 text-center">
+                      <img src="/icons/shield_3h.png" alt="3h Shield" className="w-8 h-8 mx-auto mb-1" />
+                      <span className="font-mono text-xs font-bold text-white block">3 Hours</span>
+                      <span className="text-[10px] text-gray-400">Quick Rest</span>
+                    </div>
+                    <div className="bg-black/50 border border-cyan-500/30 rounded-xl p-3 text-center">
+                      <img src="/icons/shield_6h.png" alt="6h Shield" className="w-8 h-8 mx-auto mb-1" />
+                      <span className="font-mono text-xs font-bold text-white block">6 Hours</span>
+                      <span className="text-[10px] text-gray-400">Night Guard</span>
+                    </div>
+                    <div className="bg-black/50 border border-cyan-500/30 rounded-xl p-3 text-center">
+                      <img src="/icons/shield_12h.png" alt="12h Shield" className="w-8 h-8 mx-auto mb-1" />
+                      <span className="font-mono text-xs font-bold text-white block">12 Hours</span>
+                      <span className="text-[10px] text-gray-400">Full Fortress</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-[11px] font-mono text-gray-400 leading-relaxed bg-white/[0.02] p-3 rounded-xl border border-white/5">
+                  💡 <strong className="text-gray-200">Pro-Tip:</strong> Equip shields before daily rollover cutoffs to ensure rival warlords cannot steal your crowns and knock you out of the top dividend tier.
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Feature 3: Hero Equipment & 3 Combat Stances */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="lg:col-span-6 space-y-5"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300 font-mono text-xs font-bold uppercase">
+                <Flame className="w-3.5 h-3.5" />
+                <span>Hero Customization</span>
+              </div>
+              <h3 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-wider">
+                6 Equipment Slots & 3 Combat Stances
+              </h3>
+              <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                Beyond card decks, your Hero warlord directly enters the fight. Equip gear across 6 distinct slots: <strong className="text-white">Weapon, Armor, Helmet, Ring, Amulet, and Boots</strong>. Items provide game-changing stats including Turn Delay Reduction, Dodge Chance, Max HP, and Gold multipliers.
+              </p>
+              <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                Switch between 3 distinct combat specializations in the talent tree to complement your playstyle:
+              </p>
+
+              <div className="space-y-2.5 pt-1">
+                <div className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/10 rounded-xl">
+                  <img src="/icons/void_strike_fx.webp" alt="Void Strike" className="w-8 h-8 rounded-lg" />
+                  <div>
+                    <h5 className="font-display font-bold text-xs text-amber-300 uppercase">Void Strike (Offensive)</h5>
+                    <p className="text-[11px] text-gray-400">Devastating magic bursts, armor piercing, and chain lightning.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/10 rounded-xl">
+                  <img src="/icons/blood_aura_fx.webp" alt="Blood Aura" className="w-8 h-8 rounded-lg" />
+                  <div>
+                    <h5 className="font-display font-bold text-xs text-rose-300 uppercase">Blood Aura (Defensive)</h5>
+                    <p className="text-[11px] text-gray-400">Hero life leech, damage mitigation shields, and survival surge.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/10 rounded-xl">
+                  <img src="/icons/warlord_cry_fx.webp" alt="Warlord Cry" className="w-8 h-8 rounded-lg" />
+                  <div>
+                    <h5 className="font-display font-bold text-xs text-purple-300 uppercase">Warlord Cry (Strategic)</h5>
+                    <p className="text-[11px] text-gray-400">Global creature attack buffs, stun control, and cooldown acceleration.</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Feature 3 Graphic: The Altar of Summoning */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="lg:col-span-6 rounded-2xl border border-rose-500/30 bg-gradient-to-br from-[#1c0c12] via-[#120f18] to-black p-6 sm:p-8 shadow-2xl space-y-6"
+            >
+              <div>
+                <span className="font-mono text-xs text-rose-400 font-bold uppercase tracking-wider block mb-1">
+                  Card Progression & Altar Packs
+                </span>
+                <h4 className="font-display font-black text-xl text-white uppercase">
+                  Summon, Fuse & Ascend Card Tiers
+                </h4>
+                <p className="text-xs text-gray-300 mt-2 leading-relaxed">
+                  Earn Gold and Void Dust in campaign battles to unlock booster packs at the Altar. Fuse duplicate cards to ascend their tier from Bronze up to Divine, expanding their stats and unlocking advanced combat skills.
+                </p>
+              </div>
+
+              {/* 3 Pack Chests from the game */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-black/60 border border-white/10 rounded-xl p-3 text-center hover:border-amber-500/40 transition-colors">
+                  <img src="/packs/chest_basic.webp" alt="Basic Chest" className="w-14 h-14 mx-auto object-contain mb-2" />
+                  <span className="font-display font-bold text-xs text-white uppercase block">Basic Chest</span>
+                  <span className="text-[10px] text-gray-400 font-mono">Gold Cost</span>
+                </div>
+
+                <div className="bg-black/60 border border-white/10 rounded-xl p-3 text-center hover:border-cyan-500/40 transition-colors">
+                  <img src="/packs/chest_rare.webp" alt="Rare Chest" className="w-14 h-14 mx-auto object-contain mb-2" />
+                  <span className="font-display font-bold text-xs text-cyan-300 uppercase block">Rare Chest</span>
+                  <span className="text-[10px] text-gray-400 font-mono">Void Dust</span>
+                </div>
+
+                <div className="bg-black/60 border border-white/10 rounded-xl p-3 text-center hover:border-purple-500/40 transition-colors">
+                  <img src="/packs/chest_premium.webp" alt="Premium Chest" className="w-14 h-14 mx-auto object-contain mb-2" />
+                  <span className="font-display font-bold text-xs text-purple-300 uppercase block">Royal Chest</span>
+                  <span className="text-[10px] text-gray-400 font-mono">Guaranteed Epic</span>
+                </div>
+              </div>
+
+              {/* Card Tiers Progression */}
+              <div className="p-3.5 bg-black/40 rounded-xl border border-white/10 flex items-center justify-between text-xs font-mono">
+                <span className="text-amber-600 font-bold">Bronze</span>
+                <span className="text-gray-500">→</span>
+                <span className="text-gray-300 font-bold">Silver</span>
+                <span className="text-gray-500">→</span>
+                <span className="text-yellow-400 font-bold">Gold</span>
+                <span className="text-gray-500">→</span>
+                <span className="text-purple-400 font-bold">Legendary</span>
+                <span className="text-gray-500">→</span>
+                <span className="text-amber-300 font-bold">✨ Divine</span>
+              </div>
             </motion.div>
           </div>
 
         </div>
       </section>
 
-      {/* ============ QUICK START GUIDE (CLEAN & MODERN) ============ */}
-      <section className="relative py-24 px-6 bg-[#080a0e] border-t border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 25 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <span className="text-[#c5a880] font-mono text-xs font-black tracking-widest uppercase block mb-2">
-              START PLAYING IN UNDER 1 MINUTE
+
+      {/* =========================================================================
+          5. THE 4 IN-GAME CURRENCIES (Transparent Breakdown)
+         ========================================================================= */}
+      <section className="relative py-24 px-6 bg-[#0a0d14] border-t border-b border-white/5">
+        <div className="max-w-6xl mx-auto space-y-12">
+          
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <span className="text-amber-400 font-mono text-xs font-bold uppercase tracking-wider">
+              IN-GAME CURRENCIES & RESOURCES
             </span>
-            <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-white tracking-[0.15em] uppercase">
-              How to Start
+            <h2 className="font-display font-black text-3xl sm:text-4xl text-white uppercase tracking-wide">
+              Understand the Economy
             </h2>
-            <div className="w-24 h-px bg-gradient-to-r from-transparent via-[#c5a880]/50 to-transparent mx-auto mt-4" />
-          </motion.div>
+            <p className="text-gray-400 text-sm leading-relaxed">
+              Every resource in Void Covenant has a transparent, well-defined utility in the ecosystem:
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             
-            {/* Step 1 */}
-            <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 hover:border-amber-400/50 rounded-2xl p-6 text-left transition-all">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center font-display font-black text-amber-300 text-lg mb-4">
-                1
+            {/* Currency 1: Gold */}
+            <div className="bg-gradient-to-b from-white/[0.04] to-black border border-white/10 rounded-2xl p-6 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
+                  <img src="/icons/icon_gold.webp" alt="Gold" className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="font-display font-bold text-lg text-white uppercase">Gold</h3>
+                  <span className="text-[11px] font-mono text-yellow-400 font-bold">Primary Game Currency</span>
+                </div>
+                <p className="text-xs text-gray-300 leading-relaxed font-sans">
+                  Earned from Campaign battles and PvP duels. Used to purchase basic gear, open Bronze card packs at the Altar, and pay for card fusion fees.
+                </p>
               </div>
-              <h3 className="font-display font-bold text-lg text-white uppercase tracking-wider mb-2">
-                Connect Wallet
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-400 font-sans leading-relaxed">
-                Connect any supported Web3 wallet with one click. Instant cryptographic login with zero registration forms or passwords.
-              </p>
+              <div className="mt-4 pt-3 border-t border-white/10 text-[11px] font-mono text-gray-400">
+                Sources: PvE Floors, Daily PvP
+              </div>
             </div>
 
-            {/* Step 2 */}
-            <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 hover:border-purple-400/50 rounded-2xl p-6 text-left transition-all">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center font-display font-black text-purple-300 text-lg mb-4">
-                2
+            {/* Currency 2: Void Dust */}
+            <div className="bg-gradient-to-b from-white/[0.04] to-black border border-white/10 rounded-2xl p-6 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
+                  <img src="/icons/icon_dust.webp" alt="Void Dust" className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="font-display font-bold text-lg text-white uppercase">Void Dust</h3>
+                  <span className="text-[11px] font-mono text-cyan-400 font-bold">Arcane Crafting Powder</span>
+                </div>
+                <p className="text-xs text-gray-300 leading-relaxed font-sans">
+                  Obtained by defeating campaign bosses and disenchanting duplicate cards. Used to summon Rare booster packs and upgrade card levels.
+                </p>
               </div>
-              <h3 className="font-display font-bold text-lg text-white uppercase tracking-wider mb-2">
-                Get Starter Cards
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-400 font-sans leading-relaxed">
-                Receive your complimentary beginner card deck right away and battle through the initial campaign floors to level up and earn gold.
-              </p>
+              <div className="mt-4 pt-3 border-t border-white/10 text-[11px] font-mono text-gray-400">
+                Sources: Boss Stages, League Chests
+              </div>
             </div>
 
-            {/* Step 3 */}
-            <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 hover:border-rose-400/50 rounded-2xl p-6 text-left transition-all">
-              <div className="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center font-display font-black text-rose-300 text-lg mb-4">
-                3
+            {/* Currency 3: Dark Shards */}
+            <div className="bg-gradient-to-b from-white/[0.04] to-black border border-white/10 rounded-2xl p-6 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center">
+                  <img src="/icons/icon_shards.webp" alt="Dark Shards" className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="font-display font-bold text-lg text-white uppercase">Dark Shards</h3>
+                  <span className="text-[11px] font-mono text-purple-400 font-bold">Premium Crystals</span>
+                </div>
+                <p className="text-xs text-gray-300 leading-relaxed font-sans">
+                  Premium utility crystals. Used to activate 30/90 day VIP Passes, purchase tactical Peace Shields, and refill battle energy.
+                </p>
               </div>
-              <h3 className="font-display font-bold text-lg text-white uppercase tracking-wider mb-2">
-                Battle & Earn Dividends
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-400 font-sans leading-relaxed">
-                Enter the ranked Arena, win Crowns against real opponents, climb into high leagues, and collect daily Sovereign payouts.
-              </p>
+              <div className="mt-4 pt-3 border-t border-white/10 text-[11px] font-mono text-gray-400">
+                Sources: Store, Pass Milestones
+              </div>
+            </div>
+
+            {/* Currency 4: Blood Sovereigns */}
+            <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/50 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+                  <img src="/icons/icon_sovereign.webp" alt="Blood Sovereigns" className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="font-display font-bold text-lg text-amber-300 uppercase">Blood Sovereigns</h3>
+                  <span className="text-[11px] font-mono text-emerald-400 font-bold">100 = $1.00 USDT</span>
+                </div>
+                <p className="text-xs text-gray-300 leading-relaxed font-sans">
+                  Convertible hard P2E currency. Earned through daily PvP league rankings, arena duels, and referrals. Directly withdrawable in USDT to your wallet.
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-amber-500/30 text-[11px] font-mono text-amber-400 font-bold">
+                Sources: 12 Leagues, Duels, Referrals
+              </div>
             </div>
 
           </div>
         </div>
       </section>
 
-      {/* ============ FINAL EPIC CALL TO ACTION ============ */}
-      <section className="relative py-32 px-6 overflow-hidden border-t border-[#c5a880]/20 text-center">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(197,168,128,0.08),transparent_70%)] pointer-events-none" />
 
-        <div className="max-w-3xl mx-auto relative z-10 space-y-8">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#1c1208] to-black border-2 border-[#c5a880]/60 flex items-center justify-center shadow-[0_0_25px_rgba(197,168,128,0.4)]"
-          >
-            <span className="font-display font-black text-2xl text-[#c5a880]">Ω</span>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="space-y-3"
-          >
-            <h2 className="font-display font-black text-3xl sm:text-5xl md:text-6xl text-white tracking-[0.2em] uppercase leading-tight">
-              The Covenant Awaits
+      {/* =========================================================================
+          6. HOW TO START PLAYING IN 3 EASY STEPS
+         ========================================================================= */}
+      <section className="relative py-28 px-6 bg-[#07080b]">
+        <div className="max-w-5xl mx-auto space-y-16">
+          
+          <div className="text-center max-w-xl mx-auto space-y-3">
+            <span className="text-[#c5a880] font-mono text-xs font-bold uppercase tracking-widest block">
+              QUICK ONBOARDING
+            </span>
+            <h2 className="font-display font-black text-3xl sm:text-4xl text-white uppercase tracking-wide">
+              How to Start Playing
             </h2>
-            <p className="text-base sm:text-lg text-gray-400 font-serif italic max-w-xl mx-auto">
-              Darkness will claim the hesitant. Step through the void gate and claim your rightful throne.
+            <p className="text-gray-400 text-sm leading-relaxed">
+              Jump into the Abyss in less than 60 seconds with zero friction:
             </p>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="pt-4"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+            
+            {/* Step 1 */}
+            <div className="bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10 hover:border-amber-400/50 rounded-2xl p-6 space-y-4 transition-all group">
+              <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center font-display font-black text-xl text-amber-300 group-hover:scale-110 transition-transform">
+                1
+              </div>
+              <h3 className="font-display font-bold text-lg text-white uppercase tracking-wider">
+                Connect Web3 Wallet
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                Connect any compatible Web3 wallet with one click. Instant cryptographic login — zero registration forms, email verification, or passwords.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10 hover:border-purple-400/50 rounded-2xl p-6 space-y-4 transition-all group">
+              <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center font-display font-black text-xl text-purple-300 group-hover:scale-110 transition-transform">
+                2
+              </div>
+              <h3 className="font-display font-bold text-lg text-white uppercase tracking-wider">
+                Claim Starter Deck
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                Receive your free starter deck right away. Battle through initial Campaign floors to earn Gold, unlock Void Dust, and level up your squad.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10 hover:border-emerald-400/50 rounded-2xl p-6 space-y-4 transition-all group">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center font-display font-black text-xl text-emerald-300 group-hover:scale-110 transition-transform">
+                3
+              </div>
+              <h3 className="font-display font-bold text-lg text-white uppercase tracking-wider">
+                Climb & Earn Payouts
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                Enter the ranked Arena, climb the 12 competitive leagues, collect daily Sovereign dividends, and withdraw USDT straight to your wallet.
+              </p>
+            </div>
+
+          </div>
+
+          <div className="text-center pt-4">
             <button
               onClick={onConnectWallet}
               disabled={isConnecting}
-              className="px-12 py-4 bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-black font-display font-black text-sm sm:text-base tracking-[0.3em] uppercase rounded-xl transition-all duration-300 shadow-[0_0_35px_rgba(245,158,11,0.4)] hover:shadow-[0_0_50px_rgba(245,158,11,0.7)] cursor-pointer hover:scale-105 active:scale-95"
+              className="px-10 py-3.5 bg-[#151a21] border border-[#c5a880]/50 hover:border-[#c5a880] text-[#ebd09b] font-display font-black text-xs sm:text-sm tracking-[0.25em] uppercase rounded-xl transition-all shadow-lg hover:shadow-[0_0_25px_rgba(197,168,128,0.2)] cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-60"
             >
-              {isConnecting ? 'CONNECTING...' : 'ENTER THE VOID'}
+              {isConnecting ? 'CONNECTING...' : 'START PLAYING NOW'}
             </button>
-          </motion.div>
+          </div>
+
         </div>
       </section>
 
-      {/* ============ FOOTER ============ */}
-      <footer className="border-t border-white/10 py-12 px-6 bg-black/80">
+
+      {/* =========================================================================
+          7. FINAL EPIC CALL TO ACTION
+         ========================================================================= */}
+      <section className="relative py-28 px-6 overflow-hidden border-t border-[#c5a880]/20 text-center bg-gradient-to-b from-[#07080b] via-[#100e17] to-black">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(197,168,128,0.08),transparent_70%)] pointer-events-none" />
+
+        <div className="max-w-3xl mx-auto relative z-10 space-y-6">
+          <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#1c1208] to-black border-2 border-[#c5a880]/60 flex items-center justify-center shadow-[0_0_25px_rgba(197,168,128,0.4)]">
+            <span className="font-display font-black text-2xl text-[#c5a880]">Ω</span>
+          </div>
+
+          <div className="space-y-3">
+            <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-[0.2em] uppercase leading-tight">
+              The Covenant Awaits
+            </h2>
+            <p className="text-sm sm:text-base text-gray-400 font-serif italic max-w-lg mx-auto">
+              Build your battle deck. Command dark legions. Claim your daily share of the Abyssal treasury.
+            </p>
+          </div>
+
+          <div className="pt-4">
+            <button
+              onClick={onConnectWallet}
+              disabled={isConnecting}
+              className="px-12 py-4 bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-black font-display font-black text-sm sm:text-base tracking-[0.3em] uppercase rounded-xl transition-all duration-300 shadow-[0_0_35px_rgba(245,158,11,0.4)] hover:shadow-[0_0_50px_rgba(245,158,11,0.7)] cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-60"
+            >
+              {isConnecting ? 'CONNECTING...' : 'ENTER THE VOID'}
+            </button>
+          </div>
+        </div>
+      </section>
+
+
+      {/* =========================================================================
+          8. CLEAN MODERN FOOTER
+         ========================================================================= */}
+      <footer className="border-t border-white/10 py-10 px-6 bg-black">
         <div className="max-w-4xl mx-auto flex flex-col items-center gap-6">
           {/* Social Links */}
           <div className="flex items-center gap-6">
@@ -638,13 +1037,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             </a>
           </div>
 
-          <p className="text-xs text-gray-600 font-display tracking-widest">
-            VOID COVENANT © 2024–2026 • DARK TACTICAL TCG
+          <p className="text-xs text-gray-500 font-display tracking-widest text-center">
+            VOID COVENANT © 2024–2026 • DARK TACTICAL CARD RPG • PLAY TO EARN
           </p>
         </div>
       </footer>
 
-      {/* ============ CSS KEYFRAMES ============ */}
+
+      {/* =========================================================================
+          ANIMATIONS
+         ========================================================================= */}
       <style>{`
         @keyframes landingFloat {
           0% { transform: translateY(0px) translateX(0px); }
