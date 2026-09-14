@@ -276,3 +276,27 @@ body {
   animation: battle-plague-channel 0.7s ease-in-out infinite;
   will-change: transform, box-shadow;
 }
+
+/* Mobile & Touch Optimizations */
+@media (pointer: coarse) {
+  /* Prevent blue tap highlights and accidental zoom on double-tap in battles */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Touch action optimization for combat table */
+  .touch-battle-surface {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+}
+
+/* Safe area padding for notch and dynamic island in landscape */
+@supports (padding: env(safe-area-inset-left)) {
+  .safe-landscape-padding {
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+    padding-right: max(0.5rem, env(safe-area-inset-right));
+    padding-bottom: max(0.25rem, env(safe-area-inset-bottom));
+  }
+}

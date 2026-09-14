@@ -1305,10 +1305,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     : null;
 
   return (
-    <div className="h-screen max-h-screen overflow-hidden bg-[#090705] text-gray-200 p-2 md:p-3 font-sans flex flex-col justify-between select-none relative">
+    <div className="h-screen max-h-screen overflow-hidden bg-[#090705] text-gray-200 p-1 sm:p-2 md:p-3 font-sans flex flex-col justify-between select-none relative touch-battle-surface safe-landscape-padding">
       
       {/* Header Bar */}
-      <div className="bg-[#120d0a]/95 border border-[#ebd09b]/15 rounded-lg p-1.5 px-3 flex justify-between items-center max-w-7xl mx-auto w-full mb-2 shadow-md h-[40px] shrink-0 z-20">
+      <div className="bg-[#120d0a]/95 border border-[#ebd09b]/15 rounded-lg p-1.5 px-3 flex justify-between items-center max-w-7xl mx-auto w-full mb-1 sm:mb-2 shadow-md h-[36px] sm:h-[40px] shrink-0 z-20">
         <button
           onClick={() => {
             const confirmMsg = battleType === 'pvp'
@@ -1838,6 +1838,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           className="w-full h-full relative"
                         >
                           <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (card) {
+                                setHoveredCard(prev => (prev?.id === card.id ? null : card));
+                              }
+                            }}
                             onMouseEnter={() => card && setHoveredCard(card)}
                             onMouseLeave={() => setHoveredCard(null)}
                             style={{
@@ -2087,6 +2093,12 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           className="w-full h-full relative"
                         >
                           <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (card) {
+                                setHoveredCard(prev => (prev?.id === card.id ? null : card));
+                              }
+                            }}
                             onMouseEnter={() => card && setHoveredCard(card)}
                             onMouseLeave={() => setHoveredCard(null)}
                             style={{
@@ -2577,18 +2589,18 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           )}
         </AnimatePresence>
 
-        {/* Floating Card Analyzer Tooltip - Large and readable details */}
+        {/* Floating Card Analyzer Tooltip - Large and readable details (Touch-friendly & Desktop) */}
         <AnimatePresence>
           {hoveredCard && (
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="absolute bottom-[175px] left-6 w-[350px] bg-[#0d1117]/98 border-2 border-[#ebd09b]/35 rounded-2xl p-4 z-45 shadow-[0_10px_35px_rgba(0,0,0,0.85)] pointer-events-none text-left flex gap-3.5"
+              className="absolute bottom-[170px] left-3 sm:left-6 max-w-[94vw] w-[360px] bg-[#0d1117]/98 border-2 border-[#ebd09b]/35 rounded-2xl p-3.5 sm:p-4 z-45 shadow-[0_10px_35px_rgba(0,0,0,0.9)] pointer-events-auto text-left flex gap-3.5"
             >
               {/* Card visual representation inside analyzer */}
               <div 
-                className="w-[110px] h-[155px] rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible bg-[#151a21] text-white shadow-md shrink-0"
+                className="w-[100px] sm:w-[110px] h-[145px] sm:h-[155px] rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible bg-[#151a21] text-white shadow-md shrink-0"
                 style={{ borderColor: getTierBorderColor(hoveredCard.tier) }}
               >
                 {/* Background art */}
@@ -2632,24 +2644,27 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   {hoveredCard.skills.map((s, sIdx) => (
                     <div 
                       key={sIdx}
-                      className={`flex items-center gap-0.5 text-[8px] font-mono font-black px-1.5 py-0.2 rounded-full border ${getSkillBadgeStyle(s.type)}`}
+                      className={`flex items-center gap-0.5 text-[8.5px] font-mono font-black px-1.5 py-0.5 rounded-full border ${getSkillBadgeStyle(s.type)}`}
                     >
                       <span>{getSkillIcon(s.type)}</span>
                       <span className="leading-none">{s.value}</span>
                     </div>
                   ))}
+                  {hoveredCard.skills.length === 0 && (
+                    <span className="text-[7.5px] font-mono font-bold text-gray-500 uppercase tracking-widest leading-none my-0.5">No Skills</span>
+                  )}
                 </div>
 
-                <div className="h-0.5 shrink-0" />
+                <div className="h-1 shrink-0" />
 
-                {/* Gothic style corner badges (NO emojis) */}
+                {/* Corner badges */}
                 <div className="absolute -bottom-3 -left-3 w-8 h-8 z-20 flex items-center justify-center">
                   <img src="/icons/gothic_attack.webp" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                  <span className="relative text-[#ff3b30] text-[13.5px] font-black font-mono leading-none z-10" style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{hoveredCard.attack}</span>
+                  <span className="relative text-[#ff3b30] text-[12.5px] font-black font-mono leading-none z-10" style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px -2px 2px #000, 0 0 5px #000' }}>{hoveredCard.attack}</span>
                 </div>
                 <div className="absolute -bottom-3 -right-3 w-8 h-8 z-20 flex items-center justify-center">
                   <img src="/icons/gothic_health.webp" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                  <span className="relative text-[#ffffff] text-[12.5px] font-black font-mono leading-none z-10" style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{hoveredCard.health}</span>
+                  <span className="relative text-[#ffffff] text-[12.5px] font-black font-mono leading-none z-10" style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px -2px 2px #000, 0 0 5px #000' }}>{hoveredCard.health}</span>
                 </div>
 
                 {/* Persistent Armor Badge */}
@@ -2662,7 +2677,16 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               {/* Descriptions & specs */}
               <div className="flex-1 flex flex-col justify-between min-w-0">
                 <div>
-                  <h4 className="font-display font-black text-sm text-white leading-none mb-1">{hoveredCard.name}</h4>
+                  <div className="flex items-start justify-between gap-1">
+                    <h4 className="font-display font-black text-sm text-white leading-none mb-1">{hoveredCard.name}</h4>
+                    <button
+                      onClick={() => setHoveredCard(null)}
+                      className="text-gray-400 hover:text-white p-0.5 rounded hover:bg-white/10 transition-colors"
+                      title="Close"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                   <div className="flex gap-2 text-[9px] font-mono text-gray-400 border-b border-gray-800 pb-1.5 mb-1.5">
                     <span className="text-[#ebd09b] font-bold">{hoveredCard.tier.toUpperCase()}</span>
                     <span>•</span>
@@ -2750,7 +2774,15 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   }}
                   onClick={() => {
                     if (!isSimulating) {
-                      setSelectedHandCardId(isSelected ? null : card.id);
+                      if (isSelected) {
+                        setSelectedHandCardId(null);
+                        setHoveredHandCardIndex(null);
+                        setHoveredCard(null);
+                      } else {
+                        setSelectedHandCardId(card.id);
+                        setHoveredHandCardIndex(idx);
+                        setHoveredCard(card as any);
+                      }
                     }
                   }}
                   onMouseEnter={() => {
@@ -2758,8 +2790,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     setHoveredCard(card as any);
                   }}
                   onMouseLeave={() => {
-                    setHoveredHandCardIndex(null);
-                    setHoveredCard(null);
+                    if (!isSelected) {
+                      setHoveredHandCardIndex(null);
+                      setHoveredCard(null);
+                    }
                   }}
                   className={`absolute bottom-[0px] left-[calc(50%-55px)] w-[110px] h-[155px] origin-bottom rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center cursor-pointer transition-shadow bg-[#151a21] text-white select-none overflow-visible shadow-lg ${
                     isSelected 

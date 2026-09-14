@@ -23,10 +23,13 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import bs58Pkg from 'bs58';
 import { assetPreloader } from './utils/assetPreloader';
+import { useDeviceDetect } from './utils/useDeviceDetect';
+import { MobileOrientationGuard } from './components/MobileOrientationGuard';
 
 const bs58 = (bs58Pkg as any).default || bs58Pkg;
 
 function MainAppContent() {
+  const device = useDeviceDetect();
   const { profile, isLoadingProfile, connectSolanaWallet, registerPlayer, disconnectSolanaWallet, startBattleOnServer, isShardsShopOpen, setIsShardsShopOpen, isGoldShopOpen, setIsGoldShopOpen, isDustShopOpen, setIsDustShopOpen, hasNewDefenseAttacks } = useGame();
   const { connected, publicKey, signMessage, disconnect } = useWallet();
   const { setVisible } = useWalletModal();
@@ -236,25 +239,29 @@ function MainAppContent() {
 
   if (!profile.isRegistered) {
     return (
-      <RegistrationScreen 
-        onRegister={(username, avatarUrl) => registerPlayer(username, avatarUrl)} 
-      />
+      <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait}>
+        <RegistrationScreen 
+          onRegister={(username, avatarUrl) => registerPlayer(username, avatarUrl)} 
+        />
+      </MobileOrientationGuard>
     );
   }
 
   // If in active battle, render full screen combat field for maximum immersion
   if (activeBattleStage) {
     return (
-      <BattleFieldView
-        stage={activeBattleStage}
-        onExitBattle={handleExitBattle}
-        battleType={activeBattleType}
-      />
+      <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait}>
+        <BattleFieldView
+          stage={activeBattleStage}
+          onExitBattle={handleExitBattle}
+          battleType={activeBattleType}
+        />
+      </MobileOrientationGuard>
     );
   }
 
   return (
-    <>
+    <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait}>
       <div className="bg-noise" />
       <div className="ambient-orb-1" />
       <div className="ambient-orb-2" />
@@ -447,7 +454,7 @@ function MainAppContent() {
       {isDustShopOpen && (
         <DustShopModal onClose={() => setIsDustShopOpen(false)} />
       )}
-    </>
+    </MobileOrientationGuard>
   );
 }
 
