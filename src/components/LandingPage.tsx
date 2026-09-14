@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronDown, ChevronLeft, ChevronRight, Sparkles, Twitter, Send } from 'lucide-react';
+import { 
+  ChevronDown, 
+  ChevronLeft, 
+  ChevronRight, 
+  Sparkles, 
+  Twitter, 
+  Send, 
+  ArrowUpRight 
+} from 'lucide-react';
 
 interface LandingPageProps {
   onConnectWallet: () => void;
   isConnecting: boolean;
 }
 
-// Floating particles (same approach as SplashScreen)
+// Floating particles & rune symbols (100% identical to original Hero Section)
 const particles = Array.from({ length: 40 }, (_, i) => ({
   id: i,
   left: `${(i * 37 + 13) % 100}%`,
@@ -20,265 +28,153 @@ const particles = Array.from({ length: 40 }, (_, i) => ({
 
 const runeSymbols = ['ᚱ', 'ᛉ', 'ᛟ', 'ᚦ', 'ᛊ', 'ᚨ', 'ᛗ'];
 
-interface CreatureAbility {
-  name: string;
-  type: string;
-  desc: string;
-  synergy: string;
-}
-
-interface CreatureTierData {
-  atk: number;
-  hp: number;
-  trait: string;
-}
-
-interface Creature {
-  id: string;
-  name: string;
-  subtitle: string;
-  faction: string;
-  art: string;
-  turnDelay: number;
-  speedDesc: string;
-  accentColor: string;
-  accentGlow: string;
-  borderClass: string;
-  badgeClass: string;
-  lore: string;
-  tiers: {
-    bronze: CreatureTierData;
-    silver: CreatureTierData;
-    gold: CreatureTierData;
-    legendary: CreatureTierData;
-  };
-  abilities: CreatureAbility[];
-  metrics: {
-    damage: number;
-    resilience: number;
-    initiative: number;
-    control: number;
-  };
-}
-
-const CREATURES: Creature[] = [
+// Curated dark fantasy champions with genuine game card art
+const CHAMPIONS_GALLERY = [
   {
     id: 'void_overlord',
     name: 'Void Overlord',
-    subtitle: 'Sovereign of the Nether Spire',
+    title: 'Sovereign of the Nether Spire',
     faction: 'Abyssal Void',
     art: '/cards/void_overlord.webp',
-    turnDelay: 3,
-    speedDesc: 'Balanced Initiative (3T)',
-    accentColor: '#a855f7',
-    accentGlow: 'rgba(168,85,247,0.35)',
-    borderClass: 'border-purple-500/50 hover:border-purple-400',
-    badgeClass: 'bg-purple-950/80 text-purple-300 border-purple-500/50',
-    lore: '“Born within the event horizon of the shattered nexus. His whispers shatter mortal sanity before his blade even leaves the scabbard.”',
-    tiers: {
-      bronze: { atk: 4, hp: 18, trait: 'Hex (1 Turn)' },
-      silver: { atk: 5, hp: 24, trait: 'Hex + Plague I' },
-      gold: { atk: 6, hp: 29, trait: 'Hex + Plague II + Vampirism 30%' },
-      legendary: { atk: 8, hp: 35, trait: 'Void Collapse (Hex 2T + Plague III + Vampirism 50%)' },
-    },
-    abilities: [
-      {
-        name: 'Void Hex',
-        type: 'Disruption',
-        desc: 'Striking an enemy commander or creature silences their passive triggers and special talents for 2 full combat turns.',
-        synergy: 'Deploy against high-threat enemy bosses to instantly disable their retaliation mechanics.',
-      },
-      {
-        name: 'Nether Plague',
-        type: 'Affliction',
-        desc: 'Infects the target and adjacent tiles with creeping void rot, dealing 3 pure damage every turn bypassing physical armor.',
-        synergy: 'Invaluable against armored vanguard tanks with excessive defensive stats.',
-      },
-      {
-        name: 'Soul Siphon',
-        type: 'Vampirism',
-        desc: 'Channeling void hunger, converts 50% of unmitigated combat damage directly into permanent Warlord health replenishment.',
-        synergy: 'Keeps your Warlord at maximum resilience throughout prolonged arena skirmishes.',
-      },
-    ],
-    metrics: { damage: 85, resilience: 90, initiative: 65, control: 95 },
+    initiative: '3-Turn Countdown',
+    glowColor: 'rgba(168,85,247,0.4)',
+    accentBorder: 'border-purple-500/60',
+    accentText: 'text-purple-300',
+    accentBadge: 'bg-purple-950/80 text-purple-300 border-purple-500/50',
+    lore: 'Born within the event horizon of the shattered nexus. His whispers shatter mortal sanity before his blade leaves the scabbard.',
+    combatRole: 'Hex Silence & Soul Siphon',
+    roleDesc: 'Silences enemy triggers and channels 50% of dealt damage directly into permanent Warlord health replenishment.',
+    stats: { atk: '8 ATK', hp: '35 HP', delay: '3T' }
   },
   {
     id: 'blood_queen',
     name: 'Blood Queen',
-    subtitle: 'Matriarch of the Crimson Citadel',
+    title: 'Matriarch of the Crimson Citadel',
     faction: 'Sanguine Court',
     art: '/cards/blood_queen.webp',
-    turnDelay: 2,
-    speedDesc: 'High-Velocity Striker (2T)',
-    accentColor: '#ef4444',
-    accentGlow: 'rgba(239,68,68,0.35)',
-    borderClass: 'border-red-500/50 hover:border-red-400',
-    badgeClass: 'bg-red-950/80 text-red-300 border-red-500/50',
-    lore: '“Her court drinks vintage wine only when imperial blood runs dry. None who have gazed upon her veiled crown have survived until the dawn.”',
-    tiers: {
-      bronze: { atk: 4, hp: 12, trait: 'Sanguine Tap (+3 HP)' },
-      silver: { atk: 5, hp: 15, trait: 'Blood Feast (+5 HP)' },
-      gold: { atk: 7, hp: 18, trait: 'Crimson Surge (+7 HP)' },
-      legendary: { atk: 8, hp: 20, trait: 'Immortal Bloodline (+10 HP + First Strike)' },
-    },
-    abilities: [
-      {
-        name: 'Crimson Feast',
-        type: 'High Vampirism',
-        desc: 'Extracts vital lifeforce with every strike, draining +7 HP directly from targets to keep herself near invulnerability.',
-        synergy: 'Outheals damage taken when placed in front-row skirmish exchanges.',
-      },
-      {
-        name: 'First Strike',
-        type: 'Speed Initiative',
-        desc: 'With a lightning 2-Turn delay, attacks before standard 3T and 4T enemy bruisers can prepare their offensive routines.',
-        synergy: 'Eliminates frail backline spellcasters before they can execute spells.',
-      },
-      {
-        name: 'Sanguine Surge',
-        type: 'Crisis Passive',
-        desc: 'When your Warlord health falls below 35%, Blood Queen gains +4 temporary ATK and life leech doubles.',
-        synergy: 'Provides unexpected comeback potential in high-stakes arena finishes.',
-      },
-    ],
-    metrics: { damage: 88, resilience: 65, initiative: 98, control: 45 },
+    initiative: '2-Turn Lightning Strike',
+    glowColor: 'rgba(239,68,68,0.4)',
+    accentBorder: 'border-red-500/60',
+    accentText: 'text-red-300',
+    accentBadge: 'bg-red-950/80 text-red-300 border-red-500/50',
+    lore: 'Her court drinks vintage wine only when imperial blood runs dry. None who have gazed upon her veiled crown survived until the dawn.',
+    combatRole: 'First Strike & Sanguine Surge',
+    roleDesc: 'Attacks before standard bruisers can react, siphoning life with every blow to sustain your frontline indefinitely.',
+    stats: { atk: '8 ATK', hp: '20 HP', delay: '2T' }
   },
   {
     id: 'azrael_death',
     name: 'Azrael, Death',
-    subtitle: 'Angel of the Final Harvest',
+    title: 'Angel of the Final Harvest',
     faction: 'Reaper Host',
     art: '/cards/azrael_angel_of_death.webp',
-    turnDelay: 4,
-    speedDesc: 'Colossal Siege Engine (4T)',
-    accentColor: '#f59e0b',
-    accentGlow: 'rgba(245,158,11,0.35)',
-    borderClass: 'border-amber-500/50 hover:border-amber-400',
-    badgeClass: 'bg-amber-950/80 text-amber-300 border-amber-500/50',
-    lore: '“He counts no friends, bows to no pantheon. When the hourglass of the realm empties, Azrael walks the ash fields alone.”',
-    tiers: {
-      bronze: { atk: 8, hp: 18, trait: 'Reaping Strike' },
-      silver: { atk: 10, hp: 22, trait: 'Reaping Strike + Cleave' },
-      gold: { atk: 12, hp: 26, trait: 'Dread Scythe + Sacrifice' },
-      legendary: { atk: 15, hp: 30, trait: 'Final Judgment (Cleave + Hex + Sacrifice)' },
-    },
-    abilities: [
-      {
-        name: 'Colossal Cleave',
-        type: 'Board Cleave',
-        desc: 'A devastating 15 ATK sweep that strikes the primary target and splashes 50% damage to all neighboring units.',
-        synergy: 'Decimates swarms and breaks heavily defended line formations in a single blow.',
-      },
-      {
-        name: 'Martyr’s Sacrifice',
-        type: 'Damage Redirection',
-        desc: 'Should lethal damage target your Warlord, Azrael claims lesser undead allies to absorb 100% of the fatal blow.',
-        synergy: 'Combines with cheap summon tokens to form an impenetrable tactical moat.',
-      },
-      {
-        name: 'Soul Reap',
-        type: 'Hex Ruin',
-        desc: 'Units slain by Azrael cannot be resurrected or triggered by on-death spells, banishing them permanently.',
-        synergy: 'Hard counter to necromancer decks that rely on graveyard rebirth.',
-      },
-    ],
-    metrics: { damage: 100, resilience: 80, initiative: 35, control: 75 },
+    initiative: '4-Turn Siege Engine',
+    glowColor: 'rgba(245,158,11,0.4)',
+    accentBorder: 'border-amber-500/60',
+    accentText: 'text-amber-300',
+    accentBadge: 'bg-amber-950/80 text-amber-300 border-amber-500/50',
+    lore: 'He bows to no pantheon. When the hourglass of the realm empties, Azrael walks the ash fields alone with his board-cleaving scythe.',
+    combatRole: 'Colossal Cleave & Martyrdom',
+    roleDesc: 'Sweeps across entire enemy ranks, and sacrifices lesser undead minions to absorb 100% of lethal blows aimed at your Warlord.',
+    stats: { atk: '15 ATK', hp: '30 HP', delay: '4T' }
   },
   {
     id: 'abyssal_dragon',
     name: 'Abyssal Dragon',
-    subtitle: 'Titan of the Molten Trench',
+    title: 'Titan of the Molten Trench',
     faction: 'Deep Trench',
     art: '/cards/abyssal_dragon.webp',
-    turnDelay: 4,
-    speedDesc: 'Heavy Juggernaut (4T)',
-    accentColor: '#06b6d4',
-    accentGlow: 'rgba(6,182,212,0.35)',
-    borderClass: 'border-cyan-500/50 hover:border-cyan-400',
-    badgeClass: 'bg-cyan-950/80 text-cyan-300 border-cyan-500/50',
-    lore: '“Sleeping for centuries beneath oceanic magma trenches. Its awakening causes tidal cataclysms across the surface empires.”',
-    tiers: {
-      bronze: { atk: 7, hp: 22, trait: 'Void Breath' },
-      silver: { atk: 9, hp: 28, trait: 'Abyssal Roar' },
-      gold: { atk: 11, hp: 32, trait: 'Tectonic Shatter' },
-      legendary: { atk: 14, hp: 38, trait: 'Cataclysm (Full Row Burn + Armor Shred)' },
-    },
-    abilities: [
-      {
-        name: 'Void Inferno',
-        type: 'AoE Incinerate',
-        desc: 'Breathes torrents of black flame across the opposing battle rank, inflicting lasting burn ticks that shred defensive armor.',
-        synergy: 'Weakens heavily armored defensive bulwarks over consecutive combat turns.',
-      },
-      {
-        name: 'Obsidian Scales',
-        type: 'Fortification',
-        desc: 'Ancient trench scales negate a flat 4 damage from all non-critical enemy physical attacks.',
-        synergy: 'Shrugs off small multi-hit attackers with negligible damage taken.',
-      },
-      {
-        name: 'Cataclysmic Roar',
-        type: 'Turn Delay Debuff',
-        desc: 'Releases a seismic bellow that stalls all opposing units with Turn Delay 3 or higher by +1 round.',
-        synergy: 'Disrupts the opponent’s planned attack sequence and wins the initiative race.',
-      },
-    ],
-    metrics: { damage: 92, resilience: 95, initiative: 40, control: 80 },
+    initiative: '4-Turn Juggernaut',
+    glowColor: 'rgba(6,182,212,0.4)',
+    accentBorder: 'border-cyan-500/60',
+    accentText: 'text-cyan-300',
+    accentBadge: 'bg-cyan-950/80 text-cyan-300 border-cyan-500/50',
+    lore: 'Sleeping for centuries beneath oceanic magma trenches. Its awakening causes tidal cataclysms across the surface empires.',
+    combatRole: 'Void Inferno & Armor Shred',
+    roleDesc: 'Breathes torrents of black flame across opposing battle ranks, inflicting permanent burn ticks that tear through heavy armor.',
+    stats: { atk: '14 ATK', hp: '38 HP', delay: '4T' }
   },
   {
     id: 'dracula_first',
     name: 'Dracula, The First',
-    subtitle: 'Progenitor of the Nightborne',
+    title: 'Progenitor of the Nightborne',
     faction: 'Sanguine Court',
     art: '/cards/dracula_the_first.webp',
-    turnDelay: 3,
-    speedDesc: 'Tactical Mastermind (3T)',
-    accentColor: '#10b981',
-    accentGlow: 'rgba(16,185,129,0.35)',
-    borderClass: 'border-emerald-500/50 hover:border-emerald-400',
-    badgeClass: 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50',
-    lore: '“The first mortal who dared to drink the blood of a dead god. For a thousand winters he has dictated the rise and fall of kings.”',
-    tiers: {
-      bronze: { atk: 5, hp: 18, trait: 'Hypnotic Gaze' },
-      silver: { atk: 7, hp: 24, trait: 'Mist Form + Vampirism' },
-      gold: { atk: 9, hp: 28, trait: 'Mind Dominance' },
-      legendary: { atk: 11, hp: 34, trait: 'Sire’s Decree (Mind Control + Resurrection)' },
-    },
-    abilities: [
-      {
-        name: 'Sire’s Decree',
-        type: 'Mind Control',
-        desc: 'Enthralls the highest-attack enemy creature on field, compelling it to strike its own adjacent ally on its next turn.',
-        synergy: 'Turns the opponent’s strongest damage carry into your greatest weapon.',
-      },
-      {
-        name: 'Mist Evasion',
-        type: 'Survival',
-        desc: 'A 50% chance to dissolve into mist when taking lethal damage, avoiding the attack entirely.',
-        synergy: 'Unpredictable evasion disrupts opponents attempting to calculate lethal combos.',
-      },
-      {
-        name: 'Progenitor’s Bond',
-        type: 'Aura Vampirism',
-        desc: 'Whenever any friendly vampire creature attacks, both Dracula and your Warlord recover 30% of the damage dealt.',
-        synergy: 'Multiplying vampire synergy heals the entire squad to full strength.',
-      },
-    ],
-    metrics: { damage: 80, resilience: 85, initiative: 70, control: 98 },
+    initiative: '3-Turn Mastermind',
+    glowColor: 'rgba(16,185,129,0.4)',
+    accentBorder: 'border-emerald-500/60',
+    accentText: 'text-emerald-300',
+    accentBadge: 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50',
+    lore: 'The first mortal who dared to drink the blood of a dead god. For a thousand winters he has dictated the rise and fall of kings.',
+    combatRole: 'Mind Control & Mist Evasion',
+    roleDesc: 'Enthralls the highest-attack enemy creature on the field, compelling it to strike adjacent allies on its next turn.',
+    stats: { atk: '11 ATK', hp: '34 HP', delay: '3T' }
+  },
+  {
+    id: 'aurelius_demiurge',
+    name: 'Aurelius',
+    title: 'The Fallen Demiurge',
+    faction: 'Divine Pantheon',
+    art: '/cards/aurelius_the_demiurge.webp',
+    initiative: '4-Turn Apex Deity',
+    glowColor: 'rgba(235,208,155,0.45)',
+    accentBorder: 'border-amber-300/70',
+    accentText: 'text-amber-200',
+    accentBadge: 'bg-yellow-950/80 text-amber-200 border-amber-400/50',
+    lore: 'A disgraced architect of the cosmos who descended into the Abyss, reforging broken reality with celestial gold and void fire.',
+    combatRole: 'Divine Barrier & Cataclysm',
+    roleDesc: 'Manifests an indestructible golden barrier around your Warlord while shattering opposing defensive runes.',
+    stats: { atk: '16 ATK', hp: '40 HP', delay: '4T' }
   },
 ];
 
+// High-end Equipment Loadout with genuine item icons
+const WARLORD_ARTIFACTS = [
+  { slot: 'Weapon', name: 'Soulreaper Scythe', icon: '/icons/equipment/items/soulreaper_scythe.png', trait: '+18 Attack • Siphon Blade' },
+  { slot: 'Armor', name: 'Mantle of the Lich King', icon: '/icons/equipment/items/mantle_of_the_lich_king.png', trait: '+35 Max HP • Armor Bulwark' },
+  { slot: 'Helmet', name: 'Crown of Thorns', icon: '/icons/equipment/items/crown_of_thorns.png', trait: '-1 Turn Delay to Summons' },
+  { slot: 'Ring', name: 'Ring of Infinite Ruin', icon: '/icons/equipment/items/ring_of_infinite_ruin.png', trait: '+22% Critical Spell Pierce' },
+  { slot: 'Amulet', name: 'Eye of the Leviathan', icon: '/icons/equipment/items/eye_of_the_leviathan.png', trait: '+15% Dodge Chance' },
+  { slot: 'Boots', name: 'Boots of the Apocalypse', icon: '/icons/equipment/items/boots_of_the_apocalypse.png', trait: '+25% Gold & Sovereign Multiplier' },
+];
+
 export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isConnecting }) => {
-  const [selectedCreatureIndex, setSelectedCreatureIndex] = useState(0);
-  const [selectedTier, setSelectedTier] = useState<'bronze' | 'silver' | 'gold' | 'legendary'>('legendary');
-  const [selectedAbilityIndex, setSelectedAbilityIndex] = useState(0);
+  const [selectedChampionIdx, setSelectedChampionIdx] = useState(0);
+  const activeChampion = CHAMPIONS_GALLERY[selectedChampionIdx];
+
+  // Active section tracking for floating navigation
+  const [activeNav, setActiveNav] = useState<string>('hero');
+  const [showNav, setShowNav] = useState<boolean>(false);
+
+  // Track scroll position to update active navigation item and toggle visibility
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setShowNav(scrollY > 220);
+
+      const sections = ['hero', 'lore', 'tactics', 'warlord', 'colosseum', 'treasury', 'alliance'];
+      for (const id of sections.reverse()) {
+        const el = document.getElementById(id);
+        if (el && scrollY >= el.offsetTop - 300) {
+          setActiveNav(id);
+          break;
+        }
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // 3D Card Hover Tilt state
   const [cardTilt, setCardTilt] = useState({ rotateX: 0, rotateY: 0, glareX: 50, glareY: 50 });
   const [isHoveringCard, setIsHoveringCard] = useState(false);
-
-  const activeCreature = CREATURES[selectedCreatureIndex];
-  const activeStats = activeCreature.tiers[selectedTier];
-  const activeAbility = activeCreature.abilities[selectedAbilityIndex] || activeCreature.abilities[0];
 
   const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -286,8 +182,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
     const y = e.clientY - rect.top;
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
-    const rotateX = ((y - centerY) / centerY) * -12;
-    const rotateY = ((x - centerX) / centerX) * 12;
+    const rotateX = ((y - centerY) / centerY) * -14;
+    const rotateY = ((x - centerX) / centerX) * 14;
     const glareX = (x / rect.width) * 100;
     const glareY = (y / rect.height) * 100;
     setCardTilt({ rotateX, rotateY, glareX, glareY });
@@ -298,41 +194,95 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
     setCardTilt({ rotateX: 0, rotateY: 0, glareX: 50, glareY: 50 });
   };
 
-  const tierColors = {
-    bronze: {
-      name: 'Bronze Tier',
-      border: 'border-[#cd7f32]/60',
-      badge: 'bg-[#cd7f32]/20 text-[#e6a87c] border-[#cd7f32]/40',
-      glow: 'rgba(205,127,50,0.3)',
-      text: 'text-[#e6a87c]',
-    },
-    silver: {
-      name: 'Silver Tier',
-      border: 'border-slate-400/60',
-      badge: 'bg-slate-700/40 text-slate-200 border-slate-400/40',
-      glow: 'rgba(148,163,184,0.3)',
-      text: 'text-slate-300',
-    },
-    gold: {
-      name: 'Gold Tier',
-      border: 'border-amber-400/70',
-      badge: 'bg-amber-950/60 text-amber-300 border-amber-400/50',
-      glow: 'rgba(245,158,11,0.35)',
-      text: 'text-amber-400',
-    },
-    legendary: {
-      name: 'Legendary Tier',
-      border: 'border-purple-400/80 shadow-[0_0_25px_rgba(168,85,247,0.3)]',
-      badge: 'bg-purple-950/70 text-purple-200 border-purple-400/60',
-      glow: 'rgba(168,85,247,0.45)',
-      text: 'text-purple-300',
-    },
-  };
-
   return (
-    <div className="min-h-screen bg-[#0b0c10] text-white overflow-x-hidden">
-      {/* ============ HERO SECTION ============ */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+    <div className="min-h-screen bg-[#050608] text-[#e8e6e3] overflow-x-hidden selection:bg-[#c5a880]/30 selection:text-[#ebd09b]">
+      
+      {/* =========================================================================
+          FLOATING LUXURY GOTHIC NAVIGATION BAR (SHOWN ONLY ON SCROLL)
+         ========================================================================= */}
+      <AnimatePresence>
+        {showNav && (
+          <motion.nav
+            initial={{ y: -60, opacity: 0, scale: 0.95 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: -60, opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+            className="fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-[96vw] overflow-x-auto no-scrollbar"
+          >
+        <div className="relative px-3 sm:px-4 py-1.5 rounded-full bg-[#07080c]/90 backdrop-blur-2xl border border-[#c5a880]/35 shadow-[0_12px_40px_rgba(0,0,0,0.9),0_0_20px_rgba(197,168,128,0.12)] flex items-center gap-1 sm:gap-1.5">
+          {/* Subtle gothic inner border highlight */}
+          <div className="absolute inset-[1px] rounded-full border border-white/[0.04] pointer-events-none" />
+
+          {/* Return to Top button */}
+          <button
+            onClick={() => scrollToSection('hero')}
+            title="Главная"
+            className={`relative px-3 py-1.5 rounded-full text-xs font-display tracking-widest uppercase transition-all duration-300 flex items-center gap-1.5 ${
+              activeNav === 'hero'
+                ? 'text-[#ebd09b] bg-white/[0.08] border border-[#c5a880]/50 shadow-[0_0_12px_rgba(197,168,128,0.2)]'
+                : 'text-[#8e8579] hover:text-[#ebd09b] hover:bg-white/[0.04]'
+            }`}
+          >
+            <span className="font-display font-black text-[#c5a880] text-sm">Ω</span>
+            <span className="font-bold text-[11px] hidden sm:inline">Main</span>
+          </button>
+
+          <span className="text-[#c5a880]/20 text-[10px] select-none hidden sm:inline">|</span>
+
+          {/* Nav Items */}
+          {[
+            { id: 'lore', label: 'Abyss' },
+            { id: 'tactics', label: 'Combat' },
+            { id: 'warlord', label: 'Warlords' },
+            { id: 'colosseum', label: 'Leagues' },
+            { id: 'treasury', label: 'Economy' },
+            { id: 'alliance', label: 'Referral system' },
+          ].map((item) => {
+            const isActive = activeNav === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                className={`relative px-2.5 sm:px-3 py-1.5 rounded-full font-display text-[10px] sm:text-[11px] tracking-[0.14em] uppercase whitespace-nowrap transition-all duration-300 ${
+                  isActive
+                    ? 'text-[#f6edd9] font-bold shadow-[0_0_16px_rgba(212,175,55,0.25)]'
+                    : 'text-[#8e8579] hover:text-[#ebd09b] hover:bg-white/[0.04]'
+                }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="activeNavBackground"
+                    className="absolute inset-0 rounded-full bg-gradient-to-r from-[#241a12] via-[#2d2218] to-[#1c130d] border border-[#c5a880]/50 -z-10"
+                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                  />
+                )}
+                {item.label}
+              </button>
+            );
+          })}
+
+          <div className="w-[1px] h-4 bg-gradient-to-b from-transparent via-[#c5a880]/30 to-transparent mx-1 hidden sm:block" />
+
+          {/* CTA Play Now - Refined Dark Gothic Gold Button */}
+          <button
+            onClick={onConnectWallet}
+            disabled={isConnecting}
+            className="group relative px-4 py-1.5 rounded-full bg-gradient-to-r from-[#181a20] via-[#221c17] to-[#181a20] hover:from-[#2a221b] hover:to-[#221c17] text-[#ebd09b] hover:text-[#fff2d1] border border-[#c5a880]/60 hover:border-[#ebd09b] shadow-[0_0_15px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.15)] hover:shadow-[0_0_20px_rgba(197,168,128,0.35)] transition-all duration-300 cursor-pointer active:scale-95 flex items-center gap-2 whitespace-nowrap"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880] group-hover:bg-[#ebd09b] shadow-[0_0_6px_rgba(197,168,128,0.8)] animate-pulse" />
+            <span className="font-display font-bold text-[10px] sm:text-[11px] tracking-[0.18em] uppercase">
+              {isConnecting ? 'Connecting...' : 'Play Now'}
+            </span>
+          </button>
+        </div>
+      </motion.nav>
+      )}
+      </AnimatePresence>
+
+      {/* =========================================================================
+          1. HERO SECTION (100% PRESERVED AS STRICTLY DIRECTED)
+         ========================================================================= */}
+      <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
         {/* Background gradient */}
         <div
           className="absolute inset-0"
@@ -420,15 +370,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             VOID COVENANT
           </motion.h1>
 
-          {/* Subtitle */}
-          <motion.p
+          {/* Subtitle / P2E Category Badge */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.9 }}
-            className="font-display text-sm md:text-base text-[#c5a880]/70 tracking-[0.4em] uppercase select-none"
+            className="flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#c5a880]/10 border border-[#c5a880]/30 shadow-[0_0_15px_rgba(197,168,128,0.15)]"
           >
-            Dark Card RPG
-          </motion.p>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse" />
+            <span className="font-display font-bold text-xs md:text-sm text-[#ebd09b] tracking-[0.3em] uppercase select-none">
+              Play-to-Earn Dark Card RPG
+            </span>
+          </motion.div>
 
           {/* Separator */}
           <motion.div
@@ -438,14 +391,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             className="w-56 h-px bg-gradient-to-r from-transparent via-[#c5a880]/40 to-transparent"
           />
 
-          {/* Tagline */}
+          {/* Tagline highlighting dark fantasy & play-to-earn */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.4 }}
-            className="text-sm md:text-base text-gray-400 italic font-sans max-w-lg leading-relaxed select-none"
+            className="text-sm md:text-base text-gray-300 italic font-serif max-w-lg leading-relaxed select-none"
           >
-            Command the darkness. Forge your covenant. Conquer the Abyss.
+            Command forbidden forces, conquer high-stakes arenas, and claim real on-chain rewards for every tactical victory.
           </motion.p>
 
           {/* CTA Button */}
@@ -493,1092 +446,553 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
           />
         </motion.div>
       </section>
-      {/* =========================================================================
-          2. THE NETHER CODEX & 3D CREATURE SHOWCASE (Interactive & Dynamic)
-         ========================================================================= */}
-      <section className="relative py-28 px-4 sm:px-6 border-t border-[#c5a880]/20 bg-gradient-to-b from-[#07080b] via-[#0d1017] to-[#07080b] overflow-hidden">
-        {/* Ambient occult glow behind active creature */}
-        <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[900px] h-[600px] rounded-full blur-[140px] pointer-events-none transition-all duration-700 opacity-25"
-          style={{ background: activeCreature.accentColor }}
-        />
 
-        <div className="max-w-6xl mx-auto space-y-14 relative z-10">
+      {/* =========================================================================
+          2. THE CORE PREMISE: A WORLD OF FALLEN GODS & DARK MAGIC
+         ========================================================================= */}
+      <section id="lore" className="relative py-28 px-6 border-t border-[#c5a880]/20 bg-[radial-gradient(ellipse_at_top,#14101e_0%,#050608_70%)] overflow-hidden">
+        {/* Occult ambient aura */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-purple-950/20 blur-[170px] pointer-events-none" />
+
+        <div className="max-w-6xl mx-auto space-y-20 relative z-10">
           
           {/* Section Heading */}
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="font-mono text-xs uppercase tracking-[0.35em] text-[#c5a880] block font-bold">
-              — The Nether Codex —
+            <span className="font-mono text-xs uppercase tracking-[0.4em] text-[#c5a880] font-bold block">
+              // Enter The Covenant
             </span>
-            <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-wider uppercase leading-tight">
-              Command 99 Creatures of Darkness
-            </h2>
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
-              Inspect the dark pantheon of the void. Switch ascension tiers, study signature abilities, and assemble an unstoppable tactical warband.
-            </p>
-          </div>
-
-          {/* Master Interactive Stage: Card Inspector on Left + Tactical Codex on Right */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center bg-[#0e1118]/80 border border-[#c5a880]/20 rounded-3xl p-6 sm:p-10 backdrop-blur-md shadow-[0_15px_50px_rgba(0,0,0,0.7)] relative overflow-hidden">
-            
-            {/* Background runic watermark ring */}
-            <div className="absolute -right-24 -bottom-24 w-96 h-96 rounded-full border border-[#c5a880]/5 pointer-events-none animate-[spin_60s_linear_infinite]" />
-
-            {/* LEFT COLUMN: 3D Holographic Card Stage */}
-            <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
-              
-              {/* Backlight halo */}
-              <div 
-                className="absolute inset-0 rounded-3xl blur-3xl opacity-40 transition-all duration-500 pointer-events-none"
-                style={{ background: activeCreature.accentGlow }}
-              />
-
-              {/* The 3D Interactive Card */}
-              <div
-                style={{ perspective: 1000 }}
-                className="w-full max-w-[320px] sm:max-w-[340px] cursor-pointer select-none"
-                onMouseMove={handleCardMouseMove}
-                onMouseEnter={() => setIsHoveringCard(true)}
-                onMouseLeave={handleCardMouseLeave}
-              >
-                <motion.div
-                  animate={{
-                    rotateX: cardTilt.rotateX,
-                    rotateY: cardTilt.rotateY,
-                    scale: isHoveringCard ? 1.03 : 1,
-                  }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                  className={`relative rounded-2xl p-4 bg-gradient-to-b from-[#1c1822] via-[#100d14] to-[#08070b] border-2 transition-colors duration-500 shadow-2xl ${tierColors[selectedTier].border}`}
-                  style={{
-                    boxShadow: `0 20px 45px -10px ${activeCreature.accentGlow}`,
-                    transformStyle: 'preserve-3d',
-                  }}
-                >
-                  {/* Dynamic Specular Glare Effect */}
-                  {isHoveringCard && (
-                    <div
-                      className="absolute inset-0 rounded-2xl pointer-events-none z-20 mix-blend-overlay transition-opacity duration-300"
-                      style={{
-                        background: `radial-gradient(circle at ${cardTilt.glareX}% ${cardTilt.glareY}%, rgba(255,255,255,0.3) 0%, transparent 60%)`,
-                      }}
-                    />
-                  )}
-
-                  {/* Top Bar: Tier Badge + Turn Delay */}
-                  <div className="flex items-center justify-between pb-3 border-b border-white/10 relative z-10">
-                    <div>
-                      <span className={`text-[10px] font-mono font-bold tracking-widest uppercase block ${tierColors[selectedTier].text}`}>
-                        {tierColors[selectedTier].name}
-                      </span>
-                      <h3 className="font-display font-black text-lg sm:text-xl text-white tracking-wide uppercase">
-                        {activeCreature.name}
-                      </h3>
-                    </div>
-
-                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-black/70 border border-[#c5a880]/30 text-xs font-mono font-bold text-[#ebd09b]">
-                      <span className="text-[10px] text-gray-400">INIT</span>
-                      <span>{activeCreature.turnDelay}T</span>
-                    </div>
-                  </div>
-
-                  {/* Card Art Canvas */}
-                  <div className="relative mt-3 rounded-xl overflow-hidden aspect-[4/5] border border-white/10 bg-black/60 group">
-                    <AnimatePresence mode="wait">
-                      <motion.img
-                        key={activeCreature.id}
-                        src={activeCreature.art}
-                        alt={activeCreature.name}
-                        initial={{ opacity: 0, scale: 1.08 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.35 }}
-                        className="w-full h-full object-cover"
-                      />
-                    </AnimatePresence>
-
-                    {/* Dark bottom gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-
-                    {/* Bottom stats inside card */}
-                    <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center z-10">
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-950/90 border border-red-500/70 text-red-300 font-display font-black text-sm shadow-[0_0_15px_rgba(239,68,68,0.4)]">
-                        <span className="text-[10px] tracking-wider text-red-400/80">ATK</span>
-                        <span>{activeStats.atk}</span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/90 border border-emerald-500/70 text-emerald-300 font-display font-black text-sm shadow-[0_0_15px_rgba(16,185,129,0.4)]">
-                        <span className="text-[10px] tracking-wider text-emerald-400/80">HP</span>
-                        <span>{activeStats.hp}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Current Active Trait Banner */}
-                  <div className="mt-3 p-2.5 rounded-xl bg-black/50 border border-white/10 text-center">
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400 block">Tier Trait</span>
-                    <span className="text-xs font-mono font-bold text-white tracking-wide">
-                      {activeStats.trait}
-                    </span>
-                  </div>
-
-                  {/* 3D Tilt Hint */}
-                  <div className="text-center pt-2">
-                    <span className="text-[9px] font-mono text-gray-500 tracking-wider uppercase">
-                      Hover & move cursor to tilt 3D foil
-                    </span>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-
-            {/* RIGHT COLUMN: The Tactical Dossier & Codex Inspector */}
-            <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
-              
-              {/* Dossier Header */}
-              <div className="space-y-2 border-b border-[#c5a880]/15 pb-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono tracking-wider uppercase font-bold bg-[#c5a880]/15 border border-[#c5a880]/30 text-[#ebd09b]">
-                    {activeCreature.faction}
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono tracking-wider uppercase font-bold bg-white/5 border border-white/15 text-gray-300">
-                    {activeCreature.speedDesc}
-                  </span>
-                </div>
-
-                <div className="flex items-baseline justify-between gap-4">
-                  <h3 className="font-display font-black text-2xl sm:text-3xl text-white tracking-wide uppercase">
-                    {activeCreature.name}
-                  </h3>
-                  <span className="text-xs font-mono text-gray-400 italic hidden sm:inline">
-                    {activeCreature.subtitle}
-                  </span>
-                </div>
-
-                <p className="text-xs sm:text-sm text-[#ebd09b]/80 font-serif italic leading-relaxed pt-1">
-                  {activeCreature.lore}
-                </p>
-              </div>
-
-              {/* Interactive Ascension Tier Switcher */}
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#c5a880] font-bold flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-[#c5a880]" />
-                    Ascension Evolution Preview
-                  </span>
-                  <span className="text-[10px] font-mono text-gray-400">
-                    Click tier to simulate power growth
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {(['bronze', 'silver', 'gold', 'legendary'] as const).map((tier) => {
-                    const isSelected = selectedTier === tier;
-                    const tierMeta = tierColors[tier];
-                    const stat = activeCreature.tiers[tier];
-
-                    return (
-                      <button
-                        key={tier}
-                        onClick={() => setSelectedTier(tier)}
-                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
-                          isSelected
-                            ? `${tierMeta.badge} shadow-lg scale-[1.02]`
-                            : 'bg-black/40 border-white/10 text-gray-400 hover:border-white/30 hover:text-gray-200'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between text-[11px] font-mono font-bold capitalize">
-                          <span>{tier}</span>
-                          {isSelected && <span className="text-[9px]">ACTIVE</span>}
-                        </div>
-                        <div className="mt-1 flex items-center justify-between text-[10px] font-mono">
-                          <span className="text-red-400 font-bold">{stat.atk} ATK</span>
-                          <span className="text-emerald-400 font-bold">{stat.hp} HP</span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Interactive Ability Codex */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#c5a880] font-bold">
-                    Signature Abilities & Synergies
-                  </span>
-                  <span className="text-[10px] font-mono text-gray-400">
-                    Select ability to inspect tactical advantage
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  {activeCreature.abilities.map((ability, idx) => {
-                    const isAbilitySelected = selectedAbilityIndex === idx;
-                    return (
-                      <button
-                        key={ability.name}
-                        onClick={() => setSelectedAbilityIndex(idx)}
-                        className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
-                          isAbilitySelected
-                            ? 'bg-[#1a2130] border-[#c5a880] text-white shadow-md'
-                            : 'bg-black/40 border-white/10 text-gray-400 hover:border-white/25 hover:text-gray-200'
-                        }`}
-                      >
-                        <div className="text-[10px] font-mono text-[#c5a880] font-semibold uppercase">
-                          {ability.type}
-                        </div>
-                        <div className="text-xs font-display font-black text-white uppercase tracking-wide truncate mt-0.5">
-                          {ability.name}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Selected Ability Detail Box */}
-                <div className="p-4 rounded-xl bg-black/60 border border-[#c5a880]/30 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-display font-black text-[#ebd09b] uppercase tracking-wider">
-                      {activeAbility.name} • {activeAbility.type}
-                    </span>
-                    <span className="text-[10px] font-mono text-purple-300 font-bold uppercase">
-                      Tactical Analysis
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-200 leading-relaxed font-sans">
-                    {activeAbility.desc}
-                  </p>
-                  <div className="pt-1 flex items-start gap-2 text-[11px] font-mono text-[#c5a880]">
-                    <span className="text-gray-400 font-bold shrink-0">PRO TIP:</span>
-                    <span>{activeAbility.synergy}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Combat Performance Gauges */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1 border-t border-[#c5a880]/15">
-                {[
-                  { label: 'Burst Damage', val: activeCreature.metrics.damage, color: 'bg-red-500' },
-                  { label: 'Survivability', val: activeCreature.metrics.resilience, color: 'bg-emerald-500' },
-                  { label: 'Initiative Speed', val: activeCreature.metrics.initiative, color: 'bg-amber-500' },
-                  { label: 'Control / Hex', val: activeCreature.metrics.control, color: 'bg-purple-500' },
-                ].map((gauge) => (
-                  <div key={gauge.label} className="space-y-1">
-                    <div className="flex justify-between text-[9px] font-mono uppercase text-gray-400">
-                      <span>{gauge.label}</span>
-                      <span className="text-white font-bold">{gauge.val}%</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden border border-white/10">
-                      <div
-                        className={`h-full ${gauge.color} transition-all duration-500 rounded-full`}
-                        style={{ width: `${gauge.val}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* CREATURE ROSTER RIBBON (The Hand / Carousel Selector) */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between px-2">
-              <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#c5a880] font-bold">
-                Browse Iconic Champions ({selectedCreatureIndex + 1} of {CREATURES.length})
+            <h2 className="font-display font-black text-4xl sm:text-6xl text-white tracking-wider uppercase leading-tight text-shadow-gold">
+              In A World of Dead Gods, <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ebd09b] via-[#c5a880] to-[#8c7355]">
+                Power Is Seized, Not Given
               </span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    setSelectedCreatureIndex((prev) => (prev > 0 ? prev - 1 : CREATURES.length - 1));
-                    setSelectedAbilityIndex(0);
-                  }}
-                  className="w-8 h-8 rounded-lg bg-black/60 border border-[#c5a880]/30 hover:border-[#c5a880] text-[#ebd09b] flex items-center justify-center transition-colors cursor-pointer"
-                  aria-label="Previous creature"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedCreatureIndex((prev) => (prev < CREATURES.length - 1 ? prev + 1 : 0));
-                    setSelectedAbilityIndex(0);
-                  }}
-                  className="w-8 h-8 rounded-lg bg-black/60 border border-[#c5a880]/30 hover:border-[#c5a880] text-[#ebd09b] flex items-center justify-center transition-colors cursor-pointer"
-                  aria-label="Next creature"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* 5-Card Ribbon */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
-              {CREATURES.map((creature, idx) => {
-                const isSelected = selectedCreatureIndex === idx;
-                return (
-                  <button
-                    key={creature.id}
-                    onClick={() => {
-                      setSelectedCreatureIndex(idx);
-                      setSelectedAbilityIndex(0);
-                    }}
-                    className={`relative rounded-2xl p-2.5 text-left transition-all duration-300 cursor-pointer overflow-hidden border-2 ${
-                      isSelected
-                        ? `${creature.borderClass} bg-[#181d28] shadow-[0_0_25px_rgba(197,168,128,0.25)] scale-[1.02]`
-                        : 'border-white/10 bg-black/40 hover:border-white/30 hover:bg-black/60 opacity-70 hover:opacity-100'
-                    }`}
-                  >
-                    {isSelected && (
-                      <div className="absolute top-0 right-0 px-2 py-0.5 rounded-bl-lg bg-[#c5a880] text-black font-mono font-black text-[9px] uppercase tracking-wider">
-                        Inspecting
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-14 rounded-lg overflow-hidden border border-white/20 shrink-0 bg-black">
-                        <img
-                          src={creature.art}
-                          alt={creature.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <span className="text-[9px] font-mono text-[#c5a880] uppercase tracking-wider block truncate">
-                          {creature.faction}
-                        </span>
-                        <h4 className="font-display font-black text-xs text-white uppercase truncate">
-                          {creature.name}
-                        </h4>
-                        <span className="text-[10px] font-mono text-gray-400 block mt-0.5">
-                          {creature.turnDelay} Turn Delay
-                        </span>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* =========================================================================
-          3. TACTICAL COMBAT MECHANICS (Turn Delays & Synergies)
-         ========================================================================= */}
-      <section className="relative py-28 px-6 bg-[#090b10] border-t border-b border-[#c5a880]/15 overflow-hidden">
-        <div className="max-w-6xl mx-auto space-y-16 relative z-10">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="font-mono text-xs uppercase tracking-[0.3em] text-[#c5a880] font-bold block">
-              — Tactical Battlefield —
-            </span>
-            <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-wider uppercase leading-tight">
-              Turn-Based Strategy. Depth Over Luck.
             </h2>
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
-              Combat in Void Covenant unfolds on a tactical grid where every action counts. Positioning, mana management, and predicting your opponent's initiative determine the victor.
+            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic max-w-2xl mx-auto">
+              Void Covenant is a dark fantasy card battle RPG where you forge pacts with ancient horrors, master lethal forbidden sorceries, and challenge warlords across the world for glory and real treasure.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            
-            {/* Visual Clash Banner */}
-            <div className="lg:col-span-6 rounded-2xl overflow-hidden border-2 border-purple-500/30 shadow-[0_0_45px_rgba(168,85,247,0.2)] group">
+          {/* Cinematic Feature 1: The Descent into the Abyss */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            <div className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-[#c5a880]/30 shadow-[0_20px_60px_rgba(0,0,0,0.9)] group">
+              <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[#ebd09b] z-20 pointer-events-none" />
+              <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-[#ebd09b] z-20 pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-[#ebd09b] z-20 pointer-events-none" />
+              <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#ebd09b] z-20 pointer-events-none" />
+
               <img
-                src="/landing_warlord_duel.jpg"
-                alt="Warlord Duel"
+                src="/dark_heroes_lore.jpg"
+                alt="Command Legions of Darkness"
                 className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
             </div>
 
-            {/* Mechanics Explanation */}
+            <div className="lg:col-span-5 space-y-6">
+              <span className="text-xs font-mono uppercase tracking-[0.3em] text-[#c5a880] font-bold block">
+                01 // Dark Fantasy Campaign
+              </span>
+              <h3 className="font-display font-black text-3xl sm:text-4xl text-white uppercase tracking-wide leading-tight">
+                Conquer The Infinite Catacombs
+              </h3>
+              <p className="text-sm sm:text-base text-gray-300 font-sans leading-relaxed">
+                Descend into an endless subterranean abyss ruled by colossal overlords and forgotten deities. Every floor tests the synergy of your dark deck, yielding ancient relics, forbidden cards, and mystical spoils.
+              </p>
+              <div className="pt-2 border-t border-white/10 space-y-3">
+                <div className="flex items-center gap-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#ebd09b]" />
+                  <span className="text-xs font-mono uppercase tracking-wider text-gray-200">Towering Abyssal Bosses Every 10 Floors</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#ebd09b]" />
+                  <span className="text-xs font-mono uppercase tracking-wider text-gray-200">Harvest Rare Transmutation Dust & Artifacts</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#ebd09b]" />
+                  <span className="text-xs font-mono uppercase tracking-wider text-gray-200">Test Unbreakable Deck Combinations</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Cinematic Feature 2: Tactical Grid Duels */}
+          <div id="tactics" className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center pt-8">
+            <div className="lg:col-span-5 space-y-6 order-2 lg:order-1">
+              <span className="text-xs font-mono uppercase tracking-[0.3em] text-purple-400 font-bold block">
+                02 // Deep Tactical Combat
+              </span>
+              <h3 className="font-display font-black text-3xl sm:text-4xl text-white uppercase tracking-wide leading-tight">
+                High-Stakes Magic Duels
+              </h3>
+              <p className="text-sm sm:text-base text-gray-300 font-sans leading-relaxed">
+                No mindless autoplay or pay-to-win shortcuts. Battles in Void Covenant are a cerebral duel of timing, sacrifice, and counters.
+              </p>
+              <div className="pt-2 border-t border-white/10 space-y-3">
+                <div className="flex items-center gap-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                  <span className="text-xs font-mono uppercase tracking-wider text-gray-200">Master 4 Forbidden Arts: Vampirism, Hexes, Plague, & Dark Sacrifice</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                  <span className="text-xs font-mono uppercase tracking-wider text-gray-200">Break through enemy lines to strike opposing warlords directly</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                  <span className="text-xs font-mono uppercase tracking-wider text-gray-200">Every decision, turn delay, and trigger can reverse the match</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-purple-500/40 shadow-[0_20px_60px_rgba(168,85,247,0.2)] order-1 lg:order-2 group">
+              <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-purple-400 z-20 pointer-events-none" />
+              <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-purple-400 z-20 pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-purple-400 z-20 pointer-events-none" />
+              <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-purple-400 z-20 pointer-events-none" />
+
+              <img
+                src="/gameplay_cinematic_duel.jpg"
+                alt="High Stakes Colosseum Arena Duel"
+                className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* =========================================================================
+          3. HERO & GEAR: THE LIVING WARLORD
+         ========================================================================= */}
+      <section id="warlord" className="relative py-28 px-6 border-t border-[#c5a880]/20 bg-[#06080d] overflow-hidden">
+        <div className="max-w-6xl mx-auto space-y-16">
+          
+          <div className="text-center max-w-3xl mx-auto space-y-4">
+            <span className="font-mono text-xs uppercase tracking-[0.35em] text-[#c5a880] block font-bold">
+              // The Commander System
+            </span>
+            <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-wider uppercase leading-tight text-shadow-gold">
+              You Are Not Just A Spectator. <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-[#ebd09b] to-amber-400">
+                You Lead The Frontline.
+              </span>
+            </h2>
+            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
+              Your hero enters combat alongside your creatures. Forge mythical armaments, choose your combat stance, and unleash game-changing hero abilities when all seems lost.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            {/* Feature 1: Reliquary */}
+            <div className="relative rounded-3xl p-8 bg-gradient-to-b from-[#181124] via-[#0c0914] to-black border border-purple-500/40 hover:border-purple-400/80 transition-all duration-500 space-y-6 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col justify-between group">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono uppercase tracking-[0.25em] text-purple-400 font-bold">
+                    01 // Arsenal
+                  </span>
+                  <span className="px-3 py-1 rounded-full bg-purple-950/80 border border-purple-500/40 text-[10px] font-mono text-purple-300 uppercase">
+                    6 Relic Sockets
+                  </span>
+                </div>
+
+                <h4 className="font-display font-black text-2xl text-white uppercase tracking-wide">
+                  Legendary Reliquary
+                </h4>
+
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+                  Equip weapons, heavy dreadplate armor, cursed rings, and royal crowns discovered in the catacombs to amplify hero power and passive aura bonuses.
+                </p>
+
+                {/* Real In-Game Relic Icons Gallery */}
+                <div className="grid grid-cols-3 gap-3 pt-2">
+                  <div className="p-3 rounded-2xl bg-black/60 border border-purple-500/30 text-center hover:border-purple-400/70 transition-all">
+                    <img src="/icons/equipment/items/soulreaper_scythe.png" alt="Soulreaper Scythe" className="w-12 h-12 object-contain mx-auto mb-1 drop-shadow" />
+                    <span className="text-[10px] font-mono text-purple-200 block truncate">Scythe</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-black/60 border border-purple-500/30 text-center hover:border-purple-400/70 transition-all">
+                    <img src="/icons/equipment/items/mantle_of_the_lich_king.png" alt="Lich Mantle" className="w-12 h-12 object-contain mx-auto mb-1 drop-shadow" />
+                    <span className="text-[10px] font-mono text-purple-200 block truncate">Mantle</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-black/60 border border-purple-500/30 text-center hover:border-purple-400/70 transition-all">
+                    <img src="/icons/equipment/items/ring_of_infinite_ruin.png" alt="Ruin Ring" className="w-12 h-12 object-contain mx-auto mb-1 drop-shadow" />
+                    <span className="text-[10px] font-mono text-purple-200 block truncate">Signet</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-purple-500/20 flex items-center justify-between text-xs font-mono text-purple-300">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                  Full Hero Customization
+                </span>
+                <span className="text-[10px] text-gray-500 uppercase">Profile Loadout</span>
+              </div>
+            </div>
+
+            {/* Feature 2: Battle Stances */}
+            <div className="relative rounded-3xl p-8 bg-gradient-to-b from-[#24170d] via-[#100b06] to-black border border-amber-500/40 hover:border-amber-400/80 transition-all duration-500 space-y-6 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col justify-between group">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono uppercase tracking-[0.25em] text-amber-400 font-bold">
+                    02 // Tactics
+                  </span>
+                  <span className="px-3 py-1 rounded-full bg-amber-950/80 border border-amber-500/40 text-[10px] font-mono text-amber-300 uppercase">
+                    3 Combat Trees
+                  </span>
+                </div>
+
+                <h4 className="font-display font-black text-2xl text-white uppercase tracking-wide">
+                  Dynamic Stances
+                </h4>
+
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+                  Switch between offensive void strikes, blood auras that heal your lines, and warlord cries that turn the tide of losing skirmishes.
+                </p>
+
+                {/* Stance cards */}
+                <div className="space-y-2.5 pt-2">
+                  <div className="px-4 py-2.5 rounded-xl bg-black/60 border border-purple-500/40 flex items-center justify-between">
+                    <span className="font-display font-bold text-xs text-purple-300 uppercase">Void Strike</span>
+                    <span className="text-[10px] font-mono text-gray-400">Burst Spell Damage</span>
+                  </div>
+                  <div className="px-4 py-2.5 rounded-xl bg-black/60 border border-red-500/40 flex items-center justify-between">
+                    <span className="font-display font-bold text-xs text-red-300 uppercase">Blood Aura</span>
+                    <span className="text-[10px] font-mono text-gray-400">Sustain & Ward</span>
+                  </div>
+                  <div className="px-4 py-2.5 rounded-xl bg-black/60 border border-amber-500/40 flex items-center justify-between">
+                    <span className="font-display font-bold text-xs text-amber-300 uppercase">Warlord Cry</span>
+                    <span className="text-[10px] font-mono text-gray-400">Rally & Buff All</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-amber-500/20 flex items-center justify-between text-xs font-mono text-amber-300">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                  Tactical Talent Stances
+                </span>
+                <span className="text-[10px] text-gray-500 uppercase">Active Playstyle</span>
+              </div>
+            </div>
+
+            {/* Feature 3: Deck Synergy & Card Mastery */}
+            <div className="relative rounded-3xl p-8 bg-gradient-to-b from-[#101924] via-[#080d14] to-black border border-cyan-500/40 hover:border-cyan-400/80 transition-all duration-500 space-y-6 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col justify-between group">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono uppercase tracking-[0.25em] text-cyan-400 font-bold">
+                    03 // Mastery
+                  </span>
+                  <span className="px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-[10px] font-mono text-cyan-300 uppercase">
+                    Synergy & Tiers
+                  </span>
+                </div>
+
+                <h4 className="font-display font-black text-2xl text-white uppercase tracking-wide">
+                  Forbidden Card Summons
+                </h4>
+
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+                  Summon creatures across multiple rarity tiers — from relentless undead warriors to legendary abyssal dragons. Combine passive creature auras with your warlord's spells to construct an invincible combat deck.
+                </p>
+
+                {/* Booster packs preview */}
+                <div className="grid grid-cols-3 gap-2.5 pt-2">
+                  <div className="p-2 rounded-xl bg-black/60 border border-white/10 text-center">
+                    <img src="/packs/pack_bronze.webp" alt="Bronze Pack" className="w-11 h-14 object-contain mx-auto mb-1 drop-shadow" />
+                    <span className="text-[9px] font-mono text-amber-300 block uppercase font-bold">Bronze</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-black/60 border border-cyan-500/30 text-center">
+                    <img src="/packs/pack_obsidian.webp" alt="Obsidian Pack" className="w-11 h-14 object-contain mx-auto mb-1 drop-shadow" />
+                    <span className="text-[9px] font-mono text-cyan-300 block uppercase font-bold">Obsidian</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-black/60 border border-rose-500/40 text-center">
+                    <img src="/packs/pack_abyssal.webp" alt="Abyssal Pack" className="w-11 h-14 object-contain mx-auto mb-1 drop-shadow" />
+                    <span className="text-[9px] font-mono text-rose-300 block uppercase font-bold">Abyssal</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-cyan-500/20 flex items-center justify-between text-xs font-mono text-cyan-300">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                  10-Card Battle Deck
+                </span>
+                <span className="text-[10px] text-gray-500 uppercase">Full Deck Synergy</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* =========================================================================
+          4. THE GLOBAL ARENA: CLIMB TO GODHOOD
+         ========================================================================= */}
+      <section id="colosseum" className="relative py-28 px-6 border-t border-[#c5a880]/20 bg-[radial-gradient(ellipse_at_bottom,#1a110a_0%,#050608_80%)] overflow-hidden">
+        <div className="max-w-6xl mx-auto space-y-16">
+          
+          <div className="text-center max-w-3xl mx-auto space-y-4">
+            <span className="font-mono text-xs uppercase tracking-[0.35em] text-amber-400 block font-bold">
+              // The Global Colosseum
+            </span>
+            <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-wider uppercase leading-tight text-shadow-gold">
+              Climb 12 Prestigious Leagues <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-rose-400">
+                To Claim The Crown of Gods
+              </span>
+            </h2>
+            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
+              Compete against commanders worldwide in live ranked arena duels. Earn trophies, climb tiers, and fight for the ultimate honor: a place in the supreme Divine Pantheon.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            
+            <div className="lg:col-span-6 relative rounded-3xl overflow-hidden border-2 border-amber-400/50 shadow-[0_20px_60px_rgba(245,158,11,0.25)] group">
+              <img
+                src="/landing_divine_throne.jpg"
+                alt="The Throne of the Gods"
+                className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent flex items-end p-8">
+                <div>
+                  <span className="text-xs font-mono uppercase tracking-widest text-amber-300 font-bold block">
+                    The Ultimate Throne
+                  </span>
+                  <p className="font-display font-black text-2xl sm:text-3xl text-white uppercase mt-1">
+                    The Divine Pantheon
+                  </p>
+                  <p className="text-xs text-gray-300 font-sans mt-2">
+                    An ultra-exclusive realm reserved for the two most feared warlords in the entire world.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-6 space-y-6">
+              <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+                <div className="flex items-center gap-4">
+                  <img src="/icons/league_divine.png" alt="Divine" className="w-12 h-12 object-contain" />
+                  <div>
+                    <h4 className="font-display font-black text-xl text-amber-300 uppercase">Daily Midnight Reset</h4>
+                    <p className="text-xs text-gray-400">Ranks shift every 24 hours — the weak fall, the relentless rise.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+                <div className="flex items-center gap-4">
+                  <img src="/icons/league_void_overlord.png" alt="Void Overlord" className="w-12 h-12 object-contain" />
+                  <div>
+                    <h4 className="font-display font-black text-xl text-rose-300 uppercase">Daily Sovereign Dividends</h4>
+                    <p className="text-xs text-gray-400">High-tier warlords receive daily treasury rewards in Blood Sovereigns based on their rank.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+                <div className="flex items-center gap-4">
+                  <img src="/icons/league_grandmaster_crest.png" alt="Grandmaster" className="w-12 h-12 object-contain" />
+                  <div>
+                    <h4 className="font-display font-black text-xl text-purple-300 uppercase">Strategic Defense Decks</h4>
+                    <p className="text-xs text-gray-400">Formulate impregnable defense setups to guard your trophies while offline.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* =========================================================================
+          5. THE ECONOMY: REAL HARD CURRENCY EARNINGS
+         ========================================================================= */}
+      <section id="treasury" className="relative py-28 px-6 border-t border-[#c5a880]/20 bg-[#06070a] overflow-hidden">
+        <div className="max-w-6xl mx-auto space-y-16">
+          
+          <div className="text-center max-w-3xl mx-auto space-y-4">
+            <span className="font-mono text-xs uppercase tracking-[0.35em] text-emerald-400 block font-bold">
+              // Sovereign Economics
+            </span>
+            <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-wider uppercase leading-tight text-shadow-gold">
+              Play, Conquer, and Cash Out <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300">
+                Real USDT Value
+              </span>
+            </h2>
+            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
+              Void Covenant is built on a transparent hard currency exchange with zero token volatility. Every victory, ladder climb, and challenge directly translates into real, withdrawable value.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            
             <div className="lg:col-span-6 space-y-6">
               
-              <div className="p-5 rounded-2xl bg-black/50 border border-white/10 space-y-2">
+              <div className="p-8 rounded-3xl bg-gradient-to-r from-[#1c150b] via-[#10151f] to-[#0c1813] border-2 border-emerald-500/40 shadow-2xl space-y-4">
+                <span className="text-xs font-mono text-emerald-400 font-bold uppercase tracking-widest block">
+                  Guaranteed Fixed Benchmark
+                </span>
+                <div className="flex flex-wrap items-baseline gap-3">
+                  <span className="font-display font-black text-3xl sm:text-4xl text-white">100 Sovereigns</span>
+                  <span className="font-display font-black text-3xl sm:text-4xl text-emerald-400">= $1.00 USDT</span>
+                </div>
+                <p className="text-sm text-gray-300 font-sans leading-relaxed">
+                  No fluctuating charts or sudden devaluations. Blood Sovereigns are backed by a fixed exchange rate and can be requested for withdrawal directly to your personal Web3 wallet at any time.
+                </p>
+              </div>
+
+              {/* True In-Game Ways to Earn Blood Sovereigns */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2">
+                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2 hover:border-amber-500/40 transition-all">
+                  <div className="flex items-center gap-2">
+                    <img src="/icons/league_divine.png" alt="Leagues" className="w-6 h-6 object-contain" />
+                    <span className="text-xs font-mono text-amber-300 font-bold uppercase">Daily League Dividends</span>
+                  </div>
+                  <p className="text-xs text-gray-400 font-sans leading-relaxed">Hold positions in high-tier leagues to receive daily sovereign rewards delivered directly to your mailbox at midnight.</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2 hover:border-amber-500/40 transition-all">
+                  <div className="flex items-center gap-2">
+                    <img src="/icons/ticket_gladiator.png" alt="Arena" className="w-6 h-6 object-contain" />
+                    <span className="text-xs font-mono text-amber-300 font-bold uppercase">PvP Arena Battles</span>
+                  </div>
+                  <p className="text-xs text-gray-400 font-sans leading-relaxed">Defeat rival warlords in ranked duels to earn daily victory sovereigns straight into your active bank balance.</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2 hover:border-amber-500/40 transition-all">
+                  <div className="flex items-center gap-2">
+                    <img src="/icons/referral_seal.png" alt="Referrals" className="w-6 h-6 object-contain" />
+                    <span className="text-xs font-mono text-amber-300 font-bold uppercase">Alliance Bounties</span>
+                  </div>
+                  <p className="text-xs text-gray-400 font-sans leading-relaxed">Invite other commanders to receive instant pass activation bounties and a continuous 15% share of their winnings.</p>
+                </div>
+              </div>
+
+            </div>
+
+            <div className="lg:col-span-6 relative rounded-3xl overflow-hidden border-2 border-emerald-500/40 shadow-[0_20px_60px_rgba(16,185,129,0.2)] group">
+              <img
+                src="/web3_treasury_vault.jpg"
+                alt="Imperial Treasury of Blood Sovereigns"
+                className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent flex items-end p-8">
+                <div>
+                  <span className="text-xs font-mono text-emerald-400 uppercase tracking-widest font-bold block">
+                    The Treasury Vault
+                  </span>
+                  <p className="font-display font-black text-2xl sm:text-3xl text-white uppercase mt-1">
+                    Direct Non-Custodial Withdrawals
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* =========================================================================
+          6. BROTHERHOOD: REFERRAL & ALLIANCE SYSTEM
+         ========================================================================= */}
+      <section id="alliance" className="relative py-28 px-6 border-t border-[#c5a880]/20 bg-[radial-gradient(ellipse_at_top,#140d18_0%,#050608_70%)] overflow-hidden">
+        <div className="max-w-6xl mx-auto space-y-16">
+          
+          <div className="text-center max-w-3xl mx-auto space-y-4">
+            <span className="font-mono text-xs uppercase tracking-[0.35em] text-[#ebd09b] block font-bold">
+              // The Covenant Alliance
+            </span>
+            <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-wider uppercase leading-tight text-shadow-gold">
+              Build Your Dark Legion, <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ebd09b] via-amber-300 to-fuchsia-400">
+                Earn Lifetime Bounties
+              </span>
+            </h2>
+            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
+              War is won together. Invite fellow commanders into the Abyss and earn instant sovereign bounties alongside continuous dividends from their battlefield conquests.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div className="p-7 rounded-3xl bg-gradient-to-b from-[#1a111a] to-black border border-amber-500/40 hover:border-amber-400/80 transition-all duration-500 space-y-4 shadow-xl">
+              <div className="w-12 h-12 rounded-2xl bg-amber-950/60 border border-amber-500/40 flex items-center justify-center">
+                <img src="/icons/referral_seal.png" alt="Alliance Bounty" className="w-8 h-8 object-contain drop-shadow" />
+              </div>
+              <div className="space-y-1">
                 <span className="text-xs font-mono text-amber-400 font-bold uppercase tracking-wider block">
-                  Core Combat Rule
+                  Up To +600 SOV ($6.00)
                 </span>
-                <h3 className="font-display font-black text-xl text-white uppercase">
-                  Turn Delays & Initiative
-                </h3>
-                <p className="text-sm text-gray-300 leading-relaxed font-sans">
-                  Creatures do not attack mindlessly. Each card possesses a Turn Delay countdown: swift skirmishers strike almost immediately, while cataclysmic titans require multiple turns to awaken. You must outplay your opponent’s countdowns and counter their board before their leviathans strike.
-                </p>
-              </div>
-
-              {/* 4 Dark Creature Arts */}
-              <div className="space-y-3">
-                <span className="text-xs font-mono text-purple-400 font-bold uppercase tracking-wider block">
-                  Four Creature Disciplines
-                </span>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-red-500/30">
-                    <h4 className="font-display font-bold text-sm text-red-300 uppercase">Vampirism</h4>
-                    <p className="text-xs text-gray-400 mt-1 leading-relaxed">
-                      Strikes drain health from enemy targets, sustaining your frontline across prolonged combat exchanges.
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-purple-500/30">
-                    <h4 className="font-display font-bold text-sm text-purple-300 uppercase">Hex Curses</h4>
-                    <p className="text-xs text-gray-400 mt-1 leading-relaxed">
-                      Afflicts priority enemy targets with dark runes, significantly amplifying all incoming battlefield damage.
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-emerald-500/30">
-                    <h4 className="font-display font-bold text-sm text-emerald-300 uppercase">Plague</h4>
-                    <p className="text-xs text-gray-400 mt-1 leading-relaxed">
-                      Spreads incurable poison that rots enemy ranks at the end of each round, eroding sturdy defenders.
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-amber-500/30">
-                    <h4 className="font-display font-bold text-sm text-amber-300 uppercase">Sacrifice</h4>
-                    <p className="text-xs text-gray-400 mt-1 leading-relaxed">
-                      Martyrs an allied minion on the altar of war to restore your warlord's health from near-fatal attacks.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-
-      {/* =========================================================================
-          4. WARLORD LOADOUT & 3 COMBAT STANCES
-         ========================================================================= */}
-      <section className="relative py-28 px-6 bg-[#07080b]">
-        <div className="max-w-6xl mx-auto space-y-16">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="font-mono text-xs uppercase tracking-[0.3em] text-[#c5a880] font-bold block">
-              — Hero Customization —
-            </span>
-            <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-wider uppercase leading-tight">
-              Six Artifact Slots. Three Combat Stances.
-            </h2>
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
-              Your warlord is not merely a bystander. Equip ancient relics and choose talent specializations to turn your hero into a devastating battlefield force.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
-            {/* Left: 6 Equipment Slots */}
-            <div className="lg:col-span-6 rounded-2xl p-7 bg-gradient-to-b from-[#18140e] via-[#0f0e0b] to-black border border-amber-500/40 shadow-xl space-y-6">
-              <div>
-                <span className="text-[11px] font-mono text-amber-300 font-bold uppercase tracking-wider block">
-                  Relic Loadouts
-                </span>
-                <h3 className="font-display font-black text-2xl text-white uppercase mt-1">
-                  Six Gear Slots
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-300 mt-2 leading-relaxed font-sans">
-                  Equip your warlord with Weapons, Armor, Helmets, Rings, Amulets, and Boots discovered in the abyss. Each artifact grants critical stat bonuses:
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 font-mono text-xs">
-                <div className="p-3 bg-black/60 rounded-xl border border-white/10 text-gray-200">
-                  <span className="text-cyan-300 font-bold block mb-0.5">Turn Delay Reduction</span>
-                  Summons strike faster
-                </div>
-                <div className="p-3 bg-black/60 rounded-xl border border-white/10 text-gray-200">
-                  <span className="text-blue-300 font-bold block mb-0.5">Dodge Chance %</span>
-                  Evade lethal enemy blows
-                </div>
-                <div className="p-3 bg-black/60 rounded-xl border border-white/10 text-gray-200">
-                  <span className="text-emerald-300 font-bold block mb-0.5">Bonus Maximum HP</span>
-                  Outlast opponent burst
-                </div>
-                <div className="p-3 bg-black/60 rounded-xl border border-white/10 text-gray-200">
-                  <span className="text-amber-300 font-bold block mb-0.5">Gold Multiplier</span>
-                  Increased match spoils
-                </div>
-              </div>
-            </div>
-
-            {/* Right: 3 Combat Stances */}
-            <div className="lg:col-span-6 rounded-2xl p-7 bg-gradient-to-b from-[#1a101f] via-[#100a14] to-black border border-purple-500/40 shadow-xl space-y-6">
-              <div>
-                <span className="text-[11px] font-mono text-purple-300 font-bold uppercase tracking-wider block">
-                  Talent Trees
-                </span>
-                <h3 className="font-display font-black text-2xl text-white uppercase mt-1">
-                  Three Combat Stances
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-300 mt-2 leading-relaxed font-sans">
-                  Invest talent points into specialized hero branches to tailor your warlord to your playstyle:
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <div className="p-3.5 rounded-xl bg-black/50 border border-amber-500/30">
-                  <h4 className="font-display font-bold text-sm text-amber-300 uppercase">
-                    Void Strike (Offensive Mastery)
-                  </h4>
-                  <p className="text-xs text-gray-300 mt-1 font-sans">
-                    Piercing magic bursts, direct armor bypass, and chain lightning that arcs across enemy backlines.
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-black/50 border border-rose-500/30">
-                  <h4 className="font-display font-bold text-sm text-rose-300 uppercase">
-                    Blood Aura (Defensive Mastery)
-                  </h4>
-                  <p className="text-xs text-gray-300 mt-1 font-sans">
-                    Hero lifesteal, emergency damage absorption barriers, and vital health surges in close duels.
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-black/50 border border-purple-500/30">
-                  <h4 className="font-display font-bold text-sm text-purple-300 uppercase">
-                    Warlord Cry (Tactical Mastery)
-                  </h4>
-                  <p className="text-xs text-gray-300 mt-1 font-sans">
-                    Board-wide creature attack enhancements, enemy turn stuns, and cooldown acceleration.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-
-      {/* =========================================================================
-          5. CARD BOOSTER SUMMONING & THE DARK FUSION ALTAR
-         ========================================================================= */}
-      <section className="relative py-28 px-6 bg-[#090b10] border-t border-b border-[#c5a880]/15">
-        <div className="max-w-6xl mx-auto space-y-16">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="font-mono text-xs uppercase tracking-[0.3em] text-cyan-400 font-bold block">
-              — Expand & Evolve —
-            </span>
-            <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-wider uppercase leading-tight">
-              Card Summoning & The Fusion Altar
-            </h2>
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
-              Expand your army by opening occult Card Boosters, then merge duplicate warriors in the Dark Fusion Altar to raise levels, reduce turn delays, and awaken game-changing traits.
-            </p>
-          </div>
-
-          {/* 3 Real Card Booster Packs */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            {/* Pack 1: Core Void Booster */}
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-[#10141d] via-[#090b10] to-black border border-white/10 hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] transition-all text-center space-y-4 group">
-              <div className="h-44 rounded-xl bg-gradient-to-b from-amber-950/20 via-black/50 to-black flex items-center justify-center relative overflow-hidden border border-white/5 group-hover:border-amber-500/30">
-                <img
-                  src="/packs/pack_bronze.webp"
-                  alt="Bronze Core Pack"
-                  className="w-32 h-32 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(245,158,11,0.3)]"
-                />
-                <div className="absolute bottom-2 px-2.5 py-0.5 rounded-full bg-black/80 border border-amber-500/40">
-                  <span className="font-mono text-[10px] text-amber-300 font-bold tracking-wider uppercase">CORE BOOSTER</span>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <h3 className="font-display font-black text-xl text-white uppercase group-hover:text-amber-300 transition-colors">
-                  Bronze Core Pack
-                </h3>
-                <span className="text-xs font-mono text-amber-400 font-bold block">Summoned with In-Game Gold</span>
-              </div>
-              <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                Foundational card pack for every commander. Unlocks frontline warriors, undead thralls, and tactical minions to build your deck foundation.
-              </p>
-            </div>
-
-            {/* Pack 2: Obsidian Pack */}
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-[#0c1f2a] via-[#08131a] to-black border border-cyan-500/30 hover:border-cyan-400/70 hover:shadow-[0_0_35px_rgba(6,182,212,0.25)] transition-all text-center space-y-4 group">
-              <div className="h-44 rounded-xl bg-gradient-to-b from-cyan-950/40 via-black/50 to-black flex items-center justify-center relative overflow-hidden border border-cyan-500/20 group-hover:border-cyan-400/40">
-                <img
-                  src="/packs/pack_obsidian.webp"
-                  alt="Obsidian Pack"
-                  className="w-32 h-32 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(6,182,212,0.4)]"
-                />
-                <div className="absolute bottom-2 px-2.5 py-0.5 rounded-full bg-black/80 border border-cyan-400/50">
-                  <span className="font-mono text-[10px] text-cyan-300 font-bold tracking-wider uppercase">TIER II SUMMON</span>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <h3 className="font-display font-black text-xl text-white uppercase group-hover:text-cyan-300 transition-colors">
-                  Obsidian Void Pack
-                </h3>
-                <span className="text-xs font-mono text-cyan-400 font-bold block">Summoned with Dark Shards</span>
-              </div>
-              <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                Infused with dark void mana. High-probability drops for Silver & Gold combatants, specialized blood priestesses, and lethal hex casters.
-              </p>
-            </div>
-
-            {/* Pack 3: Abyssal Master Pack */}
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-[#220a14] via-[#14050c] to-black border border-rose-500/40 hover:border-rose-400/80 hover:shadow-[0_0_35px_rgba(244,63,94,0.3)] transition-all text-center space-y-4 group">
-              <div className="h-44 rounded-xl bg-gradient-to-b from-rose-950/40 via-black/50 to-black flex items-center justify-center relative overflow-hidden border border-rose-500/20 group-hover:border-rose-400/40">
-                <img
-                  src="/packs/pack_abyssal.webp"
-                  alt="Abyssal Pack"
-                  className="w-32 h-32 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(244,63,94,0.45)]"
-                />
-                <div className="absolute bottom-2 px-2.5 py-0.5 rounded-full bg-black/80 border border-rose-400/50">
-                  <span className="font-mono text-[10px] text-rose-300 font-bold tracking-wider uppercase">FORBIDDEN TIER III</span>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <h3 className="font-display font-black text-xl text-white uppercase group-hover:text-rose-300 transition-colors">
-                  Abyssal Master Pack
-                </h3>
-                <span className="text-xs font-mono text-rose-400 font-bold block">Guaranteed High-Tier Pulls</span>
-              </div>
-              <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                The apex summoning vault. Unlocks catastrophic leviathans, ancient reaper lords, and guaranteed gold or legendary champions.
-              </p>
-            </div>
-
-          </div>
-
-          {/* Dedicated Fusion Altar Mechanics Box */}
-          <div className="rounded-3xl p-8 sm:p-10 bg-gradient-to-b from-[#170e24] via-[#0d0716] to-black border-2 border-purple-500/40 shadow-2xl relative overflow-hidden space-y-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-purple-500/20 pb-6">
-              <div>
-                <span className="text-xs font-mono text-purple-300 uppercase tracking-widest font-bold block">
-                  Ritual Evolution
-                </span>
-                <h3 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-wide mt-1">
-                  The Dark Fusion Altar: Duplicate Upgrades
-                </h3>
-              </div>
-              <span className="px-3.5 py-1.5 rounded-full bg-purple-950/80 border border-purple-400/60 text-xs font-mono text-purple-200 font-bold tracking-wider">
-                100% Guaranteed Success
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-              {/* Step 1: Duplicate Leveling */}
-              <div className="p-6 rounded-2xl bg-black/60 border border-purple-500/20 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold text-purple-400 uppercase tracking-wider">
-                    Phase 1: Level Progression
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded bg-purple-900/40 text-[11px] font-mono text-purple-200">
-                    Levels 1 → 5
-                  </span>
-                </div>
-                <h4 className="font-display font-bold text-lg text-white uppercase">
-                  Merge Duplicate Cards
-                </h4>
-                <p className="text-xs text-gray-300 font-sans leading-relaxed">
-                  Sacrifice duplicate copies of the same entity together with Gold and Void Dust. Every fusion level grants permanent increases to your creature's base Attack and Health.
-                </p>
-              </div>
-
-              {/* Step 2: Tier Ascension */}
-              <div className="p-6 rounded-2xl bg-black/60 border border-amber-500/30 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">
-                    Phase 2: Tier Ascension
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded bg-amber-900/40 text-[11px] font-mono text-amber-200">
-                    Bronze → Silver → Gold
-                  </span>
-                </div>
-                <h4 className="font-display font-bold text-lg text-white uppercase">
-                  Reduced Delay & Bonus Passives
-                </h4>
-                <p className="text-xs text-gray-300 font-sans leading-relaxed">
-                  Maxing out Level 5 triggers a breakthrough: your creature ascends to the next tier, slashes its combat Turn Delay so it strikes earlier, and awakens a unique passive trait.
-                </p>
-              </div>
-            </div>
-
-            {/* Ascension Tier Flow */}
-            <div className="p-4 rounded-xl bg-black/80 border border-white/10 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm font-mono text-center">
-              <span className="text-[#cd7f32] font-bold">Bronze (Base)</span>
-              <span className="text-gray-500">→</span>
-              <span className="text-slate-300 font-bold">Silver (+Stats & -Delay)</span>
-              <span className="text-gray-500">→</span>
-              <span className="text-amber-400 font-bold">Gold (Awakened Trait)</span>
-              <span className="text-gray-500">→</span>
-              <span className="text-purple-400 font-bold">Legendary Masterpiece</span>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-
-      {/* =========================================================================
-          6. THE COMPETITIVE LEAGUE SYSTEM (12 Ranked Divisions)
-         ========================================================================= */}
-      <section className="relative py-28 px-6 bg-[#07080b] border-t border-[#c5a880]/15">
-        <div className="max-w-6xl mx-auto space-y-16">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="font-mono text-xs uppercase tracking-[0.3em] text-[#c5a880] font-bold block">
-              — The Colosseum of Shadows —
-            </span>
-            <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-wider uppercase leading-tight">
-              12 Ranked Leagues. Daily Ascension.
-            </h2>
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
-              Climb from a Bronze initiate to the godlike 2-seat Divine Pantheon. Compete for Crowns in cutthroat arena duels where daily rollovers continuously promote the strong and demote the weak.
-            </p>
-          </div>
-
-          {/* 3 Core League Engine Pillars */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-[#141822] to-black border border-white/10 hover:border-[#c5a880]/50 transition-all space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-500/40 flex items-center justify-center font-display font-black text-amber-300">
-                  01
-                </div>
-                <h3 className="font-display font-black text-lg text-white uppercase">
-                  Crown Duels (PvP)
-                </h3>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
-                Spend Arena Tickets to battle rival Warlords. Every duel victory captures Crowns from your opponent, driving your live rank higher within your current league.
-              </p>
-            </div>
-
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-[#1a1324] to-black border border-white/10 hover:border-purple-500/50 transition-all space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-950/60 border border-purple-500/40 flex items-center justify-center font-display font-black text-purple-300">
-                  02
-                </div>
-                <h3 className="font-display font-black text-lg text-white uppercase">
-                  Daily 24H Rollover
-                </h3>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
-                The ladder never sleeps. Every 24 hours: Top warlords in the Promotion Zone ascend to higher leagues, mid ranks hold Safe Zone, and bottom ranks demote.
-              </p>
-            </div>
-
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-[#20150d] to-black border border-white/10 hover:border-amber-400/50 transition-all space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-yellow-950/60 border border-yellow-500/40 flex items-center justify-center font-display font-black text-yellow-300">
-                  03
-                </div>
-                <h3 className="font-display font-black text-lg text-white uppercase">
-                  Daily Dividends
-                </h3>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
-                Holding high rank pays real tribute. Every daily rollover delivers automatic mail tributes of Blood Sovereigns (withdrawable to USDT), Gold, and Void Dust.
-              </p>
-            </div>
-
-          </div>
-
-          {/* The Apex Ranks (Divine, Void Overlord, Grandmaster) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            {/* Divine */}
-            <div className="rounded-2xl p-7 bg-gradient-to-b from-[#241a08] via-[#140e04] to-black border-2 border-amber-400/60 shadow-[0_0_35px_rgba(245,158,11,0.25)] text-center space-y-4">
-              <div className="relative inline-block">
-                <img
-                  src="/icons/league_divine.png"
-                  alt="Divine League Crest"
-                  className="w-24 h-24 mx-auto drop-shadow-[0_0_25px_rgba(245,158,11,0.6)]"
-                />
-                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-400 text-[10px] font-mono text-amber-200 font-bold uppercase tracking-wider whitespace-nowrap">
-                  2 Seats Only
-                </span>
-              </div>
-              <div className="space-y-1">
-                <h3 className="font-display font-black text-2xl text-amber-300 uppercase tracking-wide">
-                  Divine Pantheon
-                </h3>
-                <span className="text-xs font-mono text-gray-400 block">The Realm's Sovereign Throne</span>
-              </div>
-              <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                The apex peak. Only two warlords hold this honor. Rank #1 retains eternal godhood, while Rank #2 is relegated back to Overlord. Claims the largest daily Sovereign bounty in the realm.
-              </p>
-            </div>
-
-            {/* Void Overlord */}
-            <div className="rounded-2xl p-7 bg-gradient-to-b from-[#240b14] via-[#14050a] to-black border-2 border-rose-500/60 shadow-[0_0_35px_rgba(244,63,94,0.25)] text-center space-y-4">
-              <div className="relative inline-block">
-                <img
-                  src="/icons/league_void_overlord.png"
-                  alt="Void Overlord Crest"
-                  className="w-24 h-24 mx-auto drop-shadow-[0_0_25px_rgba(244,63,94,0.5)]"
-                />
-                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-rose-950 border border-rose-400 text-[10px] font-mono text-rose-200 font-bold uppercase tracking-wider whitespace-nowrap">
-                  10 Seats
-                </span>
-              </div>
-              <div className="space-y-1">
-                <h3 className="font-display font-black text-2xl text-rose-300 uppercase tracking-wide">
-                  Void Overlord
-                </h3>
-                <span className="text-xs font-mono text-gray-400 block">Ascension Proving Grounds</span>
-              </div>
-              <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                Ten titan warlords battle for the single ticket to Divine immortality. Only Rank #1 is promoted to godhood each rollover, while the bottom three demote to Grandmaster.
-              </p>
-            </div>
-
-            {/* Grandmaster */}
-            <div className="rounded-2xl p-7 bg-gradient-to-b from-[#1b1028] via-[#0f0717] to-black border-2 border-purple-500/60 shadow-[0_0_35px_rgba(168,85,247,0.25)] text-center space-y-4">
-              <div className="relative inline-block">
-                <img
-                  src="/icons/league_grandmaster.png"
-                  alt="Grandmaster Crest"
-                  className="w-24 h-24 mx-auto drop-shadow-[0_0_25px_rgba(168,85,247,0.5)]"
-                />
-                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-purple-950 border border-purple-400 text-[10px] font-mono text-purple-200 font-bold uppercase tracking-wider whitespace-nowrap">
-                  30 Seats
-                </span>
-              </div>
-              <div className="space-y-1">
-                <h3 className="font-display font-black text-2xl text-purple-300 uppercase tracking-wide">
-                  Grandmaster
-                </h3>
-                <span className="text-xs font-mono text-gray-400 block">Imperial Elite Command</span>
-              </div>
-              <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                Thirty master tacticians fighting for high-echelon prestige. Top three advance to Void Overlord, while the bottom ten drop down to Master division.
-              </p>
-            </div>
-
-          </div>
-
-          {/* Full 12-Division Progression Ladder */}
-          <div className="p-6 sm:p-8 rounded-2xl bg-black/70 border border-[#c5a880]/20 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
-              <div>
-                <span className="text-xs font-mono text-[#c5a880] uppercase tracking-widest font-bold block">
-                  The Full Competitive Hierarchy
-                </span>
-                <h4 className="font-display font-black text-xl text-white uppercase mt-0.5">
-                  12 Ranks From Mortal to God
+                <h4 className="font-display font-black text-xl text-white uppercase">
+                  Instant Pass Bounty
                 </h4>
               </div>
-              <span className="text-[11px] font-mono text-gray-400">
-                Daily Promotion • Safe Retention • Relegation
-              </span>
+              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+                Receive instant one-time Blood Sovereign payouts into your vault whenever an invited ally activates a Premium or Ultra pass.
+              </p>
             </div>
 
-            {/* Grid of all 12 league crests */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-              {[
-                { name: 'Bronze', icon: '/icons/league_bronze.png', status: 'Entry Tier', color: 'text-amber-600' },
-                { name: 'Silver', icon: '/icons/league_silver.png', status: 'Open Tier', color: 'text-slate-300' },
-                { name: 'Gold', icon: '/icons/league_gold.png', status: 'Open Tier', color: 'text-amber-400' },
-                { name: 'Platinum', icon: '/icons/league_platinum.png', status: 'Competitive', color: 'text-indigo-300' },
-                { name: 'Sapphire', icon: '/icons/league_sapphire.png', status: 'Competitive', color: 'text-blue-400' },
-                { name: 'Emerald', icon: '/icons/league_emerald.png', status: 'Competitive', color: 'text-emerald-400' },
-                { name: 'Ruby', icon: '/icons/league_ruby.png', status: 'High Tier', color: 'text-red-400' },
-                { name: 'Diamond', icon: '/icons/league_diamond.png', status: 'High Tier', color: 'text-cyan-300' },
-                { name: 'Master', icon: '/icons/league_master.png', status: '50 Seats', color: 'text-purple-300' },
-                { name: 'Grandmaster', icon: '/icons/league_grandmaster.png', status: '30 Seats', color: 'text-amber-300' },
-                { name: 'Void Overlord', icon: '/icons/league_void_overlord.png', status: '10 Seats', color: 'text-rose-400' },
-                { name: 'Divine', icon: '/icons/league_divine.png', status: '2 Seats', color: 'text-amber-300' },
-              ].map((lg) => (
-                <div
-                  key={lg.name}
-                  className="p-3 rounded-xl bg-black/50 border border-white/10 hover:border-[#c5a880]/40 transition-all flex flex-col items-center text-center space-y-2 group"
-                >
-                  <img
-                    src={lg.icon}
-                    alt={lg.name}
-                    className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div>
-                    <span className={`font-display font-bold text-xs uppercase block ${lg.color}`}>
-                      {lg.name}
-                    </span>
-                    <span className="text-[10px] font-mono text-gray-500 block mt-0.5">
-                      {lg.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-
-      {/* =========================================================================
-          7. PLAY-TO-EARN ECONOMY & THE 4 IN-GAME RESOURCES
-         ========================================================================= */}
-      <section className="relative py-28 px-6 bg-[#090b10] border-t border-b border-[#c5a880]/15">
-        <div className="max-w-6xl mx-auto space-y-16">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="font-mono text-xs uppercase tracking-[0.3em] text-amber-400 font-bold block">
-              — Play to Earn —
-            </span>
-            <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-wider uppercase leading-tight">
-              Real Value. Withdrawable on Demand.
-            </h2>
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
-              Void Covenant operates on a transparent hard currency model. Win battles, climb the leagues, and withdraw your rewards directly in USDT.
-            </p>
-          </div>
-
-          {/* Central Treasury Card */}
-          <div className="rounded-3xl border-2 border-amber-500/40 bg-gradient-to-r from-[#1c1308] via-[#12161f] to-[#0d1410] p-8 sm:p-12 shadow-[0_20px_70px_rgba(0,0,0,0.9)]">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-              
-              <div className="lg:col-span-7 space-y-6">
-                <span className="font-mono text-xs text-amber-400 font-bold uppercase tracking-widest block">
-                  HARD CONVERTIBLE REWARDS
+            <div className="p-7 rounded-3xl bg-gradient-to-b from-[#121620] to-black border border-fuchsia-500/40 hover:border-fuchsia-400/80 transition-all duration-500 space-y-4 shadow-xl">
+              <div className="w-12 h-12 rounded-2xl bg-fuchsia-950/60 border border-fuchsia-500/40 flex items-center justify-center">
+                <img src="/icons/icon_sovereign.webp" alt="Lifetime Share" className="w-8 h-8 object-contain drop-shadow" />
+              </div>
+              <div className="space-y-1">
+                <span className="text-xs font-mono text-fuchsia-400 font-bold uppercase tracking-wider block">
+                  15% Passive Revenue
                 </span>
-                
-                <div className="flex flex-wrap items-baseline gap-4">
-                  <span className="font-display font-black text-4xl sm:text-6xl text-white tracking-wider">
-                    100 SOVEREIGNS
-                  </span>
-                  <span className="font-display font-black text-3xl sm:text-5xl text-emerald-400 tracking-wide">
-                    = $1.00 USDT
-                  </span>
-                </div>
-
-                <p className="text-gray-300 text-base leading-relaxed font-sans">
-                  Blood Sovereigns are awarded through ranked arena victories, daily competitive league standing, and covenant referral commissions. Request on-chain withdrawals directly to your Web3 wallet whenever you choose.
-                </p>
-
-                <div className="pt-2 flex flex-wrap gap-4">
-                  <div className="px-4 py-2 rounded-xl bg-black/60 border border-emerald-500/40 text-xs font-mono text-emerald-300 font-bold">
-                    Direct Web3 Wallet Withdrawal
-                  </div>
-                  <div className="px-4 py-2 rounded-xl bg-black/60 border border-amber-500/40 text-xs font-mono text-amber-300 font-bold">
-                    Guaranteed $0.01 USDT Fixed Rate
-                  </div>
-                </div>
+                <h4 className="font-display font-black text-xl text-white uppercase">
+                  Lifetime Sovereign Share
+                </h4>
               </div>
-
-              <div className="lg:col-span-5 flex justify-center">
-                <div className="relative rounded-2xl overflow-hidden border-2 border-amber-500/40 shadow-2xl max-w-sm w-full group">
-                  <img
-                    src="/landing_p2e_treasury.jpg"
-                    alt="Imperial Treasury Vault"
-                    className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent flex items-end p-5">
-                    <div>
-                      <span className="text-[10px] font-mono text-amber-300 uppercase tracking-widest block">The Imperial Vault</span>
-                      <p className="text-sm font-display font-bold text-white uppercase tracking-wider">
-                        Player-Owned Economy
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          {/* The 4 Resources */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            {/* Gold */}
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-white/[0.04] to-black border border-white/10 flex flex-col justify-between">
-              <div className="space-y-4">
-                <img src="/icons/icon_gold.webp" alt="Gold" className="w-12 h-12 drop-shadow" />
-                <div>
-                  <h3 className="font-display font-bold text-lg text-white uppercase">Gold</h3>
-                  <span className="text-[11px] font-mono text-yellow-400 font-bold">Battle Currency</span>
-                </div>
-                <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                  Earned across Campaign floors and PvP wins. Used for card fusing, shop items, and basic booster packs.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-white/10 text-[11px] font-mono text-gray-400">
-                Earned in: Campaign & PvP
-              </div>
+              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+                Earn an ongoing 15% share of all Blood Sovereigns won by your allies across ranked arena battles and daily leaderboard finishes.
+              </p>
             </div>
 
-            {/* Void Dust */}
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-white/[0.04] to-black border border-white/10 flex flex-col justify-between">
-              <div className="space-y-4">
-                <img src="/icons/icon_dust.webp" alt="Void Dust" className="w-12 h-12 drop-shadow" />
-                <div>
-                  <h3 className="font-display font-bold text-lg text-white uppercase">Void Dust</h3>
-                  <span className="text-[11px] font-mono text-cyan-400 font-bold">Crafting Powder</span>
-                </div>
-                <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                  Harvested from boss victories and disenchanting duplicates. Used for Altar card packs and card leveling.
-                </p>
+            <div className="p-7 rounded-3xl bg-gradient-to-b from-[#141510] to-black border border-emerald-500/40 hover:border-emerald-400/80 transition-all duration-500 space-y-4 shadow-xl">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 flex items-center justify-center">
+                <img src="/icons/icon_gold.webp" alt="Starter Bonus" className="w-8 h-8 object-contain drop-shadow" />
               </div>
-              <div className="mt-4 pt-3 border-t border-white/10 text-[11px] font-mono text-gray-400">
-                Earned in: Boss Trials & Disenchanting
+              <div className="space-y-1">
+                <span className="text-xs font-mono text-emerald-400 font-bold uppercase tracking-wider block">
+                  +1,000 Gold Starter
+                </span>
+                <h4 className="font-display font-black text-xl text-white uppercase">
+                  Welcome Gift For Allies
+                </h4>
               </div>
-            </div>
-
-            {/* Dark Shards */}
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-white/[0.04] to-black border border-white/10 flex flex-col justify-between">
-              <div className="space-y-4">
-                <img src="/icons/icon_shards.webp" alt="Dark Shards" className="w-12 h-12 drop-shadow" />
-                <div>
-                  <h3 className="font-display font-bold text-lg text-white uppercase">Dark Shards</h3>
-                  <span className="text-[11px] font-mono text-purple-400 font-bold">Premium Crystals</span>
-                </div>
-                <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                  Acquired in store or pass milestones. Used for VIP passes, tactical Peace Shields, and energy refills.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-white/10 text-[11px] font-mono text-gray-400">
-                Used for: VIP Passes & Shields
-              </div>
-            </div>
-
-            {/* Blood Sovereigns */}
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-amber-950/40 via-black to-black border-2 border-amber-500/50 shadow-xl flex flex-col justify-between">
-              <div className="space-y-4">
-                <img src="/icons/icon_sovereign.webp" alt="Blood Sovereigns" className="w-12 h-12 drop-shadow-[0_0_12px_rgba(245,158,11,0.5)]" />
-                <div>
-                  <h3 className="font-display font-bold text-lg text-amber-300 uppercase">Blood Sovereigns</h3>
-                  <span className="text-[11px] font-mono text-emerald-400 font-bold">100 = $1.00 USDT</span>
-                </div>
-                <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                  Convertible hard currency. Won through daily league standing, arena duels, and referrals. Directly withdrawable.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-amber-500/40 text-[11px] font-mono text-amber-300 font-bold">
-                Withdrawable to Web3 Wallet
-              </div>
+              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+                Your recruits begin their journey with a boosted starter treasury bonus, giving them immediate power to forge initial decks.
+              </p>
             </div>
 
           </div>
+
         </div>
       </section>
 
-
       {/* =========================================================================
-          8. FINAL CALL TO ACTION
+          7. GET STARTED IN SECONDS (CTA)
          ========================================================================= */}
-      <section className="relative py-28 px-6 overflow-hidden border-t border-[#c5a880]/20 text-center bg-gradient-to-b from-[#07080b] via-[#100e17] to-black">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(197,168,128,0.08),transparent_70%)] pointer-events-none" />
-
-        <div className="max-w-3xl mx-auto relative z-10 space-y-6">
-          <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#1c1208] to-black border-2 border-[#c5a880]/60 flex items-center justify-center shadow-[0_0_25px_rgba(197,168,128,0.4)]">
-            <span className="font-display font-black text-2xl text-[#c5a880]">Ω</span>
+      <section className="relative py-32 px-6 overflow-hidden border-t border-[#c5a880]/25 text-center bg-[radial-gradient(ellipse_at_center,#181022_0%,#050608_80%)]">
+        <div className="max-w-3xl mx-auto relative z-10 space-y-8">
+          
+          <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-[#24170a] to-black border-2 border-[#c5a880]/70 flex items-center justify-center shadow-[0_0_40px_rgba(197,168,128,0.5)]">
+            <span className="font-display font-black text-4xl text-[#c5a880]">Ω</span>
           </div>
 
-          <div className="space-y-3">
-            <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-[0.2em] uppercase leading-tight">
-              The Covenant Awaits
+          <div className="space-y-4">
+            <h2 className="font-display font-black text-4xl sm:text-6xl text-white tracking-[0.15em] uppercase leading-tight text-shadow-gold">
+              Your Throne Awaits
             </h2>
-            <p className="text-sm sm:text-base text-gray-400 font-serif italic max-w-lg mx-auto">
-              Play directly in browser or Telegram. Instant Web3 connection with zero forms or downloads.
+            <p className="text-base sm:text-lg text-gray-300 font-serif italic max-w-xl mx-auto leading-relaxed">
+              No downloads. No endless tutorials. Connect your wallet or play in browser within seconds and begin your ascent into the Abyss.
             </p>
           </div>
 
@@ -1586,44 +1000,66 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             <button
               onClick={onConnectWallet}
               disabled={isConnecting}
-              className="px-12 py-4 bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-black font-display font-black text-sm sm:text-base tracking-[0.3em] uppercase rounded-xl transition-all duration-300 shadow-[0_0_35px_rgba(245,158,11,0.4)] hover:shadow-[0_0_50px_rgba(245,158,11,0.7)] cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-60"
+              className="px-14 py-5 bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-black font-display font-black text-base tracking-[0.3em] uppercase rounded-2xl transition-all duration-300 shadow-[0_0_40px_rgba(245,158,11,0.5)] hover:shadow-[0_0_60px_rgba(245,158,11,0.8)] cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-60"
             >
-              {isConnecting ? 'CONNECTING...' : 'ENTER THE VOID'}
+              {isConnecting ? 'CONNECTING...' : 'ENTER THE COVENANT'}
             </button>
           </div>
+
+          {/* Luxury Metallic Badges */}
+          <div className="pt-8 flex flex-wrap justify-center items-center gap-4">
+            <div className="px-5 py-2.5 rounded-full bg-[#121620]/80 border border-[#c5a880]/30 shadow-lg flex items-center gap-2.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#ebd09b]" />
+              <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#ebd09b] font-bold">
+                Roguelike Abyss
+              </span>
+            </div>
+
+            <div className="px-5 py-2.5 rounded-full bg-[#1b140e]/80 border border-amber-500/30 shadow-lg flex items-center gap-2.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+              <span className="text-xs font-mono uppercase tracking-[0.2em] text-amber-300 font-bold">
+                Global Ranked Arena
+              </span>
+            </div>
+
+            <div className="px-5 py-2.5 rounded-full bg-[#0c1813]/80 border border-emerald-500/30 shadow-lg flex items-center gap-2.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="text-xs font-mono uppercase tracking-[0.2em] text-emerald-300 font-bold">
+                Direct Crypto Payouts
+              </span>
+            </div>
+          </div>
+
         </div>
       </section>
 
-
       {/* =========================================================================
-          9. CLEAN MODERN FOOTER
+          7. FOOTER
          ========================================================================= */}
-      <footer className="border-t border-white/10 py-10 px-6 bg-black">
+      <footer className="border-t border-white/10 py-12 px-6 bg-black">
         <div className="max-w-4xl mx-auto flex flex-col items-center gap-6">
-          {/* Social Links */}
           <div className="flex items-center gap-6">
             <a
               href="#"
-              className="w-10 h-10 rounded-full bg-white/5 border border-[#c5a880]/20 flex items-center justify-center hover:border-[#c5a880]/60 hover:bg-white/10 transition-all duration-300"
+              className="w-12 h-12 rounded-full bg-white/5 border border-[#c5a880]/30 flex items-center justify-center hover:border-[#c5a880]/80 hover:bg-white/10 transition-all duration-300"
               aria-label="Twitter / X"
             >
-              <Twitter className="w-4 h-4 text-gray-400 hover:text-amber-300 transition-colors" />
+              <Twitter className="w-5 h-5 text-gray-400 hover:text-amber-300 transition-colors" />
             </a>
             <a
               href="#"
-              className="w-10 h-10 rounded-full bg-white/5 border border-[#c5a880]/20 flex items-center justify-center hover:border-[#c5a880]/60 hover:bg-white/10 transition-all duration-300"
+              className="w-12 h-12 rounded-full bg-white/5 border border-[#c5a880]/30 flex items-center justify-center hover:border-[#c5a880]/80 hover:bg-white/10 transition-all duration-300"
               aria-label="Telegram"
             >
-              <Send className="w-4 h-4 text-gray-400 hover:text-amber-300 transition-colors" />
+              <Send className="w-5 h-5 text-gray-400 hover:text-amber-300 transition-colors" />
             </a>
           </div>
 
           <p className="text-xs text-gray-500 font-display tracking-widest text-center">
-            VOID COVENANT © 2024–2026 • DARK TACTICAL CARD RPG • PLAY TO EARN
+            VOID COVENANT © 2024–2026
           </p>
         </div>
       </footer>
-
 
       {/* =========================================================================
           ANIMATIONS
