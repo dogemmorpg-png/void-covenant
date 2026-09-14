@@ -1057,94 +1057,161 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
 
 
       {/* =========================================================================
-          5. THE ALTAR OF SUMMONING & CARD FUSION
+          5. CARD BOOSTER SUMMONING & THE DARK FUSION ALTAR
          ========================================================================= */}
       <section className="relative py-28 px-6 bg-[#090b10] border-t border-b border-[#c5a880]/15">
         <div className="max-w-6xl mx-auto space-y-16">
           
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="font-mono text-xs uppercase tracking-[0.3em] text-purple-400 font-bold block">
-              — Collection & Ascension —
+            <span className="font-mono text-xs uppercase tracking-[0.3em] text-cyan-400 font-bold block">
+              — Expand & Evolve —
             </span>
             <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-wider uppercase leading-tight">
-              The Altar of Summoning & Card Fusion
+              Card Summoning & The Fusion Altar
             </h2>
             <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
-              Victory rewards you with Gold and Void Dust. Channel these spoils into the Altar to summon booster chests, fuse duplicate creatures, and ascend your deck into godlike rarities.
+              Expand your army by opening occult Card Boosters, then merge duplicate warriors in the Dark Fusion Altar to raise levels, reduce turn delays, and awaken game-changing traits.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* 3 Real Card Booster Packs */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
-            {/* Chest 1 */}
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-white/[0.04] to-black border border-white/10 hover:border-amber-500/40 transition-all text-center space-y-4">
-              <img
-                src="/packs/chest_basic.webp"
-                alt="Basic Chest"
-                className="w-20 h-20 mx-auto object-contain drop-shadow"
-              />
-              <div>
-                <h3 className="font-display font-black text-xl text-white uppercase">Basic Chest</h3>
-                <span className="text-xs font-mono text-yellow-400 font-bold">Summoned with Gold</span>
+            {/* Pack 1: Core Void Booster */}
+            <div className="rounded-2xl p-6 bg-gradient-to-b from-[#10141d] via-[#090b10] to-black border border-white/10 hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] transition-all text-center space-y-4 group">
+              <div className="h-44 rounded-xl bg-gradient-to-b from-amber-950/20 via-black/50 to-black flex items-center justify-center relative overflow-hidden border border-white/5 group-hover:border-amber-500/30">
+                <img
+                  src="/packs/pack_bronze.webp"
+                  alt="Bronze Core Pack"
+                  className="w-32 h-32 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(245,158,11,0.3)]"
+                />
+                <div className="absolute bottom-2 px-2.5 py-0.5 rounded-full bg-black/80 border border-amber-500/40">
+                  <span className="font-mono text-[10px] text-amber-300 font-bold tracking-wider uppercase">CORE BOOSTER</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-display font-black text-xl text-white uppercase group-hover:text-amber-300 transition-colors">
+                  Bronze Core Pack
+                </h3>
+                <span className="text-xs font-mono text-amber-400 font-bold block">Summoned with In-Game Gold</span>
               </div>
               <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                Draws frontline warriors and footsoldiers to establish your core deck foundation.
+                Foundational card pack for every commander. Unlocks frontline warriors, undead thralls, and tactical minions to build your deck foundation.
               </p>
             </div>
 
-            {/* Chest 2 */}
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-white/[0.04] to-black border border-white/10 hover:border-cyan-500/40 transition-all text-center space-y-4">
-              <img
-                src="/packs/chest_rare.webp"
-                alt="Rare Chest"
-                className="w-20 h-20 mx-auto object-contain drop-shadow"
-              />
-              <div>
-                <h3 className="font-display font-black text-xl text-cyan-300 uppercase">Rare Chest</h3>
-                <span className="text-xs font-mono text-cyan-400 font-bold">Summoned with Void Dust</span>
+            {/* Pack 2: Obsidian Pack */}
+            <div className="rounded-2xl p-6 bg-gradient-to-b from-[#0c1f2a] via-[#08131a] to-black border border-cyan-500/30 hover:border-cyan-400/70 hover:shadow-[0_0_35px_rgba(6,182,212,0.25)] transition-all text-center space-y-4 group">
+              <div className="h-44 rounded-xl bg-gradient-to-b from-cyan-950/40 via-black/50 to-black flex items-center justify-center relative overflow-hidden border border-cyan-500/20 group-hover:border-cyan-400/40">
+                <img
+                  src="/packs/pack_obsidian.webp"
+                  alt="Obsidian Pack"
+                  className="w-32 h-32 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(6,182,212,0.4)]"
+                />
+                <div className="absolute bottom-2 px-2.5 py-0.5 rounded-full bg-black/80 border border-cyan-400/50">
+                  <span className="font-mono text-[10px] text-cyan-300 font-bold tracking-wider uppercase">TIER II SUMMON</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-display font-black text-xl text-white uppercase group-hover:text-cyan-300 transition-colors">
+                  Obsidian Void Pack
+                </h3>
+                <span className="text-xs font-mono text-cyan-400 font-bold block">Summoned with Dark Shards</span>
               </div>
               <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                Unlocks specialized spellweavers, vampires, and tactical support creatures.
+                Infused with dark void mana. High-probability drops for Silver & Gold combatants, specialized blood priestesses, and lethal hex casters.
               </p>
             </div>
 
-            {/* Chest 3 */}
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-white/[0.04] to-black border border-white/10 hover:border-purple-500/40 transition-all text-center space-y-4">
-              <img
-                src="/packs/chest_premium.webp"
-                alt="Royal Chest"
-                className="w-20 h-20 mx-auto object-contain drop-shadow"
-              />
-              <div>
-                <h3 className="font-display font-black text-xl text-purple-300 uppercase">Royal Chest</h3>
-                <span className="text-xs font-mono text-purple-400 font-bold">High-Tier Vault</span>
+            {/* Pack 3: Abyssal Master Pack */}
+            <div className="rounded-2xl p-6 bg-gradient-to-b from-[#220a14] via-[#14050c] to-black border border-rose-500/40 hover:border-rose-400/80 hover:shadow-[0_0_35px_rgba(244,63,94,0.3)] transition-all text-center space-y-4 group">
+              <div className="h-44 rounded-xl bg-gradient-to-b from-rose-950/40 via-black/50 to-black flex items-center justify-center relative overflow-hidden border border-rose-500/20 group-hover:border-rose-400/40">
+                <img
+                  src="/packs/pack_abyssal.webp"
+                  alt="Abyssal Pack"
+                  className="w-32 h-32 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(244,63,94,0.45)]"
+                />
+                <div className="absolute bottom-2 px-2.5 py-0.5 rounded-full bg-black/80 border border-rose-400/50">
+                  <span className="font-mono text-[10px] text-rose-300 font-bold tracking-wider uppercase">FORBIDDEN TIER III</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-display font-black text-xl text-white uppercase group-hover:text-rose-300 transition-colors">
+                  Abyssal Master Pack
+                </h3>
+                <span className="text-xs font-mono text-rose-400 font-bold block">Guaranteed High-Tier Pulls</span>
               </div>
               <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                Guaranteed high-tier pulls yielding catastrophic leviathans and legendary lords.
+                The apex summoning vault. Unlocks catastrophic leviathans, ancient reaper lords, and guaranteed gold or legendary champions.
               </p>
             </div>
 
           </div>
 
-          {/* Tier Evolution Strip */}
-          <div className="p-6 rounded-2xl bg-black/60 border border-white/10 text-center space-y-3">
-            <span className="text-xs font-mono text-gray-400 uppercase tracking-widest block">
-              Card Tier Ascension System
-            </span>
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs sm:text-sm font-mono">
-              <span className="text-amber-600 font-bold">Bronze</span>
-              <span className="text-gray-600">→</span>
-              <span className="text-gray-300 font-bold">Silver</span>
-              <span className="text-gray-600">→</span>
-              <span className="text-yellow-400 font-bold">Gold</span>
-              <span className="text-gray-600">→</span>
-              <span className="text-purple-400 font-bold">Legendary</span>
-              <span className="text-gray-600">→</span>
-              <span className="text-amber-300 font-bold">Divine Ascended</span>
+          {/* Dedicated Fusion Altar Mechanics Box */}
+          <div className="rounded-3xl p-8 sm:p-10 bg-gradient-to-b from-[#170e24] via-[#0d0716] to-black border-2 border-purple-500/40 shadow-2xl relative overflow-hidden space-y-8">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-purple-500/20 pb-6">
+              <div>
+                <span className="text-xs font-mono text-purple-300 uppercase tracking-widest font-bold block">
+                  Ritual Evolution
+                </span>
+                <h3 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-wide mt-1">
+                  The Dark Fusion Altar: Duplicate Upgrades
+                </h3>
+              </div>
+              <span className="px-3.5 py-1.5 rounded-full bg-purple-950/80 border border-purple-400/60 text-xs font-mono text-purple-200 font-bold tracking-wider">
+                100% Guaranteed Success
+              </span>
             </div>
-            <p className="text-xs text-gray-400 font-sans max-w-xl mx-auto pt-1">
-              Fusing identical cards increases base Attack and Health while dramatically enhancing their active skill values.
-            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              {/* Step 1: Duplicate Leveling */}
+              <div className="p-6 rounded-2xl bg-black/60 border border-purple-500/20 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono font-bold text-purple-400 uppercase tracking-wider">
+                    Phase 1: Level Progression
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded bg-purple-900/40 text-[11px] font-mono text-purple-200">
+                    Levels 1 → 5
+                  </span>
+                </div>
+                <h4 className="font-display font-bold text-lg text-white uppercase">
+                  Merge Duplicate Cards
+                </h4>
+                <p className="text-xs text-gray-300 font-sans leading-relaxed">
+                  Sacrifice duplicate copies of the same entity together with Gold and Void Dust. Every fusion level grants permanent increases to your creature's base Attack and Health.
+                </p>
+              </div>
+
+              {/* Step 2: Tier Ascension */}
+              <div className="p-6 rounded-2xl bg-black/60 border border-amber-500/30 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">
+                    Phase 2: Tier Ascension
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded bg-amber-900/40 text-[11px] font-mono text-amber-200">
+                    Bronze → Silver → Gold
+                  </span>
+                </div>
+                <h4 className="font-display font-bold text-lg text-white uppercase">
+                  Reduced Delay & Bonus Passives
+                </h4>
+                <p className="text-xs text-gray-300 font-sans leading-relaxed">
+                  Maxing out Level 5 triggers a breakthrough: your creature ascends to the next tier, slashes its combat Turn Delay so it strikes earlier, and awakens a unique passive trait.
+                </p>
+              </div>
+            </div>
+
+            {/* Ascension Tier Flow */}
+            <div className="p-4 rounded-xl bg-black/80 border border-white/10 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm font-mono text-center">
+              <span className="text-[#cd7f32] font-bold">Bronze (Base)</span>
+              <span className="text-gray-500">→</span>
+              <span className="text-slate-300 font-bold">Silver (+Stats & -Delay)</span>
+              <span className="text-gray-500">→</span>
+              <span className="text-amber-400 font-bold">Gold (Awakened Trait)</span>
+              <span className="text-gray-500">→</span>
+              <span className="text-purple-400 font-bold">Legendary Masterpiece</span>
+            </div>
           </div>
 
         </div>
@@ -1152,90 +1219,195 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
 
 
       {/* =========================================================================
-          6. RANKED ARENA & TACTICAL PEACE SHIELDS
+          6. THE COMPETITIVE LEAGUE SYSTEM (12 Ranked Divisions)
          ========================================================================= */}
-      <section className="relative py-28 px-6 bg-[#07080b]">
+      <section className="relative py-28 px-6 bg-[#07080b] border-t border-[#c5a880]/15">
         <div className="max-w-6xl mx-auto space-y-16">
           
           <div className="text-center max-w-3xl mx-auto space-y-4">
             <span className="font-mono text-xs uppercase tracking-[0.3em] text-[#c5a880] font-bold block">
-              — Competitive Arena —
+              — The Colosseum of Shadows —
             </span>
             <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-wider uppercase leading-tight">
-              Twelve Ranked Divisions & Peace Shields
+              12 Ranked Leagues. Daily Ascension.
             </h2>
             <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
-              Compete against other warlords in ranked arena duels to earn Crowns. Daily promotions and demotions maintain a living, cutthroat ladder.
+              Climb from a Bronze initiate to the godlike 2-seat Divine Pantheon. Compete for Crowns in cutthroat arena duels where daily rollovers continuously promote the strong and demote the weak.
             </p>
           </div>
 
-          {/* Three Apex League Emblems */}
+          {/* 3 Core League Engine Pillars */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-[#221808] to-black border border-amber-500/40 text-center space-y-3">
-              <img
-                src="/icons/league_divine.png"
-                alt="Divine League Crest"
-                className="w-20 h-20 mx-auto drop-shadow-[0_0_20px_rgba(245,158,11,0.5)]"
-              />
-              <h3 className="font-display font-black text-xl text-amber-300 uppercase">Divine Pantheon</h3>
-              <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                The pinnacle of realm dominance where only the reigning immortals dwell.
+            <div className="rounded-2xl p-6 bg-gradient-to-b from-[#141822] to-black border border-white/10 hover:border-[#c5a880]/50 transition-all space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-500/40 flex items-center justify-center font-display font-black text-amber-300">
+                  01
+                </div>
+                <h3 className="font-display font-black text-lg text-white uppercase">
+                  Crown Duels (PvP)
+                </h3>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+                Spend Arena Tickets to battle rival Warlords. Every duel victory captures Crowns from your opponent, driving your live rank higher within your current league.
               </p>
             </div>
 
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-[#220910] to-black border border-rose-500/40 text-center space-y-3">
-              <img
-                src="/icons/league_void_overlord.png"
-                alt="Void Overlord Crest"
-                className="w-20 h-20 mx-auto drop-shadow-[0_0_20px_rgba(244,63,94,0.4)]"
-              />
-              <h3 className="font-display font-black text-xl text-rose-300 uppercase">Void Overlord</h3>
-              <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                High-stakes dominion division fighting for promotion to the Divine throne.
+            <div className="rounded-2xl p-6 bg-gradient-to-b from-[#1a1324] to-black border border-white/10 hover:border-purple-500/50 transition-all space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-950/60 border border-purple-500/40 flex items-center justify-center font-display font-black text-purple-300">
+                  02
+                </div>
+                <h3 className="font-display font-black text-lg text-white uppercase">
+                  Daily 24H Rollover
+                </h3>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+                The ladder never sleeps. Every 24 hours: Top warlords in the Promotion Zone ascend to higher leagues, mid ranks hold Safe Zone, and bottom ranks demote.
               </p>
             </div>
 
-            <div className="rounded-2xl p-6 bg-gradient-to-b from-[#1b1226] to-black border border-purple-500/40 text-center space-y-3">
-              <img
-                src="/icons/league_grandmaster.png"
-                alt="Grandmaster Crest"
-                className="w-20 h-20 mx-auto drop-shadow-[0_0_20px_rgba(168,85,247,0.4)]"
-              />
-              <h3 className="font-display font-black text-xl text-purple-300 uppercase">Grandmaster</h3>
-              <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                Elite tacticians advancing through competitive ranks towards realm dominance.
+            <div className="rounded-2xl p-6 bg-gradient-to-b from-[#20150d] to-black border border-white/10 hover:border-amber-400/50 transition-all space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-yellow-950/60 border border-yellow-500/40 flex items-center justify-center font-display font-black text-yellow-300">
+                  03
+                </div>
+                <h3 className="font-display font-black text-lg text-white uppercase">
+                  Daily Dividends
+                </h3>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+                Holding high rank pays real tribute. Every daily rollover delivers automatic mail tributes of Blood Sovereigns (withdrawable to USDT), Gold, and Void Dust.
               </p>
             </div>
 
           </div>
 
-          {/* Tactical Peace Shields Showcase */}
-          <div className="rounded-2xl p-6 sm:p-8 bg-gradient-to-r from-[#0c141e] via-[#090e17] to-[#070b12] border border-cyan-500/30 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="space-y-2 max-w-xl">
-              <span className="text-[11px] font-mono text-cyan-400 font-bold uppercase tracking-wider block">
-                Strategic Defense
-              </span>
-              <h3 className="font-display font-black text-2xl text-white uppercase">
-                Lock Your Crowns with Peace Shields
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
-                Never lose your hard-earned rank while you sleep or step away. Activate 3-Hour, 6-Hour, or 12-Hour Peace Shields to make your warlord invulnerable to enemy duel challenges.
+          {/* The Apex Ranks (Divine, Void Overlord, Grandmaster) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            {/* Divine */}
+            <div className="rounded-2xl p-7 bg-gradient-to-b from-[#241a08] via-[#140e04] to-black border-2 border-amber-400/60 shadow-[0_0_35px_rgba(245,158,11,0.25)] text-center space-y-4">
+              <div className="relative inline-block">
+                <img
+                  src="/icons/league_divine.png"
+                  alt="Divine League Crest"
+                  className="w-24 h-24 mx-auto drop-shadow-[0_0_25px_rgba(245,158,11,0.6)]"
+                />
+                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-400 text-[10px] font-mono text-amber-200 font-bold uppercase tracking-wider whitespace-nowrap">
+                  2 Seats Only
+                </span>
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-display font-black text-2xl text-amber-300 uppercase tracking-wide">
+                  Divine Pantheon
+                </h3>
+                <span className="text-xs font-mono text-gray-400 block">The Realm's Sovereign Throne</span>
+              </div>
+              <p className="text-xs text-gray-300 leading-relaxed font-sans">
+                The apex peak. Only two warlords hold this honor. Rank #1 retains eternal godhood, while Rank #2 is relegated back to Overlord. Claims the largest daily Sovereign bounty in the realm.
               </p>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="text-center p-3 rounded-xl bg-black/50 border border-cyan-500/30">
-                <img src="/icons/shield_3h.png" alt="3h Shield" className="w-10 h-10 mx-auto mb-1" />
-                <span className="font-mono text-xs font-bold text-white block">3 Hours</span>
+
+            {/* Void Overlord */}
+            <div className="rounded-2xl p-7 bg-gradient-to-b from-[#240b14] via-[#14050a] to-black border-2 border-rose-500/60 shadow-[0_0_35px_rgba(244,63,94,0.25)] text-center space-y-4">
+              <div className="relative inline-block">
+                <img
+                  src="/icons/league_void_overlord.png"
+                  alt="Void Overlord Crest"
+                  className="w-24 h-24 mx-auto drop-shadow-[0_0_25px_rgba(244,63,94,0.5)]"
+                />
+                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-rose-950 border border-rose-400 text-[10px] font-mono text-rose-200 font-bold uppercase tracking-wider whitespace-nowrap">
+                  10 Seats
+                </span>
               </div>
-              <div className="text-center p-3 rounded-xl bg-black/50 border border-cyan-500/30">
-                <img src="/icons/shield_6h.png" alt="6h Shield" className="w-10 h-10 mx-auto mb-1" />
-                <span className="font-mono text-xs font-bold text-white block">6 Hours</span>
+              <div className="space-y-1">
+                <h3 className="font-display font-black text-2xl text-rose-300 uppercase tracking-wide">
+                  Void Overlord
+                </h3>
+                <span className="text-xs font-mono text-gray-400 block">Ascension Proving Grounds</span>
               </div>
-              <div className="text-center p-3 rounded-xl bg-black/50 border border-cyan-500/30">
-                <img src="/icons/shield_12h.png" alt="12h Shield" className="w-10 h-10 mx-auto mb-1" />
-                <span className="font-mono text-xs font-bold text-white block">12 Hours</span>
+              <p className="text-xs text-gray-300 leading-relaxed font-sans">
+                Ten titan warlords battle for the single ticket to Divine immortality. Only Rank #1 is promoted to godhood each rollover, while the bottom three demote to Grandmaster.
+              </p>
+            </div>
+
+            {/* Grandmaster */}
+            <div className="rounded-2xl p-7 bg-gradient-to-b from-[#1b1028] via-[#0f0717] to-black border-2 border-purple-500/60 shadow-[0_0_35px_rgba(168,85,247,0.25)] text-center space-y-4">
+              <div className="relative inline-block">
+                <img
+                  src="/icons/league_grandmaster.png"
+                  alt="Grandmaster Crest"
+                  className="w-24 h-24 mx-auto drop-shadow-[0_0_25px_rgba(168,85,247,0.5)]"
+                />
+                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-purple-950 border border-purple-400 text-[10px] font-mono text-purple-200 font-bold uppercase tracking-wider whitespace-nowrap">
+                  30 Seats
+                </span>
               </div>
+              <div className="space-y-1">
+                <h3 className="font-display font-black text-2xl text-purple-300 uppercase tracking-wide">
+                  Grandmaster
+                </h3>
+                <span className="text-xs font-mono text-gray-400 block">Imperial Elite Command</span>
+              </div>
+              <p className="text-xs text-gray-300 leading-relaxed font-sans">
+                Thirty master tacticians fighting for high-echelon prestige. Top three advance to Void Overlord, while the bottom ten drop down to Master division.
+              </p>
+            </div>
+
+          </div>
+
+          {/* Full 12-Division Progression Ladder */}
+          <div className="p-6 sm:p-8 rounded-2xl bg-black/70 border border-[#c5a880]/20 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
+              <div>
+                <span className="text-xs font-mono text-[#c5a880] uppercase tracking-widest font-bold block">
+                  The Full Competitive Hierarchy
+                </span>
+                <h4 className="font-display font-black text-xl text-white uppercase mt-0.5">
+                  12 Ranks From Mortal to God
+                </h4>
+              </div>
+              <span className="text-[11px] font-mono text-gray-400">
+                Daily Promotion • Safe Retention • Relegation
+              </span>
+            </div>
+
+            {/* Grid of all 12 league crests */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+              {[
+                { name: 'Bronze', icon: '/icons/league_bronze.png', status: 'Entry Tier', color: 'text-amber-600' },
+                { name: 'Silver', icon: '/icons/league_silver.png', status: 'Open Tier', color: 'text-slate-300' },
+                { name: 'Gold', icon: '/icons/league_gold.png', status: 'Open Tier', color: 'text-amber-400' },
+                { name: 'Platinum', icon: '/icons/league_platinum.png', status: 'Competitive', color: 'text-indigo-300' },
+                { name: 'Sapphire', icon: '/icons/league_sapphire.png', status: 'Competitive', color: 'text-blue-400' },
+                { name: 'Emerald', icon: '/icons/league_emerald.png', status: 'Competitive', color: 'text-emerald-400' },
+                { name: 'Ruby', icon: '/icons/league_ruby.png', status: 'High Tier', color: 'text-red-400' },
+                { name: 'Diamond', icon: '/icons/league_diamond.png', status: 'High Tier', color: 'text-cyan-300' },
+                { name: 'Master', icon: '/icons/league_master.png', status: '50 Seats', color: 'text-purple-300' },
+                { name: 'Grandmaster', icon: '/icons/league_grandmaster.png', status: '30 Seats', color: 'text-amber-300' },
+                { name: 'Void Overlord', icon: '/icons/league_void_overlord.png', status: '10 Seats', color: 'text-rose-400' },
+                { name: 'Divine', icon: '/icons/league_divine.png', status: '2 Seats', color: 'text-amber-300' },
+              ].map((lg) => (
+                <div
+                  key={lg.name}
+                  className="p-3 rounded-xl bg-black/50 border border-white/10 hover:border-[#c5a880]/40 transition-all flex flex-col items-center text-center space-y-2 group"
+                >
+                  <img
+                    src={lg.icon}
+                    alt={lg.name}
+                    className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div>
+                    <span className={`font-display font-bold text-xs uppercase block ${lg.color}`}>
+                      {lg.name}
+                    </span>
+                    <span className="text-[10px] font-mono text-gray-500 block mt-0.5">
+                      {lg.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
