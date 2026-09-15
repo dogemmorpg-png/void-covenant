@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { CheckCircle, Sparkles, Shield, User, Flame, Dices } from 'lucide-react';
+import { CheckCircle, Sparkles, Shield, User, Flame, Dices, PenLine, X } from 'lucide-react';
 
 interface RegistrationScreenProps {
   onRegister: (username: string, avatarUrl: string) => Promise<{ success: boolean; message: string }>;
@@ -88,7 +88,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
 
     const usernameRegex = /^[a-zA-Z0-9_]{4,12}$/;
     if (!usernameRegex.test(trimmed)) {
-      setError('Name must be 4-12 characters (English letters, numbers, or _)');
+      setError('Name must be 4-12 characters (letters, numbers, or _)');
       return;
     }
 
@@ -105,7 +105,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
   const currentAvatarObj = AVATARS.find(a => a.url === selectedAvatar) || AVATARS[0];
 
   return (
-    <div className="fixed inset-0 w-full h-[100dvh] bg-[#06080d] text-white flex flex-col justify-between overflow-x-hidden overflow-y-auto select-none pt-[max(64px,calc(env(safe-area-inset-top)+48px))] pb-[max(12px,env(safe-area-inset-bottom))] px-3 sm:px-6">
+    <div className="fixed inset-0 w-full h-[100dvh] bg-[#06080d] text-white overflow-x-hidden overflow-y-auto select-none pt-[max(78px,calc(env(safe-area-inset-top)+54px))] pb-[max(16px,env(safe-area-inset-bottom))] px-3.5 flex flex-col items-center">
       {/* Dark fantasy atmospheric artwork & vignette background */}
       <div 
         className="absolute inset-0 bg-cover bg-center opacity-25 scale-105 pointer-events-none"
@@ -120,171 +120,186 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
       <div className="absolute bottom-2 left-3 text-[#ebd09b]/20 font-serif text-[10px] pointer-events-none">⟦Ω⟧</div>
       <div className="absolute bottom-2 right-3 text-[#ebd09b]/20 font-serif text-[10px] pointer-events-none">⟦Ω⟧</div>
 
-      {/* Compact Header Bar - Positioned with safe clearance below Telegram's Close button */}
-      <header className="relative z-10 w-full max-w-md mx-auto flex items-center justify-between pb-2 border-b border-[#ebd09b]/20 shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-red-600/40 via-red-950 to-black border border-red-500/70 flex items-center justify-center shadow-[0_0_12px_rgba(221,44,64,0.6)]">
-            <span className="font-display font-bold text-[#dd2c40] text-xs">Ω</span>
-          </div>
-          <div>
-            <h1 className="font-display font-bold text-xs sm:text-sm tracking-wider text-white leading-tight">
-              ENTER THE COVENANT
-            </h1>
-            <span className="text-[8.5px] font-mono text-[#ebd09b]/70 tracking-wider block">
-              CHOOSE YOUR AVATAR & SEAL YOUR MONIKER
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1.5 text-[9px] font-mono text-amber-300 bg-amber-950/40 border border-amber-500/40 px-2 py-0.5 rounded-full">
-          <Sparkles className="w-2.5 h-2.5 text-amber-400 animate-pulse" />
-          <span>REGISTRATION</span>
-        </div>
-      </header>
-
-      {/* Main Form: Compact, fits on 1 screen without scrolling */}
-      <form onSubmit={handleSubmit} className="relative z-10 flex-1 w-full max-w-md mx-auto my-auto py-2 flex flex-col justify-between gap-3 min-h-0">
+      {/* Main Container: Vertically centered, unified tight spacing (no giant gaps) */}
+      <div className="relative z-10 w-full max-w-md my-auto flex flex-col gap-2.5">
         
-        {/* SECTION 1: Avatar Selector (Single Horizontal Row of 4 Cards) */}
-        <div className="bg-[#0b0f19]/90 border border-[#c5a880]/30 rounded-2xl p-2.5 backdrop-blur-md shadow-2xl flex flex-col gap-1.5 shrink-0">
-          <div className="flex items-center justify-between pb-1 border-b border-white/10 shrink-0">
-            <div className="flex items-center gap-1.5">
-              <Shield className="w-3.5 h-3.5 text-[#ebd09b]" />
-              <span className="text-[10px] font-display font-bold tracking-wider text-[#ebd09b] uppercase">
-                1. Choose Entity
+        {/* Compact Header Bar - Positioned safely below Telegram's Close button */}
+        <header className="w-full flex items-center justify-between pb-1.5 border-b border-[#ebd09b]/20 shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-red-600/40 via-red-950 to-black border border-red-500/70 flex items-center justify-center shadow-[0_0_12px_rgba(221,44,64,0.6)]">
+              <span className="font-display font-bold text-[#dd2c40] text-xs">Ω</span>
+            </div>
+            <div>
+              <h1 className="font-display font-bold text-xs sm:text-sm tracking-wider text-white leading-tight">
+                ENTER THE COVENANT
+              </h1>
+              <span className="text-[8px] font-mono text-[#ebd09b]/70 tracking-wider block">
+                CHOOSE YOUR AVATAR & SEAL YOUR MONIKER
               </span>
             </div>
-            <span className="text-[9px] font-mono text-gray-300">
-              <strong className="text-amber-300 font-bold">{currentAvatarObj.name}</strong> ({currentAvatarObj.role})
-            </span>
           </div>
 
-          {/* 4 Avatar Cards Row: All 4 visible side-by-side without vertical crowding */}
-          <div className="grid grid-cols-4 gap-2 my-0.5 items-stretch">
-            {AVATARS.map(avatar => {
-              const isSelected = selectedAvatar === avatar.url;
-              return (
-                <div
-                  key={avatar.id}
+          <div className="flex items-center gap-1 text-[8.5px] font-mono text-amber-300 bg-amber-950/40 border border-amber-500/40 px-2 py-0.5 rounded-full shrink-0">
+            <Sparkles className="w-2.5 h-2.5 text-amber-400 animate-pulse" />
+            <span>REGISTRATION</span>
+          </div>
+        </header>
+
+        {/* Main Form: Compact, tight gap between cards */}
+        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2.5">
+          
+          {/* SECTION 1: Avatar Selector (Single Horizontal Row of 4 Cards) */}
+          <div className="bg-[#0b0f19]/90 border border-[#c5a880]/30 rounded-2xl p-2.5 backdrop-blur-md shadow-2xl flex flex-col gap-1.5 shrink-0">
+            <div className="flex items-center justify-between pb-1 border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-1.5">
+                <Shield className="w-3.5 h-3.5 text-[#ebd09b]" />
+                <span className="text-[10px] font-display font-bold tracking-wider text-[#ebd09b] uppercase">
+                  1. Choose Entity
+                </span>
+              </div>
+              <span className="text-[9px] font-mono text-gray-300">
+                <strong className="text-amber-300 font-bold">{currentAvatarObj.name}</strong> ({currentAvatarObj.role})
+              </span>
+            </div>
+
+            {/* 4 Avatar Cards Row */}
+            <div className="grid grid-cols-4 gap-2 my-0.5 items-stretch">
+              {AVATARS.map(avatar => {
+                const isSelected = selectedAvatar === avatar.url;
+                return (
+                  <div
+                    key={avatar.id}
+                    onClick={() => {
+                      setSelectedAvatar(avatar.url);
+                      triggerHaptic();
+                    }}
+                    className={`group relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-200 aspect-[3/4] flex flex-col justify-end p-1 bg-[#0c101a] shadow-md ${
+                      isSelected
+                        ? 'border-[#ebd09b] shadow-[0_0_15px_rgba(235,208,155,0.6)] ring-2 ring-[#ebd09b]/60 scale-[1.02] z-10'
+                        : 'border-white/15 opacity-65 hover:opacity-100 hover:scale-[1.01]'
+                    }`}
+                  >
+                    <img 
+                      src={avatar.url} 
+                      alt={avatar.name} 
+                      className="absolute inset-0 w-full h-full object-cover select-none" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent pointer-events-none" />
+                    
+                    {isSelected && (
+                      <div className="absolute top-1 right-1 bg-[#ebd09b] text-black rounded-full p-0.5 shadow-md z-10">
+                        <CheckCircle className="w-2.5 h-2.5" />
+                      </div>
+                    )}
+
+                    <div className="relative z-10 text-left">
+                      <span className="text-[8px] font-display font-bold text-white block leading-tight truncate drop-shadow">
+                        {avatar.name}
+                      </span>
+                      <span className="text-[7px] font-mono text-[#ebd09b] block leading-none truncate">
+                        {avatar.role}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Single line description of selected avatar */}
+            <div className="text-[8px] font-mono text-gray-400 text-center bg-black/40 py-0.5 px-2 rounded-lg border border-white/5 truncate shrink-0">
+              {currentAvatarObj.desc} • Used in Arena & Profile
+            </div>
+          </div>
+
+          {/* SECTION 2: Summoner Moniker (Prominent Editable Input Field) */}
+          <div className="bg-[#0b0f19]/90 border border-[#c5a880]/30 rounded-2xl p-2.5 backdrop-blur-md shadow-2xl flex flex-col gap-2 shrink-0">
+            <div className="flex items-center justify-between pb-1 border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-[#ebd09b]" />
+                <span className="text-[10px] font-display font-bold tracking-wider text-[#ebd09b] uppercase">
+                  2. Summoner Moniker
+                </span>
+              </div>
+              <span className="text-[8.5px] font-mono text-amber-300/80">
+                {username.length}/12 chars
+              </span>
+            </div>
+
+            {/* Clearly defined interactive text input box */}
+            <div className="relative flex items-center bg-[#05070c] border-2 border-amber-500/60 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-400/40 rounded-xl px-2.5 py-2 shadow-inner transition-all">
+              <div className="flex items-center gap-1.5 mr-2 shrink-0 select-none">
+                <span className="text-amber-400 text-sm">👑</span>
+                <PenLine className="w-3.5 h-3.5 text-amber-400/80" />
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => {
+                    const cleaned = e.target.value.replace(/[^a-zA-Z0-9_]/g, '').substring(0, 12);
+                    setUsername(cleaned);
+                  }}
+                  placeholder="Tap here to type your name..."
+                  maxLength={12}
+                  autoCapitalize="characters"
+                  autoCorrect="off"
+                  spellCheck="false"
+                  className="w-full bg-transparent text-white font-mono font-bold text-sm tracking-wider focus:outline-none placeholder-zinc-500 uppercase caret-amber-400"
+                />
+              </div>
+
+              {username.length > 0 && (
+                <button
+                  type="button"
                   onClick={() => {
-                    setSelectedAvatar(avatar.url);
+                    setUsername('');
                     triggerHaptic();
                   }}
-                  className={`group relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-200 aspect-[3/4] flex flex-col justify-end p-1.5 bg-[#0c101a] shadow-md ${
-                    isSelected
-                      ? 'border-[#ebd09b] shadow-[0_0_15px_rgba(235,208,155,0.6)] ring-2 ring-[#ebd09b]/60 scale-[1.02] z-10'
-                      : 'border-white/15 opacity-65 hover:opacity-100 hover:scale-[1.01]'
-                  }`}
+                  className="p-1 text-zinc-500 hover:text-zinc-200 transition-colors cursor-pointer shrink-0 ml-1"
+                  title="Clear"
                 >
-                  <img 
-                    src={avatar.url} 
-                    alt={avatar.name} 
-                    className="absolute inset-0 w-full h-full object-cover select-none" 
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent pointer-events-none" />
-                  
-                  {isSelected && (
-                    <div className="absolute top-1 right-1 bg-[#ebd09b] text-black rounded-full p-0.5 shadow-md z-10">
-                      <CheckCircle className="w-2.5 h-2.5" />
-                    </div>
-                  )}
-
-                  <div className="relative z-10 text-left">
-                    <span className="text-[8.5px] font-display font-bold text-white block leading-tight truncate drop-shadow">
-                      {avatar.name}
-                    </span>
-                    <span className="text-[7.5px] font-mono text-[#ebd09b] block leading-none truncate">
-                      {avatar.role}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Single line description of selected avatar */}
-          <div className="text-[8.5px] font-mono text-gray-400 text-center bg-black/40 py-0.5 px-2 rounded-lg border border-white/5 truncate shrink-0">
-            {currentAvatarObj.desc} • Used across PvP Arena & Profile
-          </div>
-        </div>
-
-        {/* SECTION 2: Summoner Moniker (Native Standard Input + Quick Picks) */}
-        <div className="bg-[#0b0f19]/90 border border-[#c5a880]/30 rounded-2xl p-2.5 backdrop-blur-md shadow-2xl flex flex-col gap-2 shrink-0">
-          <div className="flex items-center justify-between pb-1 border-b border-white/10 shrink-0">
-            <div className="flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-[#ebd09b]" />
-              <span className="text-[10px] font-display font-bold tracking-wider text-[#ebd09b] uppercase">
-                2. Summoner Moniker
-              </span>
-            </div>
-            <span className="text-[8.5px] font-mono text-gray-400">
-              {username.length}/12 chars
-            </span>
-          </div>
-
-          {/* Standard Native Input Box (No fake virtual keyboard modal) */}
-          <div className="relative flex items-center bg-black/80 border-2 border-[#c5a880]/60 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-400/40 rounded-xl p-2 shadow-inner transition-all">
-            <span className="text-amber-400 text-base ml-1 mr-2 select-none">👑</span>
-            <div className="flex-1 min-w-0">
-              <label className="text-[7.5px] font-mono text-zinc-400 block uppercase tracking-wider leading-none mb-0.5 select-none">
-                LORD MONIKER (4-12 CHARS)
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => {
-                  const cleaned = e.target.value.replace(/[^a-zA-Z0-9_]/g, '').substring(0, 12);
-                  setUsername(cleaned);
-                }}
-                placeholder="Enter Moniker..."
-                maxLength={12}
-                autoCapitalize="characters"
-                autoCorrect="off"
-                spellCheck="false"
-                className="w-full bg-transparent text-white font-display font-bold text-sm tracking-wider focus:outline-none placeholder-zinc-600 uppercase"
-              />
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
 
-            {/* Random Dice Button */}
-            <button
-              type="button"
-              onClick={rollNewName}
-              title="Roll Random Moniker"
-              className="px-2 py-1.5 rounded-lg bg-[#ebd09b]/20 hover:bg-[#ebd09b] text-[#ebd09b] hover:text-black border border-[#ebd09b]/40 font-mono text-[9.5px] font-bold flex items-center gap-1 cursor-pointer active:scale-95 transition-all shrink-0 ml-1.5"
-            >
-              <Dices className="w-3.5 h-3.5" />
-              <span>Roll</span>
-            </button>
-          </div>
+            {/* Explicit helper text stating you can type */}
+            <div className="flex items-center justify-between text-[8px] font-mono text-zinc-400 px-0.5 -mt-0.5">
+              <span>✏️ Tap field to enter custom name</span>
+              <span>4-12 characters (A-Z, 0-9, _)</span>
+            </div>
 
-          {/* 1-Tap Quick-Pick Suggestions */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between">
-              <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider">
-                Quick-Pick Names (Tap to choose):
-              </span>
+            {/* Alternative shortcuts: Roll Random & Telegram chip */}
+            <div className="flex items-center gap-2 pt-0.5">
               <button
                 type="button"
-                onClick={rollNewSuggestions}
-                className="text-[8px] font-mono text-[#ebd09b]/80 hover:text-[#ebd09b] cursor-pointer"
+                onClick={rollNewName}
+                className="flex-1 py-1.5 px-2 rounded-lg bg-amber-950/40 hover:bg-amber-900/60 border border-amber-500/40 text-amber-300 font-mono text-[9px] font-bold flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-sm"
               >
-                ↻ Refresh
+                <Dices className="w-3 h-3 text-amber-400" />
+                <span>🎲 Roll Random</span>
               </button>
-            </div>
 
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {tgSuggestedName && tgSuggestedName !== username && (
+              {tgSuggestedName && (
                 <button
                   type="button"
                   onClick={() => {
                     setUsername(tgSuggestedName);
                     triggerHaptic();
                   }}
-                  className="px-2 py-1 rounded-md bg-blue-950/70 border border-blue-500/50 text-blue-300 font-mono text-[9px] hover:bg-blue-900/60 cursor-pointer active:scale-95 transition-all font-bold"
+                  className="flex-1 py-1.5 px-2 rounded-lg bg-blue-950/50 hover:bg-blue-900/60 border border-blue-500/40 text-blue-300 font-mono text-[9px] font-bold flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-sm truncate"
                 >
-                  @{rawTgName}
+                  <span>📱 Use @{rawTgName}</span>
                 </button>
               )}
+            </div>
+
+            {/* Quick picks suggestions row */}
+            <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+              <span className="text-[8px] font-mono text-zinc-500 uppercase tracking-wider shrink-0">
+                Quick picks:
+              </span>
               {quickPicks.map((name, idx) => (
                 <button
                   key={idx}
@@ -293,48 +308,56 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
                     setUsername(name);
                     triggerHaptic();
                   }}
-                  className="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-gray-300 hover:border-amber-400/50 hover:text-white font-mono text-[9px] cursor-pointer active:scale-95 transition-all"
+                  className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-gray-300 hover:border-amber-400/50 hover:text-amber-200 font-mono text-[8.5px] cursor-pointer active:scale-95 transition-all"
                 >
                   ⚔️ {name}
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={rollNewSuggestions}
+                title="Refresh Suggestions"
+                className="text-[8.5px] font-mono text-[#ebd09b]/70 hover:text-[#ebd09b] ml-auto cursor-pointer p-0.5"
+              >
+                ↻
+              </button>
             </div>
           </div>
-        </div>
 
-        {/* Error Notification */}
-        {error && (
-          <div className="bg-red-950/80 border border-red-500/60 text-red-200 text-[10px] font-mono px-3 py-1.5 rounded-xl text-center shadow-lg animate-shake shrink-0">
-            {error}
-          </div>
-        )}
-
-        {/* SECTION 3: SEAL THE PACT SUBMIT BUTTON */}
-        <button
-          type="submit"
-          disabled={isSubmitting || username.length < 4}
-          className="w-full py-3 bg-gradient-to-r from-[#c5a880] via-[#ebd09b] to-[#c5a880] text-black font-display font-black text-xs sm:text-sm tracking-widest uppercase rounded-xl shadow-[0_0_25px_rgba(235,208,155,0.4)] hover:shadow-[0_0_35px_rgba(235,208,155,0.7)] active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shrink-0"
-        >
-          {isSubmitting ? (
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-              <span>SEALING PACT...</span>
+          {/* Error Notification */}
+          {error && (
+            <div className="bg-red-950/80 border border-red-500/60 text-red-200 text-[10px] font-mono px-3 py-1.5 rounded-xl text-center shadow-lg animate-shake shrink-0">
+              {error}
             </div>
-          ) : (
-            <>
-              <Flame className="w-4 h-4 text-black animate-pulse" />
-              <span>SEAL THE PACT ⚔️</span>
-            </>
           )}
-        </button>
 
-      </form>
+          {/* SECTION 3: SEAL THE PACT SUBMIT BUTTON */}
+          <button
+            type="submit"
+            disabled={isSubmitting || username.length < 4}
+            className="w-full py-3 bg-gradient-to-r from-[#c5a880] via-[#ebd09b] to-[#c5a880] text-black font-display font-black text-xs sm:text-sm tracking-widest uppercase rounded-xl shadow-[0_0_25px_rgba(235,208,155,0.4)] hover:shadow-[0_0_35px_rgba(235,208,155,0.7)] active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shrink-0 mt-0.5"
+          >
+            {isSubmitting ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                <span>SEALING PACT...</span>
+              </div>
+            ) : (
+              <>
+                <Flame className="w-4 h-4 text-black animate-pulse" />
+                <span>SEAL THE PACT ⚔️</span>
+              </>
+            )}
+          </button>
 
-      {/* Subtle Footer Note */}
-      <footer className="relative z-10 w-full max-w-md mx-auto text-center text-[8.5px] font-mono text-zinc-500 pb-1 shrink-0">
-        The Void Covenant • Tactical Card RPG
-      </footer>
+        </form>
 
+        {/* Subtle Footer Note */}
+        <footer className="w-full text-center text-[8px] font-mono text-zinc-500 pt-0.5 shrink-0">
+          The Void Covenant • Tactical Card RPG
+        </footer>
+
+      </div>
     </div>
   );
 };
