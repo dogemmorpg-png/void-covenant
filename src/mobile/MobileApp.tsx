@@ -9,7 +9,7 @@ import { MobileCampaignView } from './views/MobileCampaignView';
 import { MobilePvpView } from './views/MobilePvpView';
 import { MobileCollectionView } from './views/MobileCollectionView';
 import { MobileHeroView } from './views/MobileHeroView';
-import { MobileBattleView } from './views/MobileBattleView';
+import { BattleFieldView } from '../components/BattleFieldView';
 
 // Desktop Shared Views for Store, Bank & Premium
 import { GachaStoreView } from '../components/GachaStoreView';
@@ -51,14 +51,15 @@ export const MobileApp: React.FC = () => {
     setActiveTab(activeBattleType === 'pvp' ? 'pvp' : 'campaign');
   };
 
-  // If battle active, render dedicated mobile combat view (full-screen, unblocked)
+  // If battle active, render genuine BattleFieldView with isMobile=true (100% authentic assets & sequencer)
   if (activeBattleStage) {
     return (
       <div className="h-[100dvh] w-full overflow-hidden bg-[#070504]">
-        <MobileBattleView
+        <BattleFieldView
           stage={activeBattleStage}
           onExitBattle={handleExitBattle}
           battleType={activeBattleType}
+          isMobile={true}
         />
       </div>
     );
