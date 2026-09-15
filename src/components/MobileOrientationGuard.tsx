@@ -17,21 +17,39 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
 
   // Initialize Telegram WebApp fullscreen
   useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp) {
+    const setupTelegram = () => {
+      if (typeof window === 'undefined' || !(window as any).Telegram?.WebApp) return;
       const tg = (window as any).Telegram.WebApp;
       try {
         tg.ready();
         tg.expand();
+        
+        // Request fullscreen to hide system status bar (clock, battery, notifications)
         if (typeof tg.requestFullscreen === 'function') {
           tg.requestFullscreen();
         }
+        
+        // Disable vertical swipes to prevent accidental closing
         if (typeof tg.disableVerticalSwipes === 'function') {
           tg.disableVerticalSwipes();
+        }
+        
+        // Lock orientation to landscape if available
+        if (typeof tg.lockOrientation === 'function') {
+          try { tg.lockOrientation(); } catch {}
         }
       } catch (e) {
         console.warn('Telegram WebApp setup error:', e);
       }
-    }
+    };
+
+    // Initial call
+    setupTelegram();
+    
+    // Retry after a short delay — some Telegram clients need the WebApp bridge 
+    // to fully initialize before requestFullscreen succeeds
+    const retryTimer = setTimeout(setupTelegram, 600);
+    return () => clearTimeout(retryTimer);
   }, []);
 
   const requestLandscapeAndFullscreen = async () => {
