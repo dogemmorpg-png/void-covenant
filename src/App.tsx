@@ -192,32 +192,36 @@ function MainAppContent() {
   if (isTelegram) {
     if (isTelegramAuthLoading || (isTelegramAuthenticated && isLoadingProfile)) {
       return (
-        <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 rounded-full border-t-2 border-r-2 border-t-[#ebd09b] border-r-transparent animate-spin" />
-            <p className="text-[#ebd09b] font-mono text-xs tracking-[0.3em] animate-pulse">
-              INITIALIZING TELEGRAM SESSION...
-            </p>
+        <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait}>
+          <div className="w-full h-full min-h-screen bg-[#07090e] flex items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-12 h-12 rounded-full border-t-2 border-r-2 border-t-[#ebd09b] border-r-transparent animate-spin" />
+              <p className="text-[#ebd09b] font-mono text-xs tracking-[0.3em] animate-pulse">
+                INITIALIZING TELEGRAM SESSION...
+              </p>
+            </div>
           </div>
-        </div>
+        </MobileOrientationGuard>
       );
     }
 
     if (telegramAuthError) {
       return (
-        <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center p-6 text-center">
-          <div className="max-w-md p-8 border border-red-500/30 bg-black/80 rounded-2xl space-y-4">
-            <div className="w-12 h-12 rounded-full border border-red-500 text-red-500 flex items-center justify-center mx-auto text-xl font-bold">!</div>
-            <h2 className="font-display text-xl text-white tracking-wider">TELEGRAM AUTH FAILED</h2>
-            <p className="text-gray-400 text-xs font-mono">{telegramAuthError}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-red-600 hover:bg-red-500 text-white font-display text-xs font-bold tracking-wider rounded-lg transition-all cursor-pointer"
-            >
-              RETRY
-            </button>
+        <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait}>
+          <div className="w-full h-full min-h-screen bg-[#07090e] flex items-center justify-center p-6 text-center">
+            <div className="max-w-md p-8 border border-red-500/30 bg-black/80 rounded-2xl space-y-4">
+              <div className="w-12 h-12 rounded-full border border-red-500 text-red-500 flex items-center justify-center mx-auto text-xl font-bold">!</div>
+              <h2 className="font-display text-xl text-white tracking-wider">TELEGRAM AUTH FAILED</h2>
+              <p className="text-gray-400 text-xs font-mono">{telegramAuthError}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-2 bg-red-600 hover:bg-red-500 text-white font-display text-xs font-bold tracking-wider rounded-lg transition-all cursor-pointer"
+              >
+                RETRY
+              </button>
+            </div>
           </div>
-        </div>
+        </MobileOrientationGuard>
       );
     }
   }
