@@ -192,11 +192,11 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
         </div>
       </header>
 
-      {/* Main Form: 2-Column Landscape */}
-      <form onSubmit={handleSubmit} className="relative z-10 flex-1 w-full my-1.5 flex items-stretch gap-3.5 min-h-0">
+      {/* Main Form: Responsive Vertical/Landscape */}
+      <form onSubmit={handleSubmit} className="relative z-10 flex-1 w-full my-1.5 flex flex-col md:flex-row items-stretch gap-3.5 min-h-0 overflow-y-auto">
         
-        {/* Left Column: Avatar Grid (56% width) */}
-        <div className="flex-[56] flex flex-col justify-between bg-[#0b0f19]/90 border border-[#c5a880]/30 rounded-2xl p-3 backdrop-blur-md shadow-2xl min-h-0">
+        {/* Left/Top Column: Avatar Grid */}
+        <div className="flex-1 md:flex-[56] flex flex-col justify-between bg-[#0b0f19]/90 border border-[#c5a880]/30 rounded-2xl p-3 backdrop-blur-md shadow-2xl shrink-0">
           <div className="flex items-center justify-between pb-1 border-b border-white/10 shrink-0">
             <div className="flex items-center gap-1.5">
               <Shield className="w-3.5 h-3.5 text-[#ebd09b]" />
@@ -209,8 +209,8 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
             </span>
           </div>
 
-          {/* 4 Avatar Cards Row - strictly bounded by w-full to avoid horizontal overlap */}
-          <div className="grid grid-cols-4 gap-2.5 my-auto py-1 items-center">
+          {/* 4 Avatar Cards Grid: 2x2 on mobile, 4x1 on wider screens */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 my-auto py-1 items-center">
             {AVATARS.map(avatar => {
               const isSelected = selectedAvatar === avatar.url;
               return (
@@ -260,8 +260,8 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
           </div>
         </div>
 
-        {/* Right Column: Moniker Selection & Submit (44% width) */}
-        <div className="flex-[44] flex flex-col justify-between bg-[#0b0f19]/90 border border-[#c5a880]/30 rounded-2xl p-3 backdrop-blur-md shadow-2xl min-h-0">
+        {/* Right/Bottom Column: Moniker Selection & Submit */}
+        <div className="flex-1 md:flex-[44] flex flex-col justify-between bg-[#0b0f19]/90 border border-[#c5a880]/30 rounded-2xl p-3 backdrop-blur-md shadow-2xl shrink-0">
           <div className="flex items-center justify-between pb-1 border-b border-white/10 shrink-0">
             <div className="flex items-center gap-1.5">
               <User className="w-3.5 h-3.5 text-[#ebd09b]" />

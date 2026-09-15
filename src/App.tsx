@@ -309,7 +309,7 @@ function MainAppContent() {
 
   if (!profile.isRegistered) {
     return (
-      <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait}>
+      <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait} disableRotatePrompt={true}>
         <RegistrationScreen 
           onRegister={(username, avatarUrl) => registerPlayer(username, avatarUrl)} 
         />

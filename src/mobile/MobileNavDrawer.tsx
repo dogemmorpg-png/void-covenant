@@ -34,8 +34,8 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
   const menuItems = [
     {
       id: 'campaign' as MobileTab,
-      label: 'Кампания',
-      sublabel: 'Башня Бездны',
+      label: 'Campaign',
+      sublabel: 'Abyssal Spire & Floors',
       icon: Swords,
       color: 'text-emerald-400',
       border: 'border-emerald-500/40',
@@ -44,19 +44,19 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
     },
     {
       id: 'pvp' as MobileTab,
-      label: 'Арена Дуэлей',
-      sublabel: 'PvP Лиги & Короны',
+      label: 'PvP Arena',
+      sublabel: 'Ranked Duels & Crowns',
       icon: Trophy,
       color: 'text-rose-400',
       border: 'border-rose-500/40',
       bg: 'from-rose-950/40 to-black/80',
-      badge: hasNewDefenseAttacks ? 'НОВЫЙ БОЙ' : null,
+      badge: hasNewDefenseAttacks ? 'NEW DUEL' : null,
       badgeColor: 'bg-rose-500 text-white',
     },
     {
       id: 'collection' as MobileTab,
-      label: 'Карты и Колода',
-      sublabel: 'Коллекция & Слияние',
+      label: 'Cards & Deck',
+      sublabel: 'Collection & Fusion',
       icon: FolderGit,
       color: 'text-amber-400',
       border: 'border-amber-500/40',
@@ -66,8 +66,8 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
     },
     {
       id: 'hero' as MobileTab,
-      label: 'Лорд и Снаряжение',
-      sublabel: 'Таланты & Экипировка',
+      label: 'Lord & Gear',
+      sublabel: 'Talents & Equipment',
       icon: UserCircle2,
       color: 'text-yellow-400',
       border: 'border-yellow-500/40',
@@ -76,8 +76,8 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
     },
     {
       id: 'altar' as MobileTab,
-      label: 'Алтарь и Магазин',
-      sublabel: 'Призыв & Осколки',
+      label: 'Altar & Shop',
+      sublabel: 'Summon & Dark Shards',
       icon: Store,
       color: 'text-purple-400',
       border: 'border-purple-500/40',
@@ -86,8 +86,8 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
     },
     {
       id: 'premium' as MobileTab,
-      label: 'Боевой Пропуск',
-      sublabel: 'Сезонные Награды',
+      label: 'Battle Pass',
+      sublabel: 'Seasonal Pass Spoils',
       icon: Crown,
       color: 'text-yellow-300',
       border: 'border-yellow-400/50',
@@ -97,8 +97,8 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
     },
     {
       id: 'bank' as MobileTab,
-      label: 'Банк и Казна',
-      sublabel: 'Суверены & Вывод',
+      label: 'Bank & Treasury',
+      sublabel: 'Sovereigns & Dividends',
       icon: Landmark,
       color: 'text-cyan-400',
       border: 'border-cyan-500/40',
@@ -117,7 +117,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
   return (
     <>
       {/* =========================================================================
-          1. FLOATING CORNER MENU TRIGGER BUTTON (Bottom-Right or Docked)
+          1. FLOATING CORNER MENU TRIGGER BUTTON
          ========================================================================= */}
       <div className="fixed bottom-4 right-4 z-40 select-none">
         <button
@@ -162,9 +162,9 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                 </div>
                 <div>
                   <h3 className="font-cinzel font-black text-sm text-[#ebd09b] tracking-wider uppercase">
-                    Навигация Бездны
+                    Abyssal Navigation
                   </h3>
-                  <span className="text-[10px] font-mono text-zinc-400">Выберите раздел игры</span>
+                  <span className="text-[10px] font-mono text-zinc-400">Select Realm Destination</span>
                 </div>
               </div>
 
@@ -233,8 +233,8 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
 
             {/* Bottom Footer Note */}
             <div className="pt-3 mt-2 border-t border-white/5 flex items-center justify-between text-[9px] font-mono text-zinc-500 shrink-0">
-              <span>VOID COVENANT v2.0 • TELEGRAM</span>
-              <span className="text-amber-500/80 font-bold">DARK FANTASY CCG</span>
+              <span>VOID COVENANT • TELEGRAM</span>
+              <span className="text-amber-500/80 font-bold">DARK FANTASY CARD RPG</span>
             </div>
 
           </div>
