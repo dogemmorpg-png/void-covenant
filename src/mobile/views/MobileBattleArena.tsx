@@ -856,33 +856,56 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
     }
   }, [currentStepIndex, animateSequence, finalBattleState]);
 
-  // Handle Play Card
+  // Handle Play Card (1:1 PC Mechanics - places card locally, does NOT end turn)
   const handlePlayCard = (slotIndex: number) => {
     if (!selectedHandCardId || isSimulating || isAnimating) return;
-    const card = visualState.playerHand.find(c => c.id === selectedHandCardId);
-    if (!card) return;
+    if (battle.playerBoard[slotIndex] !== null) return;
 
-    if (visualState.playerMana < (card.manaCost || 1)) {
+    const cardToPlay = battle.playerHand.find(c => c.id === selectedHandCardId);
+    if (!cardToPlay) return;
+
+    const cost = cardToPlay.manaCost || 1;
+    if (battle.playerMana < cost) {
       toast('Not enough Mana to summon this creature!', 'error');
       return;
     }
 
-    setIsSimulating(true);
+    const newBattleState = placeCardLocally(battle, selectedHandCardId, slotIndex);
+    if (newBattleState !== battle) {
+      const oldAlliesCount = battle.playerBoard.filter(c => c !== null && !c.isDead).length;
+      const newAlliesCount = newBattleState.playerBoard.filter(c => c !== null && !c.isDead).length;
+
+      if (newAlliesCount < oldAlliesCount) {
+        let sacrificedSlot = -1;
+        for (let i = 0; i < 5; i++) {
+          if (battle.playerBoard[i] && !newBattleState.playerBoard[i]) {
+            sacrificedSlot = i;
+            break;
+          }
+        }
+        if (sacrificedSlot !== -1) {
+          addFloatingText('💀 SACRIFICE', { side: 'player', slot: sacrificedSlot }, 'text-red-500 font-bold scale-110');
+        }
+        const sacrificeSkill = cardToPlay.skills.find(s => s.type === 'sacrifice');
+        if (sacrificeSkill) {
+          addFloatingText(`+${sacrificeSkill.value} HP 💚`, 'player-hero', 'text-emerald-400 font-black text-sm');
+          addFloatingText(`+${Math.round(sacrificeSkill.value / 2)}⚔️ +${sacrificeSkill.value}❤️`, { side: 'player', slot: slotIndex }, 'text-yellow-400 font-bold');
+        }
+      } else {
+        addFloatingText('SUMMON', { side: 'player', slot: slotIndex }, 'text-[#ebd09b] font-bold tracking-widest');
+      }
+
+      setSummoningCard({ side: 'player', slot: slotIndex });
+      setTimeout(() => setSummoningCard(null), 600);
+
+      setBattle(newBattleState);
+      setVisualState(newBattleState);
+    }
+
     setSelectedHandCardId(null);
-
-    const { nextState, animateSequence: steps } = simulateCombatTurn(
-      battle,
-      selectedHandCardId,
-      slotIndex,
-      profile,
-      stage
-    );
-
-    setFinalBattleState(nextState);
-    setupPlaybackState(steps);
   };
 
-  // Handle End Turn without playing card
+  // Handle End Turn (Triggers combat resolution and enemy actions)
   const handleEndTurnWithoutCard = () => {
     if (isSimulating || isAnimating) return;
     setIsSimulating(true);
@@ -946,12 +969,12 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
   const selectedHandCard = visualState.playerHand.find(c => c.id === selectedHandCardId);
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#07090e] text-white select-none overflow-hidden font-sans relative">
+    <div className="flex flex-col h-full w-full bg-[#07090e] text-white select-none overflow-hidden font-sans relative pt-[max(78px,calc(env(safe-area-inset-top)+54px))] pb-[max(12px,env(safe-area-inset-bottom))]">
       
       {/* =========================================================================
           1. TOP APP BAR (Stage Name, Surrender, Codex)
          ========================================================================= */}
-      <header className="h-10 px-3 flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-[#0b0f17] via-[#121927] to-[#0b0f17] shrink-0 z-30">
+      <header className="h-9 px-3 flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-[#0b0f17] via-[#121927] to-[#0b0f17] shrink-0 z-30">
         <button
           onClick={() => onExitBattle(false)}
           className="flex items-center gap-1.5 px-2.5 py-1 bg-red-950/70 hover:bg-red-900 border border-red-500/40 rounded-lg text-red-200 text-xs font-mono font-bold transition-all active:scale-95 cursor-pointer"
@@ -964,7 +987,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
           <span className="font-display font-black text-xs text-[#ebd09b] tracking-wider uppercase drop-shadow">
             {battleType === 'pvp' ? 'PvP Duel Arena' : `Stage ${stage.id}: ${stage.name}`}
           </span>
-          <span className="text-[9px] font-mono text-zinc-400">
+          <span className="text-[8.5px] font-mono text-zinc-400">
             Abyssal Spire • Vertical Mode
           </span>
         </div>
@@ -981,9 +1004,9 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       {/* =========================================================================
           2. ENEMY COMMANDER HEADER HUD (Portrait, HP, Mana)
          ========================================================================= */}
-      <div className="px-3 py-1.5 bg-gradient-to-b from-[#180a0a]/90 to-transparent border-b border-red-950/40 flex items-center justify-between shrink-0 relative">
+      <div className="px-3 py-1 bg-gradient-to-b from-[#180a0a]/90 to-transparent border-b border-red-950/40 flex items-center justify-between shrink-0 relative">
         <div className="flex items-center gap-2 min-w-0">
-          <div className={`w-9 h-9 rounded-xl overflow-hidden border-2 border-red-500/70 shadow-md relative shrink-0 ${
+          <div className={`w-8 h-8 rounded-lg overflow-hidden border-2 border-red-500/70 shadow-md relative shrink-0 ${
             defenderAction?.side === 'enemy' && defenderAction?.slot === -1 ? 'anim-hero-recoil' : ''
           }`}>
             <img 
@@ -999,20 +1022,20 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
               <span className="font-display font-black text-xs text-red-300 truncate">
                 {stage.enemyName || 'Abyssal Overlord'}
               </span>
-              <span className="text-[9px] font-mono px-1 rounded bg-red-950 border border-red-800/80 text-red-400 font-bold">
+              <span className="text-[8.5px] font-mono px-1 rounded bg-red-950 border border-red-800/80 text-red-400 font-bold">
                 Lvl {stage.enemyLevel || 1}
               </span>
             </div>
 
             {/* Health Bar */}
             <div className="flex items-center gap-1.5 mt-0.5">
-              <div className="w-24 h-2 bg-zinc-900 rounded-full overflow-hidden border border-red-950">
+              <div className="w-24 h-1.5 bg-zinc-900 rounded-full overflow-hidden border border-red-950">
                 <div 
                   className="h-full bg-gradient-to-r from-red-600 to-red-400 transition-all duration-300"
                   style={{ width: `${Math.max(0, Math.min(100, (visualState.enemyHeroHealth / visualState.enemyHeroMaxHealth) * 100))}%` }}
                 />
               </div>
-              <span className="text-[10px] font-mono font-black text-red-300">
+              <span className="text-[9.5px] font-mono font-black text-red-300">
                 {visualState.enemyHeroHealth} / {visualState.enemyHeroMaxHealth}
               </span>
             </div>
@@ -1020,7 +1043,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
         </div>
 
         {/* Floating text on enemy hero */}
-        <div className="absolute top-2 left-1/3 pointer-events-none flex flex-col items-center z-40">
+        <div className="absolute top-1 left-1/3 pointer-events-none flex flex-col items-center z-40">
           {floatingTexts.filter(f => f.target === 'enemy-hero').map(f => (
             <span key={f.id} className={`${f.colorClass} animate-bounce font-black`}>
               {f.text}
@@ -1029,9 +1052,9 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
         </div>
 
         {/* Enemy Mana */}
-        <div className="flex items-center gap-1 bg-black/60 px-2 py-1 rounded-lg border border-red-500/30">
-          <span className="text-[9px]">💎</span>
-          <span className="text-xs font-mono font-black text-cyan-300">
+        <div className="flex items-center gap-1 bg-black/60 px-2 py-0.5 rounded-lg border border-red-500/30">
+          <span className="text-[8.5px]">💎</span>
+          <span className="text-[10.5px] font-mono font-black text-cyan-300">
             {visualState.enemyMana} / {visualState.enemyMaxMana}
           </span>
         </div>
@@ -1040,7 +1063,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       {/* =========================================================================
           3. ARENA PLAYFIELD (5 VS 5 BOARD + CENTRAL CLASH BAR)
          ========================================================================= */}
-      <main className="flex-1 flex flex-col justify-between p-2 overflow-hidden relative min-h-0">
+      <main className="flex-1 flex flex-col justify-between px-2 py-1 overflow-hidden relative min-h-0">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(235,208,155,0.04)_0%,transparent_70%)] pointer-events-none" />
 
         {/* ROW 1: ENEMY SQUAD (5 SLOTS) */}
@@ -1093,7 +1116,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                     '--anim-duration': `${Math.max(0.25, 0.68 / effectiveSpeed)}s`,
                     '--recoil-duration': `${Math.max(0.18, 0.32 / effectiveSpeed)}s`,
                   } as React.CSSProperties}
-                  className={`relative h-[104px] sm:h-[110px] rounded-xl border flex flex-col justify-between p-1 select-none overflow-visible transition-all cursor-pointer ${
+                  className={`relative h-[92px] sm:h-[100px] rounded-xl border flex flex-col justify-between p-1 select-none overflow-visible transition-all cursor-pointer ${
                     card 
                       ? `${getTierBorderColor(card.tier)} bg-[#151a21]` 
                       : 'border-dashed border-red-950/50 bg-black/30'
@@ -1403,7 +1426,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                     '--anim-duration': `${Math.max(0.25, 0.68 / effectiveSpeed)}s`,
                     '--recoil-duration': `${Math.max(0.18, 0.32 / effectiveSpeed)}s`,
                   } as React.CSSProperties}
-                  className={`relative h-[104px] sm:h-[110px] rounded-xl border flex flex-col justify-between p-1 select-none overflow-visible transition-all cursor-pointer ${
+                  className={`relative h-[92px] sm:h-[100px] rounded-xl border flex flex-col justify-between p-1 select-none overflow-visible transition-all cursor-pointer ${
                     card 
                       ? `${getTierBorderColor(card.tier)} bg-[#151a21]` 
                       : canPlayHere
@@ -1646,7 +1669,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       {/* =========================================================================
           5. FIXED HAND OF 3 CARDS (Authentic PC Visual Style, Skills & Delay)
          ========================================================================= */}
-      <div className="bg-[#090d15] border-t border-white/10 p-2 shrink-0 z-20">
+      <div className="bg-[#090d15] border-t border-white/10 px-2 pt-1.5 pb-2.5 shrink-0 z-20">
         <div className="flex items-center justify-between px-1 mb-1 text-[8.5px] font-mono text-zinc-400">
           <div className="flex items-center gap-1.5">
             <span className="font-bold text-[#ebd09b] uppercase tracking-wider">COMMANDER HAND (FIXED 3)</span>
@@ -1674,7 +1697,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                   }
                   setSelectedHandCardId(prev => prev === card.id ? null : card.id);
                 }}
-                className={`relative flex-1 max-w-[120px] h-[146px] rounded-xl border flex flex-col justify-between p-1.5 select-none transition-all cursor-pointer overflow-visible ${
+                className={`relative flex-1 max-w-[120px] h-[132px] sm:h-[138px] rounded-xl border flex flex-col justify-between p-1.5 select-none transition-all cursor-pointer overflow-visible ${
                   isSelected 
                     ? 'border-amber-400 ring-2 ring-amber-400 -translate-y-2 shadow-[0_0_20px_rgba(245,158,11,0.6)] z-30' 
                     : !canAfford
@@ -1759,19 +1782,19 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                 </button>
 
                 {/* Gothic Corner Badges: Attack & Health */}
-                <div className="absolute -bottom-3 -left-3 w-8 h-8 z-20 flex items-center justify-center pointer-events-none">
+                <div className="absolute -bottom-1.5 -left-1.5 w-7 h-7 z-20 flex items-center justify-center pointer-events-none">
                   <img src="/icons/gothic_attack.webp" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded shadow-md" />
                   <span 
-                    className="relative text-[#ff3b30] text-[13px] font-black font-mono leading-none z-10"
+                    className="relative text-[#ff3b30] text-xs font-black font-mono leading-none z-10"
                     style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}
                   >
                     {card.attack}
                   </span>
                 </div>
-                <div className="absolute -bottom-3 -right-3 w-8 h-8 z-20 flex items-center justify-center pointer-events-none">
+                <div className="absolute -bottom-1.5 -right-1.5 w-7 h-7 z-20 flex items-center justify-center pointer-events-none">
                   <img src="/icons/gothic_health.webp" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded shadow-md" />
                   <span 
-                    className="relative text-white text-[13px] font-black font-mono leading-none z-10"
+                    className="relative text-white text-xs font-black font-mono leading-none z-10"
                     style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}
                   >
                     {card.health}
