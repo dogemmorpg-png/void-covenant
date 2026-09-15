@@ -198,7 +198,6 @@ interface BattleFieldViewProps {
   stage: CampaignStage;
   onExitBattle: (victory: boolean) => void;
   battleType?: 'campaign' | 'pvp';
-  isMobile?: boolean;
 }
 
 // Visual text floating effects
@@ -297,7 +296,7 @@ const getSkillDescEnglish = (type: string, value: number) => {
   }
 };
 
-export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitBattle, battleType = 'campaign', isMobile = false }) => {
+export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitBattle, battleType = 'campaign' }) => {
   const { profile, setProfile, submitBattleResult } = useGame();
   const toast = useToast();
   
@@ -1306,26 +1305,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     : null;
 
   return (
-    <div 
-      style={{
-        paddingTop: isMobile ? 'max(2.75rem, env(safe-area-inset-top, 2.75rem))' : undefined,
-        paddingLeft: isMobile ? 'max(0.5rem, env(safe-area-inset-left, 0.5rem))' : undefined,
-        paddingRight: isMobile ? 'max(0.5rem, env(safe-area-inset-right, 0.5rem))' : undefined,
-        paddingBottom: isMobile ? 'max(0.25rem, env(safe-area-inset-bottom, 0.25rem))' : undefined,
-      }}
-      className="h-screen max-h-screen overflow-hidden bg-[#090705] text-gray-200 p-1 sm:p-2 md:p-3 font-sans flex flex-col justify-between select-none relative touch-battle-surface"
-    >
+    <div className="h-screen max-h-screen overflow-hidden bg-[#090705] text-gray-200 p-1 sm:p-2 md:p-3 font-sans flex flex-col justify-between select-none relative touch-battle-surface safe-landscape-padding">
       
       {/* Header Bar */}
-      <div 
-        style={{
-          paddingLeft: isMobile ? 'max(6.75rem, env(safe-area-inset-left, 6.75rem))' : undefined,
-          paddingRight: isMobile ? 'max(6.75rem, env(safe-area-inset-right, 6.75rem))' : undefined,
-        }}
-        className={`bg-[#120d0a]/95 border border-[#ebd09b]/15 rounded-lg p-1.5 px-3 flex justify-between items-center max-w-7xl mx-auto w-full shadow-md shrink-0 z-20 ${
-          isMobile ? 'h-[34px] mb-1' : 'h-[36px] sm:h-[40px] mb-1 sm:mb-2'
-        }`}
-      >
+      <div className="bg-[#120d0a]/95 border border-[#ebd09b]/15 rounded-lg p-1.5 px-3 flex justify-between items-center max-w-7xl mx-auto w-full mb-1 sm:mb-2 shadow-md h-[36px] sm:h-[40px] shrink-0 z-20">
         <button
           onClick={() => {
             const confirmMsg = battleType === 'pvp'
@@ -1338,97 +1321,33 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               onExitBattle(false);
             }
           }}
-          className="flex items-center gap-1 text-[10px] font-mono font-bold text-amber-500 hover:text-white transition-all bg-black/60 py-1 px-2 border border-amber-950/40 rounded cursor-pointer shrink-0"
+          className="flex items-center gap-1 text-[10px] font-mono font-bold text-amber-500 hover:text-white transition-all bg-black/60 py-1 px-2 border border-amber-950/40 rounded cursor-pointer"
         >
           <ArrowLeft className="w-3 h-3" /> ESCAPE
         </button>
 
-        {/* Center: On mobile when animating, show live combat step; otherwise show stage and turn */}
-        {isMobile && isAnimating ? (
-          <div className="flex items-center gap-2 min-w-0 max-w-[340px] px-2 bg-black/60 py-0.5 rounded-md border border-red-900/50">
-            <div className="w-2 h-2 rounded-full bg-red-500 animate-ping shrink-0" />
-            <span className="font-display font-black text-[10px] text-white tracking-wide truncate drop-shadow">
-              {activeLogStepText || 'Combat step...'}
-            </span>
-            <span className="text-[8.5px] font-mono text-amber-400 shrink-0 font-bold">
-              {currentStepIndex + 1}/{animateSequence.length}
-            </span>
-          </div>
-        ) : (
-          <div className="text-center font-display font-black text-xs sm:text-sm tracking-widest text-shadow-gold text-white uppercase flex items-center gap-2 truncate">
-            <span>{stage.name}</span>
-            <span className="text-amber-950">•</span>
-            <span className="text-amber-500 font-mono text-[11px] sm:text-xs font-bold shrink-0">TURN {visualState.turn}</span>
-          </div>
-        )}
+        <div className="text-center font-display font-black text-sm tracking-widest text-shadow-gold text-white uppercase flex items-center gap-3">
+          <span>{stage.name}</span>
+          <span className="text-amber-950">•</span>
+          <span className="text-amber-500 font-mono text-xs font-bold">TURN {visualState.turn}</span>
+        </div>
 
-        <div className="flex items-center gap-1.5 shrink-0">
-          {/* If animating on mobile, show speed multipliers and pause here in header */}
-          {isMobile && isAnimating ? (
-            <div className="flex items-center gap-1">
-              <div className="flex bg-black/60 p-0.5 rounded border border-amber-950/40 h-6 items-center">
-                {[1, 2, 3].map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setSpeedMultiplier(s)}
-                    className={`w-5 h-5 flex items-center justify-center text-[9px] font-mono font-black rounded transition-all cursor-pointer ${
-                      speedMultiplier === s
-                        ? 'bg-gradient-to-b from-amber-400 to-yellow-600 text-black font-bold'
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                  >
-                    {s}x
-                  </button>
-                ))}
-              </div>
-              <button
-                onClick={() => setIsPaused(!isPaused)}
-                className="bg-black/60 hover:bg-amber-950/30 border border-amber-900/40 text-white text-[8px] font-mono font-bold h-6 px-1.5 rounded cursor-pointer transition-all flex items-center gap-1 active:scale-95"
-              >
-                {isPaused ? <Play className="w-2 h-2 text-emerald-400 fill-emerald-400" /> : <Pause className="w-2 h-2 text-yellow-400 fill-yellow-400" />}
-                <span>{isPaused ? 'RES' : 'PAUSE'}</span>
-              </button>
-            </div>
-          ) : (
-            <>
-              {/* DUEL LOG Button in Header */}
-              <button
-                onClick={() => setShowLogDrawer(true)}
-                className="flex items-center gap-1 text-[9.5px] font-mono font-bold text-amber-400 hover:text-white bg-black/60 py-1 px-2 border border-amber-950/40 rounded cursor-pointer transition-all"
-              >
-                <Scroll className="w-3 h-3 text-amber-500" />
-                <span>LOG</span>
-                {visualState.combatLog.length > 1 && (
-                  <span className="bg-red-600 text-white text-[7.5px] font-black px-1 rounded-full leading-none">
-                    {visualState.combatLog.length - 1}
-                  </span>
-                )}
-              </button>
-
-              {/* RULES Button */}
-              <button
-                onClick={() => setShowHelpModal(true)}
-                className="text-[9.5px] font-mono text-[#ebd09b] hover:text-white bg-black/60 py-1 px-2 border border-[#ebd09b]/25 rounded cursor-pointer transition-all"
-              >
-                RULES
-              </button>
-            </>
-          )}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowHelpModal(true)}
+            className="text-[10px] font-mono text-[#ebd09b] hover:text-white bg-black/60 py-1 px-2 border border-[#ebd09b]/25 rounded cursor-pointer transition-all"
+          >
+            RULES
+          </button>
         </div>
       </div>
 
       {/* Main Container */}
-      <div className={`max-w-7xl mx-auto w-full flex-1 flex flex-col justify-between relative min-h-0 ${
-        isMobile ? 'pb-1' : 'pb-16'
-      }`}>
+      <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col justify-between relative min-h-0 pb-16">
         
         {/* Battle Arena - Medieval Fantasy Table */}
         <div 
-          className={`flex-1 flex flex-col justify-center bg-[#120d0a] shadow-[inset_0_0_60px_rgba(0,0,0,0.95),_0_10px_30px_rgba(0,0,0,0.85)] relative min-h-0 overflow-hidden will-change-transform ${
-            isMobile 
-              ? 'border-2 border-[#251a14] rounded-xl p-1.5' 
-              : 'border-[6px] border-[#251a14] rounded-2xl p-4'
-          }`}
+          className="flex-1 flex flex-col justify-center border-[6px] border-[#251a14] bg-[#120d0a] rounded-2xl p-4 shadow-[inset_0_0_60px_rgba(0,0,0,0.95),_0_10px_30px_rgba(0,0,0,0.85)] relative min-h-0 overflow-hidden will-change-transform"
         >
           {/* Wooden Table Board Divider */}
           <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#ebd09b]/15 to-transparent -translate-y-1/2 pointer-events-none z-10" />
@@ -1670,11 +1589,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   '--dodge-duration': `${Math.max(0.2, 0.35 / effectiveSpeed)}s`,
                   '--cast-duration': `${Math.max(0.3, 0.6 / effectiveSpeed)}s`,
                 } as React.CSSProperties}
-                className={`absolute flex items-center z-30 bg-[#100b08]/95 border will-change-transform ${heroAnimClass} ${
-                  isMobile 
-                    ? 'top-1.5 left-1.5 p-1 gap-1.5 rounded-xl' 
-                    : 'top-4 left-4 p-2 gap-3 rounded-2xl'
-                } ${
+                className={`absolute top-4 left-4 flex items-center gap-3 z-30 bg-[#100b08]/95 p-2 rounded-2xl border will-change-transform ${heroAnimClass} ${
                   isEnemyDodge
                     ? 'border-cyan-400 shadow-[0_0_35px_rgba(6,182,212,0.95)]'
                     : isEnemyHit 
@@ -1685,7 +1600,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 }`}
               >
                 <div className="relative">
-                  <div className={`${isMobile ? 'w-10 h-10' : 'w-18 h-18'} rounded-full border-2 border-red-700/80 bg-[#1c0808] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center`}>
+                  <div className="w-18 h-18 rounded-full border-4 border-red-700/80 bg-[#1c0808] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
                     {renderFloatingTextsFor('enemy-hero')}
                     {stage.enemyHeroImage && (stage.enemyHeroImage.startsWith('/') || stage.enemyHeroImage.startsWith('http')) ? (
                       <img 
@@ -1701,15 +1616,15 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     )}
                   </div>
                   {/* Health Shield */}
-                  <div className={`absolute -bottom-1 -right-1 ${isMobile ? 'w-6 h-6' : 'w-8 h-8'} rounded-full bg-gradient-to-br from-red-600 to-red-800 border-2 border-red-300 flex items-center justify-center shadow-lg z-30`}>
-                    <span className={`text-white ${isMobile ? 'text-[10px]' : 'text-xs'} font-black font-mono leading-none select-none`}>{visualState.enemyHeroHealth}</span>
+                  <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-gradient-to-br from-red-600 to-red-800 border-2 border-red-300 flex items-center justify-center shadow-lg z-30">
+                    <span className="text-white text-xs font-black font-mono leading-none select-none">{visualState.enemyHeroHealth}</span>
                   </div>
                 </div>
                 <div>
                   <span className="text-[8px] font-mono font-bold text-red-500/70 tracking-wider uppercase block leading-none">Enemy Lord</span>
                   <h4 className="font-display font-black text-xs text-white mt-1 leading-none">{stage.enemyHeroName}</h4>
                   <div className="flex items-center gap-1 mt-1 bg-black/40 px-1.5 py-0.5 rounded border border-red-950/20">
-                    {renderManaIcon(visualState.enemyMana || 0, isMobile ? "w-4 h-4" : "w-5 h-5")}
+                    {renderManaIcon(visualState.enemyMana || 0, "w-5 h-5")}
                     <span className="text-[10px] font-mono font-bold text-cyan-400 leading-none pl-0.5">
                       / {visualState.enemyMaxMana || 0}
                     </span>
@@ -1732,11 +1647,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   '--dodge-duration': `${Math.max(0.2, 0.35 / effectiveSpeed)}s`,
                   '--cast-duration': `${Math.max(0.3, 0.6 / effectiveSpeed)}s`,
                 } as React.CSSProperties}
-                className={`absolute flex items-center z-30 bg-[#100b08]/95 border will-change-transform ${heroAnimClass} ${
-                  isMobile 
-                    ? 'bottom-1.5 left-1.5 p-1 gap-1.5 rounded-xl' 
-                    : 'bottom-4 left-4 p-2 gap-3 rounded-2xl'
-                } ${
+                className={`absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-[#100b08]/95 p-2 rounded-2xl border will-change-transform ${heroAnimClass} ${
                   isPlayerDodge
                     ? 'border-cyan-400 shadow-[0_0_35px_rgba(6,182,212,0.95)]'
                     : isPlayerHit 
@@ -1747,7 +1658,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 }`}
               >
                 <div className="relative">
-                  <div className={`${isMobile ? 'w-10 h-10' : 'w-18 h-18'} rounded-full border-2 border-cyan-600/80 bg-[#0d161d] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center`}>
+                  <div className="w-18 h-18 rounded-full border-4 border-cyan-600/80 bg-[#0d161d] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
                     {renderFloatingTextsFor('player-hero')}
                     {profile.avatarUrl ? (
                       <img 
@@ -1763,15 +1674,15 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     )}
                   </div>
                   {/* Health Shield */}
-                  <div className={`absolute -bottom-1 -right-1 ${isMobile ? 'w-6 h-6' : 'w-8 h-8'} rounded-full bg-gradient-to-br from-red-600 to-red-800 border-2 border-red-300 flex items-center justify-center shadow-lg z-30`}>
-                    <span className={`text-white ${isMobile ? 'text-[10px]' : 'text-xs'} font-black font-mono leading-none select-none`}>{visualState.playerHeroHealth}</span>
+                  <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-gradient-to-br from-red-600 to-red-800 border-2 border-red-300 flex items-center justify-center shadow-lg z-30">
+                    <span className="text-white text-xs font-black font-mono leading-none select-none">{visualState.playerHeroHealth}</span>
                   </div>
                 </div>
                 <div>
                   <span className="text-[8px] font-mono font-bold text-cyan-400/70 tracking-wider uppercase block leading-none">Your Hero</span>
                   <h4 className="font-display font-black text-xs text-white mt-1 leading-none">{profile.username || 'Summoner'}</h4>
                   <div className="flex items-center gap-1 mt-1 bg-black/40 px-1.5 py-0.5 rounded border border-cyan-950/20">
-                    {renderManaIcon(visualState.playerMana || 0, isMobile ? "w-4 h-4" : "w-5 h-5")}
+                    {renderManaIcon(visualState.playerMana || 0, "w-5 h-5")}
                     <span className="text-[10px] font-mono font-bold text-cyan-400 leading-none pl-0.5">
                       / {visualState.playerMaxMana || 0}
                     </span>
@@ -1782,32 +1693,28 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           })()}
 
           {/* Hearthstone Style Flip End Turn Button (Right center) */}
-          <div className={`absolute top-1/2 -translate-y-1/2 z-35 ${isMobile ? 'right-2' : 'right-4'}`}>
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 z-35">
             {!selectedHandCardId ? (
               <button
                 disabled={isSimulating}
                 onClick={handleEndTurnWithoutCard}
-                className={`${
-                  isMobile ? 'w-[72px] h-[32px] text-[9px]' : 'w-[86px] h-[36px] text-[10px]'
-                } bg-gradient-to-b from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 disabled:from-gray-800 disabled:to-gray-900 border-2 border-[#ebd09b]/80 disabled:border-gray-800 text-black disabled:text-gray-600 font-display font-black uppercase tracking-wider rounded-md shadow-[0_4px_12px_rgba(0,0,0,0.6),_0_0_8px_rgba(235,208,155,0.15)] hover:shadow-[0_4px_15px_rgba(235,208,155,0.35),_0_0_12px_rgba(235,208,155,0.25)] transition-all active:scale-95 cursor-pointer flex items-center justify-center leading-none`}
+                className={`w-[86px] h-[36px] bg-gradient-to-b from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 disabled:from-gray-800 disabled:to-gray-900 border-2 border-[#ebd09b]/80 disabled:border-gray-800 text-black disabled:text-gray-600 font-display font-black text-[10px] uppercase tracking-wider rounded-md shadow-[0_4px_12px_rgba(0,0,0,0.6),_0_0_8px_rgba(235,208,155,0.15)] hover:shadow-[0_4px_15px_rgba(235,208,155,0.35),_0_0_12px_rgba(235,208,155,0.25)] transition-all active:scale-95 cursor-pointer flex items-center justify-center leading-none`}
               >
                 {isSimulating ? 'PLAYING' : 'END TURN'}
               </button>
             ) : (
               <button
                 onClick={() => setSelectedHandCardId(null)}
-                className={`${
-                  isMobile ? 'w-[72px] h-[32px] text-[8px]' : 'w-[86px] h-[36px] text-[9px]'
-                } bg-gradient-to-b from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 border-2 border-red-500 text-white font-display font-black uppercase tracking-wider rounded-md shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center leading-none`}
+                className="w-[86px] h-[36px] bg-gradient-to-b from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 border-2 border-red-500 text-white font-display font-black text-[9px] uppercase tracking-wider rounded-md shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center leading-none"
               >
                 ✕ CANCEL
               </button>
             )}
           </div>
 
-          {/* PLAYBACK ACTION BANNER / CONTROLLER (DESKTOP ONLY - on mobile it is in Header) */}
+          {/* PLAYBACK ACTION BANNER / CONTROLLER */}
           <AnimatePresence mode="wait">
-            {!isMobile && isAnimating && (
+            {isAnimating && (
               <motion.div
                 initial={{ opacity: 0, y: -15, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -1878,9 +1785,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           </AnimatePresence>
 
           {/* BOARD STAGE FIELD (LINEAR DUELS) - centered board */}
-          <div className={`flex-1 flex flex-col justify-center min-h-0 relative ${
-            isMobile ? 'gap-1.5 my-0.5 py-1' : 'gap-8 md:gap-10 my-2 py-14'
-          }`}>
+          <div className="flex-1 flex flex-col justify-center gap-8 md:gap-10 my-2 min-h-0 relative py-14">
             
             {/* 1. ENEMY BOARD */}
             <div className="grid grid-cols-5 gap-3 relative">
@@ -1917,7 +1822,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                               : "shadow-[0_4px_10px_rgba(0,0,0,0.4)]";
 
                 return (
-                  <div key={idx} className={`relative aspect-[13/18] ${isMobile ? 'max-h-[122px] max-w-[88px]' : 'max-h-[190px] max-w-[140px]'} mx-auto w-full shrink-0`}>
+                  <div key={idx} className="relative aspect-[13/18] max-h-[190px] max-w-[140px] mx-auto w-full shrink-0">
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       {renderFloatingTextsFor({ side: 'enemy', slot: idx })}
                     </div>
@@ -1939,8 +1844,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                                 setHoveredCard(prev => (prev?.id === card.id ? null : card));
                               }
                             }}
-                            onMouseEnter={() => !isMobile && card && setHoveredCard(card)}
-                            onMouseLeave={() => !isMobile && setHoveredCard(null)}
+                            onMouseEnter={() => card && setHoveredCard(card)}
+                            onMouseLeave={() => setHoveredCard(null)}
                             style={{
                               borderColor: isHit ? '#ef4444' : (isPlagueCasting ? '#10b981' : (isPlagueTargeted ? '#84cc16' : (isActing ? '#f59e0b' : (isTargeted ? '#f43f5e' : getTierBorderColor(card.tier))))),
                               '--strike-x': `${strikeX}px`,
@@ -1949,7 +1854,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                               '--anim-duration': `${Math.max(0.25, 0.72 / effectiveSpeed)}s`,
                               '--recoil-duration': `${Math.max(0.18, 0.32 / effectiveSpeed)}s`,
                             } as React.CSSProperties}
-                            className={`w-full h-full rounded-xl border flex flex-col justify-between ${isMobile ? 'p-1 pb-1.5' : 'p-1.5 pb-2'} text-center relative overflow-visible select-none bg-[#151a21] text-white cursor-help ${borderGlowClass} ${
+                            className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none bg-[#151a21] text-white cursor-help ${borderGlowClass} ${
                               isActing
                                 ? 'anim-card-strike-enemy'
                                 : isHit
@@ -1979,46 +1884,46 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                                   <img 
                                     src="/icons/gothic_hourglass.webp" 
                                     alt="Locked" 
-                                    className={`${isMobile ? 'w-7 h-7' : 'w-10 h-10'} object-contain rounded-full border border-purple-500/30 shadow-[0_0_12px_rgba(168,85,247,0.5)]`} 
+                                    className="w-10 h-10 object-contain rounded-full border border-purple-500/30 shadow-[0_0_12px_rgba(168,85,247,0.5)]" 
                                   />
-                                  <div className={`absolute -bottom-2 bg-gradient-to-b from-[#180f2b] to-[#0c051a] border border-[#a855f7]/60 rounded-full ${isMobile ? 'w-4.5 h-4.5' : 'w-5 h-5'} flex items-center justify-center shadow-lg`}>
-                                    <span className={`text-[#c084fc] ${isMobile ? 'text-[8.5px]' : 'text-[10px]'} font-black font-mono leading-none`}>{card.delay}</span>
+                                  <div className="absolute -bottom-2.5 bg-gradient-to-b from-[#180f2b] to-[#0c051a] border border-[#a855f7]/60 rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
+                                    <span className="text-[#c084fc] text-[10px] font-black font-mono leading-none">{card.delay}</span>
                                   </div>
                                 </div>
                               </div>
                             )}
                           </div>
 
-                          <div className="flex justify-between items-center text-[7.5px] md:text-[8px] font-mono font-black text-gray-400 z-10 relative px-1">
+                          <div className="flex justify-between items-center text-[7px] md:text-[8px] font-mono font-black text-gray-400 z-10 relative px-1">
                             <span className={`uppercase tracking-wider ${getTierTextColor(card.tier)}`}>
                               {card.tier}
                             </span>
                             <span>Lvl {card.level}</span>
                           </div>
 
-                          <div className={`mt-0.5 z-10 relative ${isMobile ? 'px-0.5 py-0' : 'px-1 py-0.5'} bg-black/50 rounded border border-white/5`}>
-                            <span className={`${isMobile ? 'text-[9px]' : 'text-[10px] md:text-[11px]'} font-display font-black tracking-tight text-white block truncate leading-tight`}>
+                          <div className="mt-1 z-10 relative px-1 bg-black/45 py-0.5 rounded border border-white/5">
+                            <span className="text-[10px] md:text-[11px] font-display font-black tracking-tight text-white block truncate leading-none">
                               {card.name}
                             </span>
                           </div>
 
                           {/* Dedicated skills bar at the bottom center */}
-                          <div className={`w-full ${isMobile ? 'py-0.5 gap-0.5 max-h-[24px]' : 'py-1 gap-1 max-h-[30px]'} bg-black/60 border-y border-white/5 flex justify-center z-10 relative flex-wrap overflow-visible mt-auto mb-1`}>
+                          <div className="w-full py-1 bg-black/60 border-y border-white/5 flex justify-center gap-1 z-10 relative flex-wrap max-h-[30px] overflow-visible mt-auto mb-1">
                             {card.skills.map((s, sIdx) => (
                               <div 
                                 key={sIdx}
-                                className={`flex items-center gap-0.5 ${isMobile ? 'text-[8px] px-1 py-0' : 'text-[9px] px-1.5 py-0.5'} font-mono font-black rounded-full border ${getSkillBadgeStyle(s.type)}`}
+                                className={`flex items-center gap-0.5 text-[9px] font-mono font-black px-1.5 py-0.5 rounded-full border ${getSkillBadgeStyle(s.type)}`}
                               >
                                 <span>{getSkillIcon(s.type)}</span>
                                 <span className="leading-none">{s.value}</span>
                               </div>
                             ))}
                             {card.skills.length === 0 && (
-                              <span className={`${isMobile ? 'text-[7px]' : 'text-[7.5px]'} font-mono font-bold text-gray-500 uppercase tracking-widest leading-none my-0.5`}>No Skills</span>
+                              <span className="text-[7.5px] font-mono font-bold text-gray-500 uppercase tracking-widest leading-none my-0.5">No Skills</span>
                             )}
                           </div>
 
-                          <div className="w-full bg-black/50 h-1 rounded-full overflow-hidden z-10 border border-black/30 relative mb-1 shrink-0">
+                          <div className="w-full bg-black/50 h-1 rounded-full overflow-hidden z-10 border border-black/30 relative mb-1.5 shrink-0">
                             <motion.div
                               className="bg-red-500 h-full w-full rounded-full origin-left transform-gpu will-change-transform"
                               animate={{ scaleX: Math.max(0, card.health / card.maxHealth) }}
@@ -2027,13 +1932,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           </div>
 
                           {/* Gothic style corner badges (NO emojis) */}
-                          <div className={`absolute ${isMobile ? '-bottom-2.5 -left-2.5 w-7 h-7' : '-bottom-3.5 -left-3.5 w-9 h-9'} z-20 flex items-center justify-center`}>
+                          <div className="absolute -bottom-3.5 -left-3.5 w-9 h-9 z-20 flex items-center justify-center">
                             <img src="/icons/gothic_attack.webp" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                            <span className={`relative text-[#ff3b30] ${isMobile ? 'text-[12px]' : 'text-[15px]'} font-black font-mono leading-none select-none z-10`} style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{card.attack}</span>
+                            <span className="relative text-[#ff3b30] text-[15px] font-black font-mono leading-none select-none z-10" style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{card.attack}</span>
                           </div>
-                          <div className={`absolute ${isMobile ? '-bottom-2.5 -right-2.5 w-7 h-7' : '-bottom-3.5 -right-3.5 w-9 h-9'} z-20 flex items-center justify-center`}>
+                          <div className="absolute -bottom-3.5 -right-3.5 w-9 h-9 z-20 flex items-center justify-center">
                             <img src="/icons/gothic_health.webp" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                            <span className={`relative text-[#ffffff] ${isMobile ? 'text-[12px]' : 'text-[15px]'} font-black font-mono leading-none select-none z-10`} style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{card.health}</span>
+                            <span className="relative text-[#ffffff] text-[15px] font-black font-mono leading-none select-none z-10" style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{card.health}</span>
                           </div>
 
                           {/* Persistent Armor Badge */}
@@ -2172,7 +2077,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                               : "shadow-[0_4px_10px_rgba(0,0,0,0.4)]";
 
                 return (
-                  <div key={idx} className={`relative aspect-[13/18] ${isMobile ? 'max-h-[122px] max-w-[88px]' : 'max-h-[190px] max-w-[140px]'} mx-auto w-full shrink-0`}>
+                  <div key={idx} className="relative aspect-[13/18] max-h-[190px] max-w-[140px] mx-auto w-full shrink-0">
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       {renderFloatingTextsFor({ side: 'player', slot: idx })}
                     </div>
@@ -2194,8 +2099,8 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                                 setHoveredCard(prev => (prev?.id === card.id ? null : card));
                               }
                             }}
-                            onMouseEnter={() => !isMobile && card && setHoveredCard(card)}
-                            onMouseLeave={() => !isMobile && setHoveredCard(null)}
+                            onMouseEnter={() => card && setHoveredCard(card)}
+                            onMouseLeave={() => setHoveredCard(null)}
                             style={{
                               borderColor: isHit ? '#ef4444' : (isPlagueCasting ? '#10b981' : (isPlagueTargeted ? '#84cc16' : (isActing ? '#f59e0b' : (isTargeted ? '#f43f5e' : getTierBorderColor(card.tier))))),
                               '--strike-x': `${strikeX}px`,
@@ -2204,7 +2109,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                               '--anim-duration': `${Math.max(0.25, 0.72 / effectiveSpeed)}s`,
                               '--recoil-duration': `${Math.max(0.18, 0.32 / effectiveSpeed)}s`,
                             } as React.CSSProperties}
-                            className={`w-full h-full rounded-xl border flex flex-col justify-between ${isMobile ? 'p-1 pb-1.5' : 'p-1.5 pb-2'} text-center relative overflow-visible select-none bg-[#151a21] text-white cursor-help ${borderGlowClass} ${
+                            className={`w-full h-full rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible select-none bg-[#151a21] text-white cursor-help ${borderGlowClass} ${
                               isActing
                                 ? 'anim-card-strike-player'
                                 : isHit
@@ -2234,46 +2139,46 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                                   <img 
                                     src="/icons/gothic_hourglass.webp" 
                                     alt="Locked" 
-                                    className={`${isMobile ? 'w-7 h-7' : 'w-10 h-10'} object-contain rounded-full border border-purple-500/30 shadow-[0_0_12px_rgba(168,85,247,0.5)]`} 
+                                    className="w-10 h-10 object-contain rounded-full border border-purple-500/30 shadow-[0_0_12px_rgba(168,85,247,0.5)]" 
                                   />
-                                  <div className={`absolute -bottom-2 bg-gradient-to-b from-[#180f2b] to-[#0c051a] border border-[#a855f7]/60 rounded-full ${isMobile ? 'w-4.5 h-4.5' : 'w-5 h-5'} flex items-center justify-center shadow-lg`}>
-                                    <span className={`text-[#c084fc] ${isMobile ? 'text-[8.5px]' : 'text-[10px]'} font-black font-mono leading-none`}>{card.delay}</span>
+                                  <div className="absolute -bottom-2.5 bg-gradient-to-b from-[#180f2b] to-[#0c051a] border border-[#a855f7]/60 rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
+                                    <span className="text-[#c084fc] text-[10px] font-black font-mono leading-none">{card.delay}</span>
                                   </div>
                                 </div>
                               </div>
                             )}
                           </div>
 
-                          <div className="flex justify-between items-center text-[7.5px] md:text-[8px] font-mono font-black text-gray-400 z-10 relative px-1">
+                          <div className="flex justify-between items-center text-[7px] md:text-[8px] font-mono font-black text-gray-400 z-10 relative px-1">
                             <span className={`uppercase tracking-wider ${getTierTextColor(card.tier)}`}>
                               {card.tier}
                             </span>
                             <span>Lvl {card.level}</span>
                           </div>
 
-                          <div className={`mt-0.5 z-10 relative ${isMobile ? 'px-0.5 py-0' : 'px-1 py-0.5'} bg-black/50 rounded border border-white/5`}>
-                            <span className={`${isMobile ? 'text-[9px]' : 'text-[10px] md:text-[11px]'} font-display font-black tracking-tight text-white block truncate leading-tight`}>
+                          <div className="mt-1 z-10 relative px-1 bg-black/45 py-0.5 rounded border border-white/5">
+                            <span className="text-[10px] md:text-[11px] font-display font-black tracking-tight text-white block truncate leading-none">
                               {card.name}
                             </span>
                           </div>
 
                           {/* Dedicated skills bar at the bottom center */}
-                          <div className={`w-full ${isMobile ? 'py-0.5 gap-0.5 max-h-[24px]' : 'py-1 gap-1 max-h-[30px]'} bg-black/60 border-y border-white/5 flex justify-center z-10 relative flex-wrap overflow-visible mt-auto mb-1`}>
+                          <div className="w-full py-1 bg-black/60 border-y border-white/5 flex justify-center gap-1 z-10 relative flex-wrap max-h-[30px] overflow-visible mt-auto mb-1">
                             {card.skills.map((s, sIdx) => (
                               <div 
                                 key={sIdx}
-                                className={`flex items-center gap-0.5 ${isMobile ? 'text-[8px] px-1 py-0' : 'text-[9px] px-1.5 py-0.5'} font-mono font-black rounded-full border ${getSkillBadgeStyle(s.type)}`}
+                                className={`flex items-center gap-0.5 text-[9px] font-mono font-black px-1.5 py-0.5 rounded-full border ${getSkillBadgeStyle(s.type)}`}
                               >
                                 <span>{getSkillIcon(s.type)}</span>
                                 <span className="leading-none">{s.value}</span>
                               </div>
                             ))}
                             {card.skills.length === 0 && (
-                              <span className={`${isMobile ? 'text-[7px]' : 'text-[7.5px]'} font-mono font-bold text-gray-500 uppercase tracking-widest leading-none my-0.5`}>No Skills</span>
+                              <span className="text-[7.5px] font-mono font-bold text-gray-500 uppercase tracking-widest leading-none my-0.5">No Skills</span>
                             )}
                           </div>
 
-                          <div className="w-full bg-black/50 h-1 rounded-full overflow-hidden z-10 border border-black/30 relative mb-1 shrink-0">
+                          <div className="w-full bg-black/50 h-1 rounded-full overflow-hidden z-10 border border-black/30 relative mb-1.5 shrink-0">
                             <motion.div
                               className="bg-emerald-500 h-full w-full rounded-full origin-left transform-gpu will-change-transform"
                               animate={{ scaleX: Math.max(0, card.health / card.maxHealth) }}
@@ -2282,13 +2187,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           </div>
 
                           {/* Gothic style corner badges (NO emojis) */}
-                          <div className={`absolute ${isMobile ? '-bottom-2.5 -left-2.5 w-7 h-7' : '-bottom-3.5 -left-3.5 w-9 h-9'} z-20 flex items-center justify-center`}>
+                          <div className="absolute -bottom-3.5 -left-3.5 w-9 h-9 z-20 flex items-center justify-center">
                             <img src="/icons/gothic_attack.webp" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                            <span className={`relative text-[#ff3b30] ${isMobile ? 'text-[12px]' : 'text-[15px]'} font-black font-mono leading-none select-none z-10`} style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{card.attack}</span>
+                            <span className="relative text-[#ff3b30] text-[15px] font-black font-mono leading-none select-none z-10" style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{card.attack}</span>
                           </div>
-                          <div className={`absolute ${isMobile ? '-bottom-2.5 -right-2.5 w-7 h-7' : '-bottom-3.5 -right-3.5 w-9 h-9'} z-20 flex items-center justify-center`}>
+                          <div className="absolute -bottom-3.5 -right-3.5 w-9 h-9 z-20 flex items-center justify-center">
                             <img src="/icons/gothic_health.webp" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                            <span className={`relative text-[#ffffff] ${isMobile ? 'text-[12px]' : 'text-[15px]'} font-black font-mono leading-none select-none z-10`} style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{card.health}</span>
+                            <span className="relative text-[#ffffff] text-[15px] font-black font-mono leading-none select-none z-10" style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{card.health}</span>
                           </div>
 
                           {/* Persistent Armor Badge */}
@@ -2426,21 +2331,19 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
           )}
         </AnimatePresence>
 
-        {/* Collapsible log button (DESKTOP ONLY - on mobile it is in Header) */}
-        {!isMobile && (
-          <button
-            onClick={() => setShowLogDrawer(true)}
-            className="absolute top-14 right-4 bg-[#120d0a]/95 border border-[#ebd09b]/25 hover:border-amber-500 text-[#ebd09b] hover:text-white px-3 py-1.5 rounded-lg cursor-pointer shadow-lg transition-all z-35 flex items-center gap-1.5 font-display font-black text-[10px] uppercase tracking-wider group"
-          >
-            <Scroll className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-            <span>DUEL LOG</span>
-            {visualState.combatLog.length > 1 && (
-              <span className="bg-red-600 text-white font-mono text-[8px] font-black px-1.5 py-0.2 rounded-full border border-black animate-pulse leading-none">
-                {visualState.combatLog.length - 1}
-              </span>
-            )}
-          </button>
-        )}
+        {/* Collapsible log button */}
+        <button
+          onClick={() => setShowLogDrawer(true)}
+          className="absolute top-14 right-4 bg-[#120d0a]/95 border border-[#ebd09b]/25 hover:border-amber-500 text-[#ebd09b] hover:text-white px-3 py-1.5 rounded-lg cursor-pointer shadow-lg transition-all z-35 flex items-center gap-1.5 font-display font-black text-[10px] uppercase tracking-wider group"
+        >
+          <Scroll className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+          <span>DUEL LOG</span>
+          {visualState.combatLog.length > 1 && (
+            <span className="bg-red-600 text-white font-mono text-[8px] font-black px-1.5 py-0.2 rounded-full border border-black animate-pulse leading-none">
+              {visualState.combatLog.length - 1}
+            </span>
+          )}
+        </button>
 
         {/* Combat Log Drawer Overlay (REDESIGNED AAA CHRONICLE) */}
         <AnimatePresence>
@@ -2458,13 +2361,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 animate={{ x: 0 }}
                 exit={{ x: '100%' }}
                 transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-                style={{
-                  paddingTop: isMobile ? 'max(2.5rem, env(safe-area-inset-top, 2.5rem))' : undefined,
-                  paddingBottom: isMobile ? 'max(0.5rem, env(safe-area-inset-bottom, 0.5rem))' : undefined,
-                }}
-                className={`fixed right-0 top-0 bottom-0 ${
-                  isMobile ? 'w-[85vw] max-w-[320px] p-2.5' : 'w-88 sm:w-[420px] p-4 sm:p-5'
-                } bg-gradient-to-b from-[#131822] via-[#0d1017] to-[#0a0d13] border-l border-[#ebd09b]/35 z-50 flex flex-col justify-between shadow-[-10px_0_40px_rgba(0,0,0,0.85)]`}
+                className="fixed right-0 top-0 bottom-0 w-88 sm:w-[420px] bg-gradient-to-b from-[#131822] via-[#0d1017] to-[#0a0d13] border-l border-[#ebd09b]/35 z-50 p-4 sm:p-5 flex flex-col justify-between shadow-[-10px_0_40px_rgba(0,0,0,0.85)]"
               >
                 {/* Header */}
                 <div className="border-b border-gray-800 pb-3 mb-2 space-y-2.5">
@@ -2699,17 +2596,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className={`absolute ${
-                isMobile 
-                  ? 'bottom-2 left-1/2 -translate-x-1/2 w-[92vw] max-w-[380px] p-3' 
-                  : 'bottom-[170px] left-3 sm:left-6 max-w-[94vw] w-[360px] p-3.5 sm:p-4'
-              } bg-[#0d1117]/98 border-2 border-[#ebd09b]/40 rounded-2xl z-45 shadow-[0_10px_40px_rgba(0,0,0,0.95)] pointer-events-auto text-left flex gap-3`}
+              className="absolute bottom-[170px] left-3 sm:left-6 max-w-[94vw] w-[360px] bg-[#0d1117]/98 border-2 border-[#ebd09b]/35 rounded-2xl p-3.5 sm:p-4 z-45 shadow-[0_10px_35px_rgba(0,0,0,0.9)] pointer-events-auto text-left flex gap-3.5"
             >
               {/* Card visual representation inside analyzer */}
               <div 
-                className={`${
-                  isMobile ? 'w-[90px] h-[126px] p-1 pb-1.5' : 'w-[100px] sm:w-[110px] h-[145px] sm:h-[155px] p-1.5 pb-2'
-                } rounded-xl border flex flex-col justify-between text-center relative overflow-visible bg-[#151a21] text-white shadow-md shrink-0`}
+                className="w-[100px] sm:w-[110px] h-[145px] sm:h-[155px] rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible bg-[#151a21] text-white shadow-md shrink-0"
                 style={{ borderColor: getTierBorderColor(hoveredCard.tier) }}
               >
                 {/* Background art */}
@@ -2727,10 +2618,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         <img 
                           src="/icons/gothic_hourglass.webp" 
                           alt="Locked" 
-                          className="w-8 h-8 object-contain rounded-full border border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.5)]" 
+                          className="w-9 h-9 object-contain rounded-full border border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.5)]" 
                         />
                         <div className="absolute -bottom-2 bg-gradient-to-b from-[#180f2b] to-[#0c051a] border border-[#a855f7]/60 rounded-full w-4.5 h-4.5 flex items-center justify-center shadow-lg">
-                          <span className="text-[#c084fc] text-[8.5px] font-black font-mono leading-none">{hoveredCard.delay}</span>
+                          <span className="text-[#c084fc] text-[9px] font-black font-mono leading-none">{hoveredCard.delay}</span>
                         </div>
                       </div>
                     </div>
@@ -2742,38 +2633,38 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   <span>Lvl {hoveredCard.level}</span>
                 </div>
 
-                <div className="mt-0.5 z-10 relative bg-black/45 py-0.5 rounded border border-white/5">
-                  <span className={`${isMobile ? 'text-[8.5px]' : 'text-[10px]'} font-display font-black tracking-tight text-white block truncate leading-none`}>
+                <div className="mt-1 z-10 relative bg-black/45 py-0.5 rounded border border-white/5">
+                  <span className="text-[10px] font-display font-black tracking-tight text-white block truncate leading-none">
                     {hoveredCard.name}
                   </span>
                 </div>
 
                 {/* Dedicated skills bar at the bottom center */}
-                <div className="w-full py-0.5 bg-black/60 border-y border-white/5 flex justify-center gap-0.5 z-10 relative flex-wrap max-h-[26px] overflow-visible mt-auto mb-1">
+                <div className="w-full py-0.5 bg-black/60 border-y border-white/5 flex justify-center gap-1 z-10 relative flex-wrap max-h-[30px] overflow-visible mt-auto mb-1">
                   {hoveredCard.skills.map((s, sIdx) => (
                     <div 
                       key={sIdx}
-                      className={`flex items-center gap-0.5 ${isMobile ? 'text-[7.5px] px-1 py-0' : 'text-[8.5px] px-1.5 py-0.5'} font-mono font-black rounded-full border ${getSkillBadgeStyle(s.type)}`}
+                      className={`flex items-center gap-0.5 text-[8.5px] font-mono font-black px-1.5 py-0.5 rounded-full border ${getSkillBadgeStyle(s.type)}`}
                     >
                       <span>{getSkillIcon(s.type)}</span>
                       <span className="leading-none">{s.value}</span>
                     </div>
                   ))}
                   {hoveredCard.skills.length === 0 && (
-                    <span className="text-[7px] font-mono font-bold text-gray-500 uppercase tracking-widest leading-none my-0.5">No Skills</span>
+                    <span className="text-[7.5px] font-mono font-bold text-gray-500 uppercase tracking-widest leading-none my-0.5">No Skills</span>
                   )}
                 </div>
 
                 <div className="h-1 shrink-0" />
 
                 {/* Corner badges */}
-                <div className={`absolute ${isMobile ? '-bottom-2 -left-2 w-6 h-6' : '-bottom-3 -left-3 w-8 h-8'} z-20 flex items-center justify-center`}>
+                <div className="absolute -bottom-3 -left-3 w-8 h-8 z-20 flex items-center justify-center">
                   <img src="/icons/gothic_attack.webp" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                  <span className={`relative text-[#ff3b30] ${isMobile ? 'text-[10px]' : 'text-[12.5px]'} font-black font-mono leading-none z-10`} style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{hoveredCard.attack}</span>
+                  <span className="relative text-[#ff3b30] text-[12.5px] font-black font-mono leading-none z-10" style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px -2px 2px #000, 0 0 5px #000' }}>{hoveredCard.attack}</span>
                 </div>
-                <div className={`absolute ${isMobile ? '-bottom-2 -right-2 w-6 h-6' : '-bottom-3 -right-3 w-8 h-8'} z-20 flex items-center justify-center`}>
+                <div className="absolute -bottom-3 -right-3 w-8 h-8 z-20 flex items-center justify-center">
                   <img src="/icons/gothic_health.webp" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                  <span className={`relative text-[#ffffff] ${isMobile ? 'text-[10px]' : 'text-[12.5px]'} font-black font-mono leading-none z-10`} style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{hoveredCard.health}</span>
+                  <span className="relative text-[#ffffff] text-[12.5px] font-black font-mono leading-none z-10" style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px -2px 2px #000, 0 0 5px #000' }}>{hoveredCard.health}</span>
                 </div>
 
                 {/* Persistent Armor Badge */}
@@ -2790,41 +2681,41 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     <h4 className="font-display font-black text-sm text-white leading-none mb-1">{hoveredCard.name}</h4>
                     <button
                       onClick={() => setHoveredCard(null)}
-                      className="text-gray-400 hover:text-white p-0.5 rounded hover:bg-white/10 transition-colors cursor-pointer"
+                      className="text-gray-400 hover:text-white p-0.5 rounded hover:bg-white/10 transition-colors"
                       title="Close"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <div className="flex gap-2 text-[9px] font-mono text-gray-400 border-b border-gray-800 pb-1 mb-1">
+                  <div className="flex gap-2 text-[9px] font-mono text-gray-400 border-b border-gray-800 pb-1.5 mb-1.5">
                     <span className="text-[#ebd09b] font-bold">{hoveredCard.tier.toUpperCase()}</span>
                     <span>•</span>
                     <span>Level {hoveredCard.level}</span>
                   </div>
                   
-                  <div className="space-y-1.5 pr-1 max-h-[70px] overflow-y-auto custom-scrollbar">
+                  <div className="space-y-2 pr-1">
                     {hoveredCard.skills.map((s, sIdx) => (
                       <div key={sIdx} className="space-y-0.5">
-                        <div className="font-mono font-black text-[9.5px] flex items-center gap-1 text-white">
+                        <div className="font-mono font-black text-[10px] flex items-center gap-1 text-white">
                           <span>{getSkillIcon(s.type)}</span>
                           <span className="uppercase tracking-wider">{getSkillNameEnglish(s.type)} {s.value}</span>
                         </div>
-                        <p className="text-gray-400 font-sans text-[9px] leading-relaxed pl-4">{getSkillDescEnglish(s.type, s.value)}</p>
+                        <p className="text-gray-400 font-sans text-[9.5px] leading-relaxed pl-4">{getSkillDescEnglish(s.type, s.value)}</p>
                       </div>
                     ))}
                     {hoveredCard.skills.length === 0 && (
-                      <p className="text-[9px] text-gray-500 font-mono italic">No special abilities.</p>
+                      <p className="text-[9.5px] text-gray-500 font-mono italic">No special abilities.</p>
                     )}
                   </div>
                 </div>
 
-                <div className="bg-black/45 p-1 rounded-lg border border-gray-800/60 grid grid-cols-2 gap-1 text-center font-mono text-[8.5px] mt-1">
-                  <div className="bg-slate-900/50 p-0.5 rounded border border-slate-700/40">
-                    <span className="text-slate-400 text-[6.5px] block font-bold uppercase tracking-wider">ARMOR</span>
+                <div className="bg-black/45 p-1.5 rounded-lg border border-gray-800/60 grid grid-cols-2 gap-1 text-center font-mono text-[9px] mt-1.5">
+                  <div className="bg-slate-900/50 p-1 rounded border border-slate-700/40">
+                    <span className="text-slate-400 text-[7px] block font-bold uppercase tracking-wider">ARMOR</span>
                     <span className="text-cyan-300 font-bold">🛡️ {hoveredCard.armor || 0}</span>
                   </div>
-                  <div className="bg-amber-950/40 p-0.5 rounded border border-amber-700/40">
-                    <span className="text-amber-400 text-[6.5px] block font-bold uppercase tracking-wider">BARRIER</span>
+                  <div className="bg-amber-950/40 p-1 rounded border border-amber-700/40">
+                    <span className="text-amber-400 text-[7px] block font-bold uppercase tracking-wider">BARRIER</span>
                     <span className="text-amber-300 font-bold">{(hoveredCard.barrier ?? hoveredCard.ward) ? '✨ ACTIVE' : 'NONE'}</span>
                   </div>
                 </div>
@@ -2834,9 +2725,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         </AnimatePresence>
 
         {/* PLAYER HAND FAN ZONE - animated interactively using state-driven slide-aside positioning */}
-        <div className={`absolute left-1/2 -translate-x-1/2 flex justify-center items-end z-40 select-none pointer-events-none w-full max-w-[560px] px-2 ${
-          isMobile ? 'h-[115px] bottom-0.5' : 'h-[170px] bottom-2'
-        }`}>
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex justify-center items-end h-[170px] z-40 select-none pointer-events-none w-full max-w-[560px] px-2">
           <div className="flex justify-center items-end relative w-full h-full pointer-events-auto">
             {visualState.playerHand.map((card, idx) => {
               const isSelected = selectedHandCardId === card.id;
@@ -2845,20 +2734,18 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               const totalHand = visualState.playerHand.length;
               const middle = (totalHand - 1) / 2;
               const offset = idx - middle;
-              const rotate = offset * (isMobile ? 3.5 : 5); 
+              const rotate = offset * 5; 
               
               // Dynamic card step based on screen width
-              const stepX = isMobile ? 32 : (typeof window !== 'undefined' && window.innerWidth < 640 ? 38 : 52);
+              const stepX = typeof window !== 'undefined' && window.innerWidth < 640 ? 38 : 52;
               let translateX = offset * stepX;
               // Push cards slightly down when not hovered, but raise them so they are readable
-              let translateY = isMobile 
-                ? Math.abs(offset) * 2.5 + (isSelected ? -22 : 28)
-                : Math.abs(offset) * 5 + (isSelected ? -25 : 35);
-              let scale = isMobile ? (isSelected ? 1.05 : 0.95) : 1.0;
+              let translateY = Math.abs(offset) * 5 + (isSelected ? -25 : 35);
+              let scale = 1.0;
               let zIndex = 10 + idx;
 
-              // If a card is hovered on desktop, slide other cards aside (Hearthstone style)
-              if (!isMobile && hoveredHandCardIndex !== null) {
+              // If a card is hovered, slide other cards aside (Hearthstone style)
+              if (hoveredHandCardIndex !== null) {
                 if (hoveredHandCardIndex === idx) {
                   translateY = -75;
                   scale = 1.45;
@@ -2877,7 +2764,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     x: translateX,
                     y: translateY,
                     scale: scale,
-                    rotate: (!isMobile && hoveredHandCardIndex === idx) ? 0 : rotate,
+                    rotate: hoveredHandCardIndex === idx ? 0 : rotate,
                     zIndex: zIndex
                   }}
                   transition={{
@@ -2890,29 +2777,25 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       if (isSelected) {
                         setSelectedHandCardId(null);
                         setHoveredHandCardIndex(null);
-                        if (!isMobile) setHoveredCard(null);
+                        setHoveredCard(null);
                       } else {
                         setSelectedHandCardId(card.id);
                         setHoveredHandCardIndex(idx);
-                        if (!isMobile) setHoveredCard(card as any);
+                        setHoveredCard(card as any);
                       }
                     }
                   }}
                   onMouseEnter={() => {
-                    if (!isMobile) {
-                      setHoveredHandCardIndex(idx);
-                      setHoveredCard(card as any);
-                    }
+                    setHoveredHandCardIndex(idx);
+                    setHoveredCard(card as any);
                   }}
                   onMouseLeave={() => {
-                    if (!isMobile && !isSelected) {
+                    if (!isSelected) {
                       setHoveredHandCardIndex(null);
                       setHoveredCard(null);
                     }
                   }}
-                  className={`absolute bottom-[0px] left-[calc(50%-${isMobile ? '42px' : '55px'})] ${
-                    isMobile ? 'w-[84px] h-[116px] p-1 pb-1.5' : 'w-[110px] h-[155px] p-1.5 pb-2'
-                  } origin-bottom rounded-xl border flex flex-col justify-between text-center cursor-pointer transition-shadow bg-[#151a21] text-white select-none overflow-visible shadow-lg ${
+                  className={`absolute bottom-[0px] left-[calc(50%-55px)] w-[110px] h-[155px] origin-bottom rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center cursor-pointer transition-shadow bg-[#151a21] text-white select-none overflow-visible shadow-lg ${
                     isSelected 
                       ? 'border-[#66fcf1] shadow-[0_0_15px_rgba(102,252,241,0.6)]' 
                       : (visualState.playerMana || 0) < (card.manaCost || 1)
@@ -2942,10 +2825,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                             <img 
                               src="/icons/gothic_hourglass.webp" 
                               alt="Locked" 
-                              className={`${isMobile ? 'w-7 h-7' : 'w-10 h-10'} object-contain rounded-full border border-purple-500/30 shadow-[0_0_12px_rgba(168,85,247,0.5)] animate-pulse`} 
+                              className="w-10 h-10 object-contain rounded-full border border-purple-500/30 shadow-[0_0_12px_rgba(168,85,247,0.5)] animate-pulse" 
                             />
-                            <div className={`absolute -bottom-2 bg-gradient-to-b from-[#180f2b] to-[#0c051a] border border-[#a855f7]/60 rounded-full ${isMobile ? 'w-4.5 h-4.5' : 'w-5 h-5'} flex items-center justify-center shadow-lg`}>
-                              <span className={`text-[#c084fc] ${isMobile ? 'text-[8.5px]' : 'text-[10px]'} font-black font-mono leading-none`}>{card.delay}</span>
+                            <div className="absolute -bottom-2.5 bg-gradient-to-b from-[#180f2b] to-[#0c051a] border border-[#a855f7]/60 rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
+                              <span className="text-[#c084fc] text-[10px] font-black font-mono leading-none">{card.delay}</span>
                             </div>
                           </div>
                         </div>
@@ -2954,44 +2837,44 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
                     <div className="flex justify-between items-center z-10 relative px-0.5 mt-0.5">
                       <div className="flex items-center gap-1">
-                        {renderManaIcon(card.manaCost || 1, isMobile ? "w-4 h-4" : "w-[18px] h-[18px]")}
-                        <span className={`text-[7.5px] md:text-[8px] font-mono font-black ${getTierTextColor(card.tier)}`}>{card.tier}</span>
+                        {renderManaIcon(card.manaCost || 1, "w-[18px] h-[18px]")}
+                        <span className={`text-[7px] md:text-[8px] font-mono font-black ${getTierTextColor(card.tier)}`}>{card.tier}</span>
                       </div>
-                      <span className="text-[7.5px] md:text-[8px] font-mono font-black text-gray-400">Lvl {card.level}</span>
+                      <span className="text-[7px] md:text-[8px] font-mono font-black text-gray-400">Lvl {card.level}</span>
                     </div>
 
-                    <div className={`mt-0.5 z-10 relative ${isMobile ? 'px-0.5 py-0' : 'px-1 py-0.5'} bg-black/50 rounded border border-white/5`}>
-                      <span className={`${isMobile ? 'text-[9px]' : 'text-[10px] md:text-[11px]'} font-display font-black tracking-tight text-white block truncate leading-tight`}>
+                    <div className="mt-1 z-10 relative px-1 bg-black/45 py-0.5 rounded border border-white/5">
+                      <span className="text-[10px] md:text-[11px] font-display font-black tracking-tight text-white block truncate leading-none">
                         {card.name}
                       </span>
                     </div>
 
                     {/* Dedicated skills bar at the bottom center */}
-                    <div className={`w-full ${isMobile ? 'py-0.5 gap-0.5 max-h-[24px]' : 'py-1 gap-1 max-h-[30px]'} bg-black/60 border-y border-white/5 flex justify-center z-10 relative flex-wrap overflow-visible mt-auto mb-1`}>
+                    <div className="w-full py-1 bg-black/60 border-y border-white/5 flex justify-center gap-1 z-10 relative flex-wrap max-h-[30px] overflow-visible mt-auto mb-1">
                       {card.skills.map((s, sIdx) => (
                         <div 
                           key={sIdx}
-                          className={`flex items-center gap-0.5 ${isMobile ? 'text-[8px] px-1 py-0' : 'text-[9px] px-1.5 py-0.5'} font-mono font-black rounded-full border ${getSkillBadgeStyle(s.type)}`}
+                          className={`flex items-center gap-0.5 text-[9px] font-mono font-black px-1.5 py-0.5 rounded-full border ${getSkillBadgeStyle(s.type)}`}
                         >
                           <span>{getSkillIcon(s.type)}</span>
                           <span className="leading-none">{s.value}</span>
                         </div>
                       ))}
                       {card.skills.length === 0 && (
-                        <span className={`${isMobile ? 'text-[7px]' : 'text-[7.5px]'} font-mono font-bold text-gray-500 uppercase tracking-widest leading-none my-0.5`}>No Skills</span>
+                        <span className="text-[7.5px] font-mono font-bold text-gray-500 uppercase tracking-widest leading-none my-0.5">No Skills</span>
                       )}
                     </div>
 
-                    <div className="h-0.5 shrink-0" />
+                    <div className="h-1 shrink-0" />
 
                     {/* Gothic style corner badges (NO emojis) */}
-                    <div className={`absolute ${isMobile ? '-bottom-2.5 -left-2.5 w-7 h-7' : '-bottom-3.5 -left-3.5 w-9 h-9'} z-20 flex items-center justify-center`}>
+                    <div className="absolute -bottom-3.5 -left-3.5 w-9 h-9 z-20 flex items-center justify-center">
                       <img src="/icons/gothic_attack.webp" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                      <span className={`relative text-[#ff3b30] ${isMobile ? 'text-[12px]' : 'text-[15px]'} font-black font-mono leading-none select-none z-10`} style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{card.attack}</span>
+                      <span className="relative text-[#ff3b30] text-[15px] font-black font-mono leading-none select-none z-10" style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{card.attack}</span>
                     </div>
-                    <div className={`absolute ${isMobile ? '-bottom-2.5 -right-2.5 w-7 h-7' : '-bottom-3.5 -right-3.5 w-9 h-9'} z-20 flex items-center justify-center`}>
+                    <div className="absolute -bottom-3.5 -right-3.5 w-9 h-9 z-20 flex items-center justify-center">
                       <img src="/icons/gothic_health.webp" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
-                      <span className={`relative text-[#ffffff] ${isMobile ? 'text-[12px]' : 'text-[15px]'} font-black font-mono leading-none select-none z-10`} style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{card.health}</span>
+                      <span className="relative text-[#ffffff] text-[15px] font-black font-mono leading-none select-none z-10" style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>{card.health}</span>
                     </div>
                   </>
                 </motion.div>
@@ -3282,36 +3165,29 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       {/* DETAILED HELP MODAL (FULL RICH TEXT - EXPANDED ZERO-SCROLL AAA GUIDE) */}
       <AnimatePresence>
         {showHelpModal && (
-          <div 
-            onClick={() => setShowHelpModal(false)}
-            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-2 sm:p-4"
-          >
+          <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-2.5 sm:p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 8 }}
-              onClick={(e) => e.stopPropagation()}
-              className={`bg-[#12161f] border border-[#ebd09b]/50 rounded-2xl max-w-2xl sm:max-w-3xl w-full shadow-[0_0_60px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col ${
-                isMobile ? 'max-h-[88vh]' : 'max-h-[90vh]'
-              }`}
+              className="bg-[#12161f] border border-[#ebd09b]/50 rounded-2xl max-w-2xl sm:max-w-3xl w-full shadow-[0_0_60px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col"
             >
               {/* Modal Header */}
-              <div className={`flex justify-between items-center ${isMobile ? 'px-3 py-2' : 'px-4 sm:px-6 py-3'} bg-gradient-to-r from-black/85 via-[#1a1f2c] to-black/85 border-b border-[#ebd09b]/25 shrink-0`}>
-                <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-[#ebd09b]/25 to-purple-950/70 border border-[#ebd09b]/50 flex items-center justify-center shadow-md shrink-0">
-                    <Swords className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-[#ebd09b]" />
+              <div className="flex justify-between items-center px-4 sm:px-6 py-3 bg-gradient-to-r from-black/85 via-[#1a1f2c] to-black/85 border-b border-[#ebd09b]/25">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-[#ebd09b]/25 to-purple-950/70 border border-[#ebd09b]/50 flex items-center justify-center shadow-md">
+                    <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-[#ebd09b]" />
                   </div>
                   <div>
-                    <h3 className="font-display font-black text-xs sm:text-base text-[#ebd09b] tracking-wider uppercase leading-tight">
+                    <h3 className="font-display font-black text-sm sm:text-base text-[#ebd09b] tracking-wider uppercase leading-tight">
                       Combat Tactics Guide
                     </h3>
-                    <span className="text-[9px] sm:text-xs font-mono text-gray-400 block -mt-0.5">Rules & Codex of Void Covenant</span>
+                    <span className="text-[10px] sm:text-xs font-mono text-gray-400 block -mt-0.5">Rules & Codex of Void Covenant</span>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowHelpModal(false)}
-                  className="text-white font-mono font-bold text-xs bg-red-950/90 hover:bg-red-900 border border-red-500 rounded-lg w-7 h-7 flex items-center justify-center transition-all cursor-pointer shadow active:scale-95"
-                  title="Close Rules"
+                  className="text-gray-400 hover:text-white font-mono font-bold text-xs bg-black/50 hover:bg-black/80 border border-gray-700 hover:border-gray-400 rounded-lg p-1.5 sm:px-2.5 sm:py-1.5 transition-all cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -3355,7 +3231,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               </div>
 
               {/* Full Rich Body Content with Distinct Standalone Cards */}
-              <div className="p-2.5 sm:p-4 text-xs sm:text-[13px] text-gray-300 overflow-y-auto custom-scrollbar flex-1 min-h-0">
+              <div className="p-3 sm:p-4 text-xs sm:text-[13px] text-gray-300">
                 {helpTab === 'basics' && (
                   <motion.div initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
                     {/* 1. Combat System (Linear Duels) */}
@@ -3530,12 +3406,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               </div>
 
               {/* Modal Footer */}
-              <div className={`${isMobile ? 'p-2' : 'p-3 sm:p-3.5'} bg-black/85 border-t border-gray-800 shrink-0`}>
+              <div className="p-3 sm:p-3.5 bg-black/85 border-t border-gray-800">
                 <button
                   onClick={() => setShowHelpModal(false)}
-                  className={`w-full bg-gradient-to-r from-[#c5a880] to-[#ebd09b] hover:from-[#ebd09b] hover:to-[#fff] text-black font-display font-black ${
-                    isMobile ? 'py-2 text-xs' : 'py-2.5 sm:py-3 text-xs sm:text-sm'
-                  } rounded-xl transition-all shadow-[0_0_20px_rgba(235,208,155,0.3)] tracking-widest cursor-pointer active:scale-98`}
+                  className="w-full bg-gradient-to-r from-[#c5a880] to-[#ebd09b] hover:from-[#ebd09b] hover:to-[#fff] text-black font-display font-black py-2.5 sm:py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(235,208,155,0.3)] text-xs sm:text-sm tracking-widest cursor-pointer active:scale-98"
                 >
                   ⚔️ UNDERSTOOD, TO BATTLE!
                 </button>
