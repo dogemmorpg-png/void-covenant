@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Sparkles } from 'lucide-react';
 
 interface GameLoadingScreenProps {
   statusText?: string;
@@ -65,9 +64,8 @@ export const GameLoadingScreen: React.FC<GameLoadingScreenProps> = ({
       </div>
 
       {/* Status Text */}
-      <div className="mt-3 flex items-center gap-1.5 text-[11px] font-mono text-gray-400 tracking-wider">
-        <Sparkles className="w-3 h-3 text-amber-400 animate-pulse" />
-        <span className="text-amber-200/90 animate-pulse">
+      <div className="mt-3 flex items-center justify-center text-[11px] font-mono tracking-wider">
+        <span className="text-amber-200/80 animate-pulse">
           {statusText}
         </span>
       </div>

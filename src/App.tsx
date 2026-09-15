@@ -45,11 +45,13 @@ function MainAppContent() {
   const [isTelegramAuthLoading, setIsTelegramAuthLoading] = useState<boolean>(() => hasTelegramInitData);
   const [isTelegramAuthenticated, setIsTelegramAuthenticated] = useState(false);
   const [telegramAuthError, setTelegramAuthError] = useState<string | null>(null);
+  const authInitiatedRef = React.useRef(false);
 
   // Auto-login Telegram users via Telegram initData
   React.useEffect(() => {
     const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
-    if (tg?.initData && !isTelegramAuthenticated && !isTelegramAuthLoading) {
+    if (tg?.initData && !authInitiatedRef.current) {
+      authInitiatedRef.current = true;
       const authenticateTelegram = async () => {
         setIsTelegramAuthLoading(true);
         setTelegramAuthError(null);
@@ -83,7 +85,7 @@ function MainAppContent() {
 
       authenticateTelegram();
     }
-  }, [isTelegramAuthenticated, isTelegramAuthLoading, connectSolanaWallet]);
+  }, [connectSolanaWallet]);
   
   // Intelligent Background Asset Preloader (UI + Deck + Background Cards)
   React.useEffect(() => {
