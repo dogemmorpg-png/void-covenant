@@ -283,6 +283,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     currentProfile = calculateEnergy(currentProfile);
 
+    // Ensure Telegram players complete the registration screen (choose avatar & name)
+    if (walletAddress.startsWith('tg_') && (!currentProfile.avatarUrl || !currentProfile.avatarUrl.startsWith('/avatars/'))) {
+      currentProfile.isRegistered = false;
+    }
+
     // ONLY merge fields that are safe for the user to change locally:
     // deck, equipped, soundOn, isRegistered, username, avatarUrl
     if (safeProfileData) {
