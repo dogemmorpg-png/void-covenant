@@ -219,13 +219,16 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
   const [battle, setBattle] = useState<BattleState>(() => initializeBattle(
     (profile?.collection || []).filter(c => (profile?.deck || []).includes(c.id)),
     stage,
+    (profile?.heroMaxHealth || 30) + getEquipmentBonus('maxHealth'),
+    getEquipmentBonus('dodge'),
+    getEquipmentBonus('delayReduction'),
     startingPlayerMana,
     playerCreatureBuff,
-    enemyStartingMana,
-    enemyCreatureBuff,
     enemyHeroMaxHealth,
     enemyDodgeChance,
-    enemyDelayReduction
+    enemyDelayReduction,
+    enemyStartingMana,
+    enemyCreatureBuff
   ));
 
   const [visualState, setVisualState] = useState<BattleState>(battle);
@@ -757,14 +760,14 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       <main className="flex-1 relative flex flex-col justify-between px-2 sm:px-4 py-1 overflow-hidden min-h-0">
         
         {/* Ambient Dark Gothic Background */}
-        <div className="absolute inset-0 bg-radial from-[#13111c] via-[#07060a] to-[#020203] pointer-events-none" />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, #13111c, #07060a, #020203)' }} />
 
         {/* ----------------- LEFT HERO COLUMN (TOKENS) ----------------- */}
         {/* Enemy Commander Token */}
         <div className="absolute top-2 left-2 z-20 flex flex-col items-center bg-black/70 border border-red-500/40 rounded-lg p-1 w-[46px] shadow-lg">
           <div className="w-7 h-7 rounded-full overflow-hidden border border-red-500/60 bg-zinc-900 shrink-0">
             <img 
-              src={stage.enemyAvatar || "/portraits/boss_default.webp"} 
+              src={stage.enemyHeroImage || "/portraits/boss_default.webp"} 
               alt="Enemy" 
               className="w-full h-full object-cover"
               onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
