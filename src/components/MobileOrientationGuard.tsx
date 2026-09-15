@@ -17,76 +17,25 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
 }) => {
   const [hasRequestedFullscreen, setHasRequestedFullscreen] = useState(false);
 
-  // Initialize Telegram WebApp fullscreen
+  // Initialize Telegram WebApp fullscreen ONLY for mobile devices
   useEffect(() => {
-    const setupTelegram = () => {
-      if (typeof window === 'undefined' || !(window as any).Telegram?.WebApp) return;
+    if (!isMobile) return; // NEVER run on desktop PC — prevents consuming user gesture for wallet extensions
+
+    if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp) {
       const tg = (window as any).Telegram.WebApp;
       try {
         tg.ready();
         tg.expand();
-        
-        // Request fullscreen to hide system status bar (clock, battery, notifications)
-        if (typeof tg.requestFullscreen === 'function') {
-          tg.requestFullscreen();
-        }
-        
-        // Set Telegram header and background colors to seamlessly blend with the dark gothic theme
-        if (typeof tg.setHeaderColor === 'function') {
-          try { tg.setHeaderColor('#070504'); } catch {}
-        }
-        if (typeof tg.setBackgroundColor === 'function') {
-          try { tg.setBackgroundColor('#070504'); } catch {}
-        }
-
-        // Disable vertical swipes to prevent accidental closing
         if (typeof tg.disableVerticalSwipes === 'function') {
           tg.disableVerticalSwipes();
-        }
-        
-        // Ensure orientation is UNLOCKED so user can freely rotate device
-        if (typeof tg.unlockOrientation === 'function') {
-          try { tg.unlockOrientation(); } catch {}
         }
       } catch (e) {
         console.warn('Telegram WebApp setup error:', e);
       }
-    };
-
-    // Initial call
-    setupTelegram();
-    
-    // Retry after a short delay — some Telegram clients need the WebApp bridge 
-    // to fully initialize before requestFullscreen succeeds
-    const retryTimer = setTimeout(setupTelegram, 600);
-
-    // Browsers require a user gesture (tap/click) to allow entering fullscreen.
-    // Try requesting fullscreen on the very first user touch.
-    const handleFirstTouch = () => {
-      if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp) {
-        const tg = (window as any).Telegram.WebApp;
-        if (typeof tg.requestFullscreen === 'function') {
-          try { tg.requestFullscreen(); } catch {}
-        }
-      }
-    };
-    window.addEventListener('pointerdown', handleFirstTouch, { once: true });
-
-    return () => {
-      clearTimeout(retryTimer);
-      window.removeEventListener('pointerdown', handleFirstTouch);
-    };
-  }, []);
+    }
+  }, [isMobile]);
 
   const requestLandscapeAndFullscreen = async () => {
-    if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp) {
-      const tg = (window as any).Telegram.WebApp;
-      try {
-        if (typeof tg.requestFullscreen === 'function') tg.requestFullscreen();
-        if (typeof tg.unlockOrientation === 'function') tg.unlockOrientation();
-      } catch {}
-    }
-
     try {
       if (document.documentElement.requestFullscreen) {
         await document.documentElement.requestFullscreen();
@@ -105,7 +54,7 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
     }
   };
 
-  // Show prompt only if not disabled AND on mobile device in portrait orientation
+  // Show prompt if on mobile device AND in portrait orientation AND not disabled
   const showRotatePrompt = !disableRotatePrompt && isMobile && isPortrait;
 
   return (
@@ -189,7 +138,7 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Render children game content directly without artificial CSS rotations */}
+      {/* Render children game content directly */}
       <div className={showRotatePrompt ? 'hidden' : 'w-full h-full flex flex-col min-h-screen min-h-[100dvh]'}>
         {children}
       </div>
