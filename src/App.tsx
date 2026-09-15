@@ -25,6 +25,7 @@ import bs58Pkg from 'bs58';
 import { assetPreloader } from './utils/assetPreloader';
 import { useDeviceDetect } from './utils/useDeviceDetect';
 import { MobileOrientationGuard } from './components/MobileOrientationGuard';
+import { MobileApp } from './mobile/MobileApp';
 
 const bs58 = (bs58Pkg as any).default || bs58Pkg;
 
@@ -246,6 +247,21 @@ function MainAppContent() {
       </MobileOrientationGuard>
     );
   }
+
+  // ═══════════════════════════════════════════════════
+  // MOBILE: Render entirely separate mobile UI shell
+  // ═══════════════════════════════════════════════════
+  if (device.isMobile) {
+    return (
+      <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait}>
+        <MobileApp />
+      </MobileOrientationGuard>
+    );
+  }
+
+  // ═══════════════════════════════════════════════════
+  // DESKTOP: Original desktop UI (unchanged below)
+  // ═══════════════════════════════════════════════════
 
   // If in active battle, render full screen combat field for maximum immersion
   if (activeBattleStage) {

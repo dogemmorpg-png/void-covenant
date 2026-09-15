@@ -300,3 +300,31 @@ body {
     padding-bottom: max(0.25rem, env(safe-area-inset-bottom));
   }
 }
+
+/* ====== MOBILE LANDSCAPE SHELL LOCKDOWN ====== */
+@media (max-height: 550px) and (orientation: landscape) {
+  .mobile-shell-locked {
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+  }
+  .mobile-content-area {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mobile-content-area::-webkit-scrollbar { width: 3px; }
+  .mobile-content-area::-webkit-scrollbar-thumb { background: rgba(197,168,128,0.3); border-radius: 10px; }
+  
+  /* Disable heavy GPU effects on mobile */
+  .bg-noise { display: none !important; }
+  .ambient-orb-1, .ambient-orb-2 { display: none !important; }
+  .glass-panel {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: rgba(14, 17, 24, 0.96) !important;
+  }
+}
+
+/* No-scrollbar utility */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
