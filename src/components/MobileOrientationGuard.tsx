@@ -29,6 +29,14 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
           tg.requestFullscreen();
         }
         
+        // Set Telegram header and background colors to seamlessly blend with the dark gothic theme
+        if (typeof tg.setHeaderColor === 'function') {
+          try { tg.setHeaderColor('#070504'); } catch {}
+        }
+        if (typeof tg.setBackgroundColor === 'function') {
+          try { tg.setBackgroundColor('#070504'); } catch {}
+        }
+
         // Disable vertical swipes to prevent accidental closing
         if (typeof tg.disableVerticalSwipes === 'function') {
           tg.disableVerticalSwipes();
@@ -49,7 +57,23 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
     // Retry after a short delay — some Telegram clients need the WebApp bridge 
     // to fully initialize before requestFullscreen succeeds
     const retryTimer = setTimeout(setupTelegram, 600);
-    return () => clearTimeout(retryTimer);
+
+    // Browsers require a user gesture (tap/click) to allow entering fullscreen.
+    // Try requesting fullscreen on the very first user touch.
+    const handleFirstTouch = () => {
+      if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp) {
+        const tg = (window as any).Telegram.WebApp;
+        if (typeof tg.requestFullscreen === 'function') {
+          try { tg.requestFullscreen(); } catch {}
+        }
+      }
+    };
+    window.addEventListener('pointerdown', handleFirstTouch, { once: true });
+
+    return () => {
+      clearTimeout(retryTimer);
+      window.removeEventListener('pointerdown', handleFirstTouch);
+    };
   }, []);
 
   const requestLandscapeAndFullscreen = async () => {
