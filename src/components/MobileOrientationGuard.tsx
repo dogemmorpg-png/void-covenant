@@ -34,9 +34,9 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
           tg.disableVerticalSwipes();
         }
         
-        // Lock orientation to landscape if available
-        if (typeof tg.lockOrientation === 'function') {
-          try { tg.lockOrientation(); } catch {}
+        // Ensure orientation is UNLOCKED so user can freely rotate device
+        if (typeof tg.unlockOrientation === 'function') {
+          try { tg.unlockOrientation(); } catch {}
         }
       } catch (e) {
         console.warn('Telegram WebApp setup error:', e);
@@ -53,6 +53,14 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
   }, []);
 
   const requestLandscapeAndFullscreen = async () => {
+    if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp) {
+      const tg = (window as any).Telegram.WebApp;
+      try {
+        if (typeof tg.requestFullscreen === 'function') tg.requestFullscreen();
+        if (typeof tg.unlockOrientation === 'function') tg.unlockOrientation();
+      } catch {}
+    }
+
     try {
       if (document.documentElement.requestFullscreen) {
         await document.documentElement.requestFullscreen();
