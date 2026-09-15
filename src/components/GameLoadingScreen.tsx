@@ -7,10 +7,10 @@ interface GameLoadingScreenProps {
 }
 
 export const GameLoadingScreen: React.FC<GameLoadingScreenProps> = ({
-  statusText = 'INITIALIZING TELEGRAM SESSION...'
+  statusText = 'Loading...'
 }) => {
   return (
-    <div className="w-full h-full bg-[#07080c] text-white flex flex-col items-center justify-center select-none overflow-hidden relative p-4">
+    <div className="fixed inset-0 z-[99999] w-full h-[100dvh] bg-[#07080c] text-white flex flex-col items-center justify-center select-none overflow-hidden p-4">
       {/* Occult atmospheric background */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(221,44,64,0.18)_0%,transparent_70%)] pointer-events-none" />
       <div className="absolute w-80 h-80 rounded-full bg-amber-600/10 blur-3xl pointer-events-none" />

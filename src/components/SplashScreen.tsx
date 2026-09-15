@@ -122,7 +122,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
               transition={{ duration: 0.7, delay: 1.0 }}
               className="font-display text-sm md:text-base text-[#c5a880]/70 tracking-[0.4em] uppercase select-none"
             >
-              Тёмная Карточная RPG
+              Dark Tactical Card RPG
             </motion.p>
 
             {/* Decorative separator */}

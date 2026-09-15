@@ -115,13 +115,13 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
                 <span>Mobile Battlefield Mode</span>
               </div>
               <h2 className="font-display font-black text-2xl text-white tracking-wider uppercase leading-tight">
-                Поверните устройство <br />
+                Rotate Device <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ebd09b] via-[#c5a880] to-[#997d5a]">
-                  горизонтально
+                  to Landscape
                 </span>
               </h2>
               <p className="font-serif italic text-xs text-gray-400 leading-relaxed">
-                Включите автоповорот экрана в шторке телефона и поверните устройство для перехода в боевой режим.
+                Enable auto-rotate in your phone settings and turn your device horizontally to enter the Battlefield.
               </p>
             </div>
 
@@ -131,14 +131,14 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
               className="mt-6 px-6 py-2.5 rounded-full bg-gradient-to-r from-[#221c17] via-[#2f241a] to-[#221c17] border border-[#c5a880]/50 hover:border-[#ebd09b] text-[#ebd09b] font-display text-xs tracking-widest uppercase shadow-[0_0_20px_rgba(0,0,0,0.8)] active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
             >
               <Maximize className="w-3.5 h-3.5 text-amber-400" />
-              <span>Во весь экран</span>
+              <span>Enter Fullscreen</span>
             </button>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Render children game content directly without artificial CSS rotations */}
-      <div className={showRotatePrompt ? 'hidden' : 'contents'}>
+      <div className={showRotatePrompt ? 'hidden' : 'w-full h-full flex flex-col min-h-screen min-h-[100dvh]'}>
         {children}
       </div>
     </>

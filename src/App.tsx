@@ -40,8 +40,9 @@ function MainAppContent() {
   const [isSigning, setIsSigning] = useState(false);
 
   // Telegram Mini App authentication state
-  const isTelegram = device.isTelegram || (typeof window !== 'undefined' && Boolean((window as any).Telegram?.WebApp?.initData));
-  const [isTelegramAuthLoading, setIsTelegramAuthLoading] = useState(false);
+  const hasTelegramInitData = typeof window !== 'undefined' && Boolean((window as any).Telegram?.WebApp?.initData);
+  const isTelegram = device.isTelegram || hasTelegramInitData;
+  const [isTelegramAuthLoading, setIsTelegramAuthLoading] = useState<boolean>(() => hasTelegramInitData);
   const [isTelegramAuthenticated, setIsTelegramAuthenticated] = useState(false);
   const [telegramAuthError, setTelegramAuthError] = useState<string | null>(null);
 
@@ -190,14 +191,10 @@ function MainAppContent() {
   }, [connected, publicKey, isVerified, isSigning, profile.solanaAddress, connectSolanaWallet, disconnectSolanaWallet, signMessage, disconnect]);
 
   // Telegram Loading & Error Screens
-  if (isTelegram) {
-    if (isTelegramAuthLoading || (isTelegramAuthenticated && isLoadingProfile)) {
-      return <GameLoadingScreen statusText="INITIALIZING TELEGRAM SESSION..." />;
-    }
-
+  if (isTelegram && hasTelegramInitData) {
     if (telegramAuthError) {
       return (
-        <div className="min-h-screen bg-[#07090e] flex items-center justify-center p-6 text-center">
+        <div className="fixed inset-0 z-[99999] bg-[#07090e] flex items-center justify-center p-6 text-center">
           <div className="max-w-md p-8 border border-red-500/30 bg-black/80 rounded-2xl space-y-4">
             <div className="w-12 h-12 rounded-full border border-red-500 text-red-500 flex items-center justify-center mx-auto text-xl font-bold">!</div>
             <h2 className="font-display text-xl text-white tracking-wider">TELEGRAM AUTH FAILED</h2>
@@ -211,6 +208,10 @@ function MainAppContent() {
           </div>
         </div>
       );
+    }
+
+    if (isTelegramAuthLoading || !isTelegramAuthenticated || isLoadingProfile) {
+      return <GameLoadingScreen statusText="Loading..." />;
     }
   }
 

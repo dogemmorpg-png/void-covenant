@@ -216,7 +216,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
           {/* Return to Top button */}
           <button
             onClick={() => scrollToSection('hero')}
-            title="Главная"
+            title="Home"
             className={`relative px-3 py-1.5 rounded-full text-xs font-display tracking-widest uppercase transition-all duration-300 flex items-center gap-1.5 ${
               activeNav === 'hero'
                 ? 'text-[#ebd09b] bg-white/[0.08] border border-[#c5a880]/50 shadow-[0_0_12px_rgba(197,168,128,0.2)]'
