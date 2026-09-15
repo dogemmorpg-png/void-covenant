@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { CheckCircle, Sparkles, Shield, User, Flame } from 'lucide-react';
+import { CheckCircle, Sparkles, Shield, User, Flame, Dices, Edit3, X, Check } from 'lucide-react';
 
 interface RegistrationScreenProps {
   onRegister: (username: string, avatarUrl: string) => Promise<{ success: boolean; message: string }>;
@@ -13,17 +13,124 @@ const AVATARS = [
   { id: 'rogue', name: 'Shadow Rogue', role: 'Assassin', desc: 'Critical strikes & stealth', url: '/avatars/rogue.webp' }
 ];
 
+const FANTASY_PREFIXES = [
+  'Void', 'Shadow', 'Grim', 'Dark', 'Dread', 'Blood', 'Night', 'Frost',
+  'Doom', 'Soul', 'Abyss', 'Nether', 'Iron', 'Hex', 'Rune', 'Ash', 'Storm'
+];
+
+const FANTASY_SUFFIXES = [
+  'Knight', 'Reaper', 'Walker', 'Blade', 'Lord', 'Warden', 'Mage', 'Fang',
+  'Bane', 'Hunter', 'Shade', 'King', 'Claw', 'Priest', 'Guard', 'Weaver'
+];
+
+function generateRandomMoniker(): string {
+  const p = FANTASY_PREFIXES[Math.floor(Math.random() * FANTASY_PREFIXES.length)];
+  const s = FANTASY_SUFFIXES[Math.floor(Math.random() * FANTASY_SUFFIXES.length)];
+  const name = `${p}_${s}`;
+  return name.length > 12 ? name.substring(0, 12) : name;
+}
+
+function sanitizeName(raw: string): string {
+  const cleaned = raw.replace(/[^a-zA-Z0-9_]/g, '');
+  if (cleaned.length < 4) return (cleaned + '_lord').substring(0, 12);
+  return cleaned.substring(0, 12);
+}
+
 export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegister }) => {
   const { publicKey } = useWallet();
-  const tgUser = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp?.initDataUnsafe?.user : null;
+  const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
+  const tgUser = tg?.initDataUnsafe?.user;
+
+  const rawTgName = tgUser?.username || tgUser?.first_name || '';
+  const tgSuggestedName = rawTgName ? sanitizeName(rawTgName) : null;
+
   const defaultUsername = publicKey 
     ? 'Sum_' + publicKey.toBase58().substring(0, 4) 
-    : (tgUser?.username || '');
+    : (tgSuggestedName || generateRandomMoniker());
 
   const [username, setUsername] = useState(defaultUsername);
   const [selectedAvatar, setSelectedAvatar] = useState(AVATARS[0].url);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // In-Game Virtual Keyboard Modal state
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const [draftUsername, setDraftUsername] = useState(username);
+
+  // Quick suggestion chips
+  const [quickPicks, setQuickPicks] = useState<string[]>(() => [
+    generateRandomMoniker(),
+    generateRandomMoniker(),
+    generateRandomMoniker()
+  ]);
+
+  const rollNewSuggestions = useCallback(() => {
+    setQuickPicks([
+      generateRandomMoniker(),
+      generateRandomMoniker(),
+      generateRandomMoniker()
+    ]);
+  }, []);
+
+  const triggerHaptic = useCallback(() => {
+    try {
+      tg?.HapticFeedback?.impactOccurred?.('light');
+    } catch {}
+  }, [tg]);
+
+  const rollNewName = useCallback(() => {
+    triggerHaptic();
+    const newName = generateRandomMoniker();
+    setUsername(newName);
+    setDraftUsername(newName);
+  }, [triggerHaptic]);
+
+  const openKeyboard = () => {
+    setDraftUsername(username);
+    setIsKeyboardOpen(true);
+    triggerHaptic();
+  };
+
+  const handleVirtualKey = (char: string) => {
+    triggerHaptic();
+    if (draftUsername.length < 12) {
+      setDraftUsername(prev => prev + char);
+    }
+  };
+
+  const handleVirtualBackspace = () => {
+    triggerHaptic();
+    setDraftUsername(prev => prev.slice(0, -1));
+  };
+
+  const saveVirtualKeyboard = () => {
+    triggerHaptic();
+    const trimmed = draftUsername.trim();
+    if (trimmed.length >= 4) {
+      setUsername(trimmed);
+      setIsKeyboardOpen(false);
+    }
+  };
+
+  // Keyboard physical event listener for PC/Emulator
+  useEffect(() => {
+    if (!isKeyboardOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Backspace') {
+        handleVirtualBackspace();
+      } else if (e.key === 'Enter') {
+        if (draftUsername.length >= 4) {
+          saveVirtualKeyboard();
+        }
+      } else if (e.key === 'Escape') {
+        setIsKeyboardOpen(false);
+      } else if (/^[a-zA-Z0-9_]$/.test(e.key)) {
+        handleVirtualKey(e.key.toUpperCase());
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isKeyboardOpen, draftUsername]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,8 +195,8 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
       {/* Main Form: 2-Column Landscape */}
       <form onSubmit={handleSubmit} className="relative z-10 flex-1 w-full my-1.5 flex items-stretch gap-3.5 min-h-0">
         
-        {/* Left Column: Avatar Grid (58% width) */}
-        <div className="flex-[58] flex flex-col justify-between bg-[#0b0f19]/90 border border-[#c5a880]/30 rounded-2xl p-3 backdrop-blur-md shadow-2xl min-h-0">
+        {/* Left Column: Avatar Grid (56% width) */}
+        <div className="flex-[56] flex flex-col justify-between bg-[#0b0f19]/90 border border-[#c5a880]/30 rounded-2xl p-3 backdrop-blur-md shadow-2xl min-h-0">
           <div className="flex items-center justify-between pb-1 border-b border-white/10 shrink-0">
             <div className="flex items-center gap-1.5">
               <Shield className="w-3.5 h-3.5 text-[#ebd09b]" />
@@ -102,14 +209,17 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
             </span>
           </div>
 
-          {/* 4 Avatar Cards Row - each strictly bounded by w-full to avoid horizontal overlap */}
+          {/* 4 Avatar Cards Row - strictly bounded by w-full to avoid horizontal overlap */}
           <div className="grid grid-cols-4 gap-2.5 my-auto py-1 items-center">
             {AVATARS.map(avatar => {
               const isSelected = selectedAvatar === avatar.url;
               return (
                 <div
                   key={avatar.id}
-                  onClick={() => setSelectedAvatar(avatar.url)}
+                  onClick={() => {
+                    setSelectedAvatar(avatar.url);
+                    triggerHaptic();
+                  }}
                   className={`group relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-200 w-full aspect-[4/5] flex flex-col justify-end p-2 bg-[#0c101a] shadow-lg ${
                     isSelected
                       ? 'border-[#ebd09b] shadow-[0_0_20px_rgba(235,208,155,0.6)] ring-2 ring-[#ebd09b]/60 z-10'
@@ -150,34 +260,119 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
           </div>
         </div>
 
-        {/* Right Column: Identity & Submit (42% width) */}
-        <div className="flex-[42] flex flex-col justify-between bg-[#0b0f19]/80 border border-[#c5a880]/30 rounded-2xl p-3 backdrop-blur-md shadow-2xl min-h-0">
-          <div className="flex items-center gap-1.5 pb-1.5 border-b border-white/10 shrink-0">
-            <User className="w-4 h-4 text-[#ebd09b]" />
-            <span className="text-[11px] font-display font-bold tracking-wider text-[#ebd09b] uppercase">
-              2. Summoner Moniker
+        {/* Right Column: Moniker Selection & Submit (44% width) */}
+        <div className="flex-[44] flex flex-col justify-between bg-[#0b0f19]/90 border border-[#c5a880]/30 rounded-2xl p-3 backdrop-blur-md shadow-2xl min-h-0">
+          <div className="flex items-center justify-between pb-1 border-b border-white/10 shrink-0">
+            <div className="flex items-center gap-1.5">
+              <User className="w-3.5 h-3.5 text-[#ebd09b]" />
+              <span className="text-[10.5px] font-display font-bold tracking-wider text-[#ebd09b] uppercase">
+                2. Summoner Moniker
+              </span>
+            </div>
+            <span className="text-[9px] font-mono text-gray-400">
+              {username.length}/12 chars
             </span>
           </div>
 
-          <div className="space-y-2 my-auto">
-            <label className="block text-[10px] font-mono text-gray-300 uppercase tracking-wider">
-              Enter your Lord name
-            </label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              maxLength={12}
-              required
-              className="w-full bg-black/60 border border-[#c5a880]/60 focus:border-[#ebd09b] rounded-xl px-3.5 py-2 text-white font-display text-sm tracking-wider focus:outline-none focus:ring-1 focus:ring-[#ebd09b] focus:shadow-[0_0_15px_rgba(235,208,155,0.4)] transition-all"
-              placeholder="Lord_Name..."
-            />
-            <span className="text-[9px] font-mono text-gray-400 block">
-              4-12 characters • English letters, numbers, or _
-            </span>
+          {/* Interactive Moniker Selection Area */}
+          <div className="space-y-2.5 my-auto">
+            {/* Moniker Display Plaque (Tap to open in-game keyboard or dice) */}
+            <div 
+              onClick={openKeyboard}
+              className="group cursor-pointer relative bg-black/70 border-2 border-[#c5a880]/60 hover:border-[#ebd09b] rounded-xl p-2.5 flex items-center justify-between shadow-[0_0_15px_rgba(0,0,0,0.8)] hover:shadow-[0_0_18px_rgba(235,208,155,0.25)] transition-all"
+            >
+              <div className="flex items-center gap-2 overflow-hidden">
+                <span className="text-amber-400 text-base">👑</span>
+                <div>
+                  <span className="text-[8px] font-mono text-gray-400 block uppercase tracking-wider">LORD MONIKER</span>
+                  <span className="text-white font-display text-sm tracking-widest font-bold truncate block text-shadow-gold">
+                    {username}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    rollNewName();
+                  }}
+                  title="Roll Random Moniker"
+                  className="px-2 py-1 rounded-lg bg-white/10 hover:bg-[#ebd09b] hover:text-black text-[#ebd09b] transition-all text-xs flex items-center gap-1 cursor-pointer font-mono"
+                >
+                  <Dices className="w-3.5 h-3.5" />
+                  <span className="text-[9px] hidden sm:inline">Reroll</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={openKeyboard}
+                  title="Open In-Game Keyboard"
+                  className="px-2.5 py-1 rounded-lg bg-[#ebd09b]/25 hover:bg-[#ebd09b] text-[#ebd09b] hover:text-black transition-all text-[9.5px] font-mono flex items-center gap-1 cursor-pointer font-bold"
+                >
+                  <Edit3 className="w-3 h-3" />
+                  <span>Type</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 1-Tap Quick-Pick Suggestions */}
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider">
+                  Quick-Pick Names (Tap to set):
+                </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    rollNewSuggestions();
+                    triggerHaptic();
+                  }}
+                  className="text-[8px] font-mono text-[#ebd09b]/80 hover:text-[#ebd09b] cursor-pointer"
+                >
+                  ↻ Refresh
+                </button>
+              </div>
+
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {tgSuggestedName && tgSuggestedName !== username && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUsername(tgSuggestedName);
+                      triggerHaptic();
+                    }}
+                    className="px-2 py-0.5 rounded-full bg-blue-950/70 border border-blue-500/50 hover:border-blue-400 text-blue-200 text-[8.5px] font-mono transition-all flex items-center gap-1 cursor-pointer active:scale-95"
+                  >
+                    <span>👤</span>
+                    <span>@{tgSuggestedName}</span>
+                  </button>
+                )}
+
+                {quickPicks.map(pName => (
+                  <button
+                    key={pName}
+                    type="button"
+                    onClick={() => {
+                      setUsername(pName);
+                      triggerHaptic();
+                    }}
+                    className={`px-2 py-0.5 rounded-full border text-[8.5px] font-mono transition-all flex items-center gap-1 cursor-pointer active:scale-95 ${
+                      username === pName
+                        ? 'bg-[#ebd09b]/30 border-[#ebd09b] text-[#ebd09b]'
+                        : 'bg-white/5 border-white/15 hover:border-[#ebd09b]/60 text-gray-300 hover:text-white'
+                    }`}
+                  >
+                    <span>⚔️</span>
+                    <span>{pName}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {error && (
-              <div className="bg-red-950/80 border border-red-500/60 text-red-200 text-[9px] p-2 rounded-lg font-mono flex items-center gap-1.5">
+              <div className="bg-red-950/80 border border-red-500/60 text-red-200 text-[8.5px] p-1.5 rounded-lg font-mono flex items-center gap-1.5">
                 <span>⚠️</span>
                 <span>{error}</span>
               </div>
@@ -187,7 +382,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
           {/* Action Button */}
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !username.trim()}
             className="w-full bg-gradient-to-r from-[#ebd09b] via-[#f3dfb9] to-[#c5a880] hover:from-[#f3dfb9] hover:to-[#ebd09b] text-black font-display font-bold tracking-widest py-3 rounded-xl shadow-[0_0_25px_rgba(235,208,155,0.45)] transition-all transform hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-xs uppercase flex items-center justify-center gap-2 shrink-0"
           >
             {isSubmitting ? (
@@ -211,6 +406,145 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
       <footer className="relative z-10 w-full text-center text-[8px] font-mono text-gray-500 shrink-0">
         The Void Covenant • Tactical Card RPG
       </footer>
+
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {/* IN-GAME THUMB-FRIENDLY VIRTUAL KEYBOARD MODAL (NO ANDROID POPUP) */}
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {isKeyboardOpen && (
+        <div className="fixed inset-0 z-[99999] bg-black/90 backdrop-blur-md flex flex-col justify-between p-3 pt-5 pb-3">
+          {/* Top preview row */}
+          <div className="max-w-2xl w-full mx-auto flex items-center justify-between bg-[#0b0f19] border-2 border-[#ebd09b]/80 rounded-2xl px-4 py-2 shadow-[0_0_25px_rgba(235,208,155,0.3)] shrink-0">
+            <div className="flex items-center gap-2 overflow-hidden">
+              <span className="text-xl">👑</span>
+              <div className="flex items-baseline gap-1">
+                <span className="font-display font-bold text-base sm:text-lg text-white tracking-widest text-shadow-gold">
+                  {draftUsername || <span className="text-gray-500 italic">...</span>}
+                </span>
+                <span className="w-0.5 h-4 bg-[#ebd09b] animate-pulse inline-block" />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="font-mono text-xs text-gray-400">
+                {draftUsername.length}/12
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic();
+                  const rnd = generateRandomMoniker();
+                  setDraftUsername(rnd);
+                }}
+                className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-[#ebd09b] hover:text-black text-[#ebd09b] font-mono text-xs transition-all flex items-center gap-1 cursor-pointer"
+              >
+                <Dices className="w-3.5 h-3.5" />
+                <span>Reroll</span>
+              </button>
+              {draftUsername && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic();
+                    setDraftUsername('');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300 hover:bg-red-900/60 text-xs font-mono cursor-pointer"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Big touchable keys (designed for landscape phone thumbs) */}
+          <div className="max-w-2xl w-full mx-auto space-y-1.5 my-auto select-none">
+            {/* Row 1: Numbers */}
+            <div className="flex justify-center gap-1 sm:gap-1.5">
+              {['1','2','3','4','5','6','7','8','9','0'].map(char => (
+                <button
+                  key={char}
+                  type="button"
+                  onClick={() => handleVirtualKey(char)}
+                  className="flex-1 max-w-[62px] h-9 sm:h-10 rounded-xl bg-[#131826] border border-white/15 active:border-[#ebd09b] active:bg-[#ebd09b] active:text-black text-white font-mono font-bold text-sm shadow-md cursor-pointer transition-transform active:scale-90 flex items-center justify-center"
+                >
+                  {char}
+                </button>
+              ))}
+            </div>
+
+            {/* Row 2: QWERTY */}
+            <div className="flex justify-center gap-1 sm:gap-1.5">
+              {['Q','W','E','R','T','Y','U','I','O','P'].map(char => (
+                <button
+                  key={char}
+                  type="button"
+                  onClick={() => handleVirtualKey(char)}
+                  className="flex-1 max-w-[62px] h-9 sm:h-10 rounded-xl bg-[#131826] border border-white/15 active:border-[#ebd09b] active:bg-[#ebd09b] active:text-black text-white font-display font-bold text-sm shadow-md cursor-pointer transition-transform active:scale-90 flex items-center justify-center"
+                >
+                  {char}
+                </button>
+              ))}
+            </div>
+
+            {/* Row 3: ASDF */}
+            <div className="flex justify-center gap-1 sm:gap-1.5">
+              {['A','S','D','F','G','H','J','K','L','_'].map(char => (
+                <button
+                  key={char}
+                  type="button"
+                  onClick={() => handleVirtualKey(char)}
+                  className="flex-1 max-w-[62px] h-9 sm:h-10 rounded-xl bg-[#131826] border border-white/15 active:border-[#ebd09b] active:bg-[#ebd09b] active:text-black text-white font-display font-bold text-sm shadow-md cursor-pointer transition-transform active:scale-90 flex items-center justify-center"
+                >
+                  {char}
+                </button>
+              ))}
+            </div>
+
+            {/* Row 4: ZXCV + Backspace */}
+            <div className="flex justify-center gap-1 sm:gap-1.5">
+              {['Z','X','C','V','B','N','M'].map(char => (
+                <button
+                  key={char}
+                  type="button"
+                  onClick={() => handleVirtualKey(char)}
+                  className="flex-1 max-w-[62px] h-9 sm:h-10 rounded-xl bg-[#131826] border border-white/15 active:border-[#ebd09b] active:bg-[#ebd09b] active:text-black text-white font-display font-bold text-sm shadow-md cursor-pointer transition-transform active:scale-90 flex items-center justify-center"
+                >
+                  {char}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={handleVirtualBackspace}
+                className="flex-[1.5] max-w-[90px] h-9 sm:h-10 rounded-xl bg-red-950/50 border border-red-500/40 active:bg-red-600 active:text-white text-red-300 font-mono font-bold text-xs shadow-md cursor-pointer transition-transform active:scale-90 flex items-center justify-center gap-1"
+              >
+                <span>⌫</span>
+                <span>Del</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Bottom Confirmation Bar */}
+          <div className="max-w-2xl w-full mx-auto flex items-center justify-between gap-3 shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsKeyboardOpen(false)}
+              className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-gray-300 font-mono text-xs tracking-wider cursor-pointer flex items-center gap-1.5"
+            >
+              <X className="w-3.5 h-3.5" />
+              <span>Cancel</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={saveVirtualKeyboard}
+              disabled={draftUsername.length < 4}
+              className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#ebd09b] via-[#f3dfb9] to-[#c5a880] text-black font-display font-bold tracking-widest text-xs uppercase shadow-[0_0_20px_rgba(235,208,155,0.4)] disabled:opacity-40 cursor-pointer flex items-center justify-center gap-2"
+            >
+              <Check className="w-4 h-4 text-black" />
+              <span>Confirm Moniker ({draftUsername.length >= 4 ? draftUsername : 'Min 4 Chars'})</span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
