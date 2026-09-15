@@ -192,24 +192,30 @@ function MainAppContent() {
   // Telegram Loading & Error Screens
   if (isTelegram) {
     if (isTelegramAuthLoading || (isTelegramAuthenticated && isLoadingProfile)) {
-      return <GameLoadingScreen statusText="INITIALIZING TELEGRAM SESSION..." />;
+      return (
+        <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait}>
+          <GameLoadingScreen statusText="INITIALIZING TELEGRAM SESSION..." />
+        </MobileOrientationGuard>
+      );
     }
 
     if (telegramAuthError) {
       return (
-        <div className="min-h-screen bg-[#07090e] flex items-center justify-center p-6 text-center">
-          <div className="max-w-md p-8 border border-red-500/30 bg-black/80 rounded-2xl space-y-4">
-            <div className="w-12 h-12 rounded-full border border-red-500 text-red-500 flex items-center justify-center mx-auto text-xl font-bold">!</div>
-            <h2 className="font-display text-xl text-white tracking-wider">TELEGRAM AUTH FAILED</h2>
-            <p className="text-gray-400 text-xs font-mono">{telegramAuthError}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-red-600 hover:bg-red-500 text-white font-display text-xs font-bold tracking-wider rounded-lg transition-all cursor-pointer"
-            >
-              RETRY
-            </button>
+        <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait}>
+          <div className="w-full h-full bg-[#07090e] flex items-center justify-center p-6 text-center">
+            <div className="max-w-md p-8 border border-red-500/30 bg-black/80 rounded-2xl space-y-4">
+              <div className="w-12 h-12 rounded-full border border-red-500 text-red-500 flex items-center justify-center mx-auto text-xl font-bold">!</div>
+              <h2 className="font-display text-xl text-white tracking-wider">TELEGRAM AUTH FAILED</h2>
+              <p className="text-gray-400 text-xs font-mono">{telegramAuthError}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-2 bg-red-600 hover:bg-red-500 text-white font-display text-xs font-bold tracking-wider rounded-lg transition-all cursor-pointer"
+              >
+                RETRY
+              </button>
+            </div>
           </div>
-        </div>
+        </MobileOrientationGuard>
       );
     }
   }
@@ -306,9 +312,11 @@ function MainAppContent() {
 
   if (!profile.isRegistered) {
     return (
-      <RegistrationScreen 
-        onRegister={(username, avatarUrl) => registerPlayer(username, avatarUrl)} 
-      />
+      <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait}>
+        <RegistrationScreen 
+          onRegister={(username, avatarUrl) => registerPlayer(username, avatarUrl)} 
+        />
+      </MobileOrientationGuard>
     );
   }
 
