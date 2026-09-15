@@ -4,18 +4,18 @@ import { MobileHeaderHUD } from './MobileHeaderHUD';
 import { MobileNavBar } from './MobileNavBar';
 import { CampaignStage } from '../types';
 
-// Mobile-optimized view components
-import { MobileCampaignView } from './MobileCampaignView';
-import { MobileCollectionView } from './MobileCollectionView';
-import { MobileGachaView } from './MobileGachaView';
-import { MobilePvpView } from './MobilePvpView';
-import { MobileHeroView } from './MobileHeroView';
-import { MobileTalentsView } from './MobileTalentsView';
-import { MobileBankView } from './MobileBankView';
-import { MobilePremiumView } from './MobilePremiumView';
-import MobileBattleView from './MobileBattleView';
+// Genuine full game components (identical logic and mechanics to desktop)
+import { CampaignView } from '../components/CampaignView';
+import { CollectionDeckView } from '../components/CollectionDeckView';
+import { GachaStoreView } from '../components/GachaStoreView';
+import { PvpArenaView } from '../components/PvpArenaView';
+import { BattleFieldView } from '../components/BattleFieldView';
+import { HeroInventoryView } from '../components/HeroInventoryView';
+import { TalentsView } from '../components/TalentsView';
+import { BankView } from '../components/BankView';
+import { PremiumPassView } from '../components/PremiumPassView';
 
-// Modals (shared with desktop)
+// Modals
 import { ShardsShopModal } from '../components/ShardsShopModal';
 import { GoldShopModal } from '../components/GoldShopModal';
 import { DustShopModal } from '../components/DustShopModal';
@@ -24,7 +24,6 @@ type MobileTab = 'campaign' | 'pvp' | 'collection' | 'hero' | 'talents' | 'altar
 
 export const MobileApp: React.FC = () => {
   const {
-    profile,
     startBattleOnServer,
     hasNewDefenseAttacks,
     isShardsShopOpen,
@@ -46,87 +45,94 @@ export const MobileApp: React.FC = () => {
     setActiveTab(tab as MobileTab);
   };
 
-  const handleExitBattle = (isVictory: boolean) => {
+  const handleExitBattle = (_isVictory: boolean) => {
     setActiveBattleStage(null);
     setActiveTab(activeBattleType === 'pvp' ? 'pvp' : 'campaign');
   };
 
-  // If a battle is active, render the mobile battlefield full-screen (no HUD/NavBar)
+  // If a battle is active, render the genuine BattleFieldView full-screen in mobile shell
   if (activeBattleStage) {
     return (
-      <MobileBattleView
-        stage={activeBattleStage}
-        onExitBattle={handleExitBattle}
-        battleType={activeBattleType}
-      />
+      <div className="mobile-battle-shell h-[100dvh] w-full overflow-hidden">
+        <BattleFieldView
+          stage={activeBattleStage}
+          onExitBattle={handleExitBattle}
+          battleType={activeBattleType}
+        />
+      </div>
     );
   }
 
-  const renderActiveView = () => {
-    switch (activeTab) {
-      case 'campaign':
-        return (
-          <MobileCampaignView onStartBattle={(stage) => {
-            setActiveBattleType('campaign');
-            setActiveBattleStage(stage);
-            startBattleOnServer('campaign', stage.id.toString(), stage.energyCost).then(success => {
-              if (!success) setActiveBattleStage(null);
-            }).catch(() => {});
-          }} />
-        );
-      case 'pvp':
-        return (
-          <MobilePvpView
-            onStartBattle={async (stage: any, type: any, opponentPayload: any) => {
-              setActiveBattleType(type);
-              setActiveBattleStage(stage);
-              startBattleOnServer('pvp', stage.id.toString(), 1, opponentPayload).then(success => {
-                if (!success) setActiveBattleStage(null);
-              }).catch(() => {});
-              return true;
-            }}
-            isMatching={isPvpMatching}
-            setIsMatching={setIsPvpMatching}
-            isModalOpen={isPvpModalOpen}
-            setIsModalOpen={setIsPvpModalOpen}
-            onNavigateToShop={(tab = 'shields') => {
-              setShopInitialTab(tab as any);
-              setActiveTab('altar');
-            }}
-          />
-        );
-      case 'collection': return <MobileCollectionView />;
-      case 'hero':
-        return (
-          <MobileHeroView
-            onNavigateToShop={(tab = 'divine') => {
-              setShopInitialTab(tab as any);
-              setActiveTab('altar');
-            }}
-          />
-        );
-      case 'talents': return <MobileTalentsView />;
-      case 'altar': return <MobileGachaView initialTab={shopInitialTab} />;
-      case 'premium': return <MobilePremiumView />;
-      case 'bank': return <MobileBankView />;
-      default:
-        return (
-          <div className="flex items-center justify-center h-full w-full">
-            <h2 className="font-display text-2xl text-gray-500 uppercase">{activeTab}</h2>
-          </div>
-        );
-    }
-  };
-
   return (
-    <div className="mobile-shell-locked bg-[#050505] text-white flex flex-col relative">
-      {/* Top HUD — hidden during PvP matching/modal for immersion */}
+    <div className="mobile-shell-locked bg-[#050505] text-white flex flex-col relative w-full h-[100dvh] overflow-hidden">
+      {/* Top HUD — hidden during PvP matching/modal for maximum immersion */}
       {!isPvpMatching && !isPvpModalOpen && (
         <MobileHeaderHUD onNavigateTab={handleTabChange} />
       )}
 
-      <main className="mobile-content-area flex-1 relative w-full overflow-y-auto">
-        {renderActiveView()}
+      {/* Main Tab Content — preserves DOM mount state with block/hidden like desktop */}
+      <main className="mobile-content-area flex-1 relative w-full overflow-y-auto min-h-0">
+        <div className="py-2 px-1 sm:px-3">
+          <div className={activeTab === 'campaign' ? 'block' : 'hidden'}>
+            <CampaignView onStartBattle={(stage) => {
+              setActiveBattleType('campaign');
+              setActiveBattleStage(stage);
+              startBattleOnServer('campaign', stage.id.toString(), stage.energyCost).then(success => {
+                if (!success) setActiveBattleStage(null);
+              }).catch(() => {});
+            }} />
+          </div>
+
+          <div className={activeTab === 'pvp' ? 'block' : 'hidden'}>
+            <PvpArenaView 
+              onStartBattle={async (stage, type, opponentPayload) => {
+                setActiveBattleType(type);
+                setActiveBattleStage(stage);
+                startBattleOnServer('pvp', stage.id.toString(), 1, opponentPayload).then(success => {
+                  if (!success) setActiveBattleStage(null);
+                }).catch(() => {});
+                return true;
+              }}
+              isMatching={isPvpMatching}
+              setIsMatching={setIsPvpMatching}
+              isModalOpen={isPvpModalOpen}
+              setIsModalOpen={setIsPvpModalOpen}
+              onNavigateToShop={(tab = 'shields') => {
+                setShopInitialTab(tab as any);
+                setActiveTab('altar');
+              }}
+            />
+          </div>
+
+          <div className={activeTab === 'collection' ? 'block' : 'hidden'}>
+            <CollectionDeckView />
+          </div>
+
+          <div className={activeTab === 'hero' ? 'block' : 'hidden'}>
+            <HeroInventoryView 
+              onNavigateToShop={(tab = 'divine') => {
+                setShopInitialTab(tab as any);
+                setActiveTab('altar');
+              }}
+            />
+          </div>
+
+          <div className={activeTab === 'talents' ? 'block' : 'hidden'}>
+            <TalentsView />
+          </div>
+
+          <div className={activeTab === 'altar' ? 'block' : 'hidden'}>
+            <GachaStoreView initialTab={shopInitialTab} />
+          </div>
+
+          <div className={activeTab === 'bank' ? 'block' : 'hidden'}>
+            <BankView />
+          </div>
+
+          <div className={activeTab === 'premium' ? 'block' : 'hidden'}>
+            <PremiumPassView />
+          </div>
+        </div>
       </main>
 
       {/* Bottom Navigation — hidden during PvP matching/modal */}
