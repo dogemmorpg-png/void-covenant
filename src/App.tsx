@@ -37,6 +37,51 @@ function MainAppContent() {
   
   const [isVerified, setIsVerified] = useState(false);
   const [isSigning, setIsSigning] = useState(false);
+
+  // Telegram Mini App authentication state
+  const isTelegram = device.isTelegram || (typeof window !== 'undefined' && Boolean((window as any).Telegram?.WebApp?.initData));
+  const [isTelegramAuthLoading, setIsTelegramAuthLoading] = useState(false);
+  const [isTelegramAuthenticated, setIsTelegramAuthenticated] = useState(false);
+  const [telegramAuthError, setTelegramAuthError] = useState<string | null>(null);
+
+  // Auto-login Telegram users via Telegram initData
+  React.useEffect(() => {
+    const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
+    if (tg?.initData && !isTelegramAuthenticated && !isTelegramAuthLoading) {
+      const authenticateTelegram = async () => {
+        setIsTelegramAuthLoading(true);
+        setTelegramAuthError(null);
+        try {
+          const res = await fetch('/api/auth-telegram', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ initData: tg.initData }),
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || 'Telegram authentication failed');
+          }
+
+          const data = await res.json();
+          localStorage.setItem('void_covenant_token', data.token);
+          if (data.startParam) {
+            localStorage.setItem('void_covenant_referrer', data.startParam);
+          }
+
+          setIsTelegramAuthenticated(true);
+          await connectSolanaWallet(data.walletAddress);
+        } catch (err: any) {
+          console.error('Telegram auth error:', err);
+          setTelegramAuthError(err.message || 'Failed to authenticate Telegram user');
+        } finally {
+          setIsTelegramAuthLoading(false);
+        }
+      };
+
+      authenticateTelegram();
+    }
+  }, [isTelegramAuthenticated, isTelegramAuthLoading, connectSolanaWallet]);
   
   // Intelligent Background Asset Preloader (UI + Deck + Background Cards)
   React.useEffect(() => {
@@ -143,7 +188,41 @@ function MainAppContent() {
     }
   }, [connected, publicKey, isVerified, isSigning, profile.solanaAddress, connectSolanaWallet, disconnectSolanaWallet, signMessage, disconnect]);
 
-  if (!connected) {
+  // Telegram Loading & Error Screens
+  if (isTelegram) {
+    if (isTelegramAuthLoading || (isTelegramAuthenticated && isLoadingProfile)) {
+      return (
+        <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 rounded-full border-t-2 border-r-2 border-t-[#ebd09b] border-r-transparent animate-spin" />
+            <p className="text-[#ebd09b] font-mono text-xs tracking-[0.3em] animate-pulse">
+              INITIALIZING TELEGRAM SESSION...
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    if (telegramAuthError) {
+      return (
+        <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center p-6 text-center">
+          <div className="max-w-md p-8 border border-red-500/30 bg-black/80 rounded-2xl space-y-4">
+            <div className="w-12 h-12 rounded-full border border-red-500 text-red-500 flex items-center justify-center mx-auto text-xl font-bold">!</div>
+            <h2 className="font-display text-xl text-white tracking-wider">TELEGRAM AUTH FAILED</h2>
+            <p className="text-gray-400 text-xs font-mono">{telegramAuthError}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-2 bg-red-600 hover:bg-red-500 text-white font-display text-xs font-bold tracking-wider rounded-lg transition-all cursor-pointer"
+            >
+              RETRY
+            </button>
+          </div>
+        </div>
+      );
+    }
+  }
+
+  if (!isTelegram && !connected) {
     return (
       <LandingPage
         onConnectWallet={() => setVisible(true)}
@@ -153,7 +232,7 @@ function MainAppContent() {
   }
 
   // Prevent UI flickering while profile state syncs with wallet connection state
-  if (connected && publicKey && (!isVerified || profile.solanaAddress !== publicKey.toBase58() || isLoadingProfile)) {
+  if (!isTelegram && connected && publicKey && (!isVerified || profile.solanaAddress !== publicKey.toBase58() || isLoadingProfile)) {
     // If we're not loading and not signing, but we're stuck here, it means the server fetch failed.
     if (!isLoadingProfile && !isSigning && isVerified) {
       return (

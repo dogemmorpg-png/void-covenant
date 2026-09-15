@@ -238,8 +238,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         solanaAddress: walletAddress,
         solBalance: 12.5,
         isPremiumBP: false,
-        username: '',
-        isRegistered: false,
+        username: decoded.username || '',
+        avatarUrl: decoded.photoUrl || '',
+        telegramId: decoded.telegramId || null,
+        isRegistered: Boolean(decoded.telegramId),
         referredBy: isReferred ? referrerAddress : null
       };
       // Prevent creating duplicates by checking again or using insert

@@ -7,6 +7,7 @@ export interface DeviceInfo {
   isTouch: boolean;
   isPortrait: boolean;
   isLandscape: boolean;
+  isTelegram: boolean;
 }
 
 export function useDeviceDetect(): DeviceInfo {
@@ -19,11 +20,16 @@ export function useDeviceDetect(): DeviceInfo {
         isTouch: false,
         isPortrait: false,
         isLandscape: true,
+        isTelegram: false,
       };
     }
 
     const ua = navigator.userAgent || '';
-    const isMobileUA = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+    const isTg = Boolean(
+      (window as any).Telegram?.WebApp?.initData ||
+      /Telegram/i.test(ua)
+    );
+    const isMobileUA = isTg || /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
     const isTabletUA = /iPad|Tablet/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
@@ -31,8 +37,8 @@ export function useDeviceDetect(): DeviceInfo {
     const height = window.innerHeight;
     const isPortrait = height > width;
 
-    // A device is considered mobile if it has mobile UA or small touch screen
-    const isMobileDevice = isMobileUA || (hasTouch && width <= 850 && isPortrait) || (hasTouch && height <= 520 && !isPortrait);
+    // A device is considered mobile if it has mobile UA, is in Telegram, or small touch screen
+    const isMobileDevice = isTg || isMobileUA || (hasTouch && width <= 850 && isPortrait) || (hasTouch && height <= 520 && !isPortrait);
     const isTabletDevice = !isMobileDevice && (isTabletUA || (hasTouch && width <= 1180));
     const isDesktopDevice = !isMobileDevice && !isTabletDevice;
 
@@ -43,6 +49,7 @@ export function useDeviceDetect(): DeviceInfo {
       isTouch: hasTouch,
       isPortrait,
       isLandscape: !isPortrait,
+      isTelegram: isTg,
     };
   };
 
