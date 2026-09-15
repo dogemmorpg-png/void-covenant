@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { MobileHeaderHUD } from './MobileHeaderHUD';
-import { MobileNavBar } from './MobileNavBar';
+import { MobileNavDrawer, MobileTab } from './MobileNavDrawer';
 import { CampaignStage } from '../types';
-
 // Dedicated AAA Mobile Landscape Views
 import { MobileCampaignView } from './views/MobileCampaignView';
 import { MobilePvpView } from './views/MobilePvpView';
@@ -25,6 +24,7 @@ type MobileTab = 'campaign' | 'pvp' | 'collection' | 'hero' | 'altar' | 'bank' |
 
 export const MobileApp: React.FC = () => {
   const {
+    profile,
     startBattleOnServer,
     hasNewDefenseAttacks,
     isShardsShopOpen,
@@ -138,12 +138,13 @@ export const MobileApp: React.FC = () => {
         </div>
       </main>
 
-      {/* Bottom Navigation */}
+      {/* Expandable Gothic Corner Menu Drawer (Frees up 100% of vertical screen space) */}
       {!isPvpMatching && !isPvpModalOpen && (
-        <MobileNavBar
+        <MobileNavDrawer
           activeTab={activeTab}
           onTabChange={handleTabChange}
           hasNewDefenseAttacks={hasNewDefenseAttacks}
+          deckCount={profile?.deck?.length || 0}
         />
       )}
 

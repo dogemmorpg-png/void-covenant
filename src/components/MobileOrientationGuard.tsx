@@ -5,12 +5,14 @@ import { RotateCw, Maximize, Sparkles } from 'lucide-react';
 interface MobileOrientationGuardProps {
   isMobile: boolean;
   isPortrait: boolean;
+  disableRotatePrompt?: boolean;
   children: React.ReactNode;
 }
 
 export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
   isMobile,
   isPortrait,
+  disableRotatePrompt = false,
   children,
 }) => {
   const [hasRequestedFullscreen, setHasRequestedFullscreen] = useState(false);
@@ -103,8 +105,8 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
     }
   };
 
-  // Show prompt if on mobile device AND in portrait orientation
-  const showRotatePrompt = isMobile && isPortrait;
+  // Show prompt only if not disabled AND on mobile device in portrait orientation
+  const showRotatePrompt = !disableRotatePrompt && isMobile && isPortrait;
 
   return (
     <>

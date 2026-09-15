@@ -322,7 +322,7 @@ function MainAppContent() {
   // ═══════════════════════════════════════════════════
   if (device.isMobile) {
     return (
-      <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait}>
+      <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait} disableRotatePrompt={true}>
         <MobileApp />
       </MobileOrientationGuard>
     );
