@@ -4,14 +4,15 @@ import { MobileHeaderHUD } from './MobileHeaderHUD';
 import { MobileNavBar } from './MobileNavBar';
 import { CampaignStage } from '../types';
 
-// Genuine full game components (identical logic and mechanics to desktop)
-import { CampaignView } from '../components/CampaignView';
-import { CollectionDeckView } from '../components/CollectionDeckView';
+// Dedicated AAA Mobile Landscape Views
+import { MobileCampaignView } from './views/MobileCampaignView';
+import { MobilePvpView } from './views/MobilePvpView';
+import { MobileCollectionView } from './views/MobileCollectionView';
+import { MobileHeroView } from './views/MobileHeroView';
+import { MobileBattleView } from './views/MobileBattleView';
+
+// Desktop Shared Views for Store, Bank & Premium
 import { GachaStoreView } from '../components/GachaStoreView';
-import { PvpArenaView } from '../components/PvpArenaView';
-import { BattleFieldView } from '../components/BattleFieldView';
-import { HeroInventoryView } from '../components/HeroInventoryView';
-import { TalentsView } from '../components/TalentsView';
 import { BankView } from '../components/BankView';
 import { PremiumPassView } from '../components/PremiumPassView';
 
@@ -20,7 +21,7 @@ import { ShardsShopModal } from '../components/ShardsShopModal';
 import { GoldShopModal } from '../components/GoldShopModal';
 import { DustShopModal } from '../components/DustShopModal';
 
-type MobileTab = 'campaign' | 'pvp' | 'collection' | 'hero' | 'talents' | 'altar' | 'bank' | 'premium';
+type MobileTab = 'campaign' | 'pvp' | 'collection' | 'hero' | 'altar' | 'bank' | 'premium';
 
 export const MobileApp: React.FC = () => {
   const {
@@ -50,11 +51,11 @@ export const MobileApp: React.FC = () => {
     setActiveTab(activeBattleType === 'pvp' ? 'pvp' : 'campaign');
   };
 
-  // If a battle is active, render the genuine BattleFieldView full-screen in mobile shell
+  // If battle active, render dedicated mobile combat view (full-screen, unblocked)
   if (activeBattleStage) {
     return (
-      <div className="mobile-battle-shell h-[100dvh] w-full overflow-hidden">
-        <BattleFieldView
+      <div className="h-[100dvh] w-full overflow-hidden bg-[#070504]">
+        <MobileBattleView
           stage={activeBattleStage}
           onExitBattle={handleExitBattle}
           battleType={activeBattleType}
@@ -65,16 +66,16 @@ export const MobileApp: React.FC = () => {
 
   return (
     <div className="mobile-shell-locked bg-[#050505] text-white flex flex-col relative w-full h-[100dvh] overflow-hidden">
-      {/* Top HUD — hidden during PvP matching/modal for maximum immersion */}
+      {/* Top HUD — Telegram-safe insets */}
       {!isPvpMatching && !isPvpModalOpen && (
         <MobileHeaderHUD onNavigateTab={handleTabChange} />
       )}
 
-      {/* Main Tab Content — preserves DOM mount state with block/hidden like desktop */}
-      <main className="mobile-content-area flex-1 relative w-full overflow-y-auto min-h-0">
-        <div className="py-2 px-1 sm:px-3">
-          <div className={activeTab === 'campaign' ? 'block' : 'hidden'}>
-            <CampaignView onStartBattle={(stage) => {
+      {/* Main Tab Content — 100% fitted to mobile landscape console layout */}
+      <main className="mobile-content-area flex-1 relative w-full overflow-hidden min-h-0">
+        <div className="h-full w-full">
+          <div className={activeTab === 'campaign' ? 'h-full w-full block' : 'hidden'}>
+            <MobileCampaignView onStartBattle={(stage) => {
               setActiveBattleType('campaign');
               setActiveBattleStage(stage);
               startBattleOnServer('campaign', stage.id.toString(), stage.energyCost).then(success => {
@@ -83,8 +84,8 @@ export const MobileApp: React.FC = () => {
             }} />
           </div>
 
-          <div className={activeTab === 'pvp' ? 'block' : 'hidden'}>
-            <PvpArenaView 
+          <div className={activeTab === 'pvp' ? 'h-full w-full block' : 'hidden'}>
+            <MobilePvpView 
               onStartBattle={async (stage, type, opponentPayload) => {
                 setActiveBattleType(type);
                 setActiveBattleStage(stage);
@@ -104,12 +105,12 @@ export const MobileApp: React.FC = () => {
             />
           </div>
 
-          <div className={activeTab === 'collection' ? 'block' : 'hidden'}>
-            <CollectionDeckView />
+          <div className={activeTab === 'collection' ? 'h-full w-full block' : 'hidden'}>
+            <MobileCollectionView />
           </div>
 
-          <div className={activeTab === 'hero' ? 'block' : 'hidden'}>
-            <HeroInventoryView 
+          <div className={activeTab === 'hero' ? 'h-full w-full block' : 'hidden'}>
+            <MobileHeroView 
               onNavigateToShop={(tab = 'divine') => {
                 setShopInitialTab(tab as any);
                 setActiveTab('altar');
@@ -117,28 +118,30 @@ export const MobileApp: React.FC = () => {
             />
           </div>
 
-          <div className={activeTab === 'talents' ? 'block' : 'hidden'}>
-            <TalentsView />
+          <div className={activeTab === 'altar' ? 'h-full w-full block overflow-y-auto' : 'hidden'}>
+            <div className="p-2">
+              <GachaStoreView initialTab={shopInitialTab} />
+            </div>
           </div>
 
-          <div className={activeTab === 'altar' ? 'block' : 'hidden'}>
-            <GachaStoreView initialTab={shopInitialTab} />
+          <div className={activeTab === 'bank' ? 'h-full w-full block overflow-y-auto' : 'hidden'}>
+            <div className="p-2">
+              <BankView />
+            </div>
           </div>
 
-          <div className={activeTab === 'bank' ? 'block' : 'hidden'}>
-            <BankView />
-          </div>
-
-          <div className={activeTab === 'premium' ? 'block' : 'hidden'}>
-            <PremiumPassView />
+          <div className={activeTab === 'premium' ? 'h-full w-full block overflow-y-auto' : 'hidden'}>
+            <div className="p-2">
+              <PremiumPassView />
+            </div>
           </div>
         </div>
       </main>
 
-      {/* Bottom Navigation — hidden during PvP matching/modal */}
+      {/* Bottom Navigation */}
       {!isPvpMatching && !isPvpModalOpen && (
         <MobileNavBar
-          activeTab={activeTab as any}
+          activeTab={activeTab}
           onTabChange={handleTabChange}
           hasNewDefenseAttacks={hasNewDefenseAttacks}
         />

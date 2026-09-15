@@ -50,7 +50,13 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
 
   return (
     <>
-      <div className="h-[34px] bg-[#0c0e14]/90 backdrop-blur-md border-b border-white/10 flex items-center justify-between px-2 w-full sticky top-0 z-50 safe-landscape-padding">
+      <div 
+        style={{
+          paddingLeft: 'max(4.5rem, env(safe-area-inset-left, 4.5rem))',
+          paddingRight: 'max(4.75rem, env(safe-area-inset-right, 4.75rem))'
+        }}
+        className="h-[36px] bg-[#0c0e14]/95 backdrop-blur-md border-b border-white/10 flex items-center justify-between px-2 w-full sticky top-0 z-50"
+      >
         {/* Left: Avatar & Info */}
         <div className="flex items-center gap-1.5 shrink-0"
           onClick={() => onNavigateTab?.('premium')}
