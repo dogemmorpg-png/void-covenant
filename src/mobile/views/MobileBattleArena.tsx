@@ -18,9 +18,11 @@ import {
   Star, 
   HelpCircle,
   Sparkles,
-  Info
+  Info,
+  ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { assetPreloader } from '../../utils/assetPreloader';
 
 interface MobileBattleArenaProps {
   stage: CampaignStage;
@@ -510,6 +512,15 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
   const lossBaseGold = 20;
   const [lossEarnedGold, setLossEarnedGold] = useState<number>(() => applyRewardMultiplier(lossBaseGold, battleGoldMultiplier));
   const [logFilter, setLogFilter] = useState<'all' | 'damage' | 'skills' | 'deaths'>('all');
+
+  // Preload battle creature assets immediately
+  useEffect(() => {
+    if (stage?.enemyDeck) {
+      assetPreloader.preloadBattleCreatures(stage.enemyDeck);
+    }
+    const playerDeck = (profile?.collection || []).filter(c => (profile?.deck || []).includes(c.id));
+    assetPreloader.preloadBattleCreatures(playerDeck);
+  }, [stage, profile?.deck]);
 
   // Sync visual state when idle
   useEffect(() => {
@@ -1576,6 +1587,21 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
             >
               {isPaused ? <Play className="w-3.5 h-3.5 text-emerald-400" /> : <Pause className="w-3.5 h-3.5" />}
             </button>
+            {isPaused && (
+              <button
+                onClick={() => {
+                  setAttackerAction(null);
+                  setDefenderAction(null);
+                  setActiveSkillVfx(null);
+                  setCurrentStepIndex(prev => prev + 1);
+                }}
+                className="flex items-center gap-0.5 px-1.5 py-1 rounded-lg bg-amber-950/80 border border-amber-500/70 text-[10px] font-mono font-bold text-amber-300 hover:text-white cursor-pointer active:scale-95 shadow-sm"
+                title="Step forward one action"
+              >
+                <ChevronRight className="w-3.5 h-3.5 text-amber-400" />
+                <span>STEP</span>
+              </button>
+            )}
             <button
               onClick={() => setShowLogDrawer(true)}
               className="flex items-center gap-1 px-2 py-1 rounded-lg bg-red-950/70 border border-red-500/70 text-red-300 hover:text-white hover:border-red-400 shadow-[0_0_8px_rgba(239,68,68,0.25)] cursor-pointer active:scale-95"
