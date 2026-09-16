@@ -593,31 +593,45 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
     switch (step.type) {
       case 'sacrifice': {
-        const placingCard = visualState.playerBoard[step.slot];
-        const sacrCard = visualState.playerBoard[step.targetSlot];
+        const isEnemy = step.side === 'enemy';
+        const placingCard = isEnemy ? visualState.enemyBoard[step.slot] : visualState.playerBoard[step.slot];
+        const sacrCard = isEnemy ? visualState.enemyBoard[step.targetSlot] : visualState.playerBoard[step.targetSlot];
+        const targetSide = isEnemy ? 'enemy' : 'player';
+        const heroTarget = isEnemy ? 'enemy-hero' : 'player-hero';
         
-        stepDescription = `💀 Sacrifice: ${placingCard?.name || 'Card'} destroys ${sacrCard?.name || 'ally'}`;
+        stepDescription = `💀 Sacrifice: ${placingCard?.name || 'Card'} destroys ${sacrCard?.name || step.sacrificedCardName || 'ally'}`;
         
-        setActiveSkillVfx({ type: 'sacrifice', side: 'player', slot: step.targetSlot });
+        setActiveSkillVfx({ type: 'sacrifice', side: targetSide, slot: step.targetSlot });
         const tVfx = setTimeout(() => setActiveSkillVfx(null), Math.round(650 / effectiveSpeed));
         timeouts.push(tVfx);
 
-        addFloatingText('💀 SACRIFICE', { side: 'player', slot: step.targetSlot }, 'text-red-500 font-bold scale-110');
-        addFloatingText(`+${step.healAmount} HP 💚`, 'player-hero', 'text-emerald-400 font-black text-sm');
-        addFloatingText(`+${step.buffAttack}⚔️ +${step.buffHealth}❤️`, { side: 'player', slot: step.slot }, 'text-yellow-400 font-bold');
+        addFloatingText('💀 SACRIFICE', { side: targetSide, slot: step.targetSlot }, 'text-red-500 font-bold scale-110');
+        addFloatingText(`+${step.healAmount} HP 💚`, heroTarget, isEnemy ? 'text-rose-400 font-black text-sm' : 'text-emerald-400 font-black text-sm');
+        addFloatingText(`+${step.buffAttack}⚔️ +${step.buffHealth}❤️`, { side: targetSide, slot: step.slot }, 'text-yellow-400 font-bold');
 
         // Allow sacrifice effect to play on target card before removing it
         const tSacr = setTimeout(() => {
           setVisualState(prev => {
             const copy = cloneBattleState(prev);
-            copy.playerBoard[step.targetSlot] = null;
-            const card = copy.playerBoard[step.slot];
-            if (card) {
-              card.attack += step.buffAttack;
-              card.health += step.buffHealth;
-              card.maxHealth += step.buffHealth;
+            if (isEnemy) {
+              copy.enemyBoard[step.targetSlot] = null;
+              const card = copy.enemyBoard[step.slot];
+              if (card) {
+                card.attack += step.buffAttack;
+                card.health += step.buffHealth;
+                card.maxHealth += step.buffHealth;
+              }
+              copy.enemyHeroHealth = Math.min(copy.enemyHeroMaxHealth, copy.enemyHeroHealth + step.healAmount);
+            } else {
+              copy.playerBoard[step.targetSlot] = null;
+              const card = copy.playerBoard[step.slot];
+              if (card) {
+                card.attack += step.buffAttack;
+                card.health += step.buffHealth;
+                card.maxHealth += step.buffHealth;
+              }
+              copy.playerHeroHealth = Math.min(copy.playerHeroMaxHealth, copy.playerHeroHealth + step.healAmount);
             }
-            copy.playerHeroHealth = Math.min(copy.playerHeroMaxHealth, copy.playerHeroHealth + step.healAmount);
             return copy;
           });
         }, Math.round(380 / effectiveSpeed));
@@ -1990,7 +2004,20 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           className="absolute inset-0 bg-emerald-500/35 z-30 pointer-events-none rounded-xl"
                         />
                       )}
-                      {activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
+                      {activeSkillVfx?.type === 'sacrifice' && activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
+                        <motion.div
+                          key="skill-vfx-sacrifice"
+                          initial={{ opacity: 0, scale: 0.85 }}
+                          animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.05, 1.05, 0.9] }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
+                          className="absolute inset-0 bg-black/55 border-2 border-red-500 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none shadow-[0_0_25px_rgba(239,68,68,0.85)] overflow-hidden"
+                        >
+                          <img src="/icons/sacrifice_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-90" />
+                          <span className="relative text-[8.5px] font-mono font-black text-red-400 tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border border-red-500/40 z-10 animate-pulse">SACRIFICED</span>
+                        </motion.div>
+                      )}
+                      {activeSkillVfx?.type !== 'sacrifice' && activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
                         <motion.div
                           key={`skill-vfx-${activeSkillVfx.type}`}
                           initial={{ opacity: 0, scale: 0.85 }}
@@ -2254,7 +2281,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                           className="absolute inset-0 bg-emerald-500/35 z-30 pointer-events-none rounded-xl"
                         />
                       )}
-                      {activeSkillVfx?.type === 'sacrifice' && activeSkillVfx?.side === 'player' && activeSkillVfx?.slot === idx && (
+                      {activeSkillVfx?.type === 'sacrifice' && activeSkillVfx?.side === side && activeSkillVfx?.slot === idx && (
                         <motion.div
                           key="skill-vfx-sacrifice"
                           initial={{ opacity: 0, scale: 0.85 }}

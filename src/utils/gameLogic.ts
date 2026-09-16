@@ -673,11 +673,13 @@ export function simulateCombatTurn(
         
         animateSequence.push({
           type: 'sacrifice',
+          side: 'player',
           slot: playedSlotIndex,
           targetSlot: randomAllySlot,
           healAmount: healAmt,
           buffAttack: Math.round(sacrificeSkill.value / 2),
-          buffHealth: sacrificeSkill.value
+          buffHealth: sacrificeSkill.value,
+          sacrificedCardName: sacrificedCard.name
         });
       }
 
@@ -736,6 +738,8 @@ export function simulateCombatTurn(
         // Trigger enemy sacrifice if any
         const enemySacSkill = enemyCard.skills.find(s => s.type === 'sacrifice');
         const enemyAllies = state.enemyBoard.filter(c => c !== null && !c.isDead).length;
+        let enemySacrificedSlot: number | null = null;
+        let sacrCardName = '';
         if (enemySacSkill && enemyAllies > 0) {
           const enemyActiveSlots: number[] = [];
           state.enemyBoard.forEach((c, idx) => {
@@ -745,6 +749,8 @@ export function simulateCombatTurn(
           const sacrCard = state.enemyBoard[randAllySlot]!;
           sacrCard.isDead = true;
           state.enemyBoard[randAllySlot] = null;
+          enemySacrificedSlot = randAllySlot;
+          sacrCardName = sacrCard.name;
           
           state.enemyHeroHealth = Math.min(state.enemyHeroMaxHealth, state.enemyHeroHealth + enemySacSkill.value);
           enemyCard.attack += Math.round(enemySacSkill.value / 2);
@@ -782,6 +788,20 @@ export function simulateCombatTurn(
             skills: enemyCard.skills.map(s => ({ ...s }))
           }
         });
+
+        // Push sacrifice animation step if enemy sacrificed an ally
+        if (enemySacrificedSlot !== null && enemySacSkill) {
+          animateSequence.push({
+            type: 'sacrifice',
+            side: 'enemy',
+            slot: chosenSlot,
+            targetSlot: enemySacrificedSlot,
+            healAmount: enemySacSkill.value,
+            buffAttack: Math.round(enemySacSkill.value / 2),
+            buffHealth: enemySacSkill.value,
+            sacrificedCardName: sacrCardName
+          });
+        }
       }
     } else {
       logs.push(`😈 Enemy cannot afford to play ${enemyCard.name} (needs ${cost} Mana, has ${state.enemyMana} Mana).`);
