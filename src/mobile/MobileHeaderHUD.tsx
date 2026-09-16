@@ -45,12 +45,14 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
 
   const [topInset, setTopInset] = useState<number>(() => {
     if (typeof window !== 'undefined') {
-      const tg = (window as any).Telegram?.WebApp;
-      if (tg) {
-        const inset = tg.safeAreaInset?.top ?? tg.contentSafeAreaInset?.top;
-        if (typeof inset === 'number' && inset > 0) return inset + 6;
-        return 50; // Standard Telegram mobile top clearance (status bar + tg close header)
-      }
+      try {
+        const tg = (window as any).Telegram?.WebApp;
+        if (tg) {
+          const inset = tg.safeAreaInset?.top ?? tg.contentSafeAreaInset?.top;
+          if (typeof inset === 'number' && inset > 0) return inset + 6;
+          return 50; // Standard Telegram mobile top clearance (status bar + tg close header)
+        }
+      } catch {}
     }
     return 8; // Standard browser clearance
   });
@@ -65,17 +67,23 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
       } catch (e) {}
 
       const checkInset = () => {
-        const inset = tg.safeAreaInset?.top ?? tg.contentSafeAreaInset?.top;
-        if (typeof inset === 'number' && inset > 0) {
-          setTopInset(inset + 6);
-        } else {
-          setTopInset(50);
-        }
+        try {
+          const inset = tg.safeAreaInset?.top ?? tg.contentSafeAreaInset?.top;
+          if (typeof inset === 'number' && inset > 0) {
+            setTopInset(inset + 6);
+          } else {
+            setTopInset(50);
+          }
+        } catch {}
       };
       checkInset();
-      tg.onEvent?.('viewportChanged', checkInset);
+      try {
+        tg.onEvent?.('viewportChanged', checkInset);
+      } catch {}
       return () => {
-        tg.offEvent?.('viewportChanged', checkInset);
+        try {
+          tg.offEvent?.('viewportChanged', checkInset);
+        } catch {}
       };
     }
   }, []);

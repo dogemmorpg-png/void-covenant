@@ -543,12 +543,54 @@ function MainAppContent() {
   );
 }
 
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: Error | null }> {
+  state = { hasError: false, error: null as Error | null };
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error('App ErrorBoundary caught error:', error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="fixed inset-0 z-[99999] bg-[#07090e] text-white flex items-center justify-center p-6 text-center">
+          <div className="max-w-md w-full p-6 border border-red-500/40 bg-black/90 rounded-2xl shadow-2xl space-y-4">
+            <div className="w-12 h-12 rounded-full bg-red-950/60 border border-red-500/50 flex items-center justify-center mx-auto text-red-400 text-xl font-bold">
+              ⚠
+            </div>
+            <h2 className="font-display font-black text-lg text-red-400 tracking-wider uppercase">
+              Application Error
+            </h2>
+            <p className="text-xs text-zinc-400 font-mono leading-relaxed break-words">
+              {this.state.error?.message || 'An unexpected rendering error occurred.'}
+            </p>
+            <button
+              onClick={() => {
+                this.setState({ hasError: false, error: null });
+                window.location.reload();
+              }}
+              className="w-full py-2.5 px-4 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-display font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-lg active:scale-95"
+            >
+              Reload Application
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
   return (
-    <ToastProvider>
-      <GameProvider>
-        <MainAppContent />
-      </GameProvider>
-    </ToastProvider>
+    <ErrorBoundary>
+      <ToastProvider>
+        <GameProvider>
+          <MainAppContent />
+        </GameProvider>
+      </ToastProvider>
+    </ErrorBoundary>
   );
 }
+

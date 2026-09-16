@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Swords, 
   Trophy, 
@@ -109,12 +109,14 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
 
   const [bottomInset, setBottomInset] = useState<number>(() => {
     if (typeof window !== 'undefined') {
-      const tg = (window as any).Telegram?.WebApp;
-      if (tg) {
-        const inset = tg.safeAreaInset?.bottom ?? tg.contentSafeAreaInset?.bottom;
-        if (typeof inset === 'number' && inset > 0) return inset + 2;
-        return 14; // Standard Android system navigation buttons clearance
-      }
+      try {
+        const tg = (window as any).Telegram?.WebApp;
+        if (tg) {
+          const inset = tg.safeAreaInset?.bottom ?? tg.contentSafeAreaInset?.bottom;
+          if (typeof inset === 'number' && inset > 0) return inset + 2;
+          return 14; // Standard Android system navigation buttons clearance
+        }
+      } catch {}
     }
     return 8;
   });
@@ -123,17 +125,23 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
     const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
     if (tg) {
       const checkInset = () => {
-        const inset = tg.safeAreaInset?.bottom ?? tg.contentSafeAreaInset?.bottom;
-        if (typeof inset === 'number' && inset > 0) {
-          setBottomInset(inset + 2);
-        } else {
-          setBottomInset(14);
-        }
+        try {
+          const inset = tg.safeAreaInset?.bottom ?? tg.contentSafeAreaInset?.bottom;
+          if (typeof inset === 'number' && inset > 0) {
+            setBottomInset(inset + 2);
+          } else {
+            setBottomInset(14);
+          }
+        } catch {}
       };
       checkInset();
-      tg.onEvent?.('viewportChanged', checkInset);
+      try {
+        tg.onEvent?.('viewportChanged', checkInset);
+      } catch {}
       return () => {
-        tg.offEvent?.('viewportChanged', checkInset);
+        try {
+          tg.offEvent?.('viewportChanged', checkInset);
+        } catch {}
       };
     }
   }, []);
