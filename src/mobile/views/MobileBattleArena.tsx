@@ -135,6 +135,16 @@ const renderManaIcon = (cost: number, sizeClass: string = "w-4 h-4") => {
   );
 };
 
+// Authentic PC Mana Badge for Hero HUDs (replaces emoji 💎)
+const renderHeroManaBadge = (current: number, max: number) => (
+  <div className="flex items-center gap-1 bg-black/60 px-2 py-0.5 rounded-lg border border-cyan-500/40 shrink-0 shadow-sm">
+    {renderManaIcon(current, "w-4 h-4")}
+    <span className="text-[10px] font-mono font-bold text-cyan-300 leading-none whitespace-nowrap pl-0.5">
+      / {max}
+    </span>
+  </div>
+);
+
 // 100% Authentic PC Skill Icons
 const renderSkillIcon = (type: string, sizeClass: string = "w-3.5 h-3.5") => {
   const normType = type?.toLowerCase();
@@ -406,6 +416,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
 
   const [floatingTexts, setFloatingTexts] = useState<FloatingTextEffect[]>([]);
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
+  const [helpTab, setHelpTab] = useState<'basics' | 'skills' | 'defense'>('basics');
   const [showLogDrawer, setShowLogDrawer] = useState<boolean>(false);
   const [finalBattleState, setFinalBattleState] = useState<BattleState | null>(null);
   const battleResultSubmittedRef = useRef<boolean>(false);
@@ -455,9 +466,10 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
     for (let i = 0; i < 5; i++) {
       const pCard = playState.playerBoard[i];
       const eCard = playState.enemyBoard[i];
-      if (pCard && pCard.delay > 0) pCard.delay = Math.max(0, pCard.delay - 1);
-      if (eCard && eCard.delay > 0) eCard.delay = Math.max(0, eCard.delay - 1);
+      if (pCard && Number(pCard.delay) > 0) pCard.delay = Math.max(0, Number(pCard.delay) - 1);
+      if (eCard && Number(eCard.delay) > 0) eCard.delay = Math.max(0, Number(eCard.delay) - 1);
     }
+    setBattle(playState);
     setVisualState(playState);
     setAnimateSequence(steps);
     setCurrentStepIndex(0);
@@ -1010,9 +1022,12 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
             defenderAction?.side === 'enemy' && defenderAction?.slot === -1 ? 'anim-hero-recoil' : ''
           }`}>
             <img 
-              src={stage.enemyAvatar || '/avatars/avatar_default.webp'} 
-              alt={stage.enemyName || 'Enemy Lord'} 
+              src={stage.enemyHeroImage ? (stage.enemyHeroImage.includes('mage') ? '/avatars/vampire.webp' : (stage.enemyHeroImage.includes('thief') ? '/avatars/rogue.webp' : stage.enemyHeroImage)) : '/avatars/knight.webp'} 
+              alt={stage.enemyHeroName || stage.name || 'Enemy Lord'} 
               className="w-full h-full object-cover" 
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = '/avatars/knight.webp';
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           </div>
@@ -1020,7 +1035,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
               <span className="font-display font-black text-xs text-red-300 truncate">
-                {stage.enemyName || 'Abyssal Overlord'}
+                {stage.enemyHeroName || stage.name || 'Abyssal Overlord'}
               </span>
               <span className="text-[8.5px] font-mono px-1 rounded bg-red-950 border border-red-800/80 text-red-400 font-bold">
                 Lvl {stage.enemyLevel || 1}
@@ -1035,7 +1050,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                   style={{ width: `${Math.max(0, Math.min(100, (visualState.enemyHeroHealth / visualState.enemyHeroMaxHealth) * 100))}%` }}
                 />
               </div>
-              <span className="text-[9.5px] font-mono font-black text-red-300">
+              <span className="text-[9.5px] font-mono font-black text-red-300 whitespace-nowrap">
                 {visualState.enemyHeroHealth} / {visualState.enemyHeroMaxHealth}
               </span>
             </div>
@@ -1052,12 +1067,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
         </div>
 
         {/* Enemy Mana */}
-        <div className="flex items-center gap-1 bg-black/60 px-2 py-0.5 rounded-lg border border-red-500/30">
-          <span className="text-[8.5px]">💎</span>
-          <span className="text-[10.5px] font-mono font-black text-cyan-300">
-            {visualState.enemyMana} / {visualState.enemyMaxMana}
-          </span>
-        </div>
+        {renderHeroManaBadge(visualState.enemyMana || 0, visualState.enemyMaxMana || 0)}
       </div>
 
       {/* =========================================================================
@@ -1071,7 +1081,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
           <div className="flex items-center justify-between px-1 mb-1 text-[8.5px] font-mono text-zinc-500 uppercase tracking-wider">
             <span>ENEMY SQUAD (5 SLOTS)</span>
             <span className="text-red-400/90 font-mono">
-              HAND: {visualState.enemyHand.length} | DECK: {visualState.enemyDeckSize || visualState.enemyHand.length}
+              REMAINING DECK: {visualState.enemyDeckSize || visualState.enemyHand.length || 0}
             </span>
           </div>
 
@@ -1151,8 +1161,8 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
 
-                        {/* AUTHENTIC PC DELAY OVERLAY: ONLY SHOWN WHEN card.delay > 0 */}
-                        {card.delay > 0 && (
+                        {/* AUTHENTIC PC DELAY OVERLAY: ONLY SHOWN WHEN card.delay > 0 AND NOT ACTING */}
+                        {Number(card.delay) > 0 && !isActing && (
                           <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-15">
                             <div className="flex flex-col items-center justify-center relative">
                               <img 
@@ -1463,8 +1473,8 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
 
-                        {/* AUTHENTIC PC DELAY OVERLAY: ONLY SHOWN WHEN card.delay > 0 */}
-                        {card.delay > 0 && (
+                        {/* AUTHENTIC PC DELAY OVERLAY: ONLY SHOWN WHEN card.delay > 0 AND NOT ACTING */}
+                        {Number(card.delay) > 0 && !isActing && (
                           <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-15">
                             <div className="flex flex-col items-center justify-center relative">
                               <img 
@@ -1609,27 +1619,22 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
               </span>
             </div>
 
-            <div className="flex items-center gap-2 mt-0.5">
+            <div className="flex items-center gap-2 mt-0.5 shrink-0">
               {/* HP Bar */}
-              <div className="flex items-center gap-1">
-                <div className="w-20 h-2 bg-zinc-900 rounded-full overflow-hidden border border-emerald-950">
+              <div className="flex items-center gap-1.5 shrink-0">
+                <div className="w-16 sm:w-20 h-2 bg-zinc-900 rounded-full overflow-hidden border border-emerald-950 shrink-0">
                   <div 
                     className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 transition-all duration-300"
                     style={{ width: `${Math.max(0, Math.min(100, (visualState.playerHeroHealth / visualState.playerHeroMaxHealth) * 100))}%` }}
                   />
                 </div>
-                <span className="text-[10px] font-mono font-black text-emerald-300">
+                <span className="text-[10px] font-mono font-black text-emerald-300 whitespace-nowrap">
                   {visualState.playerHeroHealth} / {visualState.playerHeroMaxHealth}
                 </span>
               </div>
 
               {/* Personal Player Mana */}
-              <div className="flex items-center gap-1 bg-cyan-950/70 px-1.5 py-0.5 rounded border border-cyan-500/50">
-                <span className="text-[9px]">💎</span>
-                <span className="text-[10px] font-mono font-black text-cyan-300">
-                  {visualState.playerMana} / {visualState.playerMaxMana}
-                </span>
-              </div>
+              {renderHeroManaBadge(visualState.playerMana || 0, visualState.playerMaxMana || 0)}
             </div>
           </div>
         </div>
@@ -1672,7 +1677,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       <div className="bg-[#090d15] border-t border-white/10 px-2 pt-1.5 pb-2.5 shrink-0 z-20">
         <div className="flex items-center justify-between px-1 mb-1 text-[8.5px] font-mono text-zinc-400">
           <div className="flex items-center gap-1.5">
-            <span className="font-bold text-[#ebd09b] uppercase tracking-wider">COMMANDER HAND (FIXED 3)</span>
+            <span className="font-bold text-[#ebd09b] uppercase tracking-wider">COMMANDER HAND</span>
             <span className="text-[7.5px] text-zinc-500">Tap to deploy</span>
           </div>
           <span className="text-zinc-400 font-mono">
@@ -2035,35 +2040,261 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       {/* =========================================================================
           10. RULES CODEX MODAL (100% English)
          ========================================================================= */}
-      {showHelpModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="w-full max-w-sm bg-[#120d18] border border-[#ebd09b]/50 rounded-2xl p-4 flex flex-col space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10">
-              <h4 className="font-display font-black text-sm text-[#ebd09b] uppercase">Codex of War</h4>
-              <button onClick={() => setShowHelpModal(false)} className="text-zinc-400 hover:text-white">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="text-[11px] font-sans text-zinc-300 space-y-2 max-h-72 overflow-y-auto">
-              <p><strong>⏳ Cast Delay (Timer):</strong> Number of rounds before the creature unleashes its first strike. Delay 0 attacks immediately.</p>
-              <p><strong>💎 Mana:</strong> Energy required to summon this creature to the battlefield. Refilled every round.</p>
-              <p><strong>⚔️ Duels:</strong> Creatures strike the opposing card. If the slot is unoccupied, direct damage is dealt to the Lord.</p>
-              <p><strong>🩸 Vampirism:</strong> Restores health to this card upon inflicting attack damage.</p>
-              <p><strong>🦠 Plague:</strong> Spreads toxic miasma at the end of every round, afflicting enemy creatures.</p>
-              <p><strong>👁️ Hex:</strong> Curses the opposing target, amplifying all subsequent incoming damage.</p>
-              <p><strong>💀 Sacrifice:</strong> Destroys a friendly creature upon deployment to permanently bolster self and heal the Lord.</p>
-            </div>
-
-            <button
-              onClick={() => setShowHelpModal(false)}
-              className="w-full py-2 bg-zinc-800 text-white font-mono text-xs font-bold rounded-xl"
+      <AnimatePresence>
+        {showHelpModal && (
+          <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md bg-[#120d18] border border-[#ebd09b]/50 rounded-2xl overflow-hidden flex flex-col shadow-2xl max-h-[88vh]"
             >
-              UNDERSTOOD
-            </button>
+              {/* Header */}
+              <div className="flex justify-between items-center px-4 py-3 bg-gradient-to-r from-black/90 via-[#1a1424] to-black/90 border-b border-[#ebd09b]/25 shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#ebd09b]/25 to-purple-950/70 border border-[#ebd09b]/50 flex items-center justify-center shadow-md shrink-0">
+                    <Swords className="w-4 h-4 text-[#ebd09b]" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-black text-xs sm:text-sm text-[#ebd09b] tracking-wider uppercase leading-tight">
+                      Combat Tactics Guide
+                    </h3>
+                    <span className="text-[9.5px] font-mono text-gray-400 block -mt-0.5">Rules & Codex of Void Covenant</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowHelpModal(false)}
+                  className="text-gray-400 hover:text-white font-mono font-bold text-xs bg-black/50 hover:bg-black/80 border border-gray-700 hover:border-gray-400 rounded-lg p-1.5 transition-all cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Navigation Tabs */}
+              <div className="grid grid-cols-3 gap-1 p-2 bg-black/70 border-b border-gray-800 text-center font-display text-[10px] sm:text-xs font-bold shrink-0">
+                <button
+                  onClick={() => setHelpTab('basics')}
+                  className={`py-1.5 px-1 rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                    helpTab === 'basics'
+                      ? 'bg-gradient-to-r from-amber-950/90 to-purple-950/90 border border-[#ebd09b] text-[#ebd09b] shadow-[0_0_10px_rgba(235,208,155,0.25)]'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent'
+                  }`}
+                >
+                  <Swords className="w-3 h-3 shrink-0" />
+                  <span>DUEL BASICS</span>
+                </button>
+                <button
+                  onClick={() => setHelpTab('skills')}
+                  className={`py-1.5 px-1 rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                    helpTab === 'skills'
+                      ? 'bg-gradient-to-r from-purple-950/90 to-indigo-950/90 border border-purple-400 text-purple-200 shadow-[0_0_10px_rgba(168,85,247,0.3)]'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent'
+                  }`}
+                >
+                  <Zap className="w-3 h-3 shrink-0 text-purple-400" />
+                  <span>DARK SKILLS</span>
+                </button>
+                <button
+                  onClick={() => setHelpTab('defense')}
+                  className={`py-1.5 px-1 rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                    helpTab === 'defense'
+                      ? 'bg-gradient-to-r from-cyan-950/90 to-blue-950/90 border border-cyan-400 text-cyan-200 shadow-[0_0_10px_rgba(6,182,212,0.3)]'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent'
+                  }`}
+                >
+                  <Shield className="w-3 h-3 shrink-0 text-cyan-400" />
+                  <span>DEFENSE & TIPS</span>
+                </button>
+              </div>
+
+              {/* Scrollable Body Content */}
+              <div className="p-3 text-[11px] sm:text-xs text-gray-300 overflow-y-auto max-h-[52vh] space-y-2">
+                {helpTab === 'basics' && (
+                  <motion.div initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
+                    {/* 1. Combat System (Linear Duels) */}
+                    <div className="p-2.5 rounded-xl bg-black/45 border border-white/10 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-display font-bold text-xs text-white flex items-center gap-1.5">
+                          🗡️ Combat System (Linear Duels)
+                        </h4>
+                        <span className="text-[9px] font-mono text-amber-300/80">5-Slot Board</span>
+                      </div>
+                      <p className="text-gray-300 text-[11px] leading-relaxed">
+                        Combat is 1v1 on a linear 5-slot board. Cards attack <strong className="text-white">strictly opposite themselves</strong>. If the slot opposite is empty, all damage goes directly to enemy Lord. Goal is to bring enemy health to zero.
+                      </p>
+                      <div className="grid grid-cols-2 gap-1.5 pt-0.5 font-mono text-[10px]">
+                        <div className="p-1.5 rounded-lg bg-purple-950/30 border border-purple-800/40 text-center">
+                          <span className="text-purple-300 font-bold block">⚔️ Creature Clash</span>
+                          <span className="text-gray-400 text-[9.5px]">Opposite occupied ➔ cards duel</span>
+                        </div>
+                        <div className="p-1.5 rounded-lg bg-red-950/30 border border-red-800/40 text-center">
+                          <span className="text-red-300 font-bold block">🎯 Direct Strike</span>
+                          <span className="text-gray-400 text-[9.5px]">Opposite empty ➔ hits Lord!</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2. Turn Delay */}
+                    <div className="p-2.5 rounded-xl bg-black/45 border border-white/10 space-y-1">
+                      <h4 className="font-display font-bold text-xs text-white flex items-center gap-1.5">
+                        ⏳ Delay Mechanics (Delay)
+                      </h4>
+                      <p className="text-gray-300 text-[11px] leading-relaxed">
+                        When placed on board, card has a delay indicator (e.g. 1, 2 or 3 turns). It cannot attack immediately. Each turn timer decreases by 1. Reaching <strong className="text-emerald-300">0</strong> makes card active ⚔️ and attacks at the end of each turn.
+                      </p>
+                    </div>
+
+                    {/* 3 & 4. Mana Crystals & Victory Goal */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div className="p-2.5 rounded-xl bg-black/45 border border-white/10 space-y-1">
+                        <h4 className="font-display font-bold text-xs text-cyan-300 flex items-center gap-1.5">
+                          🔮 Mana Crystals
+                        </h4>
+                        <p className="text-gray-300 text-[10.5px] leading-relaxed">
+                          Mana refills and grows each round (1 ➔ 10). Each card costs Mana indicated on its crystal badge.
+                        </p>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-black/45 border border-white/10 space-y-1">
+                        <h4 className="font-display font-bold text-xs text-[#ebd09b] flex items-center gap-1.5">
+                          👑 Victory Goal
+                        </h4>
+                        <p className="text-gray-300 text-[10.5px] leading-relaxed">
+                          Destroy the enemy Lord by reducing their Health to <strong className="text-red-400">0 HP</strong> before they destroy yours.
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {helpTab === 'skills' && (
+                  <motion.div initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
+                    {/* Vampirism */}
+                    <div className="p-2.5 rounded-xl bg-gradient-to-r from-rose-950/40 to-black/60 border border-rose-900/50 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          {renderSkillIcon("vampirism", "w-4 h-4")}
+                          <span className="font-display font-bold text-xs text-rose-300">Vampirism [X]</span>
+                        </div>
+                        <span className="px-1.5 py-0.5 rounded bg-rose-950 border border-rose-700/60 font-mono text-[8.5px] font-bold text-rose-300 uppercase">
+                          On Attack
+                        </span>
+                      </div>
+                      <p className="text-gray-300 text-[10.5px] leading-relaxed">
+                        Every time creature attacks and damages another card, it heals itself by <strong className="text-emerald-400">+X HP</strong> (up to max HP).
+                      </p>
+                    </div>
+
+                    {/* Hex */}
+                    <div className="p-2.5 rounded-xl bg-gradient-to-r from-purple-950/40 to-black/60 border border-purple-900/50 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          {renderSkillIcon("hex", "w-4 h-4")}
+                          <span className="font-display font-bold text-xs text-purple-300">Hex [X]</span>
+                        </div>
+                        <span className="px-1.5 py-0.5 rounded bg-purple-950 border border-purple-700/60 font-mono text-[8.5px] font-bold text-purple-300 uppercase">
+                          Before Strike
+                        </span>
+                      </div>
+                      <p className="text-gray-300 text-[10.5px] leading-relaxed">
+                        Before dealing damage, hexes the opposite creature, increasing next incoming damage by <strong className="text-purple-300">+X</strong>.
+                      </p>
+                    </div>
+
+                    {/* Plague */}
+                    <div className="p-2.5 rounded-xl bg-gradient-to-r from-emerald-950/40 to-black/60 border border-emerald-900/50 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          {renderSkillIcon("plague", "w-4 h-4")}
+                          <span className="font-display font-bold text-xs text-emerald-300">Plague [X]</span>
+                        </div>
+                        <span className="px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-700/60 font-mono text-[8.5px] font-bold text-emerald-300 uppercase">
+                          End of Turn
+                        </span>
+                      </div>
+                      <p className="text-gray-300 text-[10.5px] leading-relaxed">
+                        At the end of each turn, emits poisonous spores dealing <strong className="text-emerald-400">X pure damage</strong> to a random living enemy on board.
+                      </p>
+                    </div>
+
+                    {/* Sacrifice */}
+                    <div className="p-2.5 rounded-xl bg-gradient-to-r from-red-950/50 to-black/60 border border-red-900/60 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          {renderSkillIcon("sacrifice", "w-4 h-4")}
+                          <span className="font-display font-bold text-xs text-red-300">Sacrifice [X]</span>
+                        </div>
+                        <span className="px-1.5 py-0.5 rounded bg-red-950 border border-red-700/60 font-mono text-[8.5px] font-bold text-red-300 uppercase">
+                          On Play
+                        </span>
+                      </div>
+                      <p className="text-gray-300 text-[10.5px] leading-relaxed">
+                        On play, destroys a random ally on your board. In return, <strong className="text-emerald-400">heals your hero by +X HP</strong>, and creature permanently gets <strong className="text-red-400">+(X/2) Attack</strong> and <strong className="text-emerald-400">+X Health</strong>.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+
+                {helpTab === 'defense' && (
+                  <motion.div initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
+                    {/* 1 & 2. Barrier & Armor Plates */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div className="p-2.5 rounded-xl bg-cyan-950/30 border border-cyan-800/40 space-y-1">
+                        <span className="font-display font-bold text-xs text-cyan-300 flex items-center gap-1.5">
+                          🛡️ Barrier / Ward
+                        </span>
+                        <p className="text-gray-300 text-[10.5px] leading-relaxed">
+                          A magical shield that absorbs <strong className="text-cyan-200">100% of the first incoming attack</strong>, regardless of damage. Shatters upon hit.
+                        </p>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-slate-900/50 border border-slate-700/50 space-y-1">
+                        <span className="font-display font-bold text-xs text-slate-300 flex items-center gap-1.5">
+                          🔰 Armor Plates
+                        </span>
+                        <p className="text-gray-300 text-[10.5px] leading-relaxed">
+                          Armor points absorb damage first before the creature's core Health is touched. Breaks once exhausted.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 3. Hero Evade / Dodge */}
+                    <div className="p-2.5 rounded-xl bg-black/45 border border-white/10 flex items-center gap-2.5">
+                      <span className="text-lg">💨</span>
+                      <div className="text-[10.5px] leading-relaxed">
+                        <strong className="text-white block font-display text-xs mb-0.5">Hero Evade / Dodge</strong>
+                        <span className="text-gray-300">Equipped boots and agility talents give your Hero a chance to completely dodge direct attacks!</span>
+                      </div>
+                    </div>
+
+                    {/* 4. Master Pro-Tips */}
+                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-950/30 via-black/40 to-amber-950/30 border border-[#ebd09b]/30 space-y-1">
+                      <span className="text-xs font-display font-bold text-[#ebd09b] flex items-center gap-1.5">
+                        💡 Tactical Pro-Tips:
+                      </span>
+                      <ul className="space-y-0.5 text-[10.5px] text-gray-300 list-disc pl-4 font-sans">
+                        <li><strong className="text-white">Sacrifice strategy:</strong> Sacrifice weak or wounded cards for explosive buffs to key creatures!</li>
+                        <li><strong className="text-white">Empty lane rush:</strong> Place low-delay attackers directly opposite empty slots to burn the enemy Lord.</li>
+                        <li><strong className="text-white">Break shields first:</strong> Pop enemy Barrier charges with minor attacks or Plague before heavy strikes.</li>
+                      </ul>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-3 bg-black/85 border-t border-gray-800 shrink-0">
+                <button
+                  onClick={() => setShowHelpModal(false)}
+                  className="w-full bg-gradient-to-r from-[#c5a880] to-[#ebd09b] hover:from-[#ebd09b] hover:to-[#fff] text-black font-display font-black py-2.5 rounded-xl transition-all shadow-[0_0_15px_rgba(235,208,155,0.3)] text-xs tracking-widest cursor-pointer active:scale-98 uppercase"
+                >
+                  ⚔️ Understood, To Battle!
+                </button>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
     </div>
   );
