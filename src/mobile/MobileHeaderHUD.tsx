@@ -43,6 +43,43 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
   const [isClaimingSovereigns, setIsClaimingSovereigns] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
+  const [topInset, setTopInset] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const tg = (window as any).Telegram?.WebApp;
+      if (tg) {
+        const inset = tg.safeAreaInset?.top ?? tg.contentSafeAreaInset?.top;
+        if (typeof inset === 'number' && inset > 0) return inset + 6;
+        return 50; // Standard Telegram mobile top clearance (status bar + tg close header)
+      }
+    }
+    return 8; // Standard browser clearance
+  });
+
+  useEffect(() => {
+    const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
+    if (tg) {
+      try {
+        tg.ready?.();
+        tg.setHeaderColor?.('#0c0e14');
+        tg.setBackgroundColor?.('#050505');
+      } catch (e) {}
+
+      const checkInset = () => {
+        const inset = tg.safeAreaInset?.top ?? tg.contentSafeAreaInset?.top;
+        if (typeof inset === 'number' && inset > 0) {
+          setTopInset(inset + 6);
+        } else {
+          setTopInset(50);
+        }
+      };
+      checkInset();
+      tg.onEvent?.('viewportChanged', checkInset);
+      return () => {
+        tg.offEvent?.('viewportChanged', checkInset);
+      };
+    }
+  }, []);
+
   const isAdmin =
     profile?.username?.toLowerCase() === 'adminus' ||
     (profile as any)?.role === 'admin' ||
@@ -133,7 +170,7 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
     <>
       <header 
         style={{
-          paddingTop: 'max(0.4rem, env(safe-area-inset-top, 0.4rem))',
+          paddingTop: `max(${topInset}px, env(safe-area-inset-top, ${topInset}px))`,
           paddingLeft: 'max(0.6rem, env(safe-area-inset-left, 0.6rem))',
           paddingRight: 'max(0.6rem, env(safe-area-inset-right, 0.6rem))'
         }}

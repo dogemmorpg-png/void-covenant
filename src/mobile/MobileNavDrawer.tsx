@@ -107,6 +107,37 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
     },
   ];
 
+  const [bottomInset, setBottomInset] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const tg = (window as any).Telegram?.WebApp;
+      if (tg) {
+        const inset = tg.safeAreaInset?.bottom ?? tg.contentSafeAreaInset?.bottom;
+        if (typeof inset === 'number' && inset > 0) return inset + 2;
+        return 14; // Standard Android system navigation buttons clearance
+      }
+    }
+    return 8;
+  });
+
+  useEffect(() => {
+    const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
+    if (tg) {
+      const checkInset = () => {
+        const inset = tg.safeAreaInset?.bottom ?? tg.contentSafeAreaInset?.bottom;
+        if (typeof inset === 'number' && inset > 0) {
+          setBottomInset(inset + 2);
+        } else {
+          setBottomInset(14);
+        }
+      };
+      checkInset();
+      tg.onEvent?.('viewportChanged', checkInset);
+      return () => {
+        tg.offEvent?.('viewportChanged', checkInset);
+      };
+    }
+  }, []);
+
   const currentItem = menuItems.find(i => i.id === activeTab) || menuItems[0];
 
   const handleSelect = (tab: MobileTab) => {
@@ -117,30 +148,103 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
   return (
     <>
       {/* =========================================================================
-          1. FLOATING CORNER MENU TRIGGER BUTTON
+          1. DOCKED MOBILE BOTTOM NAVIGATION BAR (Safe from phone Back button)
          ========================================================================= */}
-      <div className="fixed bottom-4 right-4 z-40 select-none">
-        <button
-          onClick={() => setIsOpen(true)}
-          className="group relative flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-gradient-to-r from-[#181320] via-[#120e18] to-[#181320] border-2 border-[#ebd09b]/60 hover:border-[#ebd09b] text-white shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_15px_rgba(235,208,155,0.25)] active:scale-95 transition-all cursor-pointer"
-        >
-          {/* Ambient Glow */}
-          <div className="absolute inset-0 rounded-full bg-amber-500/10 blur-sm group-hover:bg-amber-500/20 transition-all pointer-events-none" />
+      <nav 
+        style={{
+          paddingBottom: `max(${bottomInset}px, env(safe-area-inset-bottom, ${bottomInset}px))`
+        }}
+        className="fixed bottom-0 left-0 right-0 z-40 bg-[#0c0e14]/98 backdrop-blur-lg border-t border-white/10 select-none shadow-[0_-8px_30px_rgba(0,0,0,0.9)]"
+      >
+        <div className="max-w-md mx-auto grid grid-cols-5 px-1 pt-1 pb-0.5">
+          {/* Tab 1: Campaign */}
+          <button
+            onClick={() => onTabChange('campaign')}
+            className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer active:scale-95 ${
+              activeTab === 'campaign'
+                ? 'bg-emerald-950/40 border border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.25)] text-emerald-300'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            <Swords className={`w-4 h-4 ${activeTab === 'campaign' ? 'text-emerald-400 drop-shadow-[0_0_6px_rgba(16,185,129,0.8)]' : ''}`} />
+            <span className="font-display font-bold text-[9px] tracking-wider uppercase mt-1">
+              Campaign
+            </span>
+          </button>
 
-          <div className="relative flex items-center justify-center">
-            <Compass className="w-4 h-4 text-[#ebd09b] group-hover:rotate-45 transition-transform duration-300" />
-            {hasNewDefenseAttacks && (
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-[#120e18] animate-ping" />
-            )}
-          </div>
+          {/* Tab 2: Arena */}
+          <button
+            onClick={() => onTabChange('pvp')}
+            className={`relative flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer active:scale-95 ${
+              activeTab === 'pvp'
+                ? 'bg-rose-950/40 border border-rose-500/50 shadow-[0_0_12px_rgba(244,63,94,0.25)] text-rose-300'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            <div className="relative">
+              <Trophy className={`w-4 h-4 ${activeTab === 'pvp' ? 'text-rose-400 drop-shadow-[0_0_6px_rgba(244,63,94,0.8)]' : ''}`} />
+              {hasNewDefenseAttacks && (
+                <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+              )}
+            </div>
+            <span className="font-display font-bold text-[9px] tracking-wider uppercase mt-1">
+              Arena
+            </span>
+          </button>
 
-          <span className="relative font-cinzel font-black text-xs text-[#ebd09b] tracking-wider uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
-            {currentItem.label}
-          </span>
+          {/* Tab 3: Cards */}
+          <button
+            onClick={() => onTabChange('collection')}
+            className={`relative flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer active:scale-95 ${
+              activeTab === 'collection'
+                ? 'bg-amber-950/40 border border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.25)] text-amber-300'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            <div className="relative">
+              <FolderGit className={`w-4 h-4 ${activeTab === 'collection' ? 'text-amber-400 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : ''}`} />
+              {deckCount !== undefined && (
+                <span className="absolute -top-1.5 -right-3 text-[7.5px] font-mono font-black px-1 rounded-full bg-amber-500/30 text-amber-300 border border-amber-500/40">
+                  {deckCount}
+                </span>
+              )}
+            </div>
+            <span className="font-display font-bold text-[9px] tracking-wider uppercase mt-1">
+              Cards
+            </span>
+          </button>
 
-          <span className="relative w-1.5 h-1.5 rounded-full bg-[#ebd09b]/60" />
-        </button>
-      </div>
+          {/* Tab 4: Lord */}
+          <button
+            onClick={() => onTabChange('hero')}
+            className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer active:scale-95 ${
+              activeTab === 'hero'
+                ? 'bg-yellow-950/40 border border-yellow-500/50 shadow-[0_0_12px_rgba(234,179,8,0.25)] text-yellow-300'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            <UserCircle2 className={`w-4 h-4 ${activeTab === 'hero' ? 'text-yellow-400 drop-shadow-[0_0_6px_rgba(234,179,8,0.8)]' : ''}`} />
+            <span className="font-display font-bold text-[9px] tracking-wider uppercase mt-1">
+              Lord
+            </span>
+          </button>
+
+          {/* Tab 5: Menu / Drawer */}
+          <button
+            onClick={() => setIsOpen(true)}
+            className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer active:scale-95 ${
+              ['altar', 'bank', 'premium'].includes(activeTab)
+                ? 'bg-[#1b1424] border border-[#ebd09b]/60 shadow-[0_0_12px_rgba(235,208,155,0.25)] text-[#ebd09b]'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            <Compass className={`w-4 h-4 ${['altar', 'bank', 'premium'].includes(activeTab) ? 'text-[#ebd09b] drop-shadow-[0_0_6px_rgba(235,208,155,0.8)]' : ''}`} />
+            <span className="font-display font-bold text-[9px] tracking-wider uppercase mt-1 truncate max-w-full">
+              {['altar', 'bank', 'premium'].includes(activeTab) ? currentItem.label.split(' ')[0] : 'Menu'}
+            </span>
+          </button>
+        </div>
+      </nav>
 
       {/* =========================================================================
           2. SLIDE-UP NAVIGATION DRAWER (Atmospheric Gothic Modal)
