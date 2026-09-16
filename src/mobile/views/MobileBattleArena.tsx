@@ -1166,19 +1166,25 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
         </div>
 
         {/* =========================================================================
-            3. ARENA PLAYFIELD (5 VS 5 BOARD + CENTRAL CLASH BAR)
+            3. ARENA PLAYFIELD (5 VS 5 BOARD + CENTRAL CLASH BAR) - MEDIEVAL TABLE
            ========================================================================= */}
-        <main className="flex-1 flex flex-col justify-between px-2 py-1 relative min-h-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(235,208,155,0.04)_0%,transparent_70%)] pointer-events-none" />
+        <main className="flex-1 flex flex-col justify-between mx-2 my-1 px-2 py-1.5 sm:px-3 sm:py-2 rounded-2xl border-[3px] border-[#251a14] bg-[#120d0a] shadow-[inset_0_0_50px_rgba(0,0,0,0.95),_0_6px_20px_rgba(0,0,0,0.85)] ring-1 ring-[#ebd09b]/15 relative min-h-0 overflow-hidden">
+          {/* Authentic Medieval Table Divider Line */}
+          <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#ebd09b]/15 to-transparent -translate-y-1/2 pointer-events-none z-0" />
+          
+          {/* Table Vignette Overlay */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(235,208,155,0.03)_0%,rgba(0,0,0,0.6)_100%)] pointer-events-none z-0" />
 
-        {/* ROW 1: ENEMY SQUAD (5 SLOTS) */}
-        <div>
-          <div className="flex items-center justify-between px-1 mb-1 text-[8.5px] font-mono text-zinc-500 uppercase tracking-wider">
-            <span>ENEMY SQUAD (5 SLOTS)</span>
-            <span className="text-red-400/90 font-mono">
-              REMAINING DECK: {visualState.enemyDeckSize || visualState.enemyHand.length || 0}
-            </span>
-          </div>
+          {/* ROW 1: ENEMY SQUAD (5 SLOTS) */}
+          <div className="relative z-10">
+            <div className="flex items-center justify-between px-1 mb-1 text-[8px] sm:text-[8.5px] font-mono tracking-wider">
+              <span className="text-red-400/80 font-bold uppercase tracking-widest flex items-center gap-1">
+                <span>💀</span> ENEMY FORMATION
+              </span>
+              <span className="text-red-400/70 font-bold tracking-wider">
+                REMAINING DECK: {visualState.enemyDeckSize || visualState.enemyHand.length || 0}
+              </span>
+            </div>
 
           <div className="grid grid-cols-5 gap-1.5 w-full relative" id="enemy-board">
             {visualState.enemyBoard.map((card, idx) => {
@@ -1221,10 +1227,10 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                     '--anim-duration': `${Math.max(0.25, 0.68 / effectiveSpeed)}s`,
                     '--recoil-duration': `${Math.max(0.18, 0.32 / effectiveSpeed)}s`,
                   } as React.CSSProperties}
-                  className={`relative h-[92px] sm:h-[100px] rounded-xl border flex flex-col justify-between p-1 select-none overflow-visible transition-all cursor-pointer ${
+                  className={`relative h-[92px] sm:h-[100px] rounded-xl border flex flex-col justify-between p-1 select-none overflow-visible transition-all ${
                     card 
-                      ? `${getTierBorderColor(card.tier)} bg-[#151a21]` 
-                      : 'border-dashed border-red-950/50 bg-black/30'
+                      ? `${getTierBorderColor(card.tier)} bg-[#151a21] cursor-pointer` 
+                      : 'border-amber-950/25 bg-black/55 shadow-[inset_0_3px_10px_rgba(0,0,0,0.9)] cursor-default'
                   } ${borderGlowClass} ${
                     isActing
                       ? 'anim-card-strike-enemy'
@@ -1352,8 +1358,12 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                       </div>
                     </>
                   ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-zinc-700 font-mono text-[9px]">
-                      <span>#{idx + 1}</span>
+                    /* Authentic PC Recessed Empty Slot */
+                    <div className="flex flex-col items-center justify-center h-full w-full relative">
+                      <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-amber-950/35 transition-colors" />
+                      <span className="text-[6.5px] sm:text-[7px] font-mono font-bold text-amber-950/35 uppercase tracking-widest mt-1 select-none">
+                        EMPTY SLOT
+                      </span>
                     </div>
                   )}
                 </div>
@@ -1366,8 +1376,8 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
         {/* =========================================================================
             CENTRAL GOTHIC CLASH BAR (Combat status, action log, speed buttons)
            ========================================================================= */}
-        <div className="my-1 py-1.5 px-2.5 rounded-xl bg-gradient-to-r from-black/90 via-[#18121d]/95 to-black/90 border border-[#ebd09b]/30 flex items-center justify-between shrink-0 shadow-lg relative overflow-hidden">
-          <div className="absolute inset-y-0 left-0 w-1 bg-amber-500" />
+        <div className="my-1 py-1 px-2.5 rounded-xl bg-gradient-to-r from-[#1c140e]/95 via-[#0d0906] to-[#1c140e]/95 border border-[#ebd09b]/30 flex items-center justify-between shrink-0 shadow-[0_4px_14px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(235,208,155,0.15)] relative overflow-hidden z-10">
+          <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-amber-400 to-amber-600" />
           
           <div className="flex items-center gap-2 min-w-0 flex-1 pr-2">
             <div className="w-5 h-5 rounded-full bg-amber-500/20 border border-amber-500/60 flex items-center justify-center text-[10px] text-amber-300 shrink-0">
@@ -1386,7 +1396,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                   {visualState.phase === 'combat_simulation' ? 'FIGHTING' : 'DEPLOYMENT'}
                 </span>
               </div>
-              <p className="text-[9px] font-mono text-zinc-300 leading-tight truncate mt-0.5">
+              <p className="text-[9px] font-mono text-amber-100/80 leading-tight truncate mt-0.5">
                 {activeLogStepText || (selectedHandCardId ? `Deploy ${selectedHandCard?.name} -> Tap empty slot` : 'Select card in hand to deploy')}
               </p>
             </div>
@@ -1420,11 +1430,13 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
         </div>
 
         {/* ROW 2: PLAYER SQUAD (5 SLOTS) */}
-        <div>
-          <div className="flex items-center justify-between px-1 mb-1 text-[8.5px] font-mono text-zinc-500 uppercase tracking-wider">
-            <span>YOUR SQUAD (5 SLOTS)</span>
-            <span className="text-amber-400/90 font-mono">
-              {selectedHandCardId ? 'TAP GLOWING SLOT TO DEPLOY' : 'DEPLOYED SQUAD'}
+        <div className="relative z-10">
+          <div className="flex items-center justify-between px-1 mb-1 text-[8px] sm:text-[8.5px] font-mono tracking-wider">
+            <span className="text-amber-500/80 font-bold uppercase tracking-widest flex items-center gap-1">
+              <span>🛡️</span> ALLIED FORMATION
+            </span>
+            <span className="text-amber-400/90 font-bold tracking-wider">
+              {selectedHandCardId ? '✦ TAP RECESSED SLOT TO DEPLOY' : 'DEPLOYED FORMATION'}
             </span>
           </div>
 
@@ -1476,12 +1488,12 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                     '--anim-duration': `${Math.max(0.25, 0.68 / effectiveSpeed)}s`,
                     '--recoil-duration': `${Math.max(0.18, 0.32 / effectiveSpeed)}s`,
                   } as React.CSSProperties}
-                  className={`relative h-[92px] sm:h-[100px] rounded-xl border flex flex-col justify-between p-1 select-none overflow-visible transition-all cursor-pointer ${
+                  className={`relative h-[92px] sm:h-[100px] rounded-xl border flex flex-col justify-between p-1 select-none overflow-visible transition-all ${
                     card 
-                      ? `${getTierBorderColor(card.tier)} bg-[#151a21]` 
+                      ? `${getTierBorderColor(card.tier)} bg-[#151a21] cursor-pointer` 
                       : canPlayHere
-                        ? 'border-[#66fcf1] bg-cyan-950/20 shadow-[0_0_15px_rgba(102,252,241,0.45)] animate-pulse ring-1 ring-[#66fcf1]'
-                        : 'border-dashed border-zinc-700 bg-black/40 hover:border-amber-400/50'
+                        ? 'border-dashed border-emerald-500/70 bg-emerald-950/25 shadow-[inset_0_2px_10px_rgba(16,185,129,0.25),0_0_14px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/40 cursor-pointer animate-pulse'
+                        : 'border-amber-950/25 bg-black/55 shadow-[inset_0_3px_10px_rgba(0,0,0,0.9)] cursor-default'
                   } ${borderGlowClass} ${
                     isActing
                       ? 'anim-card-strike-player'
@@ -1617,12 +1629,12 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                       </div>
                     </>
                   ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-zinc-600 font-mono text-[9px]">
-                      {canPlayHere ? (
-                        <span className="text-[#66fcf1] font-bold text-[8.5px] animate-pulse">DEPLOY</span>
-                      ) : (
-                        <span>#{slotIndex + 1}</span>
-                      )}
+                    /* Authentic PC Recessed Empty Slot */
+                    <div className="flex flex-col items-center justify-center h-full w-full relative">
+                      <Swords className={`w-4 h-4 sm:w-5 sm:h-5 transition-colors ${canPlayHere ? 'text-emerald-400 animate-pulse' : 'text-amber-950/35'}`} />
+                      <span className={`text-[6.5px] sm:text-[7px] font-mono font-bold uppercase tracking-widest mt-1 select-none ${canPlayHere ? 'text-emerald-400 font-black' : 'text-amber-950/35'}`}>
+                        {canPlayHere ? 'PLACE HERE' : 'EMPTY SLOT'}
+                      </span>
                     </div>
                   )}
                 </div>
