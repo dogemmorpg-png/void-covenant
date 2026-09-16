@@ -354,12 +354,18 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
       {/* Referrals & Invites Modal */}
       {isReferralModalOpen && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+          style={{
+            paddingTop: `max(${topInset}px, calc(env(safe-area-inset-top, 0px) + 54px))`,
+            paddingBottom: 'max(42px, calc(env(safe-area-inset-bottom, 0px) + 28px))',
+            paddingLeft: 'max(0.75rem, env(safe-area-inset-left, 0.75rem))',
+            paddingRight: 'max(0.75rem, env(safe-area-inset-right, 0.75rem))'
+          }}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
           onClick={(e) => {
             if (e.target === e.currentTarget) setIsReferralModalOpen(false);
           }}
         >
-          <div className="bg-gradient-to-b from-[#180d12] via-[#10070a] to-[#080204] border border-[#ebd09b]/35 rounded-3xl w-full max-w-2xl overflow-hidden shadow-[0_0_60px_rgba(245,158,11,0.25)] relative flex flex-col animate-in zoom-in-95 duration-200 max-h-[92vh]">
+          <div className="bg-gradient-to-b from-[#180d12] via-[#10070a] to-[#080204] border border-[#ebd09b]/35 rounded-3xl w-full max-w-2xl overflow-hidden shadow-[0_0_60px_rgba(245,158,11,0.25)] relative flex flex-col animate-in zoom-in-95 duration-200 max-h-full my-auto">
             
             {/* Modal Header */}
             <div className="border-b border-white/10 px-4 py-3 sm:px-6 sm:py-4 flex justify-between items-center bg-black/40">
@@ -386,7 +392,7 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
             </div>
 
             {/* Modal Body */}
-            <div className="p-4 sm:p-6 pb-8 sm:pb-12 space-y-4 overflow-y-auto max-h-[calc(92vh-80px)] scrollbar-thin scrollbar-thumb-amber-500/20">
+            <div className="p-3.5 sm:p-6 pb-12 sm:pb-16 space-y-3.5 sm:space-y-4 overflow-y-auto max-h-[calc(100dvh-170px)] scrollbar-thin scrollbar-thumb-amber-500/20">
 
               {/* Personal Invitation Link Card */}
               <div className="bg-black/60 border border-white/15 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-md">

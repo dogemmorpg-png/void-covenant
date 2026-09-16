@@ -139,12 +139,18 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
 
   return (
     <div 
-      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+      style={{
+        paddingTop: 'max(78px, calc(env(safe-area-inset-top, 0px) + 54px))',
+        paddingBottom: 'max(42px, calc(env(safe-area-inset-bottom, 0px) + 28px))',
+        paddingLeft: 'max(0.75rem, env(safe-area-inset-left, 0.75rem))',
+        paddingRight: 'max(0.75rem, env(safe-area-inset-right, 0.75rem))'
+      }}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="relative w-full max-w-4xl bg-gradient-to-b from-[#180a10] via-[#100508] to-[#0a0204] border border-[#ebd09b]/30 rounded-3xl shadow-[0_0_50px_rgba(221,44,64,0.25)] overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-4xl bg-gradient-to-b from-[#180a10] via-[#100508] to-[#0a0204] border border-[#ebd09b]/30 rounded-3xl shadow-[0_0_50px_rgba(221,44,64,0.25)] overflow-hidden flex flex-col max-h-full my-auto">
         
         {/* Header */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-white/10 bg-black/40">
