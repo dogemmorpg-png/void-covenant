@@ -148,68 +148,68 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
           <div className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-[#ebd09b]/40 pointer-events-none" />
 
           {/* 1. Header: Title & Energy Badge */}
-          <div className="text-center border-b border-white/10 pb-3 flex flex-col items-center relative z-10">
+          <div className="text-center border-b border-gray-800/80 pb-3 flex flex-col items-center relative z-10">
             <h2 className="font-display font-black text-xl sm:text-2xl text-white tracking-widest text-shadow-gold">
               THE ENDLESS ABYSS
             </h2>
-            <p className="text-[11px] text-gray-400 mt-0.5 font-sans leading-relaxed">
-              Descend into infinite depths. Defeat dark entities for ancient spoils.
+            <p className="text-[11px] text-gray-400 mt-1 max-w-xl mx-auto font-sans leading-relaxed">
+              Descend into the infinite depths. Defeat the dark entities to claim ancient resources.
             </p>
 
             {/* Prominent Centered Energy Pill with + Button */}
             <div 
               onClick={() => setIsBuyEnergyModalOpen(true)}
-              className="mt-2.5 inline-flex items-center gap-2 bg-gradient-to-r from-[#061c12] via-black to-[#061c12] border border-emerald-500/50 hover:border-emerald-400 rounded-full py-1 pl-3 pr-1.5 shadow-[0_0_15px_rgba(16,185,129,0.25)] select-none transition-all cursor-pointer group active:scale-95"
+              className="mt-2.5 inline-flex items-center gap-2.5 bg-gradient-to-r from-[#061c12] via-black to-[#061c12] border border-emerald-500/50 hover:border-emerald-400 rounded-full py-1 pl-3 pr-1.5 shadow-[0_0_18px_rgba(16,185,129,0.25)] select-none transition-all cursor-pointer group active:scale-95"
               title="Click to Refill Energy with Dark Shards"
             >
               <img 
                 src="/icons/icon_energy.webp" 
                 alt="Energy" 
-                className="w-4 h-4 sm:w-5 sm:h-5 object-contain drop-shadow-[0_0_6px_rgba(16,185,129,0.9)] group-hover:scale-110 transition-transform" 
+                className="w-4 h-4 sm:w-5 sm:h-5 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.9)] group-hover:scale-110 transition-transform" 
               />
-              <div className="flex items-baseline gap-1 leading-none">
+              <div className="flex items-baseline gap-1.5 leading-none">
                 <span className="font-display font-bold text-[10px] sm:text-xs text-gray-300 tracking-wider">ENERGY:</span>
                 <span className="font-mono text-xs sm:text-sm font-black text-emerald-400">
                   {profile.pveEnergy || 0}
                 </span>
-                <span className="font-mono text-[10px] text-emerald-500/70">
-                  /{pveEnergyMax}
+                <span className="font-mono text-[10px] sm:text-xs font-bold text-emerald-500/70">
+                  / {pveEnergyMax}
                 </span>
               </div>
-              <span className="font-mono text-[10px] text-emerald-300/90 font-bold border-l border-emerald-500/30 pl-2 pr-1">
-                {timeUntilRegen ? `+1 in ${timeUntilRegen}` : 'Full'}
+              <span className="font-mono text-[10px] sm:text-[11px] text-emerald-300/90 font-bold border-l border-emerald-500/30 pl-2 pr-1">
+                {timeUntilRegen ? `+1 in ${timeUntilRegen}` : 'Full Energy'}
               </span>
-              <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gradient-to-b from-emerald-500 to-emerald-700 group-hover:from-emerald-400 group-hover:to-emerald-600 text-black flex items-center justify-center border border-emerald-300/50 shadow-[0_0_8px_rgba(16,185,129,0.6)] shrink-0">
-                <Plus className="w-3 h-3 stroke-[3]" />
+              <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gradient-to-b from-emerald-500 to-emerald-700 group-hover:from-emerald-400 group-hover:to-emerald-600 text-black flex items-center justify-center border border-emerald-300/50 shadow-[0_0_10px_rgba(16,185,129,0.6)] shrink-0">
+                <Plus className="w-3.5 h-3.5 stroke-[3] text-black" />
               </div>
             </div>
           </div>
 
-          {/* 2. Large Centered Floor Selector & Stars */}
-          <div className="flex items-center justify-between bg-black/50 border border-white/10 rounded-2xl py-2 px-3 sm:px-4 shadow-inner relative z-10">
+          {/* 2. Large Centered Floor Selector matching PC */}
+          <div className="flex items-center justify-between bg-black/40 border border-gray-800/50 rounded-[28px] py-3 px-4 sm:px-6 shadow-inner relative z-10">
             <button 
               onClick={handlePrev}
               disabled={viewingFloor === 1}
-              className="p-2.5 sm:p-3 rounded-xl bg-black/60 border border-[#ebd09b]/30 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer active:scale-90 shrink-0"
+              className="p-3 rounded-2xl bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer active:scale-90 shrink-0 shadow-md"
               title="Previous Floor"
             >
-              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+              <ChevronLeft className="w-6 h-6" />
             </button>
 
             <div className="flex flex-col items-center select-none text-center px-2">
-              <span className={`text-[10px] font-mono tracking-widest uppercase font-black ${isBoss ? 'text-red-400 animate-pulse' : 'text-[#ebd09b]'}`}>
-                {isBoss ? '🔥 BOSS FLOOR' : 'THE ABYSS'}
+              <span className={`text-[11px] font-mono tracking-widest uppercase font-bold ${isBoss ? 'text-red-500 animate-pulse' : 'text-[#ebd09b]'}`}>
+                {isBoss ? 'Boss Floor' : 'Floor'}
               </span>
-              <div className="text-4xl sm:text-5xl font-display font-black text-white text-shadow-gold leading-none my-0.5">
+              <div className="text-5xl sm:text-6xl font-display font-black text-white text-shadow-gold leading-none my-1">
                 {viewingFloor}
               </div>
               
               {/* 3 Stars display directly under floor number */}
-              <div className="flex justify-center gap-1.5 my-0.5">
+              <div className="flex justify-center gap-1.5 my-1">
                 {[1, 2, 3].map(star => (
                   <Star 
                     key={star} 
-                    className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                    className={`w-5 h-5 sm:w-6 sm:h-6 ${
                       star <= stageStars 
                         ? 'text-[#ebd09b] fill-[#ebd09b] drop-shadow-[0_0_8px_rgba(235,208,155,0.8)]' 
                         : 'text-gray-700'
@@ -218,180 +218,142 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
                 ))}
               </div>
 
-              <span className={`text-[9px] font-mono tracking-wider uppercase font-bold mt-0.5 ${
-                viewingFloor === maxFloor ? 'text-emerald-400' : 'text-amber-400/90'
+              <span className={`text-[10px] font-mono tracking-wider uppercase font-bold ${
+                viewingFloor === maxFloor ? 'text-emerald-400' : 'text-amber-500'
               }`}>
-                {viewingFloor === maxFloor ? 'Current Stage' : 'Farm Cleared'}
+                {viewingFloor === maxFloor ? 'Current Max' : 'Farm Mode'}
               </span>
             </div>
 
             <button 
               onClick={handleNext}
               disabled={viewingFloor >= maxFloor}
-              className="p-2.5 sm:p-3 rounded-xl bg-black/60 border border-[#ebd09b]/30 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer active:scale-90 shrink-0"
+              className="p-3 rounded-2xl bg-black/40 border border-[#ebd09b]/25 hover:border-[#ebd09b]/60 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer active:scale-90 shrink-0 shadow-md"
               title="Next Floor"
             >
-              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              <ChevronRight className="w-6 h-6" />
             </button>
           </div>
 
-          {/* 3. Encounter Card (Enemy Lord Details) */}
-          <div className="bg-black/55 border border-white/10 rounded-2xl p-3 flex items-center gap-3 shadow-inner relative z-10">
-            <div className={`w-14 h-14 rounded-2xl overflow-hidden border-2 shrink-0 flex items-center justify-center ${
-              isBoss 
-                ? 'border-red-600/80 bg-red-950/40 shadow-[0_0_15px_rgba(220,38,38,0.4)]' 
-                : 'border-[#ebd09b]/40 bg-zinc-900 shadow-md'
-            }`}>
-              {selectedStage.enemyHeroImage?.startsWith('/') ? (
-                <img 
-                  src={selectedStage.enemyHeroImage} 
-                  alt={selectedStage.enemyHeroName} 
-                  className="w-full h-full object-cover" 
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/avatars/knight.webp'; }}
-                />
-              ) : isBoss ? (
-                <Crown className="w-7 h-7 text-purple-400 animate-pulse drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
-              ) : (
-                <Skull className="w-7 h-7 text-red-400" />
-              )}
+          {/* 3. Encounter & Victory Rewards matching PC 1:1 */}
+          <div className="flex flex-col gap-3 relative z-10">
+            {/* Encounter details */}
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-mono text-gray-500 tracking-widest uppercase font-bold block">
+                ENCOUNTER
+              </span>
+              <div className="bg-black/50 border border-gray-800/60 rounded-2xl p-3.5 sm:p-4 flex items-center gap-3.5 shadow-inner">
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center border shrink-0 ${
+                  isBoss ? 'bg-[#4e0707] border-[#dd2c40]/50 shadow-[0_0_15px_rgba(220,38,38,0.4)]' : 'bg-[#1f2833] border-cyan-900'
+                } overflow-hidden`}>
+                  {selectedStage.enemyHeroImage?.startsWith('/') ? (
+                    <img 
+                      src={selectedStage.enemyHeroImage} 
+                      alt="Enemy Hero" 
+                      className="w-full h-full object-cover animate-pulse" 
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/avatars/knight.webp'; }}
+                    />
+                  ) : isBoss ? (
+                    <Crown className="w-8 h-8 text-purple-500 drop-shadow-[0_0_12px_rgba(168,85,247,0.8)] animate-pulse" />
+                  ) : (
+                    <Skull className="w-7 h-7 text-red-500/90" />
+                  )}
+                </div>
+                <div>
+                  <h4 className="font-display font-bold text-white text-base sm:text-lg leading-none">
+                    {selectedStage.enemyHeroName}
+                  </h4>
+                  <p className="text-xs font-mono text-gray-400 mt-2">
+                    Hero Health: <span className="text-[#dd2c40] font-bold">{selectedStage.enemyHeroHealth} HP</span>
+                  </p>
+                  <p className="text-[10px] text-gray-500 font-mono mt-0.5">
+                    Deck Size: {selectedStage.enemyDeck?.length || 10} Cards
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <h4 className="font-display font-black text-sm sm:text-base text-white truncate text-shadow-gold">
-                  {selectedStage.enemyHeroName}
-                </h4>
-                <span className="font-mono text-[9px] bg-red-950/80 border border-red-500/50 px-1.5 py-0.2 rounded text-red-300 font-bold shrink-0">
-                  Lv.{selectedStage.enemyLevel || viewingFloor}
-                </span>
-              </div>
-              <p className="text-[10px] text-gray-400 font-sans line-clamp-1 mt-0.5">
-                {selectedStage.description || 'Defeat the guardian of the abyss to open the descent.'}
-              </p>
-              <div className="flex items-center gap-2.5 mt-1 font-mono text-[10px]">
-                <span className="text-red-400 font-bold">
-                  ❤️ {selectedStage.enemyHeroHealth} HP
-                </span>
-                <span className="text-gray-600">•</span>
-                <span className="text-cyan-300 font-bold">
-                  🎴 {selectedStage.enemyDeck?.length || 10} Cards
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* 4. Victory Rewards (Clear Rewards) */}
-          <div className="space-y-1.5 relative z-10">
-            <span className="text-[9px] font-mono text-[#ebd09b]/90 tracking-widest uppercase font-black block">
-              VICTORY REWARDS
-            </span>
-            <div className="grid grid-cols-3 gap-1.5 font-mono text-[10px] font-bold">
-              {/* Gold Pill */}
-              <div className="flex items-center justify-center gap-1.5 bg-black/60 border border-amber-500/30 rounded-xl p-2 text-amber-300 shadow-inner">
-                <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_0_4px_rgba(245,158,11,0.5)]" />
-                <div className="flex flex-col items-start leading-tight">
-                  <span className="text-xs font-black text-amber-400">+{selectedStage.goldReward}</span>
-                  <span className="text-[7.5px] text-amber-500/80 uppercase font-sans">Gold</span>
-                </div>
-              </div>
-
-              {/* Dust Pill */}
-              <div className="flex items-center justify-center gap-1.5 bg-black/60 border border-cyan-500/30 rounded-xl p-2 text-cyan-300 shadow-inner">
-                <img src="/icons/icon_dust.webp" alt="Dust" className="w-5 h-5 object-contain shrink-0 drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]" />
-                <div className="flex flex-col items-start leading-tight">
-                  <span className="text-xs font-black text-cyan-300">+{selectedStage.dustReward}</span>
-                  <span className="text-[7.5px] text-cyan-400/80 uppercase font-sans">Dust</span>
-                </div>
-              </div>
-
-              {/* Shards or EXP Pill */}
-              {selectedStage.shardsReward > 0 ? (
-                <div className="flex items-center justify-center gap-1.5 bg-black/60 border border-red-500/30 rounded-xl p-2 text-rose-300 shadow-inner">
-                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_0_4px_rgba(244,63,94,0.6)]" />
-                  <div className="flex flex-col items-start leading-tight">
-                    <span className="text-xs font-black text-rose-400">+{selectedStage.shardsReward}</span>
-                    <span className="text-[7.5px] text-rose-400/80 uppercase font-sans">Shards</span>
+            {/* Victory Rewards matching PC */}
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-mono text-[#ebd09b]/80 tracking-widest uppercase font-bold block">
+                VICTORY REWARDS
+              </span>
+              <div className="bg-black/50 border border-gray-800/60 rounded-2xl p-2.5 sm:p-3.5 flex items-center justify-around gap-2 shadow-inner">
+                {/* Gold Pill */}
+                <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-amber-500/20 hover:border-amber-400/50 hover:bg-amber-500/[0.06] transition-all cursor-default group">
+                  <div className="flex items-center gap-1.5">
+                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 sm:w-6 sm:h-6 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] group-hover:scale-110 transition-transform" />
+                    <span className="font-mono font-black text-amber-300 text-sm sm:text-base leading-none">+{selectedStage.goldReward}</span>
                   </div>
+                  <span className="text-[9px] text-amber-500/70 font-mono uppercase tracking-wider font-semibold mt-1">Gold</span>
                 </div>
-              ) : (
-                <div className="flex items-center justify-center gap-1.5 bg-black/60 border border-emerald-500/30 rounded-xl p-2 text-emerald-300 shadow-inner">
-                  <img src="/icons/icon_exp.webp" alt="EXP" className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_0_4px_rgba(16,185,129,0.6)]" />
-                  <div className="flex flex-col items-start leading-tight">
-                    <span className="text-xs font-black text-emerald-400">+{selectedStage.id * 16 + 32}</span>
-                    <span className="text-[7.5px] text-emerald-400/80 uppercase font-sans">Hero EXP</span>
+
+                {/* Dust Pill */}
+                <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-cyan-500/20 hover:border-cyan-400/50 hover:bg-cyan-500/[0.06] transition-all cursor-default group">
+                  <div className="flex items-center gap-1.5">
+                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-6 h-6 sm:w-7 sm:h-7 object-contain drop-shadow-[0_0_10px_rgba(102,252,241,0.6)] scale-125 group-hover:scale-135 transition-transform" />
+                    <span className="font-mono font-black text-[#66fcf1] text-sm sm:text-base leading-none">+{selectedStage.dustReward}</span>
                   </div>
+                  <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider font-semibold mt-1">Dust</span>
                 </div>
-              )}
+
+                {/* Shards or EXP Pill */}
+                {selectedStage.shardsReward > 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-red-500/20 hover:border-red-400/50 hover:bg-red-500/[0.06] transition-all cursor-default group">
+                    <div className="flex items-center gap-1.5">
+                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-5 h-5 sm:w-6 sm:h-6 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.5)] scale-110 group-hover:scale-120 transition-transform" />
+                      <span className="font-mono font-black text-rose-400 text-sm sm:text-base leading-none">+{selectedStage.shardsReward}</span>
+                    </div>
+                    <span className="text-[9px] text-red-400/70 font-mono uppercase tracking-wider font-semibold mt-1">Shards</span>
+                  </div>
+                ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-emerald-500/20 hover:border-emerald-400/50 hover:bg-emerald-500/[0.06] transition-all cursor-default group">
+                    <div className="flex items-center gap-1.5">
+                      <img src="/icons/icon_exp.webp" alt="EXP" className="w-5 h-5 sm:w-6 sm:h-6 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.7)] group-hover:scale-110 transition-transform" />
+                      <span className="font-mono font-black text-emerald-400 text-sm sm:text-base leading-none">+{selectedStage.id * 16 + 32}</span>
+                    </div>
+                    <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider font-semibold mt-1">Hero EXP</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Guaranteed Card Drop (if present) */}
           {selectedStage.cardReward && (
-            <div className="bg-emerald-950/30 border border-emerald-500/40 p-2.5 rounded-2xl flex items-center justify-between shadow-inner relative z-10">
+            <div className="bg-black/50 border border-emerald-500/20 p-3 rounded-2xl flex items-center justify-between shadow-inner relative z-10">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-emerald-950/60 flex items-center justify-center border border-emerald-500/40 shrink-0">
+                <div className="w-8 h-8 rounded-full bg-emerald-950/40 flex items-center justify-center border border-emerald-500/30 shrink-0">
                   <Award className="w-4 h-4 text-emerald-400" />
                 </div>
                 <div>
                   <span className="text-emerald-400 font-bold text-xs block leading-tight">Guaranteed Card Drop</span>
-                  <span className="text-[10px] text-gray-300 font-mono">{selectedStage.cardReward.name}</span>
+                  <span className="text-[10px] text-gray-400 font-mono mt-0.5">{selectedStage.cardReward.name}</span>
                 </div>
               </div>
-              <span className="text-[9px] bg-emerald-950/60 text-emerald-400 px-2 py-0.5 rounded font-mono border border-emerald-500/30 font-bold">
-                100% Drop
+              <span className="text-[9px] bg-emerald-950/40 text-emerald-400 px-2.5 py-0.5 rounded-lg font-mono border border-emerald-500/20">
+                Guaranteed
               </span>
             </div>
           )}
 
-          {/* 5. Guarding Creatures Ribbon */}
-          <div className="space-y-1.5 relative z-10">
-            <span className="text-[9px] font-mono text-gray-400 tracking-widest uppercase font-bold block">
-              GUARDING CREATURES ({selectedStage.enemyDeck?.length || 0})
-            </span>
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-1 bg-black/40 border border-white/5 rounded-2xl">
-              {(selectedStage.enemyDeck || []).map((card, i) => (
-                <div 
-                  key={i} 
-                  className="w-12 h-16 rounded-xl border border-white/15 bg-gray-950 overflow-hidden shrink-0 relative flex flex-col justify-end shadow-md"
-                  title={`${card.name} (Atk: ${card.attack}, HP: ${card.health})`}
-                >
-                  {card.image && (
-                    <img 
-                      src={card.image} 
-                      alt="" 
-                      className="absolute inset-0 w-full h-full object-cover opacity-85" 
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                  
-                  {/* Miniature Card Stats */}
-                  <div className="relative z-10 flex justify-between px-1 pb-0.5 text-[8px] font-mono font-black leading-none">
-                    <span className="text-red-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
-                      {card.attack}
-                    </span>
-                    <span className="text-emerald-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
-                      {card.health}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 6. Action Buttons: BATTLE & SWEEP */}
-          <div className="pt-2 border-t border-white/10 flex flex-col gap-2 relative z-10">
+          {/* 4. Action Buttons: BATTLE & SWEEP matching PC dark slate style */}
+          <div className="pt-2 border-t border-gray-800/80 flex flex-col gap-2 relative z-10">
             <button
               onClick={handleStart}
-              className={`w-full py-3 px-4 rounded-2xl font-display font-black text-sm tracking-widest uppercase flex items-center justify-center gap-3 cursor-pointer active:scale-95 transition-all shadow-lg ${
-                isBoss
-                  ? 'bg-gradient-to-r from-[#450a0a] via-[#dc2626] to-[#450a0a] hover:brightness-110 text-white border-2 border-red-500/60 shadow-[0_0_25px_rgba(220,38,38,0.45)]'
-                  : 'bg-gradient-to-r from-[#ebd09b] via-[#f59e0b] to-[#ebd09b] hover:brightness-110 text-black border-2 border-amber-300/60 shadow-[0_0_25px_rgba(245,158,11,0.4)]'
+              className={`w-full font-display font-bold tracking-widest py-3 sm:py-3.5 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-4 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase ${
+                isBoss 
+                  ? 'bg-gradient-to-b from-[#3a0b12] via-[#200508] to-[#140204] border-2 border-red-600/50 hover:border-red-500 text-red-400 hover:text-white shadow-[0_0_15px_rgba(220,38,38,0.2)] hover:shadow-[0_0_25px_rgba(239,68,68,0.35)]'
+                  : 'bg-gradient-to-b from-[#221a12] via-[#150f0a] to-[#0c0805] border-2 border-[#c5a880]/50 hover:border-[#ebd09b] text-[#ebd09b] hover:text-white shadow-[0_0_15px_rgba(197,168,128,0.2)] hover:shadow-[0_0_25px_rgba(235,208,155,0.35)]'
               }`}
             >
-              <Swords className="w-4 h-4 stroke-[2.5]" />
-              <span>ENTER BATTLE</span>
-              <span className="font-mono text-xs font-black bg-black/25 px-2 py-0.5 rounded-full flex items-center gap-1">
-                ⚡ {selectedStage.energyCost}
+              <Swords className="w-5 h-5 animate-pulse" /> 
+              <span className="mr-0.5">BATTLE</span>
+              <span className={`flex items-center gap-1.5 bg-black/50 border rounded-full px-3 py-0.5 font-mono text-base sm:text-lg font-bold text-emerald-400 shadow-inner ${
+                isBoss ? 'border-red-500/30' : 'border-[#ebd09b]/35'
+              }`}>
+                {selectedStage.energyCost}
+                <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
               </span>
             </button>
 
@@ -399,17 +361,18 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
               <button
                 onClick={handleSweep}
                 disabled={isSweeping || (profile.pveEnergy || 0) < selectedStage.energyCost}
-                className="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-[#1b122c] via-[#2e1065] to-[#06020c] hover:brightness-110 border-2 border-purple-500/50 text-purple-200 font-display font-black text-xs tracking-widest uppercase flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)] disabled:opacity-40"
+                className="w-full font-display font-bold tracking-widest py-3 sm:py-3.5 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-4 cursor-pointer hover:scale-[1.02] active:scale-[0.98] text-sm uppercase bg-gradient-to-b from-[#1b122c] via-[#0e071a] to-[#06020c] border-2 border-purple-600/50 hover:border-purple-400 text-purple-400 hover:text-white shadow-[0_0_15px_rgba(147,51,234,0.2)] hover:shadow-[0_0_25px_rgba(168,85,247,0.35)] disabled:opacity-40"
               >
-                <FastForward className="w-4 h-4" />
-                <span>{isSweeping ? 'SWEEPING...' : 'QUICK SWEEP'}</span>
-                <span className="font-mono text-xs font-black bg-black/40 px-2 py-0.5 rounded-full text-emerald-400">
-                  ⚡ {selectedStage.energyCost}
+                <FastForward className="w-5 h-5" /> 
+                <span className="mr-0.5">SWEEP</span>
+                <span className="flex items-center gap-1.5 bg-black/50 border border-purple-500/30 rounded-full px-3 py-0.5 font-mono text-base sm:text-lg font-bold text-emerald-400 shadow-inner">
+                  {selectedStage.energyCost}
+                  <img src="/icons/icon_energy.webp" alt="Energy" className="w-5 h-5 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
                 </span>
               </button>
             ) : (
               <div className="text-center py-0.5 text-[10px] font-mono text-gray-500">
-                {stageStars === 0 ? 'Clear floor to earn stars' : `${stageStars}/3 Stars • 3★ unlocks Quick Sweep`}
+                {stageStars === 0 ? 'Clear floor to earn stars' : `${stageStars}/3 Stars • 3★ unlocks Sweep`}
               </div>
             )}
           </div>
