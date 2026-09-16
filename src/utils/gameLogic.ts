@@ -99,11 +99,11 @@ export function simulateCombatTurn(
 
   logs.push(`--- TURN ${state.turn} ---`);
   // --- HERO PHASE (Talents) ---
-  if (profile && profile.activeStance && profile.talents) {
-    const stance = profile.activeStance as TalentStance;
-    const stats = getTalentStats(profile.talents, stance);
-    if (stats && Math.random() * 100 < stats.triggerChance) {
-      logs.push(`⚡ Commander activated ${stance.toUpperCase()} (${stats.triggerChance.toFixed(1)}% chance)!`);
+  const stance = (profile?.activeStance || 'void_strike') as TalentStance;
+  const talents = profile?.talents || {};
+  const stats = getTalentStats(talents, stance);
+  if (stats && Math.random() * 100 < stats.triggerChance) {
+    logs.push(`⚡ Commander activated ${stance.toUpperCase()} (${stats.triggerChance.toFixed(1)}% chance)!`);
       
       if (stance === 'void_strike') {
         const activeEnemies = [];
@@ -310,7 +310,6 @@ export function simulateCombatTurn(
         }
       }
     }
-  }
 
   // --- ENEMY BOSS / PVP HERO PHASE ---
   if (stage && (stage.id % 5 === 0 || stage.id === -1)) {
