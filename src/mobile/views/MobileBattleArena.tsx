@@ -421,6 +421,69 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
   const [finalBattleState, setFinalBattleState] = useState<BattleState | null>(null);
   const battleResultSubmittedRef = useRef<boolean>(false);
 
+  // Long-press inspection for cards in hand
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isLongPressActiveRef = useRef<boolean>(false);
+  const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
+
+  const startCardLongPress = (card: Card, clientX: number, clientY: number) => {
+    if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+    isLongPressActiveRef.current = false;
+    touchStartPosRef.current = { x: clientX, y: clientY };
+
+    longPressTimerRef.current = setTimeout(() => {
+      isLongPressActiveRef.current = true;
+      try {
+        (window as any).Telegram?.WebApp?.HapticFeedback?.impactOccurred('medium');
+      } catch {}
+      setInspectCardData(card);
+
+      // Global window listener: guarantees closing the moment finger is lifted anywhere
+      const handleGlobalRelease = () => {
+        setInspectCardData(null);
+        setTimeout(() => {
+          isLongPressActiveRef.current = false;
+        }, 120);
+        window.removeEventListener('pointerup', handleGlobalRelease);
+        window.removeEventListener('touchend', handleGlobalRelease);
+        window.removeEventListener('touchcancel', handleGlobalRelease);
+      };
+
+      window.addEventListener('pointerup', handleGlobalRelease, { once: true });
+      window.addEventListener('touchend', handleGlobalRelease, { once: true });
+      window.addEventListener('touchcancel', handleGlobalRelease, { once: true });
+    }, 320);
+  };
+
+  const endCardLongPress = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    if (isLongPressActiveRef.current) {
+      setInspectCardData(null);
+      setTimeout(() => {
+        isLongPressActiveRef.current = false;
+      }, 120);
+    }
+  };
+
+  const moveCardLongPress = (clientX: number, clientY: number) => {
+    if (!touchStartPosRef.current || !longPressTimerRef.current) return;
+    const dx = Math.abs(clientX - touchStartPosRef.current.x);
+    const dy = Math.abs(clientY - touchStartPosRef.current.y);
+    if (dx > 12 || dy > 12) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+    };
+  }, []);
+
   // Rewards calculation
   const isSubActive = profile?.subscriptionExpiresAt && Number(profile.subscriptionExpiresAt) > Date.now();
   const subTier = isSubActive ? (profile?.subscriptionTier || 'free') : 'free';
@@ -1724,7 +1787,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
         <div className="flex items-center justify-between px-1 mb-1 text-[8.5px] font-mono text-zinc-400">
           <div className="flex items-center gap-1.5">
             <span className="font-bold text-[#ebd09b] uppercase tracking-wider">COMMANDER HAND</span>
-            <span className="text-[7.5px] text-zinc-500">Tap to deploy</span>
+            <span className="text-[7.5px] text-zinc-500">Tap to deploy • Hold to inspect</span>
           </div>
           <span className="text-zinc-400 font-mono">
             REMAINING DECK: {visualState.playerDeckSize || visualState.playerDeckQueue?.length || 0}
@@ -1741,6 +1804,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
               <div
                 key={`hand-card-${card.id}`}
                 onClick={() => {
+                  if (isLongPressActiveRef.current) return;
                   if (isSimulating || isAnimating) return;
                   if (!canAfford) {
                     toast('Not enough Mana to summon!', 'error');
@@ -1748,7 +1812,13 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                   }
                   setSelectedHandCardId(prev => prev === card.id ? null : card.id);
                 }}
-                className={`relative flex-1 max-w-[120px] h-[132px] sm:h-[138px] rounded-xl border flex flex-col justify-between p-1.5 select-none transition-all cursor-pointer overflow-visible ${
+                onPointerDown={(e) => startCardLongPress(card, e.clientX, e.clientY)}
+                onPointerUp={endCardLongPress}
+                onPointerLeave={endCardLongPress}
+                onPointerCancel={endCardLongPress}
+                onPointerMove={(e) => moveCardLongPress(e.clientX, e.clientY)}
+                style={{ touchAction: 'manipulation' }}
+                className={`relative flex-1 max-w-[120px] h-[132px] sm:h-[138px] rounded-xl border flex flex-col justify-between p-1.5 select-none transition-all cursor-pointer overflow-visible active:scale-[0.98] ${
                   isSelected 
                     ? 'border-amber-400 ring-2 ring-amber-400 -translate-y-2 shadow-[0_0_20px_rgba(245,158,11,0.6)] z-30' 
                     : !canAfford
@@ -1820,18 +1890,6 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                   )}
                 </div>
 
-                {/* Inspect Button in corner */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setInspectCardData(card);
-                  }}
-                  className="absolute top-1 right-1 p-0.5 rounded-full bg-black/80 border border-white/20 text-zinc-400 hover:text-white z-20 cursor-pointer"
-                  title="Inspect Details"
-                >
-                  <Info className="w-3 h-3" />
-                </button>
-
                 {/* Gothic Corner Badges: Attack & Health */}
                 <div className="absolute -bottom-1.5 -left-1.5 w-7 h-7 z-20 flex items-center justify-center pointer-events-none">
                   <img src="/icons/gothic_attack.webp" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded shadow-md" />
@@ -1864,87 +1922,203 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       </div>
 
       {/* =========================================================================
-          6. FULL CARD INSPECT MODAL (100% English, Detailed Descriptions)
+          6. AUTHENTIC PC CARD ANALYZER MODAL (Gothic Art, Emblems, Full Skill Specs)
          ========================================================================= */}
-      {inspectCardData && (
-        <div 
-          onClick={() => setInspectCardData(null)}
-          className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex flex-col items-center justify-center p-4"
-        >
-          <div 
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-[310px] bg-gradient-to-b from-[#181320] via-[#0f0b15] to-[#08060b] border-2 border-[#ebd09b] rounded-2xl p-4 flex flex-col items-center shadow-[0_0_35px_rgba(235,208,155,0.4)] relative"
+      <AnimatePresence>
+        {inspectCardData && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            onClick={() => setInspectCardData(null)}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 select-none"
           >
-            <button
-              onClick={() => setInspectCardData(null)}
-              className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-zinc-400 hover:text-white cursor-pointer"
+            <motion.div 
+              initial={{ scale: 0.92, opacity: 0, y: 8 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.92, opacity: 0, y: 8 }}
+              transition={{ duration: 0.16 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-[360px] bg-[#0d1117]/98 border-2 border-[#ebd09b]/50 rounded-2xl p-3 sm:p-3.5 shadow-[0_10px_35px_rgba(0,0,0,0.95),0_0_30px_rgba(235,208,155,0.25)] relative flex gap-3 text-left"
             >
-              <X className="w-4 h-4" />
-            </button>
-
-            {/* Artwork */}
-            <div className="w-32 h-40 rounded-xl overflow-hidden border border-white/20 mb-2 relative shadow-lg">
-              <img src={inspectCardData.image} alt={inspectCardData.name} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-            </div>
-
-            <h3 className="font-display font-black text-base text-amber-200 text-center">
-              {inspectCardData.name}
-            </h3>
-            <span className={`text-[10px] font-mono font-bold uppercase tracking-widest mt-0.5 ${getTierTextColor(inspectCardData.tier)}`}>
-              {inspectCardData.tier} CREATURE • LVL {inspectCardData.level || 1}
-            </span>
-
-            {/* Stats Grid */}
-            <div className="grid grid-cols-4 gap-1 w-full my-3 py-2 border-y border-white/10 text-center font-mono">
-              <div>
-                <div className="text-[8px] text-zinc-400">COST</div>
-                <div className="text-xs font-black text-cyan-300">💎 {inspectCardData.manaCost || 1}</div>
-              </div>
-              <div>
-                <div className="text-[8px] text-zinc-400">DELAY</div>
-                <div className="text-xs font-black text-purple-300">⏳ {inspectCardData.delay}</div>
-              </div>
-              <div>
-                <div className="text-[8px] text-zinc-400">ATTACK</div>
-                <div className="text-xs font-black text-red-400">⚔️ {inspectCardData.attack}</div>
-              </div>
-              <div>
-                <div className="text-[8px] text-zinc-400">HEALTH</div>
-                <div className="text-xs font-black text-emerald-400">❤️ {inspectCardData.health}</div>
-              </div>
-            </div>
-
-            {/* Skills Details */}
-            <div className="w-full space-y-1.5 mb-3 max-h-36 overflow-y-auto custom-scrollbar">
-              {inspectCardData.skills && inspectCardData.skills.length > 0 ? (
-                inspectCardData.skills.map((sk: any, idx: number) => (
-                  <div key={idx} className="bg-black/60 p-2 rounded-xl border border-white/10">
-                    <div className="text-[11px] font-mono font-bold text-amber-300 flex items-center gap-1.5">
-                      {renderSkillIcon(sk.type, "w-3.5 h-3.5")}
-                      <span>{getSkillNameEnglish(sk.type)} ({sk.value})</span>
+              {/* Left Column: Full-fidelity PC Gothic Card Preview */}
+              <div 
+                className="w-[108px] sm:w-[114px] h-[155px] sm:h-[162px] rounded-xl border flex flex-col justify-between p-1.5 pb-2 text-center relative overflow-visible bg-[#151a21] text-white shadow-md shrink-0 select-none"
+                style={{ borderColor: getTierBorderColor(inspectCardData.tier) }}
+              >
+                {/* Background Art */}
+                <div className="absolute inset-0 rounded-xl overflow-hidden z-0 pointer-events-none">
+                  <div className={`absolute inset-0 opacity-[0.06] bg-gradient-to-br ${getTierBgGradient(inspectCardData.tier)}`} />
+                  {inspectCardData.image && (
+                    <>
+                      <img 
+                        src={inspectCardData.image} 
+                        alt={inspectCardData.name} 
+                        className="absolute inset-0 w-full h-full object-cover opacity-85" 
+                        onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
+                    </>
+                  )}
+                  {Number(inspectCardData.delay) > 0 && (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-15">
+                      <div className="flex flex-col items-center justify-center relative">
+                        <img 
+                          src="/icons/gothic_hourglass.webp" 
+                          alt="Locked" 
+                          className="w-8 h-8 object-contain rounded-full border border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.5)] animate-pulse" 
+                        />
+                        <div className="absolute -bottom-2 bg-gradient-to-b from-[#180f2b] to-[#0c051a] border border-[#a855f7]/60 rounded-full w-4.5 h-4.5 flex items-center justify-center shadow-lg">
+                          <span className="text-[#c084fc] text-[9px] font-black font-mono leading-none">{inspectCardData.delay}</span>
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-[9.5px] text-zinc-300 mt-0.5 leading-relaxed font-sans">
-                      {getSkillDescEnglish(sk.type, sk.value)}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <div className="bg-black/40 p-2 rounded-xl border border-white/5 text-center text-[10px] font-mono text-zinc-500">
-                  No passive abilities on this creature.
+                  )}
                 </div>
-              )}
-            </div>
 
-            <button
-              onClick={() => setInspectCardData(null)}
-              className="w-full py-2 bg-gradient-to-r from-zinc-800 to-zinc-900 hover:from-zinc-700 text-white font-mono text-xs font-bold rounded-xl border border-zinc-600 cursor-pointer active:scale-95 transition-all"
-            >
-              CLOSE
-            </button>
-          </div>
-        </div>
-      )}
+                {/* Card Top: Mana Icon + Tier & Level */}
+                <div className="flex justify-between items-center z-10 relative">
+                  <div className="flex items-center gap-0.5">
+                    {renderManaIcon(inspectCardData.manaCost || 1, "w-4 h-4")}
+                    <span className={`text-[7px] font-mono font-black uppercase ${getTierTextColor(inspectCardData.tier)}`}>
+                      {inspectCardData.tier ? inspectCardData.tier.substring(0, 3) : 'BRZ'}
+                    </span>
+                  </div>
+                  <span className="text-[7.5px] font-mono font-bold text-gray-400">
+                    Lvl {inspectCardData.level || 1}
+                  </span>
+                </div>
+
+                {/* Card Name Plate */}
+                <div className="mt-0.5 z-10 relative bg-black/65 py-0.5 px-0.5 rounded border border-white/5 text-center">
+                  <span className="text-[9px] font-display font-black text-white block truncate leading-none">
+                    {inspectCardData.name}
+                  </span>
+                </div>
+
+                {/* Dedicated skills bar at bottom */}
+                <div className="w-full py-0.5 bg-black/60 border-y border-white/5 flex justify-center gap-1 z-10 relative flex-wrap max-h-[30px] overflow-visible mt-auto mb-1">
+                  {inspectCardData.skills && inspectCardData.skills.length > 0 ? (
+                    inspectCardData.skills.map((s: any, sIdx: number) => (
+                      <div 
+                        key={sIdx}
+                        className={`flex items-center gap-0.5 text-[7.5px] font-mono font-black px-1 rounded-full border ${getSkillBadgeStyle(s.type)}`}
+                      >
+                        <span>{renderSkillIcon(s.type, "w-2.5 h-2.5")}</span>
+                        <span className="leading-none">{s.value}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <span className="text-[7px] font-mono font-bold text-gray-500 uppercase tracking-widest leading-none my-0.5">No Skills</span>
+                  )}
+                </div>
+
+                <div className="h-0.5 shrink-0" />
+
+                {/* Corner Emblems: Attack & Health */}
+                <div className="absolute -bottom-2.5 -left-2.5 w-7 h-7 z-20 flex items-center justify-center pointer-events-none">
+                  <img src="/icons/gothic_attack.webp" alt="ATK" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                  <span className="relative text-[#ff3b30] text-[11px] font-black font-mono leading-none z-10" style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>
+                    {inspectCardData.attack}
+                  </span>
+                </div>
+                <div className="absolute -bottom-2.5 -right-2.5 w-7 h-7 z-20 flex items-center justify-center pointer-events-none">
+                  <img src="/icons/gothic_health.webp" alt="HP" className="absolute inset-0 w-full h-full object-cover rounded-lg border border-zinc-700/50 shadow-md" />
+                  <span className="relative text-[#ffffff] text-[11px] font-black font-mono leading-none z-10" style={{ textShadow: '2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 0 0 5px #000' }}>
+                    {inspectCardData.health}
+                  </span>
+                </div>
+
+                {/* Persistent Armor Badge */}
+                {(inspectCardData.armor || 0) > 0 && <ArmorBadge armor={inspectCardData.armor!} />}
+
+                {/* Persistent Barrier Dome */}
+                {Boolean(inspectCardData.barrier ?? inspectCardData.ward) && <BarrierDome />}
+              </div>
+
+              {/* Right Column: Descriptions & Specs */}
+              <div className="flex-1 flex flex-col justify-between min-w-0">
+                <div>
+                  <div className="flex items-start justify-between gap-1">
+                    <h4 className="font-display font-black text-xs sm:text-sm text-white leading-tight truncate">
+                      {inspectCardData.name}
+                    </h4>
+                    <button
+                      onClick={() => setInspectCardData(null)}
+                      className="text-gray-400 hover:text-white p-0.5 rounded hover:bg-white/10 transition-colors shrink-0 cursor-pointer"
+                      title="Close"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 text-[8.5px] font-mono text-gray-400 border-b border-gray-800 pb-1 mb-1.5">
+                    <span className={`font-bold ${getTierTextColor(inspectCardData.tier)}`}>
+                      {inspectCardData.tier?.toUpperCase()}
+                    </span>
+                    <span>•</span>
+                    <span>Level {inspectCardData.level || 1}</span>
+                    <span>•</span>
+                    <span className="text-purple-400">Delay {inspectCardData.delay}</span>
+                  </div>
+
+                  {/* Mana & Delay Chips */}
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <div className="flex items-center gap-1 bg-black/50 px-1.5 py-0.5 rounded border border-cyan-500/30 text-[9px] font-mono text-cyan-300">
+                      {renderManaIcon(inspectCardData.manaCost || 1, "w-3.5 h-3.5")}
+                      <span>Cost {inspectCardData.manaCost || 1}</span>
+                    </div>
+                    <div className="flex items-center gap-1 bg-black/50 px-1.5 py-0.5 rounded border border-purple-500/30 text-[9px] font-mono text-purple-300">
+                      <span>⏳ Delay {inspectCardData.delay}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Skills list with rich descriptions */}
+                  <div className="space-y-1.5 pr-0.5 max-h-[105px] overflow-y-auto custom-scrollbar">
+                    {inspectCardData.skills && inspectCardData.skills.length > 0 ? (
+                      inspectCardData.skills.map((s: any, sIdx: number) => (
+                        <div key={sIdx} className="bg-black/40 p-1.5 rounded-lg border border-white/5 space-y-0.5">
+                          <div className="font-mono font-black text-[9.5px] flex items-center gap-1 text-amber-300">
+                            <span>{renderSkillIcon(s.type, "w-3 h-3")}</span>
+                            <span className="uppercase tracking-wider">{getSkillNameEnglish(s.type)} ({s.value})</span>
+                          </div>
+                          <p className="text-gray-300 font-sans text-[8.5px] leading-relaxed pl-3.5">
+                            {getSkillDescEnglish(s.type, s.value)}
+                          </p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-[9px] text-gray-500 font-mono italic">No special abilities.</p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  {/* Status Chips: Armor & Barrier */}
+                  <div className="bg-black/50 p-1 rounded-lg border border-gray-800/60 grid grid-cols-2 gap-1 text-center font-mono text-[8.5px] mt-1.5">
+                    <div className="bg-slate-900/60 p-0.5 rounded border border-slate-700/40">
+                      <span className="text-slate-400 text-[6.5px] block font-bold uppercase tracking-wider">ARMOR</span>
+                      <span className="text-cyan-300 font-bold">🛡️ {inspectCardData.armor || 0}</span>
+                    </div>
+                    <div className="bg-amber-950/50 p-0.5 rounded border border-amber-700/40">
+                      <span className="text-amber-400 text-[6.5px] block font-bold uppercase tracking-wider">BARRIER</span>
+                      <span className="text-amber-300 font-bold">{(inspectCardData.barrier ?? inspectCardData.ward) ? '✨ ACTIVE' : 'NONE'}</span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => setInspectCardData(null)}
+                    className="w-full mt-2 py-1.5 bg-gradient-to-r from-zinc-800 to-zinc-900 hover:from-zinc-700 text-white font-mono text-[10px] font-bold rounded-lg border border-zinc-600 cursor-pointer active:scale-95 transition-all uppercase tracking-wider shadow-sm"
+                  >
+                    CLOSE
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* =========================================================================
           7. VICTORY MODAL (1:1 PC Rewards, Stars, Breakdowns)
