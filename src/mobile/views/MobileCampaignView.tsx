@@ -3,7 +3,19 @@ import { useGame } from '../../context/GameContext';
 import { useToast } from '../../components/Toast';
 import { generateCampaignStage } from '../../data/cards';
 import { CampaignStage } from '../../types';
-import { Skull, Swords, ChevronLeft, ChevronRight, Star, FastForward, Plus, X } from 'lucide-react';
+import { 
+  Skull, 
+  Swords, 
+  ChevronLeft, 
+  ChevronRight, 
+  Star, 
+  FastForward, 
+  Plus, 
+  X, 
+  Award, 
+  Crown,
+  ShieldAlert
+} from 'lucide-react';
 import { assetPreloader } from '../../utils/assetPreloader';
 import { getActiveSubscriptionTier, getTierLimits } from '../../utils/energyHelper';
 
@@ -26,6 +38,7 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
   const maxFloor = profile.pveProgress || 1;
   const [viewingFloor, setViewingFloor] = useState<number>(maxFloor);
 
+  // Auto-update viewing floor if player progresses
   useEffect(() => {
     if (viewingFloor < maxFloor && viewingFloor === maxFloor - 1) {
       setViewingFloor(maxFloor);
@@ -34,6 +47,7 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
 
   const selectedStage = generateCampaignStage(viewingFloor);
 
+  // Preload enemy creatures for the currently viewed campaign stage
   useEffect(() => {
     if (selectedStage?.enemyDeck) {
       assetPreloader.preloadBattleCreatures(selectedStage.enemyDeck);
@@ -56,16 +70,17 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
       const timeLeft = Math.max(0, pveRegenTime - (timePassed % pveRegenTime));
       const minutes = Math.floor(timeLeft / 60000);
       const seconds = Math.floor((timeLeft % 60000) / 1000);
-      setTimeUntilRegen(`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
+      setTimeUntilRegen(`${minutes}:${seconds.toString().padStart(2, '0')}`);
     };
 
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [profile.lastPveEnergyRefill, profile.pveEnergy]);
+  }, [profile.pveEnergy, profile.pveEnergyMax, profile.lastPveEnergyRefill, profile.lastEnergyRefill, profile.subscriptionTier, profile.subscriptionExpiresAt]);
 
-  const isBoss = selectedStage.isBoss;
-  const stageStars = profile.pveStageStars?.[viewingFloor] || 0;
+  const isBoss = viewingFloor % 10 === 0;
+  // Match PC star storage logic
+  const stageStars = profile.campaignStars?.[selectedStage.id.toString()] || 0;
   const canSweep = stageStars === 3;
 
   const handlePrev = () => {
@@ -76,274 +91,506 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
     if (viewingFloor < maxFloor) setViewingFloor(prev => prev + 1);
   };
 
-  const handleSweep = async () => {
+  const handleStart = () => {
+    if ((profile.deck?.length || 0) < 10) {
+      toast('Your Combat Deck must have exactly 10 cards to fight! Go to CARDS tab.', 'warning');
+      return;
+    }
     if ((profile.pveEnergy || 0) < selectedStage.energyCost) {
-      toast(`Insufficient Energy (${selectedStage.energyCost} required)`, 'warning');
+      toast('Not enough PvE energy! Opening Energy Vault...', 'warning');
       setIsBuyEnergyModalOpen(true);
       return;
     }
+    onStartBattle(selectedStage);
+  };
+
+  const handleSweep = async () => {
+    if (isSweeping) return;
+    if ((profile.pveEnergy || 0) < selectedStage.energyCost) {
+      toast('Not enough PvE energy for a sweep! Opening Energy Vault...', 'warning');
+      setIsBuyEnergyModalOpen(true);
+      return;
+    }
+    setIsSweeping(true);
     try {
-      setIsSweeping(true);
-      const res = await submitAction('sweep_campaign_stage', { stageId: viewingFloor });
-      if (res.success) {
-        toast(`Floor ${viewingFloor} Cleared! +${res.rewards?.gold || 0} Gold, +${res.rewards?.dust || 0} Dust`, 'success');
+      // Backend expects sweep_stage with floorNum
+      const res = await submitAction('sweep_stage', { floorNum: viewingFloor });
+      if (!res.success) {
+        toast(res.message || 'Sweep battle failed', 'error');
       } else {
-        toast(res.error || 'Auto-battle failed', 'error');
+        toast(res.message || `Floor ${viewingFloor} Cleared!`, 'success');
       }
     } catch {
-      toast('Network error during auto-battle', 'error');
+      toast('Network error during sweep battle', 'error');
     } finally {
       setIsSweeping(false);
     }
   };
 
   return (
-    <div className="h-full w-full flex flex-col p-1.5 sm:p-2 select-none overflow-hidden">
-      {/* 2-Column Landscape Console Layout */}
-      <div className="flex-1 flex gap-2 min-h-0">
-        {/* LEFT COLUMN: Floor Navigation & Energy (38% width) */}
-        <div className="w-[38%] max-w-[320px] bg-gradient-to-b from-[#140e0c]/90 via-[#0a0705]/95 to-[#050403] border border-[#ebd09b]/25 rounded-xl p-2 flex flex-col justify-between shadow-xl relative overflow-hidden">
-          {/* Subtle glow */}
-          <div className="absolute -top-12 -left-12 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+    <div className="h-full w-full overflow-y-auto select-none px-2.5 sm:px-4 pt-2 pb-28 custom-scrollbar">
+      <div className="max-w-md mx-auto w-full flex flex-col gap-3">
+        
+        {/* Unified Majestic Slate Panel */}
+        <div className={`rounded-3xl p-4 sm:p-5 w-full relative overflow-hidden flex flex-col gap-3.5 border transition-all duration-300 ${
+          isBoss 
+            ? 'border-red-950/70 shadow-[0_0_40px_rgba(220,38,38,0.2)] bg-gradient-to-b from-[#1c080d]/95 via-[#0d0406]/95 to-[#050203]' 
+            : 'border-[#ebd09b]/25 shadow-[0_0_35px_rgba(0,0,0,0.85)] bg-gradient-to-b from-[#15100c]/95 via-[#0a0705]/95 to-[#050403]'
+        }`}>
+          {/* Ambient Background Glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(235,208,155,0.03)_0%,transparent_70%)] pointer-events-none" />
+          {isBoss && <div className="absolute inset-0 bg-red-950/10 pointer-events-none animate-pulse" />}
 
-          {/* Top: Energy Pill */}
-          <div 
-            onClick={() => setIsBuyEnergyModalOpen(true)}
-            className="flex items-center justify-between bg-black/60 border border-emerald-500/40 hover:border-emerald-400 rounded-lg px-2 py-1 shadow-inner cursor-pointer transition-all active:scale-98"
-          >
-            <div className="flex items-center gap-1.5">
-              <img src="/icons/icon_energy.webp" alt="⚡" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
-              <span className="font-display text-[10px] text-gray-300 font-bold">ENERGY:</span>
-              <span className="font-mono text-xs font-black text-emerald-400 leading-none">
-                {profile.pveEnergy || 0}
-                <span className="text-[9px] text-emerald-600 font-normal">/{pveEnergyMax}</span>
+          {/* Decorative Corner Brackets matching PC */}
+          <div className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-[#ebd09b]/40 pointer-events-none" />
+          <div className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-[#ebd09b]/40 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 border-[#ebd09b]/40 pointer-events-none" />
+          <div className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-[#ebd09b]/40 pointer-events-none" />
+
+          {/* 1. Header: Title & Energy Badge */}
+          <div className="text-center border-b border-white/10 pb-3 flex flex-col items-center relative z-10">
+            <h2 className="font-display font-black text-xl sm:text-2xl text-white tracking-widest text-shadow-gold">
+              THE ENDLESS ABYSS
+            </h2>
+            <p className="text-[11px] text-gray-400 mt-0.5 font-sans leading-relaxed">
+              Descend into infinite depths. Defeat dark entities for ancient spoils.
+            </p>
+
+            {/* Prominent Centered Energy Pill with + Button */}
+            <div 
+              onClick={() => setIsBuyEnergyModalOpen(true)}
+              className="mt-2.5 inline-flex items-center gap-2 bg-gradient-to-r from-[#061c12] via-black to-[#061c12] border border-emerald-500/50 hover:border-emerald-400 rounded-full py-1 pl-3 pr-1.5 shadow-[0_0_15px_rgba(16,185,129,0.25)] select-none transition-all cursor-pointer group active:scale-95"
+              title="Click to Refill Energy with Dark Shards"
+            >
+              <img 
+                src="/icons/icon_energy.webp" 
+                alt="Energy" 
+                className="w-4 h-4 sm:w-5 sm:h-5 object-contain drop-shadow-[0_0_6px_rgba(16,185,129,0.9)] group-hover:scale-110 transition-transform" 
+              />
+              <div className="flex items-baseline gap-1 leading-none">
+                <span className="font-display font-bold text-[10px] sm:text-xs text-gray-300 tracking-wider">ENERGY:</span>
+                <span className="font-mono text-xs sm:text-sm font-black text-emerald-400">
+                  {profile.pveEnergy || 0}
+                </span>
+                <span className="font-mono text-[10px] text-emerald-500/70">
+                  /{pveEnergyMax}
+                </span>
+              </div>
+              <span className="font-mono text-[10px] text-emerald-300/90 font-bold border-l border-emerald-500/30 pl-2 pr-1">
+                {timeUntilRegen ? `+1 in ${timeUntilRegen}` : 'Full'}
               </span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-[9px] font-mono font-bold text-emerald-300/80">
-                {timeUntilRegen ? timeUntilRegen : 'FULL'}
-              </span>
-              <div className="w-4 h-4 rounded bg-emerald-600 text-black flex items-center justify-center font-black">
+              <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gradient-to-b from-emerald-500 to-emerald-700 group-hover:from-emerald-400 group-hover:to-emerald-600 text-black flex items-center justify-center border border-emerald-300/50 shadow-[0_0_8px_rgba(16,185,129,0.6)] shrink-0">
                 <Plus className="w-3 h-3 stroke-[3]" />
               </div>
             </div>
           </div>
 
-          {/* Center: Big Floor Carousel Card */}
-          <div className="flex-1 flex items-center justify-between my-1 bg-black/40 border border-white/5 rounded-xl px-2 py-1 relative">
-            <button
+          {/* 2. Large Centered Floor Selector & Stars */}
+          <div className="flex items-center justify-between bg-black/50 border border-white/10 rounded-2xl py-2 px-3 sm:px-4 shadow-inner relative z-10">
+            <button 
               onClick={handlePrev}
               disabled={viewingFloor === 1}
-              className="w-8 h-8 rounded-lg bg-black/60 border border-[#ebd09b]/30 text-[#ebd09b] flex items-center justify-center disabled:opacity-20 active:scale-90 transition-all cursor-pointer shrink-0"
+              className="p-2.5 sm:p-3 rounded-xl bg-black/60 border border-[#ebd09b]/30 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer active:scale-90 shrink-0"
+              title="Previous Floor"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
 
-            <div className="flex flex-col items-center select-none text-center">
-              <span className={`text-[9px] font-mono tracking-widest uppercase font-black ${isBoss ? 'text-red-400 animate-pulse' : 'text-[#ebd09b]'}`}>
+            <div className="flex flex-col items-center select-none text-center px-2">
+              <span className={`text-[10px] font-mono tracking-widest uppercase font-black ${isBoss ? 'text-red-400 animate-pulse' : 'text-[#ebd09b]'}`}>
                 {isBoss ? '🔥 BOSS FLOOR' : 'THE ABYSS'}
               </span>
-              <div className="font-display font-black text-3xl sm:text-4xl text-white text-shadow-gold leading-none my-0.5">
+              <div className="text-4xl sm:text-5xl font-display font-black text-white text-shadow-gold leading-none my-0.5">
                 {viewingFloor}
               </div>
-              {/* Stars */}
-              <div className="flex gap-1">
-                {[1, 2, 3].map(s => (
-                  <Star
-                    key={s}
-                    className={`w-3.5 h-3.5 ${s <= stageStars ? 'text-amber-400 fill-amber-400 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : 'text-gray-700'}`}
+              
+              {/* 3 Stars display directly under floor number */}
+              <div className="flex justify-center gap-1.5 my-0.5">
+                {[1, 2, 3].map(star => (
+                  <Star 
+                    key={star} 
+                    className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                      star <= stageStars 
+                        ? 'text-[#ebd09b] fill-[#ebd09b] drop-shadow-[0_0_8px_rgba(235,208,155,0.8)]' 
+                        : 'text-gray-700'
+                    }`} 
                   />
                 ))}
               </div>
-              <span className={`text-[8px] font-mono uppercase font-bold mt-0.5 ${viewingFloor === maxFloor ? 'text-emerald-400' : 'text-amber-400/80'}`}>
+
+              <span className={`text-[9px] font-mono tracking-wider uppercase font-bold mt-0.5 ${
+                viewingFloor === maxFloor ? 'text-emerald-400' : 'text-amber-400/90'
+              }`}>
                 {viewingFloor === maxFloor ? 'Current Stage' : 'Farm Cleared'}
               </span>
             </div>
 
-            <button
+            <button 
               onClick={handleNext}
-              disabled={viewingFloor === maxFloor}
-              className="w-8 h-8 rounded-lg bg-black/60 border border-[#ebd09b]/30 text-[#ebd09b] flex items-center justify-center disabled:opacity-20 active:scale-90 transition-all cursor-pointer shrink-0"
+              disabled={viewingFloor >= maxFloor}
+              className="p-2.5 sm:p-3 rounded-xl bg-black/60 border border-[#ebd09b]/30 text-[#ebd09b] hover:bg-[#ebd09b]/10 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer active:scale-90 shrink-0"
+              title="Next Floor"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
           </div>
 
-          {/* Bottom Left: Sweep or Mode */}
-          {canSweep ? (
-            <button
-              onClick={handleSweep}
-              disabled={isSweeping || (profile.pveEnergy || 0) < selectedStage.energyCost}
-              className="w-full py-1.5 bg-gradient-to-r from-amber-600/30 to-amber-900/30 hover:from-amber-600/50 hover:to-amber-900/50 border border-amber-500/50 rounded-lg flex items-center justify-center gap-1.5 text-amber-300 font-display text-[10px] font-bold tracking-wider uppercase transition-all active:scale-95 cursor-pointer disabled:opacity-40"
-            >
-              <FastForward className="w-3.5 h-3.5" />
-              <span>{isSweeping ? 'Sweeping...' : 'Quick Sweep (⚡1)'}</span>
-            </button>
-          ) : (
-            <div className="text-center py-1 text-[9px] font-mono text-gray-500">
-              {stageStars === 0 ? 'Not completed yet' : `${stageStars}/3 Stars — 3★ unlocks Sweep`}
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT COLUMN: Boss Info, Deck, Rewards & BIG FIGHT BUTTON (62% width) */}
-        <div className="flex-1 bg-gradient-to-b from-[#140e0c]/90 via-[#0a0705]/95 to-[#050403] border border-[#ebd09b]/25 rounded-xl p-2.5 flex flex-col justify-between shadow-xl relative overflow-hidden">
-          {/* Subtle boss glow */}
-          <div className="absolute -top-12 -right-12 w-40 h-40 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
-
-          {/* Top: Boss Banner */}
-          <div className="flex items-center gap-2.5 bg-black/40 border border-white/10 rounded-xl p-2">
-            <div className="w-12 h-12 rounded-xl border-2 border-red-600/60 bg-red-950/40 overflow-hidden flex items-center justify-center shadow-md shrink-0">
-              {selectedStage.enemyHeroImage ? (
+          {/* 3. Encounter Card (Enemy Lord Details) */}
+          <div className="bg-black/55 border border-white/10 rounded-2xl p-3 flex items-center gap-3 shadow-inner relative z-10">
+            <div className={`w-14 h-14 rounded-2xl overflow-hidden border-2 shrink-0 flex items-center justify-center ${
+              isBoss 
+                ? 'border-red-600/80 bg-red-950/40 shadow-[0_0_15px_rgba(220,38,38,0.4)]' 
+                : 'border-[#ebd09b]/40 bg-zinc-900 shadow-md'
+            }`}>
+              {selectedStage.enemyHeroImage?.startsWith('/') ? (
                 <img 
                   src={selectedStage.enemyHeroImage} 
-                  alt="" 
+                  alt={selectedStage.enemyHeroName} 
                   className="w-full h-full object-cover" 
                   onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/avatars/knight.webp'; }}
                 />
+              ) : isBoss ? (
+                <Crown className="w-7 h-7 text-purple-400 animate-pulse drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
               ) : (
-                <Skull className="w-6 h-6 text-red-500" />
+                <Skull className="w-7 h-7 text-red-400" />
               )}
             </div>
+
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="font-display font-black text-sm text-white truncate tracking-wide text-shadow-gold">
-                  {selectedStage.name}
-                </h3>
-                <span className="font-mono text-[9px] bg-red-950/80 border border-red-500/40 px-1.5 py-0.2 rounded text-red-300 shrink-0 font-bold">
+                <h4 className="font-display font-black text-sm sm:text-base text-white truncate text-shadow-gold">
+                  {selectedStage.enemyHeroName}
+                </h4>
+                <span className="font-mono text-[9px] bg-red-950/80 border border-red-500/50 px-1.5 py-0.2 rounded text-red-300 font-bold shrink-0">
                   Lv.{selectedStage.enemyLevel || viewingFloor}
                 </span>
               </div>
-              <p className="font-sans text-[10px] text-gray-400 line-clamp-1 mt-0.5">
+              <p className="text-[10px] text-gray-400 font-sans line-clamp-1 mt-0.5">
                 {selectedStage.description || 'Defeat the guardian of the abyss to open the descent.'}
               </p>
-              <div className="flex items-center gap-2 mt-1 font-mono text-[9px] text-gray-400">
-                <span className="text-red-400 font-bold">❤️ HP: {selectedStage.enemyHeroHealth || (30 + viewingFloor * 2)}</span>
-                <span>•</span>
-                <span className="text-cyan-400 font-bold">🎴 Deck: {selectedStage.enemyDeck?.length || 10} creatures</span>
+              <div className="flex items-center gap-2.5 mt-1 font-mono text-[10px]">
+                <span className="text-red-400 font-bold">
+                  ❤️ {selectedStage.enemyHeroHealth} HP
+                </span>
+                <span className="text-gray-600">•</span>
+                <span className="text-cyan-300 font-bold">
+                  🎴 {selectedStage.enemyDeck?.length || 10} Cards
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Center: Enemy Deck Miniature Preview + Rewards */}
-          <div className="flex items-center gap-2 my-1.5 min-h-0">
-            {/* Enemy Deck Miniatures */}
-            <div className="flex-1 bg-black/40 border border-white/5 rounded-xl p-1.5">
-              <span className="text-[8px] font-mono text-gray-400 uppercase font-bold block mb-1">Guarding Creatures</span>
-              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
-                {(selectedStage.enemyDeck || []).slice(0, 7).map((c, i) => (
-                  <div 
-                    key={i} 
-                    className="w-8 h-11 rounded border border-white/15 bg-gray-900 overflow-hidden shrink-0 relative flex flex-col justify-end"
-                    title={c.name}
-                  >
-                    {c.image && <img src={c.image} alt="" className="absolute inset-0 w-full h-full object-cover opacity-80" />}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-                    <div className="relative z-10 flex justify-between px-0.5 text-[7px] font-mono font-black text-white leading-none pb-0.5">
-                      <span className="text-red-400">{c.attack}</span>
-                      <span className="text-emerald-400">{c.health}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Stage Victory Rewards */}
-            <div className="w-[42%] bg-black/40 border border-white/5 rounded-xl p-1.5 shrink-0">
-              <span className="text-[8px] font-mono text-amber-400 uppercase font-bold block mb-1">Clear Rewards</span>
-              <div className="grid grid-cols-2 gap-1 font-mono text-[9px] font-bold">
-                <div className="flex items-center gap-1 bg-black/50 px-1.5 py-0.5 rounded border border-amber-950/40 text-amber-400">
-                  <img src="/icons/icon_gold.webp" alt="" className="w-3.5 h-3.5 object-contain" />
-                  <span>+{selectedStage.goldReward}</span>
-                </div>
-                <div className="flex items-center gap-1 bg-black/50 px-1.5 py-0.5 rounded border border-cyan-950/40 text-cyan-400">
-                  <img src="/icons/icon_dust.webp" alt="" className="w-3.5 h-3.5 object-contain" />
-                  <span>+{selectedStage.dustReward}</span>
-                </div>
-                <div className="flex items-center gap-1 bg-black/50 px-1.5 py-0.5 rounded border border-emerald-950/40 text-emerald-400">
-                  <img src="/icons/icon_exp.webp" alt="" className="w-3.5 h-3.5 object-contain" />
-                  <span>+{selectedStage.expReward}</span>
-                </div>
-                {selectedStage.shardsReward > 0 && (
-                  <div className="flex items-center gap-1 bg-black/50 px-1.5 py-0.5 rounded border border-rose-950/40 text-rose-400">
-                    <img src="/icons/icon_shards.webp" alt="" className="w-3.5 h-3.5 object-contain" />
-                    <span>+{selectedStage.shardsReward}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Action: BIG TACTILE FIGHT BUTTON */}
-          <button
-            onClick={() => {
-              if ((profile.pveEnergy || 0) < selectedStage.energyCost) {
-                toast(`Insufficient Energy (${selectedStage.energyCost} required)`, 'warning');
-                setIsBuyEnergyModalOpen(true);
-                return;
-              }
-              onStartBattle(selectedStage);
-            }}
-            className="w-full py-2.5 bg-gradient-to-r from-[#ebd09b] via-[#f59e0b] to-[#ebd09b] hover:brightness-110 text-black font-display font-black text-sm tracking-widest uppercase rounded-xl shadow-[0_0_25px_rgba(245,158,11,0.4)] flex items-center justify-center gap-2 transition-all active:scale-98 cursor-pointer"
-          >
-            <Swords className="w-4 h-4 stroke-[2.5]" />
-            <span>ENTER BATTLE</span>
-            <span className="font-mono text-xs font-bold bg-black/20 px-1.5 py-0.5 rounded">
-              ⚡ {selectedStage.energyCost} Energy
+          {/* 4. Victory Rewards (Clear Rewards) */}
+          <div className="space-y-1.5 relative z-10">
+            <span className="text-[9px] font-mono text-[#ebd09b]/90 tracking-widest uppercase font-black block">
+              VICTORY REWARDS
             </span>
-          </button>
+            <div className="grid grid-cols-3 gap-1.5 font-mono text-[10px] font-bold">
+              {/* Gold Pill */}
+              <div className="flex items-center justify-center gap-1.5 bg-black/60 border border-amber-500/30 rounded-xl p-2 text-amber-300 shadow-inner">
+                <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_0_4px_rgba(245,158,11,0.5)]" />
+                <div className="flex flex-col items-start leading-tight">
+                  <span className="text-xs font-black text-amber-400">+{selectedStage.goldReward}</span>
+                  <span className="text-[7.5px] text-amber-500/80 uppercase font-sans">Gold</span>
+                </div>
+              </div>
+
+              {/* Dust Pill */}
+              <div className="flex items-center justify-center gap-1.5 bg-black/60 border border-cyan-500/30 rounded-xl p-2 text-cyan-300 shadow-inner">
+                <img src="/icons/icon_dust.webp" alt="Dust" className="w-5 h-5 object-contain shrink-0 drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]" />
+                <div className="flex flex-col items-start leading-tight">
+                  <span className="text-xs font-black text-cyan-300">+{selectedStage.dustReward}</span>
+                  <span className="text-[7.5px] text-cyan-400/80 uppercase font-sans">Dust</span>
+                </div>
+              </div>
+
+              {/* Shards or EXP Pill */}
+              {selectedStage.shardsReward > 0 ? (
+                <div className="flex items-center justify-center gap-1.5 bg-black/60 border border-red-500/30 rounded-xl p-2 text-rose-300 shadow-inner">
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_0_4px_rgba(244,63,94,0.6)]" />
+                  <div className="flex flex-col items-start leading-tight">
+                    <span className="text-xs font-black text-rose-400">+{selectedStage.shardsReward}</span>
+                    <span className="text-[7.5px] text-rose-400/80 uppercase font-sans">Shards</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-1.5 bg-black/60 border border-emerald-500/30 rounded-xl p-2 text-emerald-300 shadow-inner">
+                  <img src="/icons/icon_exp.webp" alt="EXP" className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_0_4px_rgba(16,185,129,0.6)]" />
+                  <div className="flex flex-col items-start leading-tight">
+                    <span className="text-xs font-black text-emerald-400">+{selectedStage.id * 16 + 32}</span>
+                    <span className="text-[7.5px] text-emerald-400/80 uppercase font-sans">Hero EXP</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Guaranteed Card Drop (if present) */}
+          {selectedStage.cardReward && (
+            <div className="bg-emerald-950/30 border border-emerald-500/40 p-2.5 rounded-2xl flex items-center justify-between shadow-inner relative z-10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-emerald-950/60 flex items-center justify-center border border-emerald-500/40 shrink-0">
+                  <Award className="w-4 h-4 text-emerald-400" />
+                </div>
+                <div>
+                  <span className="text-emerald-400 font-bold text-xs block leading-tight">Guaranteed Card Drop</span>
+                  <span className="text-[10px] text-gray-300 font-mono">{selectedStage.cardReward.name}</span>
+                </div>
+              </div>
+              <span className="text-[9px] bg-emerald-950/60 text-emerald-400 px-2 py-0.5 rounded font-mono border border-emerald-500/30 font-bold">
+                100% Drop
+              </span>
+            </div>
+          )}
+
+          {/* 5. Guarding Creatures Ribbon */}
+          <div className="space-y-1.5 relative z-10">
+            <span className="text-[9px] font-mono text-gray-400 tracking-widest uppercase font-bold block">
+              GUARDING CREATURES ({selectedStage.enemyDeck?.length || 0})
+            </span>
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-1 bg-black/40 border border-white/5 rounded-2xl">
+              {(selectedStage.enemyDeck || []).map((card, i) => (
+                <div 
+                  key={i} 
+                  className="w-12 h-16 rounded-xl border border-white/15 bg-gray-950 overflow-hidden shrink-0 relative flex flex-col justify-end shadow-md"
+                  title={`${card.name} (Atk: ${card.attack}, HP: ${card.health})`}
+                >
+                  {card.image && (
+                    <img 
+                      src={card.image} 
+                      alt="" 
+                      className="absolute inset-0 w-full h-full object-cover opacity-85" 
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                  
+                  {/* Miniature Card Stats */}
+                  <div className="relative z-10 flex justify-between px-1 pb-0.5 text-[8px] font-mono font-black leading-none">
+                    <span className="text-red-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                      {card.attack}
+                    </span>
+                    <span className="text-emerald-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                      {card.health}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 6. Action Buttons: BATTLE & SWEEP */}
+          <div className="pt-2 border-t border-white/10 flex flex-col gap-2 relative z-10">
+            <button
+              onClick={handleStart}
+              className={`w-full py-3 px-4 rounded-2xl font-display font-black text-sm tracking-widest uppercase flex items-center justify-center gap-3 cursor-pointer active:scale-95 transition-all shadow-lg ${
+                isBoss
+                  ? 'bg-gradient-to-r from-[#450a0a] via-[#dc2626] to-[#450a0a] hover:brightness-110 text-white border-2 border-red-500/60 shadow-[0_0_25px_rgba(220,38,38,0.45)]'
+                  : 'bg-gradient-to-r from-[#ebd09b] via-[#f59e0b] to-[#ebd09b] hover:brightness-110 text-black border-2 border-amber-300/60 shadow-[0_0_25px_rgba(245,158,11,0.4)]'
+              }`}
+            >
+              <Swords className="w-4 h-4 stroke-[2.5]" />
+              <span>ENTER BATTLE</span>
+              <span className="font-mono text-xs font-black bg-black/25 px-2 py-0.5 rounded-full flex items-center gap-1">
+                ⚡ {selectedStage.energyCost}
+              </span>
+            </button>
+
+            {canSweep ? (
+              <button
+                onClick={handleSweep}
+                disabled={isSweeping || (profile.pveEnergy || 0) < selectedStage.energyCost}
+                className="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-[#1b122c] via-[#2e1065] to-[#06020c] hover:brightness-110 border-2 border-purple-500/50 text-purple-200 font-display font-black text-xs tracking-widest uppercase flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)] disabled:opacity-40"
+              >
+                <FastForward className="w-4 h-4" />
+                <span>{isSweeping ? 'SWEEPING...' : 'QUICK SWEEP'}</span>
+                <span className="font-mono text-xs font-black bg-black/40 px-2 py-0.5 rounded-full text-emerald-400">
+                  ⚡ {selectedStage.energyCost}
+                </span>
+              </button>
+            ) : (
+              <div className="text-center py-0.5 text-[10px] font-mono text-gray-500">
+                {stageStars === 0 ? 'Clear floor to earn stars' : `${stageStars}/3 Stars • 3★ unlocks Quick Sweep`}
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
 
-      {/* Energy Refill Modal */}
+      {/* Abyssal Energy Vault Modal (Full PC Feature Implementation) */}
       {isBuyEnergyModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3">
-          <div className="bg-[#0f0b08] border-2 border-emerald-500/50 rounded-2xl max-w-sm w-full p-4 space-y-3 text-center shadow-2xl relative">
-            <button 
+        <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-gradient-to-b from-[#0f1f17] via-[#09140f] to-[#040906] border-2 border-emerald-500/50 rounded-3xl p-4 sm:p-6 max-w-sm w-full relative shadow-[0_0_60px_rgba(0,0,0,0.95)] space-y-3.5 overflow-hidden animate-in zoom-in-95 duration-200">
+            
+            {/* Ambient Background Glows */}
+            <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-48 h-48 bg-emerald-500/15 blur-3xl pointer-events-none" />
+
+            {/* Close Button */}
+            <button
               onClick={() => setIsBuyEnergyModalOpen(false)}
-              className="absolute top-2.5 right-2.5 text-gray-400 hover:text-white"
+              className="absolute top-3 right-3 text-gray-400 hover:text-white w-7 h-7 flex items-center justify-center bg-black/70 border border-white/10 rounded-full z-30 transition-all cursor-pointer"
+              title="Close"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" />
             </button>
-            <div className="w-10 h-10 rounded-full bg-emerald-950/60 border border-emerald-500 flex items-center justify-center mx-auto shadow-lg">
-              <img src="/icons/icon_energy.webp" alt="" className="w-6 h-6 object-contain" />
-            </div>
-            <div>
-              <h3 className="font-display font-bold text-sm text-white uppercase tracking-wider">Replenish Energy</h3>
-              <p className="font-sans text-[10px] text-gray-400 mt-0.5">
-                Instantly restore 5 Campaign Energy for 10 Dark Shards.
+
+            {/* Header */}
+            <div className="text-center space-y-1 relative z-10 pt-1">
+              <div className="w-12 h-12 mx-auto rounded-2xl bg-gradient-to-b from-emerald-950/80 to-black border-2 border-emerald-500/60 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.35)]">
+                <img src="/icons/icon_energy.webp" alt="Energy" className="w-7 h-7 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.85)]" />
+              </div>
+              <h3 className="font-display font-black text-base sm:text-lg text-transparent bg-clip-text bg-gradient-to-b from-emerald-100 via-emerald-300 to-teal-400 tracking-wider uppercase text-shadow-gold">
+                ABYSSAL ENERGY VAULT
+              </h3>
+              <p className="text-[10px] text-gray-300 font-sans leading-tight max-w-xs mx-auto">
+                Exchange Dark Shards for PvE Energy to descend deeper into the Abyss.
               </p>
             </div>
-            <div className="flex items-center justify-center gap-2 bg-black/50 py-1.5 rounded-lg font-mono text-xs text-rose-300">
-              <img src="/icons/icon_shards.webp" alt="" className="w-4 h-4 object-contain" />
-              <span>Cost: 10 Dark Shards (Have: {profile.darkShards || 0})</span>
+
+            {/* Status Bar: Current Energy, Regen & Shards */}
+            <div className="grid grid-cols-3 gap-1.5 bg-black/60 border border-white/10 rounded-2xl p-2 relative z-10 shadow-inner text-center">
+              <div className="border-r border-white/10 pr-1">
+                <span className="text-[8px] font-mono text-gray-400 uppercase block font-bold">Energy</span>
+                <span className="font-mono text-xs font-black text-emerald-400 flex items-center justify-center gap-0.5 mt-0.5">
+                  <img src="/icons/icon_energy.webp" alt="" className="w-3 h-3 object-contain" />
+                  {profile.pveEnergy || 0}/{pveEnergyMax}
+                </span>
+              </div>
+
+              <div className="border-r border-white/10 px-1">
+                <span className="text-[8px] font-mono text-gray-400 uppercase block font-bold">Regen</span>
+                <span className="font-mono text-xs font-black text-teal-300 block mt-0.5">
+                  +1/{Math.round(pveRegenInterval / 60000)}m
+                </span>
+              </div>
+
+              <div className="pl-1">
+                <span className="text-[8px] font-mono text-gray-400 uppercase block font-bold">Shards</span>
+                <span className="font-mono text-xs font-black text-rose-300 flex items-center justify-center gap-0.5 mt-0.5">
+                  <img src="/icons/icon_shards.webp" alt="" className="w-3 h-3 object-contain" />
+                  {profile.darkShards || 0}
+                </span>
+              </div>
             </div>
+
+            {/* 3 Energy Packages matching PC */}
+            <div className="grid grid-cols-3 gap-2 relative z-10">
+              {[
+                { 
+                  count: 3, 
+                  cost: 10, 
+                  label: 'Minor Vial', 
+                  image: '/icons/energy_vial_small.webp',
+                  theme: 'border-white/10 bg-black/70' 
+                },
+                { 
+                  count: 10, 
+                  cost: 25, 
+                  label: 'Flask', 
+                  image: '/icons/energy_flask_medium.webp',
+                  popular: true, 
+                  badge: 'POPULAR',
+                  theme: 'border-emerald-500/60 bg-emerald-950/25 shadow-[0_0_12px_rgba(16,185,129,0.2)]' 
+                },
+                { 
+                  count: 25, 
+                  cost: 50, 
+                  label: 'Elixir', 
+                  image: '/icons/energy_elixir_large.webp',
+                  badge: 'BEST',
+                  theme: 'border-amber-500/60 bg-amber-950/25 shadow-[0_0_12px_rgba(245,158,11,0.2)]' 
+                }
+              ].map((pkg) => {
+                const canAfford = (profile.darkShards || 0) >= pkg.cost;
+
+                return (
+                  <div 
+                    key={pkg.count}
+                    className={`relative rounded-2xl border p-2 flex flex-col items-center justify-between text-center transition-all ${pkg.theme}`}
+                  >
+                    {/* Badge */}
+                    {pkg.badge && (
+                      <div className={`absolute -top-2 px-1.5 py-0.2 rounded-full text-[7.5px] font-mono font-black uppercase border ${
+                        pkg.popular 
+                          ? 'bg-emerald-500 text-black border-emerald-300' 
+                          : 'bg-amber-500 text-black border-amber-300'
+                      }`}>
+                        {pkg.badge}
+                      </div>
+                    )}
+
+                    {/* Icon & Count */}
+                    <div className="flex flex-col items-center mt-1 space-y-0.5">
+                      <div className="w-10 h-10 rounded-xl bg-black/60 border border-white/10 p-0.5 flex items-center justify-center overflow-hidden">
+                        <img src={pkg.image} alt="" className="w-full h-full object-contain" />
+                      </div>
+                      <span className="font-display font-black text-sm text-white">
+                        +{pkg.count}
+                      </span>
+                      <span className="text-[8px] text-gray-400 font-sans leading-none">
+                        {pkg.label}
+                      </span>
+                    </div>
+
+                    {/* Price Button */}
+                    <button
+                      onClick={async () => {
+                        if (isPurchasingEnergy) return;
+                        if (!canAfford) {
+                          toast(`Not enough Dark Shards! Need ${pkg.cost} Shards.`, 'warning');
+                          setIsBuyEnergyModalOpen(false);
+                          setIsShardsShopOpen(true);
+                          return;
+                        }
+                        setIsPurchasingEnergy(true);
+                        try {
+                          const success = await buyPveEnergy(pkg.count);
+                          if (success) {
+                            toast(`Restored +${pkg.count} PvE Energy!`, 'success');
+                          } else {
+                            toast('Failed to purchase energy', 'error');
+                          }
+                        } finally {
+                          setIsPurchasingEnergy(false);
+                        }
+                      }}
+                      disabled={isPurchasingEnergy}
+                      className={`w-full mt-2 py-1.5 rounded-xl font-mono font-black text-xs transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                        canAfford
+                          ? pkg.popular
+                            ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-black shadow-sm active:scale-95'
+                            : 'bg-white/10 hover:bg-white/20 text-white border border-white/20 active:scale-95'
+                          : 'bg-red-950/30 text-red-400 border border-red-500/30'
+                      }`}
+                    >
+                      <span>{pkg.cost}</span>
+                      <img src="/icons/icon_shards.webp" alt="" className="w-3.5 h-3.5 object-contain" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Overflow Protected Note */}
+            <div className="bg-black/60 border border-white/10 rounded-xl p-2 text-center text-[10px] text-gray-300 font-sans leading-tight relative z-10 flex items-center justify-center gap-1.5">
+              <span className="text-emerald-400 text-xs">💡</span>
+              <span>
+                <strong className="text-emerald-300">Overflow Protected:</strong> Energy purchased with Dark Shards is added above cap and never expires.
+              </span>
+            </div>
+
+            {/* Back to Abyss Button */}
             <button
-              onClick={async () => {
-                if ((profile.darkShards || 0) < 10) {
-                  setIsBuyEnergyModalOpen(false);
-                  setIsShardsShopOpen(true);
-                  toast('Insufficient Dark Shards! Opening Shop...', 'warning');
-                  return;
-                }
-                setIsPurchasingEnergy(true);
-                const success = await buyPveEnergy();
-                setIsPurchasingEnergy(false);
-                if (success) {
-                  toast('Energy restored by +5!', 'success');
-                  setIsBuyEnergyModalOpen(false);
-                } else {
-                  toast('Failed to restore energy', 'error');
-                }
-              }}
-              disabled={isPurchasingEnergy}
-              className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-black font-display font-black text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
+              onClick={() => setIsBuyEnergyModalOpen(false)}
+              className="w-full py-2 rounded-xl border border-white/10 bg-black/40 text-gray-300 font-display font-bold tracking-wider text-[11px] uppercase transition-colors cursor-pointer active:scale-95 relative z-10"
             >
-              {isPurchasingEnergy ? 'Restoring...' : 'Confirm Refill (+5 Energy)'}
+              Back to Abyss
             </button>
           </div>
         </div>
       )}
+
     </div>
   );
 };
+
