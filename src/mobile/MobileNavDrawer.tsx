@@ -6,12 +6,7 @@ import {
   UserCircle2, 
   Store, 
   Crown, 
-  Landmark, 
-  Menu, 
-  X, 
-  Compass,
-  ChevronRight,
-  Sparkles
+  Landmark 
 } from 'lucide-react';
 
 export type MobileTab = 'campaign' | 'pvp' | 'collection' | 'hero' | 'altar' | 'bank' | 'premium';
@@ -29,8 +24,6 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
   hasNewDefenseAttacks,
   deckCount = 10,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
   // Dynamic bottom inset detection for Telegram WebApp and Android navigation buttons
   const [bottomInset, setBottomInset] = useState<number>(() => {
     if (typeof window !== 'undefined') {
@@ -73,85 +66,85 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
   const menuItems = [
     {
       id: 'campaign' as MobileTab,
-      label: 'Campaign',
+      label: 'CAMPAIGN',
       icon: Swords,
       color: 'text-emerald-400',
       activeColor: 'text-emerald-300',
-      border: 'border-emerald-500/50',
-      bg: 'from-emerald-950/50 to-black/80',
-      shadow: 'shadow-[0_0_10px_rgba(16,185,129,0.3)]',
+      border: 'border-emerald-500/40',
+      bg: 'from-emerald-950/40 via-black/60 to-black/80',
+      shadow: 'shadow-[0_0_12px_rgba(16,185,129,0.25)]',
       badge: null,
       badgeColor: '',
     },
     {
       id: 'pvp' as MobileTab,
-      label: 'Arena',
+      label: 'ARENA',
       icon: Trophy,
       color: 'text-rose-400',
       activeColor: 'text-rose-300',
-      border: 'border-rose-500/50',
-      bg: 'from-rose-950/50 to-black/80',
-      shadow: 'shadow-[0_0_10px_rgba(244,63,94,0.3)]',
-      badge: hasNewDefenseAttacks ? '!' : null,
-      badgeColor: 'bg-rose-500 text-white',
+      border: 'border-rose-500/40',
+      bg: 'from-rose-950/40 via-black/60 to-black/80',
+      shadow: 'shadow-[0_0_12px_rgba(244,63,94,0.25)]',
+      badge: null,
+      badgeColor: '',
     },
     {
       id: 'collection' as MobileTab,
-      label: 'Cards',
+      label: 'CARDS',
       icon: FolderGit,
-      color: 'text-amber-400',
-      activeColor: 'text-amber-300',
-      border: 'border-amber-500/50',
-      bg: 'from-amber-950/50 to-black/80',
-      shadow: 'shadow-[0_0_10px_rgba(245,158,11,0.3)]',
+      color: 'text-[#ebd09b]',
+      activeColor: 'text-[#ebd09b]',
+      border: 'border-[#c5a880]/40',
+      bg: 'from-[#221a12]/60 via-black/60 to-black/80',
+      shadow: 'shadow-[0_0_12px_rgba(197,168,128,0.25)]',
       badge: deckCount !== undefined ? `${deckCount}` : null,
-      badgeColor: 'bg-amber-500/30 text-amber-300 border border-amber-500/40',
+      badgeColor: 'bg-[#c5a880]/20 text-[#ebd09b] border border-[#c5a880]/40',
     },
     {
       id: 'hero' as MobileTab,
-      label: 'Lord',
+      label: 'LORD',
       icon: UserCircle2,
-      color: 'text-yellow-400',
-      activeColor: 'text-yellow-300',
-      border: 'border-yellow-500/50',
-      bg: 'from-yellow-950/50 to-black/80',
-      shadow: 'shadow-[0_0_10px_rgba(234,179,8,0.3)]',
+      color: 'text-[#ebd09b]',
+      activeColor: 'text-[#ebd09b]',
+      border: 'border-[#c5a880]/40',
+      bg: 'from-[#221a12]/60 via-black/60 to-black/80',
+      shadow: 'shadow-[0_0_12px_rgba(197,168,128,0.25)]',
       badge: null,
       badgeColor: '',
     },
     {
       id: 'altar' as MobileTab,
-      label: 'Altar',
+      label: 'SHOP',
       icon: Store,
       color: 'text-purple-400',
       activeColor: 'text-purple-300',
-      border: 'border-purple-500/50',
-      bg: 'from-purple-950/50 to-black/80',
-      shadow: 'shadow-[0_0_10px_rgba(168,85,247,0.3)]',
+      border: 'border-purple-500/40',
+      bg: 'from-purple-950/40 via-black/60 to-black/80',
+      shadow: 'shadow-[0_0_12px_rgba(168,85,247,0.25)]',
       badge: null,
       badgeColor: '',
     },
     {
       id: 'premium' as MobileTab,
-      label: 'Pass',
+      label: 'PREMIUM',
       icon: Crown,
       color: 'text-yellow-300',
-      activeColor: 'text-yellow-200',
-      border: 'border-yellow-400/50',
-      bg: 'from-yellow-950/50 to-black/80',
-      shadow: 'shadow-[0_0_10px_rgba(250,204,21,0.3)]',
+      activeColor: 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-amber-300 to-yellow-400 font-black',
+      border: 'border-yellow-400/60',
+      bg: 'from-amber-500/20 via-yellow-500/10 to-black/70',
+      shadow: 'shadow-[0_0_16px_rgba(250,204,21,0.4)]',
       badge: null,
       badgeColor: '',
     },
     {
       id: 'bank' as MobileTab,
-      label: 'Bank',
+      label: 'BANK',
       icon: Landmark,
-      color: 'text-cyan-400',
-      activeColor: 'text-cyan-300',
-      border: 'border-cyan-500/50',
-      bg: 'from-cyan-950/50 to-black/80',
-      shadow: 'shadow-[0_0_10px_rgba(6,182,212,0.3)]',
+      color: 'text-amber-400',
+      activeColor: 'text-amber-300',
+      border: 'border-amber-500/40',
+      bg: 'from-amber-950/40 via-black/60 to-black/80',
+      shadow: 'shadow-[0_0_12px_rgba(245,158,11,0.25)]',
       badge: null,
       badgeColor: '',
     },
@@ -162,11 +155,13 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
       style={{
         paddingBottom: `max(${bottomInset}px, calc(env(safe-area-inset-bottom, 0px) + 12px))`
       }}
-      className="fixed bottom-0 left-0 right-0 z-40 bg-[#0c0e14]/98 backdrop-blur-lg border-t border-white/10 select-none shadow-[0_-8px_30px_rgba(0,0,0,0.9)]"
+      className="fixed bottom-0 left-0 right-0 z-40 bg-[#151a21]/98 backdrop-blur-md border-t border-[#c5a880]/25 select-none shadow-[0_-8px_30px_rgba(0,0,0,0.95)]"
     >
       <div className="max-w-md mx-auto grid grid-cols-7 px-1 pt-1 pb-0.5">
         {menuItems.map((item) => {
           const isActive = activeTab === item.id;
+          const isArena = item.id === 'pvp';
+          const isPremium = item.id === 'premium';
           const Icon = item.icon;
 
           return (
@@ -175,20 +170,45 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
               onClick={() => onTabChange(item.id)}
               className={`flex flex-col items-center justify-center py-1 px-0.5 rounded-xl transition-all cursor-pointer active:scale-95 relative min-w-0 ${
                 isActive
-                  ? `bg-gradient-to-b ${item.bg} border ${item.border} ${item.shadow} ${item.activeColor}`
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? `bg-black/50 bg-gradient-to-b ${item.bg} border ${item.border} ${item.shadow}`
+                  : 'text-gray-400 hover:text-white border border-transparent'
               }`}
             >
               <div className="relative">
-                <Icon className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${isActive ? `${item.color} drop-shadow-[0_0_6px_currentColor]` : ''}`} />
+                <Icon 
+                  className={`w-4 h-4 sm:w-4.5 sm:h-4.5 transition-all ${
+                    isActive 
+                      ? `${item.color} ${isPremium ? 'drop-shadow-[0_0_8px_rgba(250,204,21,0.7)] animate-pulse' : 'drop-shadow-[0_0_6px_currentColor]'}` 
+                      : 'text-gray-400'
+                  }`} 
+                />
+                
+                {/* PC-matching Arena Defense Attacks Ping Badge */}
+                {isArena && hasNewDefenseAttacks && !isActive && (
+                  <span className="absolute -top-1 -right-1.5 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.9)]"></span>
+                  </span>
+                )}
+
+                {/* PC-matching Premium VIP Pulse Badge */}
+                {isPremium && (
+                  <span className="absolute -top-1 -right-1.5 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400 shadow-[0_0_6px_rgba(250,204,21,0.9)]"></span>
+                  </span>
+                )}
+
+                {/* Deck Card Count Pill Badge */}
                 {item.badge && (
-                  <span className={`absolute -top-1.5 -right-2 text-[7px] font-mono font-black px-0.5 rounded-full ${item.badgeColor}`}>
+                  <span className={`absolute -top-1.5 -right-2 text-[7px] font-mono font-black px-1 rounded-full ${item.badgeColor}`}>
                     {item.badge}
                   </span>
                 )}
               </div>
-              <span className={`font-display font-bold text-[7.5px] sm:text-[8.5px] tracking-tight uppercase mt-0.5 truncate max-w-full ${
-                isActive ? item.activeColor : 'text-zinc-400'
+
+              <span className={`font-display font-bold text-[7.5px] sm:text-[8.5px] tracking-wider uppercase mt-0.5 truncate max-w-full ${
+                isActive ? item.activeColor : 'text-gray-400'
               }`}>
                 {item.label}
               </span>
@@ -201,4 +221,5 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
 };
 
 export default MobileNavDrawer;
+
 
