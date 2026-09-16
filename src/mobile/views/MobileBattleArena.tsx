@@ -555,13 +555,20 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
     let stepDescription = '';
 
     const strikeDuration = Math.round(680 / effectiveSpeed);
-    const impactDelay = Math.round(310 / effectiveSpeed);
+    let impactDelay = Math.round(310 / effectiveSpeed);
     let stepDuration = Math.round(820 / effectiveSpeed);
 
-    if (step.type === 'enemy_play') stepDuration = Math.round(720 / effectiveSpeed);
-    else if (step.type === 'hero_skill') stepDuration = Math.round(680 / effectiveSpeed);
-    else if (step.type === 'plague') stepDuration = Math.round(820 / effectiveSpeed);
-    else if (step.type === 'death') stepDuration = Math.round(380 / effectiveSpeed);
+    if (step.type === 'enemy_play') {
+      stepDuration = Math.round(720 / effectiveSpeed);
+    } else if (step.type === 'hero_skill') {
+      const isTargetingBoard = step.targetSlot !== undefined && step.targetSlot >= 0;
+      impactDelay = isTargetingBoard ? Math.round(280 / effectiveSpeed) : Math.round(180 / effectiveSpeed);
+      stepDuration = isTargetingBoard ? Math.round(750 / effectiveSpeed) : Math.round(520 / effectiveSpeed);
+    } else if (step.type === 'plague') {
+      stepDuration = Math.round(820 / effectiveSpeed);
+    } else if (step.type === 'death') {
+      stepDuration = Math.round(380 / effectiveSpeed);
+    }
 
     const timeouts: ReturnType<typeof setTimeout>[] = [];
 
@@ -572,7 +579,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
         stepDescription = `💀 Sacrifice: ${placingCard?.name || 'Creature'} destroys ${sacrCard?.name || 'Ally'}!`;
         
         setActiveSkillVfx({ type: 'sacrifice', side: 'player', slot: step.targetSlot });
-        const tVfx = setTimeout(() => setActiveSkillVfx(null), Math.round(650 / effectiveSpeed));
+        const tVfx = setTimeout(() => setActiveSkillVfx(null), Math.round(450 / effectiveSpeed));
         timeouts.push(tVfx);
 
         addFloatingText('💀 SACRIFICE', { side: 'player', slot: step.targetSlot }, 'text-red-500 font-black text-xs');
@@ -632,7 +639,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
 
           if (hasHex) {
             setActiveSkillVfx({ type: 'hex', side: defSide, slot: step.targetSlot });
-            const tHex = setTimeout(() => setActiveSkillVfx(null), Math.round(650 / effectiveSpeed));
+            const tHex = setTimeout(() => setActiveSkillVfx(null), Math.round(450 / effectiveSpeed));
             timeouts.push(tHex);
           }
 
@@ -779,7 +786,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
             const tHit = setTimeout(() => {
               setDefenderAction({ side: targetSide, slot: step.targetSlot, type: 'hit' });
               setActiveSkillVfx({ type: 'void_strike', side: targetSide, slot: step.targetSlot });
-              const tVfx = setTimeout(() => setActiveSkillVfx(null), Math.round(650 / effectiveSpeed));
+              const tVfx = setTimeout(() => setActiveSkillVfx(null), Math.round(450 / effectiveSpeed));
               timeouts.push(tVfx);
 
               if (step.barrierBlocked) {
@@ -841,7 +848,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
             stepDescription = `🩸 Blood Aura: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} restores +${step.heal} HP to ally!`;
             setDefenderAction({ side: targetSide, slot: step.targetSlot, type: 'heal' });
             setActiveSkillVfx({ type: 'blood_aura', side: targetSide, slot: step.targetSlot });
-            const tVfx = setTimeout(() => setActiveSkillVfx(null), Math.round(650 / effectiveSpeed));
+            const tVfx = setTimeout(() => setActiveSkillVfx(null), Math.round(450 / effectiveSpeed));
             timeouts.push(tVfx);
 
             addFloatingText(`🩸 +${step.heal}`, { side: targetSide, slot: step.targetSlot }, 'text-emerald-400 font-bold');
@@ -880,7 +887,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
             stepDescription = `🔥 Warlord's Cry: ${isPlayerCaster ? 'Lord' : 'Enemy Commander'} boosts ally combat power!`;
             setDefenderAction({ side: targetSide, slot: step.targetSlot, type: 'heal' });
             setActiveSkillVfx({ type: 'warlord_cry', side: targetSide, slot: step.targetSlot });
-            const tVfx = setTimeout(() => setActiveSkillVfx(null), Math.round(650 / effectiveSpeed));
+            const tVfx = setTimeout(() => setActiveSkillVfx(null), Math.round(450 / effectiveSpeed));
             timeouts.push(tVfx);
 
             addFloatingText('🔥 BUFF', { side: targetSide, slot: step.targetSlot }, 'text-yellow-400 font-bold');
@@ -934,7 +941,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
         timeouts.push(tPlagueClear);
 
         setActiveSkillVfx({ type: 'plague', side: defSide, slot: step.targetSlot });
-        const tVfx = setTimeout(() => setActiveSkillVfx(null), Math.round(650 / effectiveSpeed));
+        const tVfx = setTimeout(() => setActiveSkillVfx(null), Math.round(450 / effectiveSpeed));
         timeouts.push(tVfx);
 
         addFloatingText('🦠 PLAGUE', { side: defSide, slot: step.targetSlot }, 'text-emerald-400 font-black text-xs');
@@ -999,11 +1006,26 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
     const stepTimer = setTimeout(() => {
       setAttackerAction(null);
       setDefenderAction(null);
+      setActiveSkillVfx(null);
+      setSummoningCard(null);
+      setPlagueAction(null);
+      setBarrierShatterSlot(null);
+      setArmorSparkSlot(null);
+      setArmorBreakSlot(null);
       setCurrentStepIndex(prev => prev + 1);
     }, stepDuration);
     timeouts.push(stepTimer);
 
-    return () => timeouts.forEach(t => clearTimeout(t));
+    return () => {
+      timeouts.forEach(t => clearTimeout(t));
+      setActiveSkillVfx(null);
+      setAttackerAction(null);
+      setDefenderAction(null);
+      setPlagueAction(null);
+      setBarrierShatterSlot(null);
+      setArmorSparkSlot(null);
+      setArmorBreakSlot(null);
+    };
   }, [currentStepIndex, animateSequence, isPaused, speedMultiplier]);
 
   // Handle sequence completion
@@ -1022,10 +1044,15 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       setIsAnimating(false);
       setIsSimulating(false);
       setCurrentStepIndex(-1);
+      setActiveLogStepText('');
       setAttackerAction(null);
       setDefenderAction(null);
       setActiveSkillVfx(null);
+      setSummoningCard(null);
       setPlagueAction(null);
+      setBarrierShatterSlot(null);
+      setArmorSparkSlot(null);
+      setArmorBreakSlot(null);
     }
   }, [currentStepIndex, animateSequence, finalBattleState]);
 
@@ -1425,23 +1452,48 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                       {armorBreakSlot?.side === 'enemy' && armorBreakSlot?.slot === idx && <ArmorBreakOverlay />}
 
                       {/* Active Skill VFX */}
-                      {activeSkillVfx?.side === 'enemy' && activeSkillVfx?.slot === idx && (
-                        <div className="absolute inset-0 bg-black/60 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none border-2 border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.8)] overflow-hidden">
-                          <img 
-                            src={
-                              activeSkillVfx.type === 'plague' ? '/icons/plague_fx.webp' :
-                              activeSkillVfx.type === 'void_strike' ? '/icons/void_strike_fx.webp' :
-                              activeSkillVfx.type === 'blood_aura' ? '/icons/blood_aura_fx.webp' :
-                              activeSkillVfx.type === 'warlord_cry' ? '/icons/warlord_cry_fx.webp' :
-                              '/icons/hex_fx.webp'
-                            } 
-                            className="absolute inset-0 w-full h-full object-cover opacity-90" 
-                          />
-                          <span className="relative text-[8px] font-mono font-black tracking-widest uppercase bg-black/80 px-1.5 py-0.5 rounded border text-purple-300 z-10">
-                            {activeSkillVfx.type.toUpperCase()}
-                          </span>
-                        </div>
-                      )}
+                      <AnimatePresence>
+                        {activeSkillVfx?.side === 'enemy' && activeSkillVfx?.slot === idx && (
+                          <motion.div
+                            key={`enemy-skill-vfx-${activeSkillVfx.type}`}
+                            initial={{ opacity: 0, scale: 0.85 }}
+                            animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.03, 1.03, 0.9] }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
+                            className={`absolute inset-0 bg-black/55 border-2 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none overflow-hidden ${
+                              activeSkillVfx.type === 'plague' ? 'border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.85)]' :
+                              activeSkillVfx.type === 'void_strike' ? 'border-cyan-500 shadow-[0_0_25px_rgba(6,182,212,0.85)]' :
+                              activeSkillVfx.type === 'blood_aura' ? 'border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.85)]' :
+                              activeSkillVfx.type === 'warlord_cry' ? 'border-amber-500 shadow-[0_0_25px_rgba(245,158,11,0.85)]' :
+                              'border-purple-500 shadow-[0_0_25px_rgba(168,85,247,0.85)]'
+                            }`}
+                          >
+                            <img 
+                              src={
+                                activeSkillVfx.type === 'plague' ? '/icons/plague_fx.webp' :
+                                activeSkillVfx.type === 'void_strike' ? '/icons/void_strike_fx.webp' :
+                                activeSkillVfx.type === 'blood_aura' ? '/icons/blood_aura_fx.webp' :
+                                activeSkillVfx.type === 'warlord_cry' ? '/icons/warlord_cry_fx.webp' :
+                                '/icons/hex_fx.webp'
+                              } 
+                              className="absolute inset-0 w-full h-full object-cover opacity-90" 
+                            />
+                            <span className={`relative text-[8px] font-mono font-black tracking-widest uppercase leading-none bg-black/80 px-1.5 py-0.5 rounded border z-10 ${
+                              activeSkillVfx.type === 'plague' ? 'text-emerald-400 border-emerald-500/40' :
+                              activeSkillVfx.type === 'void_strike' ? 'text-cyan-300 border-cyan-500/40' :
+                              activeSkillVfx.type === 'blood_aura' ? 'text-red-300 border-red-500/40' :
+                              activeSkillVfx.type === 'warlord_cry' ? 'text-amber-300 border-amber-500/40' :
+                              'text-purple-300 border-purple-500/40'
+                            }`}>
+                              {activeSkillVfx.type === 'plague' ? 'PLAGUE INFECT' :
+                               activeSkillVfx.type === 'void_strike' ? 'VOID STRIKE' :
+                               activeSkillVfx.type === 'blood_aura' ? 'BLOOD AURA' :
+                               activeSkillVfx.type === 'warlord_cry' ? 'WARLORD CRY' :
+                               'HEX CURSED'}
+                            </span>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
                       {/* Bottom Badges: Gothic Attack & Health */}
                       <div className="absolute -bottom-2 -left-2 w-7 h-7 z-20 flex items-center justify-center pointer-events-none">
@@ -1688,31 +1740,63 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                       {armorBreakSlot?.side === 'player' && armorBreakSlot?.slot === slotIndex && <ArmorBreakOverlay />}
 
                       {/* Active Skill VFX */}
-                      {activeSkillVfx?.type === 'sacrifice' && activeSkillVfx?.side === 'player' && activeSkillVfx?.slot === slotIndex && (
-                        <div className="absolute inset-0 bg-black/60 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none border-2 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.8)] overflow-hidden">
-                          <img src="/icons/sacrifice_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-90" />
-                          <span className="relative text-[8px] font-mono font-black tracking-widest uppercase bg-black/80 px-1.5 py-0.5 rounded border text-red-400 z-10 animate-pulse">
-                            SACRIFICED
-                          </span>
-                        </div>
-                      )}
-                      {activeSkillVfx?.type !== 'sacrifice' && activeSkillVfx?.side === 'player' && activeSkillVfx?.slot === slotIndex && (
-                        <div className="absolute inset-0 bg-black/60 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none border-2 border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.8)] overflow-hidden">
-                          <img 
-                            src={
-                              activeSkillVfx.type === 'plague' ? '/icons/plague_fx.webp' :
-                              activeSkillVfx.type === 'void_strike' ? '/icons/void_strike_fx.webp' :
-                              activeSkillVfx.type === 'blood_aura' ? '/icons/blood_aura_fx.webp' :
-                              activeSkillVfx.type === 'warlord_cry' ? '/icons/warlord_cry_fx.webp' :
-                              '/icons/hex_fx.webp'
-                            } 
-                            className="absolute inset-0 w-full h-full object-cover opacity-90" 
-                          />
-                          <span className="relative text-[8px] font-mono font-black tracking-widest uppercase bg-black/80 px-1.5 py-0.5 rounded border text-purple-300 z-10">
-                            {activeSkillVfx.type.toUpperCase()}
-                          </span>
-                        </div>
-                      )}
+                      <AnimatePresence>
+                        {activeSkillVfx?.type === 'sacrifice' && activeSkillVfx?.side === 'player' && activeSkillVfx?.slot === slotIndex && (
+                          <motion.div
+                            key={`player-sacrifice-vfx`}
+                            initial={{ opacity: 0, scale: 0.85 }}
+                            animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.03, 1.03, 0.9] }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
+                            className="absolute inset-0 bg-black/60 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none border-2 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.8)] overflow-hidden"
+                          >
+                            <img src="/icons/sacrifice_fx.webp" className="absolute inset-0 w-full h-full object-cover opacity-90" />
+                            <span className="relative text-[8px] font-mono font-black tracking-widest uppercase bg-black/80 px-1.5 py-0.5 rounded border text-red-400 z-10 animate-pulse">
+                              SACRIFICED
+                            </span>
+                          </motion.div>
+                        )}
+                        {activeSkillVfx?.type !== 'sacrifice' && activeSkillVfx?.side === 'player' && activeSkillVfx?.slot === slotIndex && (
+                          <motion.div
+                            key={`player-skill-vfx-${activeSkillVfx.type}`}
+                            initial={{ opacity: 0, scale: 0.85 }}
+                            animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.03, 1.03, 0.9] }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: Math.max(0.35, 0.65 / effectiveSpeed) }}
+                            className={`absolute inset-0 bg-black/55 border-2 rounded-xl z-35 flex flex-col items-center justify-center pointer-events-none overflow-hidden ${
+                              activeSkillVfx.type === 'plague' ? 'border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.85)]' :
+                              activeSkillVfx.type === 'void_strike' ? 'border-cyan-500 shadow-[0_0_25px_rgba(6,182,212,0.85)]' :
+                              activeSkillVfx.type === 'blood_aura' ? 'border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.85)]' :
+                              activeSkillVfx.type === 'warlord_cry' ? 'border-amber-500 shadow-[0_0_25px_rgba(245,158,11,0.85)]' :
+                              'border-purple-500 shadow-[0_0_25px_rgba(168,85,247,0.85)]'
+                            }`}
+                          >
+                            <img 
+                              src={
+                                activeSkillVfx.type === 'plague' ? '/icons/plague_fx.webp' :
+                                activeSkillVfx.type === 'void_strike' ? '/icons/void_strike_fx.webp' :
+                                activeSkillVfx.type === 'blood_aura' ? '/icons/blood_aura_fx.webp' :
+                                activeSkillVfx.type === 'warlord_cry' ? '/icons/warlord_cry_fx.webp' :
+                                '/icons/hex_fx.webp'
+                              } 
+                              className="absolute inset-0 w-full h-full object-cover opacity-90" 
+                            />
+                            <span className={`relative text-[8px] font-mono font-black tracking-widest uppercase leading-none bg-black/80 px-2 py-0.5 rounded border z-10 ${
+                              activeSkillVfx.type === 'plague' ? 'text-emerald-400 border-emerald-500/40' :
+                              activeSkillVfx.type === 'void_strike' ? 'text-cyan-300 border-cyan-500/40' :
+                              activeSkillVfx.type === 'blood_aura' ? 'text-red-300 border-red-500/40' :
+                              activeSkillVfx.type === 'warlord_cry' ? 'text-amber-300 border-amber-500/40' :
+                              'text-purple-300 border-purple-500/40'
+                            }`}>
+                              {activeSkillVfx.type === 'plague' ? 'PLAGUE INFECT' :
+                               activeSkillVfx.type === 'void_strike' ? 'VOID STRIKE' :
+                               activeSkillVfx.type === 'blood_aura' ? 'BLOOD AURA' :
+                               activeSkillVfx.type === 'warlord_cry' ? 'WARLORD CRY' :
+                               'HEX CURSED'}
+                            </span>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
                       {/* Bottom Badges: Gothic Attack & Health */}
                       <div className="absolute -bottom-2 -left-2 w-7 h-7 z-20 flex items-center justify-center pointer-events-none">
