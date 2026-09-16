@@ -439,6 +439,9 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
   const initialBaseExp = battleType === 'pvp' ? 100 : ((stage.id || 1) * 16 + 32);
   const [earnedExp, setEarnedExp] = useState<number>(() => initialBaseExp);
   const [earnedSovereigns, setEarnedSovereigns] = useState<number>(0);
+  const lossBaseGold = 20;
+  const [lossEarnedGold, setLossEarnedGold] = useState<number>(() => applyRewardMultiplier(lossBaseGold, battleGoldMultiplier));
+  const [logFilter, setLogFilter] = useState<'all' | 'damage' | 'skills' | 'deaths'>('all');
 
   // Sync visual state when idle
   useEffect(() => {
@@ -975,7 +978,14 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
   const handleBattleLost = async () => {
     if (battleResultSubmittedRef.current) return;
     battleResultSubmittedRef.current = true;
-    await submitBattleResult(battleType, stage.id.toString(), 'loss');
+    const res = await submitBattleResult(battleType, stage.id.toString(), 'loss');
+    if (res?.success) {
+      if (res.rewards?.gold !== undefined) {
+        setLossEarnedGold(res.rewards.gold);
+      } else if (res.goldReward !== undefined) {
+        setLossEarnedGold(res.goldReward);
+      }
+    }
   };
 
   const selectedHandCard = visualState.playerHand.find(c => c.id === selectedHandCardId);
@@ -989,27 +999,25 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       <header className="h-9 px-3 flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-[#0b0f17] via-[#121927] to-[#0b0f17] shrink-0 z-30">
         <button
           onClick={() => onExitBattle(false)}
-          className="flex items-center gap-1.5 px-2.5 py-1 bg-red-950/70 hover:bg-red-900 border border-red-500/40 rounded-lg text-red-200 text-xs font-mono font-bold transition-all active:scale-95 cursor-pointer"
+          className="flex items-center gap-1.5 px-2.5 py-1 bg-red-950/70 hover:bg-red-900 border border-red-500/50 rounded-lg text-red-200 text-xs font-mono font-bold transition-all active:scale-95 cursor-pointer shadow-sm"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Surrender</span>
+          <span>Escape</span>
         </button>
 
         <div className="flex flex-col items-center">
           <span className="font-display font-black text-xs text-[#ebd09b] tracking-wider uppercase drop-shadow">
             {battleType === 'pvp' ? 'PvP Duel Arena' : `Stage ${stage.id}: ${stage.name}`}
           </span>
-          <span className="text-[8.5px] font-mono text-zinc-400">
-            Abyssal Spire • Vertical Mode
-          </span>
         </div>
 
         <button
           onClick={() => setShowHelpModal(true)}
-          className="p-1.5 rounded-lg bg-black/60 border border-white/10 text-zinc-300 hover:text-white transition-all cursor-pointer"
-          title="Battle Codex"
+          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-black/75 border border-[#ebd09b]/60 hover:border-[#ebd09b] text-[#ebd09b] hover:text-white transition-all cursor-pointer shadow-[0_0_10px_rgba(235,208,155,0.25)] active:scale-95"
+          title="Battle Rules & Codex"
         >
-          <HelpCircle className="w-4 h-4" />
+          <HelpCircle className="w-3.5 h-3.5 text-[#ebd09b]" />
+          <span className="text-[10px] font-mono font-bold tracking-wider">RULES</span>
         </button>
       </header>
 
@@ -1354,27 +1362,28 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
           </div>
 
           {/* Speed Multiplier & Log History Controls */}
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={() => setSpeedMultiplier(prev => prev === 1 ? 2 : prev === 2 ? 3 : 1)}
-              className="px-1.5 py-0.5 rounded bg-black/80 border border-amber-500/40 text-[9px] font-mono font-bold text-amber-300 hover:bg-amber-950/50 cursor-pointer active:scale-95"
+              className="px-2 py-1 rounded-lg bg-amber-950/70 border border-amber-400/80 text-[10px] font-mono font-black text-amber-300 hover:bg-amber-900/80 shadow-[0_0_8px_rgba(245,158,11,0.25)] cursor-pointer active:scale-95"
               title="Toggle Combat Animation Speed"
             >
               {speedMultiplier}x
             </button>
             <button
               onClick={() => setIsPaused(prev => !prev)}
-              className="p-1 rounded bg-black/80 border border-white/20 text-zinc-300 hover:text-white cursor-pointer active:scale-95"
+              className="p-1.5 rounded-lg bg-black/80 border border-zinc-600 hover:border-zinc-400 text-zinc-200 hover:text-white cursor-pointer active:scale-95 shadow-sm"
               title={isPaused ? 'Resume Combat' : 'Pause Combat'}
             >
-              {isPaused ? <Play className="w-3 h-3 text-emerald-400" /> : <Pause className="w-3 h-3" />}
+              {isPaused ? <Play className="w-3.5 h-3.5 text-emerald-400" /> : <Pause className="w-3.5 h-3.5" />}
             </button>
             <button
               onClick={() => setShowLogDrawer(true)}
-              className="p-1 rounded bg-black/80 border border-white/20 text-zinc-300 hover:text-white cursor-pointer active:scale-95"
+              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-red-950/70 border border-red-500/70 text-red-300 hover:text-white hover:border-red-400 shadow-[0_0_8px_rgba(239,68,68,0.25)] cursor-pointer active:scale-95"
               title="View Combat History"
             >
-              <Scroll className="w-3 h-3 text-[#ebd09b]" />
+              <Scroll className="w-3.5 h-3.5 text-red-400" />
+              <span className="text-[10px] font-mono font-bold tracking-wider">LOGS</span>
             </button>
           </div>
         </div>
@@ -1901,141 +1910,515 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       )}
 
       {/* =========================================================================
-          7. VICTORY MODAL (Rewards, Stars, Submit Result)
+          7. VICTORY MODAL (1:1 PC Rewards, Stars, Breakdowns)
          ========================================================================= */}
       {visualState.phase === 'player_won' && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-b from-[#18140f] via-[#0d0a08] to-[#050403] border-2 border-amber-500/60 rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-[0_0_50px_rgba(245,158,11,0.35)] relative">
+        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-3 sm:p-4 animate-fade-in pt-[max(72px,calc(env(safe-area-inset-top)+48px))] pb-[max(16px,env(safe-area-inset-bottom))]">
+          <div className="bg-gradient-to-b from-[#18140f] via-[#0d0a08] to-[#050403] border-2 border-amber-500/50 rounded-3xl p-4 sm:p-6 max-w-sm w-full max-h-[85vh] overflow-y-auto custom-scrollbar text-center space-y-3 sm:space-y-4 shadow-[0_0_50px_rgba(245,158,11,0.25)] relative">
             
-            <div className="w-16 h-16 mx-auto bg-gradient-to-b from-amber-950 to-black border-2 border-amber-400 rounded-full flex items-center justify-center shadow-[0_0_25px_rgba(245,158,11,0.5)]">
-              <Swords className="w-8 h-8 text-amber-300 drop-shadow" />
+            {/* Ambient Background Flare */}
+            <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-amber-500/15 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-yellow-500/10 blur-3xl pointer-events-none" />
+
+            {/* Glowing Victory Crest */}
+            <div className="relative mx-auto w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center">
+              <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-md animate-pulse" />
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-b from-amber-950 via-black to-black border-2 border-amber-400 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.4)] relative z-10">
+                <Swords className="w-7 h-7 sm:w-8 sm:h-8 text-amber-300 drop-shadow-[0_0_10px_rgba(245,158,11,0.8)]" />
+              </div>
             </div>
 
-            <div>
-              <h3 className="font-display font-black text-2xl text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-300 to-yellow-500 uppercase tracking-wider">
-                {battleType === 'pvp' ? 'ARENA VICTORY!' : 'COVENANT VICTORY!'}
+            <div className="space-y-1 relative z-10">
+              <h3 className="font-display font-black text-xl sm:text-2xl text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-300 to-yellow-500 tracking-widest uppercase text-shadow-gold">
+                {battleType === 'pvp' ? 'ARENA TRIUMPH!' : 'COVENANT VICTORY!'}
               </h3>
-              <p className="text-xs text-zinc-300 mt-1">
-                {battleType === 'pvp' ? 'Opposing summoner vanquished!' : 'Abyssal floor conquered and cleansed!'}
+              <p className="text-[11px] sm:text-xs text-gray-300 font-sans leading-relaxed px-2">
+                {battleType === 'pvp' ? 'You vanquished the opposing summoner and claimed arena crowns.' : 'You defeated the abyssal lord and cleansed the cursed lands.'}
               </p>
             </div>
 
-            {/* Campaign Stars */}
+            {/* Stars Result (Only for Campaign) */}
             {battleType === 'campaign' && (() => {
-              const hpPct = visualState.playerHeroHealth / visualState.playerHeroMaxHealth;
-              const earnedStars = hpPct === 1 ? 3 : hpPct >= 0.5 ? 2 : 1;
+              const hpPercentage = visualState.playerHeroHealth / visualState.playerHeroMaxHealth;
+              const earnedStars = hpPercentage === 1 ? 3 : hpPercentage >= 0.5 ? 2 : 1;
               return (
-                <div className="flex justify-center gap-3 py-1">
-                  {[1, 2, 3].map(s => (
-                    <Star 
-                      key={s} 
-                      className={`w-7 h-7 transition-all ${
-                        s <= earnedStars 
-                          ? 'text-amber-400 fill-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.9)] scale-110' 
-                          : 'text-zinc-800 fill-zinc-900'
-                      }`} 
-                    />
-                  ))}
+                <div className="bg-black/60 p-3 rounded-2xl border border-amber-500/20 relative z-10">
+                  <span className="text-[9.5px] font-display text-amber-400 tracking-widest block uppercase font-bold mb-1.5">STAGE MASTERY</span>
+                  <div className="flex justify-center gap-2.5 mb-2">
+                    {[1, 2, 3].map(s => (
+                      <Star 
+                        key={s} 
+                        className={`w-6 h-6 sm:w-7 sm:h-7 transition-all duration-500 ${s <= earnedStars ? 'text-amber-400 fill-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.9)] scale-110' : 'text-gray-800 fill-gray-900'}`} 
+                      />
+                    ))}
+                  </div>
+                  
+                  <div className="text-[10.5px] font-sans text-gray-300 space-y-1 bg-black/50 p-2 sm:p-2.5 rounded-xl border border-white/5 text-left">
+                    <div className="flex justify-between items-center py-0.5">
+                      <span className="flex items-center gap-1.5">
+                        <Star className={`w-3 h-3 ${earnedStars >= 1 ? 'text-amber-400 fill-amber-400' : 'text-gray-700'}`} />
+                        <span className={earnedStars >= 1 ? "text-emerald-400 font-bold" : "text-gray-500"}>1 Star Challenge</span>
+                      </span>
+                      <span className={earnedStars >= 1 ? "text-emerald-400/90 font-mono" : "text-gray-500 font-mono"}>Clear Stage</span>
+                    </div>
+                    <div className="flex justify-between items-center border-t border-white/5 pt-0.5 py-0.5">
+                      <span className="flex items-center gap-1.5">
+                        <Star className={`w-3 h-3 ${earnedStars >= 2 ? 'text-amber-400 fill-amber-400' : 'text-gray-700'}`} />
+                        <span className={earnedStars >= 2 ? "text-emerald-400 font-bold" : "text-gray-500"}>2 Star Challenge</span>
+                      </span>
+                      <span className={earnedStars >= 2 ? "text-emerald-400/90 font-mono" : "text-gray-500 font-mono"}>Keep HP &gt; 50%</span>
+                    </div>
+                    <div className="flex justify-between items-center border-t border-white/5 pt-0.5 py-0.5">
+                      <span className="flex items-center gap-1.5">
+                        <Star className={`w-3 h-3 ${earnedStars === 3 ? 'text-amber-400 fill-amber-400' : 'text-gray-700'}`} />
+                        <span className={earnedStars === 3 ? "text-emerald-400 font-bold" : "text-gray-500"}>3 Star Challenge</span>
+                      </span>
+                      <span className={earnedStars === 3 ? "text-emerald-400/90 font-mono" : "text-gray-500 font-mono"}>Keep HP 100%</span>
+                    </div>
+                  </div>
                 </div>
               );
             })()}
 
-            {/* Rewards */}
-            <div className="bg-black/60 p-3 rounded-2xl border border-white/10 flex justify-around items-center font-mono">
-              <div className="text-center">
-                <span className="text-[9px] text-zinc-400 block">GOLD</span>
-                <span className="text-sm font-black text-amber-400">+{earnedGold}</span>
+            {/* Rewards Card */}
+            <div className="bg-black/60 p-3 rounded-2xl border border-amber-500/25 space-y-2.5 relative z-10">
+              <span className="text-[9.5px] font-display text-amber-400/90 tracking-widest block uppercase font-bold">REWARD OBTAINED</span>
+              <div className={`grid gap-2 ${battleType === 'pvp' ? (earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-3') : (stage.shardsReward > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3')}`}>
+                {/* Gold */}
+                <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                  <span className="text-amber-300 font-display font-black text-sm flex items-center gap-1 text-shadow-gold">
+                    +{earnedGold}
+                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain drop-shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
+                  </span>
+                  <span className="text-[8.5px] text-amber-400/70 font-mono uppercase tracking-wider font-bold">Gold</span>
+                </div>
+                
+                {/* Dust */}
+                <div className="bg-gradient-to-b from-cyan-950/40 via-black to-black border border-cyan-500/30 p-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                  <span className="text-cyan-300 font-display font-black text-sm flex items-center gap-1 text-shadow-cyan">
+                    +{earnedDust}
+                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(102,252,241,0.6)]" />
+                  </span>
+                  <span className="text-[8.5px] text-cyan-400/70 font-mono uppercase tracking-wider font-bold">Dust</span>
+                </div>
+
+                {/* EXP */}
+                <div className="bg-gradient-to-b from-emerald-950/40 via-black to-black border border-emerald-500/30 p-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                  <span className="text-emerald-300 font-display font-black text-sm flex items-center gap-1 text-shadow-emerald">
+                    +{earnedExp}
+                    <img src="/icons/icon_exp.webp" alt="EXP" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(16,185,129,0.7)]" />
+                  </span>
+                  <span className="text-[8.5px] text-emerald-400/70 font-mono uppercase tracking-wider font-bold">EXP</span>
+                </div>
+                
+                {/* Crowns (PvP Only) */}
+                {battleType === 'pvp' && (
+                  <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/40 p-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                    <span className="text-amber-300 font-display font-black text-sm flex items-center gap-1 text-shadow-gold">
+                      +20
+                      <img src="/icons/crown.png" alt="Crown" className="w-4 h-4 object-contain brightness-110" />
+                    </span>
+                    <span className="text-[8.5px] text-amber-400/80 font-mono uppercase tracking-wider font-bold">Crowns</span>
+                  </div>
+                )}
+
+                {/* Sovereigns (PvP Only - Subscriber Bounty when > 0) */}
+                {battleType === 'pvp' && earnedSovereigns > 0 && (
+                  <div className="bg-gradient-to-b from-amber-950/50 via-black to-black border border-amber-500/50 p-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                    <span className="text-amber-400 font-display font-black text-sm flex items-center gap-1 text-shadow-gold">
+                      +{earnedSovereigns}
+                      <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 object-contain" />
+                    </span>
+                    <span className="text-[8.5px] text-amber-300 font-mono uppercase tracking-wider font-bold">Sovereigns</span>
+                  </div>
+                )}
+
+                {battleType === 'campaign' && stage.shardsReward > 0 && (
+                  <div className="bg-gradient-to-b from-rose-950/40 via-black to-black border border-rose-500/30 p-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
+                    <span className="text-rose-400 font-display font-black text-sm flex items-center gap-1 text-shadow-crimson">
+                      +{stage.shardsReward}
+                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                    </span>
+                    <span className="text-[8.5px] text-rose-400/70 font-mono uppercase tracking-wider font-bold">Shards</span>
+                  </div>
+                )}
+
+                {battleType === 'campaign' && stage.cardReward && (
+                  <div className="bg-gradient-to-b from-emerald-950/40 via-black to-black border border-emerald-500/30 px-3 py-1.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center w-full col-span-3 mt-0.5">
+                    <span className="text-emerald-300 font-display font-black text-xs flex items-center gap-1.5 text-shadow-emerald">
+                      {stage.cardReward.name}
+                      <span className="text-xs">🎴</span>
+                    </span>
+                    <span className="text-[8.5px] text-emerald-400/70 font-mono uppercase tracking-wider font-bold">Guaranteed Card</span>
+                  </div>
+                )}
               </div>
-              <div className="text-center">
-                <span className="text-[9px] text-zinc-400 block">DUST</span>
-                <span className="text-sm font-black text-cyan-400">+{earnedDust}</span>
-              </div>
-              <div className="text-center">
-                <span className="text-[9px] text-zinc-400 block">EXP</span>
-                <span className="text-sm font-black text-purple-300">+{earnedExp}</span>
-              </div>
-              {earnedSovereigns > 0 && (
-                <div className="text-center">
-                  <span className="text-[9px] text-amber-300 block">SOV</span>
-                  <span className="text-sm font-black text-yellow-300">+{earnedSovereigns}</span>
+
+              {/* Gold Bonus Breakdown Info Strip */}
+              {(subGoldBonusPercent > 0 || equipGoldBonus > 0) && (
+                <div className="flex items-center justify-center gap-1.5 flex-wrap bg-amber-950/20 border border-amber-500/20 rounded-xl px-2.5 py-1 text-[9.5px]">
+                  <span className="text-amber-400/80 font-mono flex items-center gap-1">
+                    <span className="font-bold text-amber-300">Gold Bonus:</span>
+                  </span>
+                  <div className="flex items-center gap-1 flex-wrap">
+                    {subGoldBonusPercent > 0 && (
+                      <span className="inline-flex items-center gap-0.5 font-black text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded">
+                        <span>{subTier === 'ultra' ? '👑' : '⚜️'}</span>
+                        <span>+{subGoldBonusPercent}% {subTier === 'ultra' ? 'Ultra' : 'VIP'}</span>
+                      </span>
+                    )}
+                    {subGoldBonusPercent > 0 && equipGoldBonus > 0 && (
+                      <span className="text-gray-500 font-bold">+</span>
+                    )}
+                    {equipGoldBonus > 0 && (
+                      <span className="inline-flex items-center gap-0.5 font-black text-cyan-300 bg-cyan-500/15 border border-cyan-500/30 px-1.5 py-0.5 rounded">
+                        <span>🛡️</span>
+                        <span>+{equipGoldBonus}% Gear</span>
+                      </span>
+                    )}
+                    <span className="text-gray-400 text-[9px] font-mono">
+                      (Total +{subGoldBonusPercent + equipGoldBonus}%)
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
 
             <button
               onClick={() => onExitBattle(true)}
-              className="w-full py-3 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-400 text-black font-display font-black text-sm rounded-xl shadow-lg active:scale-95 transition-all cursor-pointer uppercase tracking-wider"
+              className="w-full bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:to-yellow-400 text-black font-display font-black tracking-widest py-3 px-4 rounded-2xl shadow-[0_0_20px_rgba(245,158,11,0.4)] text-xs uppercase transition-all duration-300 active:scale-[0.98] cursor-pointer relative z-10"
             >
-              CLAIM SPOILS 🏆
+              CLAIM LOOT AND EXIT
             </button>
           </div>
         </div>
       )}
 
       {/* =========================================================================
-          8. DEFEAT MODAL
+          8. DEFEAT MODAL (1:1 PC Breakdown, Consolation Gold, Consequences)
          ========================================================================= */}
       {visualState.phase === 'player_lost' && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-b from-[#180a0a] via-[#0d0505] to-[#040101] border-2 border-red-500/60 rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-[0_0_50px_rgba(239,68,68,0.35)]">
-            <div className="w-16 h-16 mx-auto bg-gradient-to-b from-red-950 to-black border-2 border-red-500 rounded-full flex items-center justify-center shadow-[0_0_25px_rgba(239,68,68,0.5)]">
-              <Skull className="w-8 h-8 text-red-400" />
+        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-3 sm:p-4 animate-fade-in pt-[max(72px,calc(env(safe-area-inset-top)+48px))] pb-[max(16px,env(safe-area-inset-bottom))]">
+          <div className="bg-gradient-to-b from-[#1c080a] via-[#0e0304] to-[#050102] border-2 border-rose-600/50 rounded-3xl p-4 sm:p-6 max-w-sm w-full max-h-[85vh] overflow-y-auto custom-scrollbar text-center space-y-3 sm:space-y-4 shadow-[0_0_50px_rgba(225,29,72,0.25)] relative">
+            
+            {/* Ambient Background Flare */}
+            <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-rose-600/15 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-red-600/10 blur-3xl pointer-events-none" />
+
+            {/* Glowing Defeat Skull */}
+            <div className="relative mx-auto w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center">
+              <div className="absolute inset-0 bg-rose-600/20 rounded-full blur-md animate-pulse" />
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-b from-red-950 via-black to-black border-2 border-rose-500 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(225,29,72,0.4)] relative z-10">
+                <Skull className="w-7 h-7 sm:w-8 sm:h-8 text-rose-500 drop-shadow-[0_0_10px_rgba(225,29,72,0.8)] animate-pulse" />
+              </div>
             </div>
 
-            <div>
-              <h3 className="font-display font-black text-2xl text-red-500 uppercase tracking-wider">
-                DEFEAT
+            <div className="space-y-1 relative z-10">
+              <h3 className="font-display font-black text-xl sm:text-2xl text-transparent bg-clip-text bg-gradient-to-b from-rose-100 via-rose-500 to-red-600 tracking-widest uppercase text-shadow-crimson">
+                {battleType === 'pvp' ? 'DEFEATED IN DUEL' : 'YOU ARE DEFEATED'}
               </h3>
-              <p className="text-xs text-zinc-400 mt-1">
-                Your squad was consumed by the void. Regroup and enhance your deck.
+              <p className="text-[11px] sm:text-xs text-gray-300 font-sans leading-relaxed px-2">
+                {battleType === 'pvp' ? 'Your opponent proved stronger in this clash. Refine your deck tactics and take revenge!' : 'Darkness consumed your mind. Upgrade cards and try again.'}
               </p>
+            </div>
+
+            <div className="bg-black/60 p-3 rounded-2xl border border-rose-500/25 space-y-2.5 relative z-10">
+              <span className="text-[9.5px] font-display text-rose-400/90 tracking-widest block uppercase font-bold">BATTLE CONSEQUENCES</span>
+              <div className="flex justify-center items-center gap-3">
+                <div className="bg-gradient-to-b from-amber-950/30 via-black to-black border border-amber-500/30 px-3.5 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[85px]">
+                  <span className="text-amber-400 font-display font-black text-sm flex items-center gap-1 text-shadow-gold">
+                    +{lossEarnedGold}
+                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain drop-shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
+                  </span>
+                  <span className="text-[8.5px] text-amber-400/70 font-mono uppercase tracking-wider font-bold">Consolation</span>
+                </div>
+                
+                {battleType === 'pvp' && (
+                  <div className="bg-gradient-to-b from-rose-950/40 via-black to-black border border-rose-500/40 px-3.5 py-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center min-w-[85px]">
+                    <span className="text-rose-400 font-display font-black text-sm flex items-center gap-1 text-shadow-crimson">
+                      -15
+                      <img src="/icons/crown.png" alt="Crown" className="w-4 h-4 object-contain" />
+                    </span>
+                    <span className="text-[8.5px] text-rose-400/70 font-mono uppercase tracking-wider font-bold">Crowns</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Gold Bonus Breakdown Info Strip on Defeat */}
+              {(subGoldBonusPercent > 0 || equipGoldBonus > 0) && (
+                <div className="flex items-center justify-center gap-1.5 flex-wrap bg-amber-950/20 border border-amber-500/20 rounded-xl px-2.5 py-1 text-[9.5px]">
+                  <span className="text-amber-400/80 font-mono flex items-center gap-1">
+                    <span className="font-bold text-amber-300">Gold Bonus:</span>
+                  </span>
+                  <div className="flex items-center gap-1 flex-wrap">
+                    {subGoldBonusPercent > 0 && (
+                      <span className="inline-flex items-center gap-0.5 font-black text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded">
+                        <span>{subTier === 'ultra' ? '👑' : '⚜️'}</span>
+                        <span>+{subGoldBonusPercent}% {subTier === 'ultra' ? 'Ultra' : 'VIP'}</span>
+                      </span>
+                    )}
+                    {subGoldBonusPercent > 0 && equipGoldBonus > 0 && (
+                      <span className="text-gray-500 font-bold">+</span>
+                    )}
+                    {equipGoldBonus > 0 && (
+                      <span className="inline-flex items-center gap-0.5 font-black text-cyan-300 bg-cyan-500/15 border border-cyan-500/30 px-1.5 py-0.5 rounded">
+                        <span>🛡️</span>
+                        <span>+{equipGoldBonus}% Gear</span>
+                      </span>
+                    )}
+                    <span className="text-gray-400 text-[9px] font-mono">
+                      (Total +{subGoldBonusPercent + equipGoldBonus}%)
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <button
               onClick={() => onExitBattle(false)}
-              className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-display font-black text-sm rounded-xl border border-zinc-600 active:scale-95 transition-all cursor-pointer uppercase tracking-wider"
+              className="w-full bg-gradient-to-r from-red-950 via-rose-900 to-red-950 border-2 border-rose-600/70 hover:border-rose-400 text-white font-display font-black tracking-widest py-3 px-4 rounded-2xl shadow-[0_0_20px_rgba(225,29,72,0.3)] text-xs uppercase transition-all duration-300 active:scale-[0.98] cursor-pointer relative z-10"
             >
-              RETREAT TO ALTAR
+              {battleType === 'pvp' ? 'RETURN TO ARENA' : 'RETURN TO CAMPAIGN'}
             </button>
           </div>
         </div>
       )}
 
       {/* =========================================================================
-          9. COMBAT LOG DRAWER
+          9. COMBAT CHRONICLE MODAL (1:1 PC Tabs, Icons, Event Cards)
          ========================================================================= */}
-      {showLogDrawer && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-end">
-          <div className="w-full max-w-xs h-full bg-[#0d0912] border-l border-white/10 p-4 flex flex-col justify-between shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
-              <div className="flex items-center gap-2">
-                <Scroll className="w-4 h-4 text-[#ebd09b]" />
-                <h4 className="font-display font-black text-xs text-[#ebd09b] uppercase tracking-wider">
-                  Combat History
-                </h4>
-              </div>
-              <button onClick={() => setShowLogDrawer(false)} className="text-zinc-400 hover:text-white">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto space-y-1.5 my-3 pr-1 text-[10px] font-mono text-zinc-300 custom-scrollbar">
-              {visualState.combatLog.map((entry, idx) => (
-                <div key={idx} className="bg-black/50 p-1.5 rounded border border-white/5">
-                  {entry}
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={() => setShowLogDrawer(false)}
-              className="w-full py-2 bg-zinc-800 text-white font-mono text-xs font-bold rounded-xl"
+      <AnimatePresence>
+        {showLogDrawer && (
+          <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 pt-[max(72px,calc(env(safe-area-inset-top)+48px))] pb-[max(16px,env(safe-area-inset-bottom))]">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md bg-[#0d0914] border border-[#ebd09b]/40 rounded-2xl overflow-hidden flex flex-col shadow-2xl max-h-[82vh]"
             >
-              CLOSE
-            </button>
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-black/90 via-[#181122] to-black/90 border-b border-gray-800 shrink-0">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-red-950/60 border border-red-500/40 flex items-center justify-center shrink-0">
+                    <Scroll className="w-3.5 h-3.5 text-red-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-display font-black text-xs sm:text-sm text-[#ebd09b] uppercase tracking-wider">
+                      Battle Chronicle
+                    </h4>
+                    <span className="text-[9px] font-mono text-gray-400 block -mt-0.5">Live Duel Combat Logs</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowLogDrawer(false)}
+                  className="text-gray-400 hover:text-white p-1 rounded-lg border border-gray-800 hover:border-gray-600 bg-black/40 transition-all cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Category Filter Tabs */}
+              <div className="grid grid-cols-4 gap-1 p-1.5 bg-black/60 border-b border-gray-800 text-[10px] font-mono font-bold text-center shrink-0">
+                <button
+                  onClick={() => setLogFilter('all')}
+                  className={`py-1 rounded-lg transition-all cursor-pointer ${
+                    logFilter === 'all'
+                      ? 'bg-[#ebd09b] text-black font-black shadow'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  ALL
+                </button>
+                <button
+                  onClick={() => setLogFilter('damage')}
+                  className={`py-1 rounded-lg transition-all cursor-pointer ${
+                    logFilter === 'damage'
+                      ? 'bg-red-600 text-white font-black shadow'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  ⚔️ ATK
+                </button>
+                <button
+                  onClick={() => setLogFilter('skills')}
+                  className={`py-1 rounded-lg transition-all cursor-pointer ${
+                    logFilter === 'skills'
+                      ? 'bg-purple-600 text-white font-black shadow'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  🔮 SKILL
+                </button>
+                <button
+                  onClick={() => setLogFilter('deaths')}
+                  className={`py-1 rounded-lg transition-all cursor-pointer ${
+                    logFilter === 'deaths'
+                      ? 'bg-zinc-700 text-white font-black shadow'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  💀 DEAD
+                </button>
+              </div>
+
+              {/* Log List with Styled Event Cards */}
+              <div
+                id="combat-log-scroll"
+                className="flex-1 overflow-y-auto text-[11px] p-2.5 space-y-1.5 custom-scrollbar"
+              >
+                {visualState.combatLog
+                  .filter(log => {
+                    if (logFilter === 'all') return true;
+                    if (logFilter === 'damage') return log.includes('damage') || log.includes('deals') || log.includes('Breakthrough') || log.includes('hits') || log.includes('--- TURN') || log.includes('--- Turn');
+                    if (logFilter === 'skills') return log.includes('Vampirism') || log.includes('Hex') || log.includes('Plague') || log.includes('Sacrifice') || log.includes('healed') || log.includes('Barrier') || log.includes('Armor') || log.includes('⚡') || log.includes('--- TURN') || log.includes('--- Turn');
+                    if (logFilter === 'deaths') return log.includes('destroyed') || log.includes('turns to dust') || log.includes('fell') || log.includes('Death') || log.includes('💀') || log.includes('VICTORY') || log.includes('DEFEAT') || log.includes('--- TURN') || log.includes('--- Turn');
+                    return true;
+                  })
+                  .map((log, index) => {
+                    // 1. Turn Divider
+                    if (log.includes('--- TURN') || log.includes('--- Turn')) {
+                      const turnNum = log.replace(/[^0-9]/g, '') || '?';
+                      return (
+                        <div key={index} className="flex items-center gap-1.5 my-1.5 py-0.5 px-2.5 rounded-lg bg-gradient-to-r from-amber-950/70 via-black/60 to-transparent border-l-2 border-[#ebd09b]">
+                          <Swords className="w-3 h-3 text-[#ebd09b]" />
+                          <span className="font-display font-black text-[11px] text-[#ebd09b] tracking-wider uppercase">
+                            TURN {turnNum}
+                          </span>
+                        </div>
+                      );
+                    }
+
+                    // 2. Battle Start
+                    if (log.includes('Battle has begun')) {
+                      return (
+                        <div key={index} className="p-2 rounded-xl bg-black/40 border border-white/10 text-gray-300 text-[10.5px] flex items-center gap-2">
+                          <span className="text-sm shrink-0">⚔️</span>
+                          <span className="font-sans leading-relaxed">{log}</span>
+                        </div>
+                      );
+                    }
+
+                    // 3. Breakthrough (Direct Face Damage)
+                    if (log.includes('Breakthrough') || log.includes('direct damage') || log.includes('Direct Strike')) {
+                      return (
+                        <div key={index} className="p-2 rounded-xl bg-gradient-to-r from-red-950/40 to-black/50 border border-red-800/40 text-[10.5px] flex items-start gap-2 shadow-sm">
+                          <span className="text-sm shrink-0">🎯</span>
+                          <div className="flex-1 leading-relaxed text-gray-200 font-sans">
+                            <span dangerouslySetInnerHTML={{ __html: log }} />
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // 4. Destruction / Death
+                    if (log.includes('destroyed') || log.includes('turns to dust') || log.includes('fell') || log.includes('Death') || log.includes('DEFEAT') || log.includes('DEAD')) {
+                      return (
+                        <div key={index} className="p-2 rounded-xl bg-black/70 border border-red-950/80 text-[10.5px] flex items-start gap-2 shadow-inner">
+                          <span className="text-sm shrink-0">💀</span>
+                          <div className="flex-1 text-red-300/95 leading-relaxed font-sans font-medium">
+                            <span dangerouslySetInnerHTML={{ __html: log }} />
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // 5. Sacrifice
+                    if (log.includes('Sacrifice') || log.includes('💀 Sacrifice')) {
+                      return (
+                        <div key={index} className="p-2 rounded-xl bg-gradient-to-r from-amber-950/35 to-black/50 border border-amber-800/40 text-[10.5px] flex items-start gap-2">
+                          <span className="text-sm shrink-0">💀</span>
+                          <div className="flex-1 text-amber-200 leading-relaxed font-sans">
+                            <span dangerouslySetInnerHTML={{ __html: log }} />
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // 6. Healing / Vampirism
+                    if (log.includes('healed') || log.includes('Vampirism') || log.includes('🩸')) {
+                      return (
+                        <div key={index} className="p-2 rounded-xl bg-gradient-to-r from-emerald-950/35 to-black/50 border border-emerald-800/40 text-[10.5px] flex items-start gap-2">
+                          <span className="text-sm shrink-0">🩸</span>
+                          <div className="flex-1 text-emerald-200 leading-relaxed font-sans">
+                            <span dangerouslySetInnerHTML={{ __html: log }} />
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // 7. Hex / Curses
+                    if (log.includes('Hex') || log.includes('hexes') || log.includes('🔮')) {
+                      return (
+                        <div key={index} className="p-2 rounded-xl bg-gradient-to-r from-purple-950/35 to-black/50 border border-purple-800/40 text-[10.5px] flex items-start gap-2">
+                          <span className="text-sm shrink-0">🔮</span>
+                          <div className="flex-1 text-purple-200 leading-relaxed font-sans">
+                            <span dangerouslySetInnerHTML={{ __html: log }} />
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // 8. Plague
+                    if (log.includes('Plague') || log.includes('poisonous spores') || log.includes('🧪') || log.includes('afflicted')) {
+                      return (
+                        <div key={index} className="p-2 rounded-xl bg-gradient-to-r from-emerald-950/35 to-black/50 border border-emerald-800/40 text-[10.5px] flex items-start gap-2">
+                          <span className="text-sm shrink-0">🧪</span>
+                          <div className="flex-1 text-emerald-300 leading-relaxed font-sans">
+                            <span dangerouslySetInnerHTML={{ __html: log }} />
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // 9. Barrier & Armor
+                    if (log.includes('Barrier') || log.includes('Armor') || log.includes('🛡️')) {
+                      return (
+                        <div key={index} className="p-2 rounded-xl bg-gradient-to-r from-cyan-950/35 to-black/50 border border-cyan-800/40 text-[10.5px] flex items-start gap-2">
+                          <span className="text-sm shrink-0">🛡️</span>
+                          <div className="flex-1 text-cyan-200 leading-relaxed font-sans">
+                            <span dangerouslySetInnerHTML={{ __html: log }} />
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // 10. Hero Skills & Stances
+                    if (log.includes('⚡') || log.includes('Commander') || log.includes('Void Strike') || log.includes('Warcry') || log.includes('Blood Aura')) {
+                      return (
+                        <div key={index} className="p-2 rounded-xl bg-gradient-to-r from-indigo-950/40 to-black/50 border border-indigo-700/50 text-[10.5px] flex items-start gap-2 shadow-sm">
+                          <span className="text-sm shrink-0">⚡</span>
+                          <div className="flex-1 text-indigo-200 leading-relaxed font-sans font-medium">
+                            <span dangerouslySetInnerHTML={{ __html: log }} />
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // Default Attack/Clash Event Card
+                    return (
+                      <div key={index} className="p-2 rounded-xl bg-black/40 border border-white/5 text-[10.5px] text-gray-300 flex items-start gap-2 leading-relaxed font-sans">
+                        <span className="text-sm shrink-0 opacity-70">🗡️</span>
+                        <div className="flex-1">
+                          <span dangerouslySetInnerHTML={{ __html: log }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+
+              {/* Footer */}
+              <div className="p-2.5 bg-black/85 border-t border-gray-800 shrink-0">
+                <button
+                  onClick={() => setShowLogDrawer(false)}
+                  className="w-full bg-black/50 hover:bg-black/80 border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white py-2 rounded-xl text-xs font-mono font-bold cursor-pointer transition-all tracking-wider uppercase active:scale-98"
+                >
+                  CLOSE CHRONICLE
+                </button>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* =========================================================================
           10. RULES CODEX MODAL (100% English)
