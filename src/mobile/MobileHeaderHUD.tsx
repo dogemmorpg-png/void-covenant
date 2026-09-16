@@ -49,12 +49,12 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
         const tg = (window as any).Telegram?.WebApp;
         if (tg) {
           const inset = tg.safeAreaInset?.top ?? tg.contentSafeAreaInset?.top;
-          if (typeof inset === 'number' && inset > 0) return inset + 6;
-          return 50; // Standard Telegram mobile top clearance (status bar + tg close header)
+          if (typeof inset === 'number' && inset > 0) return Math.max(78, inset + 48);
+          return 78; // Exact clearance matching MobileBattleArena
         }
       } catch {}
     }
-    return 8; // Standard browser clearance
+    return 78; // Standard mobile clearance
   });
 
   useEffect(() => {
@@ -70,9 +70,9 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
         try {
           const inset = tg.safeAreaInset?.top ?? tg.contentSafeAreaInset?.top;
           if (typeof inset === 'number' && inset > 0) {
-            setTopInset(inset + 6);
+            setTopInset(Math.max(78, inset + 48));
           } else {
-            setTopInset(50);
+            setTopInset(78);
           }
         } catch {}
       };
@@ -178,7 +178,7 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
     <>
       <header 
         style={{
-          paddingTop: `max(${topInset}px, env(safe-area-inset-top, ${topInset}px))`,
+          paddingTop: `max(${topInset}px, calc(env(safe-area-inset-top, 0px) + 54px))`,
           paddingLeft: 'max(0.6rem, env(safe-area-inset-left, 0.6rem))',
           paddingRight: 'max(0.6rem, env(safe-area-inset-right, 0.6rem))'
         }}
