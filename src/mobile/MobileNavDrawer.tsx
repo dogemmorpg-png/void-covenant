@@ -31,6 +31,45 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  // Dynamic bottom inset detection for Telegram WebApp and Android navigation buttons
+  const [bottomInset, setBottomInset] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const tg = (window as any).Telegram?.WebApp;
+        if (tg) {
+          const inset = tg.safeAreaInset?.bottom ?? tg.contentSafeAreaInset?.bottom;
+          if (typeof inset === 'number' && inset > 0) return Math.max(26, inset + 8);
+        }
+      } catch {}
+    }
+    return 26; // Safe clearance above Android 3-button navigation bar
+  });
+
+  useEffect(() => {
+    const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
+    if (tg) {
+      const checkInset = () => {
+        try {
+          const inset = tg.safeAreaInset?.bottom ?? tg.contentSafeAreaInset?.bottom;
+          if (typeof inset === 'number' && inset > 0) {
+            setBottomInset(Math.max(26, inset + 8));
+          } else {
+            setBottomInset(26);
+          }
+        } catch {}
+      };
+      checkInset();
+      try {
+        tg.onEvent?.('viewportChanged', checkInset);
+      } catch {}
+      return () => {
+        try {
+          tg.offEvent?.('viewportChanged', checkInset);
+        } catch {}
+      };
+    }
+  }, []);
+
   const menuItems = [
     {
       id: 'campaign' as MobileTab,
@@ -121,7 +160,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
   return (
     <nav 
       style={{
-        paddingBottom: 'max(12px, calc(env(safe-area-inset-bottom, 0px) + 4px))'
+        paddingBottom: `max(${bottomInset}px, calc(env(safe-area-inset-bottom, 0px) + 12px))`
       }}
       className="fixed bottom-0 left-0 right-0 z-40 bg-[#0c0e14]/98 backdrop-blur-lg border-t border-white/10 select-none shadow-[0_-8px_30px_rgba(0,0,0,0.9)]"
     >
