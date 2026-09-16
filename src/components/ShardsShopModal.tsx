@@ -279,35 +279,38 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
     >
       
       {/* Modal Container */}
-      <div className="bg-gradient-to-b from-[#18111e] via-[#100a15] to-[#08050a] border-2 border-red-500/30 max-w-xl w-full rounded-3xl p-5 sm:p-6 shadow-[0_0_60px_rgba(221,44,64,0.18)] relative overflow-hidden flex flex-col space-y-5 animate-in zoom-in-95 duration-200">
+      <div className="bg-gradient-to-b from-[#18111e] via-[#100a15] to-[#08050a] border-2 border-red-500/30 max-w-xl w-full rounded-3xl p-3 sm:p-5 shadow-[0_0_60px_rgba(221,44,64,0.18)] relative overflow-hidden flex flex-col space-y-2.5 sm:space-y-4 animate-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto custom-scrollbar">
         
         {/* Top decorative gradient bar */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-700 via-purple-600 to-rose-600" />
         <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 h-24 bg-red-600/15 blur-3xl pointer-events-none" />
 
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-white/10 pb-3.5 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-black/70 border border-red-500/50 flex items-center justify-center shadow-inner">
+        <div className="flex justify-between items-center border-b border-white/10 pb-2 sm:pb-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-black/70 border border-red-500/50 flex items-center justify-center shadow-inner shrink-0">
               <img 
                 src="/icons/icon_shards.webp" 
                 alt="Dark Shards" 
-                className="w-7 h-7 object-contain drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]" 
+                className="w-6 h-6 sm:w-7 sm:h-7 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" 
               />
             </div>
             <div>
-              <h3 className="font-display font-black text-white text-base sm:text-lg tracking-widest uppercase text-shadow-gold flex items-center gap-2">
+              <h3 className="font-display font-black text-white text-xs sm:text-base tracking-widest uppercase text-shadow-gold leading-none">
                 DARK SHARDS SHOP
               </h3>
+              <p className="text-[9px] sm:text-[10px] text-rose-300/80 font-mono mt-0.5">
+                Acquire shards on Solana Mainnet
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {connected && publicKey ? (
               <div 
                 onClick={() => disconnect()}
                 title="Click to disconnect"
-                className="hidden sm:flex items-center gap-1.5 bg-black/60 hover:bg-red-950/40 border border-emerald-500/40 hover:border-red-500/40 px-2.5 py-1 rounded-full text-[10px] font-mono text-emerald-400 hover:text-red-300 transition-all cursor-pointer"
+                className="flex items-center gap-1 bg-black/60 hover:bg-red-950/40 border border-emerald-500/40 hover:border-red-500/40 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono text-emerald-400 hover:text-red-300 transition-all cursor-pointer"
               >
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span>{publicKey.toBase58().slice(0, 4)}...{publicKey.toBase58().slice(-4)}</span>
@@ -315,99 +318,85 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
             ) : (
               <button
                 onClick={() => setVisible(true)}
-                className="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-purple-900/60 to-[#1f2833] hover:from-purple-700 hover:to-indigo-900 border border-purple-500/40 text-purple-300 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider transition-all cursor-pointer"
+                className="flex items-center gap-1 bg-gradient-to-r from-purple-900/60 to-[#1f2833] hover:from-purple-700 hover:to-indigo-900 border border-purple-500/40 text-purple-300 px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold tracking-wider transition-all cursor-pointer"
               >
-                <Wallet className="w-3 h-3" /> CONNECT
+                <Wallet className="w-2.5 h-2.5" /> CONNECT
               </button>
             )}
 
             <button 
               onClick={onClose}
-              className="w-8 h-8 rounded-xl bg-black/50 hover:bg-red-950/60 border border-white/10 hover:border-red-500/40 text-gray-400 hover:text-red-300 flex items-center justify-center transition-all cursor-pointer"
+              className="w-7 h-7 rounded-xl bg-black/50 hover:bg-red-950/60 border border-white/10 hover:border-red-500/40 text-gray-400 hover:text-red-300 flex items-center justify-center transition-all cursor-pointer ml-0.5"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
 
         {/* Main Content */}
         {paymentState.status === 'idle' || paymentState.status === 'success' || paymentState.status === 'error' || paymentState.status === 'pending' ? (
-          <div className="space-y-4">
+          <div className="space-y-2.5 sm:space-y-4">
             
-            {/* Wallet connection banner if not connected on mobile */}
-            {!connected && (
-              <div className="sm:hidden bg-purple-950/30 border border-purple-500/30 rounded-2xl p-3 flex items-center justify-between">
-                <span className="text-xs text-purple-200 font-sans">Connect wallet to buy</span>
-                <button
-                  onClick={() => setVisible(true)}
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-mono font-bold px-3 py-1.5 rounded-xl text-xs"
-                >
-                  CONNECT
-                </button>
-              </div>
-            )}
-
-            {/* Packages 2x2 Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Packages 2x2 Grid on ALL screens */}
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {SOLANA_PACKAGES.map(pkg => {
                 const isPopular = pkg.popular;
                 return (
                   <div
                     key={pkg.id}
-                    className={`relative rounded-2xl p-3.5 flex flex-col justify-between border transition-all duration-300 group hover:scale-[1.02] ${
+                    className={`relative rounded-2xl p-2 sm:p-3 flex flex-col justify-between border transition-all duration-200 group hover:scale-[1.02] ${
                       isPopular 
-                        ? 'bg-gradient-to-b from-[#211229]/90 via-[#140b1a]/95 to-black border-purple-500/50 shadow-[0_0_25px_rgba(168,85,247,0.15)]' 
+                        ? 'bg-gradient-to-b from-[#211229]/90 via-[#140b1a]/95 to-black border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.2)]' 
                         : 'bg-gradient-to-b from-[#1b121e]/80 via-[#100a14]/90 to-black border-white/10 hover:border-red-500/40'
                     }`}
                   >
                     {/* Badge */}
                     {pkg.badge && (
-                      <span className={`absolute top-2.5 right-2.5 text-[8px] px-2 py-0.5 rounded-full font-mono font-black tracking-wider border uppercase ${getBadgeStyle(pkg.badge)}`}>
+                      <span className={`absolute top-1.5 right-1.5 text-[7px] sm:text-[8px] px-1.5 py-0.2 rounded-full font-mono font-black tracking-wider border uppercase z-10 ${getBadgeStyle(pkg.badge)}`}>
                         {pkg.badge}
                       </span>
                     )}
 
                     {/* Image Showcase */}
-                    <div className="w-full flex items-center justify-center pt-2 pb-1 relative">
+                    <div className="w-full flex items-center justify-center py-0.5 sm:py-1 relative">
                       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(239,68,68,0.12),transparent_70%)] pointer-events-none" />
                       {pkg.image && (
                         <img 
                           src={pkg.image} 
                           alt={pkg.name} 
-                          className="w-24 h-24 sm:w-26 sm:h-26 object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)] group-hover:scale-105 transition-transform duration-300" 
+                          className="w-14 h-14 sm:w-20 sm:h-20 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.85)] group-hover:scale-105 transition-transform duration-300 rounded-xl" 
                         />
                       )}
                     </div>
 
                     {/* Title */}
-                    <div className="text-center mt-1">
-                      <span className="text-white font-display font-bold text-xs sm:text-sm tracking-wide block truncate">
+                    <div className="text-center mt-0.5">
+                      <span className="text-white font-display font-bold text-[10px] sm:text-xs tracking-wide block truncate">
                         {pkg.name}
                       </span>
                     </div>
 
-                    {/* Price & Reward Row */}
-                    <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <img 
-                          src="/icons/icon_shards.webp" 
-                          alt="Shards" 
-                          className="w-7 h-7 sm:w-8 sm:h-8 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.7)] group-hover:scale-110 transition-transform duration-300" 
-                        />
-                        <span className="text-xl sm:text-2xl font-black text-white font-mono leading-none tracking-tight">
-                          {pkg.shardsReward}
-                        </span>
-                      </div>
-
-                      <button
-                        onClick={() => handlePurchasePackage(pkg)}
-                        disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
-                        className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-mono text-xs font-black py-2 px-3.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_15px_rgba(168,85,247,0.35)] hover:scale-105 flex items-center gap-1.5 active:scale-95"
-                      >
-                        <span>{pkg.solCost}</span>
-                        <span className="text-[10px] text-purple-200 font-bold">SOL</span>
-                      </button>
+                    {/* Reward Amount */}
+                    <div className="flex items-center justify-center gap-1 my-1">
+                      <img 
+                        src="/icons/icon_shards.webp" 
+                        alt="Shards" 
+                        className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.7)] shrink-0" 
+                      />
+                      <span className="text-xs sm:text-sm font-black text-white font-mono leading-none tracking-tight">
+                        +{pkg.shardsReward}
+                      </span>
                     </div>
+
+                    {/* Price Button */}
+                    <button
+                      onClick={() => handlePurchasePackage(pkg)}
+                      disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
+                      className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-mono text-[10px] sm:text-xs font-black py-1.5 sm:py-2 px-1 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_10px_rgba(168,85,247,0.3)] hover:scale-102 flex items-center justify-center gap-1 active:scale-95"
+                    >
+                      <span>{pkg.solCost}</span>
+                      <span className="text-[7.5px] sm:text-[9px] text-purple-200 font-bold">SOL</span>
+                    </button>
                   </div>
                 );
               })}
