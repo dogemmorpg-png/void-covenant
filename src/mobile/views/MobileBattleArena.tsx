@@ -656,7 +656,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
 
       case 'direct_attack': {
         const attackerCard = step.attacker === 'player' ? visualState.playerBoard[step.slot] : visualState.enemyBoard[step.slot];
-        stepDescription = `💥 Direct Strike: ${attackerCard?.name || 'Creature'} deals -${step.damage} directly to Lord!`;
+        stepDescription = `💥 Breakthrough: ${attackerCard?.name || 'Creature'} deals -${step.damage} direct damage to Lord!`;
         setAttackerAction({ side: step.attacker, slot: step.slot, targetSlot: -1, isDirect: true });
 
         const tHit = setTimeout(() => {
@@ -664,6 +664,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
           const targetHeroLabel = step.attacker === 'player' ? 'enemy-hero' : 'player-hero';
 
           setDefenderAction({ side: targetHeroSide, slot: -1, type: 'hit' });
+          addFloatingText('BREAKTHROUGH! ⚡', { side: step.attacker, slot: step.slot }, 'text-amber-300 font-black text-xs scale-110');
           addFloatingText(`💥 -${step.damage}`, targetHeroLabel, 'text-red-500 font-black text-sm');
 
           setVisualState(prev => {
@@ -808,8 +809,17 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
 
       case 'dodge': {
         const isEnemy = step.side === 'enemy';
-        stepDescription = `🛡️ Dodge Evasion: ${isEnemy ? 'Enemy Lord' : 'Your Lord'} evaded the strike!`;
-        addFloatingText('DODGE! 🛡️', isEnemy ? 'enemy-hero' : 'player-hero', 'text-cyan-300 font-black text-xs');
+        const attackerSide = step.attacker || (isEnemy ? 'player' : 'enemy');
+        const attackerCard = attackerSide === 'player' ? visualState.playerBoard[step.slot] : visualState.enemyBoard[step.slot];
+        stepDescription = `🛡️ Evaded! ${isEnemy ? 'Enemy Lord' : 'Your Lord'} dodged direct attack from ${attackerCard?.name || 'Creature'}!`;
+
+        setAttackerAction({ side: attackerSide, slot: step.slot, targetSlot: -1, isDirect: true });
+
+        const tHit = setTimeout(() => {
+          setDefenderAction({ side: step.side, slot: -1, type: 'dodge' });
+          addFloatingText('DODGE! 🛡️', isEnemy ? 'enemy-hero' : 'player-hero', 'text-cyan-400 font-black text-sm');
+        }, impactDelay);
+        timeouts.push(tHit);
         break;
       }
 
@@ -1005,9 +1015,9 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
           <span>Escape</span>
         </button>
 
-        <div className="flex flex-col items-center">
-          <span className="font-display font-black text-xs text-[#ebd09b] tracking-wider uppercase drop-shadow">
-            {battleType === 'pvp' ? 'PvP Duel Arena' : `Stage ${stage.id}: ${stage.name}`}
+        <div className="flex flex-col items-center min-w-0 max-w-[55%] px-1">
+          <span className="font-display font-black text-xs text-[#ebd09b] tracking-wider uppercase drop-shadow truncate">
+            {stage.name || (battleType === 'pvp' ? `Arena: ${stage.enemyHeroName || 'Opponent'}` : `The Abyss - Floor ${stage.id}`)}
           </span>
         </div>
 
@@ -1022,66 +1032,80 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       </header>
 
       {/* =========================================================================
-          2. ENEMY COMMANDER HEADER HUD (Portrait, HP, Mana)
+          BATTLEFIELD VIEWPORT (Enemy Commander HUD, 5v5 Playfield, Player Commander HUD)
          ========================================================================= */}
-      <div className="px-3 py-1 bg-gradient-to-b from-[#180a0a]/90 to-transparent border-b border-red-950/40 flex items-center justify-between shrink-0 relative">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className={`w-8 h-8 rounded-lg overflow-hidden border-2 border-red-500/70 shadow-md relative shrink-0 ${
-            defenderAction?.side === 'enemy' && defenderAction?.slot === -1 ? 'anim-hero-recoil' : ''
-          }`}>
-            <img 
-              src={stage.enemyHeroImage ? (stage.enemyHeroImage.includes('mage') ? '/avatars/vampire.webp' : (stage.enemyHeroImage.includes('thief') ? '/avatars/rogue.webp' : stage.enemyHeroImage)) : '/avatars/knight.webp'} 
-              alt={stage.enemyHeroName || stage.name || 'Enemy Lord'} 
-              className="w-full h-full object-cover" 
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = '/avatars/knight.webp';
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          </div>
-
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5">
-              <span className="font-display font-black text-xs text-red-300 truncate">
-                {stage.enemyHeroName || stage.name || 'Abyssal Overlord'}
-              </span>
-              <span className="text-[8.5px] font-mono px-1 rounded bg-red-950 border border-red-800/80 text-red-400 font-bold">
-                Lvl {stage.enemyLevel || 1}
-              </span>
+      <div className="flex-1 flex flex-col justify-between relative overflow-hidden min-h-0">
+        {/* =========================================================================
+            2. ENEMY COMMANDER HEADER HUD (Portrait, HP, Mana)
+           ========================================================================= */}
+        <div className={`px-3 py-1 bg-gradient-to-b from-[#180a0a]/90 to-transparent border-b flex items-center justify-between shrink-0 relative transition-all duration-200 ${
+          defenderAction?.side === 'enemy' && defenderAction?.slot === -1 && defenderAction?.type === 'hit'
+            ? 'border-red-500 bg-red-950/40 shadow-[0_0_15px_rgba(239,68,68,0.5)]'
+            : attackerAction?.side === 'player' && attackerAction?.isDirect
+              ? 'border-amber-400/60 bg-amber-950/20'
+              : 'border-red-950/40'
+        }`}>
+          <div className="flex items-center gap-2 min-w-0">
+            <div className={`w-8 h-8 rounded-lg overflow-hidden border-2 shadow-md relative shrink-0 transition-all ${
+              defenderAction?.side === 'enemy' && defenderAction?.slot === -1
+                ? (defenderAction.type === 'dodge' ? 'border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.8)] anim-hero-dodge' : 'border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.9)] anim-hero-recoil')
+                : attackerAction?.side === 'player' && attackerAction?.isDirect
+                  ? 'border-amber-400 ring-1 ring-amber-400/80 animate-pulse'
+                  : 'border-red-500/70'
+            }`}>
+              <img 
+                src={stage.enemyHeroImage ? (stage.enemyHeroImage.includes('mage') ? '/avatars/vampire.webp' : (stage.enemyHeroImage.includes('thief') ? '/avatars/rogue.webp' : stage.enemyHeroImage)) : '/avatars/knight.webp'} 
+                alt={stage.enemyHeroName || stage.name || 'Enemy Lord'} 
+                className="w-full h-full object-cover" 
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = '/avatars/knight.webp';
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             </div>
 
-            {/* Health Bar */}
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <div className="w-24 h-1.5 bg-zinc-900 rounded-full overflow-hidden border border-red-950">
-                <div 
-                  className="h-full bg-gradient-to-r from-red-600 to-red-400 transition-all duration-300"
-                  style={{ width: `${Math.max(0, Math.min(100, (visualState.enemyHeroHealth / visualState.enemyHeroMaxHealth) * 100))}%` }}
-                />
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="font-display font-black text-xs text-red-300 truncate">
+                  {stage.enemyHeroName || stage.name || 'Abyssal Overlord'}
+                </span>
+                <span className="text-[8.5px] font-mono px-1 rounded bg-red-950 border border-red-800/80 text-red-400 font-bold">
+                  Lvl {stage.enemyLevel || 1}
+                </span>
               </div>
-              <span className="text-[9.5px] font-mono font-black text-red-300 whitespace-nowrap">
-                {visualState.enemyHeroHealth} / {visualState.enemyHeroMaxHealth}
-              </span>
+
+              {/* Health Bar (compact width with room for 3-digit HP) */}
+              <div className="flex items-center gap-1.5 mt-0.5 shrink-0">
+                <div className="w-14 sm:w-18 h-1.5 bg-zinc-900 rounded-full overflow-hidden border border-red-950 shrink-0">
+                  <div 
+                    className="h-full bg-gradient-to-r from-red-600 to-red-400 transition-all duration-300"
+                    style={{ width: `${Math.max(0, Math.min(100, (visualState.enemyHeroHealth / visualState.enemyHeroMaxHealth) * 100))}%` }}
+                  />
+                </div>
+                <span className="text-[9px] sm:text-[9.5px] font-mono font-black text-red-300 whitespace-nowrap shrink-0">
+                  {visualState.enemyHeroHealth} / {visualState.enemyHeroMaxHealth}
+                </span>
+              </div>
             </div>
           </div>
+
+          {/* Floating text on enemy hero */}
+          <div className="absolute top-1 left-1/3 pointer-events-none flex flex-col items-center z-40">
+            {floatingTexts.filter(f => f.target === 'enemy-hero').map(f => (
+              <span key={f.id} className={`${f.colorClass} animate-bounce font-black`}>
+                {f.text}
+              </span>
+            ))}
+          </div>
+
+          {/* Enemy Mana */}
+          {renderHeroManaBadge(visualState.enemyMana || 0, visualState.enemyMaxMana || 0)}
         </div>
 
-        {/* Floating text on enemy hero */}
-        <div className="absolute top-1 left-1/3 pointer-events-none flex flex-col items-center z-40">
-          {floatingTexts.filter(f => f.target === 'enemy-hero').map(f => (
-            <span key={f.id} className={`${f.colorClass} animate-bounce font-black`}>
-              {f.text}
-            </span>
-          ))}
-        </div>
-
-        {/* Enemy Mana */}
-        {renderHeroManaBadge(visualState.enemyMana || 0, visualState.enemyMaxMana || 0)}
-      </div>
-
-      {/* =========================================================================
-          3. ARENA PLAYFIELD (5 VS 5 BOARD + CENTRAL CLASH BAR)
-         ========================================================================= */}
-      <main className="flex-1 flex flex-col justify-between px-2 py-1 overflow-hidden relative min-h-0">
+        {/* =========================================================================
+            3. ARENA PLAYFIELD (5 VS 5 BOARD + CENTRAL CLASH BAR)
+           ========================================================================= */}
+        <main className="flex-1 flex flex-col justify-between px-2 py-1 relative min-h-0">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(235,208,155,0.04)_0%,transparent_70%)] pointer-events-none" />
 
         {/* ROW 1: ENEMY SQUAD (5 SLOTS) */}
@@ -1275,62 +1299,6 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
           </div>
         </div>
 
-        {/* Dynamic Projectile Beam Overlay during Combat Strikes */}
-        {isAnimating && attackerAction !== null && (
-          <svg className="absolute inset-0 w-full h-full pointer-events-none z-30">
-            <defs>
-              <linearGradient id="strikeBeamGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ff4500" stopOpacity="0.9" />
-                <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.5" />
-              </linearGradient>
-            </defs>
-            {(() => {
-              const side = attackerAction.side;
-              const slot = attackerAction.slot;
-              const sX = `${20 * slot + 10}%`;
-              const sY = side === 'player' ? '70%' : '30%';
-
-              let eX = '50%';
-              let eY = '50%';
-
-              if (attackerAction.isDirect) {
-                eX = '50%';
-                eY = side === 'player' ? '12%' : '88%';
-              } else {
-                eX = `${20 * attackerAction.targetSlot + 10}%`;
-                eY = side === 'player' ? '30%' : '70%';
-              }
-
-              return (
-                <>
-                  <line x1={sX} y1={sY} x2={eX} y2={eY} stroke="#ff4500" strokeWidth="4" strokeOpacity="0.3" strokeLinecap="round" />
-                  <line x1={sX} y1={sY} x2={eX} y2={eY} stroke="url(#strikeBeamGrad)" strokeWidth="2" strokeLinecap="round" strokeDasharray="5 3" />
-                  <circle cx={eX} cy={eY} r="6" fill="#ff4500" fillOpacity="0.4" />
-                  <circle cx={eX} cy={eY} r="3" fill="#fef08a" />
-                </>
-              );
-            })()}
-          </svg>
-        )}
-
-        {/* Dynamic Plague Miasma Stream SVG Overlay */}
-        {plagueAction !== null && (
-          <svg className="absolute inset-0 w-full h-full pointer-events-none z-30">
-            {(() => {
-              const sX = `${20 * plagueAction.sourceSlot + 10}%`;
-              const sY = plagueAction.sourceSide === 'player' ? '70%' : '30%';
-              const tX = `${20 * plagueAction.targetSlot + 10}%`;
-              const tY = plagueAction.targetSide === 'player' ? '70%' : '30%';
-              return (
-                <>
-                  <line x1={sX} y1={sY} x2={tX} y2={tY} stroke="#10b981" strokeWidth="6" strokeOpacity="0.35" strokeLinecap="round" />
-                  <line x1={sX} y1={sY} x2={tX} y2={tY} stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="4 4" />
-                  <circle cx={tX} cy={tY} r="5" fill="#10b981" />
-                </>
-              );
-            })()}
-          </svg>
-        )}
 
         {/* =========================================================================
             CENTRAL GOTHIC CLASH BAR (Combat status, action log, speed buttons)
@@ -1602,81 +1570,150 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
 
       </main>
 
-      {/* =========================================================================
-          4. PLAYER COMMANDER BAR & TURN CONTROLS (Portrait, HP, Personal Mana, End Turn)
-         ========================================================================= */}
-      <div className="px-3 py-1.5 bg-gradient-to-t from-[#0e131d] to-transparent border-t border-white/10 flex items-center justify-between shrink-0 relative">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className={`w-10 h-10 rounded-xl overflow-hidden border-2 border-emerald-500/70 shadow-md relative shrink-0 ${
-            defenderAction?.side === 'player' && defenderAction?.slot === -1 ? 'anim-hero-recoil' : ''
-          }`}>
-            <img 
-              src={profile?.avatarUrl || '/avatars/avatar_1.webp'} 
-              alt={profile?.username || 'Commander'} 
-              className="w-full h-full object-cover" 
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          </div>
-
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5">
-              <span className="font-display font-black text-xs text-emerald-300 truncate">
-                {profile?.username || 'Abyssal Lord'}
-              </span>
-              <span className="text-[9px] font-mono px-1 rounded bg-emerald-950 border border-emerald-800/80 text-emerald-400 font-bold">
-                Lvl {profile?.level || 1}
-              </span>
+        {/* =========================================================================
+            4. PLAYER COMMANDER BAR & TURN CONTROLS (Portrait, HP, Personal Mana, End Turn)
+           ========================================================================= */}
+        <div className={`px-3 py-1.5 bg-gradient-to-t from-[#0e131d] to-transparent border-t flex items-center justify-between shrink-0 relative transition-all duration-200 ${
+          defenderAction?.side === 'player' && defenderAction?.slot === -1 && defenderAction?.type === 'hit'
+            ? 'border-red-500 bg-red-950/40 shadow-[0_0_15px_rgba(239,68,68,0.5)]'
+            : attackerAction?.side === 'enemy' && attackerAction?.isDirect
+              ? 'border-amber-400/60 bg-amber-950/20'
+              : 'border-white/10'
+        }`}>
+          <div className="flex items-center gap-2 min-w-0">
+            <div className={`w-10 h-10 rounded-xl overflow-hidden border-2 shadow-md relative shrink-0 transition-all ${
+              defenderAction?.side === 'player' && defenderAction?.slot === -1
+                ? (defenderAction.type === 'dodge' ? 'border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.8)] anim-hero-dodge' : 'border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.9)] anim-hero-recoil')
+                : attackerAction?.side === 'enemy' && attackerAction?.isDirect
+                  ? 'border-amber-400 ring-1 ring-amber-400/80 animate-pulse'
+                  : 'border-emerald-500/70'
+            }`}>
+              <img 
+                src={profile?.avatarUrl || '/avatars/avatar_1.webp'} 
+                alt={profile?.username || 'Commander'} 
+                className="w-full h-full object-cover" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             </div>
 
-            <div className="flex items-center gap-2 mt-0.5 shrink-0">
-              {/* HP Bar */}
-              <div className="flex items-center gap-1.5 shrink-0">
-                <div className="w-16 sm:w-20 h-2 bg-zinc-900 rounded-full overflow-hidden border border-emerald-950 shrink-0">
-                  <div 
-                    className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 transition-all duration-300"
-                    style={{ width: `${Math.max(0, Math.min(100, (visualState.playerHeroHealth / visualState.playerHeroMaxHealth) * 100))}%` }}
-                  />
-                </div>
-                <span className="text-[10px] font-mono font-black text-emerald-300 whitespace-nowrap">
-                  {visualState.playerHeroHealth} / {visualState.playerHeroMaxHealth}
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="font-display font-black text-xs text-emerald-300 truncate">
+                  {profile?.username || 'Abyssal Lord'}
+                </span>
+                <span className="text-[9px] font-mono px-1 rounded bg-emerald-950 border border-emerald-800/80 text-emerald-400 font-bold">
+                  Lvl {profile?.level || 1}
                 </span>
               </div>
 
-              {/* Personal Player Mana */}
-              {renderHeroManaBadge(visualState.playerMana || 0, visualState.playerMaxMana || 0)}
+              <div className="flex items-center gap-2 mt-0.5 shrink-0">
+                {/* HP Bar (compact width with room for 3-digit HP) */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <div className="w-11 sm:w-14 h-2 bg-zinc-900 rounded-full overflow-hidden border border-emerald-950 shrink-0">
+                    <div 
+                      className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 transition-all duration-300"
+                      style={{ width: `${Math.max(0, Math.min(100, (visualState.playerHeroHealth / visualState.playerHeroMaxHealth) * 100))}%` }}
+                    />
+                  </div>
+                  <span className="text-[9px] sm:text-[10px] font-mono font-black text-emerald-300 whitespace-nowrap shrink-0">
+                    {visualState.playerHeroHealth} / {visualState.playerHeroMaxHealth}
+                  </span>
+                </div>
+
+                {/* Personal Player Mana */}
+                {renderHeroManaBadge(visualState.playerMana || 0, visualState.playerMaxMana || 0)}
+              </div>
             </div>
           </div>
+
+          {/* Floating text on player hero */}
+          <div className="absolute top-2 left-1/3 pointer-events-none flex flex-col items-center z-40">
+            {floatingTexts.filter(f => f.target === 'player-hero').map(f => (
+              <span key={f.id} className={`${f.colorClass} animate-bounce font-black`}>
+                {f.text}
+              </span>
+            ))}
+          </div>
+
+          {/* Large Thumb-Friendly End Turn / Cancel Button */}
+          {selectedHandCardId ? (
+            <button
+              onClick={() => setSelectedHandCardId(null)}
+              className="px-3.5 py-2 bg-gradient-to-b from-red-700 to-red-900 hover:from-red-600 text-white font-display font-black text-xs rounded-xl shadow-md border-2 border-red-500 active:scale-95 transition-all cursor-pointer uppercase tracking-wider"
+            >
+              CANCEL ✕
+            </button>
+          ) : (
+            <button
+              onClick={handleEndTurnWithoutCard}
+              disabled={isSimulating || isAnimating}
+              className={`px-4 py-2 font-display font-black text-xs rounded-xl shadow-lg border-2 transition-all uppercase tracking-wider ${
+                isSimulating || isAnimating
+                  ? 'bg-zinc-800 text-zinc-500 border-zinc-700 cursor-not-allowed'
+                  : 'bg-gradient-to-b from-amber-500 via-amber-600 to-amber-700 text-black border-amber-300 hover:from-amber-400 active:scale-95 cursor-pointer shadow-amber-500/20'
+              }`}
+            >
+              END TURN ⚔️
+            </button>
+          )}
         </div>
 
-        {/* Floating text on player hero */}
-        <div className="absolute top-2 left-1/3 pointer-events-none flex flex-col items-center z-40">
-          {floatingTexts.filter(f => f.target === 'player-hero').map(f => (
-            <span key={f.id} className={`${f.colorClass} animate-bounce font-black`}>
-              {f.text}
-            </span>
-          ))}
-        </div>
+        {/* Dynamic Projectile Beam Overlay during Combat Strikes & Direct Attacks */}
+        {isAnimating && attackerAction !== null && (
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-30">
+            <defs>
+              <linearGradient id="strikeBeamGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ff4500" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.5" />
+              </linearGradient>
+            </defs>
+            {(() => {
+              const side = attackerAction.side;
+              const slot = attackerAction.slot;
+              const sX = `${20 * slot + 10}%`;
+              const sY = side === 'player' ? '78%' : '22%';
 
-        {/* Large Thumb-Friendly End Turn / Cancel Button */}
-        {selectedHandCardId ? (
-          <button
-            onClick={() => setSelectedHandCardId(null)}
-            className="px-3.5 py-2 bg-gradient-to-b from-red-700 to-red-900 hover:from-red-600 text-white font-display font-black text-xs rounded-xl shadow-md border-2 border-red-500 active:scale-95 transition-all cursor-pointer uppercase tracking-wider"
-          >
-            CANCEL ✕
-          </button>
-        ) : (
-          <button
-            onClick={handleEndTurnWithoutCard}
-            disabled={isSimulating || isAnimating}
-            className={`px-4 py-2 font-display font-black text-xs rounded-xl shadow-lg border-2 transition-all uppercase tracking-wider ${
-              isSimulating || isAnimating
-                ? 'bg-zinc-800 text-zinc-500 border-zinc-700 cursor-not-allowed'
-                : 'bg-gradient-to-b from-amber-500 via-amber-600 to-amber-700 text-black border-amber-300 hover:from-amber-400 active:scale-95 cursor-pointer shadow-amber-500/20'
-            }`}
-          >
-            END TURN ⚔️
-          </button>
+              let eX = '50%';
+              let eY = '50%';
+
+              if (attackerAction.isDirect) {
+                // Point directly at targeted Commander Avatar (top-left for enemy, bottom-left for player)
+                eX = side === 'player' ? '28px' : '32px';
+                eY = side === 'player' ? '20px' : 'calc(100% - 24px)';
+              } else {
+                eX = `${20 * attackerAction.targetSlot + 10}%`;
+                eY = side === 'player' ? '22%' : '78%';
+              }
+
+              return (
+                <>
+                  <line x1={sX} y1={sY} x2={eX} y2={eY} stroke="#ff4500" strokeWidth="4" strokeOpacity="0.3" strokeLinecap="round" />
+                  <line x1={sX} y1={sY} x2={eX} y2={eY} stroke="url(#strikeBeamGrad)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="6 4" />
+                  <circle cx={eX} cy={eY} r="7" fill="#ff4500" fillOpacity="0.35" />
+                  <circle cx={eX} cy={eY} r="3" fill="#fef08a" />
+                </>
+              );
+            })()}
+          </svg>
+        )}
+
+        {/* Dynamic Plague Miasma Stream SVG Overlay */}
+        {plagueAction !== null && (
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-30">
+            {(() => {
+              const sX = `${20 * plagueAction.sourceSlot + 10}%`;
+              const sY = plagueAction.sourceSide === 'player' ? '78%' : '22%';
+              const tX = `${20 * plagueAction.targetSlot + 10}%`;
+              const tY = plagueAction.targetSide === 'player' ? '78%' : '22%';
+              return (
+                <>
+                  <line x1={sX} y1={sY} x2={tX} y2={tY} stroke="#10b981" strokeWidth="6" strokeOpacity="0.35" strokeLinecap="round" />
+                  <line x1={sX} y1={sY} x2={tX} y2={tY} stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="4 4" />
+                  <circle cx={tX} cy={tY} r="5" fill="#10b981" />
+                </>
+              );
+            })()}
+          </svg>
         )}
       </div>
 
