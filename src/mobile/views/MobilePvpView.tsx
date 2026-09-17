@@ -1121,13 +1121,19 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
               </button>
 
               <div className="flex items-center gap-2">
-                <img 
-                  src={getLeagueDetails(viewingLeague).icon} 
-                  alt="" 
-                  className="w-7 h-7 object-contain" 
-                />
+                {viewingLeague === 'More Leagues Soon' ? (
+                  <div className="w-7 h-7 rounded-lg bg-purple-950/80 border border-purple-500/50 flex items-center justify-center shadow-[0_0_10px_rgba(168,85,247,0.35)] shrink-0">
+                    <Lock className="w-3.5 h-3.5 text-purple-300" />
+                  </div>
+                ) : (
+                  <img 
+                    src={getLeagueDetails(viewingLeague).icon} 
+                    alt="" 
+                    className="w-7 h-7 object-contain" 
+                  />
+                )}
                 <span className={`font-display font-black text-xs sm:text-sm uppercase tracking-wider ${getLeagueDetails(viewingLeague).accent}`}>
-                  {viewingLeague === 'More Leagues Soon' ? 'EXPANSION' : `${getLeagueDetails(viewingLeague).name} LEAGUE`}
+                  {viewingLeague === 'More Leagues Soon' ? 'MORE LEAGUES SOON' : `${getLeagueDetails(viewingLeague).name} LEAGUE`}
                 </span>
               </div>
 
@@ -1141,14 +1147,18 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
 
             {/* Summoners List with Ghost Slots (Matching PC Screenshots 3 & 4) */}
             {viewingLeague === 'More Leagues Soon' ? (
-              <div className="h-56 flex flex-col items-center justify-center p-6 text-center space-y-2 bg-black/40 border border-purple-500/20 rounded-2xl">
-                <Lock className="w-8 h-8 text-purple-400/80 animate-pulse" />
-                <h4 className="font-display font-black text-xs sm:text-sm text-purple-200 uppercase tracking-widest">
-                  Uncharted Territories
-                </h4>
-                <p className="text-[10px] text-gray-400 font-sans max-w-xs leading-relaxed">
-                  Higher celestial and abyssal leagues will unlock in upcoming realm cycles.
-                </p>
+              <div className="h-64 flex flex-col items-center justify-center text-center space-y-3 p-5 bg-gradient-to-b from-purple-950/30 via-black to-black border border-purple-500/30 rounded-2xl shadow-inner animate-fade-in">
+                <div className="w-12 h-12 rounded-2xl bg-purple-950/70 border-2 border-purple-400/60 flex items-center justify-center shadow-[0_0_25px_rgba(168,85,247,0.4)]">
+                  <Lock className="w-6 h-6 text-purple-300" />
+                </div>
+                <div className="space-y-1 max-w-xs">
+                  <h4 className="font-display font-black text-xs sm:text-sm text-white uppercase tracking-wider">
+                    More Leagues Coming Soon
+                  </h4>
+                  <p className="text-[10.5px] text-gray-400 font-sans leading-relaxed">
+                    Higher leagues and new reward tiers will be available in future expansions.
+                  </p>
+                </div>
               </div>
             ) : isLoadingLeaderboard ? (
               <div className="h-56 flex flex-col items-center justify-center space-y-2">
@@ -1394,14 +1404,20 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
               </button>
 
               <div className="flex items-center gap-2">
-                <img 
-                  src={getLeagueDetails(selectedRewardLeague).icon} 
-                  alt="" 
-                  className="w-7 h-7 object-contain" 
-                />
+                {selectedRewardLeague === 'More Leagues Soon' ? (
+                  <div className="w-7 h-7 rounded-lg bg-purple-950/80 border border-purple-500/50 flex items-center justify-center shadow-[0_0_10px_rgba(168,85,247,0.35)] shrink-0">
+                    <Lock className="w-3.5 h-3.5 text-purple-300" />
+                  </div>
+                ) : (
+                  <img 
+                    src={getLeagueDetails(selectedRewardLeague).icon} 
+                    alt="" 
+                    className="w-7 h-7 object-contain" 
+                  />
+                )}
                 <div className="text-center">
                   <span className={`font-display font-black text-xs sm:text-sm uppercase tracking-wider block ${getLeagueDetails(selectedRewardLeague).accent}`}>
-                    {selectedRewardLeague === 'More Leagues Soon' ? 'EXPANSION' : `${getLeagueDetails(selectedRewardLeague).name} LEAGUE`}
+                    {selectedRewardLeague === 'More Leagues Soon' ? 'MORE LEAGUES SOON' : `${getLeagueDetails(selectedRewardLeague).name} LEAGUE`}
                   </span>
                   {(profile.pvpLeague || 'Bronze').toLowerCase() === selectedRewardLeague.toLowerCase() && (
                     <span className="text-[8px] font-mono font-bold text-emerald-400 block">
@@ -1420,7 +1436,22 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
             </div>
 
             {/* Detailed Breakdown for Selected League (Exact match with PC Screenshot 1) */}
-            {(() => {
+            {selectedRewardLeague === 'More Leagues Soon' ? (
+              <div className="bg-gradient-to-b from-purple-950/40 via-indigo-950/30 to-black border border-purple-500/40 rounded-2xl p-6 space-y-3 shadow-2xl relative overflow-hidden text-center animate-fade-in">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-purple-500/15 blur-3xl pointer-events-none" />
+                <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-b from-purple-900/80 via-black to-black border-2 border-purple-400/60 flex items-center justify-center shadow-[0_0_25px_rgba(168,85,247,0.4)] relative z-10">
+                  <Lock className="w-7 h-7 text-purple-300" />
+                </div>
+                <div className="space-y-1.5 max-w-xs mx-auto relative z-10">
+                  <h3 className="font-display font-black text-base sm:text-lg text-white tracking-wider uppercase">
+                    More Leagues Coming Soon
+                  </h3>
+                  <p className="text-[11px] text-gray-300 font-sans leading-relaxed">
+                    Higher leagues and new reward tiers will be available in future expansions.
+                  </p>
+                </div>
+              </div>
+            ) : (() => {
               const rewardsList = leagueRewardsConfig && leagueRewardsConfig.length > 0 ? leagueRewardsConfig : ALL_LEAGUE_REWARDS;
               const currentTier = rewardsList.find((t: any) => t.name.toLowerCase() === selectedRewardLeague.toLowerCase()) || rewardsList[0];
 
