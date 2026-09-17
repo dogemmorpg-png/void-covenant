@@ -13,7 +13,7 @@ import { MobileBattleArena } from './views/MobileBattleArena';
 
 // Desktop Shared Views for Store, Bank & Premium
 import { BankView } from '../components/BankView';
-import { PremiumPassView } from '../components/PremiumPassView';
+import { MobilePremiumPassView } from './views/MobilePremiumPassView';
 
 // Modals
 import { ShardsShopModal } from '../components/ShardsShopModal';
@@ -129,9 +129,7 @@ export const MobileApp: React.FC = () => {
           </div>
 
           <div className={activeTab === 'premium' ? 'h-full w-full block overflow-y-auto' : 'hidden'}>
-            <div className="p-2">
-              <PremiumPassView />
-            </div>
+            <MobilePremiumPassView />
           </div>
         </div>
       </main>
