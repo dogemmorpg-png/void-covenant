@@ -3,6 +3,7 @@ import { useGame } from '../../context/GameContext';
 import { 
   Landmark, 
   ArrowUpRight, 
+  ArrowDownLeft,
   Clock, 
   CheckCircle2, 
   AlertCircle, 
@@ -12,7 +13,7 @@ import {
   TrendingUp, 
   Swords, 
   Trophy, 
-  Mail, 
+  Scroll, 
   ClipboardPaste,
   ExternalLink 
 } from 'lucide-react';
@@ -21,7 +22,7 @@ export const MobileBankView: React.FC = () => {
   const { profile, requestWithdrawal } = useGame();
 
   const [activeTab, setActiveTab] = useState<'terminal' | 'history'>('terminal');
-  const [historyFilter, setHistoryFilter] = useState<'all' | 'accruals' | 'withdrawals'>('all');
+  const [historyTab, setHistoryTab] = useState<'incoming' | 'withdrawals'>('incoming');
 
   const [withdrawAmount, setWithdrawAmount] = useState<string>('');
   const [targetAddress, setTargetAddress] = useState<string>(profile.solanaAddress || '');
@@ -132,7 +133,7 @@ export const MobileBankView: React.FC = () => {
     const recordedMailIds = new Set<string>();
 
     // 1. Explicit sovereign transactions if present
-    if (profile.sovereignTransactions && Array.isArray(profile.sovereignTransactions)) {
+    if (profile.soovereignTransactions && Array.isArray(profile.sovereignTransactions)) {
       profile.sovereignTransactions.forEach((tx: any) => {
         if (tx.sovereignsChange > 0) {
           const isLeague = tx.action === 'LEAGUE_ROLLOVER' || tx.description?.toLowerCase().includes('league') || tx.description?.toLowerCase().includes('pvp season');
@@ -225,6 +226,23 @@ export const MobileBankView: React.FC = () => {
     return unique.sort((a, b) => b.timestamp - a.timestamp);
   }, [profile.sovereignTransactions, profile.pvpHistory, profile.mailMessages, subTier]);
 
+  // Statistics: Total incoming & Total paid out
+  const totalEarned = useMemo(() => {
+    return accrualEvents.reduce((acc, evt) => acc + (evt.amount || 0), 0);
+  }, [accrualEvents]);
+  const totalEarnedUsdt = (totalEarned * 0.01).toFixed(2);
+
+  const totalPaidOut = useMemo(() => {
+    return history
+      .filter((req) => req.status === 'completed')
+      .reduce((acc, req) => acc + (req.amountSovereigns || 0), 0);
+  }, [history]);
+  const totalPaidOutUsdt = (totalPaidOut * 0.01).toFixed(2);
+
+  const pendingCount = useMemo(() => {
+    return history.filter((req) => req.status === 'pending' || !req.status).length;
+  }, [history]);
+
   return (
     <div className="max-w-md mx-auto p-3 sm:p-4 pb-24 space-y-4 animate-fade-in">
       
@@ -285,7 +303,7 @@ export const MobileBankView: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Segmented Navigation Tabs: Terminal vs History */}
+      {/* 3. Primary Navigation Tabs: TERMINAL vs HISTORY */}
       <div className="sticky top-0 z-20 flex items-center bg-[#0d0e14]/95 backdrop-blur-md p-1 rounded-2xl border border-white/15 gap-1 shadow-[0_4px_20px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.08)]">
         {/* Terminal Tab */}
         <button
@@ -463,176 +481,235 @@ export const MobileBankView: React.FC = () => {
         </div>
       )}
 
-      {/* 5. Tab Content: HISTORY (Sub-filters: All, Incoming, Payouts) */}
+      {/* 5. Tab Content: HISTORY (Separated: INCOMING vs WITHDRAWALS) */}
       {activeTab === 'history' && (
         <div className="space-y-3">
           
-          {/* Sub-filter chips */}
-          <div className="flex gap-1.5 p-1 bg-black/40 rounded-xl border border-white/5">
+          {/* Sub-tab switcher: INCOMING vs WITHDRAWALS (50% / 50%, clean financial typography) */}
+          <div className="grid grid-cols-2 gap-1.5 p-1 bg-black/40 rounded-xl border border-white/5">
             <button
               type="button"
-              onClick={() => setHistoryFilter('all')}
-              className={`flex-1 py-1.5 rounded-lg text-[10px] font-mono font-bold uppercase transition-all ${
-                historyFilter === 'all'
-                  ? 'bg-amber-950/60 text-amber-200 border border-amber-500/40 shadow-sm'
-                  : 'text-gray-400 hover:text-white'
+              onClick={() => setHistoryTab('incoming')}
+              className={`py-2 px-2.5 rounded-lg text-[11px] font-display font-black tracking-wider uppercase transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                historyTab === 'incoming'
+                  ? 'bg-gradient-to-r from-amber-950/90 to-yellow-950/70 text-amber-200 border border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.3)]'
+                  : 'text-gray-400 hover:text-white bg-transparent'
               }`}
             >
-              All ({history.length + accrualEvents.length})
+              <ArrowDownLeft className={`w-3.5 h-3.5 shrink-0 ${historyTab === 'incoming' ? 'text-emerald-400' : 'text-gray-500'}`} />
+              <span>INCOMING</span>
+              <span className={`text-[9.5px] font-mono px-1.5 py-0.2 rounded-full font-bold ml-0.5 ${
+                historyTab === 'incoming' ? 'bg-amber-400/20 text-amber-200' : 'bg-white/5 text-gray-400'
+              }`}>
+                {accrualEvents.length}
+              </span>
             </button>
+
             <button
               type="button"
-              onClick={() => setHistoryFilter('accruals')}
-              className={`flex-1 py-1.5 rounded-lg text-[10px] font-mono font-bold uppercase transition-all ${
-                historyFilter === 'accruals'
-                  ? 'bg-amber-950/60 text-amber-200 border border-amber-500/40 shadow-sm'
-                  : 'text-gray-400 hover:text-white'
+              onClick={() => setHistoryTab('withdrawals')}
+              className={`py-2 px-2.5 rounded-lg text-[11px] font-display font-black tracking-wider uppercase transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                historyTab === 'withdrawals'
+                  ? 'bg-gradient-to-r from-cyan-950/90 to-blue-950/70 text-cyan-200 border border-cyan-500/50 shadow-[0_0_12px_rgba(6,182,212,0.3)]'
+                  : 'text-gray-400 hover:text-white bg-transparent'
               }`}
             >
-              ⚔️ Incoming ({accrualEvents.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setHistoryFilter('withdrawals')}
-              className={`flex-1 py-1.5 rounded-lg text-[10px] font-mono font-bold uppercase transition-all ${
-                historyFilter === 'withdrawals'
-                  ? 'bg-cyan-950/60 text-cyan-200 border border-cyan-500/40 shadow-sm'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              📤 Payouts ({history.length})
+              <ArrowUpRight className={`w-3.5 h-3.5 shrink-0 ${historyTab === 'withdrawals' ? 'text-cyan-400' : 'text-gray-500'}`} />
+              <span>WITHDRAWALS</span>
+              <span className={`text-[9.5px] font-mono px-1.5 py-0.2 rounded-full font-bold ml-0.5 ${
+                historyTab === 'withdrawals' ? 'bg-cyan-400/20 text-cyan-200' : 'bg-white/5 text-gray-400'
+              }`}>
+                {history.length}
+              </span>
             </button>
           </div>
 
-          {/* SECTION A: WITHDRAWAL REQUESTS (Shown in 'all' and 'withdrawals') */}
-          {(historyFilter === 'all' || historyFilter === 'withdrawals') && (
-            <div className="bg-[#141820] border border-white/10 rounded-2xl p-4 shadow-xl space-y-3">
-              <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-                <h3 className="font-display font-bold text-xs sm:text-sm text-white tracking-wider flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-gray-400" />
-                  WITHDRAWAL HISTORY
-                </h3>
-                <span className="text-[10px] font-mono text-gray-400">
-                  {history.length} requests
-                </span>
+          {/* VIEW 1: INCOMING STATISTICS & LIST */}
+          {historyTab === 'incoming' && (
+            <div className="space-y-3">
+              {/* Summary Statistics Card */}
+              <div className="grid grid-cols-2 gap-2 bg-gradient-to-r from-amber-950/30 via-black/50 to-amber-950/30 border border-amber-500/20 rounded-2xl p-3 text-center shadow-lg">
+                <div className="border-r border-white/5 pr-2">
+                  <span className="text-[9px] font-mono text-gray-400 uppercase tracking-wider block mb-0.5">
+                    Total Earned
+                  </span>
+                  <div className="flex items-center justify-center gap-1.5">
+                    <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3.5 h-3.5 object-contain" />
+                    <span className="font-mono font-black text-sm text-amber-300">
+                      +{totalEarned}
+                    </span>
+                    <span className="text-[10px] font-mono text-emerald-400 font-bold">
+                      (${totalEarnedUsdt})
+                    </span>
+                  </div>
+                </div>
+                <div className="pl-2">
+                  <span className="text-[9px] font-mono text-gray-400 uppercase tracking-wider block mb-0.5">
+                    Accrual Records
+                  </span>
+                  <span className="font-mono font-bold text-sm text-white">
+                    {accrualEvents.length} <span className="text-[10px] text-gray-400 font-normal">entries</span>
+                  </span>
+                </div>
               </div>
 
-              {history.length === 0 ? (
-                <div className="py-6 flex flex-col items-center justify-center text-center space-y-1.5 text-gray-400">
-                  <Coins className="w-8 h-8 text-gray-600 mb-1" />
-                  <span className="font-display font-bold text-xs text-gray-300">No Withdrawal Requests</span>
-                  <p className="text-[10.5px] text-gray-500 max-w-xs font-sans">
-                    Your submitted payout requests and transaction links will be tracked here.
-                  </p>
+              {/* Accruals List Container */}
+              <div className="bg-[#141820] border border-amber-500/20 rounded-2xl p-4 shadow-xl space-y-3">
+                <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                  <h3 className="font-display font-bold text-xs sm:text-sm text-amber-300 tracking-wider flex items-center gap-1.5">
+                    <TrendingUp className="w-4 h-4 text-amber-400" />
+                    ACCRUAL & INCOMING HISTORY
+                  </h3>
+                  <span className="text-[10px] font-mono text-gray-400">
+                    {accrualEvents.length} recorded
+                  </span>
                 </div>
-              ) : (
-                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-0.5">
-                  {history.map((req) => (
-                    <div key={req.id} className="bg-black/40 border border-white/5 rounded-xl p-2.5 space-y-1.5">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-1.5">
-                          <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3.5 h-3.5 object-contain" />
-                          <span className="font-mono font-bold text-amber-300 text-xs">{req.amountSovereigns} SOV</span>
-                          <span className="font-mono text-emerald-400 text-xs font-bold">(${req.amountUsdt} USDT)</span>
-                        </div>
-                        <span className={`text-[8.5px] font-mono font-bold px-2 py-0.5 rounded-full uppercase border ${
-                          req.status === 'completed' 
-                            ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300'
-                            : req.status === 'rejected'
-                            ? 'bg-red-950/60 border-red-500/40 text-red-300'
-                            : 'bg-amber-950/60 border-amber-500/40 text-amber-300 animate-pulse'
-                        }`}>
-                          {req.status === 'completed' ? '✓ Completed' : req.status === 'rejected' ? '✗ Rejected' : '⏳ Pending'}
-                        </span>
-                      </div>
 
-                      <div className="flex justify-between items-center text-[10px] font-mono text-gray-400">
-                        <span className="truncate max-w-[160px]">{req.walletAddress}</span>
-                        <span>{new Date(req.createdAt).toLocaleDateString()}</span>
-                      </div>
-
-                      {req.txHash && (
-                        <div className="pt-1 border-t border-white/5">
-                          <a 
-                            href={`https://solscan.io/tx/${req.txHash}`} 
-                            target="_blank" 
-                            rel="noreferrer" 
-                            className="text-[10px] font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
-                          >
-                            <ExternalLink className="w-3 h-3" />
-                            View Transaction on Solscan ↗
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* SECTION B: ACCRUAL & INCOMING HISTORY (Shown in 'all' and 'accruals') */}
-          {(historyFilter === 'all' || historyFilter === 'accruals') && (
-            <div className="bg-[#141820] border border-amber-500/20 rounded-2xl p-4 shadow-xl space-y-3">
-              <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-                <h3 className="font-display font-bold text-xs sm:text-sm text-amber-300 tracking-wider flex items-center gap-1.5">
-                  <TrendingUp className="w-4 h-4 text-amber-400" />
-                  ACCRUAL & INCOMING HISTORY
-                </h3>
-                <span className="text-[10px] font-mono text-gray-400">
-                  {accrualEvents.length} recorded
-                </span>
-              </div>
-
-              {accrualEvents.length === 0 ? (
-                <div className="py-6 flex flex-col items-center justify-center text-center space-y-1.5 text-gray-400">
-                  <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-8 h-8 object-contain opacity-30 mb-1" />
-                  <span className="font-display font-bold text-xs text-gray-300">No Accruals Yet</span>
-                  <p className="text-[10.5px] text-gray-500 max-w-xs font-sans">
-                    Blood Sovereigns earned from PvP duels, League Rollovers, or Mail Tributes will be recorded here.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-0.5">
-                  {accrualEvents.map((evt) => (
-                    <div key={evt.id} className="bg-black/40 border border-amber-500/15 hover:border-amber-500/30 rounded-xl p-2.5 space-y-1.5 transition-colors">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-lg bg-amber-950/60 border border-amber-500/30 flex items-center justify-center shrink-0">
-                            {evt.type === 'pvp' ? (
-                              <Swords className="w-3.5 h-3.5 text-amber-400" />
-                            ) : evt.type === 'league' ? (
-                              <Trophy className="w-3.5 h-3.5 text-yellow-400" />
-                            ) : (
-                              <Mail className="w-3.5 h-3.5 text-rose-400" />
-                            )}
+                {accrualEvents.length === 0 ? (
+                  <div className="py-8 flex flex-col items-center justify-center text-center space-y-1.5 text-gray-400">
+                    <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-8 h-8 object-contain opacity-30 mb-1" />
+                    <span className="font-display font-bold text-xs text-gray-300">No Accruals Yet</span>
+                    <p className="text-[10.5px] text-gray-500 max-w-xs font-sans">
+                      Blood Sovereigns earned from PvP duels, League Rollovers, or Mail Tributes will be recorded here.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-[360px] overflow-y-auto pr-0.5">
+                    {accrualEvents.map((evt) => (
+                      <div key={evt.id} className="bg-black/40 border border-amber-500/15 hover:border-amber-500/30 rounded-xl p-2.5 space-y-1.5 transition-colors">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-lg bg-amber-950/60 border border-amber-500/30 flex items-center justify-center shrink-0">
+                              {evt.type === 'pvp' ? (
+                                <Swords className="w-3.5 h-3.5 text-amber-400" />
+                              ) : evt.type === 'league' ? (
+                                <Trophy className="w-3.5 h-3.5 text-amber-300" />
+                              ) : (
+                                <Scroll className="w-3.5 h-3.5 text-amber-200" />
+                              )}
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-display font-bold text-[11px] text-white leading-tight">{evt.title}</span>
+                              <span className="text-[9.5px] text-gray-400 font-sans leading-tight line-clamp-1">{evt.description}</span>
+                            </div>
                           </div>
-                          <div className="flex flex-col">
-                            <span className="font-display font-bold text-[11px] text-white leading-tight">{evt.title}</span>
-                            <span className="text-[9.5px] text-gray-400 font-sans leading-tight line-clamp-1">{evt.description}</span>
+
+                          <div className="flex items-center gap-1 shrink-0 ml-2">
+                            <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3 h-3 object-contain" />
+                            <span className="font-mono font-black text-amber-300 text-xs">
+                              +{evt.amount} SOV
+                            </span>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1 shrink-0 ml-2">
-                          <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3 h-3 object-contain" />
-                          <span className="font-mono font-black text-amber-300 text-xs">
-                            +{evt.amount} SOV
+                        <div className="flex justify-between items-center text-[9.5px] font-mono text-gray-500 pt-1 border-t border-white/5">
+                          <span className="uppercase text-[8.5px] tracking-wider text-amber-500/80 font-bold">
+                            {evt.type === 'pvp' ? 'PvP Duel Win' : evt.type === 'league' ? 'League Season Rollover' : 'Imperial Decree'}
+                          </span>
+                          <span>
+                            {new Date(evt.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
                       </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
-                      <div className="flex justify-between items-center text-[9.5px] font-mono text-gray-500 pt-1 border-t border-white/5">
-                        <span className="uppercase text-[8.5px] tracking-wider text-amber-500/80 font-bold">
-                          {evt.type === 'pvp' ? 'PvP Duel Win' : evt.type === 'league' ? 'League Season Rollover' : 'Imperial Tribute'}
-                        </span>
-                        <span>
-                          {new Date(evt.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+          {/* VIEW 2: WITHDRAWALS STATISTICS & LIST */}
+          {historyTab === 'withdrawals' && (
+            <div className="space-y-3">
+              {/* Summary Statistics Card */}
+              <div className="grid grid-cols-2 gap-2 bg-gradient-to-r from-cyan-950/30 via-black/50 to-cyan-950/30 border border-cyan-500/20 rounded-2xl p-3 text-center shadow-lg">
+                <div className="border-r border-white/5 pr-2">
+                  <span className="text-[9px] font-mono text-gray-400 uppercase tracking-wider block mb-0.5">
+                    Total Paid Out
+                  </span>
+                  <div className="flex items-center justify-center gap-1.5">
+                    <span className="font-mono font-black text-sm text-cyan-300">
+                      {totalPaidOut} SOV
+                    </span>
+                    <span className="text-[10px] font-mono text-emerald-400 font-bold">
+                      (${totalPaidOutUsdt})
+                    </span>
+                  </div>
                 </div>
-              )}
+                <div className="pl-2">
+                  <span className="text-[9px] font-mono text-gray-400 uppercase tracking-wider block mb-0.5">
+                    Pending Requests
+                  </span>
+                  <span className={`font-mono font-bold text-sm ${pendingCount > 0 ? 'text-amber-300 font-black' : 'text-gray-400'}`}>
+                    {pendingCount} <span className="text-[10px] text-gray-400 font-normal">in review</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Withdrawals List Container */}
+              <div className="bg-[#141820] border border-white/10 rounded-2xl p-4 shadow-xl space-y-3">
+                <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                  <h3 className="font-display font-bold text-xs sm:text-sm text-white tracking-wider flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 text-cyan-400" />
+                    WITHDRAWAL HISTORY
+                  </h3>
+                  <span className="text-[10px] font-mono text-gray-400">
+                    {history.length} requests
+                  </span>
+                </div>
+
+                {history.length === 0 ? (
+                  <div className="py-8 flex flex-col items-center justify-center text-center space-y-1.5 text-gray-400">
+                    <Coins className="w-8 h-8 text-gray-600 mb-1" />
+                    <span className="font-display font-bold text-xs text-gray-300">No Withdrawal Requests</span>
+                    <p className="text-[10.5px] text-gray-500 max-w-xs font-sans">
+                      Your submitted payout requests and transaction links will be tracked here.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-[360px] overflow-y-auto pr-0.5">
+                    {history.map((req) => (
+                      <div key={req.id} className="bg-black/40 border border-white/5 rounded-xl p-2.5 space-y-1.5">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-1.5">
+                            <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3.5 h-3.5 object-contain" />
+                            <span className="font-mono font-bold text-amber-300 text-xs">{req.amountSovereigns} SOV</span>
+                            <span className="font-mono text-emerald-400 text-xs font-bold">(${req.amountUsdt} USDT)</span>
+                          </div>
+                          <span className={`text-[8.5px] font-mono font-bold px-2 py-0.5 rounded-full uppercase border ${
+                            req.status === 'completed' 
+                              ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300'
+                              : req.status === 'rejected'
+                              ? 'bg-red-950/60 border-red-500/40 text-red-300'
+                              : 'bg-amber-950/60 border-amber-500/40 text-amber-300 animate-pulse'
+                          }`}>
+                            {req.status === 'completed' ? '✓ Completed' : req.status === 'rejected' ? '✗ Rejected' : '⏳ Pending'}
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between items-center text-[10px] font-mono text-gray-400">
+                          <span className="truncate max-w-[160px]">{req.walletAddress}</span>
+                          <span>{new Date(req.createdAt).toLocaleDateString()}</span>
+                        </div>
+
+                        {req.txHash && (
+                          <div className="pt-1 border-t border-white/5">
+                            <a 
+                              href={`https://solscan.io/tx/${req.txHash}`} 
+                              target="_blank" 
+                              rel="noreferrer" 
+                              className="text-[10px] font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              View Transaction on Solscan ↗
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
