@@ -199,7 +199,7 @@ export const MobilePremiumPassView: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-xl mx-auto px-2 sm:px-4 py-3 sm:py-5 space-y-4 text-white font-sans">
+    <div className="max-w-xl mx-auto px-2 sm:px-4 pt-3 sm:pt-5 pb-32 sm:pb-36 space-y-4 text-white font-sans">
       
       {/* 1. Atmospheric Top Hero Showcase Banner (Responsive, No Clipping) */}
       <div className="relative rounded-2xl overflow-hidden border border-[#c5a880]/30 bg-gradient-to-b from-[#1c1524] via-[#100b17] to-[#08050c] p-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.85)]">
