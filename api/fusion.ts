@@ -3,7 +3,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
 const jwt = (jwtPkg as any).default || jwtPkg;
 import { createClient } from '@supabase/supabase-js';
-import { CARD_TEMPLATES, getEvolutionBonusSkill, getCardManaCost, getFusionCosts, sanitizeDeck } from './_shared/cards.js';
+import { CARD_TEMPLATES, getEvolutionBonusSkill, getCardManaCost, getFusionCosts, sanitizeDeck, getStarterDeck } from './_shared/cards.js';
 import { Card, CardTier, PlayerProfile } from './_shared/types.js';
 import { calculateEnergy } from './_shared/energyHelper.js';
 import { recordShardTransaction } from './_shared/shardLogger.js';
@@ -77,18 +77,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let oldUpdatedAt = profileRow ? profileRow.updated_at : null;
 
     if (!profileRow) {
+      const starterCards = getStarterDeck();
       profile = {
         gold: 1000,
         dust: 250,
         darkShards: 50,
-        collection: [
-          { id: 'c_starter_1', templateId: 's1_skeletal_warrior', name: 'Skeleton Warrior', tier: 'Common', attack: 4, health: 5, manaCost: 2, image: '/cards/skeleton_warrior.webp', count: 1, level: 1 },
-          { id: 'c_starter_2', templateId: 's1_grave_ghoul', name: 'Grave Ghoul', tier: 'Common', attack: 3, health: 6, manaCost: 2, image: '/cards/grave_ghoul.webp', count: 1, level: 1 },
-          { id: 'c_starter_3', templateId: 's1_bone_archer', name: 'Bone Archer', tier: 'Common', attack: 5, health: 3, manaCost: 2, image: '/cards/bone_archer.webp', count: 1, level: 1 },
-          { id: 'c_starter_4', templateId: 's1_plague_rat', name: 'Plague Rat', tier: 'Common', attack: 2, health: 4, manaCost: 1, image: '/cards/plague_rat.webp', count: 1, level: 1 },
-          { id: 'c_starter_5', templateId: 's1_dark_acolyte', name: 'Dark Acolyte', tier: 'Common', attack: 4, health: 4, manaCost: 2, image: '/cards/dark_acolyte.webp', count: 1, level: 1 }
-        ],
-        deck: ['c_starter_1', 'c_starter_2', 'c_starter_3', 'c_starter_4', 'c_starter_5'],
+        collection: starterCards,
+        deck: starterCards.map(c => c.id),
         pveEnergy: 5,
         pveEnergyMax: 5,
         pvpEnergy: 5,
