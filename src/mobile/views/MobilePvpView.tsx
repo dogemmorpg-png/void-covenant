@@ -803,17 +803,21 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                       READY FOR RANKED DUEL
                     </h3>
 
-                    {/* Integrated Peace Shield Indicator (Replaced "Season 1 Matchmaking...") */}
+                    {/* Integrated Peace Shield Indicator (2-row layout like PC version) */}
                     <div
                       onClick={() => setIsShieldModalOpen(true)}
-                      className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-xl border mt-1.5 cursor-pointer transition-all active:scale-95 select-none ${
+                      className={`group inline-flex items-center gap-2.5 px-2.5 py-1 rounded-xl border mt-1.5 cursor-pointer transition-all active:scale-95 select-none ${
                         shieldTimeLeft
-                          ? 'bg-emerald-950/80 border-emerald-500/60 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.25)]'
-                          : 'bg-black/60 border-white/15 text-gray-400 hover:border-purple-400/50 hover:text-purple-300'
+                          ? 'bg-gradient-to-r from-emerald-950/90 via-[#0a231b]/90 to-black/90 border-emerald-500/60 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                          : 'bg-gradient-to-r from-[#17131e]/90 via-[#100d16]/90 to-black/90 border-white/15 hover:border-purple-400/60'
                       }`}
                       title="Peace Shield Status"
                     >
-                      <div className="relative flex items-center justify-center shrink-0">
+                      <div className={`relative w-7 h-7 rounded-lg flex items-center justify-center border shrink-0 ${
+                        shieldTimeLeft
+                          ? 'bg-emerald-950/90 border-emerald-500/70 shadow-[0_0_10px_rgba(16,185,129,0.4)]'
+                          : 'bg-black/70 border-white/15'
+                      }`}>
                         <img 
                           src="/icons/shield_indicator.png" 
                           alt="" 
@@ -827,28 +831,37 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                         )}
                       </div>
 
-                      <span className="text-[9px] font-mono tracking-wider font-bold uppercase text-gray-400">
-                        PEACE SHIELD
-                      </span>
-                      <span className={`text-[7.5px] font-mono font-black px-1.5 py-0.2 rounded uppercase border ${
-                        shieldTimeLeft
-                          ? 'bg-emerald-950 border-emerald-500/60 text-emerald-300'
-                          : 'bg-rose-950/80 border-rose-500/40 text-rose-300'
-                      }`}>
-                        {shieldTimeLeft ? 'ACTIVE' : 'OFF'}
-                      </span>
+                      <div className="text-left">
+                        {/* Line 1: Label + Badge */}
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[8.5px] font-mono tracking-wider font-bold uppercase text-gray-400">
+                            PEACE SHIELD
+                          </span>
+                          <span className={`text-[7px] font-mono font-black px-1.5 py-0.2 rounded uppercase border ${
+                            shieldTimeLeft
+                              ? 'bg-emerald-950 border-emerald-500/60 text-emerald-300'
+                              : 'bg-rose-950/80 border-rose-500/40 text-rose-300'
+                          }`}>
+                            {shieldTimeLeft ? 'ACTIVE' : 'OFF'}
+                          </span>
+                        </div>
 
-                      <div className="font-mono font-black text-[10px] sm:text-[11px] flex items-center gap-1">
-                        {shieldTimeLeft ? (
-                          <span className="text-emerald-300 flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-emerald-400" />
-                            <span>{shieldTimeLeft}</span>
-                          </span>
-                        ) : (
-                          <span className="text-purple-400 underline">
-                            ACTIVATE →
-                          </span>
-                        )}
+                        {/* Line 2: Countdown or Action */}
+                        <div className="font-mono font-black text-[10.5px] sm:text-xs flex items-center gap-1 mt-0.5">
+                          {shieldTimeLeft ? (
+                            <span className="text-emerald-300 tracking-wider flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-emerald-400" />
+                              <span>{shieldTimeLeft}</span>
+                            </span>
+                          ) : (
+                            <span className="text-gray-400 group-hover:text-purple-300 transition-colors flex items-center gap-1">
+                              <span>UNPROTECTED</span>
+                              <span className="text-purple-400 font-mono uppercase underline ml-0.5">
+                                ACTIVATE →
+                              </span>
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
