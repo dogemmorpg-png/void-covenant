@@ -846,28 +846,25 @@ export const MobileCollectionView: React.FC = () => {
                 )}
               </div>
 
-              {/* Tier Filter Chips & Sort Select */}
-              <div className="flex items-center justify-between gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
-                <div className="flex items-center gap-1 shrink-0">
-                  {['all', 'divine', 'legendary', 'gold', 'silver', 'bronze'].map(t => (
-                    <button
-                      key={t}
-                      onClick={() => setTierFilter(t)}
-                      className={`px-2 py-0.5 rounded-lg font-mono text-[8px] sm:text-[9px] font-bold uppercase transition-all cursor-pointer ${
-                        tierFilter === t 
-                          ? 'bg-[#c5a880]/30 border border-[#c5a880] text-[#ebd09b] shadow' 
-                          : 'bg-black/40 border border-white/5 text-gray-400 hover:text-white'
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </div>
+              {/* Tier Filter & Sort Dropdowns */}
+              <div className="flex items-center gap-2 pt-0.5">
+                <select
+                  value={tierFilter}
+                  onChange={(e) => setTierFilter(e.target.value)}
+                  className="flex-1 bg-[#0b0c10] border border-[#c5a880]/30 rounded-xl py-1.5 px-2.5 text-[10px] sm:text-xs text-[#ebd09b] font-mono outline-none cursor-pointer"
+                >
+                  <option value="all">All tiers</option>
+                  <option value="divine">Divine</option>
+                  <option value="legendary">Legendary</option>
+                  <option value="gold">Gold</option>
+                  <option value="silver">Silver</option>
+                  <option value="bronze">Bronze</option>
+                </select>
 
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="bg-[#0b0c10] border border-[#c5a880]/30 rounded-lg py-0.5 px-2 text-[8.5px] sm:text-[9px] text-[#ebd09b] font-mono outline-none shrink-0"
+                  className="flex-1 bg-[#0b0c10] border border-[#c5a880]/30 rounded-xl py-1.5 px-2.5 text-[10px] sm:text-xs text-[#ebd09b] font-mono outline-none cursor-pointer"
                 >
                   <option value="level">Sort: Level</option>
                   <option value="attack">Sort: ATK</option>
@@ -1087,29 +1084,67 @@ export const MobileCollectionView: React.FC = () => {
 
               return (
                 <div className={`grid ${shardsCost > 0 ? 'grid-cols-3' : 'grid-cols-2'} gap-2 text-center mb-3`}>
-                  <div className="bg-black/50 border border-purple-950 p-1.5 rounded-xl">
-                    <span className="text-[8px] text-gray-500 block font-mono">Gold Cost</span>
-                    <span className={`font-mono text-[11px] font-bold ${profile.gold >= goldCost ? 'text-amber-400' : 'text-red-500'}`}>
-                      {goldCost} / {profile.gold}
-                    </span>
+                  <div className="bg-black/50 border border-purple-950 p-2 rounded-xl">
+                    <span className="text-[8.5px] text-gray-500 block font-mono">Gold Cost</span>
+                    <div className="flex items-center justify-center gap-1 font-mono text-[11.5px] font-bold mt-0.5">
+                      <span className={profile.gold >= goldCost ? 'text-amber-400' : 'text-red-500'}>
+                        {goldCost} / {profile.gold}
+                      </span>
+                      <img 
+                        src="/icons/icon_gold.webp" 
+                        alt="Gold" 
+                        className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" 
+                      />
+                    </div>
                   </div>
-                  <div className="bg-black/50 border border-purple-950 p-1.5 rounded-xl">
-                    <span className="text-[8px] text-gray-500 block font-mono">Dust Cost</span>
-                    <span className={`font-mono text-[11px] font-bold ${profile.dust >= dustCost ? 'text-cyan-300' : 'text-red-500'}`}>
-                      {dustCost} / {profile.dust}
-                    </span>
+                  <div className="bg-black/50 border border-purple-950 p-2 rounded-xl">
+                    <span className="text-[8.5px] text-gray-500 block font-mono">Dust Cost</span>
+                    <div className="flex items-center justify-center gap-1 font-mono text-[11.5px] font-bold mt-0.5">
+                      <span className={profile.dust >= dustCost ? 'text-cyan-300' : 'text-red-500'}>
+                        {dustCost} / {profile.dust}
+                      </span>
+                      <img 
+                        src="/icons/icon_dust.webp" 
+                        alt="Dust" 
+                        className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" 
+                      />
+                    </div>
                   </div>
                   {shardsCost > 0 && (
-                    <div className="bg-black/50 border border-purple-950 p-1.5 rounded-xl">
-                      <span className="text-[8px] text-gray-500 block font-mono">Shards</span>
-                      <span className={`font-mono text-[11px] font-bold ${(profile.darkShards || 0) >= shardsCost ? 'text-purple-400' : 'text-red-500'}`}>
-                        {shardsCost} / {profile.darkShards || 0}
-                      </span>
+                    <div className="bg-black/50 border border-purple-950 p-2 rounded-xl">
+                      <span className="text-[8.5px] text-gray-500 block font-mono">Shards</span>
+                      <div className="flex items-center justify-center gap-1 font-mono text-[11.5px] font-bold mt-0.5">
+                        <span className={(profile.darkShards || 0) >= shardsCost ? 'text-purple-400' : 'text-red-500'}>
+                          {shardsCost} / {profile.darkShards || 0}
+                        </span>
+                        <img 
+                          src="/icons/icon_shards.webp" 
+                          alt="Shards" 
+                          className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]" 
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
               );
-            })() : null}
+            })() : (
+              <div className="grid grid-cols-2 gap-2 text-center mb-3">
+                <div className="bg-black/50 border border-purple-950 p-2 rounded-xl">
+                  <span className="text-[8.5px] text-gray-500 block font-mono">Gold Cost</span>
+                  <div className="flex items-center justify-center gap-1 font-mono text-[11.5px] font-bold text-amber-400 mt-0.5">
+                    <span>-</span>
+                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain opacity-60" />
+                  </div>
+                </div>
+                <div className="bg-black/50 border border-purple-950 p-2 rounded-xl">
+                  <span className="text-[8.5px] text-gray-500 block font-mono">Dust Cost</span>
+                  <div className="flex items-center justify-center gap-1 font-mono text-[11.5px] font-bold text-cyan-300 mt-0.5">
+                    <span>-</span>
+                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 object-contain opacity-60" />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="space-y-1.5">
