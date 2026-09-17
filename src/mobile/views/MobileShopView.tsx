@@ -17,6 +17,7 @@ import {
   Check,
   Zap,
   ChevronRight,
+  ChevronLeft,
   Flame,
   Skull,
   Award
@@ -392,7 +393,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
   ];
 
   return (
-    <div className="h-full w-full flex flex-col bg-[#07090e] text-gray-200 select-none overflow-y-auto no-scrollbar font-sans pb-28">
+    <div className="h-full w-full flex flex-col bg-[#07090e] text-gray-200 select-none overflow-y-auto no-scrollbar font-sans pb-36">
       
       {/* 1. STICKY TOP 3x2 CATEGORY MATRIX (ZERO HORIZONTAL SCROLL, ZERO TEXT TRUNCATION) */}
       <div className="sticky top-0 z-30 bg-[#07090e]/95 backdrop-blur-md border-b border-white/10 p-2 shrink-0">
@@ -803,8 +804,18 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
             void_reaper: 'Seraph',
           };
 
+          const currentIndex = divineCards.findIndex(c => c.baseId === currentDeity.baseId);
+          const handlePrevDeity = () => {
+            const prevIdx = (currentIndex - 1 + divineCards.length) % divineCards.length;
+            setSelectedDeityId(divineCards[prevIdx].baseId);
+          };
+          const handleNextDeity = () => {
+            const nextIdx = (currentIndex + 1) % divineCards.length;
+            setSelectedDeityId(divineCards[nextIdx].baseId);
+          };
+
           return (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               
               {/* 3 Deity Switcher Chips (Clean, zero truncation) */}
               <div className="grid grid-cols-3 gap-1.5">
@@ -817,14 +828,14 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                     <button
                       key={card.baseId}
                       onClick={() => setSelectedDeityId(card.baseId)}
-                      className={`h-9 rounded-xl border flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      className={`h-8 min-[380px]:h-8.5 rounded-xl border flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                         isSelected
                           ? 'bg-gradient-to-r from-rose-950 via-[#26050d] to-rose-950 border-rose-400 text-white shadow-[0_0_12px_rgba(244,63,94,0.45)] scale-[1.02]'
                           : 'bg-black/60 border-white/10 text-gray-400 hover:text-gray-200'
                       }`}
                     >
-                      <Crown className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-amber-400' : 'text-gray-500'}`} />
-                      <span className="font-display font-black text-xs uppercase tracking-wider">
+                      <Crown className={`w-3 h-3 shrink-0 ${isSelected ? 'text-amber-400' : 'text-gray-500'}`} />
+                      <span className="font-display font-black text-[11px] uppercase tracking-wider">
                         {shortName}
                       </span>
                       {isOwned && (
@@ -835,33 +846,49 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 })}
               </div>
 
-              {/* Majestic Divine Card Frame */}
-              <div className="bg-gradient-to-b from-[#200910] via-[#14050a] to-black border-2 border-rose-500/60 rounded-2xl p-3.5 shadow-2xl space-y-3 relative overflow-hidden">
+              {/* Majestic Divine Card Frame (Tailored to fit mobile viewport without cut-off) */}
+              <div className="bg-gradient-to-b from-[#200910] via-[#14050a] to-black border-2 border-rose-500/60 rounded-2xl p-2.5 min-[380px]:p-3 shadow-2xl space-y-2 relative overflow-hidden">
                 
-                {/* Large Portrait with Gothic Ambient Overlay */}
-                <div className="relative h-52 min-[380px]:h-56 rounded-xl overflow-hidden border border-rose-400/40 bg-black/80 shadow-inner">
-                  <img src={currentDeity.image} alt={currentDeity.name} className="w-full h-full object-cover" />
+                {/* Balanced Portrait with Carousel Arrows */}
+                <div className="relative h-36 min-[380px]:h-40 rounded-xl overflow-hidden border border-rose-400/40 bg-black/80 shadow-inner">
+                  <img src={currentDeity.image} alt={currentDeity.name} className="w-full h-full object-cover object-top" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-black/35 pointer-events-none" />
 
+                  {/* Left / Right Nav Arrows on Portrait */}
+                  <button
+                    type="button"
+                    onClick={handlePrevDeity}
+                    className="absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white/80 hover:text-white flex items-center justify-center text-xs backdrop-blur-sm z-20 cursor-pointer active:scale-90 transition-all"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNextDeity}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white/80 hover:text-white flex items-center justify-center text-xs backdrop-blur-sm z-20 cursor-pointer active:scale-90 transition-all"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+
                   {/* Top Badges */}
-                  <div className="absolute top-2 left-2 right-2 flex justify-between items-center z-10">
-                    <span className="px-2.5 py-0.5 rounded-lg font-mono text-[9px] uppercase font-black tracking-wider bg-gradient-to-r from-red-950 to-rose-900 border border-rose-400 text-rose-300 shadow-[0_0_10px_rgba(244,63,94,0.6)]">
+                  <div className="absolute top-1.5 left-2 right-2 flex justify-between items-center z-10 pointer-events-none">
+                    <span className="px-2 py-0.5 rounded-lg font-mono text-[8px] min-[380px]:text-[8.5px] uppercase font-black tracking-wider bg-gradient-to-r from-red-950 to-rose-900 border border-rose-400 text-rose-300 shadow-[0_0_10px_rgba(244,63,94,0.6)]">
                       DIVINE ENTITY
                     </span>
                     <div className="flex items-center gap-1.5">
-                      {renderManaIcon(getCardManaCost(currentDeity), "w-6 h-6")}
-                      <div className="bg-black/80 border border-rose-400/40 rounded-lg px-2 py-0.5 text-[10px] font-mono font-bold text-blue-300 backdrop-blur-sm shadow flex items-center gap-1">
+                      {renderManaIcon(getCardManaCost(currentDeity), "w-5 h-5")}
+                      <div className="bg-black/80 border border-rose-400/40 rounded-lg px-1.5 py-0.2 text-[9px] font-mono font-bold text-blue-300 backdrop-blur-sm shadow flex items-center gap-1">
                         <span>⏳</span> {currentDeity.delay}
                       </div>
                     </div>
                   </div>
 
                   {/* Bottom ATK and HP */}
-                  <div className="absolute bottom-2.5 left-2.5 right-2.5 flex justify-between items-center z-10">
-                    <div className="bg-black/85 border border-red-500/70 rounded-xl px-3 py-1 text-xs font-mono font-black text-red-400 shadow-lg backdrop-blur-sm flex items-center gap-1">
+                  <div className="absolute bottom-1.5 left-2 right-2 flex justify-between items-center z-10 pointer-events-none">
+                    <div className="bg-black/85 border border-red-500/70 rounded-lg px-2.5 py-0.5 text-[11px] font-mono font-black text-red-400 shadow-lg backdrop-blur-sm flex items-center gap-1">
                       <span>⚔️</span> {currentDeity.attack}
                     </div>
-                    <div className="bg-black/85 border border-emerald-500/70 rounded-xl px-3 py-1 text-xs font-mono font-black text-emerald-400 shadow-lg backdrop-blur-sm flex items-center gap-1">
+                    <div className="bg-black/85 border border-emerald-500/70 rounded-lg px-2.5 py-0.5 text-[11px] font-mono font-black text-emerald-400 shadow-lg backdrop-blur-sm flex items-center gap-1">
                       <span>❤️</span> {currentDeity.health}
                     </div>
                   </div>
@@ -870,40 +897,40 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 {/* Name, Lore and Owned Count */}
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <h3 className="font-display font-black text-base min-[380px]:text-lg text-white leading-tight tracking-wide">
+                    <h3 className="font-display font-black text-sm min-[380px]:text-base text-white leading-tight tracking-wide">
                       {currentDeity.name}
                     </h3>
-                    <p className="text-[11px] text-gray-300 font-sans mt-0.5 leading-snug">
+                    <p className="text-[10px] text-gray-300 font-sans mt-0.5 leading-tight line-clamp-2">
                       {currentDeity.description}
                     </p>
                   </div>
                   {ownedCount > 0 && (
-                    <span className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 text-[9px] font-mono px-2 py-0.5 rounded-full font-bold shrink-0">
+                    <span className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 text-[8.5px] font-mono px-2 py-0.5 rounded-full font-bold shrink-0">
                       OWNED: {ownedCount}
                     </span>
                   )}
                 </div>
 
                 {/* Divine Skills Box */}
-                <div className="bg-black/70 border border-white/10 rounded-xl p-2.5 space-y-1.5">
-                  <div className="text-[9px] font-mono uppercase font-bold text-rose-400 tracking-wider flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-rose-400" /> DIVINE SKILLS
+                <div className="bg-black/70 border border-white/10 rounded-xl p-2 space-y-1">
+                  <div className="text-[8.5px] font-mono uppercase font-bold text-rose-400 tracking-wider flex items-center gap-1">
+                    <Sparkles className="w-2.5 h-2.5 text-rose-400" /> DIVINE SKILLS
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     {currentDeity.skills.map((skill, sIdx) => (
-                      <div key={sIdx} className="text-[10px] leading-snug flex items-start gap-1">
+                      <div key={sIdx} className="text-[9.5px] leading-snug flex items-start gap-1">
                         <span className="font-mono font-bold text-rose-300 uppercase shrink-0">[{skill.type} {skill.value}]</span>
-                        <span className="text-gray-300">{skill.description}</span>
+                        <span className="text-gray-300 line-clamp-1">{skill.description}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Wide Invocation Button */}
+                {/* Wide Invocation Button (Always 100% visible) */}
                 <button
                   disabled={isBuyingThis}
                   onClick={() => buyDivineCard(currentDeity.baseId)}
-                  className="w-full h-12 bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 hover:brightness-110 active:scale-[0.98] text-white font-display font-black tracking-widest text-xs uppercase rounded-xl shadow-[0_0_20px_rgba(244,63,94,0.5)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 transition-all"
+                  className="w-full h-10 min-[380px]:h-11 bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 hover:brightness-110 active:scale-[0.98] text-white font-display font-black tracking-wider text-xs uppercase rounded-xl shadow-[0_0_20px_rgba(244,63,94,0.5)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 transition-all"
                 >
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow" />
                   <span>{isBuyingThis ? 'INVOKING DIVINE POWER...' : 'SUMMON ENTITY • 50 SHARDS'}</span>
@@ -1027,7 +1054,10 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                           {itemOwned ? (
                             <span className="bg-emerald-950 border border-emerald-500/60 text-emerald-400 px-1 rounded text-[7.5px] font-black">✓</span>
                           ) : (
-                            <span className="text-amber-400">50🔷</span>
+                            <div className="flex items-center gap-0.5 text-rose-300 font-mono font-bold text-[8px] bg-black/70 border border-rose-500/40 px-1.5 py-0.2 rounded">
+                              <img src="/icons/icon_shards.webp" alt="Shards" className="w-2.5 h-2.5 object-contain inline" />
+                              <span>50</span>
+                            </div>
                           )}
                         </div>
 
@@ -1108,27 +1138,82 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 </button>
               </div>
 
-              {/* Resonance Bonuses */}
-              <div className="bg-black/70 border border-rose-500/30 rounded-2xl p-2.5 space-y-1.5">
-                <div className="text-[9px] font-mono text-rose-300 uppercase font-bold tracking-wider flex items-center justify-between">
-                  <span className="flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-amber-400" /> SET RESONANCE BONUSES
+              {/* Resonance Bonuses (Full-Width Milestone Cards with 100% Data Parity) */}
+              <div className="bg-gradient-to-b from-[#1c080e] via-[#100408] to-black border-2 border-rose-500/40 rounded-2xl p-3 shadow-xl space-y-2">
+                <div className="flex items-center justify-between pb-1.5 border-b border-rose-500/20">
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="font-display font-black text-xs text-white uppercase tracking-wider">
+                      SET RESONANCE BONUSES
+                    </span>
+                  </div>
+                  <span className="text-[9px] font-mono font-bold text-rose-300 bg-rose-950 border border-rose-500/50 px-2 py-0.5 rounded-full">
+                    {ownedDemiurgeCount}/6 Owned
                   </span>
-                  <span>{ownedDemiurgeCount}/6 Owned</span>
                 </div>
-                <div className="grid grid-cols-3 gap-1.5 text-[9px] font-mono">
-                  <div className={`p-1.5 rounded-lg border text-center ${ownedDemiurgeCount >= 2 ? 'bg-rose-950/80 border-rose-400 text-emerald-300 shadow' : 'bg-white/5 border-white/10 text-gray-500'}`}>
-                    <span className="font-black block text-[8px] uppercase">2 Pieces</span>
-                    +30 HP, +5% Dodge
-                  </div>
-                  <div className={`p-1.5 rounded-lg border text-center ${ownedDemiurgeCount >= 4 ? 'bg-rose-950/80 border-rose-400 text-amber-300 shadow' : 'bg-white/5 border-white/10 text-gray-500'}`}>
-                    <span className="font-black block text-[8px] uppercase">4 Pieces</span>
-                    -1 Turn Delay
-                  </div>
-                  <div className={`p-1.5 rounded-lg border text-center ${ownedDemiurgeCount >= 6 ? 'bg-rose-950/80 border-rose-400 text-purple-300 shadow' : 'bg-white/5 border-white/10 text-gray-500'}`}>
-                    <span className="font-black block text-[8px] uppercase">6 Pieces</span>
-                    +1 Mana, +3 ATK
-                  </div>
+
+                {/* 6 Pieces progress bar dots */}
+                <div className="flex items-center gap-1.5 py-0.5">
+                  {[1, 2, 3, 4, 5, 6].map((step) => (
+                    <div
+                      key={step}
+                      className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                        ownedDemiurgeCount >= step
+                          ? 'bg-gradient-to-r from-rose-500 to-amber-400 shadow-[0_0_8px_rgba(244,63,94,0.8)]'
+                          : 'bg-black/60 border border-white/10'
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {/* 3 Milestone Threshold Cards */}
+                <div className="space-y-1.5 pt-1">
+                  {DEMIURGE_SET.thresholds.map((threshold, tIdx) => {
+                    const isActive = ownedDemiurgeCount >= threshold.pieces;
+                    return (
+                      <div
+                        key={tIdx}
+                        className={`rounded-xl p-2.5 border transition-all duration-300 ${
+                          isActive
+                            ? 'bg-gradient-to-r from-rose-950/90 via-[#270710]/90 to-rose-950/80 border-rose-400/90 shadow-[0_0_12px_rgba(244,63,94,0.35)] ring-1 ring-rose-400/40'
+                            : 'bg-black/50 border-white/10 opacity-70'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-1 mb-1">
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              className={`w-4 h-4 rounded text-[8.5px] font-mono font-black flex items-center justify-center ${
+                                isActive ? 'bg-gradient-to-br from-rose-500 to-amber-500 text-black font-bold shadow' : 'bg-white/10 text-gray-400'
+                              }`}
+                            >
+                              {threshold.pieces}
+                            </span>
+                            <span
+                              className={`text-[9.5px] font-mono font-black uppercase tracking-wider ${
+                                isActive ? 'text-rose-200' : 'text-gray-400'
+                              }`}
+                            >
+                              {threshold.label} {threshold.pieces === 6 ? '(FULL SET)' : ''}
+                            </span>
+                          </div>
+
+                          {isActive ? (
+                            <span className="text-[7.5px] font-mono font-black text-rose-300 bg-rose-950 border border-rose-500/70 px-1.5 py-0.2 rounded-full flex items-center gap-1 shadow-[0_0_6px_rgba(244,63,94,0.6)]">
+                              <Check className="w-2.5 h-2.5 text-emerald-400" /> ACTIVE
+                            </span>
+                          ) : (
+                            <span className="text-[7.5px] font-mono text-rose-300/70 bg-black/50 border border-white/10 px-1.5 py-0.2 rounded-full">
+                              {threshold.pieces - ownedDemiurgeCount} more needed
+                            </span>
+                          )}
+                        </div>
+
+                        <p className={`text-[10px] font-sans leading-snug ${isActive ? 'text-rose-100 font-medium' : 'text-gray-400'}`}>
+                          {threshold.description}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
