@@ -628,82 +628,84 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
             Duel other summoners across the realm, climb the PvP leagues, and claim glorious victory rewards.
           </p>
 
-          {/* Row 2: Horizontal Stats Bar (Exact PC layout matching Screenshot 4) */}
-          <div className="flex items-center justify-between bg-[#11141a]/95 backdrop-blur-md border border-white/10 rounded-2xl p-2 px-3 shadow-inner overflow-x-auto no-scrollbar gap-2 sm:gap-4">
+          {/* Row 2: Comprehensive Stats Card (Zero horizontal scrolling; League, Rank & Resources 100% visible) */}
+          <div className="bg-[#11141a]/95 backdrop-blur-md border border-white/10 rounded-2xl p-2 sm:p-2.5 shadow-inner flex flex-col gap-1.5">
             
-            {/* CROWNS */}
-            <div className="text-center shrink-0 min-w-[55px]">
-              <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold block">CROWNS</span>
-              <div className="font-mono text-xs sm:text-sm font-black text-amber-400 flex items-center justify-center gap-1 mt-0.5">
-                <img src="/icons/crown.png" alt="" className="w-3.5 h-3.5 object-contain" />
-                <span>{profile.pvpLP || 0}</span>
-              </div>
-            </div>
-
-            <div className="w-px h-6 bg-white/10 shrink-0" />
-
-            {/* DAILY SOV */}
-            <div className="text-center shrink-0 min-w-[65px]">
-              <span className="text-[8.5px] font-mono text-amber-400 uppercase tracking-wider font-bold block">DAILY SOV</span>
-              <div className="font-mono text-xs sm:text-sm font-black text-amber-300 flex items-center justify-center gap-1 mt-0.5">
-                <img src="/icons/icon_sovereign.webp" alt="" className="w-3.5 h-3.5 object-contain" />
-                <span>{wonToday}/{sovCap}</span>
-              </div>
-            </div>
-
-            <div className="w-px h-6 bg-white/10 shrink-0" />
-
-            {/* ARENA TICKETS */}
-            <div className="text-center shrink-0 min-w-[115px] flex flex-col items-center">
-              <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold block">ARENA TICKETS</span>
-              <div className="flex items-center justify-center gap-1.5 mt-0.5">
-                <div className="font-mono text-xs sm:text-sm font-black text-rose-400 flex items-center gap-1">
-                  <img src="/icons/ticket.png" alt="" className="w-3.5 h-3.5 object-contain" />
-                  <span>{myTickets}/{pvpEnergyMax}</span>
-                  {(profile.pvpBonusTickets || 0) > 0 && (
-                    <span className="text-[8.5px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-500/50 px-1 py-0.2 rounded">
-                      +{profile.pvpBonusTickets}
-                    </span>
-                  )}
-                </div>
-                <button
-                  onClick={() => setIsBuyTicketsModalOpen(true)}
-                  className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-rose-950/80 border border-rose-500/50 text-rose-200 text-[9px] font-mono font-bold hover:text-white transition-all active:scale-95 cursor-pointer"
-                >
-                  <Plus className="w-2.5 h-2.5" />
-                  <span>BUY</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="w-px h-6 bg-white/10 shrink-0" />
-
-            {/* MY LEAGUE */}
-            <div className="text-center shrink-0 min-w-[85px] flex flex-col items-center">
-              <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold block">MY LEAGUE</span>
-              <div className="flex items-center gap-1 mt-0.5">
-                <img src={league.icon} alt="" className="w-4 h-4 object-contain" />
-                <span className={`font-display font-black text-[10px] sm:text-xs uppercase tracking-wider ${league.accent}`}>
-                  {league.name}
+            {/* Tier 1: League & Rank Standing (Full width, no horizontal scroll) */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-1.5 px-0.5">
+              <div className="flex items-center gap-2 min-w-0">
+                <img src={league.icon} alt="" className="w-5 h-5 object-contain shrink-0" />
+                <span className={`font-display font-black text-xs sm:text-sm uppercase tracking-wider truncate ${league.accent}`}>
+                  {league.name} LEAGUE
                 </span>
               </div>
+
+              {/* Rank Pill with VIP / Ultra pass jewel badge */}
+              <div className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-xl border shrink-0 ${
+                mySubTier === 'ultra' 
+                  ? 'bg-purple-950/60 border-purple-500/60 shadow-[0_0_12px_rgba(168,85,247,0.35)] text-purple-200' 
+                  : mySubTier === 'premium' 
+                  ? 'bg-amber-950/50 border-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.3)] text-amber-200' 
+                  : 'bg-black/60 border-white/15 text-gray-200'
+              }`}>
+                <span className="text-[8.5px] font-mono uppercase font-bold text-gray-400">
+                  MY RANK
+                </span>
+                <span className="font-mono text-xs sm:text-sm font-black text-white">
+                  #{myOwnLeagueRank || 1}
+                </span>
+                {mySubTier === 'ultra' && <span className="text-xs">💎</span>}
+                {mySubTier === 'premium' && <span className="text-xs">⚜️</span>}
+              </div>
             </div>
 
-            <div className="w-px h-6 bg-white/10 shrink-0" />
+            {/* Tier 2: 3 Core Resources (3 equal balanced columns, fits perfectly in 360px) */}
+            <div className="grid grid-cols-3 divide-x divide-white/10 text-center items-center">
+              {/* CROWNS */}
+              <div className="px-1">
+                <span className="text-[8px] sm:text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold block">
+                  CROWNS
+                </span>
+                <div className="font-mono text-xs sm:text-sm font-black text-amber-400 flex items-center justify-center gap-1 mt-0.5">
+                  <img src="/icons/crown.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                  <span>{profile.pvpLP || 0}</span>
+                </div>
+              </div>
 
-            {/* MY RANK */}
-            <div className={`text-center px-2 py-0.5 rounded-xl shrink-0 min-w-[65px] ${
-              mySubTier === 'ultra' ? 'bg-purple-950/40 border border-purple-500/50 shadow-[0_0_10px_rgba(168,85,247,0.3)]' :
-              mySubTier === 'premium' ? 'bg-amber-950/35 border border-amber-500/45 shadow-[0_0_10px_rgba(245,158,11,0.25)]' :
-              ''
-            }`}>
-              <span className="text-[8.5px] font-mono text-gray-400 uppercase font-bold flex items-center justify-center gap-0.5">
-                <span>MY RANK</span>
-                {mySubTier === 'ultra' && <span>💎</span>}
-                {mySubTier === 'premium' && <span>⚜️</span>}
-              </span>
-              <div className="font-mono text-xs sm:text-sm font-black text-white mt-0.5">
-                #{myOwnLeagueRank || 1}
+              {/* DAILY SOV */}
+              <div className="px-1">
+                <span className="text-[8px] sm:text-[8.5px] font-mono text-amber-400 uppercase tracking-wider font-bold block">
+                  DAILY SOV
+                </span>
+                <div className="font-mono text-xs sm:text-sm font-black text-amber-300 flex items-center justify-center gap-1 mt-0.5">
+                  <img src="/icons/icon_sovereign.webp" alt="" className="w-3.5 h-3.5 object-contain" />
+                  <span>{wonToday}/{sovCap}</span>
+                </div>
+              </div>
+
+              {/* ARENA TICKETS */}
+              <div className="px-1 flex flex-col items-center">
+                <span className="text-[8px] sm:text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold block">
+                  TICKETS
+                </span>
+                <div className="flex items-center justify-center gap-1 mt-0.5">
+                  <div className="font-mono text-xs sm:text-sm font-black text-rose-400 flex items-center gap-1">
+                    <img src="/icons/ticket.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                    <span>{myTickets}/{pvpEnergyMax}</span>
+                    {(profile.pvpBonusTickets || 0) > 0 && (
+                      <span className="text-[8px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-500/50 px-1 py-0.2 rounded">
+                        +{profile.pvpBonusTickets}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setIsBuyTicketsModalOpen(true)}
+                    className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-rose-950/80 border border-rose-500/50 text-rose-200 text-[8.5px] font-mono font-bold hover:text-white transition-all active:scale-95 cursor-pointer shrink-0"
+                  >
+                    <Plus className="w-2.5 h-2.5" />
+                    <span>BUY</span>
+                  </button>
+                </div>
               </div>
             </div>
 
