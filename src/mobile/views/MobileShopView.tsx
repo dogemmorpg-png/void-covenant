@@ -31,19 +31,19 @@ interface MobileShopViewProps {
 const renderManaIcon = (cost: number, sizeClass: string = "w-4 h-4") => {
   return (
     <div className={`relative ${sizeClass} shrink-0 flex items-center justify-center`}>
-      <svg className="absolute inset-0 w-full h-full filter drop-shadow-[0_0_4px_rgba(6,182,212,0.85)]" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2L4 7v10l8 5 8-5V7l-8-5z" fill="url(#manaCrystalGradMobileShopV2)" stroke="#66fcf1" strokeWidth="1.5" />
+      <svg className="absolute inset-0 w-full h-full filter drop-shadow-[0_0_5px_rgba(6,182,212,0.85)]" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L4 7v10l8 5 8-5V7l-8-5z" fill="url(#manaCrystalGradShopV3)" stroke="#66fcf1" strokeWidth="1.5" />
         <path d="M12 2L4 7l8 5 8-5-8-5z" fill="#66fcf1" opacity="0.35" />
         <path d="M4 7v10l8 5V12L4 7z" fill="#00d2ff" opacity="0.55" />
         <path d="M20 7v10l8 5V12L20 7z" fill="#005299" opacity="0.75" />
         <defs>
-          <radialGradient id="manaCrystalGradMobileShopV2" cx="50%" cy="50%" r="50%">
+          <radialGradient id="manaCrystalGradShopV3" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="#00f0ff" />
             <stop offset="100%" stopColor="#0033aa" />
           </radialGradient>
         </defs>
       </svg>
-      <span className="relative text-white text-[9.5px] font-black font-mono leading-none z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.95)]">
+      <span className="relative text-white text-[9.5px] font-black font-mono leading-none z-10 drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.95)]">
         {cost}
       </span>
     </div>
@@ -81,7 +81,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
   const [revealedEquipment, setRevealedEquipment] = useState<Equipment[]>([]);
   const [isRevealed, setIsRevealed] = useState(false);
 
-  // Pantheon active deity selection for single-screen focus
+  // Pantheon active deity selection
   const divineCards = CARD_TEMPLATES.filter(c => c.tier === 'divine');
   const [selectedDeityId, setSelectedDeityId] = useState<string>(divineCards[0]?.baseId || 'void_sovereign');
 
@@ -336,73 +336,65 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
     setIsRevealed(false);
   };
 
-  // 6 Categories structured in a 3x2 grid (Zero horizontal scrolling!)
+  // 6 Categories in a sleek 3x2 grid with zero text cut-off
   const CATEGORIES: {
     id: MobileShopCategory;
     name: string;
-    badge?: string;
     icon: string;
     activeBg: string;
     activeBorder: string;
-    iconGlow: string;
+    badge?: string;
   }[] = [
     {
       id: 'boosters',
       name: 'BOOSTERS',
       icon: '/packs/pack_obsidian.webp',
       activeBg: 'from-[#0d2a3a] to-[#06161f]',
-      activeBorder: 'border-cyan-400 text-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.4)]',
-      iconGlow: 'drop-shadow-[0_0_6px_rgba(6,182,212,0.8)]'
+      activeBorder: 'border-cyan-400 text-cyan-200 shadow-[0_0_14px_rgba(6,182,212,0.4)]',
     },
     {
       id: 'chests',
       name: 'CHESTS',
       icon: '/packs/chest_premium.webp',
       activeBg: 'from-[#2a1040] to-[#140620]',
-      activeBorder: 'border-purple-400 text-purple-200 shadow-[0_0_12px_rgba(168,85,247,0.4)]',
-      iconGlow: 'drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]'
+      activeBorder: 'border-purple-400 text-purple-200 shadow-[0_0_14px_rgba(168,85,247,0.4)]',
     },
     {
       id: 'pantheon',
       name: 'PANTHEON',
-      badge: '3',
       icon: '/icons/crown.png',
       activeBg: 'from-[#2e1909] to-[#170a03]',
-      activeBorder: 'border-amber-400 text-amber-200 shadow-[0_0_12px_rgba(245,158,11,0.4)]',
-      iconGlow: 'drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]'
+      activeBorder: 'border-amber-400 text-amber-200 shadow-[0_0_14px_rgba(245,158,11,0.4)]',
     },
     {
       id: 'demiurge',
       name: 'DEMIURGE',
-      badge: `${ownedDemiurgeCount}/6`,
       icon: '/icons/equipment/demiurge_crest.png',
       activeBg: 'from-[#300a16] to-[#180309]',
-      activeBorder: 'border-rose-400 text-rose-200 shadow-[0_0_12px_rgba(244,63,94,0.4)]',
-      iconGlow: 'drop-shadow-[0_0_6px_rgba(244,63,94,0.8)]'
+      activeBorder: 'border-rose-400 text-rose-200 shadow-[0_0_14px_rgba(244,63,94,0.4)]',
+      badge: `${ownedDemiurgeCount}/6`
     },
     {
       id: 'shields',
       name: 'SHIELDS',
       icon: '/icons/shield_indicator.png',
       activeBg: 'from-[#0d2c20] to-[#061811]',
-      activeBorder: 'border-emerald-400 text-emerald-200 shadow-[0_0_12px_rgba(16,185,129,0.4)]',
-      iconGlow: 'drop-shadow-[0_0_6px_rgba(16,185,129,0.8)]'
+      activeBorder: 'border-emerald-400 text-emerald-200 shadow-[0_0_14px_rgba(16,185,129,0.4)]',
     },
     {
       id: 'level_boost',
       name: 'BOOST',
-      badge: 'VIP',
       icon: '/shop/ascension_sigil.png',
       activeBg: 'from-[#2d1808] to-[#160a03]',
-      activeBorder: 'border-amber-400 text-yellow-200 shadow-[0_0_12px_rgba(245,158,11,0.45)]',
-      iconGlow: 'drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]'
+      activeBorder: 'border-amber-400 text-yellow-200 shadow-[0_0_14px_rgba(245,158,11,0.45)]',
+      badge: 'VIP'
     },
   ];
 
   return (
-    <div className="h-full w-full flex flex-col bg-[#07090e] text-gray-200 select-none overflow-y-auto no-scrollbar font-sans pb-24">
+    <div className="h-full w-full flex flex-col bg-[#07090e] text-gray-200 select-none overflow-y-auto no-scrollbar font-sans pb-28">
       
-      {/* 1. STICKY TOP 3x2 CATEGORY MATRIX (100% VISIBLE AT A GLANCE, ZERO HORIZONTAL SCROLL) */}
+      {/* 1. STICKY TOP 3x2 CATEGORY MATRIX (ZERO HORIZONTAL SCROLL, ZERO TEXT TRUNCATION) */}
       <div className="sticky top-0 z-30 bg-[#07090e]/95 backdrop-blur-md border-b border-white/10 p-2 shrink-0">
         <div className="grid grid-cols-3 gap-1.5">
           {CATEGORIES.map((cat) => {
@@ -411,7 +403,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`h-9 min-[380px]:h-10 px-2 rounded-xl border transition-all duration-150 flex items-center justify-center gap-1.5 cursor-pointer relative overflow-hidden ${
+                className={`h-9 min-[380px]:h-10 px-1.5 rounded-xl border transition-all duration-150 flex items-center justify-center gap-1.5 cursor-pointer relative overflow-hidden ${
                   isActive
                     ? `bg-gradient-to-r ${cat.activeBg} ${cat.activeBorder} font-black scale-[1.02] z-10`
                     : 'bg-black/60 border-white/10 text-gray-400 hover:text-gray-200 hover:bg-white/5 active:scale-95'
@@ -420,13 +412,13 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 <img
                   src={cat.icon}
                   alt={cat.name}
-                  className={`w-4 h-4 min-[380px]:w-4.5 min-[380px]:h-4.5 object-contain shrink-0 ${isActive ? cat.iconGlow : 'opacity-70'}`}
+                  className={`w-4 h-4 object-contain shrink-0 ${isActive ? 'drop-shadow-[0_0_6px_rgba(255,255,255,0.7)]' : 'opacity-70'}`}
                 />
-                <span className="font-display text-[10px] min-[380px]:text-[11px] tracking-wider uppercase truncate">
+                <span className="font-display text-[9.5px] min-[370px]:text-[10px] min-[400px]:text-[11px] tracking-wider uppercase">
                   {cat.name}
                 </span>
                 {cat.badge && (
-                  <span className={`text-[7.5px] min-[380px]:text-[8px] font-mono px-1 py-0.2 rounded font-bold shrink-0 ${
+                  <span className={`text-[7px] min-[380px]:text-[7.5px] font-mono px-1 py-0.2 rounded font-bold shrink-0 ${
                     isActive ? 'bg-black/70 border border-white/30 text-white' : 'bg-white/10 text-gray-400'
                   }`}>
                     {cat.badge}
@@ -438,344 +430,483 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
         </div>
       </div>
 
-      {/* 2. MAIN CATEGORY CONTENT (HIGH INFORMATION DENSITY, MINIMAL VERTICAL SCROLL) */}
-      <div className="p-2.5 min-[380px]:p-3 space-y-2.5">
+      {/* 2. MAIN CATEGORY SHOWCASE */}
+      <div className="p-2.5 min-[380px]:p-3 space-y-3">
         
-        {/* ===================== 1. BOOSTERS (CARD PACKS) ===================== */}
+        {/* ===================== 1. BOOSTERS (FULL AAA SHOWCASE CARDS) ===================== */}
         {activeCategory === 'boosters' && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             
             {/* 1. Bronze Booster */}
-            <div className="bg-gradient-to-r from-[#1a1208] via-[#110c05] to-black border border-amber-600/50 hover:border-amber-500 rounded-2xl p-2.5 flex items-center justify-between gap-2.5 shadow-lg relative overflow-hidden">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-14 h-14 min-[380px]:w-16 min-[380px]:h-16 rounded-xl bg-gradient-to-b from-amber-950/40 to-black border border-amber-600/40 flex items-center justify-center p-1 relative shrink-0">
-                  <img src="/packs/pack_bronze.webp" alt="Bronze" className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+            <div className="bg-gradient-to-b from-[#1c130a] via-[#100b05] to-[#080502] border-2 border-amber-600/60 rounded-2xl p-3 shadow-xl relative overflow-hidden space-y-2.5">
+              {/* Top Meta Line */}
+              <div className="flex items-center justify-between">
+                <span className="text-[9px] font-mono font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                  COMMON SUMMON
+                </span>
+                <span className="bg-amber-950/90 border border-amber-600/50 px-2 py-0.5 rounded text-[8px] font-mono text-amber-300 font-bold">
+                  TIER I
+                </span>
+              </div>
+
+              {/* Middle Section: Large 3D Art + Detailed Stats */}
+              <div className="flex items-center gap-3">
+                {/* 3D Pack Art Box */}
+                <div className="w-24 h-24 min-[380px]:w-26 min-[380px]:h-26 rounded-xl bg-gradient-to-b from-amber-950/40 via-black/60 to-black border border-amber-600/40 flex flex-col items-center justify-center p-1 relative shrink-0 shadow-inner">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.25),transparent_70%)]" />
+                  <img src="/packs/pack_bronze.webp" alt="Bronze Pack" className="w-20 h-20 min-[380px]:w-22 min-[380px]:h-22 object-contain relative z-10 drop-shadow-[0_0_12px_rgba(245,158,11,0.6)]" />
+                  <span className="absolute bottom-1 px-1.5 py-0.2 rounded-full bg-black/80 border border-amber-500/50 text-[7px] font-display font-black text-amber-300 uppercase tracking-wider z-20">
+                    BRONZE PACK
+                  </span>
                 </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <h3 className="font-display font-black text-xs min-[380px]:text-sm text-white uppercase truncate">
+
+                {/* Info & Rarity Table */}
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div>
+                    <h3 className="font-display font-black text-sm min-[380px]:text-base text-white uppercase leading-tight">
                       Bronze Booster
                     </h3>
-                    <span className="text-[7.5px] font-mono font-bold bg-amber-950 text-amber-300 border border-amber-600/40 px-1 rounded shrink-0">
-                      TIER I
-                    </span>
+                    <p className="text-[10px] text-gray-400 font-sans leading-tight mt-0.5">
+                      Recruit starter units & build battle presence.
+                    </p>
                   </div>
-                  <p className="text-[10px] text-gray-400 font-sans truncate mt-0.5">3 Cards • Common Units</p>
-                  <div className="flex items-center gap-1.5 mt-1 text-[9px] font-mono">
-                    <span className="text-amber-400 bg-amber-950/60 px-1 py-0.2 rounded border border-amber-600/30">90% Bronze</span>
-                    <span className="text-slate-300 bg-slate-900/60 px-1 py-0.2 rounded border border-slate-600/30">10% Silver</span>
+
+                  {/* Clean Drop Rates Box */}
+                  <div className="bg-black/65 border border-white/10 rounded-xl p-2 text-[10px] font-mono space-y-1">
+                    <div className="flex justify-between items-center text-gray-300">
+                      <span className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
+                        Common (Bronze):
+                      </span>
+                      <span className="text-amber-400 font-bold bg-amber-950/60 px-1.5 py-0.2 rounded border border-amber-600/40">90%</span>
+                    </div>
+                    <div className="flex justify-between items-center text-gray-300">
+                      <span className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                        Rare (Silver):
+                      </span>
+                      <span className="text-slate-300 font-bold bg-slate-900/60 px-1.5 py-0.2 rounded border border-slate-600/40">10%</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
+              {/* Big Solid Tactile Buy Button */}
               <button
                 onClick={() => buyPackBackend('bronze')}
-                className="shrink-0 h-11 px-3 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-600 hover:brightness-110 active:scale-95 text-black font-display font-black text-[11px] min-[380px]:text-xs tracking-wider uppercase flex flex-col items-center justify-center shadow-md cursor-pointer transition-all"
+                className="w-full h-11 bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:brightness-110 active:scale-[0.98] text-black font-display font-black text-xs tracking-widest uppercase rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.35)] flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
-                <div className="flex items-center gap-1">
-                  <img src="/icons/icon_gold.webp" alt="Gold" className="w-3.5 h-3.5 object-contain" />
-                  <span>1,000</span>
-                </div>
-                <span className="text-[8px] font-mono leading-none text-black/80 font-bold">GOLD</span>
+                <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain drop-shadow" />
+                <span>SUMMON • 1,000 GOLD</span>
               </button>
             </div>
 
             {/* 2. Obsidian Booster */}
-            <div className="bg-gradient-to-r from-[#091b26] via-[#051119] to-black border border-cyan-500/50 hover:border-cyan-400 rounded-2xl p-2.5 flex items-center justify-between gap-2.5 shadow-lg relative overflow-hidden">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-14 h-14 min-[380px]:w-16 min-[380px]:h-16 rounded-xl bg-gradient-to-b from-cyan-950/40 to-black border border-cyan-500/40 flex items-center justify-center p-1 relative shrink-0">
-                  <img src="/packs/pack_obsidian.webp" alt="Obsidian" className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]" />
+            <div className="bg-gradient-to-b from-[#0a1e2b] via-[#051119] to-[#02070b] border-2 border-cyan-500/60 rounded-2xl p-3 shadow-xl relative overflow-hidden space-y-2.5">
+              {/* Top Meta Line */}
+              <div className="flex items-center justify-between">
+                <span className="text-[9px] font-mono font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                  ELITE SUMMON
+                </span>
+                <span className="bg-cyan-950/90 border border-cyan-500/50 px-2 py-0.5 rounded text-[8px] font-mono text-cyan-300 font-bold">
+                  TIER II
+                </span>
+              </div>
+
+              {/* Middle Section: Large 3D Art + Detailed Stats */}
+              <div className="flex items-center gap-3">
+                {/* 3D Pack Art Box */}
+                <div className="w-24 h-24 min-[380px]:w-26 min-[380px]:h-26 rounded-xl bg-gradient-to-b from-cyan-950/40 via-black/60 to-black border border-cyan-500/40 flex flex-col items-center justify-center p-1 relative shrink-0 shadow-inner">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.25),transparent_70%)]" />
+                  <img src="/packs/pack_obsidian.webp" alt="Obsidian Pack" className="w-20 h-20 min-[380px]:w-22 min-[380px]:h-22 object-contain relative z-10 drop-shadow-[0_0_12px_rgba(6,182,212,0.6)]" />
+                  <span className="absolute bottom-1 px-1.5 py-0.2 rounded-full bg-black/80 border border-cyan-400/50 text-[7px] font-display font-black text-cyan-300 uppercase tracking-wider z-20">
+                    OBSIDIAN PACK
+                  </span>
                 </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <h3 className="font-display font-black text-xs min-[380px]:text-sm text-white uppercase truncate">
+
+                {/* Info & Rarity Table */}
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div>
+                    <h3 className="font-display font-black text-sm min-[380px]:text-base text-white uppercase leading-tight">
                       Obsidian Booster
                     </h3>
-                    <span className="text-[7.5px] font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-500/40 px-1 rounded shrink-0">
-                      TIER II
-                    </span>
+                    <p className="text-[10px] text-gray-400 font-sans leading-tight mt-0.5">
+                      Infused with void energy. High rare fighter rate.
+                    </p>
                   </div>
-                  <p className="text-[10px] text-gray-400 font-sans truncate mt-0.5">3 Cards • High Silver Rate</p>
-                  <div className="flex items-center gap-1.5 mt-1 text-[9px] font-mono">
-                    <span className="text-slate-300 bg-slate-900/60 px-1 py-0.2 rounded border border-slate-500/30">70% Silver</span>
-                    <span className="text-amber-400 bg-amber-950/60 px-1 py-0.2 rounded border border-amber-500/30">30% Gold</span>
-                    <span className="text-cyan-300 font-bold bg-cyan-950/80 px-1 py-0.2 rounded border border-cyan-500/40">25% L2</span>
+
+                  {/* Clean Drop Rates Box */}
+                  <div className="bg-black/65 border border-white/10 rounded-xl p-2 text-[10px] font-mono space-y-1">
+                    <div className="flex justify-between items-center text-gray-300">
+                      <span className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                        Silver: 70%
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                        Gold: 30%
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center pt-1 border-t border-white/10 text-cyan-300 font-bold">
+                      <span>Level 2 Chance:</span>
+                      <span className="bg-cyan-950/80 px-1.5 py-0.2 rounded border border-cyan-400/40">25%</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
+              {/* Big Solid Tactile Buy Button */}
               <button
                 onClick={() => buyPackBackend('obsidian')}
-                className="shrink-0 h-11 px-3 rounded-xl bg-gradient-to-r from-cyan-950 via-[#0a303d] to-cyan-950 hover:brightness-125 active:scale-95 text-cyan-200 border border-cyan-400/70 font-display font-black text-[11px] min-[380px]:text-xs tracking-wider uppercase flex flex-col items-center justify-center shadow-md cursor-pointer transition-all"
+                className="w-full h-11 bg-gradient-to-r from-cyan-950 via-[#0a3545] to-cyan-950 hover:brightness-125 active:scale-[0.98] text-cyan-200 border border-cyan-400/80 font-display font-black text-xs tracking-widest uppercase rounded-xl shadow-[0_0_15px_rgba(6,182,212,0.35)] flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
-                <div className="flex items-center gap-1">
-                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
-                  <span>30</span>
-                </div>
-                <span className="text-[8px] font-mono leading-none text-cyan-300 font-bold">SHARDS</span>
+                <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                <span>SUMMON • 30 SHARDS</span>
               </button>
             </div>
 
             {/* 3. Abyssal Lord Pack */}
-            <div className="bg-gradient-to-r from-[#240810] via-[#14040a] to-black border border-rose-500/60 hover:border-rose-400 rounded-2xl p-2.5 flex items-center justify-between gap-2.5 shadow-lg relative overflow-hidden">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-14 h-14 min-[380px]:w-16 min-[380px]:h-16 rounded-xl bg-gradient-to-b from-rose-950/40 to-black border border-rose-500/40 flex items-center justify-center p-1 relative shrink-0">
-                  <img src="/packs/pack_abyssal.webp" alt="Abyssal" className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(244,63,94,0.6)]" />
+            <div className="bg-gradient-to-b from-[#260711] via-[#150309] to-[#090104] border-2 border-rose-500/70 rounded-2xl p-3 shadow-xl relative overflow-hidden space-y-2.5">
+              {/* Top Meta Line */}
+              <div className="flex items-center justify-between">
+                <span className="text-[9px] font-mono font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+                  FORBIDDEN SUMMON
+                </span>
+                <span className="bg-rose-950/90 border border-rose-500/50 px-2 py-0.5 rounded text-[8px] font-mono text-rose-300 font-bold">
+                  TIER III
+                </span>
+              </div>
+
+              {/* Middle Section: Large 3D Art + Detailed Stats */}
+              <div className="flex items-center gap-3">
+                {/* 3D Pack Art Box */}
+                <div className="w-24 h-24 min-[380px]:w-26 min-[380px]:h-26 rounded-xl bg-gradient-to-b from-rose-950/40 via-black/60 to-black border border-rose-500/40 flex flex-col items-center justify-center p-1 relative shrink-0 shadow-inner">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(244,63,94,0.3),transparent_70%)]" />
+                  <img src="/packs/pack_abyssal.webp" alt="Abyssal Pack" className="w-20 h-20 min-[380px]:w-22 min-[380px]:h-22 object-contain relative z-10 drop-shadow-[0_0_14px_rgba(244,63,94,0.7)]" />
+                  <span className="absolute bottom-1 px-1.5 py-0.2 rounded-full bg-black/80 border border-rose-500/50 text-[7px] font-display font-black text-rose-300 uppercase tracking-wider z-20">
+                    ABYSSAL PACK
+                  </span>
                 </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <h3 className="font-display font-black text-xs min-[380px]:text-sm text-white uppercase truncate">
+
+                {/* Info & Rarity Table */}
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div>
+                    <h3 className="font-display font-black text-sm min-[380px]:text-base text-white uppercase leading-tight">
                       Abyssal Lord Pack
                     </h3>
-                    <span className="text-[7.5px] font-mono font-bold bg-rose-950 text-rose-300 border border-rose-500/50 px-1 rounded shrink-0">
-                      TIER III
-                    </span>
+                    <p className="text-[10px] text-gray-400 font-sans leading-tight mt-0.5">
+                      Primordial summon. Elite Gold & Legendary cards.
+                    </p>
                   </div>
-                  <p className="text-[10px] text-gray-400 font-sans truncate mt-0.5">3 Cards • Gold & Legendary</p>
-                  <div className="flex items-center gap-1.5 mt-1 text-[9px] font-mono">
-                    <span className="text-amber-400 bg-amber-950/60 px-1 py-0.2 rounded border border-amber-500/30">55% Gold</span>
-                    <span className="text-purple-300 bg-purple-950/60 px-1 py-0.2 rounded border border-purple-500/30">15% Leg</span>
-                    <span className="text-rose-300 font-bold bg-rose-950/80 px-1 py-0.2 rounded border border-rose-500/40">30% L2</span>
+
+                  {/* Clean Drop Rates Box */}
+                  <div className="bg-black/65 border border-white/10 rounded-xl p-2 text-[10px] font-mono space-y-1">
+                    <div className="flex justify-between items-center text-gray-300 text-[9.5px]">
+                      <span>Silver: 30%</span>
+                      <span className="text-amber-400">Gold: 55%</span>
+                      <span className="text-purple-300 font-bold">Leg: 15%</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-1 border-t border-white/10 text-rose-300 font-bold">
+                      <span>Level 2 Chance:</span>
+                      <span className="bg-rose-950/80 px-1.5 py-0.2 rounded border border-rose-500/40">30%</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
+              {/* Big Solid Tactile Buy Button */}
               <button
                 onClick={() => buyPackBackend('abyssal')}
-                className="shrink-0 h-11 px-3 rounded-xl bg-gradient-to-r from-rose-950 via-red-900 to-rose-950 hover:brightness-125 active:scale-95 text-white border border-rose-500/70 font-display font-black text-[11px] min-[380px]:text-xs tracking-wider uppercase flex flex-col items-center justify-center shadow-md cursor-pointer transition-all"
+                className="w-full h-11 bg-gradient-to-r from-rose-950 via-red-900 to-rose-950 hover:brightness-125 active:scale-[0.98] text-white border border-rose-500/80 font-display font-black text-xs tracking-widest uppercase rounded-xl shadow-[0_0_18px_rgba(244,63,94,0.4)] flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
-                <div className="flex items-center gap-1">
-                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
-                  <span>70</span>
-                </div>
-                <span className="text-[8px] font-mono leading-none text-rose-200 font-bold">SHARDS</span>
+                <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                <span>SUMMON • 70 SHARDS</span>
               </button>
             </div>
 
           </div>
         )}
 
-        {/* ===================== 2. CHESTS (RELIC EQUIPMENT) ===================== */}
+        {/* ===================== 2. CHESTS (FULL AAA SHOWCASE CARDS) ===================== */}
         {activeCategory === 'chests' && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             
             {/* 1. Basic Chest */}
-            <div className="bg-gradient-to-r from-[#1a1208] via-[#110c05] to-black border border-amber-600/50 hover:border-amber-500 rounded-2xl p-2.5 flex items-center justify-between gap-2.5 shadow-lg relative overflow-hidden">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-14 h-14 min-[380px]:w-16 min-[380px]:h-16 rounded-xl bg-gradient-to-b from-amber-950/40 to-black border border-amber-600/40 flex items-center justify-center p-1 relative shrink-0">
-                  <img src="/packs/chest_basic.webp" alt="Basic Chest" className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+            <div className="bg-gradient-to-b from-[#1c130a] via-[#100b05] to-[#080502] border-2 border-amber-600/60 rounded-2xl p-3 shadow-xl relative overflow-hidden space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[9px] font-mono font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                  STANDARD RELICS
+                </span>
+                <span className="bg-amber-950/90 border border-amber-600/50 px-2 py-0.5 rounded text-[8px] font-mono text-amber-300 font-bold">
+                  RANK I
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="w-24 h-24 min-[380px]:w-26 min-[380px]:h-26 rounded-xl bg-gradient-to-b from-amber-950/40 via-black/60 to-black border border-amber-600/40 flex flex-col items-center justify-center p-1 relative shrink-0 shadow-inner">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.25),transparent_70%)]" />
+                  <img src="/packs/chest_basic.webp" alt="Basic Chest" className="w-20 h-20 min-[380px]:w-22 min-[380px]:h-22 object-contain relative z-10 drop-shadow-[0_0_12px_rgba(245,158,11,0.6)]" />
+                  <span className="absolute bottom-1 px-1.5 py-0.2 rounded-full bg-black/80 border border-amber-500/50 text-[7px] font-display font-black text-amber-300 uppercase tracking-wider z-20">
+                    BASIC RELICS
+                  </span>
                 </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <h3 className="font-display font-black text-xs min-[380px]:text-sm text-white uppercase truncate">
-                      Basic Relic Chest
+
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div>
+                    <h3 className="font-display font-black text-sm min-[380px]:text-base text-white uppercase leading-tight">
+                      Basic Equipment Chest
                     </h3>
-                    <span className="text-[7.5px] font-mono font-bold bg-amber-950 text-amber-300 border border-amber-600/40 px-1 rounded shrink-0">
-                      RANK I
-                    </span>
+                    <p className="text-[10px] text-gray-400 font-sans leading-tight mt-0.5">
+                      1 Lord Relic • Essential starting equipment.
+                    </p>
                   </div>
-                  <p className="text-[10px] text-gray-400 font-sans truncate mt-0.5">1 Lord Relic • Starter Gear</p>
-                  <div className="flex items-center gap-1.5 mt-1 text-[9px] font-mono">
-                    <span className="text-amber-400 bg-amber-950/60 px-1 py-0.2 rounded border border-amber-600/30">80% Bronze</span>
-                    <span className="text-slate-300 bg-slate-900/60 px-1 py-0.2 rounded border border-slate-600/30">20% Silver</span>
+
+                  <div className="bg-black/65 border border-white/10 rounded-xl p-2 text-[10px] font-mono space-y-1">
+                    <div className="flex justify-between items-center text-gray-300">
+                      <span>Bronze Equipment:</span>
+                      <span className="text-amber-400 font-bold bg-amber-950/60 px-1.5 py-0.2 rounded border border-amber-600/40">80%</span>
+                    </div>
+                    <div className="flex justify-between items-center text-gray-300">
+                      <span>Silver Equipment:</span>
+                      <span className="text-slate-300 font-bold bg-slate-900/60 px-1.5 py-0.2 rounded border border-slate-600/40">20%</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <button
                 onClick={() => buyPackBackend('eq_basic', true)}
-                className="shrink-0 h-11 px-3 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-600 hover:brightness-110 active:scale-95 text-black font-display font-black text-[11px] min-[380px]:text-xs tracking-wider uppercase flex flex-col items-center justify-center shadow-md cursor-pointer transition-all"
+                className="w-full h-11 bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:brightness-110 active:scale-[0.98] text-black font-display font-black text-xs tracking-widest uppercase rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.35)] flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
-                <div className="flex items-center gap-1">
-                  <img src="/icons/icon_gold.webp" alt="Gold" className="w-3.5 h-3.5 object-contain" />
-                  <span>700</span>
-                </div>
-                <span className="text-[8px] font-mono leading-none text-black/80 font-bold">GOLD</span>
+                <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain drop-shadow" />
+                <span>FORGE RELIC • 700 GOLD</span>
               </button>
             </div>
 
             {/* 2. Rare Chest */}
-            <div className="bg-gradient-to-r from-[#091824] via-[#051019] to-black border border-cyan-500/50 hover:border-cyan-400 rounded-2xl p-2.5 flex items-center justify-between gap-2.5 shadow-lg relative overflow-hidden">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-14 h-14 min-[380px]:w-16 min-[380px]:h-16 rounded-xl bg-gradient-to-b from-cyan-950/40 to-black border border-cyan-500/40 flex items-center justify-center p-1 relative shrink-0">
-                  <img src="/packs/chest_rare.webp" alt="Rare Chest" className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]" />
+            <div className="bg-gradient-to-b from-[#0a1e2b] via-[#051119] to-[#02070b] border-2 border-cyan-500/60 rounded-2xl p-3 shadow-xl relative overflow-hidden space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[9px] font-mono font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                  ARCANE CACHE
+                </span>
+                <span className="bg-cyan-950/90 border border-cyan-500/50 px-2 py-0.5 rounded text-[8px] font-mono text-cyan-300 font-bold">
+                  RANK II
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="w-24 h-24 min-[380px]:w-26 min-[380px]:h-26 rounded-xl bg-gradient-to-b from-cyan-950/40 via-black/60 to-black border border-cyan-500/40 flex flex-col items-center justify-center p-1 relative shrink-0 shadow-inner">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.25),transparent_70%)]" />
+                  <img src="/packs/chest_rare.webp" alt="Rare Chest" className="w-20 h-20 min-[380px]:w-22 min-[380px]:h-22 object-contain relative z-10 drop-shadow-[0_0_12px_rgba(6,182,212,0.6)]" />
+                  <span className="absolute bottom-1 px-1.5 py-0.2 rounded-full bg-black/80 border border-cyan-400/50 text-[7px] font-display font-black text-cyan-300 uppercase tracking-wider z-20">
+                    RARE RELICS
+                  </span>
                 </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <h3 className="font-display font-black text-xs min-[380px]:text-sm text-white uppercase truncate">
-                      Rare Relic Chest
+
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div>
+                    <h3 className="font-display font-black text-sm min-[380px]:text-base text-white uppercase leading-tight">
+                      Rare Equipment Chest
                     </h3>
-                    <span className="text-[7.5px] font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-500/40 px-1 rounded shrink-0">
-                      RANK II
-                    </span>
+                    <p className="text-[10px] text-gray-400 font-sans leading-tight mt-0.5">
+                      1 Lord Relic • Enchanted Silver & Gold gear.
+                    </p>
                   </div>
-                  <p className="text-[10px] text-gray-400 font-sans truncate mt-0.5">1 Lord Relic • Enchanted Armaments</p>
-                  <div className="flex items-center gap-1.5 mt-1 text-[9px] font-mono">
-                    <span className="text-cyan-300 bg-cyan-950/60 px-1 py-0.2 rounded border border-cyan-500/30">50% Silver</span>
-                    <span className="text-amber-400 bg-amber-950/60 px-1 py-0.2 rounded border border-amber-500/30">10% Gold</span>
+
+                  <div className="bg-black/65 border border-white/10 rounded-xl p-2 text-[10px] font-mono space-y-1">
+                    <div className="flex justify-between items-center text-gray-300">
+                      <span>Bronze: 40%</span>
+                      <span className="text-cyan-300 font-bold">Silver: 50%</span>
+                      <span className="text-amber-400 font-bold">Gold: 10%</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <button
                 onClick={() => buyPackBackend('eq_rare', true)}
-                className="shrink-0 h-11 px-3 rounded-xl bg-gradient-to-r from-cyan-950 via-[#0a303d] to-cyan-950 hover:brightness-125 active:scale-95 text-cyan-200 border border-cyan-400/70 font-display font-black text-[11px] min-[380px]:text-xs tracking-wider uppercase flex flex-col items-center justify-center shadow-md cursor-pointer transition-all"
+                className="w-full h-11 bg-gradient-to-r from-cyan-950 via-[#0a3545] to-cyan-950 hover:brightness-125 active:scale-[0.98] text-cyan-200 border border-cyan-400/80 font-display font-black text-xs tracking-widest uppercase rounded-xl shadow-[0_0_15px_rgba(6,182,212,0.35)] flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
-                <div className="flex items-center gap-1">
-                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
-                  <span>30</span>
-                </div>
-                <span className="text-[8px] font-mono leading-none text-cyan-300 font-bold">SHARDS</span>
+                <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                <span>FORGE RELIC • 30 SHARDS</span>
               </button>
             </div>
 
             {/* 3. Premium Chest */}
-            <div className="bg-gradient-to-r from-[#21092a] via-[#14051a] to-black border border-purple-500/60 hover:border-purple-400 rounded-2xl p-2.5 flex items-center justify-between gap-2.5 shadow-lg relative overflow-hidden">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-14 h-14 min-[380px]:w-16 min-[380px]:h-16 rounded-xl bg-gradient-to-b from-purple-950/40 to-black border border-purple-500/40 flex items-center justify-center p-1 relative shrink-0">
-                  <img src="/packs/chest_premium.webp" alt="Premium Chest" className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(168,85,247,0.6)]" />
+            <div className="bg-gradient-to-b from-[#260711] via-[#150309] to-[#090104] border-2 border-purple-500/70 rounded-2xl p-3 shadow-xl relative overflow-hidden space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[9px] font-mono font-bold text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+                  IMPERIAL HOARD
+                </span>
+                <span className="bg-purple-950/90 border border-purple-500/50 px-2 py-0.5 rounded text-[8px] font-mono text-purple-300 font-bold">
+                  RANK III
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="w-24 h-24 min-[380px]:w-26 min-[380px]:h-26 rounded-xl bg-gradient-to-b from-purple-950/40 via-black/60 to-black border border-purple-500/40 flex flex-col items-center justify-center p-1 relative shrink-0 shadow-inner">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.3),transparent_70%)]" />
+                  <img src="/packs/chest_premium.webp" alt="Premium Chest" className="w-20 h-20 min-[380px]:w-22 min-[380px]:h-22 object-contain relative z-10 drop-shadow-[0_0_14px_rgba(168,85,247,0.7)]" />
+                  <span className="absolute bottom-1 px-1.5 py-0.2 rounded-full bg-black/80 border border-purple-500/50 text-[7px] font-display font-black text-purple-300 uppercase tracking-wider z-20">
+                    PREMIUM RELICS
+                  </span>
                 </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <h3 className="font-display font-black text-xs min-[380px]:text-sm text-white uppercase truncate">
-                      Premium Relic Chest
+
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div>
+                    <h3 className="font-display font-black text-sm min-[380px]:text-base text-white uppercase leading-tight">
+                      Premium Equipment Chest
                     </h3>
-                    <span className="text-[7.5px] font-mono font-bold bg-purple-950 text-purple-300 border border-purple-500/50 px-1 rounded shrink-0">
-                      RANK III
-                    </span>
+                    <p className="text-[10px] text-gray-400 font-sans leading-tight mt-0.5">
+                      1 Lord Relic • Epic & Legendary tier gear.
+                    </p>
                   </div>
-                  <p className="text-[10px] text-gray-400 font-sans truncate mt-0.5">1 Lord Relic • Epic & Legendary</p>
-                  <div className="flex items-center gap-1.5 mt-1 text-[9px] font-mono">
-                    <span className="text-cyan-300 bg-cyan-950/60 px-1 py-0.2 rounded border border-cyan-500/30">60% Silv</span>
-                    <span className="text-amber-400 bg-amber-950/60 px-1 py-0.2 rounded border border-amber-500/30">35% Gold</span>
-                    <span className="text-purple-300 bg-purple-950/60 px-1 py-0.2 rounded border border-purple-500/30 font-bold">5% Leg</span>
+
+                  <div className="bg-black/65 border border-white/10 rounded-xl p-2 text-[10px] font-mono space-y-1">
+                    <div className="flex justify-between items-center text-gray-300">
+                      <span>Silver: 60%</span>
+                      <span className="text-amber-400 font-bold">Gold: 35%</span>
+                      <span className="text-purple-300 font-bold">Leg: 5%</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <button
                 onClick={() => buyPackBackend('eq_premium', true)}
-                className="shrink-0 h-11 px-3 rounded-xl bg-gradient-to-r from-purple-950 via-rose-950 to-purple-950 hover:brightness-125 active:scale-95 text-white border border-purple-500/70 font-display font-black text-[11px] min-[380px]:text-xs tracking-wider uppercase flex flex-col items-center justify-center shadow-md cursor-pointer transition-all"
+                className="w-full h-11 bg-gradient-to-r from-purple-950 via-rose-950 to-purple-950 hover:brightness-125 active:scale-[0.98] text-white border border-purple-500/80 font-display font-black text-xs tracking-widest uppercase rounded-xl shadow-[0_0_18px_rgba(168,85,247,0.4)] flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
-                <div className="flex items-center gap-1">
-                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
-                  <span>70</span>
-                </div>
-                <span className="text-[8px] font-mono leading-none text-purple-200 font-bold">SHARDS</span>
+                <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                <span>FORGE RELIC • 70 SHARDS</span>
               </button>
             </div>
 
           </div>
         )}
 
-        {/* ===================== 3. PANTHEON (FOCUSED DEITY SWITCHER, ZERO VERTICAL SCROLL) ===================== */}
+        {/* ===================== 3. PANTHEON (LUXURIOUS DEITY SHOWCASE) ===================== */}
         {activeCategory === 'pantheon' && (() => {
           const currentDeity = divineCards.find(c => c.baseId === selectedDeityId) || divineCards[0];
           const ownedCount = (profile.collection || []).filter(c => c.baseId === currentDeity.baseId).length;
           const isBuyingThis = buyingCardId === currentDeity.baseId;
 
+          // Short, sound names without ellipsis cut-off
+          const DEITY_NAMES: Record<string, string> = {
+            void_sovereign: 'Aurelius',
+            blood_empress: 'Nyx',
+            void_reaper: 'Seraph',
+          };
+
           return (
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               
-              {/* 3 Deity Quick Selector Chips */}
+              {/* 3 Deity Switcher Chips (Clean, zero truncation) */}
               <div className="grid grid-cols-3 gap-1.5">
                 {divineCards.map((card) => {
                   const isSelected = card.baseId === currentDeity.baseId;
                   const isOwned = (profile.collection || []).some(c => c.baseId === card.baseId);
+                  const shortName = DEITY_NAMES[card.baseId] || card.name.split(',')[0].split(' ')[0];
+
                   return (
                     <button
                       key={card.baseId}
                       onClick={() => setSelectedDeityId(card.baseId)}
-                      className={`py-1.5 px-2 rounded-xl border flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      className={`h-9 rounded-xl border flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                         isSelected
-                          ? 'bg-gradient-to-r from-rose-950 to-red-950 border-rose-400 text-white shadow-[0_0_10px_rgba(244,63,94,0.4)] scale-[1.02]'
+                          ? 'bg-gradient-to-r from-rose-950 via-[#26050d] to-rose-950 border-rose-400 text-white shadow-[0_0_12px_rgba(244,63,94,0.45)] scale-[1.02]'
                           : 'bg-black/60 border-white/10 text-gray-400 hover:text-gray-200'
                       }`}
                     >
-                      <Crown className={`w-3 h-3 ${isSelected ? 'text-amber-400' : 'text-gray-500'}`} />
-                      <span className="font-display font-bold text-[10px] truncate uppercase">
-                        {card.name.replace('Void ', '')}
+                      <Crown className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-amber-400' : 'text-gray-500'}`} />
+                      <span className="font-display font-black text-xs uppercase tracking-wider">
+                        {shortName}
                       </span>
                       {isOwned && (
-                        <span className="text-emerald-400 text-[9px] font-mono">✓</span>
+                        <span className="text-emerald-400 text-[9px] font-mono font-bold">✓</span>
                       )}
                     </button>
                   );
                 })}
               </div>
 
-              {/* Single Focused Deity Showcase Card */}
-              <div className="bg-gradient-to-b from-[#1c080d] via-[#14060a] to-black border-2 border-rose-500/50 rounded-2xl p-3 shadow-2xl space-y-2.5 relative overflow-hidden">
+              {/* Majestic Divine Card Frame */}
+              <div className="bg-gradient-to-b from-[#200910] via-[#14050a] to-black border-2 border-rose-500/60 rounded-2xl p-3.5 shadow-2xl space-y-3 relative overflow-hidden">
                 
-                {/* Portrait & Stats Overlay */}
-                <div className="relative h-44 min-[380px]:h-48 rounded-xl overflow-hidden border border-rose-400/40 bg-black/70 shadow-inner">
+                {/* Large Portrait with Gothic Ambient Overlay */}
+                <div className="relative h-52 min-[380px]:h-56 rounded-xl overflow-hidden border border-rose-400/40 bg-black/80 shadow-inner">
                   <img src={currentDeity.image} alt={currentDeity.name} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/30 pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-black/35 pointer-events-none" />
 
                   {/* Top Badges */}
                   <div className="absolute top-2 left-2 right-2 flex justify-between items-center z-10">
-                    <span className="px-2 py-0.5 rounded font-mono text-[8px] uppercase font-black tracking-wider bg-rose-950 border border-rose-400 text-rose-300">
-                      DIVINE
+                    <span className="px-2.5 py-0.5 rounded-lg font-mono text-[9px] uppercase font-black tracking-wider bg-gradient-to-r from-red-950 to-rose-900 border border-rose-400 text-rose-300 shadow-[0_0_10px_rgba(244,63,94,0.6)]">
+                      DIVINE ENTITY
                     </span>
                     <div className="flex items-center gap-1.5">
-                      {renderManaIcon(getCardManaCost(currentDeity), "w-5 h-5")}
-                      <div className="bg-black/80 border border-rose-400/40 rounded-lg px-2 py-0.5 text-[9px] font-mono font-bold text-blue-300 backdrop-blur-sm shadow flex items-center gap-1">
+                      {renderManaIcon(getCardManaCost(currentDeity), "w-6 h-6")}
+                      <div className="bg-black/80 border border-rose-400/40 rounded-lg px-2 py-0.5 text-[10px] font-mono font-bold text-blue-300 backdrop-blur-sm shadow flex items-center gap-1">
                         <span>⏳</span> {currentDeity.delay}
                       </div>
                     </div>
                   </div>
 
-                  {/* Bottom Stats Badges */}
-                  <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center z-10">
-                    <div className="bg-black/85 border border-red-500/60 rounded-lg px-2 py-0.5 text-xs font-mono font-black text-red-400 shadow backdrop-blur-sm">
-                      ⚔️ {currentDeity.attack}
+                  {/* Bottom ATK and HP */}
+                  <div className="absolute bottom-2.5 left-2.5 right-2.5 flex justify-between items-center z-10">
+                    <div className="bg-black/85 border border-red-500/70 rounded-xl px-3 py-1 text-xs font-mono font-black text-red-400 shadow-lg backdrop-blur-sm flex items-center gap-1">
+                      <span>⚔️</span> {currentDeity.attack}
                     </div>
-                    <div className="bg-black/85 border border-emerald-500/60 rounded-lg px-2 py-0.5 text-xs font-mono font-black text-emerald-400 shadow backdrop-blur-sm">
-                      ❤️ {currentDeity.health}
+                    <div className="bg-black/85 border border-emerald-500/70 rounded-xl px-3 py-1 text-xs font-mono font-black text-emerald-400 shadow-lg backdrop-blur-sm flex items-center gap-1">
+                      <span>❤️</span> {currentDeity.health}
                     </div>
                   </div>
                 </div>
 
                 {/* Name, Lore and Owned Count */}
                 <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h3 className="font-display font-black text-sm min-[380px]:text-base text-white leading-tight">
+                  <div className="min-w-0">
+                    <h3 className="font-display font-black text-base min-[380px]:text-lg text-white leading-tight tracking-wide">
                       {currentDeity.name}
                     </h3>
-                    <p className="text-[10px] text-gray-300 font-sans mt-0.5 leading-snug line-clamp-2">
+                    <p className="text-[11px] text-gray-300 font-sans mt-0.5 leading-snug">
                       {currentDeity.description}
                     </p>
                   </div>
                   {ownedCount > 0 && (
-                    <span className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 text-[8.5px] font-mono px-2 py-0.5 rounded-full font-bold shrink-0">
+                    <span className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 text-[9px] font-mono px-2 py-0.5 rounded-full font-bold shrink-0">
                       OWNED: {ownedCount}
                     </span>
                   )}
                 </div>
 
-                {/* Skills Box */}
-                <div className="bg-black/60 border border-white/10 rounded-xl p-2 space-y-1">
-                  <div className="text-[8px] font-mono uppercase font-bold text-rose-400 tracking-wider flex items-center gap-1">
-                    <Sparkles className="w-2.5 h-2.5 text-rose-400" /> DIVINE SKILLS
+                {/* Divine Skills Box */}
+                <div className="bg-black/70 border border-white/10 rounded-xl p-2.5 space-y-1.5">
+                  <div className="text-[9px] font-mono uppercase font-bold text-rose-400 tracking-wider flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-rose-400" /> DIVINE SKILLS
                   </div>
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     {currentDeity.skills.map((skill, sIdx) => (
-                      <div key={sIdx} className="text-[9.5px] leading-tight">
-                        <span className="font-mono font-bold text-rose-300 uppercase mr-1">[{skill.type} {skill.value}]</span>
+                      <div key={sIdx} className="text-[10px] leading-snug flex items-start gap-1">
+                        <span className="font-mono font-bold text-rose-300 uppercase shrink-0">[{skill.type} {skill.value}]</span>
                         <span className="text-gray-300">{skill.description}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Summon Button */}
+                {/* Wide Invocation Button */}
                 <button
                   disabled={isBuyingThis}
                   onClick={() => buyDivineCard(currentDeity.baseId)}
-                  className="w-full bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 hover:brightness-110 active:scale-95 text-white font-display font-black tracking-widest py-2.5 px-4 rounded-xl shadow-[0_0_15px_rgba(244,63,94,0.5)] flex items-center justify-center gap-2 text-xs uppercase cursor-pointer disabled:opacity-50 transition-all"
+                  className="w-full h-12 bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 hover:brightness-110 active:scale-[0.98] text-white font-display font-black tracking-widest text-xs uppercase rounded-xl shadow-[0_0_20px_rgba(244,63,94,0.5)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 transition-all"
                 >
-                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
-                  <span>{isBuyingThis ? 'INVOKING...' : 'SUMMON FOR 50 SHARDS'}</span>
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow" />
+                  <span>{isBuyingThis ? 'INVOKING DIVINE POWER...' : 'SUMMON ENTITY • 50 SHARDS'}</span>
                 </button>
 
               </div>
@@ -784,7 +915,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
           );
         })()}
 
-        {/* ===================== 4. DEMIURGE (COMPACT 6-SLOT MATRIX & FORGE) ===================== */}
+        {/* ===================== 4. DEMIURGE (ALTAR OF THE DEMIURGE) ===================== */}
         {activeCategory === 'demiurge' && (() => {
           const currentItem = demiurgeItems.find(i => i.name === selectedDemiurgeItemName) || demiurgeItems[0];
           const isOwned = (profile.equipment || []).some(e => e.name === currentItem.name);
@@ -808,110 +939,160 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
           };
 
           return (
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               
-              {/* Compact Bundle Banner */}
-              <div className="bg-gradient-to-r from-[#240810] via-[#140409] to-black border border-rose-500/50 rounded-2xl p-2.5 flex items-center justify-between gap-2 shadow-lg">
-                <div className="min-w-0">
+              {/* Grand Bundle Banner */}
+              <div className="bg-gradient-to-b from-[#2a0c16] via-[#1a060d] to-black border-2 border-rose-500/60 rounded-2xl p-3 shadow-2xl space-y-2.5 relative overflow-hidden">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <Crown className="w-3.5 h-3.5 text-amber-400" />
-                    <span className="font-display font-black text-xs text-white uppercase truncate">
-                      Demiurge Set Bundle
+                    <Crown className="w-4 h-4 text-amber-400" />
+                    <span className="font-display font-black text-xs text-white uppercase tracking-wider">
+                      SET OF THE DEMIURGE
                     </span>
-                    <span className="text-[8px] font-mono text-rose-300 bg-rose-950 px-1.5 py-0.2 rounded font-bold">
-                      {ownedDemiurgeCount}/6
+                    <span className="bg-amber-400 text-black text-[8px] px-1 py-0.2 rounded font-black tracking-normal">
+                      -17% OFF
                     </span>
                   </div>
-                  <p className="text-[9.5px] text-gray-400 font-sans truncate mt-0.5">All 6 Divine Armaments (-17% Off)</p>
+                  <span className="bg-rose-950 border border-rose-500/60 text-rose-300 text-[9px] font-mono px-2 py-0.5 rounded font-black">
+                    {ownedDemiurgeCount}/6 OWNED
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-b from-rose-950 to-black border border-rose-500/60 p-1 flex items-center justify-center shrink-0 shadow-lg">
+                    <img src="/icons/equipment/demiurge_crest.png" alt="Demiurge Crest" className="w-10 h-10 object-contain drop-shadow-[0_0_10px_rgba(244,63,94,0.8)]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-display font-black text-xs sm:text-sm text-amber-300 uppercase">
+                      6-Piece Divine Bundle
+                    </h4>
+                    <p className="text-[10px] text-gray-300 font-sans leading-tight mt-0.5">
+                      Forge all 6 pieces at once and unlock complete primordial power.
+                    </p>
+                  </div>
                 </div>
 
                 <button
                   disabled={isBuyingSet || ownedDemiurgeCount === 6}
                   onClick={buyDivineSet}
-                  className={`shrink-0 py-2 px-3 rounded-xl font-display font-black text-[10.5px] min-[380px]:text-xs tracking-wider uppercase transition-all flex items-center gap-1.5 shadow-md cursor-pointer active:scale-95 ${
+                  className={`w-full h-11 rounded-xl font-display font-black text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer active:scale-[0.98] ${
                     ownedDemiurgeCount === 6
                       ? 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 cursor-default opacity-80'
-                      : 'bg-gradient-to-r from-amber-600 via-rose-600 to-amber-600 hover:brightness-110 text-white'
+                      : 'bg-gradient-to-r from-amber-600 via-rose-600 to-amber-600 hover:brightness-110 text-white border border-amber-400/50 shadow-[0_0_20px_rgba(245,158,11,0.4)]'
                   }`}
                 >
+                  <Crown className="w-4 h-4 text-amber-300" />
                   {ownedDemiurgeCount === 6 ? (
-                    <span>COMPLETED (6/6)</span>
+                    <span>FULL SET ASSEMBLED (6/6)</span>
                   ) : isBuyingSet ? (
-                    <span>FORGING...</span>
+                    <span>FORGING FULL SET...</span>
                   ) : (
-                    <>
-                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
-                      <span>250</span>
-                    </>
+                    <div className="flex items-center gap-1.5">
+                      <span>FORGE ALL 6 PIECES:</span>
+                      <span className="line-through text-rose-200/70 text-[10px]">300</span>
+                      <span className="text-amber-300 font-mono text-sm font-black flex items-center gap-0.5">
+                        <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain inline" />
+                        250
+                      </span>
+                    </div>
                   )}
                 </button>
               </div>
 
-              {/* 6-Slot Grid (3x2) */}
-              <div className="grid grid-cols-3 gap-1.5">
-                {demiurgeItems.map((item) => {
-                  const itemOwned = (profile.equipment || []).some(e => e.name === item.name);
-                  const isSelected = selectedDemiurgeItemName === item.name;
+              {/* 6-Piece Slot Selector Grid (High-Res Icons, Divine Border Aura) */}
+              <div className="space-y-1.5">
+                <div className="text-[9px] font-mono text-rose-400 uppercase font-black tracking-wider px-1 flex items-center gap-1.5">
+                  <Sword className="w-3 h-3 text-rose-400" /> SELECT ARTIFACT TO INSPECT OR FORGE
+                </div>
 
-                  return (
-                    <button
-                      key={item.name}
-                      onClick={() => setSelectedDemiurgeItemName(item.name)}
-                      className={`p-1.5 rounded-xl border transition-all flex flex-col items-center justify-between cursor-pointer ${
-                        isSelected
-                          ? 'bg-gradient-to-b from-rose-950 via-[#230812] to-black border-rose-400 text-white shadow-[0_0_10px_rgba(244,63,94,0.4)] scale-[1.02]'
-                          : itemOwned
-                          ? 'bg-gradient-to-b from-[#180a10] to-black border-rose-950/80 text-gray-300'
-                          : 'bg-black/60 border-white/10 text-gray-400'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between w-full text-[7.5px] font-mono uppercase font-bold">
-                        <span className="text-rose-400">{item.slot}</span>
-                        {itemOwned ? (
-                          <span className="text-emerald-400">✓</span>
-                        ) : (
-                          <span className="text-gray-500">50🔷</span>
-                        )}
-                      </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {demiurgeItems.map((item) => {
+                    const itemOwned = (profile.equipment || []).some(e => e.name === item.name);
+                    const isSelected = selectedDemiurgeItemName === item.name;
 
-                      <div className="w-8 h-8 my-0.5 rounded-md p-0.5 flex items-center justify-center">
-                        <img
-                          src={getEquipmentIcon(item.name, item.slot)}
-                          alt={item.name}
-                          className={`w-full h-full object-contain ${itemOwned ? 'drop-shadow-[0_0_6px_rgba(244,63,94,0.8)]' : 'grayscale opacity-60'}`}
-                        />
-                      </div>
+                    return (
+                      <button
+                        key={item.name}
+                        onClick={() => setSelectedDemiurgeItemName(item.name)}
+                        className={`p-2 rounded-xl border-2 transition-all flex flex-col items-center justify-between cursor-pointer relative overflow-hidden ${
+                          isSelected
+                            ? 'bg-gradient-to-b from-rose-950 via-[#26050d] to-black border-rose-400 text-white shadow-[0_0_15px_rgba(244,63,94,0.5)] ring-1 ring-rose-400/60 scale-[1.02]'
+                            : itemOwned
+                            ? 'bg-gradient-to-b from-[#180a10] to-black border-rose-950/80 text-gray-200 hover:border-rose-500/50'
+                            : 'bg-black/70 border-white/10 text-gray-400 hover:border-white/20'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between w-full text-[8px] font-mono uppercase font-bold">
+                          <span className="text-rose-400">{item.slot}</span>
+                          {itemOwned ? (
+                            <span className="bg-emerald-950 border border-emerald-500/60 text-emerald-400 px-1 rounded text-[7.5px] font-black">✓</span>
+                          ) : (
+                            <span className="text-amber-400">50🔷</span>
+                          )}
+                        </div>
 
-                      <div className="text-[8.5px] min-[380px]:text-[9px] font-display font-black text-white truncate w-full text-center leading-none">
-                        {item.name.replace(' of the Demiurge', '')}
-                      </div>
-                    </button>
-                  );
-                })}
+                        {/* High-res Equipment Icon with glowing drop-shadow */}
+                        <div className="w-11 h-11 my-1 rounded-xl p-1 flex items-center justify-center relative">
+                          <img
+                            src={getEquipmentIcon(item.name, item.slot)}
+                            alt={item.name}
+                            className={`w-full h-full object-contain ${
+                              itemOwned ? 'drop-shadow-[0_0_10px_rgba(244,63,94,0.9)]' : 'drop-shadow-[0_0_4px_rgba(255,255,255,0.4)] opacity-80'
+                            }`}
+                          />
+                        </div>
+
+                        <div className="text-[9px] min-[380px]:text-[10px] font-display font-black text-white truncate w-full text-center leading-none">
+                          {item.name.replace(' of the Demiurge', '')}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
-              {/* Selected Piece Inspector & Single Forge */}
-              <div className="bg-gradient-to-r from-[#1c080d] via-[#120508] to-black border border-rose-500/50 rounded-2xl p-2.5 flex items-center justify-between gap-2.5 shadow-lg">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-12 h-12 rounded-xl bg-black/80 border border-rose-400/40 p-1 flex items-center justify-center shrink-0">
+              {/* Selected Relic Inspector & Forge Box */}
+              <div className="bg-gradient-to-b from-[#1c080d] via-[#120508] to-black border-2 border-rose-500/50 rounded-2xl p-3 shadow-xl space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded font-mono text-[8px] uppercase font-black bg-rose-950 text-rose-300 border border-rose-500/60">
+                      {currentItem.slot}
+                    </span>
+                    <span className="px-2 py-0.5 rounded font-mono text-[8px] uppercase font-black bg-gradient-to-r from-red-950 to-rose-900 text-rose-300 border border-rose-400">
+                      DIVINE
+                    </span>
+                  </div>
+                  {isEquipped ? (
+                    <span className="text-[8px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-500/50 px-2 py-0.5 rounded-full font-bold">
+                      EQUIPPED
+                    </span>
+                  ) : isOwned ? (
+                    <span className="text-[8px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-500/50 px-2 py-0.5 rounded-full font-bold">
+                      OWNED
+                    </span>
+                  ) : (
+                    <span className="text-[8px] font-mono bg-amber-950 border border-amber-500/40 text-amber-300 px-2 py-0.5 rounded-full font-bold">
+                      NOT ACQUIRED
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-16 h-16 rounded-xl bg-black/80 border border-rose-400/40 p-1 flex items-center justify-center shrink-0 shadow-inner">
                     <img
                       src={getEquipmentIcon(currentItem.name, currentItem.slot)}
                       alt={currentItem.name}
-                      className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(244,63,94,0.8)]"
+                      className="w-full h-full object-contain drop-shadow-[0_0_12px_rgba(244,63,94,0.9)]"
                     />
                   </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <h4 className="font-display font-black text-xs text-white truncate">
-                        {currentItem.name}
-                      </h4>
-                      {isEquipped ? (
-                        <span className="text-[7.5px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-500/40 px-1 rounded">EQUIPPED</span>
-                      ) : isOwned ? (
-                        <span className="text-[7.5px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-500/40 px-1 rounded">OWNED</span>
-                      ) : null}
-                    </div>
-                    <div className="text-[9.5px] font-mono text-amber-300 font-bold mt-0.5">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-display font-black text-sm text-white truncate">
+                      {currentItem.name}
+                    </h4>
+                    <p className="text-[10.5px] text-gray-300 font-sans leading-tight mt-0.5 line-clamp-1">
+                      {currentItem.description}
+                    </p>
+                    <div className="text-[10px] font-mono text-amber-300 font-bold mt-1">
                       {getItemStatSummary(currentItem)}
                     </div>
                   </div>
@@ -920,28 +1101,33 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 <button
                   disabled={isForgingCurrent}
                   onClick={() => buyDivineEquipment(currentItem.name)}
-                  className="shrink-0 h-10 px-3 rounded-xl bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 hover:brightness-110 active:scale-95 text-white font-display font-black text-[11px] uppercase flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-50 transition-all"
+                  className="w-full h-11 rounded-xl bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 hover:brightness-110 active:scale-[0.98] text-white font-display font-black text-xs uppercase flex items-center justify-center gap-2 shadow-lg cursor-pointer disabled:opacity-50 transition-all"
                 >
-                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
-                  <span>{isForgingCurrent ? '...' : '50'}</span>
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                  <span>{isForgingCurrent ? 'FORGING ARTIFACT...' : 'FORGE PIECE • 50 SHARDS'}</span>
                 </button>
               </div>
 
-              {/* Set Resonance Thresholds Strip */}
-              <div className="bg-black/60 border border-white/10 rounded-xl p-2 space-y-1">
-                <div className="text-[8.5px] font-mono text-rose-300 uppercase font-bold tracking-wider flex items-center justify-between">
-                  <span>SET RESONANCE BONUSES</span>
+              {/* Resonance Bonuses */}
+              <div className="bg-black/70 border border-rose-500/30 rounded-2xl p-2.5 space-y-1.5">
+                <div className="text-[9px] font-mono text-rose-300 uppercase font-bold tracking-wider flex items-center justify-between">
+                  <span className="flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-amber-400" /> SET RESONANCE BONUSES
+                  </span>
                   <span>{ownedDemiurgeCount}/6 Owned</span>
                 </div>
-                <div className="grid grid-cols-3 gap-1 text-[8.5px] min-[380px]:text-[9px] font-mono">
-                  <div className={`p-1 rounded border text-center ${ownedDemiurgeCount >= 2 ? 'bg-rose-950/80 border-rose-500/60 text-emerald-300' : 'bg-white/5 border-white/10 text-gray-500'}`}>
-                    <span className="font-bold block">2pc:</span> +30 HP, +5% Dodge
+                <div className="grid grid-cols-3 gap-1.5 text-[9px] font-mono">
+                  <div className={`p-1.5 rounded-lg border text-center ${ownedDemiurgeCount >= 2 ? 'bg-rose-950/80 border-rose-400 text-emerald-300 shadow' : 'bg-white/5 border-white/10 text-gray-500'}`}>
+                    <span className="font-black block text-[8px] uppercase">2 Pieces</span>
+                    +30 HP, +5% Dodge
                   </div>
-                  <div className={`p-1 rounded border text-center ${ownedDemiurgeCount >= 4 ? 'bg-rose-950/80 border-rose-500/60 text-amber-300' : 'bg-white/5 border-white/10 text-gray-500'}`}>
-                    <span className="font-bold block">4pc:</span> -1 Delay
+                  <div className={`p-1.5 rounded-lg border text-center ${ownedDemiurgeCount >= 4 ? 'bg-rose-950/80 border-rose-400 text-amber-300 shadow' : 'bg-white/5 border-white/10 text-gray-500'}`}>
+                    <span className="font-black block text-[8px] uppercase">4 Pieces</span>
+                    -1 Turn Delay
                   </div>
-                  <div className={`p-1 rounded border text-center ${ownedDemiurgeCount >= 6 ? 'bg-rose-950/80 border-rose-500/60 text-purple-300' : 'bg-white/5 border-white/10 text-gray-500'}`}>
-                    <span className="font-bold block">6pc:</span> +1 Mana, +3 ATK
+                  <div className={`p-1.5 rounded-lg border text-center ${ownedDemiurgeCount >= 6 ? 'bg-rose-950/80 border-rose-400 text-purple-300 shadow' : 'bg-white/5 border-white/10 text-gray-500'}`}>
+                    <span className="font-black block text-[8px] uppercase">6 Pieces</span>
+                    +1 Mana, +3 ATK
                   </div>
                 </div>
               </div>
@@ -950,36 +1136,39 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
           );
         })()}
 
-        {/* ===================== 5. SHIELDS (PVP AEGIS PROTECTION - CLEAN VIETRINA, NO PROTECTION BANNER) ===================== */}
+        {/* ===================== 5. SHIELDS (AEGIS SHOWCASE) ===================== */}
         {activeCategory === 'shields' && (
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {[
               {
                 type: '3h' as const,
                 name: '3-Hour Void Aegis',
                 durationLabel: '3 Hours Immunity',
+                desc: 'Minor defense ward protecting Arena Crowns.',
                 cost: 8,
                 image: '/icons/shield_3h.png',
                 tag: 'STANDARD',
-                border: 'border-emerald-500/40 hover:border-emerald-400',
+                border: 'border-emerald-500/50 hover:border-emerald-400',
               },
               {
                 type: '6h' as const,
                 name: '6-Hour Astral Aegis',
                 durationLabel: '6 Hours Immunity',
+                desc: 'Greater defense ward for overnight protection.',
                 cost: 15,
                 image: '/icons/shield_6h.png',
                 tag: 'POPULAR',
-                border: 'border-cyan-500/50 hover:border-cyan-400',
+                border: 'border-cyan-500/60 hover:border-cyan-400',
               },
               {
                 type: '12h' as const,
                 name: '12-Hour Supreme Aegis',
                 durationLabel: '12 Hours Immunity',
+                desc: 'Celestial citadel barrier for maximum safety.',
                 cost: 25,
                 image: '/icons/shield_12h.png',
-                tag: 'BEST VALUE',
-                border: 'border-purple-500/50 hover:border-purple-400',
+                tag: 'BEST VALUE (-18%)',
+                border: 'border-purple-500/60 hover:border-purple-400',
               },
             ].map((item) => {
               const owned = profile.shieldsInventory?.[item.type] || 0;
@@ -989,28 +1178,32 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
               return (
                 <div
                   key={item.type}
-                  className={`bg-gradient-to-r from-[#111622] via-[#0b0e17] to-black border ${item.border} rounded-2xl p-2.5 flex items-center justify-between gap-2.5 shadow-lg`}
+                  className={`bg-gradient-to-b from-[#111724] via-[#0b0f17] to-black border-2 ${item.border} rounded-2xl p-3 shadow-xl space-y-2.5`}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-12 h-12 rounded-xl bg-black/60 border border-white/10 p-1 flex items-center justify-center shrink-0">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[8px] font-mono font-bold bg-white/10 px-2 py-0.5 rounded text-amber-300 uppercase tracking-wider">
+                      {item.tag}
+                    </span>
+                    <span className="text-[9px] font-mono text-gray-400 font-bold">
+                      Vault: {owned} Owned
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 rounded-xl bg-black/60 border border-white/10 p-1 flex items-center justify-center shrink-0">
+                      <img src={item.image} alt={item.name} className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]" />
                     </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[7.5px] font-mono font-bold bg-white/10 px-1 py-0.2 rounded text-amber-300 uppercase">
-                          {item.tag}
-                        </span>
-                        <span className="text-[8.5px] font-mono text-gray-400">
-                          Vault: {owned}
-                        </span>
-                      </div>
-                      <h4 className="font-display font-black text-xs text-white truncate mt-0.5">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-display font-black text-sm text-white truncate">
                         {item.name}
                       </h4>
-                      <div className="inline-flex items-center gap-1 text-[9.5px] font-mono text-emerald-400 font-bold">
-                        <Clock className="w-2.5 h-2.5 text-emerald-400" />
+                      <div className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400 font-bold mt-0.5">
+                        <Clock className="w-3 h-3 text-emerald-400" />
                         <span>{item.durationLabel}</span>
                       </div>
+                      <p className="text-[10px] text-gray-400 font-sans leading-tight mt-0.5">
+                        {item.desc}
+                      </p>
                     </div>
                   </div>
 
@@ -1036,20 +1229,20 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                         setIsBuyingShield(null);
                       }
                     }}
-                    className={`shrink-0 h-10 px-3 rounded-xl font-display font-black text-xs uppercase flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-md ${
+                    className={`w-full h-10 rounded-xl font-display font-black text-xs uppercase flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-[0.98] shadow-md ${
                       isPurchasing
                         ? 'bg-gray-700 text-gray-400 cursor-wait'
                         : canAfford
-                        ? 'bg-gradient-to-r from-purple-700 via-indigo-600 to-purple-800 hover:brightness-110 text-white'
+                        ? 'bg-gradient-to-r from-purple-700 via-indigo-600 to-purple-800 hover:brightness-110 text-white shadow-purple-950/60'
                         : 'bg-purple-950/60 border border-purple-500/40 text-purple-300'
                     }`}
                   >
                     {isPurchasing ? (
-                      <span>...</span>
+                      <span>ACQUIRING...</span>
                     ) : (
                       <>
-                        <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
-                        <span>{item.cost}</span>
+                        <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                        <span>ACQUIRE FOR {item.cost} SHARDS</span>
                       </>
                     )}
                   </button>
@@ -1058,24 +1251,29 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
             })}
 
             {/* Daily Subscription info banner */}
-            <div className="bg-gradient-to-r from-amber-950/20 to-purple-950/20 border border-amber-500/20 rounded-xl p-2 flex items-start gap-2 text-xs">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
-              <p className="text-gray-400 text-[9.5px] font-sans leading-snug">
+            <div className="bg-gradient-to-r from-amber-950/25 to-purple-950/25 border border-amber-500/20 rounded-xl p-2.5 flex items-start gap-2 text-xs">
+              <Sparkles className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <p className="text-gray-300 text-[10px] font-sans leading-relaxed">
                 <span className="text-amber-300 font-bold uppercase mr-1">Daily Pass Shields:</span>
-                Premium Lords get 1x 3h shield daily; Ultra Overlords get 1x 6h shield daily in Pass Tributes.
+                Premium Lords collect <strong className="text-amber-200">1x 3h Shield</strong> daily. Ultra Overlords collect <strong className="text-amber-300">1x 6h Shield</strong> daily in Pass Tributes.
               </p>
             </div>
           </div>
         )}
 
-        {/* ===================== 6. LEVEL BOOST (INSTANT ASCENSION - COMPACT) ===================== */}
+        {/* ===================== 6. LEVEL BOOST (TRANSCENDENCE CARDS) ===================== */}
         {activeCategory === 'level_boost' && (
-          <div className="space-y-2.5">
+          <div className="space-y-3">
             
-            {/* Header with Level */}
-            <div className="flex items-center justify-between bg-black/60 border border-amber-500/30 rounded-xl px-3 py-1.5">
-              <span className="text-[10px] font-mono text-gray-400 uppercase font-bold">HERO LEVEL:</span>
-              <span className="text-amber-300 font-display font-black text-xs sm:text-sm">LVL {profile.level || 1}</span>
+            {/* Header Hero Level */}
+            <div className="flex items-center justify-between bg-black/60 border border-amber-500/30 rounded-xl px-3 py-2">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-amber-400" />
+                <span className="text-[10px] font-mono text-gray-300 uppercase font-bold">CURRENT HERO LEVEL:</span>
+              </div>
+              <span className="text-amber-300 font-display font-black text-sm drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]">
+                LVL {profile.level || 1}
+              </span>
             </div>
 
             {/* Level 50 Card */}
@@ -1087,48 +1285,70 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
               const isProcessing = isBuyingLevelBoost === 50;
 
               return (
-                <div className={`rounded-2xl border p-2.5 flex items-center justify-between gap-2.5 shadow-lg ${
+                <div className={`rounded-2xl border-2 p-3 space-y-2.5 shadow-xl relative overflow-hidden transition-all ${
                   isAlreadyReached
                     ? 'bg-[#0d0f14]/80 border-white/10 opacity-70'
-                    : 'bg-gradient-to-r from-[#1c1208] via-[#120b05] to-black border-amber-500/50'
+                    : 'bg-gradient-to-b from-[#1c1208] via-[#120b05] to-black border-amber-500/60'
                 }`}>
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-14 h-14 rounded-xl bg-amber-500/10 border border-amber-400/40 p-1 flex items-center justify-center shrink-0">
-                      <img src="/shop/level_50_sigil.png" alt="Level 50 Sigil" className="w-full h-full object-contain" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-mono font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                      ASCENDANT CHAMPION
+                    </span>
+                    <span className="bg-amber-950/80 border border-amber-500/40 px-2 py-0.5 rounded text-[8px] font-mono text-amber-300 font-bold">
+                      STAGE I
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 min-[380px]:w-18 min-[380px]:h-18 rounded-xl bg-amber-500/10 border border-amber-400/50 p-1 flex items-center justify-center shrink-0 shadow-lg">
+                      <img src="/shop/level_50_sigil.png" alt="Level 50 Sigil" className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(245,158,11,0.8)]" />
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-display font-black text-xs min-[380px]:text-sm text-white uppercase truncate">
+                      <h4 className="font-display font-black text-sm min-[380px]:text-base text-white uppercase">
                         Instant Level 50
                       </h4>
-                      <p className="text-[9.5px] text-gray-400 font-sans truncate mt-0.5">Surge to Level 50 • Mid-game boost</p>
-                      <div className="flex items-center gap-2 mt-1 text-[9px] font-mono">
-                        <span className="text-amber-300">+49 Talents</span>
-                        <span className="text-gray-500">•</span>
-                        <span className="text-emerald-400">128 Base HP</span>
-                      </div>
+                      <p className="text-[10px] text-gray-300 font-sans leading-tight mt-0.5">
+                        Surge directly into mid-game content and mastery.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-black/65 border border-white/10 rounded-xl p-2.5 text-[11px] font-mono space-y-1">
+                    <div className="flex justify-between text-gray-300">
+                      <span>Hero Level:</span>
+                      <span className="text-white font-bold">Level 50</span>
+                    </div>
+                    <div className="flex justify-between text-gray-300">
+                      <span>Talent Points:</span>
+                      <span className="text-amber-300 font-bold">+49 Points</span>
+                    </div>
+                    <div className="flex justify-between text-gray-300">
+                      <span>Base Health:</span>
+                      <span className="text-emerald-300 font-bold">128 HP</span>
                     </div>
                   </div>
 
                   {isAlreadyReached ? (
-                    <span className="text-[9px] font-mono text-gray-500 font-bold px-2 py-1 bg-white/5 rounded-lg shrink-0">
-                      REACHED
-                    </span>
+                    <div className="w-full py-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-display font-black text-xs uppercase tracking-widest text-center">
+                      ✓ ALREADY REACHED LEVEL 50+
+                    </div>
                   ) : (
                     <button
                       disabled={isProcessing}
                       onClick={() => handleBuyLevelBoost(50)}
-                      className={`shrink-0 h-11 px-3 rounded-xl font-display font-black text-xs uppercase flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-md ${
+                      className={`w-full h-11 rounded-xl font-display font-black text-xs uppercase flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.98] shadow-md ${
                         isProcessing
                           ? 'bg-gray-700 text-gray-400 cursor-wait'
                           : canAfford
-                          ? 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:brightness-110 text-black'
+                          ? 'bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:brightness-110 text-black shadow-[0_0_15px_rgba(245,158,11,0.4)]'
                           : 'bg-amber-950/60 border border-amber-500/40 text-amber-300'
                       }`}
                     >
-                      {isProcessing ? '...' : (
+                      {isProcessing ? 'ASCENDING...' : (
                         <>
-                          <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
-                          <span>{cost}</span>
+                          <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                          <span>ASCEND TO LEVEL 50 • {cost} SHARDS</span>
                         </>
                       )}
                     </button>
@@ -1146,48 +1366,70 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
               const isProcessing = isBuyingLevelBoost === 100;
 
               return (
-                <div className={`rounded-2xl border p-2.5 flex items-center justify-between gap-2.5 shadow-lg ${
+                <div className={`rounded-2xl border-2 p-3 space-y-2.5 shadow-xl relative overflow-hidden transition-all ${
                   isMaxLevel
                     ? 'bg-[#0d0f14]/80 border-white/10 opacity-70'
-                    : 'bg-gradient-to-r from-[#240b15] via-[#15070d] to-black border-rose-500/50'
+                    : 'bg-gradient-to-b from-[#240b15] via-[#15070d] to-black border-rose-500/60'
                 }`}>
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-14 h-14 rounded-xl bg-rose-500/10 border border-rose-400/50 p-1 flex items-center justify-center shrink-0">
-                      <img src="/shop/level_100_sigil.png" alt="Level 100 Sigil" className="w-full h-full object-contain" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-mono font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+                      SUPREME GODHOOD
+                    </span>
+                    <span className="bg-rose-950/80 border border-rose-500/40 px-2 py-0.5 rounded text-[8px] font-mono text-rose-300 font-bold">
+                      MAXIMUM APEX
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 min-[380px]:w-18 min-[380px]:h-18 rounded-xl bg-rose-500/10 border border-rose-400/60 p-1 flex items-center justify-center shrink-0 shadow-lg">
+                      <img src="/shop/level_100_sigil.png" alt="Level 100 Sigil" className="w-full h-full object-contain drop-shadow-[0_0_12px_rgba(244,63,94,0.85)]" />
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-display font-black text-xs min-[380px]:text-sm text-white uppercase truncate">
+                      <h4 className="font-display font-black text-sm min-[380px]:text-base text-white uppercase">
                         Instant Level 100
                       </h4>
-                      <p className="text-[9.5px] text-gray-400 font-sans truncate mt-0.5">Maximum Apex • Total Mastery</p>
-                      <div className="flex items-center gap-2 mt-1 text-[9px] font-mono">
-                        <span className="text-amber-300">+99 Talents</span>
-                        <span className="text-gray-500">•</span>
-                        <span className="text-emerald-400">228 Base HP</span>
-                      </div>
+                      <p className="text-[10px] text-gray-300 font-sans leading-tight mt-0.5">
+                        Attain total mastery over the Abyss from day one.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-black/65 border border-white/10 rounded-xl p-2.5 text-[11px] font-mono space-y-1">
+                    <div className="flex justify-between text-gray-300">
+                      <span>Hero Level:</span>
+                      <span className="text-white font-bold">Level 100 (MAX)</span>
+                    </div>
+                    <div className="flex justify-between text-gray-300">
+                      <span>Talent Points:</span>
+                      <span className="text-amber-300 font-bold">+99 Points (Full Trees)</span>
+                    </div>
+                    <div className="flex justify-between text-gray-300">
+                      <span>Base Health:</span>
+                      <span className="text-emerald-300 font-bold">228 HP</span>
                     </div>
                   </div>
 
                   {isMaxLevel ? (
-                    <span className="text-[9px] font-mono text-gray-500 font-bold px-2 py-1 bg-white/5 rounded-lg shrink-0">
-                      MAX REACHED
-                    </span>
+                    <div className="w-full py-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-display font-black text-xs uppercase tracking-widest text-center">
+                      ✓ MAXIMUM LEVEL REACHED (100)
+                    </div>
                   ) : (
                     <button
                       disabled={isProcessing}
                       onClick={() => handleBuyLevelBoost(100)}
-                      className={`shrink-0 h-11 px-3 rounded-xl font-display font-black text-xs uppercase flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-md ${
+                      className={`w-full h-11 rounded-xl font-display font-black text-xs uppercase flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.98] shadow-md ${
                         isProcessing
                           ? 'bg-gray-700 text-gray-400 cursor-wait'
                           : canAfford
-                          ? 'bg-gradient-to-r from-rose-600 to-amber-500 hover:brightness-110 text-white'
+                          ? 'bg-gradient-to-r from-rose-600 via-red-500 to-amber-500 hover:brightness-110 text-white shadow-[0_0_18px_rgba(244,63,94,0.5)]'
                           : 'bg-rose-950/60 border border-rose-500/40 text-rose-300'
                       }`}
                     >
-                      {isProcessing ? '...' : (
+                      {isProcessing ? 'ASCENDING...' : (
                         <>
-                          <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
-                          <span>{cost}</span>
+                          <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                          <span>ASCEND TO LEVEL 100 • {cost} SHARDS</span>
                         </>
                       )}
                     </button>
@@ -1197,9 +1439,9 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
             })()}
 
             {/* Sanctum Notice */}
-            <div className="bg-black/60 border border-amber-500/20 rounded-xl p-2 flex items-start gap-2 text-xs">
+            <div className="bg-black/60 border border-amber-500/20 rounded-xl p-2.5 flex items-start gap-2 text-xs">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1 shrink-0" />
-              <p className="font-mono text-[9.5px] text-gray-400 leading-tight">
+              <p className="font-mono text-[10px] text-gray-300 leading-relaxed">
                 After ascending, visit the <strong>LORD</strong> tab to allocate your unassigned skill points across combat stances.
               </p>
             </div>
