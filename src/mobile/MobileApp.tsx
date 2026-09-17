@@ -8,10 +8,10 @@ import { MobileCampaignView } from './views/MobileCampaignView';
 import { MobilePvpView } from './views/MobilePvpView';
 import { MobileCollectionView } from './views/MobileCollectionView';
 import { MobileHeroView } from './views/MobileHeroView';
+import { MobileShopView } from './views/MobileShopView';
 import { MobileBattleArena } from './views/MobileBattleArena';
 
 // Desktop Shared Views for Store, Bank & Premium
-import { GachaStoreView } from '../components/GachaStoreView';
 import { BankView } from '../components/BankView';
 import { PremiumPassView } from '../components/PremiumPassView';
 
@@ -38,7 +38,7 @@ export const MobileApp: React.FC = () => {
   const [activeTab, setActiveTab] = useState<MobileTab>('campaign');
   const [activeBattleStage, setActiveBattleStage] = useState<CampaignStage | null>(null);
   const [activeBattleType, setActiveBattleType] = useState<'campaign' | 'pvp'>('campaign');
-  const [shopInitialTab, setShopInitialTab] = useState<'cards' | 'equipment' | 'divine' | 'shields'>('cards');
+  const [shopInitialTab, setShopInitialTab] = useState<'cards' | 'equipment' | 'divine' | 'shields' | 'level_boost'>('cards');
   const [isPvpMatching, setIsPvpMatching] = useState(false);
   const [isPvpModalOpen, setIsPvpModalOpen] = useState(false);
 
@@ -118,10 +118,8 @@ export const MobileApp: React.FC = () => {
             />
           </div>
 
-          <div className={activeTab === 'altar' ? 'h-full w-full block overflow-y-auto' : 'hidden'}>
-            <div className="p-2">
-              <GachaStoreView initialTab={shopInitialTab} />
-            </div>
+          <div className={activeTab === 'altar' ? 'h-full w-full block' : 'hidden'}>
+            <MobileShopView initialTab={shopInitialTab} />
           </div>
 
           <div className={activeTab === 'bank' ? 'h-full w-full block overflow-y-auto' : 'hidden'}>
