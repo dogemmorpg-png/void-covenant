@@ -11,8 +11,7 @@ import { MobileHeroView } from './views/MobileHeroView';
 import { MobileShopView } from './views/MobileShopView';
 import { MobileBattleArena } from './views/MobileBattleArena';
 
-// Desktop Shared Views for Store, Bank & Premium
-import { BankView } from '../components/BankView';
+import { MobileBankView } from './views/MobileBankView';
 import { MobilePremiumPassView } from './views/MobilePremiumPassView';
 
 // Modals
@@ -123,9 +122,7 @@ export const MobileApp: React.FC = () => {
           </div>
 
           <div className={activeTab === 'bank' ? 'h-full w-full block overflow-y-auto' : 'hidden'}>
-            <div className="p-2">
-              <BankView />
-            </div>
+            <MobileBankView />
           </div>
 
           <div className={activeTab === 'premium' ? 'h-full w-full block overflow-y-auto' : 'hidden'}>
