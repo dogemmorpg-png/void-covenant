@@ -134,7 +134,7 @@ export const PremiumPassView: React.FC = () => {
             <div className="shrink-0 flex flex-col items-start lg:items-end justify-center gap-2 p-4 rounded-2xl bg-gradient-to-b from-[#1f1627] to-[#0c0812] border-2 border-amber-500/40 shadow-[0_0_30px_rgba(245,158,11,0.2)] backdrop-blur-md">
               <div className="flex items-center gap-2">
                 <img 
-                  src={activeTier === 'ultra' ? '/icons/badge_diamond_v1.png' : '/icons/badge_crown_v1.png'} 
+                  src={activeTier === 'ultra' ? '/icons/badge_diamond_v1.png' : '/icons/badge_fleur_v1.png'} 
                   alt="Badge" 
                   className="w-5 h-5 object-contain shrink-0 drop-shadow" 
                 />
@@ -237,7 +237,7 @@ export const PremiumPassView: React.FC = () => {
             {/* Tier Badge Header Overlay */}
             <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-amber-500/40 text-amber-300 font-display font-black text-xs tracking-wider uppercase">
-                <img src="/icons/badge_crown_v1.png" alt="Crown" className="w-4.5 h-4.5 object-contain shrink-0 drop-shadow" />
+                <img src="/icons/badge_fleur_v1.png" alt="Fleur" className="w-4.5 h-4.5 object-contain shrink-0 drop-shadow" />
                 <span>PREMIUM TIER</span>
               </div>
               {activeTier === 'premium' && (

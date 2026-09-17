@@ -219,7 +219,7 @@ export const MobilePremiumPassView: React.FC = () => {
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/60 shadow-[0_0_12px_rgba(16,185,129,0.3)]">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <img 
-                  src={activeTier === 'ultra' ? '/icons/badge_diamond_v1.png' : '/icons/badge_crown_v1.png'} 
+                  src={activeTier === 'ultra' ? '/icons/badge_diamond_v1.png' : '/icons/badge_fleur_v1.png'} 
                   alt="Tier" 
                   className="w-3.5 h-3.5 object-contain inline shrink-0" 
                 />
@@ -276,7 +276,7 @@ export const MobilePremiumPassView: React.FC = () => {
               : 'bg-transparent text-gray-400 hover:text-gray-200 hover:bg-white/[0.04]'
           }`}
         >
-          <img src="/icons/badge_crown_v1.png" alt="Premium" className="w-5 h-5 object-contain shrink-0 drop-shadow" />
+          <img src="/icons/badge_fleur_v1.png" alt="Premium" className="w-5 h-5 object-contain shrink-0 drop-shadow" />
           <span>PREMIUM PASS</span>
         </button>
 
@@ -317,7 +317,7 @@ export const MobilePremiumPassView: React.FC = () => {
             {/* Tier Badge Header Overlay */}
             <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-md border border-amber-500/40 text-amber-300 font-display font-black text-[11px] tracking-wider uppercase">
-                <img src="/icons/badge_crown_v1.png" alt="Crown" className="w-4 h-4 object-contain shrink-0 drop-shadow" />
+                <img src="/icons/badge_fleur_v1.png" alt="Fleur" className="w-4 h-4 object-contain shrink-0 drop-shadow" />
                 <span>PREMIUM TIER</span>
               </div>
               {activeTier === 'premium' && (
