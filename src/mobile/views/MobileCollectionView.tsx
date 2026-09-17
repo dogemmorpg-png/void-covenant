@@ -342,14 +342,6 @@ export const MobileCollectionView: React.FC = () => {
       .filter((c): c is Card => !!c);
   }, [profile?.deck, profile?.collection]);
 
-  // Deck statistics
-  const totalDeckAtk = useMemo(() => deckCards.reduce((sum, c) => sum + c.attack, 0), [deckCards]);
-  const totalDeckHp = useMemo(() => deckCards.reduce((sum, c) => sum + c.health, 0), [deckCards]);
-  const avgMana = useMemo(() => {
-    return deckCards.length > 0
-      ? (deckCards.reduce((sum, c) => sum + (c.manaCost || 1), 0) / deckCards.length).toFixed(1)
-      : '0';
-  }, [deckCards]);
 
   // Fast duplicate lookup map
   const duplicateKeysSet = useMemo(() => {
@@ -710,21 +702,14 @@ export const MobileCollectionView: React.FC = () => {
                 </h3>
               </div>
 
-              {/* Quick stats & toggle drawer */}
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5 text-[8.5px] font-mono font-bold text-gray-400 bg-black/50 px-2 py-0.5 rounded-lg border border-white/5">
-                  <span>💎 <strong className="text-cyan-300">{avgMana}</strong></span>
-                  <span>⚔️ <strong className="text-red-400">{totalDeckAtk}</strong></span>
-                  <span>❤️ <strong className="text-emerald-400">{totalDeckHp}</strong></span>
-                </div>
-                <button
-                  onClick={() => setIsDeckExpanded(!isDeckExpanded)}
-                  className="p-1 rounded-lg bg-black/40 hover:bg-black/60 text-gray-400 hover:text-white border border-white/10 cursor-pointer"
-                  title={isDeckExpanded ? "Collapse deck" : "Expand deck"}
-                >
-                  {isDeckExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                </button>
-              </div>
+              {/* Toggle drawer */}
+              <button
+                onClick={() => setIsDeckExpanded(!isDeckExpanded)}
+                className="p-1 rounded-lg bg-black/40 hover:bg-black/60 text-gray-400 hover:text-white border border-white/10 cursor-pointer"
+                title={isDeckExpanded ? "Collapse deck" : "Expand deck"}
+              >
+                {isDeckExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              </button>
             </div>
 
             {/* Incomplete deck warning */}
@@ -777,9 +762,10 @@ export const MobileCollectionView: React.FC = () => {
 
                           {/* Right: Stats & Remove */}
                           <div className="flex items-center gap-1.5 z-10 shrink-0">
-                            <div className="flex flex-col items-end font-mono text-[8px] font-bold leading-none text-right">
+                            <div className="flex flex-col min-[380px]:flex-row items-end min-[380px]:items-center gap-0.5 min-[380px]:gap-1.5 font-mono text-[7.5px] min-[380px]:text-[8px] sm:text-[8.5px] font-black leading-tight text-right">
                               <span className="text-red-400">⚔️{card.attack}</span>
-                              <span className="text-emerald-400 mt-0.5">❤️{card.health}</span>
+                              <span className="text-emerald-400">❤️{card.health}</span>
+                              <span className="text-blue-400" title="Turn Delay">⏳{card.delay}</span>
                             </div>
                             <button
                               onClick={(e) => {
@@ -1136,17 +1122,6 @@ export const MobileCollectionView: React.FC = () => {
               >
                 <FusionAltarEmblem className="w-4 h-4 shrink-0" />
                 <span>PERFORM FUSION RITUAL</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setIsFusingMode(false);
-                  setFuseCardId1(null);
-                  setFuseCardId2(null);
-                }}
-                className="w-full bg-black/40 hover:bg-black/60 border border-white/10 text-gray-400 font-mono text-[10px] py-1.5 rounded-xl transition-all"
-              >
-                Exit Altar & Return to Sanctuary
               </button>
             </div>
           </div>
