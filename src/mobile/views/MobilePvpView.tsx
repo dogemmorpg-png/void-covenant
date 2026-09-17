@@ -21,12 +21,13 @@ import {
   Clock, 
   ShoppingBag, 
   ArrowRight,
+  User,
   X 
 } from 'lucide-react';
 import { renderStanceIcon } from '../../components/SkillAndStanceIcons';
 import { assetPreloader } from '../../utils/assetPreloader';
 import { calculateEquipmentSetBonuses } from '../../data/equipment';
-import { ALL_LEAGUE_REWARDS } from '../../data/leagueRewards';
+import { ALL_LEAGUE_REWARDS, LEAGUE_PROMOTION_CONFIG } from '../../data/leagueRewards';
 
 interface MobilePvpViewProps {
   onStartBattle: (stage: CampaignStage, type: 'campaign' | 'pvp', opponentPayload?: any) => Promise<boolean> | void;
@@ -1060,84 +1061,186 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
               </button>
             </div>
 
-            {/* Summoners List (Matching PC Image 3 & 4) */}
-            <div className="space-y-1.5 max-h-[380px] overflow-y-auto pr-0.5">
-              {leaderboard.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 font-mono text-[10px]">
-                  No summoners registered in this league yet.
-                </div>
-              ) : (
-                leaderboard.map((player, idx) => {
-                  const rank = idx + 1;
-                  const isSelf = (profile.solanaAddress && player.walletAddress && player.walletAddress.toLowerCase() === profile.solanaAddress.toLowerCase()) ||
-                    (profile.username && player.username && player.username.trim().toLowerCase() === profile.username.trim().toLowerCase());
-                  const subTier = player.subscriptionTier || 'free';
+            {/* Summoners List with Ghost Slots (Matching PC Screenshots 3 & 4) */}
+            {viewingLeague === 'More Leagues Soon' ? (
+              <div className="h-56 flex flex-col items-center justify-center p-6 text-center space-y-2 bg-black/40 border border-purple-500/20 rounded-2xl">
+                <Lock className="w-8 h-8 text-purple-400/80 animate-pulse" />
+                <h4 className="font-display font-black text-xs sm:text-sm text-purple-200 uppercase tracking-widest">
+                  Uncharted Territories
+                </h4>
+                <p className="text-[10px] text-gray-400 font-sans max-w-xs leading-relaxed">
+                  Higher celestial and abyssal leagues will unlock in upcoming realm cycles.
+                </p>
+              </div>
+            ) : isLoadingLeaderboard ? (
+              <div className="h-56 flex flex-col items-center justify-center space-y-2">
+                <div className="w-6 h-6 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
+                <span className="text-[10px] font-mono text-gray-500 uppercase">Loading Leaderboard...</span>
+              </div>
+            ) : (
+              <div className="space-y-1.5 max-h-[380px] overflow-y-auto pr-0.5">
+                {(() => {
+                  const leagueConfig = LEAGUE_PROMOTION_CONFIG[viewingLeague] || { promoteTop: 20, demoteRankAbove: 100, capacity: 10 };
+                  const leagueCap = leagueConfig.capacity || 10;
+                  const minSlots = leagueCap < 8 ? leagueCap : 8;
+                  const totalSlots = Math.max(minSlots, leaderboard.length);
 
-                  return (
-                    <div
-                      key={idx}
-                      className={`p-2 sm:p-2.5 rounded-xl border flex items-center justify-between transition-all ${
-                        isSelf
-                          ? 'bg-purple-950/30 border-purple-500/60 shadow-[0_0_12px_rgba(168,85,247,0.25)]'
-                          : rank === 1
-                          ? 'bg-amber-950/20 border-amber-500/40'
-                          : 'bg-black/50 border-white/5'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        {/* Rank Position */}
-                        <span className={`w-5 text-center font-mono font-bold text-xs ${
-                          rank === 1 ? 'text-amber-400 font-black' :
-                          rank === 2 ? 'text-slate-300 font-bold' :
-                          rank === 3 ? 'text-amber-600 font-bold' :
-                          'text-gray-500'
-                        }`}>
-                          #{rank}
-                        </span>
+                  return Array.from({ length: totalSlots }).map((_, idx) => {
+                    const rank = idx + 1;
+                    const player = leaderboard[idx];
+                    const isPromo = leagueConfig.promoteTop > 0 && rank <= leagueConfig.promoteTop;
+                    const isDemo = rank > leagueConfig.demoteRankAbove;
+                    const isSelf = Boolean(
+                      player && (
+                        (profile.solanaAddress && player.walletAddress && player.walletAddress.toLowerCase() === profile.solanaAddress.toLowerCase()) ||
+                        (profile.username && player.username && player.username.trim().toLowerCase() === profile.username.trim().toLowerCase())
+                      )
+                    );
+                    const subTier = isSelf ? mySubTier : (player?.subscriptionTier || 'free');
 
-                        {/* Avatar */}
-                        <div className={`w-6 h-6 rounded-full overflow-hidden shrink-0 border ${
-                          subTier === 'ultra' ? 'border-purple-400 ring-1 ring-purple-400/80' :
-                          subTier === 'premium' ? 'border-amber-400 ring-1 ring-amber-400/80' :
-                          'border-white/10'
-                        }`}>
-                          <img 
-                            src={getSafeAvatarUrl(player.avatarUrl)} 
-                            alt="" 
-                            className="w-full h-full object-cover" 
-                            onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/avatars/knight.webp'; }}
-                          />
+                    if (player) {
+                      return (
+                        <div
+                          key={player.walletAddress || idx}
+                          className={`p-2 sm:p-2.5 px-3 rounded-xl border flex items-center justify-between transition-all ${
+                            isSelf
+                              ? 'bg-amber-950/20 border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.2)]'
+                              : rank === 1
+                              ? 'bg-amber-950/20 border-amber-500/30'
+                              : rank === 2
+                              ? 'bg-slate-900/30 border-slate-700/30'
+                              : rank === 3
+                              ? 'bg-amber-950/10 border-amber-700/20'
+                              : 'bg-black/40 border-white/5'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            {/* Rank Position with Zone Marker */}
+                            <div className="flex items-center gap-0.5 shrink-0">
+                              <span className={`w-5 text-center font-bold font-mono text-xs ${
+                                isDemo ? 'text-rose-400 font-bold' :
+                                rank === 1 ? 'text-amber-400 font-black' :
+                                rank === 2 ? 'text-slate-300 font-bold' :
+                                rank === 3 ? 'text-amber-600 font-bold' : 
+                                isPromo ? 'text-emerald-400 font-bold' : 'text-gray-500'
+                              }`}>
+                                #{rank}
+                              </span>
+                              {isPromo && (
+                                <span className="text-[8px] text-emerald-400 font-black" title="Promotion Zone">▲</span>
+                              )}
+                              {isDemo && (
+                                <span className="text-[8px] text-rose-400 font-black" title="Demotion Zone">▼</span>
+                              )}
+                            </div>
+
+                            {/* Avatar */}
+                            <div className={`w-6 h-6 rounded-full overflow-hidden shrink-0 flex items-center justify-center border ${
+                              subTier === 'ultra' ? 'border-purple-400 ring-1 ring-purple-400/80 shadow-[0_0_8px_rgba(168,85,247,0.5)]' :
+                              subTier === 'premium' ? 'border-amber-400 ring-1 ring-amber-400/80 shadow-[0_0_8px_rgba(245,158,11,0.4)]' :
+                              'border-white/10 bg-black/50'
+                            }`}>
+                              <img 
+                                src={getSafeAvatarUrl(player.avatarUrl)} 
+                                alt="" 
+                                className="w-full h-full object-cover" 
+                                onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/avatars/knight.webp'; }}
+                              />
+                            </div>
+
+                            {/* Username */}
+                            <div className="min-w-0 flex items-center gap-1 truncate">
+                              <span className={`truncate font-sans font-bold text-xs max-w-[110px] sm:max-w-[140px] ${
+                                isSelf ? 'text-cyan-300 font-black' :
+                                subTier === 'ultra' ? 'text-purple-300 font-black' :
+                                subTier === 'premium' ? 'text-amber-300 font-black' :
+                                'text-white'
+                              }`}>
+                                {player.username}
+                              </span>
+                              {subTier === 'ultra' && <span className="text-[9px]">💎</span>}
+                              {subTier === 'premium' && <span className="text-[9px]">⚜️</span>}
+                              {isSelf && (
+                                <span className="text-[7.5px] font-mono bg-cyan-950 text-cyan-300 font-bold px-1 rounded border border-cyan-500/40 shrink-0">
+                                  YOU
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Crowns */}
+                          <div className="flex items-center gap-1 font-mono text-xs font-bold text-amber-300 shrink-0">
+                            <span>{player.pvpLP !== undefined ? player.pvpLP : (player.pvpRating || 0)}</span>
+                            <img src="/icons/crown.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                          </div>
                         </div>
-
-                        {/* Username */}
-                        <div className="min-w-0 flex items-center gap-1 truncate">
-                          <span className={`font-display font-bold text-xs truncate max-w-[120px] ${
-                            isSelf ? 'text-cyan-300 font-black' :
-                            subTier === 'ultra' ? 'text-purple-300 font-black' :
-                            subTier === 'premium' ? 'text-amber-300 font-black' :
-                            'text-white'
-                          }`}>
-                            {player.username}
-                          </span>
-                          {subTier === 'ultra' && <span className="text-[9px]">💎</span>}
-                          {subTier === 'premium' && <span className="text-[9px]">⚜️</span>}
-                          {isSelf && (
-                            <span className="text-[7.5px] font-mono bg-cyan-950 text-cyan-300 font-bold px-1 rounded border border-cyan-500/40">
-                              YOU
+                      );
+                    } else {
+                      // Placeholder row for empty slots (Matching PC Screenshots 3 & 4)
+                      return (
+                        <div
+                          key={`empty-${idx}`}
+                          className="flex items-center justify-between p-2 sm:p-2.5 px-3 rounded-xl border border-white/5 bg-black/20 text-xs opacity-35"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="w-5 text-center font-mono text-xs text-gray-600">
+                              #{rank}
                             </span>
-                          )}
+                            <span className="font-mono text-xs text-gray-600">
+                              —
+                            </span>
+                          </div>
+                          <span className="font-mono text-xs text-gray-700 font-bold">—</span>
                         </div>
-                      </div>
+                      );
+                    }
+                  });
+                })()}
+              </div>
+            )}
 
-                      {/* Crowns */}
-                      <div className="flex items-center gap-1 font-mono text-xs font-bold text-amber-300 shrink-0">
-                        <span>{player.pvpLP !== undefined ? player.pvpLP : (player.pvpRating || 0)}</span>
-                        <img src="/icons/crown.png" alt="" className="w-3.5 h-3.5 object-contain" />
-                      </div>
+            {/* Pinned My Rank Row (ONLY if viewing own league AND player is not in visible list) */}
+            {viewingLeague === (profile.pvpLeague || 'Bronze') && !leaderboard.some(p => 
+              (profile.solanaAddress && p.walletAddress && p.walletAddress.toLowerCase() === profile.solanaAddress.toLowerCase()) ||
+              (profile.username && p.username && p.username.trim().toLowerCase() === profile.username.trim().toLowerCase())
+            ) && (
+              <div className="pt-2 border-t border-cyan-500/30">
+                <div className={`flex items-center justify-between p-2 px-3 rounded-xl border text-xs font-bold transition-all ${
+                  mySubTier === 'ultra'
+                    ? 'bg-gradient-to-r from-purple-950/40 via-cyan-950/40 to-purple-950/40 border-purple-500/70 text-cyan-300 shadow-[0_0_15px_rgba(168,85,247,0.3)]'
+                    : mySubTier === 'premium'
+                    ? 'bg-gradient-to-r from-amber-950/40 via-cyan-950/40 to-amber-950/40 border-amber-500/70 text-cyan-300 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
+                    : 'bg-cyan-950/40 border-cyan-500/50 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
+                }`}>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="w-5 text-center font-bold font-mono text-xs text-cyan-300">
+                      #{myOwnLeagueRank}
+                    </span>
+                    <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 border border-cyan-400/50 bg-black/50">
+                      <img src={getSafeAvatarUrl(profile.avatarUrl)} alt="" className="w-full h-full object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/avatars/knight.webp'; }} />
                     </div>
-                  );
-                })
-              )}
+                    <span className="truncate font-sans font-bold text-xs max-w-[110px] text-white">
+                      {profile.username || 'You'}
+                    </span>
+                    {mySubTier === 'ultra' && <span className="text-[9px]">💎</span>}
+                    {mySubTier === 'premium' && <span className="text-[9px]">⚜️</span>}
+                    <span className="text-[7.5px] font-mono font-black text-cyan-300 bg-cyan-950/80 border border-cyan-500/60 px-1.5 py-0.2 rounded shrink-0">
+                      YOU
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 font-mono font-bold text-xs text-amber-300 shrink-0">
+                    <span>{profile.pvpLP || 0}</span>
+                    <img src="/icons/crown.png" alt="" className="w-3.5 h-3.5 object-contain brightness-110 contrast-125" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Real-time database updates footer */}
+            <div className="border-t border-white/5 pt-2 mt-2 flex items-center justify-center text-[9px] text-gray-500 font-mono">
+              <span className="flex items-center gap-1">
+                <RefreshCw className="w-3 h-3 text-cyan-400/80 animate-spin-slow" /> Real-time database updates
+              </span>
             </div>
           </div>
         )}
@@ -1726,47 +1829,145 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
         </div>
       )}
 
-      {/* Modal 5: League Hierarchy & Reset Rules Modal */}
+      {/* Modal 5: League Hierarchy & Reset Rules Modal (Authentic PC styling matching Screenshots 1 & 2) */}
       {isLeagueRulesModalOpen && (
         <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-md flex items-center justify-center p-3 animate-fade-in">
-          <div className="bg-gradient-to-b from-[#1c1410] via-[#100c0a] to-[#080605] border-2 border-amber-500/50 rounded-2xl max-w-sm w-full p-4 space-y-3 shadow-2xl relative">
+          <div className="bg-gradient-to-b from-[#1c141e] via-[#110d14] to-[#09060b] border-2 border-amber-500/50 rounded-3xl p-4 sm:p-6 max-w-lg sm:max-w-2xl w-full relative shadow-[0_0_60px_rgba(0,0,0,0.95)] space-y-3.5 sm:space-y-4 overflow-hidden max-h-[92vh] flex flex-col">
+            
+            {/* Ambient Background Flare */}
+            <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 bg-amber-500/15 blur-3xl pointer-events-none" />
+
+            {/* Close Button */}
             <button 
               onClick={() => setIsLeagueRulesModalOpen(false)}
-              className="absolute top-2.5 right-2.5 text-gray-400 hover:text-white w-7 h-7 flex items-center justify-center bg-black/70 rounded-full border border-white/10"
+              className="absolute top-3.5 right-3.5 text-gray-400 hover:text-white font-sans text-base font-black transition-all cursor-pointer w-8 h-8 flex items-center justify-center bg-black/70 hover:bg-black border border-white/10 hover:border-white/30 rounded-full z-30 shadow-lg active:scale-95"
+              title="Close"
             >
               ✕
             </button>
 
-            <div className="text-center space-y-1">
-              <Trophy className="w-6 h-6 text-amber-400 mx-auto" />
-              <h3 className="font-display font-black text-xs text-amber-300 uppercase tracking-wider">
+            {/* Header with Glowing Trophy */}
+            <div className="text-center space-y-1.5 relative z-10 px-4 shrink-0">
+              <div className="w-12 h-12 mx-auto rounded-2xl bg-gradient-to-b from-amber-950/80 via-black to-black border-2 border-amber-500/60 flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.35)]">
+                <Trophy className="w-6 h-6 text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.8)]" />
+              </div>
+              <h3 className="font-display font-black text-base sm:text-xl text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-300 to-yellow-500 tracking-widest uppercase text-shadow-gold">
                 LEAGUE HIERARCHY & RESET RULES
               </h3>
-              <p className="text-[9px] font-sans text-gray-300">
-                Ladder resets daily at <strong className="text-amber-400 font-mono">00:00 UTC</strong>. Daily tributes delivered to Mailbox.
+              <p className="text-[10px] sm:text-xs text-gray-300 font-sans max-w-md mx-auto leading-relaxed">
+                The Arena ladder resets daily at <strong className="text-amber-400 font-mono">00:00 UTC</strong>. Battle for top standings, ascend through the leagues, and claim your daily tributes:
               </p>
             </div>
 
-            <div className="divide-y divide-white/5 max-h-56 overflow-y-auto pr-0.5 border border-white/10 rounded-xl bg-black/50">
-              {LEAGUE_TABLE_DATA.map((row) => (
-                <div key={row.name} className="py-1.5 px-2 flex items-center justify-between text-[9px] font-mono">
-                  <div className="flex items-center gap-1.5">
-                    <img src={row.icon} alt="" className="w-4 h-4 object-contain" />
-                    <span className={`font-display font-bold uppercase ${row.color}`}>
-                      {row.name}
-                    </span>
+            {/* Table Grid with Horizontal Scroll support */}
+            <div className="border border-white/15 rounded-2xl overflow-hidden bg-black/60 shadow-2xl relative z-10 flex-1 min-h-0 flex flex-col">
+              <div className="overflow-x-auto flex-1 min-h-0">
+                <div className="min-w-[480px]">
+                  {/* Table Header */}
+                  <div className="grid grid-cols-12 bg-gradient-to-r from-amber-950/40 via-black/80 to-amber-950/40 border-b border-white/15 py-2.5 px-3 sm:px-4 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-gray-400 sticky top-0 z-20">
+                    <div className="col-span-4 flex items-center gap-1.5">
+                      <Shield className="w-3.5 h-3.5 text-amber-400" />
+                      <span>LEAGUE TIER</span>
+                    </div>
+                    <div className="col-span-3 text-center text-emerald-400 flex items-center justify-center gap-1">
+                      <span>▲</span>
+                      <span>PROMOTION</span>
+                    </div>
+                    <div className="col-span-3 text-center text-gray-300 flex items-center justify-center gap-1">
+                      <span>🛡️</span>
+                      <span>SAFE HAVEN</span>
+                    </div>
+                    <div className="col-span-2 text-center text-rose-400 flex items-center justify-center gap-1">
+                      <span>▼</span>
+                      <span>DEMOTION</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    {row.promo && <span className="text-emerald-400 font-bold">▲ {row.promo}</span>}
-                    {row.demo && <span className="text-rose-400 font-bold ml-1">▼ {row.demo}</span>}
+
+                  {/* Table Rows */}
+                  <div className="divide-y divide-white/5 max-h-[300px] sm:max-h-[340px] overflow-y-auto">
+                    {LEAGUE_TABLE_DATA.map((row) => {
+                      const isMyLeague = row.name === (profile.pvpLeague || 'Bronze');
+                      return (
+                        <div 
+                          key={row.name}
+                          className={`grid grid-cols-12 items-center py-2 px-3 sm:px-4 transition-colors ${
+                            isMyLeague 
+                              ? 'bg-amber-950/30 font-medium' 
+                              : 'hover:bg-white/[0.03]'
+                          }`}
+                        >
+                          {/* League Name & Capacity */}
+                          <div className="col-span-4 flex items-center gap-2 min-w-0 pr-1">
+                            <img src={row.icon} alt="" className="w-5 h-5 sm:w-6 sm:h-6 object-contain shrink-0" />
+                            <div className="min-w-0 truncate">
+                              <div className="flex items-center gap-1.5">
+                                <span className={`font-display font-black text-[11px] sm:text-xs uppercase tracking-wide truncate ${row.color}`}>
+                                  {row.name}
+                                </span>
+                                {isMyLeague && (
+                                  <span className="text-[7.5px] font-mono font-bold px-1 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40 shrink-0">
+                                    YOU
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-[8.5px] font-mono text-gray-400 block">
+                                {row.capacity}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Promotion Zone */}
+                          <div className="col-span-3 text-center">
+                            {row.promo ? (
+                              <span className="inline-block text-[9.5px] sm:text-[10.5px] font-mono font-black text-emerald-300 bg-emerald-950/70 border border-emerald-500/40 px-2 py-0.5 rounded-md shadow-sm">
+                                {row.promo}
+                              </span>
+                            ) : (
+                              <span className="text-[9.5px] sm:text-[10.5px] font-mono text-amber-400/90 font-bold italic">
+                                Crown Apex 👑
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Safe Haven */}
+                          <div className="col-span-3 text-center">
+                            <span className="inline-block text-[9.5px] sm:text-[10.5px] font-mono font-medium text-gray-300 bg-black/60 border border-white/10 px-2 py-0.5 rounded-md">
+                              {row.safe}
+                            </span>
+                          </div>
+
+                          {/* Demotion Zone */}
+                          <div className="col-span-2 text-center">
+                            {row.demo ? (
+                              <span className="inline-block text-[9.5px] sm:text-[10.5px] font-mono font-black text-rose-300 bg-rose-950/70 border border-rose-500/40 px-2 py-0.5 rounded-md shadow-sm">
+                                {row.demo}
+                              </span>
+                            ) : (
+                              <span className="text-[9.5px] sm:text-[10.5px] font-mono text-gray-500 italic">
+                                No Demote
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
 
+            {/* Note banner */}
+            <div className="bg-black/70 border border-white/10 rounded-2xl p-2.5 text-center text-[10px] sm:text-xs text-gray-300 font-sans leading-relaxed relative z-10 shadow-inner flex items-center justify-center gap-2 shrink-0">
+              <span className="text-amber-400 text-sm shrink-0">💡</span>
+              <span>
+                <strong className="text-amber-300">Daily 00:00 UTC:</strong> 5 Free Tickets refill • LP resets to 100 • Daily tributes delivered to <strong>Mailbox</strong>.
+              </span>
+            </div>
+
+            {/* Action button */}
             <button
               onClick={() => setIsLeagueRulesModalOpen(false)}
-              className="w-full py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-display font-black text-xs uppercase tracking-wider active:scale-95 cursor-pointer"
+              className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-display font-black tracking-widest text-xs sm:text-sm uppercase transition-all duration-300 cursor-pointer relative z-10 shadow-[0_0_20px_rgba(245,158,11,0.25)] hover:scale-[1.01] active:scale-[0.99] shrink-0"
             >
               UNDERSTOOD
             </button>
