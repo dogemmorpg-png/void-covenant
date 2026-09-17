@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useGame } from '../../context/GameContext';
 import { useToast } from '../../components/Toast';
 import { Equipment, EquipmentSlot, CardTier } from '../../types';
@@ -8,7 +8,7 @@ import * as LucideIcons from 'lucide-react';
 import { 
   Heart, Sparkles, Coins, Hourglass, Wind, Zap, 
   Check, RefreshCw, X, ShoppingBag, ArrowRight, RotateCcw,
-  Lock, ChevronDown, Award
+  Lock, Star, Award
 } from 'lucide-react';
 import { VoidStrikeIcon, BloodAuraIcon, WarlordCryIcon } from '../../components/SkillAndStanceIcons';
 
@@ -77,6 +77,8 @@ const STANCE_CONFIG: Record<TalentStance, {
   name: string; 
   icon: (size?: string) => React.ReactNode; 
   color: string; 
+  themeHex: string;
+  themeColorClass: string;
   borderActive: string;
   bgActive: string;
   desc: string;
@@ -86,6 +88,8 @@ const STANCE_CONFIG: Record<TalentStance, {
     name: 'Void Strike', 
     icon: (s = "w-4 h-4") => <VoidStrikeIcon sizeClass={s} />, 
     color: 'text-cyan-400', 
+    themeHex: '#a855f7',
+    themeColorClass: 'purple',
     borderActive: 'border-cyan-400',
     bgActive: 'from-cyan-950/60 via-[#0a1822] to-black',
     desc: '15% chance to deal 1 bonus damage.',
@@ -95,6 +99,8 @@ const STANCE_CONFIG: Record<TalentStance, {
     name: 'Blood Aura', 
     icon: (s = "w-4 h-4") => <BloodAuraIcon sizeClass={s} />, 
     color: 'text-rose-400', 
+    themeHex: '#ef4444',
+    themeColorClass: 'red',
     borderActive: 'border-rose-400',
     bgActive: 'from-red-950/60 via-[#1e070d] to-black',
     desc: '15% chance to heal an ally for 1 HP.',
@@ -104,11 +110,46 @@ const STANCE_CONFIG: Record<TalentStance, {
     name: "Warlord's Cry", 
     icon: (s = "w-4 h-4") => <WarlordCryIcon sizeClass={s} />, 
     color: 'text-amber-400', 
+    themeHex: '#f59e0b',
+    themeColorClass: 'amber',
     borderActive: 'border-amber-400',
     bgActive: 'from-amber-950/60 via-[#1f1406] to-black',
     desc: '15% chance to buff a random ally with +1 Atk.',
     badgeBg: 'bg-amber-950/60 text-amber-300 border-amber-500/40'
   },
+};
+
+// Responsive node positioning math for mobile constellation canvas
+const getMobileNodePos = (tier: number, col: number, canvasWidth: number = 360) => {
+  const cWidth = Math.max(300, canvasWidth);
+  const sideWidth = Math.min(150, Math.floor((cWidth - 20) / 2));
+  const centerWidth = Math.min(224, cWidth - 24);
+
+  let width = centerWidth;
+  let height = 74;
+  let x = Math.round(cWidth / 2);
+
+  if (col === -1) {
+    width = sideWidth;
+    x = Math.round(sideWidth / 2 + 6);
+  } else if (col === 1) {
+    width = sideWidth;
+    x = Math.round(cWidth - sideWidth / 2 - 6);
+  } else if (tier === 3) {
+    width = Math.min(220, cWidth - 24);
+    height = 76;
+  } else if (tier === 5) {
+    width = Math.min(230, cWidth - 20);
+    height = 78;
+  }
+
+  let y = 52;
+  if (tier === 2) y = 168;
+  if (tier === 3) y = 284;
+  if (tier === 4) y = 400;
+  if (tier === 5) y = 516;
+
+  return { x, y, width, height };
 };
 
 interface MobileHeroViewProps {
@@ -122,10 +163,29 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
   const [selectedSlot, setSelectedSlot] = useState<EquipmentSlot | null>(null);
   const [subTab, setSubTab] = useState<'equipment' | 'talents'>('equipment');
 
-  // Talent Tree stance sub-tab
+  // Talent Tree stance sub-tab and selected inspector node
   const [activeTalentStance, setActiveTalentStance] = useState<TalentStance>(profile?.activeStance || 'void_strike');
+  const [selectedTalentId, setSelectedTalentId] = useState<string | null>(null);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+
+  // Responsive constellation canvas measurement
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const [canvasWidth, setCanvasWidth] = useState(350);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const updateWidth = () => {
+      if (canvasRef.current) {
+        const w = canvasRef.current.clientWidth;
+        if (w > 0) setCanvasWidth(w);
+      }
+    };
+    updateWidth();
+    const ro = new ResizeObserver(() => updateWidth());
+    ro.observe(canvasRef.current);
+    return () => ro.disconnect();
+  }, [subTab]);
 
   // Equipped items resolution
   const eqWeapon = profile.equipment?.find(e => e.id === profile.equipped?.['weapon']) || null;
@@ -255,6 +315,10 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
       setIsResetConfirmOpen(false);
     }
   };
+
+  // Active talent nodes for current stance
+  const activeTalentNodes = TALENT_TREES.filter(t => t.stance === activeTalentStance);
+  const selectedTalent = activeTalentNodes.find(n => n.id === selectedTalentId) || activeTalentNodes[0];
 
   // Paperdoll individual slot box
   const renderSlotBox = (slot: EquipmentSlot, label: string, defaultIconPath: string) => {
@@ -411,7 +475,7 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                         {item.tier}
                       </span>
                       {isEquipped && (
-                        <span className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-400 text-[8.5px] font-mono font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.4)]">
+                        <span className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-400 text-[8.5px] font-mono font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-[0_0_10px_rgba(168,85,247,0.4)]">
                           <Check className="w-2.5 h-2.5" /> EQUIPPED
                         </span>
                       )}
@@ -485,117 +549,19 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
     );
   };
 
-  // Node Card for Mobile Talent Progression
-  const renderTalentNodeCard = (node: TalentNode, isWide: boolean = false) => {
-    const currentLevel = profile.talents?.[node.id] || 0;
-    const isMaxed = currentLevel >= node.maxLevel;
-    
-    let isLocked = false;
-    let lockReason = '';
-    if (node.requires && node.requires.length > 0) {
-      isLocked = !node.requires.every(reqId => {
-        const reqNode = TALENT_TREES.find(n => n.id === reqId);
-        const reqLevel = profile.talents?.[reqId] || 0;
-        return node.requireMax ? reqLevel >= (reqNode?.maxLevel || 1) : reqLevel > 0;
-      });
-      if (isLocked) {
-        const reqNames = node.requires.map(r => TALENT_TREES.find(n => n.id === r)?.name || r).join(', ');
-        lockReason = node.requireMax ? `Requires maxing ${reqNames}` : `Requires unlocking ${reqNames}`;
-      }
-    }
-
-    const IconComp = (LucideIcons as any)[node.icon] || LucideIcons.Sparkles;
-    const stanceCfg = STANCE_CONFIG[activeTalentStance];
-    const isMajor = node.tier === 3 || node.tier === 5;
-    const canUpgrade = !isLocked && !isMaxed && availableTalentPoints >= node.cost;
-
-    return (
-      <div 
-        key={node.id}
-        onClick={() => {
-          if (!isLocked && !isMaxed) handlePurchaseTalent(node);
-          else if (isLocked) toast(lockReason, 'info');
-        }}
-        className={`rounded-2xl p-2.5 sm:p-3 border-2 transition-all relative flex flex-col justify-between select-none ${
-          isLocked 
-            ? 'bg-black/50 border-white/10 opacity-50 grayscale cursor-not-allowed'
-            : isMaxed
-            ? 'bg-gradient-to-b from-[#181a24] to-[#0d0f15] border-amber-500/70 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
-            : canUpgrade
-            ? `bg-gradient-to-b from-[#161426] via-[#100e1b] to-black ${stanceCfg.borderActive} shadow-lg active:scale-98 cursor-pointer`
-            : 'bg-[#100e18] border-white/15 opacity-80'
-        } ${isWide ? 'w-full' : 'flex-1 min-w-0'}`}
-      >
-        {/* Top: Icon + Name + Level Pill */}
-        <div className="flex items-center gap-2 mb-1.5">
-          <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-inner ${
-            isMaxed 
-              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' 
-              : isLocked 
-              ? 'bg-gray-800 text-gray-500' 
-              : `${stanceCfg.badgeBg} border`
-          }`}>
-            <IconComp className="w-4 h-4" />
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between gap-1">
-              <h5 className={`font-display font-bold text-[11px] leading-tight truncate ${
-                isMajor ? 'text-amber-300' : isMaxed ? 'text-white' : 'text-gray-200'
-              }`}>
-                {node.name}
-              </h5>
-              <span className={`text-[8.5px] font-mono font-black px-1.5 py-0.2 rounded shrink-0 ${
-                isMaxed 
-                  ? 'bg-amber-500/25 text-amber-300 border border-amber-500/40' 
-                  : 'bg-black/60 text-gray-300 border border-white/10'
-              }`}>
-                {currentLevel}/{node.maxLevel}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Middle: Description */}
-        <p className="text-[9px] font-sans text-gray-400 leading-snug line-clamp-2 min-h-[24px]">
-          {node.description(Math.max(1, currentLevel))}
-        </p>
-
-        {/* Bottom: Upgrade Action or Status */}
-        <div className="mt-2 pt-1.5 border-t border-white/5 flex items-center justify-between text-[8px] font-mono">
-          {isMaxed ? (
-            <span className="w-full text-center py-0.5 text-amber-400 font-black tracking-wider flex items-center justify-center gap-1">
-              <Check className="w-2.5 h-2.5 stroke-[3]" /> MAXED
-            </span>
-          ) : isLocked ? (
-            <span className="w-full text-center py-0.5 text-gray-500 font-semibold tracking-tight truncate flex items-center justify-center gap-1">
-              <Lock className="w-2.5 h-2.5" /> {lockReason || 'Locked'}
-            </span>
-          ) : (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handlePurchaseTalent(node);
-              }}
-              disabled={!canUpgrade}
-              className={`w-full py-1 px-2 rounded-lg font-display font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1 shadow-sm ${
-                canUpgrade
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-black cursor-pointer active:scale-95'
-                  : 'bg-white/5 text-gray-500 cursor-not-allowed border border-white/5'
-              }`}
-            >
-              <span>Upgrade</span>
-              <span className="text-[7.5px] font-mono opacity-85">({node.cost}pt)</span>
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="h-full w-full flex flex-col bg-[#080a0f] text-gray-200 select-none overflow-y-auto no-scrollbar font-sans pb-24">
-      
+      {/* Dynamic Keyframes for Animated SVG Beziers */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes energyFlow {
+          from { stroke-dashoffset: 20; }
+          to { stroke-dashoffset: 0; }
+        }
+        .animate-energy {
+          animation: energyFlow 1.2s linear infinite;
+        }
+      `}} />
+
       {/* 1. TOP SUB-TAB NAVIGATION */}
       <div className="sticky top-0 z-30 bg-[#080a0f]/95 backdrop-blur-md border-b border-[#c5a880]/20 px-3 py-2 shrink-0">
         <div className="flex gap-2 max-w-sm mx-auto">
@@ -905,7 +871,7 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
         </div>
       ) : (
         /* ------------------------------------------------------------- */
-        /* TAB 2: TALENT TREE (MOBILE-OPTIMIZED VIEW)                     */
+        /* TAB 2: TALENT TREE (PC-PARITY CONSTELLATION MOBILE VIEW)      */
         /* ------------------------------------------------------------- */
         <div className="p-3 space-y-3 max-w-md mx-auto w-full">
           
@@ -928,10 +894,14 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
             <button
               onClick={() => setIsResetConfirmOpen(true)}
               disabled={spentTalentPoints === 0 || isResetting}
-              className="bg-gradient-to-r from-red-950/80 to-rose-950/90 hover:from-red-900 hover:to-rose-900 border border-rose-500/50 text-rose-200 hover:text-white px-3 py-2 rounded-xl text-[10.5px] font-display font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="bg-gradient-to-r from-red-950/80 to-rose-950/90 hover:from-red-900 hover:to-rose-900 border border-rose-500/50 text-rose-200 hover:text-white px-3 py-1.5 rounded-xl text-[10.5px] font-display font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5 text-rose-400" />
-              <span>Reset (15 💎)</span>
+              <span>RESET</span>
+              <div className="flex items-center gap-1 bg-black/60 px-2 py-0.5 rounded-lg border border-rose-500/40">
+                <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
+                <span className="font-mono text-[10.5px] text-rose-300 font-bold">15</span>
+              </div>
             </button>
           </div>
 
@@ -945,7 +915,10 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
               return (
                 <button
                   key={stKey}
-                  onClick={() => setActiveTalentStance(stKey)}
+                  onClick={() => {
+                    setActiveTalentStance(stKey);
+                    setSelectedTalentId(null);
+                  }}
                   className={`py-2 px-1 rounded-xl transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer relative ${
                     isSelectedTab
                       ? `bg-gradient-to-b ${st.bgActive} border-2 ${st.borderActive} shadow-lg text-white`
@@ -1003,91 +976,349 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
             );
           })()}
 
-          {/* Mobile Tiered Progression Tree */}
-          {(() => {
-            const activeNodes = TALENT_TREES.filter(t => t.stance === activeTalentStance);
-            const tier1Nodes = activeNodes.filter(n => n.tier === 1);
-            const tier2Nodes = activeNodes.filter(n => n.tier === 2);
-            const tier3Nodes = activeNodes.filter(n => n.tier === 3);
-            const tier4Nodes = activeNodes.filter(n => n.tier === 4);
-            const tier5Nodes = activeNodes.filter(n => n.tier === 5);
+          {/* ------------------------------------------------------------- */}
+          {/* AUTHENTIC PC-STYLE SVG CONSTELLATION TALENT TREE FOR MOBILE   */}
+          {/* ------------------------------------------------------------- */}
+          <div className="relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-950/90 via-black to-black border border-white/15 rounded-3xl p-2 pt-3 shadow-2xl overflow-hidden">
+            {/* Dynamic Background Watermark matching PC */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center opacity-[0.03] text-white">
+              <div className="scale-[10] blur-sm transform rotate-12">
+                {STANCE_CONFIG[activeTalentStance].icon("w-16 h-16")}
+              </div>
+            </div>
+
+            {/* Background Ambient Radial Glow */}
+            <div 
+              className="absolute -top-20 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full blur-[80px] pointer-events-none opacity-20"
+              style={{ backgroundColor: STANCE_CONFIG[activeTalentStance].themeHex }}
+            />
+
+            {/* Responsive Constellation Canvas */}
+            <div ref={canvasRef} className="w-full h-[580px] relative mx-auto select-none overflow-hidden">
+              
+              {/* SVG Animated Bezier Connections */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+                <defs>
+                  <filter id="glow-mob" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                </defs>
+
+                {activeTalentNodes.map(node => {
+                  if (!node.requires) return null;
+                  const targetPos = getMobileNodePos(node.tier, node.col, canvasWidth);
+
+                  // Only draw direct visual tree connections: for Tier 5, connect from immediate predecessors (Tier 4)
+                  const visibleRequires = node.tier === 5
+                    ? node.requires.filter(id => {
+                        const rn = activeTalentNodes.find(t => t.id === id);
+                        return rn && rn.tier === 4;
+                      })
+                    : node.requires;
+
+                  return visibleRequires.map(reqId => {
+                    const reqNode = activeTalentNodes.find(n => n.id === reqId);
+                    if (!reqNode) return null;
+                    const sourcePos = getMobileNodePos(reqNode.tier, reqNode.col, canvasWidth);
+
+                    const currentLevel = profile.talents?.[node.id] || 0;
+                    const reqLevel = profile.talents?.[reqNode.id] || 0;
+
+                    const isFullyUnlocked = currentLevel > 0;
+                    const isAvailable = node.requireMax ? reqLevel >= reqNode.maxLevel : reqLevel > 0;
+
+                    const sourceY = sourcePos.y + sourcePos.height / 2;
+                    const targetY = targetPos.y - targetPos.height / 2;
+                    const cpY = sourceY + (targetY - sourceY) * 0.5;
+
+                    const pathD = `M ${sourcePos.x} ${sourceY} C ${sourcePos.x} ${cpY}, ${targetPos.x} ${cpY}, ${targetPos.x} ${targetY}`;
+
+                    const themeColor = STANCE_CONFIG[activeTalentStance].themeHex;
+                    let strokeColor = '#1f2937';
+                    let strokeWidth = 2;
+                    let isAnimated = false;
+                    let pathClass = "transition-all duration-700";
+
+                    if (isFullyUnlocked) {
+                      strokeColor = themeColor;
+                      strokeWidth = 3;
+                      pathClass += " opacity-100";
+                    } else if (isAvailable) {
+                      strokeColor = themeColor;
+                      strokeWidth = 2;
+                      isAnimated = true;
+                      pathClass += " opacity-40 animate-energy";
+                    } else {
+                      pathClass += " opacity-20";
+                    }
+
+                    return (
+                      <g key={`${sourcePos.x}-${sourcePos.y}-${targetPos.x}-${targetPos.y}`}>
+                        {isFullyUnlocked && (
+                          <path 
+                            d={pathD}
+                            fill="none"
+                            stroke={strokeColor} 
+                            strokeWidth={strokeWidth + 4}
+                            filter="url(#glow-mob)"
+                            opacity={0.4}
+                          />
+                        )}
+                        <path 
+                          d={pathD}
+                          fill="none"
+                          stroke={strokeColor} 
+                          strokeWidth={strokeWidth}
+                          strokeDasharray={isAnimated ? "6 12" : "none"}
+                          strokeLinecap="round"
+                          className={pathClass}
+                        />
+                      </g>
+                    );
+                  });
+                })}
+              </svg>
+
+              {/* Interactive Node Cards on the Constellation Canvas */}
+              {activeTalentNodes.map(node => {
+                const pos = getMobileNodePos(node.tier, node.col, canvasWidth);
+                const currentLevel = profile.talents?.[node.id] || 0;
+                const isMaxed = currentLevel >= node.maxLevel;
+                const isSelected = (selectedTalentId || activeTalentNodes[0]?.id) === node.id;
+
+                let isLocked = false;
+                if (node.requires && node.requires.length > 0) {
+                  isLocked = !node.requires.every(reqId => {
+                    const reqNode = activeTalentNodes.find(n => n.id === reqId);
+                    const reqLevel = profile.talents?.[reqId] || 0;
+                    return node.requireMax ? reqLevel >= (reqNode?.maxLevel || 1) : reqLevel > 0;
+                  });
+                }
+
+                const isMajor = node.tier === 3 || node.tier === 5;
+                const IconComp = (LucideIcons as any)[node.icon] || LucideIcons.Sparkles;
+                const currentCfg = STANCE_CONFIG[activeTalentStance];
+                const canUpgrade = !isLocked && !isMaxed && availableTalentPoints >= node.cost;
+
+                // Progress ring calculation
+                const progressPct = (currentLevel / node.maxLevel) * 100;
+                const radius = 15;
+                const circumference = 2 * Math.PI * radius;
+                const strokeDashoffset = circumference - (progressPct / 100) * circumference;
+
+                // Theme styles matching PC
+                let themeBg = 'bg-[#0f0f15]/95';
+                let themeBorder = 'border-gray-800';
+                let themeText = 'text-gray-400';
+                let themeIconBg = 'bg-gray-900';
+                let themeIconColor = 'text-gray-500';
+                let glowShadow = 'none';
+
+                if (currentLevel > 0) {
+                  themeBg = isMaxed ? `bg-${currentCfg.themeColorClass}-950/30` : 'bg-[#151520]/95';
+                  themeBorder = isMaxed ? `border-${currentCfg.themeColorClass}-500/80` : `border-${currentCfg.themeColorClass}-700/50`;
+                  themeText = 'text-gray-100';
+                  themeIconBg = `bg-${currentCfg.themeColorClass}-900/40`;
+                  themeIconColor = `text-${currentCfg.themeColorClass}-400`;
+                  if (isMaxed) {
+                    glowShadow = `0 0 16px ${currentCfg.themeHex}40, inset 0 0 8px ${currentCfg.themeHex}30`;
+                  }
+                } else if (!isLocked) {
+                  themeBg = 'bg-[#151520]/95 hover:bg-[#1a1a28]';
+                  themeBorder = 'border-gray-600 hover:border-gray-400';
+                  themeText = 'text-gray-300';
+                  themeIconBg = 'bg-gray-800';
+                  themeIconColor = 'text-gray-400';
+                }
+
+                return (
+                  <button
+                    key={node.id}
+                    onClick={() => {
+                      if (isSelected && canUpgrade) {
+                        handlePurchaseTalent(node);
+                      } else {
+                        setSelectedTalentId(node.id);
+                      }
+                    }}
+                    className={`absolute z-10 flex items-center p-2 rounded-2xl border-2 transition-all duration-300 group text-left cursor-pointer ${themeBg} ${themeBorder} ${
+                      isLocked ? 'opacity-40 grayscale' : ''
+                    } ${
+                      isSelected ? 'ring-2 ring-amber-400 shadow-[0_0_18px_rgba(251,191,36,0.4)] scale-102 z-20' : 'active:scale-98'
+                    }`}
+                    style={{
+                      left: pos.x - pos.width / 2,
+                      top: pos.y - pos.height / 2,
+                      width: pos.width,
+                      height: pos.height,
+                      boxShadow: glowShadow,
+                    }}
+                  >
+                    {/* Circular Icon with Animated Progress Ring */}
+                    <div className="relative shrink-0 w-10 h-10 flex items-center justify-center mr-2">
+                      <svg className="absolute inset-0 w-full h-full -rotate-90">
+                        <circle
+                          cx="20" cy="20" r={radius}
+                          fill="transparent"
+                          stroke="#1f2937"
+                          strokeWidth="2.5"
+                        />
+                        <circle
+                          cx="20" cy="20" r={radius}
+                          fill="transparent"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                          strokeDasharray={circumference}
+                          strokeDashoffset={strokeDashoffset}
+                          strokeLinecap="round"
+                          className={`transition-all duration-700 ${themeIconColor}`}
+                        />
+                      </svg>
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center ${themeIconBg} ${themeIconColor} z-10 shadow-inner`}>
+                        <IconComp className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+
+                    {/* Node Text Content */}
+                    <div className="flex-1 min-w-0 pr-1">
+                      <div className="flex justify-between items-center mb-0.5">
+                        <h4 className={`text-[10px] min-[380px]:text-[10.5px] font-black tracking-wide truncate ${
+                          isMajor ? 'text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.5)]' : themeText
+                        }`}>
+                          {node.name}
+                        </h4>
+                        <span className={`shrink-0 text-[8px] font-mono font-bold px-1 rounded ml-1 ${
+                          isMaxed ? 'bg-amber-500/25 text-amber-300' : 'bg-black/60 text-gray-400'
+                        }`}>
+                          {currentLevel}/{node.maxLevel}
+                        </span>
+                      </div>
+                      
+                      <p className="text-[8px] text-gray-400 leading-tight line-clamp-2 font-medium">
+                        {node.description(Math.max(1, currentLevel))}
+                      </p>
+                    </div>
+
+                    {/* Star Cost Badge */}
+                    {!isLocked && !isMaxed && (
+                      <div className="absolute -top-1.5 -right-1.5 bg-black border border-amber-500/60 rounded-full w-5 h-5 flex items-center justify-center shadow-md z-30">
+                        <span className="text-[7.5px] font-black text-amber-400 flex items-center leading-none">
+                          <Star className="w-2 h-2 text-amber-500 fill-amber-500 mr-0.5" />
+                          {node.cost}
+                        </span>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="text-center text-[9px] font-mono text-gray-500 mt-1 pb-1">
+              Tap any talent node to inspect & upgrade
+            </div>
+          </div>
+
+          {/* ------------------------------------------------------------- */}
+          {/* TALENT INSPECTOR & UPGRADE CARD                               */}
+          {/* ------------------------------------------------------------- */}
+          {selectedTalent && (() => {
+            const currentLevel = profile.talents?.[selectedTalent.id] || 0;
+            const isMaxed = currentLevel >= selectedTalent.maxLevel;
+            
+            let isLocked = false;
+            let lockReason = '';
+            if (selectedTalent.requires && selectedTalent.requires.length > 0) {
+              isLocked = !selectedTalent.requires.every(reqId => {
+                const reqNode = activeTalentNodes.find(n => n.id === reqId);
+                const reqLevel = profile.talents?.[reqId] || 0;
+                return selectedTalent.requireMax ? reqLevel >= (reqNode?.maxLevel || 1) : reqLevel > 0;
+              });
+              if (isLocked) {
+                const reqNames = selectedTalent.requires.map(r => activeTalentNodes.find(n => n.id === r)?.name || r).join(' & ');
+                lockReason = selectedTalent.requireMax ? `Requires maxing ${reqNames}` : `Requires unlocking ${reqNames}`;
+              }
+            }
+
+            const IconComp = (LucideIcons as any)[selectedTalent.icon] || LucideIcons.Sparkles;
+            const isMajor = selectedTalent.tier === 3 || selectedTalent.tier === 5;
+            const canUpgrade = !isLocked && !isMaxed && availableTalentPoints >= selectedTalent.cost;
+            const currentCfg = STANCE_CONFIG[activeTalentStance];
 
             return (
-              <div className="space-y-2 pt-1">
-                {/* TIER 1 (Base Attunement) */}
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between px-1">
-                    <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold">
-                      Tier 1 · Base Attunement
-                    </span>
+              <div className="bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-amber-500/30 rounded-2xl p-3.5 shadow-xl space-y-2.5 relative overflow-hidden">
+                <div className="flex items-center justify-between border-b border-gray-800 pb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-black/70 border border-amber-500/40 flex items-center justify-center text-amber-400">
+                      <IconComp className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="font-display font-black text-xs sm:text-sm text-white uppercase tracking-wider flex items-center gap-1.5">
+                        {selectedTalent.name}
+                        {isMajor && <Award className="w-3.5 h-3.5 text-amber-400" />}
+                      </h4>
+                      <span className="text-[9px] font-mono text-gray-400">
+                        Tier {selectedTalent.tier} · {selectedTalent.cost} Skill Point{selectedTalent.cost > 1 ? 's' : ''} per level
+                      </span>
+                    </div>
                   </div>
-                  {tier1Nodes.map(node => renderTalentNodeCard(node, true))}
+
+                  <span className={`text-[10px] font-mono font-black px-2 py-0.5 rounded-full ${
+                    isMaxed 
+                      ? 'bg-amber-500/25 text-amber-300 border border-amber-500/40' 
+                      : 'bg-black/60 text-gray-300 border border-white/10'
+                  }`}>
+                    Level {currentLevel} / {selectedTalent.maxLevel}
+                  </span>
                 </div>
 
-                {/* Connector Arrow */}
-                <div className="flex justify-center text-gray-600 py-0.5">
-                  <ChevronDown className="w-4 h-4 animate-bounce" />
+                {/* Description Box */}
+                <div className="bg-black/50 border border-white/10 rounded-xl p-2.5 space-y-1">
+                  <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-widest block">
+                    {currentLevel > 0 ? 'Current Effect:' : 'Effect:'}
+                  </span>
+                  <p className="text-[11px] font-sans text-gray-200 leading-snug">
+                    {selectedTalent.description(Math.max(1, currentLevel))}
+                  </p>
+                  {currentLevel > 0 && currentLevel < selectedTalent.maxLevel && (
+                    <div className="pt-1 border-t border-white/5 mt-1">
+                      <span className="text-[8px] font-mono text-amber-400 uppercase tracking-widest block">
+                        Next Level:
+                      </span>
+                      <p className="text-[10px] font-sans text-amber-200/90 leading-snug">
+                        {selectedTalent.description(currentLevel + 1)}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
-                {/* TIER 2 (Branching Passives) */}
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between px-1">
-                    <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold">
-                      Tier 2 · Enhancement Paths
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {tier2Nodes.map(node => renderTalentNodeCard(node, false))}
-                  </div>
-                </div>
-
-                {/* Connector Arrow */}
-                <div className="flex justify-center text-gray-600 py-0.5">
-                  <ChevronDown className="w-4 h-4 animate-bounce" />
-                </div>
-
-                {/* TIER 3 (Major Keystone) */}
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between px-1">
-                    <span className="text-[8.5px] font-mono text-amber-400/90 uppercase tracking-wider font-bold flex items-center gap-1">
-                      <Award className="w-3 h-3 text-amber-400" /> Tier 3 · Major Keystone
-                    </span>
-                    <span className="text-[7.5px] font-mono text-gray-500">Requires Max T2</span>
-                  </div>
-                  {tier3Nodes.map(node => renderTalentNodeCard(node, true))}
-                </div>
-
-                {/* Connector Arrow */}
-                <div className="flex justify-center text-gray-600 py-0.5">
-                  <ChevronDown className="w-4 h-4 animate-bounce" />
-                </div>
-
-                {/* TIER 4 (Advanced Specializations) */}
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between px-1">
-                    <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold">
-                      Tier 4 · Advanced Passives
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {tier4Nodes.map(node => renderTalentNodeCard(node, false))}
-                  </div>
-                </div>
-
-                {/* Connector Arrow */}
-                <div className="flex justify-center text-gray-600 py-0.5">
-                  <ChevronDown className="w-4 h-4 animate-bounce" />
-                </div>
-
-                {/* TIER 5 (Ultimate Capstone) */}
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between px-1">
-                    <span className="text-[8.5px] font-mono text-rose-400/90 uppercase tracking-wider font-bold flex items-center gap-1">
-                      <Sparkles className="w-3 h-3 text-rose-400" /> Tier 5 · Ultimate Capstone
-                    </span>
-                    <span className="text-[7.5px] font-mono text-gray-500">Requires All Maxed</span>
-                  </div>
-                  {tier5Nodes.map(node => renderTalentNodeCard(node, true))}
+                {/* Upgrade Button or Status */}
+                <div>
+                  {isMaxed ? (
+                    <div className="w-full py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/40 text-amber-300 text-xs font-display font-black tracking-widest uppercase flex items-center justify-center gap-1.5">
+                      <Check className="w-4 h-4 stroke-[3]" /> TALENT FULLY MASTERED
+                    </div>
+                  ) : isLocked ? (
+                    <div className="w-full py-2 rounded-xl bg-red-950/40 border border-red-500/30 text-red-300 text-[10px] font-mono font-bold flex items-center justify-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5" /> {lockReason}
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handlePurchaseTalent(selectedTalent)}
+                      disabled={!canUpgrade}
+                      className={`w-full py-2.5 rounded-xl font-display font-black text-xs tracking-widest uppercase transition-all flex items-center justify-center gap-2 shadow-lg ${
+                        canUpgrade
+                          ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 hover:brightness-110 text-black shadow-[0_0_15px_rgba(251,191,36,0.4)] cursor-pointer active:scale-98'
+                          : 'bg-white/5 border border-white/10 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      <Zap className="w-3.5 h-3.5 fill-current" />
+                      <span>UPGRADE TALENT</span>
+                      <span className="text-[10px] font-mono opacity-80 font-bold">
+                        ({selectedTalent.cost} Point{selectedTalent.cost > 1 ? 's' : ''})
+                      </span>
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -1117,9 +1348,14 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
               Reset Talents?
             </h3>
 
-            <p className="text-gray-300 font-sans text-xs mb-4 leading-relaxed">
-              Refund all spent talent points for <span className="text-rose-400 font-bold">15 Dark Shards</span>?
-            </p>
+            <div className="text-gray-300 font-sans text-xs mb-4 leading-relaxed flex flex-col items-center gap-1.5">
+              <span>Refund all spent talent points for</span>
+              <div className="inline-flex items-center gap-1.5 bg-black/60 border border-rose-500/40 px-3 py-1 rounded-xl shadow-inner">
+                <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                <span className="text-rose-300 font-mono font-black text-sm">15</span>
+                <span className="text-rose-400/80 font-mono text-[9px] uppercase font-bold">Dark Shards</span>
+              </div>
+            </div>
 
             <div className="flex gap-2">
               <button
