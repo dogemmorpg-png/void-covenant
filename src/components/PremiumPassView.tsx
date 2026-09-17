@@ -208,9 +208,15 @@ export const PremiumPassView: React.FC = () => {
                 -15% DISCOUNT
               </span>
             </div>
-            <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono font-bold text-amber-300 mt-0.5">
-              <Sparkles className="w-3 h-3 text-amber-400 shrink-0 animate-pulse" />
-              <span>+ DIVINE RELIC BONUS</span>
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-amber-950/60 border border-amber-500/40 text-amber-200 mt-1 shadow-sm">
+              <img 
+                src="/icons/equipment/items/blade_of_the_demiurge.png" 
+                alt="Relic" 
+                className="w-3.5 h-3.5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)] shrink-0" 
+              />
+              <span className="font-display font-bold text-[10px] sm:text-[10.5px] uppercase tracking-wider text-amber-200">
+                + Divine Relic Included
+              </span>
             </div>
           </button>
         </div>
@@ -668,8 +674,8 @@ export const PremiumPassView: React.FC = () => {
 
             {/* Header */}
             <div className="space-y-2 relative z-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c5a880]/10 border border-[#c5a880]/30 text-[#ebd09b] text-[10px] font-mono font-black tracking-widest uppercase shadow-sm">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c5a880]/10 border border-[#c5a880]/30 text-[#ebd09b] text-[10px] font-display font-bold tracking-widest uppercase shadow-sm">
+                <img src="/icons/equipment/items/blade_of_the_demiurge.png" alt="Relic" className="w-3.5 h-3.5 object-contain drop-shadow" />
                 <span>90-DAY COVENANT PRIVILEGE</span>
               </div>
               <h3 className="text-2xl sm:text-3xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-[#ebd09b] via-[#c5a880] to-[#8c6d48] tracking-wider uppercase">

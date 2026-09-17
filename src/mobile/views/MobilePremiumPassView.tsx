@@ -345,7 +345,10 @@ export const MobilePremiumPassView: React.FC = () => {
               <div className="text-[10px] font-mono text-gray-400 uppercase tracking-wider flex items-center justify-between">
                 <span>Select Access Duration:</span>
                 {durationDays === 90 && (
-                  <span className="text-amber-400 font-bold">+1 Divine Relic Included</span>
+                  <span className="inline-flex items-center gap-1 text-[9px] font-display font-bold text-amber-300">
+                    <img src="/icons/equipment/items/blade_of_the_demiurge.png" alt="" className="w-3 h-3 object-contain drop-shadow shrink-0" />
+                    <span>+1 Divine Relic Included</span>
+                  </span>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -389,9 +392,15 @@ export const MobilePremiumPassView: React.FC = () => {
                     <span className="font-display font-black text-lg text-amber-300">{PRICES.premium[90]}</span>
                     <span className="text-[9px] font-mono text-amber-400/80">SHARDS</span>
                   </div>
-                  <div className="flex items-center gap-1 text-[8.5px] font-mono font-bold text-amber-300 mt-0.5">
-                    <Sparkles className="w-2.5 h-2.5 text-amber-400 shrink-0 animate-pulse" />
-                    <span>+1 DIVINE RELIC</span>
+                  <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-950/60 border border-amber-500/40 text-amber-200 mt-1 shadow-sm">
+                    <img 
+                      src="/icons/equipment/items/blade_of_the_demiurge.png" 
+                      alt="" 
+                      className="w-3 h-3 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)] shrink-0" 
+                    />
+                    <span className="font-display font-bold text-[8.5px] uppercase tracking-wider">
+                      +1 Divine Relic
+                    </span>
                   </div>
                 </button>
               </div>
@@ -522,7 +531,10 @@ export const MobilePremiumPassView: React.FC = () => {
               <div className="text-[10px] font-mono text-gray-400 uppercase tracking-wider flex items-center justify-between">
                 <span>Select Access Duration:</span>
                 {durationDays === 90 && (
-                  <span className="text-purple-300 font-bold">+2 Divine Relics Included</span>
+                  <span className="inline-flex items-center gap-1 text-[9px] font-display font-bold text-purple-300">
+                    <img src="/icons/equipment/items/blade_of_the_demiurge.png" alt="" className="w-3 h-3 object-contain drop-shadow shrink-0" />
+                    <span>+2 Divine Relics Included</span>
+                  </span>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -566,9 +578,15 @@ export const MobilePremiumPassView: React.FC = () => {
                     <span className="font-display font-black text-lg text-purple-300">{PRICES.ultra[90]}</span>
                     <span className="text-[9px] font-mono text-purple-400">SHARDS</span>
                   </div>
-                  <div className="flex items-center gap-1 text-[8.5px] font-mono font-bold text-amber-300 mt-0.5">
-                    <Sparkles className="w-2.5 h-2.5 text-amber-400 shrink-0 animate-pulse" />
-                    <span>+2 DIVINE RELICS</span>
+                  <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-purple-950/60 border border-purple-400/40 text-purple-200 mt-1 shadow-sm">
+                    <img 
+                      src="/icons/equipment/items/blade_of_the_demiurge.png" 
+                      alt="" 
+                      className="w-3 h-3 object-contain drop-shadow-[0_0_6px_rgba(168,85,247,0.6)] shrink-0" 
+                    />
+                    <span className="font-display font-bold text-[8.5px] uppercase tracking-wider">
+                      +2 Divine Relics
+                    </span>
                   </div>
                 </button>
               </div>
