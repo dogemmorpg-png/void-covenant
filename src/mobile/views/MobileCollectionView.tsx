@@ -737,7 +737,7 @@ export const MobileCollectionView: React.FC = () => {
                         <div
                           key={card.id}
                           onClick={() => setInspectCard(card)}
-                          className="relative flex items-center justify-between p-1.5 rounded-xl border border-gray-800/80 hover:border-gray-700 bg-[#11161d]/90 cursor-pointer transition-all overflow-hidden h-[46px] group active:scale-95"
+                          className="relative flex items-center justify-between p-1.5 rounded-xl border border-gray-800/80 hover:border-gray-700 bg-[#11161d]/90 cursor-pointer transition-all overflow-hidden h-[50px] group active:scale-95"
                         >
                           {/* Cropped card background art */}
                           <div className="absolute inset-y-0 right-0 w-2/3 overflow-hidden rounded-r-xl opacity-40 pointer-events-none">
@@ -746,10 +746,10 @@ export const MobileCollectionView: React.FC = () => {
                           </div>
 
                           {/* Left: Mana & Info */}
-                          <div className="flex items-center gap-1.5 z-10 min-w-0">
+                          <div className="flex items-center gap-1.5 z-10 min-w-0 flex-1 mr-1.5">
                             {renderManaIcon(getCardManaCost(card), "w-5 h-5")}
-                            <div className="flex flex-col min-w-0">
-                              <span className="text-[10px] font-display font-black text-white leading-none truncate group-hover:text-cyan-200">
+                            <div className="flex flex-col min-w-0 flex-1">
+                              <span className="text-[10px] sm:text-[10.5px] font-display font-black text-white leading-tight truncate group-hover:text-cyan-200">
                                 {card.name}
                               </span>
                               <div className="flex items-center gap-1 mt-0.5 text-[7.5px] font-mono leading-none">
@@ -760,19 +760,23 @@ export const MobileCollectionView: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* Right: Stats & Remove */}
+                          {/* Right: Stats (2 rows) & Remove */}
                           <div className="flex items-center gap-1.5 z-10 shrink-0">
-                            <div className="flex flex-col min-[380px]:flex-row items-end min-[380px]:items-center gap-0.5 min-[380px]:gap-1.5 font-mono text-[7.5px] min-[380px]:text-[8px] sm:text-[8.5px] font-black leading-tight text-right">
-                              <span className="text-red-400">⚔️{card.attack}</span>
-                              <span className="text-emerald-400">❤️{card.health}</span>
-                              <span className="text-blue-400" title="Turn Delay">⏳{card.delay}</span>
+                            <div className="flex flex-col items-end justify-center font-mono leading-none text-right">
+                              <div className="flex items-center gap-1 text-[8.5px] font-bold">
+                                <span className="text-red-400">⚔️{card.attack}</span>
+                                <span className="text-emerald-400">❤️{card.health}</span>
+                              </div>
+                              <span className="text-blue-400 text-[8px] font-bold mt-1" title="Turn Delay">
+                                ⏳{card.delay}
+                              </span>
                             </div>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleToggleDeck(card.id);
                               }}
-                              className="bg-[#4e0707] hover:bg-[#880d1e] border border-[#dd2c40]/60 rounded p-1 text-white cursor-pointer active:scale-90"
+                              className="bg-[#4e0707] hover:bg-[#880d1e] border border-[#dd2c40]/60 rounded p-1 text-white cursor-pointer active:scale-90 shrink-0"
                               title="Remove from deck"
                             >
                               <Minus className="w-2.5 h-2.5" />
@@ -784,7 +788,7 @@ export const MobileCollectionView: React.FC = () => {
                       return (
                         <div
                           key={idx}
-                          className="flex items-center justify-center rounded-xl border border-dashed border-white/5 bg-black/20 text-gray-600 h-[46px]"
+                          className="flex items-center justify-center rounded-xl border border-dashed border-white/5 bg-black/20 text-gray-600 h-[50px]"
                         >
                           <span className="text-[8px] font-mono tracking-wider font-bold opacity-40">EMPTY SLOT</span>
                         </div>
@@ -1195,8 +1199,14 @@ export const MobileCollectionView: React.FC = () => {
 
       {/* 4. CARD INSPECTOR MODAL / BOTTOM SHEET */}
       {inspectCard && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150">
-          <div className="bg-[#120e0b] border-2 border-[#c5a880]/50 rounded-2xl max-w-sm w-full p-4 space-y-3 shadow-2xl relative max-h-[92vh] overflow-y-auto custom-scrollbar">
+        <div 
+          onClick={() => setInspectCard(null)}
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150 cursor-pointer"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#120e0b] border-2 border-[#c5a880]/50 rounded-2xl max-w-sm w-full p-4 space-y-3 shadow-2xl relative max-h-[92vh] overflow-y-auto custom-scrollbar cursor-default"
+          >
             {/* Close Button */}
             <button
               onClick={() => setInspectCard(null)}
@@ -1381,8 +1391,14 @@ export const MobileCollectionView: React.FC = () => {
         const { goldCost, dustCost, shardsCost, isLevelUpgrade } = getFusionCosts(c1);
 
         return (
-          <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-150">
-            <div className="bg-[#151a21] border border-purple-500/50 rounded-2xl p-5 max-w-sm w-full shadow-[0_0_40px_rgba(168,85,247,0.2)] text-center relative overflow-hidden">
+          <div 
+            onClick={() => setFusionConfirmData(null)}
+            className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-150 cursor-pointer"
+          >
+            <div 
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#151a21] border border-purple-500/50 rounded-2xl p-5 max-w-sm w-full shadow-[0_0_40px_rgba(168,85,247,0.2)] text-center relative overflow-hidden cursor-default"
+            >
               <Skull className="w-10 h-10 text-purple-400 mx-auto mb-2 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
               <h2 className="text-lg font-display font-black text-white uppercase tracking-widest mb-1.5 text-shadow-gold">
                 Confirm Ritual
@@ -1441,8 +1457,14 @@ export const MobileCollectionView: React.FC = () => {
         const isInDeck = (profile.deck || []).includes(c.id);
 
         return (
-          <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in duration-150">
-            <div className="bg-[#12161f] border-2 border-cyan-500/50 rounded-2xl p-5 max-w-sm w-full shadow-[0_0_40px_rgba(6,182,212,0.25)] text-center relative overflow-hidden">
+          <div 
+            onClick={() => setDismantleConfirmCard(null)}
+            className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in duration-150 cursor-pointer"
+          >
+            <div 
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#12161f] border-2 border-cyan-500/50 rounded-2xl p-5 max-w-sm w-full shadow-[0_0_40px_rgba(6,182,212,0.25)] text-center relative overflow-hidden cursor-default"
+            >
               <div className="relative inline-block mb-2">
                 <img 
                   src="/icons/icon_dust.webp" 
