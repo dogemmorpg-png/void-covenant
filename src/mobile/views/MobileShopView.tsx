@@ -846,87 +846,101 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 })}
               </div>
 
-              {/* Majestic Divine Card Frame (Tailored to fit mobile viewport without cut-off) */}
-              <div className="bg-gradient-to-b from-[#200910] via-[#14050a] to-black border-2 border-rose-500/60 rounded-2xl p-2.5 min-[380px]:p-3 shadow-2xl space-y-2 relative overflow-hidden">
+              {/* Majestic Divine Altar Card Frame */}
+              <div className="bg-gradient-to-b from-[#220912] via-[#14050a] to-black border-2 border-rose-500/60 rounded-2xl p-3 shadow-2xl space-y-2.5 relative overflow-hidden">
                 
-                {/* Balanced Portrait with Carousel Arrows */}
-                <div className="relative h-36 min-[380px]:h-40 rounded-xl overflow-hidden border border-rose-400/40 bg-black/80 shadow-inner">
-                  <img src={currentDeity.image} alt={currentDeity.name} className="w-full h-full object-cover object-top" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-black/35 pointer-events-none" />
+                {/* Top Split: Authentic CCG Playing Card (Left) + Detailed Codex & Skills (Right) */}
+                <div className="flex gap-2.5 min-[380px]:gap-3 items-stretch">
+                  
+                  {/* 1. AUTHENTIC COLLECTIBLE TRADING CARD (PROPER 3:4.2 VERTICAL PROPORTIONS) */}
+                  <div className="w-[142px] min-[380px]:w-[156px] shrink-0 aspect-[3/4.2] rounded-2xl p-2 flex flex-col justify-between relative shadow-[0_0_22px_rgba(244,63,94,0.5)] overflow-hidden border-2 border-rose-500/80 ring-1 ring-rose-400/50 bg-black group select-none">
+                    {/* Full-bleed Portrait Artwork in authentic vertical aspect ratio (NO CROPPING) */}
+                    <img
+                      src={currentDeity.image}
+                      alt={currentDeity.name}
+                      className="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-500 group-hover:scale-105"
+                    />
+                    {/* Ambient Card Vignette */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-black/70 pointer-events-none z-0" />
 
-                  {/* Left / Right Nav Arrows on Portrait */}
-                  <button
-                    type="button"
-                    onClick={handlePrevDeity}
-                    className="absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white/80 hover:text-white flex items-center justify-center text-xs backdrop-blur-sm z-20 cursor-pointer active:scale-90 transition-all"
-                  >
-                    <ChevronLeft className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleNextDeity}
-                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white/80 hover:text-white flex items-center justify-center text-xs backdrop-blur-sm z-20 cursor-pointer active:scale-90 transition-all"
-                  >
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
+                    {/* Top Card Badges: Tier & Mana/Delay */}
+                    <div className="relative z-10 flex justify-between items-start">
+                      <span className="px-1.5 py-0.5 rounded font-mono text-[7.5px] uppercase font-black tracking-wider bg-gradient-to-r from-red-950 to-rose-900 border border-rose-400 text-rose-300 shadow-[0_0_8px_rgba(244,63,94,0.8)]">
+                        DIVINE
+                      </span>
+                      <div className="flex items-center gap-1">
+                        {renderManaIcon(getCardManaCost(currentDeity), "w-4 h-4")}
+                        <div className="bg-black/85 border border-rose-400/50 rounded px-1 py-0.2 text-[8px] font-mono font-bold text-blue-300 shadow flex items-center gap-0.5">
+                          <span>⏳</span>{currentDeity.delay}
+                        </div>
+                      </div>
+                    </div>
 
-                  {/* Top Badges */}
-                  <div className="absolute top-1.5 left-2 right-2 flex justify-between items-center z-10 pointer-events-none">
-                    <span className="px-2 py-0.5 rounded-lg font-mono text-[8px] min-[380px]:text-[8.5px] uppercase font-black tracking-wider bg-gradient-to-r from-red-950 to-rose-900 border border-rose-400 text-rose-300 shadow-[0_0_10px_rgba(244,63,94,0.6)]">
-                      DIVINE ENTITY
-                    </span>
-                    <div className="flex items-center gap-1.5">
-                      {renderManaIcon(getCardManaCost(currentDeity), "w-5 h-5")}
-                      <div className="bg-black/80 border border-rose-400/40 rounded-lg px-1.5 py-0.2 text-[9px] font-mono font-bold text-blue-300 backdrop-blur-sm shadow flex items-center gap-1">
-                        <span>⏳</span> {currentDeity.delay}
+                    {/* Empty Center Space showing glorious uncropped artwork */}
+                    <div className="flex-1" />
+
+                    {/* Bottom Card Badges: Name Banner + ATK & HP Gems */}
+                    <div className="relative z-10 space-y-1">
+                      <div className="bg-black/80 backdrop-blur-sm border border-white/10 rounded py-0.5 px-1 text-center shadow-md">
+                        <span className="text-[9px] font-display font-black text-white block truncate leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.95)]">
+                          {currentDeity.name}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-[8.5px] font-mono font-black pt-1 border-t border-rose-500/40 bg-black/85 backdrop-blur-sm rounded-lg px-2 py-0.5 shadow-md">
+                        <span className="text-red-400 flex items-center gap-0.5">
+                          <span className="text-[8px]">⚔️</span> {currentDeity.attack}
+                        </span>
+                        <span className="text-emerald-400 flex items-center gap-0.5">
+                          <span className="text-[8px]">❤️</span> {currentDeity.health}
+                        </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Bottom ATK and HP */}
-                  <div className="absolute bottom-1.5 left-2 right-2 flex justify-between items-center z-10 pointer-events-none">
-                    <div className="bg-black/85 border border-red-500/70 rounded-lg px-2.5 py-0.5 text-[11px] font-mono font-black text-red-400 shadow-lg backdrop-blur-sm flex items-center gap-1">
-                      <span>⚔️</span> {currentDeity.attack}
-                    </div>
-                    <div className="bg-black/85 border border-emerald-500/70 rounded-lg px-2.5 py-0.5 text-[11px] font-mono font-black text-emerald-400 shadow-lg backdrop-blur-sm flex items-center gap-1">
-                      <span>❤️</span> {currentDeity.health}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Name, Lore and Owned Count */}
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <h3 className="font-display font-black text-sm min-[380px]:text-base text-white leading-tight tracking-wide">
-                      {currentDeity.name}
-                    </h3>
-                    <p className="text-[10px] text-gray-300 font-sans mt-0.5 leading-tight line-clamp-2">
-                      {currentDeity.description}
-                    </p>
-                  </div>
-                  {ownedCount > 0 && (
-                    <span className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 text-[8.5px] font-mono px-2 py-0.5 rounded-full font-bold shrink-0">
-                      OWNED: {ownedCount}
-                    </span>
-                  )}
-                </div>
-
-                {/* Divine Skills Box */}
-                <div className="bg-black/70 border border-white/10 rounded-xl p-2 space-y-1">
-                  <div className="text-[8.5px] font-mono uppercase font-bold text-rose-400 tracking-wider flex items-center gap-1">
-                    <Sparkles className="w-2.5 h-2.5 text-rose-400" /> DIVINE SKILLS
-                  </div>
-                  <div className="space-y-0.5">
-                    {currentDeity.skills.map((skill, sIdx) => (
-                      <div key={sIdx} className="text-[9.5px] leading-snug flex items-start gap-1">
-                        <span className="font-mono font-bold text-rose-300 uppercase shrink-0">[{skill.type} {skill.value}]</span>
-                        <span className="text-gray-300 line-clamp-1">{skill.description}</span>
+                  {/* 2. CARD DOSSIER & DIVINE SKILLS */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-between space-y-1.5">
+                    
+                    {/* Header: Title, Category & Ownership */}
+                    <div className="space-y-1">
+                      <div className="flex items-start justify-between gap-1">
+                        <div>
+                          <span className="text-[8px] font-mono uppercase font-black tracking-widest text-rose-400 block">
+                            PRIMORDIAL CARD
+                          </span>
+                          <h3 className="font-display font-black text-xs min-[380px]:text-sm text-white leading-tight">
+                            {currentDeity.name}
+                          </h3>
+                        </div>
+                        {ownedCount > 0 && (
+                          <span className="bg-emerald-950 border border-emerald-500/50 text-emerald-300 text-[8px] font-mono px-1.5 py-0.2 rounded font-bold shrink-0 shadow">
+                            OWNED: {ownedCount}
+                          </span>
+                        )}
                       </div>
-                    ))}
+                      <p className="text-[9px] text-gray-300 font-sans leading-snug line-clamp-2 italic">
+                        {currentDeity.description}
+                      </p>
+                    </div>
+
+                    {/* Divine Skills Box */}
+                    <div className="bg-black/70 border border-rose-500/30 rounded-xl p-2 space-y-1">
+                      <div className="text-[8px] font-mono uppercase font-bold text-rose-400 tracking-wider flex items-center gap-1">
+                        <Sparkles className="w-2.5 h-2.5 text-rose-400" /> DIVINE SKILLS
+                      </div>
+                      <div className="space-y-1">
+                        {currentDeity.skills.map((skill, sIdx) => (
+                          <div key={sIdx} className="text-[9px] leading-tight">
+                            <span className="font-mono font-bold text-rose-300 uppercase block">[{skill.type} {skill.value}]</span>
+                            <span className="text-gray-300 line-clamp-2">{skill.description}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
                   </div>
                 </div>
 
-                {/* Wide Invocation Button (Always 100% visible) */}
+                {/* 3. WIDE SUMMON BUTTON (100% VISIBLE, TACTILE) */}
                 <button
                   disabled={isBuyingThis}
                   onClick={() => buyDivineCard(currentDeity.baseId)}
