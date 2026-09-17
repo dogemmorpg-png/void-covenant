@@ -235,7 +235,7 @@ export const MobilePremiumPassView: React.FC = () => {
               Void Covenant Pass
             </h1>
             <p className="text-[11px] text-gray-300 leading-snug font-sans mt-0.5">
-              Elevate your dominion over the Abyss with daily PvP tickets, guaranteed SOV bounties, daily shields, and mailbox tributes.
+              Elevate your dominion over the Abyss with expanded daily PvP tickets, guaranteed Blood Sovereigns on arena victories, daily Peace Shields, and accelerated energy recovery.
             </p>
           </div>
 
@@ -645,14 +645,18 @@ export const MobilePremiumPassView: React.FC = () => {
         </div>
       )}
 
-      {/* 4. Trust & Mechanics Info Footer (Mailbox Delivery Clarification) */}
-      <div className="bg-black/60 border border-white/10 rounded-2xl p-3 flex items-center gap-3 text-xs text-gray-400 shadow-inner">
-        <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
-          <Info className="w-4 h-4 text-amber-400" />
+      {/* 4. Trust & Mechanics Info Footer (Duration Stacking & Balance Security) */}
+      <div className="bg-black/50 border border-white/10 rounded-2xl p-3.5 sm:p-5 flex items-start gap-3.5 text-xs text-gray-400 shadow-inner">
+        <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 mt-0.5">
+          <Info className="w-4.5 h-4.5 text-amber-400" />
         </div>
-        <div className="text-[10px] text-gray-300 font-sans leading-tight">
-          <span className="text-amber-300 font-bold">Почтовая доставка: </span>
-          Ежедневные награды (золото, осколки, билеты) доставляются каждый день в 00:00 UTC прямо на вашу внутриигровую почту. Сроки продления суммируются.
+        <div className="space-y-1 text-left">
+          <div className="font-display font-bold text-gray-300 text-xs uppercase tracking-wider">
+            Duration Stacking & Balance Security
+          </div>
+          <p className="font-sans leading-relaxed text-[11px] text-gray-300">
+            Subscriptions stack seamlessly: re-purchasing the same tier adds the full duration to your remaining days. All Blood Sovereigns earned from PvP victories are credited directly to your bank balance and can be withdrawn as real USDT on Solana.
+          </p>
         </div>
       </div>
 
