@@ -1071,7 +1071,6 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                 const pos = getMobileNodePos(node.tier, node.col, canvasWidth);
                 const currentLevel = profile.talents?.[node.id] || 0;
                 const isMaxed = currentLevel >= node.maxLevel;
-                const isSelected = (selectedTalentId || activeTalentNodes[0]?.id) === node.id;
 
                 let isLocked = false;
                 if (node.requires && node.requires.length > 0) {
