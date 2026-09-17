@@ -496,14 +496,14 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
               {/* Big Solid Tactile Buy Button */}
               <button
                 onClick={() => buyPackBackend('bronze')}
-                className="w-full h-11 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:via-yellow-300 hover:to-amber-500 active:scale-[0.98] text-black border border-yellow-200/90 font-display font-black text-xs tracking-wider uppercase rounded-xl shadow-[0_4px_18px_rgba(245,158,11,0.45)] hover:shadow-[0_6px_25px_rgba(245,158,11,0.65)] flex items-center justify-between px-3 cursor-pointer transition-all"
+                className="w-full h-11 relative overflow-hidden bg-gradient-to-b from-[#3d2410] via-[#241407] to-[#120a03] hover:from-[#4d2d14] hover:via-[#2e1909] hover:to-[#170c04] border-t-2 border-t-amber-400/90 border-x border-amber-600/50 border-b-2 border-b-black font-display font-black tracking-widest px-3 rounded-xl transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.8),0_0_12px_rgba(245,158,11,0.2)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.9),0_0_18px_rgba(245,158,11,0.35)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.01] active:scale-[0.98] select-none group"
               >
-                <span className="font-display font-black tracking-wider">
+                <span className="font-display font-black tracking-widest text-amber-200 group-hover:text-amber-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                   SUMMON BOOSTER
                 </span>
-                <div className="bg-black/90 border border-black/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                <div className="bg-black/60 border border-amber-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                   <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(245,158,11,0.9)]" />
-                  <span className="font-mono font-black text-amber-300 text-xs tracking-normal">1,000 GOLD</span>
+                  <span className="font-mono font-bold text-amber-300 text-xs tracking-normal">1,000 GOLD</span>
                 </div>
               </button>
             </div>
@@ -566,14 +566,14 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
               {/* Big Solid Tactile Buy Button */}
               <button
                 onClick={() => buyPackBackend('obsidian')}
-                className="w-full h-11 bg-gradient-to-r from-cyan-600 via-teal-500 to-cyan-700 hover:from-cyan-500 hover:via-teal-400 hover:to-cyan-600 active:scale-[0.98] text-white border border-cyan-300/90 font-display font-black text-xs tracking-wider uppercase rounded-xl shadow-[0_4px_18px_rgba(6,182,212,0.45)] hover:shadow-[0_6px_25px_rgba(6,182,212,0.65)] flex items-center justify-between px-3 cursor-pointer transition-all"
+                className="w-full h-11 relative overflow-hidden bg-gradient-to-b from-[#0f3542] via-[#082029] to-[#030e13] hover:from-[#144354] hover:via-[#0b2b37] hover:to-[#05141b] border-t-2 border-t-cyan-300/90 border-x border-cyan-500/50 border-b-2 border-b-black font-display font-black tracking-widest px-3 rounded-xl transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.8),0_0_12px_rgba(6,182,212,0.2)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.9),0_0_18px_rgba(6,182,212,0.35)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.01] active:scale-[0.98] select-none group"
               >
-                <span className="font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-display font-black tracking-widest text-cyan-200 group-hover:text-cyan-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                   SUMMON BOOSTER
                 </span>
-                <div className="bg-black/90 border border-cyan-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                <div className="bg-black/60 border border-cyan-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                  <span className="font-mono font-black text-cyan-300 text-xs tracking-normal">30 SHARDS</span>
+                  <span className="font-mono font-bold text-cyan-300 text-xs tracking-normal">30 SHARDS</span>
                 </div>
               </button>
             </div>
@@ -631,14 +631,14 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
               {/* Big Solid Tactile Buy Button */}
               <button
                 onClick={() => buyPackBackend('abyssal')}
-                className="w-full h-11 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:via-rose-500 hover:to-red-600 active:scale-[0.98] text-white border border-rose-300/90 font-display font-black text-xs tracking-wider uppercase rounded-xl shadow-[0_4px_18px_rgba(225,29,72,0.45)] hover:shadow-[0_6px_25px_rgba(225,29,72,0.65)] flex items-center justify-between px-3 cursor-pointer transition-all"
+                className="w-full h-11 relative overflow-hidden bg-gradient-to-b from-[#4e101d] via-[#2d0710] to-[#140206] hover:from-[#611424] hover:via-[#390914] hover:to-[#1a0308] border-t-2 border-t-rose-400/90 border-x border-rose-500/50 border-b-2 border-b-black font-display font-black tracking-widest px-3 rounded-xl transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.8),0_0_12px_rgba(244,63,94,0.2)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.9),0_0_18px_rgba(244,63,94,0.35)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.01] active:scale-[0.98] select-none group"
               >
-                <span className="font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-display font-black tracking-widest text-rose-200 group-hover:text-rose-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                   SUMMON BOOSTER
                 </span>
-                <div className="bg-black/90 border border-rose-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                <div className="bg-black/60 border border-rose-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                  <span className="font-mono font-black text-rose-300 text-xs tracking-normal">70 SHARDS</span>
+                  <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">70 SHARDS</span>
                 </div>
               </button>
             </div>
@@ -696,14 +696,14 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
 
               <button
                 onClick={() => buyPackBackend('eq_basic', true)}
-                className="w-full h-11 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:via-yellow-300 hover:to-amber-500 active:scale-[0.98] text-black border border-yellow-200/90 font-display font-black text-xs tracking-wider uppercase rounded-xl shadow-[0_4px_18px_rgba(245,158,11,0.45)] hover:shadow-[0_6px_25px_rgba(245,158,11,0.65)] flex items-center justify-between px-3 cursor-pointer transition-all"
+                className="w-full h-11 relative overflow-hidden bg-gradient-to-b from-[#3d2410] via-[#241407] to-[#120a03] hover:from-[#4d2d14] hover:via-[#2e1909] hover:to-[#170c04] border-t-2 border-t-amber-400/90 border-x border-amber-600/50 border-b-2 border-b-black font-display font-black tracking-widest px-3 rounded-xl transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.8),0_0_12px_rgba(245,158,11,0.2)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.9),0_0_18px_rgba(245,158,11,0.35)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.01] active:scale-[0.98] select-none group"
               >
-                <span className="font-display font-black tracking-wider">
+                <span className="font-display font-black tracking-widest text-amber-200 group-hover:text-amber-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                   FORGE RELIC
                 </span>
-                <div className="bg-black/90 border border-black/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                <div className="bg-black/60 border border-amber-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                   <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(245,158,11,0.9)]" />
-                  <span className="font-mono font-black text-amber-300 text-xs tracking-normal">700 GOLD</span>
+                  <span className="font-mono font-bold text-amber-300 text-xs tracking-normal">700 GOLD</span>
                 </div>
               </button>
             </div>
@@ -751,14 +751,14 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
 
               <button
                 onClick={() => buyPackBackend('eq_rare', true)}
-                className="w-full h-11 bg-gradient-to-r from-cyan-600 via-teal-500 to-cyan-700 hover:from-cyan-500 hover:via-teal-400 hover:to-cyan-600 active:scale-[0.98] text-white border border-cyan-300/90 font-display font-black text-xs tracking-wider uppercase rounded-xl shadow-[0_4px_18px_rgba(6,182,212,0.45)] hover:shadow-[0_6px_25px_rgba(6,182,212,0.65)] flex items-center justify-between px-3 cursor-pointer transition-all"
+                className="w-full h-11 relative overflow-hidden bg-gradient-to-b from-[#0f3542] via-[#082029] to-[#030e13] hover:from-[#144354] hover:via-[#0b2b37] hover:to-[#05141b] border-t-2 border-t-cyan-300/90 border-x border-cyan-500/50 border-b-2 border-b-black font-display font-black tracking-widest px-3 rounded-xl transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.8),0_0_12px_rgba(6,182,212,0.2)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.9),0_0_18px_rgba(6,182,212,0.35)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.01] active:scale-[0.98] select-none group"
               >
-                <span className="font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-display font-black tracking-widest text-cyan-200 group-hover:text-cyan-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                   FORGE RELIC
                 </span>
-                <div className="bg-black/90 border border-cyan-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                <div className="bg-black/60 border border-cyan-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                  <span className="font-mono font-black text-cyan-300 text-xs tracking-normal">30 SHARDS</span>
+                  <span className="font-mono font-bold text-cyan-300 text-xs tracking-normal">30 SHARDS</span>
                 </div>
               </button>
             </div>
@@ -806,14 +806,14 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
 
               <button
                 onClick={() => buyPackBackend('eq_premium', true)}
-                className="w-full h-11 bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-700 hover:from-purple-500 hover:via-fuchsia-500 hover:to-indigo-600 active:scale-[0.98] text-white border border-purple-300/90 font-display font-black text-xs tracking-wider uppercase rounded-xl shadow-[0_4px_18px_rgba(168,85,247,0.45)] hover:shadow-[0_6px_25px_rgba(168,85,247,0.65)] flex items-center justify-between px-3 cursor-pointer transition-all"
+                className="w-full h-11 relative overflow-hidden bg-gradient-to-b from-[#3a154d] via-[#230b2f] to-[#100316] hover:from-[#491b61] hover:via-[#2d0e3c] hover:to-[#15041c] border-t-2 border-t-purple-400/90 border-x border-purple-500/50 border-b-2 border-b-black font-display font-black tracking-widest px-3 rounded-xl transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.8),0_0_12px_rgba(168,85,247,0.2)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.9),0_0_18px_rgba(168,85,247,0.35)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.01] active:scale-[0.98] select-none group"
               >
-                <span className="font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="font-display font-black tracking-widest text-purple-200 group-hover:text-purple-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                   FORGE RELIC
                 </span>
-                <div className="bg-black/90 border border-purple-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                <div className="bg-black/60 border border-purple-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                  <span className="font-mono font-black text-purple-200 text-xs tracking-normal">70 SHARDS</span>
+                  <span className="font-mono font-bold text-purple-200 text-xs tracking-normal">70 SHARDS</span>
                 </div>
               </button>
             </div>
@@ -971,14 +971,14 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 <button
                   disabled={isBuyingThis}
                   onClick={() => buyDivineCard(currentDeity.baseId)}
-                  className="w-full h-11 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:via-rose-500 hover:to-red-600 active:scale-[0.98] text-white border border-rose-300/90 font-display font-black tracking-wider text-xs uppercase rounded-xl shadow-[0_4px_20px_rgba(225,29,72,0.45)] hover:shadow-[0_6px_28px_rgba(225,29,72,0.65)] flex items-center justify-between px-3 cursor-pointer disabled:opacity-50 transition-all"
+                  className="w-full h-11 relative overflow-hidden bg-gradient-to-b from-[#4e101d] via-[#2d0710] to-[#140206] hover:from-[#611424] hover:via-[#390914] hover:to-[#1a0308] border-t-2 border-t-rose-400/90 border-x border-rose-500/50 border-b-2 border-b-black font-display font-black tracking-widest px-3 rounded-xl transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.8),0_0_12px_rgba(244,63,94,0.2)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.9),0_0_18px_rgba(244,63,94,0.35)] flex items-center justify-between text-xs uppercase cursor-pointer hover:scale-[1.01] active:scale-[0.98] select-none group disabled:opacity-50"
                 >
-                  <span className="font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                  <span className="font-display font-black tracking-widest text-rose-200 group-hover:text-rose-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                     {isBuyingThis ? 'INVOKING DIVINE POWER...' : 'SUMMON ENTITY'}
                   </span>
-                  <div className="bg-black/90 border border-rose-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                  <div className="bg-black/60 border border-rose-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                     <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                    <span className="font-mono font-black text-rose-300 text-xs tracking-normal">50 SHARDS</span>
+                    <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">50 SHARDS</span>
                   </div>
                 </button>
 
@@ -1048,12 +1048,12 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 <button
                   disabled={isBuyingSet || ownedDemiurgeCount === 6}
                   onClick={buyDivineSet}
-                  className={`w-full h-11 rounded-xl font-display font-black text-xs tracking-wider uppercase transition-all flex items-center shadow-lg active:scale-[0.98] ${
+                  className={`w-full h-11 rounded-xl font-display font-black text-xs tracking-wider uppercase transition-all flex items-center shadow-lg active:scale-[0.98] group ${
                     ownedDemiurgeCount === 6
                       ? 'bg-emerald-950/60 border-2 border-emerald-500/50 text-emerald-300 justify-center gap-2 cursor-default opacity-85'
                       : isBuyingSet
-                      ? 'bg-gradient-to-r from-amber-600 via-rose-600 to-red-700 border-2 border-amber-300/90 text-white justify-center gap-2 cursor-wait'
-                      : 'bg-gradient-to-r from-amber-600 via-rose-600 to-red-700 hover:from-amber-500 hover:via-rose-500 hover:to-red-600 border-2 border-amber-300/90 text-white shadow-[0_4px_22px_rgba(245,158,11,0.45)] hover:shadow-[0_6px_30px_rgba(245,158,11,0.65)] justify-between px-3 cursor-pointer'
+                      ? 'bg-gradient-to-b from-[#4d1f0f] via-[#2f0c16] to-[#18040a] border-t-2 border-t-amber-300 border-x border-amber-500/60 border-b-2 border-b-black text-white justify-center gap-2 cursor-wait'
+                      : 'bg-gradient-to-b from-[#4d1f0f] via-[#2f0c16] to-[#18040a] hover:from-[#5e2713] hover:via-[#3a101c] hover:to-[#1e060d] border-t-2 border-t-amber-300 border-x border-amber-500/60 border-b-2 border-b-black text-white shadow-[0_4px_14px_rgba(0,0,0,0.8),0_0_16px_rgba(245,158,11,0.25)] hover:shadow-[0_4px_18px_rgba(0,0,0,0.9),0_0_22px_rgba(245,158,11,0.4)] justify-between px-3 cursor-pointer'
                   }`}
                 >
                   {ownedDemiurgeCount === 6 ? (
@@ -1066,17 +1066,17 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                     </span>
                   ) : (
                     <>
-                      <span className="text-white font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+                      <span className="text-amber-100 group-hover:text-amber-50 font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                         FORGE ALL 6 PIECES
                       </span>
-                      <div className="bg-black/90 border border-amber-300/70 rounded-lg px-2.5 py-1 flex items-center gap-2 shadow-inner">
+                      <div className="bg-black/60 border border-amber-500/40 rounded-lg px-2.5 py-1 flex items-center gap-2 shadow-inner">
                         <span className="bg-gradient-to-r from-amber-400 to-amber-500 text-black text-[9px] font-black px-1.5 py-0.2 rounded shadow-sm">
                           -17%
                         </span>
                         <span className="line-through text-gray-400 font-mono text-xs font-bold">300</span>
                         <div className="flex items-center gap-1">
                           <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                          <span className="font-mono font-black text-amber-300 text-xs sm:text-sm">250</span>
+                          <span className="font-mono font-bold text-amber-300 text-xs sm:text-sm">250</span>
                         </div>
                       </div>
                     </>
@@ -1189,14 +1189,14 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 <button
                   disabled={isForgingCurrent}
                   onClick={() => buyDivineEquipment(currentItem.name)}
-                  className="w-full h-11 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:via-rose-500 hover:to-red-600 active:scale-[0.98] text-white border border-rose-300/90 font-display font-black text-xs tracking-wider uppercase flex items-center justify-between px-3 shadow-[0_4px_20px_rgba(225,29,72,0.45)] hover:shadow-[0_6px_28px_rgba(225,29,72,0.65)] cursor-pointer disabled:opacity-50 transition-all"
+                  className="w-full h-11 relative overflow-hidden bg-gradient-to-b from-[#4e101d] via-[#2d0710] to-[#140206] hover:from-[#611424] hover:via-[#390914] hover:to-[#1a0308] border-t-2 border-t-rose-400/90 border-x border-rose-500/50 border-b-2 border-b-black font-display font-black tracking-widest px-3 rounded-xl transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.8),0_0_12px_rgba(244,63,94,0.2)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.9),0_0_18px_rgba(244,63,94,0.35)] flex items-center justify-between text-xs uppercase cursor-pointer hover:scale-[1.01] active:scale-[0.98] select-none group disabled:opacity-50"
                 >
-                  <span className="font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                  <span className="font-display font-black tracking-widest text-rose-200 group-hover:text-rose-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                     {isForgingCurrent ? 'FORGING ARTIFACT...' : 'FORGE PIECE'}
                   </span>
-                  <div className="bg-black/90 border border-rose-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                  <div className="bg-black/60 border border-rose-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                     <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                    <span className="font-mono font-black text-rose-300 text-xs tracking-normal">50 SHARDS</span>
+                    <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">50 SHARDS</span>
                   </div>
                 </button>
               </div>
@@ -1377,24 +1377,24 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                         setIsBuyingShield(null);
                       }
                     }}
-                    className={`w-full h-11 rounded-xl font-display font-black text-xs tracking-wider uppercase flex items-center justify-between px-3 transition-all cursor-pointer active:scale-[0.98] shadow-[0_4px_18px_rgba(168,85,247,0.45)] hover:shadow-[0_6px_25px_rgba(168,85,247,0.65)] ${
+                    className={`w-full h-11 relative overflow-hidden font-display font-black text-xs tracking-widest uppercase flex items-center justify-between px-3 rounded-xl transition-all duration-200 select-none group ${
                       isPurchasing
-                        ? 'bg-gray-700 text-gray-400 cursor-wait justify-center'
+                        ? 'bg-gray-800 border-2 border-gray-700 text-gray-400 cursor-wait justify-center'
                         : canAfford
-                        ? 'bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:via-indigo-500 hover:to-purple-600 border border-purple-300/90 text-white'
-                        : 'bg-purple-950/60 border border-purple-500/40 text-purple-300'
+                        ? 'bg-gradient-to-b from-[#3a154d] via-[#230b2f] to-[#100316] hover:from-[#491b61] hover:via-[#2d0e3c] hover:to-[#15041c] border-t-2 border-t-purple-400/90 border-x border-purple-500/50 border-b-2 border-b-black shadow-[0_4px_12px_rgba(0,0,0,0.8),0_0_12px_rgba(168,85,247,0.2)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.9),0_0_18px_rgba(168,85,247,0.35)] cursor-pointer hover:scale-[1.01] active:scale-[0.98]'
+                        : 'bg-purple-950/40 border border-purple-500/30 text-purple-300/80 hover:bg-purple-900/50 cursor-pointer'
                     }`}
                   >
                     {isPurchasing ? (
                       <span className="w-full text-center">ACTIVATING SHIELD...</span>
                     ) : (
                       <>
-                        <span className="font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                        <span className="font-display font-black tracking-widest text-purple-200 group-hover:text-purple-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                           ACTIVATE SHIELD
                         </span>
-                        <div className="bg-black/90 border border-purple-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                        <div className="bg-black/60 border border-purple-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                           <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                          <span className="font-mono font-black text-purple-200 text-xs tracking-normal">{item.cost} SHARDS</span>
+                          <span className="font-mono font-bold text-purple-200 text-xs tracking-normal">{item.cost} SHARDS</span>
                         </div>
                       </>
                     )}
@@ -1490,24 +1490,24 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                     <button
                       disabled={isProcessing}
                       onClick={() => handleBuyLevelBoost(50)}
-                      className={`w-full h-11 rounded-xl font-display font-black text-xs tracking-wider uppercase flex items-center justify-between px-3 transition-all cursor-pointer active:scale-[0.98] shadow-[0_4px_20px_rgba(245,158,11,0.5)] hover:shadow-[0_6px_28px_rgba(245,158,11,0.7)] ${
+                      className={`w-full h-11 relative overflow-hidden font-display font-black text-xs tracking-widest uppercase flex items-center justify-between px-3 rounded-xl transition-all duration-200 select-none group ${
                         isProcessing
-                          ? 'bg-gray-800 text-gray-400 cursor-wait justify-center'
+                          ? 'bg-gray-800 border-2 border-gray-700 text-gray-400 cursor-wait justify-center'
                           : canAfford
-                          ? 'bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:via-yellow-300 hover:to-amber-500 text-black border border-yellow-200/90'
-                          : 'bg-amber-950/60 border border-amber-500/40 text-amber-300'
+                          ? 'bg-gradient-to-b from-[#3d2410] via-[#241407] to-[#120a03] hover:from-[#4d2d14] hover:via-[#2e1909] hover:to-[#170c04] border-t-2 border-t-amber-400/90 border-x border-amber-600/50 border-b-2 border-b-black shadow-[0_4px_12px_rgba(0,0,0,0.8),0_0_12px_rgba(245,158,11,0.2)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.9),0_0_18px_rgba(245,158,11,0.35)] cursor-pointer hover:scale-[1.01] active:scale-[0.98]'
+                          : 'bg-amber-950/40 border border-amber-500/40 text-amber-300/80 hover:bg-amber-900/50 cursor-pointer'
                       }`}
                     >
                       {isProcessing ? (
-                        <span>ASCENDING...</span>
+                        <span className="w-full text-center">ASCENDING...</span>
                       ) : (
                         <>
-                          <span className="font-display font-black tracking-wider text-black">
+                          <span className="font-display font-black tracking-widest text-amber-200 group-hover:text-amber-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                             ASCEND TO LEVEL 50
                           </span>
-                          <div className="bg-black/90 border border-black/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                          <div className="bg-black/60 border border-amber-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                             <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                            <span className="font-mono font-black text-amber-300 text-xs tracking-normal">{cost} SHARDS</span>
+                            <span className="font-mono font-bold text-amber-300 text-xs tracking-normal">{cost} SHARDS</span>
                           </div>
                         </>
                       )}
@@ -1578,24 +1578,24 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                     <button
                       disabled={isProcessing}
                       onClick={() => handleBuyLevelBoost(100)}
-                      className={`w-full h-11 rounded-xl font-display font-black text-xs tracking-wider uppercase flex items-center justify-between px-3 transition-all cursor-pointer active:scale-[0.98] shadow-[0_4px_25px_rgba(244,63,94,0.55)] hover:shadow-[0_6px_35px_rgba(244,63,94,0.75)] ${
+                      className={`w-full h-11 relative overflow-hidden font-display font-black text-xs tracking-widest uppercase flex items-center justify-between px-3 rounded-xl transition-all duration-200 select-none group ${
                         isProcessing
-                          ? 'bg-gray-800 text-gray-400 cursor-wait justify-center'
+                          ? 'bg-gray-800 border-2 border-gray-700 text-gray-400 cursor-wait justify-center'
                           : canAfford
-                          ? 'bg-gradient-to-r from-rose-600 via-red-500 to-amber-500 hover:from-rose-500 hover:via-red-400 hover:to-amber-400 text-white border border-rose-300/90'
-                          : 'bg-rose-950/60 border border-rose-500/40 text-rose-300'
+                          ? 'bg-gradient-to-b from-[#4e101d] via-[#2d0710] to-[#140206] hover:from-[#611424] hover:via-[#390914] hover:to-[#1a0308] border-t-2 border-t-rose-400/90 border-x border-rose-500/50 border-b-2 border-b-black shadow-[0_4px_12px_rgba(0,0,0,0.8),0_0_12px_rgba(244,63,94,0.2)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.9),0_0_18px_rgba(244,63,94,0.35)] cursor-pointer hover:scale-[1.01] active:scale-[0.98]'
+                          : 'bg-rose-950/40 border border-rose-500/40 text-rose-300/80 hover:bg-rose-900/50 cursor-pointer'
                       }`}
                     >
                       {isProcessing ? (
-                        <span>ASCENDING...</span>
+                        <span className="w-full text-center">ASCENDING...</span>
                       ) : (
                         <>
-                          <span className="font-display font-black tracking-wider text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                          <span className="font-display font-black tracking-widest text-rose-200 group-hover:text-rose-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                             ASCEND TO LEVEL 100
                           </span>
-                          <div className="bg-black/90 border border-rose-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                          <div className="bg-black/60 border border-rose-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                             <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                            <span className="font-mono font-black text-rose-300 text-xs tracking-normal">{cost} SHARDS</span>
+                            <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">{cost} SHARDS</span>
                           </div>
                         </>
                       )}
