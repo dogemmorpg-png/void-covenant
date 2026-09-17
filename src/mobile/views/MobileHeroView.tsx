@@ -122,8 +122,8 @@ const STANCE_CONFIG: Record<TalentStance, {
 // Responsive node positioning math for mobile constellation canvas
 const getMobileNodePos = (tier: number, col: number, canvasWidth: number = 360) => {
   const cWidth = Math.max(300, canvasWidth);
-  const sideWidth = Math.min(150, Math.floor((cWidth - 20) / 2));
-  const centerWidth = Math.min(224, cWidth - 24);
+  const sideWidth = Math.min(146, Math.floor((cWidth - 28) / 2));
+  const centerWidth = Math.min(220, cWidth - 28);
 
   let width = centerWidth;
   let height = 74;
@@ -131,23 +131,23 @@ const getMobileNodePos = (tier: number, col: number, canvasWidth: number = 360) 
 
   if (col === -1) {
     width = sideWidth;
-    x = Math.round(sideWidth / 2 + 6);
+    x = Math.round(sideWidth / 2 + 12);
   } else if (col === 1) {
     width = sideWidth;
-    x = Math.round(cWidth - sideWidth / 2 - 6);
+    x = Math.round(cWidth - sideWidth / 2 - 12);
   } else if (tier === 3) {
-    width = Math.min(220, cWidth - 24);
+    width = Math.min(220, cWidth - 28);
     height = 76;
   } else if (tier === 5) {
-    width = Math.min(230, cWidth - 20);
+    width = Math.min(230, cWidth - 24);
     height = 78;
   }
 
-  let y = 52;
-  if (tier === 2) y = 168;
-  if (tier === 3) y = 284;
-  if (tier === 4) y = 400;
-  if (tier === 5) y = 516;
+  let y = 54;
+  if (tier === 2) y = 170;
+  if (tier === 3) y = 286;
+  if (tier === 4) y = 402;
+  if (tier === 5) y = 518;
 
   return { x, y, width, height };
 };
@@ -163,9 +163,8 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
   const [selectedSlot, setSelectedSlot] = useState<EquipmentSlot | null>(null);
   const [subTab, setSubTab] = useState<'equipment' | 'talents'>('equipment');
 
-  // Talent Tree stance sub-tab and selected inspector node
+  // Talent Tree stance sub-tab
   const [activeTalentStance, setActiveTalentStance] = useState<TalentStance>(profile?.activeStance || 'void_strike');
-  const [selectedTalentId, setSelectedTalentId] = useState<string | null>(null);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
@@ -318,7 +317,6 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
 
   // Active talent nodes for current stance
   const activeTalentNodes = TALENT_TREES.filter(t => t.stance === activeTalentStance);
-  const selectedTalent = activeTalentNodes.find(n => n.id === selectedTalentId) || activeTalentNodes[0];
 
   // Paperdoll individual slot box
   const renderSlotBox = (slot: EquipmentSlot, label: string, defaultIconPath: string) => {
@@ -756,10 +754,6 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
 
               </div>
             </div>
-
-            <div className="mt-1 pt-2 border-t border-white/5 text-center relative z-10 text-[9px] font-mono text-purple-300/80">
-              Tap any slot to browse & equip inventory relics
-            </div>
           </div>
 
           {/* 4. SET OF THE DEMIURGE (DIVINE RESONANCE MONOLITH) */}
@@ -878,17 +872,12 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
           {/* Header Card: Points & Reset */}
           <div className="bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-[#c5a880]/30 rounded-2xl p-3.5 shadow-xl relative overflow-hidden flex items-center justify-between gap-2">
             <div className="min-w-0">
-              <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest block leading-tight">
-                Skill Points
+              <span className="block text-[10px] min-[380px]:text-[11px] font-bold tracking-widest uppercase text-gray-400 font-mono mb-0.5">
+                UNSPENT POINTS
               </span>
-              <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span className="text-xl min-[380px]:text-2xl font-display font-black text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]">
-                  {availableTalentPoints}
-                </span>
-                <span className="text-[9px] font-mono text-gray-400">
-                  / {totalTalentPoints} Total
-                </span>
-              </div>
+              <span className="block text-2xl min-[380px]:text-3xl font-display font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)] leading-none">
+                {availableTalentPoints}
+              </span>
             </div>
 
             <button
@@ -915,19 +904,16 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
               return (
                 <button
                   key={stKey}
-                  onClick={() => {
-                    setActiveTalentStance(stKey);
-                    setSelectedTalentId(null);
-                  }}
-                  className={`py-2 px-1 rounded-xl transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer relative ${
+                  onClick={() => setActiveTalentStance(stKey)}
+                  className={`py-2 px-1 rounded-xl transition-all flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
                     isSelectedTab
                       ? `bg-gradient-to-b ${st.bgActive} border-2 ${st.borderActive} shadow-lg text-white`
                       : 'border border-transparent text-gray-400 hover:text-gray-200'
                   }`}
                 >
                   <div className="shrink-0">{st.icon("w-4 h-4")}</div>
-                  <span className="text-[8.5px] min-[380px]:text-[9px] font-display font-bold uppercase truncate max-w-full">
-                    {st.name.split(' ')[0]}
+                  <span className="text-[8px] min-[380px]:text-[9px] font-display font-bold uppercase tracking-wider text-center leading-tight">
+                    {st.name}
                   </span>
                   {isEquipped && (
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)] absolute top-1 right-1" />
@@ -1135,17 +1121,12 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                 return (
                   <button
                     key={node.id}
-                    onClick={() => {
-                      if (isSelected && canUpgrade) {
-                        handlePurchaseTalent(node);
-                      } else {
-                        setSelectedTalentId(node.id);
-                      }
-                    }}
-                    className={`absolute z-10 flex items-center p-2 rounded-2xl border-2 transition-all duration-300 group text-left cursor-pointer ${themeBg} ${themeBorder} ${
-                      isLocked ? 'opacity-40 grayscale' : ''
-                    } ${
-                      isSelected ? 'ring-2 ring-amber-400 shadow-[0_0_18px_rgba(251,191,36,0.4)] scale-102 z-20' : 'active:scale-98'
+                    onClick={() => handlePurchaseTalent(node)}
+                    disabled={isMaxed}
+                    className={`absolute z-10 flex items-center p-2 rounded-2xl border-2 transition-all duration-300 group text-left ${themeBg} ${themeBorder} ${
+                      isLocked ? 'opacity-40 grayscale cursor-not-allowed' : 
+                      isMaxed ? 'cursor-default' : 
+                      'hover:scale-105 active:scale-95 cursor-pointer'
                     }`}
                     style={{
                       left: pos.x - pos.width / 2,
@@ -1155,6 +1136,11 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                       boxShadow: glowShadow,
                     }}
                   >
+                    {/* Glowing effect inside node on hover if available */}
+                    {!isLocked && !isMaxed && (
+                      <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl pointer-events-none" />
+                    )}
+
                     {/* Circular Icon with Animated Progress Ring */}
                     <div className="relative shrink-0 w-10 h-10 flex items-center justify-center mr-2">
                       <svg className="absolute inset-0 w-full h-full -rotate-90">
@@ -1200,11 +1186,11 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                       </p>
                     </div>
 
-                    {/* Star Cost Badge */}
+                    {/* Star Cost Badge (matching PC) */}
                     {!isLocked && !isMaxed && (
-                      <div className="absolute -top-1.5 -right-1.5 bg-black border border-amber-500/60 rounded-full w-5 h-5 flex items-center justify-center shadow-md z-30">
-                        <span className="text-[7.5px] font-black text-amber-400 flex items-center leading-none">
-                          <Star className="w-2 h-2 text-amber-500 fill-amber-500 mr-0.5" />
+                      <div className="absolute -top-3 -right-3 bg-black border border-amber-500/60 rounded-full w-7 h-7 min-[380px]:w-8 min-[380px]:h-8 flex items-center justify-center shadow-[0_0_10px_rgba(251,191,36,0.4)] z-30 transition-transform group-hover:scale-110 group-hover:border-amber-400 pointer-events-none">
+                        <span className="text-[9.5px] min-[380px]:text-[10.5px] font-black text-amber-400 flex flex-col items-center leading-none mt-0.5">
+                          <Star className="w-2.5 h-2.5 min-[380px]:w-3 min-[380px]:h-3 text-amber-500 fill-amber-500 mb-0.5" />
                           {node.cost}
                         </span>
                       </div>
@@ -1213,116 +1199,7 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                 );
               })}
             </div>
-
-            <div className="text-center text-[9px] font-mono text-gray-500 mt-1 pb-1">
-              Tap any talent node to inspect & upgrade
-            </div>
           </div>
-
-          {/* ------------------------------------------------------------- */}
-          {/* TALENT INSPECTOR & UPGRADE CARD                               */}
-          {/* ------------------------------------------------------------- */}
-          {selectedTalent && (() => {
-            const currentLevel = profile.talents?.[selectedTalent.id] || 0;
-            const isMaxed = currentLevel >= selectedTalent.maxLevel;
-            
-            let isLocked = false;
-            let lockReason = '';
-            if (selectedTalent.requires && selectedTalent.requires.length > 0) {
-              isLocked = !selectedTalent.requires.every(reqId => {
-                const reqNode = activeTalentNodes.find(n => n.id === reqId);
-                const reqLevel = profile.talents?.[reqId] || 0;
-                return selectedTalent.requireMax ? reqLevel >= (reqNode?.maxLevel || 1) : reqLevel > 0;
-              });
-              if (isLocked) {
-                const reqNames = selectedTalent.requires.map(r => activeTalentNodes.find(n => n.id === r)?.name || r).join(' & ');
-                lockReason = selectedTalent.requireMax ? `Requires maxing ${reqNames}` : `Requires unlocking ${reqNames}`;
-              }
-            }
-
-            const IconComp = (LucideIcons as any)[selectedTalent.icon] || LucideIcons.Sparkles;
-            const isMajor = selectedTalent.tier === 3 || selectedTalent.tier === 5;
-            const canUpgrade = !isLocked && !isMaxed && availableTalentPoints >= selectedTalent.cost;
-            const currentCfg = STANCE_CONFIG[activeTalentStance];
-
-            return (
-              <div className="bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-amber-500/30 rounded-2xl p-3.5 shadow-xl space-y-2.5 relative overflow-hidden">
-                <div className="flex items-center justify-between border-b border-gray-800 pb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-black/70 border border-amber-500/40 flex items-center justify-center text-amber-400">
-                      <IconComp className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h4 className="font-display font-black text-xs sm:text-sm text-white uppercase tracking-wider flex items-center gap-1.5">
-                        {selectedTalent.name}
-                        {isMajor && <Award className="w-3.5 h-3.5 text-amber-400" />}
-                      </h4>
-                      <span className="text-[9px] font-mono text-gray-400">
-                        Tier {selectedTalent.tier} · {selectedTalent.cost} Skill Point{selectedTalent.cost > 1 ? 's' : ''} per level
-                      </span>
-                    </div>
-                  </div>
-
-                  <span className={`text-[10px] font-mono font-black px-2 py-0.5 rounded-full ${
-                    isMaxed 
-                      ? 'bg-amber-500/25 text-amber-300 border border-amber-500/40' 
-                      : 'bg-black/60 text-gray-300 border border-white/10'
-                  }`}>
-                    Level {currentLevel} / {selectedTalent.maxLevel}
-                  </span>
-                </div>
-
-                {/* Description Box */}
-                <div className="bg-black/50 border border-white/10 rounded-xl p-2.5 space-y-1">
-                  <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-widest block">
-                    {currentLevel > 0 ? 'Current Effect:' : 'Effect:'}
-                  </span>
-                  <p className="text-[11px] font-sans text-gray-200 leading-snug">
-                    {selectedTalent.description(Math.max(1, currentLevel))}
-                  </p>
-                  {currentLevel > 0 && currentLevel < selectedTalent.maxLevel && (
-                    <div className="pt-1 border-t border-white/5 mt-1">
-                      <span className="text-[8px] font-mono text-amber-400 uppercase tracking-widest block">
-                        Next Level:
-                      </span>
-                      <p className="text-[10px] font-sans text-amber-200/90 leading-snug">
-                        {selectedTalent.description(currentLevel + 1)}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Upgrade Button or Status */}
-                <div>
-                  {isMaxed ? (
-                    <div className="w-full py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/40 text-amber-300 text-xs font-display font-black tracking-widest uppercase flex items-center justify-center gap-1.5">
-                      <Check className="w-4 h-4 stroke-[3]" /> TALENT FULLY MASTERED
-                    </div>
-                  ) : isLocked ? (
-                    <div className="w-full py-2 rounded-xl bg-red-950/40 border border-red-500/30 text-red-300 text-[10px] font-mono font-bold flex items-center justify-center gap-1.5">
-                      <Lock className="w-3.5 h-3.5" /> {lockReason}
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => handlePurchaseTalent(selectedTalent)}
-                      disabled={!canUpgrade}
-                      className={`w-full py-2.5 rounded-xl font-display font-black text-xs tracking-widest uppercase transition-all flex items-center justify-center gap-2 shadow-lg ${
-                        canUpgrade
-                          ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 hover:brightness-110 text-black shadow-[0_0_15px_rgba(251,191,36,0.4)] cursor-pointer active:scale-98'
-                          : 'bg-white/5 border border-white/10 text-gray-500 cursor-not-allowed'
-                      }`}
-                    >
-                      <Zap className="w-3.5 h-3.5 fill-current" />
-                      <span>UPGRADE TALENT</span>
-                      <span className="text-[10px] font-mono opacity-80 font-bold">
-                        ({selectedTalent.cost} Point{selectedTalent.cost > 1 ? 's' : ''})
-                      </span>
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })()}
 
         </div>
       )}
