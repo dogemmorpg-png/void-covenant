@@ -348,14 +348,14 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
   }[] = [
     {
       id: 'boosters',
-      name: 'BOOSTERS',
+      name: 'CARDS',
       icon: '/packs/pack_obsidian.webp',
       activeBg: 'from-[#0d2a3a] to-[#06161f]',
       activeBorder: 'border-cyan-400 text-cyan-200 shadow-[0_0_14px_rgba(6,182,212,0.4)]',
     },
     {
       id: 'chests',
-      name: 'CHESTS',
+      name: 'EQUIPMENT',
       icon: '/packs/chest_premium.webp',
       activeBg: 'from-[#2a1040] to-[#140620]',
       activeBorder: 'border-purple-400 text-purple-200 shadow-[0_0_14px_rgba(168,85,247,0.4)]',
@@ -838,9 +838,6 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                       <span className="font-display font-black text-[11px] uppercase tracking-wider">
                         {shortName}
                       </span>
-                      {isOwned && (
-                        <span className="text-emerald-400 text-[9px] font-mono font-bold">✓</span>
-                      )}
                     </button>
                   );
                 })}
