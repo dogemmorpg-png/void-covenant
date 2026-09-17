@@ -186,7 +186,7 @@ export const PremiumPassView: React.FC = () => {
             <div className="font-display font-black text-xs sm:text-sm tracking-wider text-white">
               30 DAYS
             </div>
-            <div className="text-[10px] font-mono text-gray-400 mt-0.5">
+            <div className="text-[10px] sm:text-[11px] font-sans text-gray-400 mt-0.5">
               Standard Access
             </div>
           </button>
@@ -208,15 +208,8 @@ export const PremiumPassView: React.FC = () => {
                 -15% DISCOUNT
               </span>
             </div>
-            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-amber-950/60 border border-amber-500/40 text-amber-200 mt-1 shadow-sm">
-              <img 
-                src="/icons/equipment/items/blade_of_the_demiurge.png" 
-                alt="Relic" 
-                className="w-3.5 h-3.5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)] shrink-0" 
-              />
-              <span className="font-display font-bold text-[10px] sm:text-[10.5px] uppercase tracking-wider text-amber-200">
-                + Divine Relic Included
-              </span>
+            <div className="text-[10px] sm:text-[11px] font-sans font-semibold text-amber-300 mt-0.5">
+              + Divine Relic Included
             </div>
           </button>
         </div>
