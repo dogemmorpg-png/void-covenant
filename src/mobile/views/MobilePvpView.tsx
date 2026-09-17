@@ -722,57 +722,96 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
         </div>
       </div>
 
-      {/* 2. NAVIGATION TABS (DUELS / LEADERBOARD / LEAGUE REWARDS / HISTORY) */}
-      <div className="flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 gap-1.5 mb-2.5 shrink-0 shadow-inner">
+      {/* 2. NAVIGATION TABS (DUELS / LEADERBOARD / REWARDS / HISTORY) */}
+      <div className="flex items-center bg-gradient-to-b from-[#13141c]/95 via-[#0c0d12]/95 to-[#08080a] p-1 sm:p-1.5 rounded-2xl border border-white/10 gap-1 sm:gap-1.5 mb-2.5 shrink-0 shadow-[0_4px_20px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.06)]">
+        {/* DUELS */}
         <button
           onClick={() => setActiveTab('duels')}
-          className={`flex-1 py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`group flex-1 py-1.5 sm:py-2 px-1 rounded-xl text-[9px] min-[360px]:text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
             activeTab === 'duels'
-              ? 'bg-gradient-to-r from-red-950/90 via-rose-900/70 to-red-950/90 border border-rose-500/60 text-white shadow-[0_0_20px_rgba(244,63,94,0.35)]'
-              : 'text-gray-400 hover:text-white border border-transparent'
+              ? 'bg-gradient-to-b from-rose-950/90 via-red-950/60 to-[#120406] border border-rose-500/70 text-rose-100 shadow-[0_0_16px_rgba(244,63,94,0.35),inset_0_1px_1px_rgba(255,255,255,0.2)]'
+              : 'bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-white/15 text-gray-400 hover:text-white'
           }`}
         >
-          <Swords className="w-3.5 h-3.5 text-rose-400" />
-          <span>DUELS</span>
+          <img 
+            src="/icons/tab_pvp_duels.png" 
+            alt="" 
+            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain transition-all duration-300 ${
+              activeTab === 'duels' 
+                ? 'scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.9)]' 
+                : 'opacity-60 grayscale-[30%] group-hover:opacity-100 group-hover:grayscale-0'
+            }`} 
+          />
+          <span className={activeTab === 'duels' ? 'drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]' : ''}>DUELS</span>
         </button>
 
+        {/* LEADERBOARD */}
         <button
           onClick={() => setActiveTab('ladder')}
-          className={`flex-1 py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`group flex-1 py-1.5 sm:py-2 px-1 rounded-xl text-[8.5px] min-[360px]:text-[9.5px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
             activeTab === 'ladder'
-              ? 'bg-gradient-to-r from-purple-950/90 via-indigo-900/70 to-purple-950/90 border border-purple-500/60 text-white shadow-[0_0_20px_rgba(168,85,247,0.35)]'
-              : 'text-gray-400 hover:text-white border border-transparent'
+              ? 'bg-gradient-to-b from-purple-950/90 via-indigo-950/60 to-[#0e0414] border border-purple-500/70 text-purple-100 shadow-[0_0_16px_rgba(168,85,247,0.35),inset_0_1px_1px_rgba(255,255,255,0.2)]'
+              : 'bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-white/15 text-gray-400 hover:text-white'
           }`}
         >
-          <Award className="w-3.5 h-3.5 text-purple-400" />
-          <span>LADDER</span>
+          <img 
+            src="/icons/tab_pvp_leaderboard.png" 
+            alt="" 
+            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain transition-all duration-300 ${
+              activeTab === 'ladder' 
+                ? 'scale-110 drop-shadow-[0_0_8px_rgba(168,85,247,0.9)]' 
+                : 'opacity-60 grayscale-[30%] group-hover:opacity-100 group-hover:grayscale-0'
+            }`} 
+          />
+          <span className={`whitespace-nowrap ${activeTab === 'ladder' ? 'drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]' : ''}`}>
+            <span className="hidden min-[350px]:inline">LEADERBOARD</span>
+            <span className="min-[350px]:hidden">RANKS</span>
+          </span>
         </button>
 
+        {/* REWARDS */}
         <button
           onClick={() => setActiveTab('rewards')}
-          className={`flex-1 py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`group flex-1 py-1.5 sm:py-2 px-1 rounded-xl text-[9px] min-[360px]:text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
             activeTab === 'rewards'
-              ? 'bg-gradient-to-r from-amber-950/90 via-yellow-900/70 to-amber-950/90 border border-amber-500/60 text-white shadow-[0_0_20px_rgba(245,158,11,0.35)]'
-              : 'text-gray-400 hover:text-white border border-transparent'
+              ? 'bg-gradient-to-b from-amber-950/90 via-yellow-950/60 to-[#140b02] border border-amber-500/70 text-amber-100 shadow-[0_0_16px_rgba(245,158,11,0.35),inset_0_1px_1px_rgba(255,255,255,0.2)]'
+              : 'bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-white/15 text-gray-400 hover:text-white'
           }`}
         >
-          <Trophy className="w-3.5 h-3.5 text-amber-400" />
-          <span>REWARDS</span>
+          <img 
+            src="/icons/tab_pvp_rewards.png" 
+            alt="" 
+            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain transition-all duration-300 ${
+              activeTab === 'rewards' 
+                ? 'scale-110 drop-shadow-[0_0_8px_rgba(245,158,11,0.9)]' 
+                : 'opacity-60 grayscale-[30%] group-hover:opacity-100 group-hover:grayscale-0'
+            }`} 
+          />
+          <span className={activeTab === 'rewards' ? 'drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]' : ''}>REWARDS</span>
         </button>
 
+        {/* HISTORY */}
         <button
           onClick={() => {
             setActiveTab('history');
             markDefenseHistoryAsViewed();
           }}
-          className={`relative flex-1 py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`relative group flex-1 py-1.5 sm:py-2 px-1 rounded-xl text-[9px] min-[360px]:text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
             activeTab === 'history'
-              ? 'bg-gradient-to-r from-cyan-950/90 via-blue-900/70 to-cyan-950/90 border border-cyan-500/60 text-white shadow-[0_0_20px_rgba(6,182,212,0.35)]'
-              : 'text-gray-400 hover:text-white border border-transparent'
+              ? 'bg-gradient-to-b from-cyan-950/90 via-sky-950/60 to-[#031114] border border-cyan-500/70 text-cyan-100 shadow-[0_0_16px_rgba(6,182,212,0.35),inset_0_1px_1px_rgba(255,255,255,0.2)]'
+              : 'bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-white/15 text-gray-400 hover:text-white'
           }`}
         >
-          <History className="w-3.5 h-3.5 text-cyan-400" />
-          <span>HISTORY</span>
+          <img 
+            src="/icons/tab_pvp_history.png" 
+            alt="" 
+            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain transition-all duration-300 ${
+              activeTab === 'history' 
+                ? 'scale-110 drop-shadow-[0_0_8px_rgba(6,182,212,0.9)]' 
+                : 'opacity-60 grayscale-[30%] group-hover:opacity-100 group-hover:grayscale-0'
+            }`} 
+          />
+          <span className={activeTab === 'history' ? 'drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]' : ''}>HISTORY</span>
           {hasNewDefenseAttacks && (
             <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping absolute top-1 right-2" />
           )}
@@ -990,7 +1029,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
               <div className="flex items-center gap-2">
-                <Award className="w-4 h-4 text-amber-400" />
+                <img src="/icons/tab_pvp_leaderboard.png" alt="" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
                 <h3 className="font-display font-bold text-xs sm:text-sm text-white tracking-widest uppercase">
                   LEADERBOARD HALL
                 </h3>
