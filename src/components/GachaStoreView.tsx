@@ -715,13 +715,12 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   <div className="mt-2.5 sm:mt-3 relative z-10">
                     <button
                       onClick={buyBronzePack}
-                      className="w-full bg-gradient-to-r from-[#221306] via-[#3a200a] to-[#221306] hover:from-[#2e1a0c] hover:via-[#4c290d] hover:to-[#2e1a0c] text-amber-100 border-2 border-amber-500/70 hover:border-amber-400 font-display font-black tracking-wider py-2.5 px-3 rounded-xl transition-all duration-300 shadow-[0_0_18px_rgba(245,158,11,0.25)] hover:shadow-[0_0_24px_rgba(245,158,11,0.45)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.02] active:scale-95 select-none"
+                      className="w-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:via-yellow-300 hover:to-amber-500 text-black border border-yellow-200/90 font-display font-black tracking-wider py-2.5 px-3 rounded-xl transition-all duration-300 shadow-[0_4px_18px_rgba(245,158,11,0.45)] hover:shadow-[0_6px_25px_rgba(245,158,11,0.65)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.02] active:scale-95 select-none"
                     >
-                      <span className="flex items-center gap-1.5 text-amber-200">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        <span>SUMMON</span>
+                      <span className="font-display font-black tracking-wider">
+                        SUMMON
                       </span>
-                      <div className="bg-black/85 border border-amber-500/60 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                      <div className="bg-black/90 border border-black/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                         <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(245,158,11,0.9)]" />
                         <span className="font-mono font-black text-amber-300 text-xs tracking-normal">1,000 GOLD</span>
                       </div>
@@ -814,13 +813,12 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   <div className="mt-2.5 sm:mt-3 relative z-10">
                     <button
                       onClick={buyObsidianPack}
-                      className="w-full bg-gradient-to-r from-[#031c26] via-[#083548] to-[#031c26] hover:from-[#052533] hover:via-[#0c445c] hover:to-[#052533] text-cyan-100 border-2 border-cyan-400/80 hover:border-cyan-300 font-display font-black tracking-wider py-2.5 px-3 rounded-xl transition-all duration-300 shadow-[0_0_18px_rgba(6,182,212,0.3)] hover:shadow-[0_0_26px_rgba(6,182,212,0.55)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.02] active:scale-95 select-none"
+                      className="w-full bg-gradient-to-r from-cyan-600 via-teal-500 to-cyan-700 hover:from-cyan-500 hover:via-teal-400 hover:to-cyan-600 text-white border border-cyan-300/90 font-display font-black tracking-wider py-2.5 px-3 rounded-xl transition-all duration-300 shadow-[0_4px_18px_rgba(6,182,212,0.45)] hover:shadow-[0_6px_25px_rgba(6,182,212,0.65)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.02] active:scale-95 select-none"
                     >
-                      <span className="flex items-center gap-1.5 text-cyan-200">
-                        <Zap className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                        <span>SUMMON</span>
+                      <span className="font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                        SUMMON
                       </span>
-                      <div className="bg-black/85 border border-cyan-400/60 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                      <div className="bg-black/90 border border-cyan-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                         <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
                         <span className="font-mono font-black text-cyan-300 text-xs tracking-normal">30 SHARDS</span>
                       </div>
@@ -913,13 +911,12 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   <div className="mt-2.5 sm:mt-3 relative z-10">
                     <button
                       onClick={buyAbyssalPack}
-                      className="w-full bg-gradient-to-r from-[#290510] via-[#45091a] to-[#290510] hover:from-[#380716] hover:via-[#5c0d23] hover:to-[#380716] text-rose-100 border-2 border-rose-500/80 hover:border-rose-400 font-display font-black tracking-wider py-2.5 px-3 rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(244,63,94,0.35)] hover:shadow-[0_0_30px_rgba(244,63,94,0.6)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.02] active:scale-95 select-none"
+                      className="w-full bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:via-rose-500 hover:to-red-600 text-white border border-rose-300/90 font-display font-black tracking-wider py-2.5 px-3 rounded-xl transition-all duration-300 shadow-[0_4px_18px_rgba(225,29,72,0.45)] hover:shadow-[0_6px_25px_rgba(225,29,72,0.65)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.02] active:scale-95 select-none"
                     >
-                      <span className="flex items-center gap-1.5 text-rose-200">
-                        <Skull className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                        <span>SUMMON</span>
+                      <span className="font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                        SUMMON
                       </span>
-                      <div className="bg-black/85 border border-rose-500/60 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                      <div className="bg-black/90 border border-rose-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                         <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
                         <span className="font-mono font-black text-rose-300 text-xs tracking-normal">70 SHARDS</span>
                       </div>
@@ -1028,13 +1025,12 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   <div className="mt-2.5 sm:mt-3 relative z-10">
                     <button
                       onClick={buyBasicEquipmentPack}
-                      className="w-full bg-gradient-to-r from-[#221306] via-[#3a200a] to-[#221306] hover:from-[#2e1a0c] hover:via-[#4c290d] hover:to-[#2e1a0c] text-amber-100 border-2 border-amber-500/70 hover:border-amber-400 font-display font-black tracking-wider py-2.5 px-3 rounded-xl transition-all duration-300 shadow-[0_0_18px_rgba(245,158,11,0.25)] hover:shadow-[0_0_24px_rgba(245,158,11,0.45)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.02] active:scale-95 select-none"
+                      className="w-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:via-yellow-300 hover:to-amber-500 text-black border border-yellow-200/90 font-display font-black tracking-wider py-2.5 px-3 rounded-xl transition-all duration-300 shadow-[0_4px_18px_rgba(245,158,11,0.45)] hover:shadow-[0_6px_25px_rgba(245,158,11,0.65)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.02] active:scale-95 select-none"
                     >
-                      <span className="flex items-center gap-1.5 text-amber-200">
-                        <Shield className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        <span>FORGE RELIC</span>
+                      <span className="font-display font-black tracking-wider">
+                        FORGE RELIC
                       </span>
-                      <div className="bg-black/85 border border-amber-500/60 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                      <div className="bg-black/90 border border-black/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                         <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(245,158,11,0.9)]" />
                         <span className="font-mono font-black text-amber-300 text-xs tracking-normal">700 GOLD</span>
                       </div>
@@ -1109,13 +1105,12 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   <div className="mt-2.5 sm:mt-3 relative z-10">
                     <button
                       onClick={buyRareEquipmentPack}
-                      className="w-full bg-gradient-to-r from-[#031c26] via-[#083548] to-[#031c26] hover:from-[#052533] hover:via-[#0c445c] hover:to-[#052533] text-cyan-100 border-2 border-cyan-400/80 hover:border-cyan-300 font-display font-black tracking-wider py-2.5 px-3 rounded-xl transition-all duration-300 shadow-[0_0_18px_rgba(6,182,212,0.3)] hover:shadow-[0_0_26px_rgba(6,182,212,0.55)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.02] active:scale-95 select-none"
+                      className="w-full bg-gradient-to-r from-cyan-600 via-teal-500 to-cyan-700 hover:from-cyan-500 hover:via-teal-400 hover:to-cyan-600 text-white border border-cyan-300/90 font-display font-black tracking-wider py-2.5 px-3 rounded-xl transition-all duration-300 shadow-[0_4px_18px_rgba(6,182,212,0.45)] hover:shadow-[0_6px_25px_rgba(6,182,212,0.65)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.02] active:scale-95 select-none"
                     >
-                      <span className="flex items-center gap-1.5 text-cyan-200">
-                        <Zap className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                        <span>FORGE RELIC</span>
+                      <span className="font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                        FORGE RELIC
                       </span>
-                      <div className="bg-black/85 border border-cyan-400/60 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                      <div className="bg-black/90 border border-cyan-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                         <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
                         <span className="font-mono font-black text-cyan-300 text-xs tracking-normal">30 SHARDS</span>
                       </div>
@@ -1190,15 +1185,14 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   <div className="mt-2.5 sm:mt-3 relative z-10">
                     <button
                       onClick={buyPremiumEquipmentPack}
-                      className="w-full bg-gradient-to-r from-[#1e072a] via-[#350d4a] to-[#1e072a] hover:from-[#290a3a] hover:via-[#471263] hover:to-[#290a3a] text-purple-100 border-2 border-purple-500/80 hover:border-purple-400 font-display font-black tracking-wider py-2.5 px-3 rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(168,85,247,0.35)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.02] active:scale-95 select-none"
+                      className="w-full bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-700 hover:from-purple-500 hover:via-fuchsia-500 hover:to-indigo-600 text-white border border-purple-300/90 font-display font-black tracking-wider py-2.5 px-3 rounded-xl transition-all duration-300 shadow-[0_4px_18px_rgba(168,85,247,0.45)] hover:shadow-[0_6px_25px_rgba(168,85,247,0.65)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.02] active:scale-95 select-none"
                     >
-                      <span className="flex items-center gap-1.5 text-purple-200">
-                        <Crown className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-                        <span>FORGE RELIC</span>
+                      <span className="font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                        FORGE RELIC
                       </span>
-                      <div className="bg-black/85 border border-purple-500/60 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                      <div className="bg-black/90 border border-purple-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                         <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                        <span className="font-mono font-black text-purple-300 text-xs tracking-normal">70 SHARDS</span>
+                        <span className="font-mono font-black text-purple-200 text-xs tracking-normal">70 SHARDS</span>
                       </div>
                     </button>
                   </div>
@@ -1309,13 +1303,12 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                         <button
                           disabled={isBuyingThis}
                           onClick={() => buyDivineCard(card.baseId)}
-                          className="w-full bg-gradient-to-r from-[#290510] via-[#45091a] to-[#290510] hover:from-[#380716] hover:via-[#5c0d23] hover:to-[#380716] active:scale-[0.98] text-rose-100 border-2 border-rose-500/80 hover:border-rose-400 font-display font-black tracking-wider py-2.5 px-3.5 rounded-xl transition-all shadow-[0_0_22px_rgba(244,63,94,0.4)] hover:shadow-[0_0_32px_rgba(244,63,94,0.7)] flex items-center justify-between text-xs uppercase cursor-pointer disabled:opacity-50"
+                          className="w-full bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:via-rose-500 hover:to-red-600 active:scale-[0.98] text-white border border-rose-300/90 font-display font-black tracking-wider py-2.5 px-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(225,29,72,0.45)] hover:shadow-[0_6px_28px_rgba(225,29,72,0.65)] flex items-center justify-between text-xs uppercase cursor-pointer disabled:opacity-50"
                         >
-                          <span className="flex items-center gap-1.5 text-rose-200">
-                            <Sparkles className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                            <span>{isBuyingThis ? 'INVOKING...' : 'SUMMON ENTITY'}</span>
+                          <span className="font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                            {isBuyingThis ? 'INVOKING...' : 'SUMMON ENTITY'}
                           </span>
-                          <div className="bg-black/85 border border-rose-500/60 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                          <div className="bg-black/90 border border-rose-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                             <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
                             <span className="font-mono font-black text-rose-300 text-xs tracking-normal">50 SHARDS</span>
                           </div>
@@ -1372,27 +1365,20 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       ownedDemiurgeCount === 6
                         ? 'bg-emerald-950/60 border-2 border-emerald-500/50 text-emerald-300 gap-2 cursor-default opacity-85'
                         : isBuyingSet
-                        ? 'bg-gradient-to-r from-[#1f0913] via-[#350f21] to-[#1f0913] border-2 border-amber-400/80 text-white gap-2 cursor-wait'
-                        : 'bg-gradient-to-r from-[#1f0913] via-[#350f21] to-[#1f0913] hover:from-[#2a0c1a] hover:via-[#48142d] hover:to-[#2a0c1a] border-2 border-amber-400/80 hover:border-amber-300 text-white shadow-[0_0_25px_rgba(245,158,11,0.35)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] gap-3 cursor-pointer hover:scale-[1.02]'
+                        ? 'bg-gradient-to-r from-amber-600 via-rose-600 to-red-700 border-2 border-amber-300/90 text-white gap-2 cursor-wait'
+                        : 'bg-gradient-to-r from-amber-600 via-rose-600 to-red-700 hover:from-amber-500 hover:via-rose-500 hover:to-red-600 border-2 border-amber-300/90 text-white shadow-[0_4px_22px_rgba(245,158,11,0.45)] hover:shadow-[0_6px_30px_rgba(245,158,11,0.65)] gap-3 cursor-pointer hover:scale-[1.02]'
                     }`}
                   >
                     {ownedDemiurgeCount === 6 ? (
-                      <>
-                        <Crown className="w-4 h-4 text-emerald-400" />
-                        <span>FULL SET ASSEMBLED (6/6)</span>
-                      </>
+                      <span className="text-emerald-300">FULL SET ASSEMBLED (6/6)</span>
                     ) : isBuyingSet ? (
-                      <>
-                        <Crown className="w-4 h-4 text-amber-400 animate-spin" />
-                        <span>FORGING ENTIRE SET...</span>
-                      </>
+                      <span className="text-amber-200">FORGING ENTIRE SET...</span>
                     ) : (
                       <>
-                        <div className="flex items-center gap-2 text-amber-200">
-                          <Crown className="w-4 h-4 text-amber-400 animate-pulse shrink-0" />
-                          <span>BUY FULL SET (6 PIECES)</span>
-                        </div>
-                        <div className="bg-black/85 border border-amber-400/60 rounded-lg px-2 py-0.5 flex items-center gap-1.5 shadow-inner">
+                        <span className="text-white font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+                          BUY FULL SET (6 PIECES)
+                        </span>
+                        <div className="bg-black/90 border border-amber-300/70 rounded-lg px-2 py-0.5 flex items-center gap-1.5 shadow-inner">
                           <span className="bg-gradient-to-r from-amber-400 to-amber-500 text-black text-[9px] font-black px-1.5 py-0.2 rounded shadow-sm">
                             -17%
                           </span>
@@ -1586,13 +1572,12 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       <button
                         disabled={isForgingCurrent}
                         onClick={() => buyDivineEquipment(currentItem.name)}
-                        className="w-full bg-gradient-to-r from-[#290510] via-[#45091a] to-[#290510] hover:from-[#380716] hover:via-[#5c0d23] hover:to-[#380716] active:scale-[0.98] text-rose-100 border-2 border-rose-500/80 hover:border-rose-400 font-display font-black tracking-wider py-2.5 px-3.5 rounded-xl transition-all shadow-[0_0_22px_rgba(244,63,94,0.4)] hover:shadow-[0_0_32px_rgba(244,63,94,0.7)] flex items-center justify-between text-xs uppercase cursor-pointer disabled:opacity-50"
+                        className="w-full bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:via-rose-500 hover:to-red-600 active:scale-[0.98] text-white border border-rose-300/90 font-display font-black tracking-wider py-2.5 px-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(225,29,72,0.45)] hover:shadow-[0_6px_28px_rgba(225,29,72,0.65)] flex items-center justify-between text-xs uppercase cursor-pointer disabled:opacity-50"
                       >
-                        <span className="flex items-center gap-1.5 text-rose-200">
-                          <Sword className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                          <span>{isForgingCurrent ? 'FORGING ARTIFACT...' : 'FORGE PIECE'}</span>
+                        <span className="font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                          {isForgingCurrent ? 'FORGING ARTIFACT...' : 'FORGE PIECE'}
                         </span>
-                        <div className="bg-black/85 border border-rose-500/60 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                        <div className="bg-black/90 border border-rose-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                           <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
                           <span className="font-mono font-black text-rose-300 text-xs tracking-normal">50 SHARDS</span>
                         </div>
@@ -1819,22 +1804,24 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           }
                         }}
                         disabled={isPurchasing}
-                        className={`w-full py-2.5 px-3 rounded-xl font-display font-black text-xs tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer select-none shadow-lg ${
+                        className={`w-full py-2.5 px-3 rounded-xl font-display font-black text-xs tracking-wider uppercase flex items-center justify-between transition-all cursor-pointer select-none shadow-[0_4px_18px_rgba(168,85,247,0.45)] hover:shadow-[0_6px_25px_rgba(168,85,247,0.65)] hover:scale-[1.02] active:scale-95 ${
                           isPurchasing
-                            ? 'bg-gray-700 text-gray-400 cursor-wait'
+                            ? 'bg-gray-700 text-gray-400 cursor-wait justify-center'
                             : canAfford
-                              ? 'bg-gradient-to-r from-purple-700 via-indigo-600 to-purple-800 hover:from-purple-600 hover:to-indigo-500 text-white shadow-purple-950/60 hover:scale-[1.02] active:scale-95'
+                              ? 'bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:via-indigo-500 hover:to-purple-600 text-white border border-purple-300/90'
                               : 'bg-purple-950/50 border border-purple-500/30 text-purple-300 hover:bg-purple-900/60'
                         }`}
                       >
                         {isPurchasing ? (
-                          <span>COMMUNING...</span>
+                          <span className="w-full text-center">ACTIVATING SHIELD...</span>
                         ) : (
                           <>
-                            <span>ACQUIRE FOR</span>
-                            <div className="flex items-center gap-1 font-mono font-black text-white">
-                              <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(244,63,94,0.8)]" />
-                              <span>{item.cost}</span>
+                            <span className="font-display font-black tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                              ACTIVATE SHIELD
+                            </span>
+                            <div className="bg-black/90 border border-purple-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                              <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
+                              <span className="font-mono font-black text-purple-200 text-xs tracking-normal">{item.cost} SHARDS</span>
                             </div>
                           </>
                         )}
@@ -2003,11 +1990,11 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           <button
                             onClick={() => handleBuyLevelBoost(50)}
                             disabled={isProcessing}
-                            className={`w-full py-2.5 px-3.5 rounded-xl font-display font-black text-xs sm:text-sm tracking-wider uppercase flex items-center justify-between transition-all duration-300 cursor-pointer select-none shadow-xl ${
+                            className={`w-full py-2.5 px-3.5 rounded-xl font-display font-black text-xs sm:text-sm tracking-wider uppercase flex items-center justify-between transition-all duration-300 cursor-pointer select-none shadow-[0_4px_20px_rgba(245,158,11,0.5)] hover:shadow-[0_6px_28px_rgba(245,158,11,0.7)] hover:scale-[1.02] active:scale-95 ${
                               isProcessing
                                 ? 'bg-gray-800 text-gray-400 cursor-wait justify-center'
                                 : canAfford
-                                ? 'bg-gradient-to-r from-[#241508] via-[#3a210c] to-[#241508] hover:from-[#311c0a] hover:via-[#4d2c0f] hover:to-[#311c0a] text-amber-100 border-2 border-amber-500/80 hover:border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:scale-[1.02] active:scale-95'
+                                ? 'bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:via-yellow-300 hover:to-amber-500 text-black border border-yellow-200/90'
                                 : 'bg-amber-950/60 border border-amber-500/40 text-amber-300'
                             }`}
                           >
@@ -2015,11 +2002,10 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                               <span>ASCENDING...</span>
                             ) : (
                               <>
-                                <span className="flex items-center gap-1.5 text-amber-200">
-                                  <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                                  <span>ASCEND TO LEVEL 50</span>
+                                <span className="font-display font-black tracking-wider text-black">
+                                  ASCEND TO LEVEL 50
                                 </span>
-                                <div className="bg-black/85 border border-amber-500/60 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                                <div className="bg-black/90 border border-black/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
                                   <span className="font-mono font-black text-amber-300 text-xs sm:text-sm tracking-normal">{cost} SHARDS</span>
                                 </div>
@@ -2131,11 +2117,11 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           <button
                             onClick={() => handleBuyLevelBoost(100)}
                             disabled={isProcessing}
-                            className={`w-full py-2.5 px-3.5 rounded-xl font-display font-black text-xs sm:text-sm tracking-wider uppercase flex items-center justify-between transition-all duration-300 cursor-pointer select-none shadow-xl ${
+                            className={`w-full py-2.5 px-3.5 rounded-xl font-display font-black text-xs sm:text-sm tracking-wider uppercase flex items-center justify-between transition-all duration-300 cursor-pointer select-none shadow-[0_4px_25px_rgba(244,63,94,0.55)] hover:shadow-[0_6px_35px_rgba(244,63,94,0.75)] hover:scale-[1.02] active:scale-95 ${
                               isProcessing
                                 ? 'bg-gray-800 text-gray-400 cursor-wait justify-center'
                                 : canAfford
-                                ? 'bg-gradient-to-r from-[#2d0813] via-[#480d1e] to-[#2d0813] hover:from-[#3b0b1a] hover:via-[#5e1227] hover:to-[#3b0b1a] text-rose-100 border-2 border-rose-500/80 hover:border-rose-400 shadow-[0_0_25px_rgba(244,63,94,0.4)] hover:scale-[1.02] active:scale-95'
+                                ? 'bg-gradient-to-r from-rose-600 via-red-500 to-amber-500 hover:from-rose-500 hover:via-red-400 hover:to-amber-400 text-white border border-rose-300/90'
                                 : 'bg-rose-950/60 border border-rose-500/40 text-rose-300'
                             }`}
                           >
@@ -2143,11 +2129,10 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                               <span>ASCENDING...</span>
                             ) : (
                               <>
-                                <span className="flex items-center gap-1.5 text-rose-200">
-                                  <Crown className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                                  <span>ASCEND TO LEVEL 100</span>
+                                <span className="font-display font-black tracking-wider text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                                  ASCEND TO LEVEL 100
                                 </span>
-                                <div className="bg-black/85 border border-rose-500/60 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
+                                <div className="bg-black/90 border border-rose-400/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
                                   <span className="font-mono font-black text-rose-300 text-xs sm:text-sm tracking-normal">{cost} SHARDS</span>
                                 </div>
