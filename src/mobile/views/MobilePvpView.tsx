@@ -600,26 +600,26 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
   const sovCap = mySubTier === 'ultra' ? 24 : 10;
 
   return (
-    <div className="h-full w-full flex flex-col p-2 sm:p-4 select-none overflow-hidden pb-24">
+    <div className="h-full w-full flex flex-col px-2 sm:px-4 pt-1 sm:pt-2 pb-[72px] select-none overflow-hidden">
       
       {/* 1. TOP MAIN HEADER BANNER (Authentic PC styling matching Screenshot 4) */}
-      <div className="bg-[#151a21] border border-[#c5a880]/20 rounded-2xl p-3 sm:p-4 shadow-xl shrink-0 mb-3 relative overflow-hidden">
+      <div className="bg-[#151a21] border border-[#c5a880]/20 rounded-2xl p-2 sm:p-3 shadow-xl shrink-0 mb-2 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-red-950/20 via-transparent to-[#151a21] pointer-events-none" />
 
-        <div className="flex flex-col gap-2.5 relative z-10">
+        <div className="flex flex-col gap-1.5 sm:gap-2.5 relative z-10">
           {/* Row 1: Title & Subtitle */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Crown className="w-5 h-5 text-amber-400 animate-bounce" />
-              <h2 className="font-display font-black text-sm sm:text-lg text-white tracking-widest uppercase text-shadow-gold">
+              <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 animate-bounce" />
+              <h2 className="font-display font-black text-xs sm:text-base text-white tracking-widest uppercase text-shadow-gold">
                 VOID ARENA
               </h2>
             </div>
             <button
               onClick={() => setIsLeagueRulesModalOpen(true)}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-950/60 hover:bg-amber-900/60 border border-amber-500/40 text-amber-300 font-display font-black text-[10px] tracking-wider uppercase transition-all active:scale-95 cursor-pointer shadow-sm"
+              className="flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-xl bg-amber-950/60 hover:bg-amber-900/60 border border-amber-500/40 text-amber-300 font-display font-black text-[9px] sm:text-[10px] tracking-wider uppercase transition-all active:scale-95 cursor-pointer shadow-sm"
             >
-              <Info className="w-3.5 h-3.5 text-amber-400" />
+              <Info className="w-3 h-3 text-amber-400" />
               <span>RULES</span>
             </button>
           </div>
@@ -629,7 +629,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
           </p>
 
           {/* Row 2: Horizontal Stats Bar (Exact PC layout matching Screenshot 4) */}
-          <div className="flex items-center justify-between bg-[#11141a]/95 backdrop-blur-md border border-white/10 rounded-2xl p-2 px-3 shadow-inner overflow-x-auto no-scrollbar gap-2 sm:gap-4">
+          <div className="flex items-center justify-between bg-[#11141a]/95 backdrop-blur-md border border-white/10 rounded-2xl p-1.5 sm:p-2 px-2.5 sm:px-3 shadow-inner overflow-x-auto no-scrollbar gap-1.5 sm:gap-4">
             
             {/* CROWNS */}
             <div className="text-center shrink-0 min-w-[55px]">
@@ -712,10 +712,10 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
       </div>
 
       {/* 2. NAVIGATION TABS (DUELS / LEADERBOARD / LEAGUE REWARDS / HISTORY) */}
-      <div className="flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 gap-1.5 mb-3 shrink-0 shadow-inner">
+      <div className="flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 gap-1 mb-2 shrink-0 shadow-inner">
         <button
           onClick={() => setActiveTab('duels')}
-          className={`flex-1 py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`flex-1 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
             activeTab === 'duels'
               ? 'bg-gradient-to-r from-red-950/90 via-rose-900/70 to-red-950/90 border border-rose-500/60 text-white shadow-[0_0_20px_rgba(244,63,94,0.35)]'
               : 'text-gray-400 hover:text-white border border-transparent'
@@ -727,7 +727,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
 
         <button
           onClick={() => setActiveTab('ladder')}
-          className={`flex-1 py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`flex-1 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
             activeTab === 'ladder'
               ? 'bg-gradient-to-r from-purple-950/90 via-indigo-900/70 to-purple-950/90 border border-purple-500/60 text-white shadow-[0_0_20px_rgba(168,85,247,0.35)]'
               : 'text-gray-400 hover:text-white border border-transparent'
@@ -739,7 +739,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
 
         <button
           onClick={() => setActiveTab('rewards')}
-          className={`flex-1 py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`flex-1 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
             activeTab === 'rewards'
               ? 'bg-gradient-to-r from-amber-950/90 via-yellow-900/70 to-amber-950/90 border border-amber-500/60 text-white shadow-[0_0_20px_rgba(245,158,11,0.35)]'
               : 'text-gray-400 hover:text-white border border-transparent'
@@ -754,7 +754,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
             setActiveTab('history');
             markDefenseHistoryAsViewed();
           }}
-          className={`relative flex-1 py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`relative flex-1 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
             activeTab === 'history'
               ? 'bg-gradient-to-r from-cyan-950/90 via-blue-900/70 to-cyan-950/90 border border-cyan-500/60 text-white shadow-[0_0_20px_rgba(6,182,212,0.35)]'
               : 'text-gray-400 hover:text-white border border-transparent'
@@ -788,184 +788,170 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
             )}
 
             {/* READY FOR RANKED DUEL Console Card (PC Image 4 Parity) */}
-            <div className="bg-gradient-to-b from-[#181216] via-[#120c11] to-[#0a0709] border border-[#c5a880]/25 rounded-2xl p-4 sm:p-5 shadow-2xl relative overflow-hidden space-y-4">
+            <div className="bg-gradient-to-b from-[#181216] via-[#120c11] to-[#0a0709] border border-[#c5a880]/25 rounded-2xl p-2.5 sm:p-4 shadow-2xl relative overflow-hidden space-y-2 sm:space-y-3">
               <div className="absolute top-0 right-0 w-48 h-48 bg-rose-500/10 blur-3xl pointer-events-none" />
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-500/5 blur-3xl pointer-events-none" />
 
-              {/* Header: Sigil + Title + Peace Shield Banner */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10 border-b border-white/10 pb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-black/60 border border-rose-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.25)] shrink-0 p-1.5">
+              {/* Header: Sigil + Title + Peace Shield right under title */}
+              <div className="flex items-center justify-between gap-2 relative z-10 border-b border-white/10 pb-2">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-black/60 border border-rose-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(244,63,94,0.25)] shrink-0 p-1">
                     <img src="/icons/arena_duel_emblem.png" alt="" className="w-full h-full object-contain" />
                   </div>
-                  <div>
-                    <h3 className="font-display font-black text-sm sm:text-base text-white tracking-widest uppercase text-shadow-gold leading-tight">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-display font-black text-xs sm:text-sm text-white tracking-wider uppercase text-shadow-gold truncate leading-tight">
                       READY FOR RANKED DUEL
                     </h3>
-                    <p className="text-[10px] text-gray-400 font-mono mt-0.5">
-                      Season 1 Matchmaking • Duel other lords & climb
-                    </p>
-                  </div>
-                </div>
 
-                {/* Minimalist Peace Shield Indicator (Matching PC Image 4) */}
-                <div
-                  onClick={() => setIsShieldModalOpen(true)}
-                  className={`group flex items-center gap-2.5 px-3 py-1.5 rounded-2xl border transition-all duration-300 cursor-pointer select-none self-start sm:self-auto shrink-0 ${
-                    shieldTimeLeft
-                      ? 'bg-gradient-to-r from-emerald-950/90 via-[#0a231b]/90 to-black/90 border-emerald-500/60 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-[1.02]'
-                      : 'bg-gradient-to-r from-[#17131e]/90 via-[#100d16]/90 to-black/90 border-white/15 hover:border-purple-400/60 hover:scale-[1.02]'
-                  }`}
-                  title="Peace Shield Status"
-                >
-                  <div className={`relative w-8 h-8 rounded-xl flex items-center justify-center border shrink-0 ${
-                    shieldTimeLeft
-                      ? 'bg-emerald-950/90 border-emerald-500/70 shadow-[0_0_12px_rgba(16,185,129,0.4)]'
-                      : 'bg-black/70 border-white/15'
-                  }`}>
-                    <img 
-                      src="/icons/shield_indicator.png" 
-                      alt="" 
-                      className={`w-5 h-5 object-contain ${shieldTimeLeft ? 'animate-pulse' : 'opacity-70'}`} 
-                    />
-                    {shieldTimeLeft && (
-                      <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-80"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                      </span>
-                    )}
-                  </div>
+                    {/* Integrated Peace Shield Indicator (Replaced "Season 1 Matchmaking...") */}
+                    <div
+                      onClick={() => setIsShieldModalOpen(true)}
+                      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg border mt-1 cursor-pointer transition-all active:scale-95 select-none ${
+                        shieldTimeLeft
+                          ? 'bg-emerald-950/80 border-emerald-500/60 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.25)]'
+                          : 'bg-black/60 border-white/15 text-gray-400 hover:border-purple-400/50 hover:text-purple-300'
+                      }`}
+                      title="Peace Shield Status"
+                    >
+                      <div className="relative flex items-center justify-center shrink-0">
+                        <img 
+                          src="/icons/shield_indicator.png" 
+                          alt="" 
+                          className={`w-3.5 h-3.5 object-contain ${shieldTimeLeft ? 'animate-pulse' : 'opacity-70'}`} 
+                        />
+                        {shieldTimeLeft && (
+                          <span className="absolute -top-0.5 -right-0.5 flex h-1.5 w-1.5">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-80" />
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                          </span>
+                        )}
+                      </div>
 
-                  <div className="text-left">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[9px] font-mono tracking-wider font-bold uppercase text-gray-400">
-                        PEACE SHIELD
+                      <span className="text-[8.5px] font-mono tracking-wider font-bold uppercase text-gray-400">
+                        SHIELD
                       </span>
-                      <span className={`text-[7.5px] font-mono font-black px-1.5 py-0.2 rounded uppercase border ${
+                      <span className={`text-[7px] font-mono font-black px-1 py-0.2 rounded uppercase border ${
                         shieldTimeLeft
                           ? 'bg-emerald-950 border-emerald-500/60 text-emerald-300'
                           : 'bg-rose-950/80 border-rose-500/40 text-rose-300'
                       }`}>
                         {shieldTimeLeft ? 'ACTIVE' : 'OFF'}
                       </span>
-                    </div>
 
-                    <div className="font-mono font-black text-[11px] sm:text-xs mt-0.5 flex items-center gap-1">
-                      {shieldTimeLeft ? (
-                        <span className="text-emerald-300 tracking-wider flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-emerald-400" />
-                          <span>{shieldTimeLeft}</span>
-                        </span>
-                      ) : (
-                        <span className="text-gray-400 group-hover:text-purple-300 transition-colors flex items-center gap-1">
-                          <span>UNPROTECTED</span>
-                          <span className="text-purple-400 font-mono uppercase underline ml-0.5">
+                      <div className="font-mono font-black text-[9px] sm:text-[10px] flex items-center gap-0.5">
+                        {shieldTimeLeft ? (
+                          <span className="text-emerald-300 flex items-center gap-0.5">
+                            <Clock className="w-2.5 h-2.5 text-emerald-400" />
+                            <span>{shieldTimeLeft}</span>
+                          </span>
+                        ) : (
+                          <span className="text-purple-400 underline">
                             ACTIVATE →
                           </span>
-                        </span>
-                      )}
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Victory & Defeat Rewards Grid (Matching PC Image 4) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 relative z-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 relative z-10">
                 {/* Victory Rewards Card */}
-                <div className="bg-gradient-to-b from-[#181a10]/90 via-[#0e1208]/90 to-[#060804]/90 border border-emerald-500/30 rounded-2xl p-3 space-y-2 shadow-lg shadow-emerald-950/20">
-                  <div className="flex items-center justify-between border-b border-emerald-500/20 pb-1.5">
-                    <span className="text-[10px] font-display text-emerald-400 uppercase font-black tracking-wider flex items-center gap-1">
-                      <Trophy className="w-3.5 h-3.5 text-emerald-400" /> VICTORY REWARDS
+                <div className="bg-gradient-to-b from-[#181a10]/90 via-[#0e1208]/90 to-[#060804]/90 border border-emerald-500/30 rounded-2xl p-2 sm:p-2.5 space-y-1 sm:space-y-1.5 shadow-lg shadow-emerald-950/20">
+                  <div className="flex items-center justify-between border-b border-emerald-500/20 pb-1">
+                    <span className="text-[9.5px] sm:text-[10px] font-display text-emerald-400 uppercase font-black tracking-wider flex items-center gap-1">
+                      <Trophy className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-400" /> VICTORY REWARDS
                     </span>
-                    <span className="text-[8px] font-mono text-emerald-400 font-bold tracking-widest bg-emerald-950/60 px-1.5 py-0.2 rounded border border-emerald-500/30">
+                    <span className="text-[7.5px] font-mono text-emerald-400 font-bold tracking-widest bg-emerald-950/60 px-1.5 py-0.2 rounded border border-emerald-500/30">
                       WIN
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-4 gap-1.5">
+                  <div className="grid grid-cols-4 gap-1">
                     {/* Gold */}
-                    <div className="bg-black/50 border border-amber-500/20 p-1.5 rounded-xl text-center flex flex-col items-center justify-center">
-                      <span className="text-amber-400 font-display font-bold text-xs block flex items-center gap-1 text-shadow-gold">
+                    <div className="bg-black/50 border border-amber-500/20 p-1 rounded-lg text-center flex flex-col items-center justify-center">
+                      <span className="text-amber-400 font-display font-bold text-[11px] sm:text-xs block flex items-center gap-0.5 text-shadow-gold">
                         +50
-                        <img src="/icons/icon_gold.webp" alt="" className="w-3.5 h-3.5 object-contain" />
+                        <img src="/icons/icon_gold.webp" alt="" className="w-3 h-3 sm:w-3.5 sm:h-3.5 object-contain" />
                       </span>
-                      <span className="text-[7.5px] text-amber-500/80 font-mono tracking-wider uppercase font-bold mt-0.5">Gold</span>
+                      <span className="text-[7px] text-amber-500/80 font-mono tracking-wider uppercase font-bold mt-0.5">Gold</span>
                     </div>
 
                     {/* Dust */}
-                    <div className="bg-black/50 border border-cyan-500/20 p-1.5 rounded-xl text-center flex flex-col items-center justify-center">
-                      <span className="text-cyan-400 font-display font-bold text-xs block flex items-center gap-1 text-shadow-cyan">
+                    <div className="bg-black/50 border border-cyan-500/20 p-1 rounded-lg text-center flex flex-col items-center justify-center">
+                      <span className="text-cyan-400 font-display font-bold text-[11px] sm:text-xs block flex items-center gap-0.5 text-shadow-cyan">
                         +25
-                        <img src="/icons/icon_dust.webp" alt="" className="w-4 h-4 object-contain" />
+                        <img src="/icons/icon_dust.webp" alt="" className="w-3 h-3 sm:w-3.5 sm:h-3.5 object-contain" />
                       </span>
-                      <span className="text-[7.5px] text-cyan-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">Dust</span>
+                      <span className="text-[7px] text-cyan-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">Dust</span>
                     </div>
 
                     {/* EXP */}
-                    <div className="bg-black/50 border border-emerald-500/20 p-1.5 rounded-xl text-center flex flex-col items-center justify-center">
-                      <span className="text-emerald-400 font-display font-bold text-xs block flex items-center gap-1 text-shadow-emerald">
+                    <div className="bg-black/50 border border-emerald-500/20 p-1 rounded-lg text-center flex flex-col items-center justify-center">
+                      <span className="text-emerald-400 font-display font-bold text-[11px] sm:text-xs block flex items-center gap-0.5 text-shadow-emerald">
                         +100
-                        <img src="/icons/icon_exp.webp" alt="" className="w-3.5 h-3.5 object-contain" />
+                        <img src="/icons/icon_exp.webp" alt="" className="w-3 h-3 sm:w-3.5 sm:h-3.5 object-contain" />
                       </span>
-                      <span className="text-[7.5px] text-emerald-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">EXP</span>
+                      <span className="text-[7px] text-emerald-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">EXP</span>
                     </div>
 
                     {/* Crowns */}
-                    <div className="bg-black/50 border border-amber-500/20 p-1.5 rounded-xl text-center flex flex-col items-center justify-center">
-                      <span className="text-amber-400 font-display font-bold text-xs block flex items-center gap-1">
+                    <div className="bg-black/50 border border-amber-500/20 p-1 rounded-lg text-center flex flex-col items-center justify-center">
+                      <span className="text-amber-400 font-display font-bold text-[11px] sm:text-xs block flex items-center gap-0.5">
                         +20
-                        <img src="/icons/crown.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                        <img src="/icons/crown.png" alt="" className="w-3 h-3 sm:w-3.5 sm:h-3.5 object-contain" />
                       </span>
-                      <span className="text-[7.5px] text-amber-500/80 font-mono tracking-wider uppercase font-bold mt-0.5">Crowns</span>
+                      <span className="text-[7px] text-amber-500/80 font-mono tracking-wider uppercase font-bold mt-0.5">Crowns</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Defeat Penalty Card */}
-                <div className="bg-gradient-to-b from-[#1a0c0e]/90 via-[#120608]/90 to-[#080304]/90 border border-rose-500/25 rounded-2xl p-3 space-y-2 shadow-lg shadow-rose-950/20">
-                  <div className="flex items-center justify-between border-b border-rose-500/20 pb-1.5">
-                    <span className="text-[10px] font-display text-rose-400 uppercase font-black tracking-wider flex items-center gap-1">
-                      <Shield className="w-3.5 h-3.5 text-rose-400" /> DEFEAT PENALTY
+                <div className="bg-gradient-to-b from-[#1a0c0e]/90 via-[#120608]/90 to-[#080304]/90 border border-rose-500/25 rounded-2xl p-2 sm:p-2.5 space-y-1 sm:space-y-1.5 shadow-lg shadow-rose-950/20">
+                  <div className="flex items-center justify-between border-b border-rose-500/20 pb-1">
+                    <span className="text-[9.5px] sm:text-[10px] font-display text-rose-400 uppercase font-black tracking-wider flex items-center gap-1">
+                      <Shield className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-rose-400" /> DEFEAT PENALTY
                     </span>
-                    <span className="text-[8px] font-mono text-rose-400 font-bold tracking-widest bg-rose-950/60 px-1.5 py-0.2 rounded border border-rose-500/30">
+                    <span className="text-[7.5px] font-mono text-rose-400 font-bold tracking-widest bg-rose-950/60 px-1.5 py-0.2 rounded border border-rose-500/30">
                       LOSS
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-1.5">
+                  <div className="grid grid-cols-2 gap-1">
                     {/* Crown Loss */}
-                    <div className="bg-black/50 border border-rose-500/20 p-1.5 rounded-xl text-center flex flex-col items-center justify-center">
-                      <span className="text-rose-400 font-display font-bold text-xs block flex items-center gap-1">
+                    <div className="bg-black/50 border border-rose-500/20 p-1 rounded-lg text-center flex flex-col items-center justify-center">
+                      <span className="text-rose-400 font-display font-bold text-[11px] sm:text-xs block flex items-center gap-0.5">
                         -15
-                        <img src="/icons/crown.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                        <img src="/icons/crown.png" alt="" className="w-3 h-3 sm:w-3.5 sm:h-3.5 object-contain" />
                       </span>
-                      <span className="text-[7.5px] text-rose-400/90 font-mono tracking-wider uppercase font-bold mt-0.5">Crowns Lost</span>
+                      <span className="text-[7px] text-rose-400/90 font-mono tracking-wider uppercase font-bold mt-0.5">Crowns Lost</span>
                     </div>
 
                     {/* Consolation Gold */}
-                    <div className="bg-black/50 border border-white/5 p-1.5 rounded-xl text-center flex flex-col items-center justify-center">
-                      <span className="text-gray-300 font-display font-bold text-xs block flex items-center gap-1">
+                    <div className="bg-black/50 border border-white/5 p-1 rounded-lg text-center flex flex-col items-center justify-center">
+                      <span className="text-gray-300 font-display font-bold text-[11px] sm:text-xs block flex items-center gap-0.5">
                         +20
-                        <img src="/icons/icon_gold.webp" alt="" className="w-3.5 h-3.5 object-contain opacity-75" />
+                        <img src="/icons/icon_gold.webp" alt="" className="w-3 h-3 sm:w-3.5 sm:h-3.5 object-contain opacity-75" />
                       </span>
-                      <span className="text-[7.5px] text-gray-400 font-mono tracking-wider uppercase font-bold mt-0.5">Consolation</span>
+                      <span className="text-[7px] text-gray-400 font-mono tracking-wider uppercase font-bold mt-0.5">Consolation</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Primary Action Button: FIND OPPONENT (Matching PC Image 4) */}
-              <div className="pt-1 relative z-10 flex flex-col items-center">
+              <div className="pt-0.5 sm:pt-1 relative z-10 flex flex-col items-center">
                 <button
                   onClick={() => handleFindOpponent(false, true)}
                   disabled={isMatching}
-                  className="w-full max-w-md font-display font-black tracking-widest py-3.5 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer hover:scale-[1.01] active:scale-[0.98] text-xs sm:text-sm uppercase bg-gradient-to-b from-[#2f1116] via-[#1c080b] to-[#100305] border-2 border-rose-600/50 hover:border-rose-400 text-rose-200 hover:text-white shadow-[0_0_15px_rgba(225,29,72,0.2)] hover:shadow-[0_0_25px_rgba(244,63,94,0.4)]"
+                  className="w-full max-w-md font-display font-black tracking-widest py-2.5 sm:py-3.5 px-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer hover:scale-[1.01] active:scale-[0.98] text-xs sm:text-sm uppercase bg-gradient-to-b from-[#2f1116] via-[#1c080b] to-[#100305] border-2 border-rose-600/50 hover:border-rose-400 text-rose-200 hover:text-white shadow-[0_0_15px_rgba(225,29,72,0.2)] hover:shadow-[0_0_25px_rgba(244,63,94,0.4)]"
                 >
-                  <Swords className="w-4 h-4 animate-pulse text-rose-400 shrink-0" />
+                  <Swords className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-pulse text-rose-400 shrink-0" />
                   <span className="tracking-wider">FIND OPPONENT</span>
-                  <span className="flex items-center gap-1 bg-black/60 border border-rose-500/40 rounded-full px-2.5 py-0.5 font-mono text-xs font-bold text-rose-400 shadow-inner">
+                  <span className="flex items-center gap-1 bg-black/60 border border-rose-500/40 rounded-full px-2 py-0.5 font-mono text-[11px] font-bold text-rose-400 shadow-inner">
                     1
-                    <img src="/icons/ticket.png" alt="" className="w-4 h-4 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(255,40,60,0.55)]" />
+                    <img src="/icons/ticket.png" alt="" className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(255,40,60,0.55)]" />
                   </span>
                 </button>
               </div>
