@@ -734,7 +734,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
           }`}
         >
           <img 
-            src="/icons/tab_pvp_duels.png" 
+            src="/icons/tab_pvp_duels_v2.png" 
             alt="" 
             className={`w-4 h-4 sm:w-5 sm:h-5 object-contain shrink-0 transition-all duration-300 ${
               activeTab === 'duels' 
@@ -755,7 +755,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
           }`}
         >
           <img 
-            src="/icons/tab_pvp_leaderboard.png" 
+            src="/icons/tab_pvp_leaderboard_v2.png" 
             alt="" 
             className={`w-4 h-4 sm:w-5 sm:h-5 object-contain shrink-0 transition-all duration-300 ${
               activeTab === 'ladder' 
@@ -778,7 +778,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
           }`}
         >
           <img 
-            src="/icons/tab_pvp_rewards.png" 
+            src="/icons/tab_pvp_rewards_v2.png" 
             alt="" 
             className={`w-4 h-4 sm:w-5 sm:h-5 object-contain shrink-0 transition-all duration-300 ${
               activeTab === 'rewards' 
@@ -802,7 +802,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
           }`}
         >
           <img 
-            src="/icons/tab_pvp_history.png" 
+            src="/icons/tab_pvp_history_v2.png" 
             alt="" 
             className={`w-4 h-4 sm:w-5 sm:h-5 object-contain shrink-0 transition-all duration-300 ${
               activeTab === 'history' 
@@ -868,7 +868,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                           : 'bg-black/70 border-white/15'
                       }`}>
                         <img 
-                          src="/icons/shield_indicator.png" 
+                          src="/icons/shield_indicator_v2.png" 
                           alt="" 
                           className={`w-full h-full object-contain p-0.5 ${shieldTimeLeft ? 'animate-pulse' : ''}`} 
                         />
@@ -1028,7 +1028,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
               <div className="flex items-center gap-2">
-                <img src="/icons/tab_pvp_leaderboard.png" alt="" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
+                <img src="/icons/tab_pvp_leaderboard_v2.png" alt="" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
                 <h3 className="font-display font-bold text-xs sm:text-sm text-white tracking-widest uppercase">
                   LEADERBOARD HALL
                 </h3>
@@ -1779,7 +1779,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
             </button>
 
             <div className="flex items-center gap-2 border-b border-white/10 pb-2">
-              <img src="/icons/shield_indicator.png" alt="" className="w-6 h-6 object-contain" />
+              <img src="/icons/shield_indicator_v2.png" alt="" className="w-6 h-6 object-contain" />
               <div>
                 <h3 className="font-display font-bold text-xs text-white uppercase tracking-wider">
                   PEACE SHIELD CHAMBER
