@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useGame } from '../../context/GameContext';
+import { useToast } from '../../components/Toast';
 import { Equipment, EquipmentSlot, CardTier } from '../../types';
 import { getEquipmentIcon, calculateEquipmentSetBonuses, DEMIURGE_SET } from '../../data/equipment';
-import { TalentsView } from '../../components/TalentsView';
+import { TALENT_TREES, TalentStance, TalentNode } from '../../data/talents';
+import * as LucideIcons from 'lucide-react';
 import { 
-  Shield, Heart, Sparkles, Coins, Hourglass, Wind, Zap, 
-  Check, RefreshCw, X, ShoppingBag, ArrowRight, RotateCcw
+  Heart, Sparkles, Coins, Hourglass, Wind, Zap, 
+  Check, RefreshCw, X, ShoppingBag, ArrowRight, RotateCcw,
+  Lock, ChevronDown, Award
 } from 'lucide-react';
 import { VoidStrikeIcon, BloodAuraIcon, WarlordCryIcon } from '../../components/SkillAndStanceIcons';
 
@@ -70,15 +73,59 @@ const TIER_PRIORITY: Record<CardTier, number> = {
   bronze: 1,
 };
 
+const STANCE_CONFIG: Record<TalentStance, { 
+  name: string; 
+  icon: (size?: string) => React.ReactNode; 
+  color: string; 
+  borderActive: string;
+  bgActive: string;
+  desc: string;
+  badgeBg: string;
+}> = {
+  void_strike: { 
+    name: 'Void Strike', 
+    icon: (s = "w-4 h-4") => <VoidStrikeIcon sizeClass={s} />, 
+    color: 'text-cyan-400', 
+    borderActive: 'border-cyan-400',
+    bgActive: 'from-cyan-950/60 via-[#0a1822] to-black',
+    desc: '15% chance to deal 1 bonus damage.',
+    badgeBg: 'bg-cyan-950/60 text-cyan-300 border-cyan-500/40'
+  },
+  blood_aura: { 
+    name: 'Blood Aura', 
+    icon: (s = "w-4 h-4") => <BloodAuraIcon sizeClass={s} />, 
+    color: 'text-rose-400', 
+    borderActive: 'border-rose-400',
+    bgActive: 'from-red-950/60 via-[#1e070d] to-black',
+    desc: '15% chance to heal an ally for 1 HP.',
+    badgeBg: 'bg-rose-950/60 text-rose-300 border-rose-500/40'
+  },
+  warlord_cry: { 
+    name: "Warlord's Cry", 
+    icon: (s = "w-4 h-4") => <WarlordCryIcon sizeClass={s} />, 
+    color: 'text-amber-400', 
+    borderActive: 'border-amber-400',
+    bgActive: 'from-amber-950/60 via-[#1f1406] to-black',
+    desc: '15% chance to buff a random ally with +1 Atk.',
+    badgeBg: 'bg-amber-950/60 text-amber-300 border-amber-500/40'
+  },
+};
+
 interface MobileHeroViewProps {
   onNavigateToShop?: (tab?: 'cards' | 'equipment' | 'divine') => void;
 }
 
 export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop }) => {
-  const { profile, equipItem, unequipItem, updateProfile } = useGame();
+  const { profile, equipItem, unequipItem, updateProfile, resetTalents, setIsShardsShopOpen } = useGame();
+  const toast = useToast();
   
   const [selectedSlot, setSelectedSlot] = useState<EquipmentSlot | null>(null);
   const [subTab, setSubTab] = useState<'equipment' | 'talents'>('equipment');
+
+  // Talent Tree stance sub-tab
+  const [activeTalentStance, setActiveTalentStance] = useState<TalentStance>(profile?.activeStance || 'void_strike');
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   // Equipped items resolution
   const eqWeapon = profile.equipment?.find(e => e.id === profile.equipped?.['weapon']) || null;
@@ -115,12 +162,7 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
   const totalHealth = baseHealth + bonusHealth;
 
   // Stance Info
-  const stanceIcons: Record<string, { label: string; icon: React.ReactNode; color: string; desc: string }> = {
-    void_strike: { label: 'Void Strike', icon: <VoidStrikeIcon sizeClass="w-4 h-4" />, color: 'text-cyan-400', desc: '25% chance to deal 1 bonus damage' },
-    blood_aura: { label: 'Blood Aura', icon: <BloodAuraIcon sizeClass="w-4 h-4" />, color: 'text-rose-400', desc: '25% chance to heal an ally for 1 HP' },
-    warlord_cry: { label: "Warlord's Cry", icon: <WarlordCryIcon sizeClass="w-4 h-4" />, color: 'text-amber-400', desc: '25% chance to buff ally +1 Atk' },
-  };
-  const activeStance = stanceIcons[profile.activeStance || 'void_strike'] || stanceIcons.void_strike;
+  const activeStance = STANCE_CONFIG[profile.activeStance || 'void_strike'] || STANCE_CONFIG.void_strike;
 
   // EXP & Level Calculations
   const getRequiredExpForLevel = (level: number) => {
@@ -142,6 +184,78 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
 
   const demiurgePieces = equippedList.filter(e => e.setId === 'demiurge').length;
 
+  // Talent Calculations
+  const totalTalentPoints = Math.max(0, (profile.level || 1) - 1);
+  const spentTalentPoints = Object.entries(profile.talents || {}).reduce((sum, [nodeId, lvl]) => {
+    const node = TALENT_TREES.find(t => t.id === nodeId);
+    return sum + (lvl * (node?.cost || 1));
+  }, 0);
+  const availableTalentPoints = totalTalentPoints - spentTalentPoints;
+
+  const handlePurchaseTalent = (node: TalentNode) => {
+    if (availableTalentPoints < node.cost) {
+      toast(`Need ${node.cost} skill point${node.cost > 1 ? 's' : ''}!`, 'warning');
+      return;
+    }
+
+    const currentLevel = profile.talents?.[node.id] || 0;
+    if (currentLevel >= node.maxLevel) {
+      toast('Talent is already maxed!', 'info');
+      return;
+    }
+
+    if (node.requires && node.requires.length > 0) {
+      const hasReq = node.requires.every(reqId => {
+        const reqNode = TALENT_TREES.find(n => n.id === reqId);
+        const reqLvl = profile.talents?.[reqId] || 0;
+        return node.requireMax ? reqLvl >= (reqNode?.maxLevel || 1) : reqLvl > 0;
+      });
+      if (!hasReq) {
+        toast(node.requireMax ? 'Must MAX OUT required previous talents first.' : 'Must unlock required previous talents first.', 'error');
+        return;
+      }
+    }
+
+    const newTalents = { ...profile.talents, [node.id]: currentLevel + 1 };
+    updateProfile({ talents: newTalents });
+    toast(`Upgraded ${node.name} (Lvl ${currentLevel + 1})!`, 'success');
+  };
+
+  const handleEquipStance = (stanceId: TalentStance) => {
+    updateProfile({ activeStance: stanceId });
+    toast(`Equipped ${STANCE_CONFIG[stanceId].name}!`, 'success');
+  };
+
+  const handleConfirmReset = async () => {
+    if (isResetting) return;
+    if (spentTalentPoints === 0) {
+      toast('No points spent to reset.', 'info');
+      setIsResetConfirmOpen(false);
+      return;
+    }
+    if ((profile.darkShards || 0) < 15) {
+      toast('Need 15 Dark Shards to reset talents.', 'warning');
+      setIsResetConfirmOpen(false);
+      if (setIsShardsShopOpen) setIsShardsShopOpen(true);
+      return;
+    }
+
+    setIsResetting(true);
+    try {
+      const res = await resetTalents();
+      if (res.success) {
+        toast('Talents reset! All points refunded.', 'success');
+      } else {
+        toast(res.message || 'Failed to reset talents.', 'error');
+      }
+    } catch (err: any) {
+      toast(err.message || 'Error resetting talents.', 'error');
+    } finally {
+      setIsResetting(false);
+      setIsResetConfirmOpen(false);
+    }
+  };
+
   // Paperdoll individual slot box
   const renderSlotBox = (slot: EquipmentSlot, label: string, defaultIconPath: string) => {
     const item = profile.equipment?.find(e => e.id === profile.equipped?.[slot]) || null;
@@ -162,13 +276,11 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
       >
         {item ? (
           <>
-            {/* Slot Top Header */}
             <div className="w-full flex items-center justify-between text-[7.5px] min-[390px]:text-[8px] font-mono font-black uppercase tracking-wider z-10 leading-none">
               <span className={tierStyle?.text}>{item.tier}</span>
               <span className="text-gray-400">{label}</span>
             </div>
 
-            {/* Item Icon Showcase */}
             <div className="w-8 h-8 min-[390px]:w-9 min-[390px]:h-9 my-auto flex items-center justify-center relative z-10">
               <img 
                 src={itemIcon} 
@@ -177,7 +289,6 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
               />
             </div>
 
-            {/* Bottom Bonus Stat */}
             <div className="w-full text-center z-10 leading-none">
               <div className="text-[7.5px] min-[390px]:text-[8.5px] text-emerald-400 font-mono font-bold truncate">
                 {formatBonusLabel(item.bonusType, item.bonusValue)}
@@ -186,12 +297,10 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
           </>
         ) : (
           <>
-            {/* Empty Slot Label */}
             <div className="w-full text-center text-[8px] font-mono text-gray-500 uppercase tracking-widest leading-none">
               {label}
             </div>
 
-            {/* Placeholder Icon */}
             <div className="w-7 h-7 my-auto flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity">
               <img 
                 src={defaultIconPath} 
@@ -200,7 +309,6 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
               />
             </div>
 
-            {/* Equip Prompt */}
             <div className="text-[7.5px] min-[390px]:text-[8px] font-mono text-purple-400 font-bold uppercase tracking-wider leading-none animate-pulse">
               + EQUIP
             </div>
@@ -216,21 +324,17 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
     const rawItems = profile.equipment?.filter(e => e.slot === selectedSlot) || [];
     const equippedItemId = profile.equipped?.[selectedSlot];
     const inventoryItems = [...rawItems].sort((a, b) => {
-      // Equipped item first
       const aEquipped = a.id === equippedItemId;
       const bEquipped = b.id === equippedItemId;
       if (aEquipped && !bEquipped) return -1;
       if (!aEquipped && bEquipped) return 1;
 
-      // Tier descending (divine -> legendary -> gold -> silver -> bronze)
       const tierDiff = (TIER_PRIORITY[b.tier] || 0) - (TIER_PRIORITY[a.tier] || 0);
       if (tierDiff !== 0) return tierDiff;
 
-      // Bonus value descending
       const bonusDiff = (b.bonusValue || 0) - (a.bonusValue || 0);
       if (bonusDiff !== 0) return bonusDiff;
 
-      // Name alphabetical
       return a.name.localeCompare(b.name);
     });
     const slotCfg = SLOTS_CONFIG.find(s => s.slot === selectedSlot);
@@ -302,7 +406,6 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                     key={item.id} 
                     className={`bg-gradient-to-b ${tierStyle.bg} border-2 ${tierStyle.border} ${tierStyle.glow} p-3 rounded-2xl flex flex-col justify-between space-y-2.5 transition-all duration-200`}
                   >
-                    {/* Item Top Bar */}
                     <div className="flex items-center justify-between">
                       <span className={`text-[9.5px] font-display font-black uppercase tracking-widest ${tierStyle.text}`}>
                         {item.tier}
@@ -314,7 +417,6 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                       )}
                     </div>
 
-                    {/* Middle: Icon + Details */}
                     <div className="flex items-center gap-3">
                       <div className="w-16 h-16 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center p-1.5 relative overflow-hidden shrink-0 shadow-inner">
                         <img 
@@ -350,7 +452,6 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                       </div>
                     </div>
 
-                    {/* Action Button */}
                     <div>
                       {isEquipped ? (
                         <button
@@ -379,6 +480,114 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
               })
             )}
           </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Node Card for Mobile Talent Progression
+  const renderTalentNodeCard = (node: TalentNode, isWide: boolean = false) => {
+    const currentLevel = profile.talents?.[node.id] || 0;
+    const isMaxed = currentLevel >= node.maxLevel;
+    
+    let isLocked = false;
+    let lockReason = '';
+    if (node.requires && node.requires.length > 0) {
+      isLocked = !node.requires.every(reqId => {
+        const reqNode = TALENT_TREES.find(n => n.id === reqId);
+        const reqLevel = profile.talents?.[reqId] || 0;
+        return node.requireMax ? reqLevel >= (reqNode?.maxLevel || 1) : reqLevel > 0;
+      });
+      if (isLocked) {
+        const reqNames = node.requires.map(r => TALENT_TREES.find(n => n.id === r)?.name || r).join(', ');
+        lockReason = node.requireMax ? `Requires maxing ${reqNames}` : `Requires unlocking ${reqNames}`;
+      }
+    }
+
+    const IconComp = (LucideIcons as any)[node.icon] || LucideIcons.Sparkles;
+    const stanceCfg = STANCE_CONFIG[activeTalentStance];
+    const isMajor = node.tier === 3 || node.tier === 5;
+    const canUpgrade = !isLocked && !isMaxed && availableTalentPoints >= node.cost;
+
+    return (
+      <div 
+        key={node.id}
+        onClick={() => {
+          if (!isLocked && !isMaxed) handlePurchaseTalent(node);
+          else if (isLocked) toast(lockReason, 'info');
+        }}
+        className={`rounded-2xl p-2.5 sm:p-3 border-2 transition-all relative flex flex-col justify-between select-none ${
+          isLocked 
+            ? 'bg-black/50 border-white/10 opacity-50 grayscale cursor-not-allowed'
+            : isMaxed
+            ? 'bg-gradient-to-b from-[#181a24] to-[#0d0f15] border-amber-500/70 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
+            : canUpgrade
+            ? `bg-gradient-to-b from-[#161426] via-[#100e1b] to-black ${stanceCfg.borderActive} shadow-lg active:scale-98 cursor-pointer`
+            : 'bg-[#100e18] border-white/15 opacity-80'
+        } ${isWide ? 'w-full' : 'flex-1 min-w-0'}`}
+      >
+        {/* Top: Icon + Name + Level Pill */}
+        <div className="flex items-center gap-2 mb-1.5">
+          <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-inner ${
+            isMaxed 
+              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' 
+              : isLocked 
+              ? 'bg-gray-800 text-gray-500' 
+              : `${stanceCfg.badgeBg} border`
+          }`}>
+            <IconComp className="w-4 h-4" />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between gap-1">
+              <h5 className={`font-display font-bold text-[11px] leading-tight truncate ${
+                isMajor ? 'text-amber-300' : isMaxed ? 'text-white' : 'text-gray-200'
+              }`}>
+                {node.name}
+              </h5>
+              <span className={`text-[8.5px] font-mono font-black px-1.5 py-0.2 rounded shrink-0 ${
+                isMaxed 
+                  ? 'bg-amber-500/25 text-amber-300 border border-amber-500/40' 
+                  : 'bg-black/60 text-gray-300 border border-white/10'
+              }`}>
+                {currentLevel}/{node.maxLevel}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Middle: Description */}
+        <p className="text-[9px] font-sans text-gray-400 leading-snug line-clamp-2 min-h-[24px]">
+          {node.description(Math.max(1, currentLevel))}
+        </p>
+
+        {/* Bottom: Upgrade Action or Status */}
+        <div className="mt-2 pt-1.5 border-t border-white/5 flex items-center justify-between text-[8px] font-mono">
+          {isMaxed ? (
+            <span className="w-full text-center py-0.5 text-amber-400 font-black tracking-wider flex items-center justify-center gap-1">
+              <Check className="w-2.5 h-2.5 stroke-[3]" /> MAXED
+            </span>
+          ) : isLocked ? (
+            <span className="w-full text-center py-0.5 text-gray-500 font-semibold tracking-tight truncate flex items-center justify-center gap-1">
+              <Lock className="w-2.5 h-2.5" /> {lockReason || 'Locked'}
+            </span>
+          ) : (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePurchaseTalent(node);
+              }}
+              disabled={!canUpgrade}
+              className={`w-full py-1 px-2 rounded-lg font-display font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1 shadow-sm ${
+                canUpgrade
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-black cursor-pointer active:scale-95'
+                  : 'bg-white/5 text-gray-500 cursor-not-allowed border border-white/5'
+              }`}
+            >
+              <span>Upgrade</span>
+              <span className="text-[7.5px] font-mono opacity-85">({node.cost}pt)</span>
+            </button>
+          )}
         </div>
       </div>
     );
@@ -415,13 +624,16 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
       </div>
 
       {subTab === 'equipment' ? (
+        /* ------------------------------------------------------------- */
+        /* TAB 1: RELICS & GEAR                                          */
+        /* ------------------------------------------------------------- */
         <div className="p-3 space-y-3 max-w-md mx-auto w-full">
 
           {/* 2. LORD PROFILE & ATTRIBUTES CARD */}
           <div className="bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-[#c5a880]/30 rounded-2xl p-3.5 shadow-xl relative overflow-hidden space-y-3">
             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-900/10 blur-3xl pointer-events-none" />
 
-            {/* Profile Avatar, Username & Stance */}
+            {/* Profile Avatar, Username & Current Stance */}
             <div className="flex items-center gap-3 relative z-10">
               <div className="w-14 h-14 rounded-full bg-gradient-to-b from-purple-950 to-black border-2 border-[#ebd09b] p-0.5 shadow-[0_0_15px_rgba(235,208,155,0.25)] flex items-center justify-center shrink-0">
                 {profile.avatarUrl ? (
@@ -441,12 +653,12 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                   </span>
                 </div>
 
-                {/* Stance Mini-Banner */}
+                {/* Stance Indicator Banner */}
                 <div className="mt-1 bg-black/60 border border-white/10 rounded-lg py-1 px-2 flex items-center gap-1.5">
-                  <div className="shrink-0">{activeStance.icon}</div>
+                  <div className="shrink-0">{activeStance.icon("w-3.5 h-3.5")}</div>
                   <div className="min-w-0 flex-1">
                     <span className={`text-[9px] font-display font-black uppercase tracking-wider block ${activeStance.color} leading-none`}>
-                      {activeStance.label}
+                      {activeStance.name}
                     </span>
                     <span className="text-[7.5px] text-gray-400 font-sans block truncate leading-tight mt-0.5">
                       {activeStance.desc}
@@ -529,33 +741,6 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                     </span>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Quick Combat Stance Switcher */}
-            <div className="pt-2 border-t border-gray-800/80">
-              <span className="text-[8.5px] font-mono text-gray-400 uppercase font-bold block mb-1">
-                Change Active Stance
-              </span>
-              <div className="grid grid-cols-3 gap-1">
-                {(['void_strike', 'blood_aura', 'warlord_cry'] as const).map(stKey => {
-                  const st = stanceIcons[stKey];
-                  const isCurrent = (profile.activeStance || 'void_strike') === stKey;
-                  return (
-                    <button
-                      key={stKey}
-                      onClick={() => updateProfile({ ...profile, activeStance: stKey as any })}
-                      className={`py-1 px-1 rounded-lg border flex items-center justify-center gap-1 transition-all cursor-pointer ${
-                        isCurrent
-                          ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-sm font-bold'
-                          : 'bg-black/40 border-white/10 text-gray-400 hover:text-white'
-                      }`}
-                    >
-                      {st.icon}
-                      <span className="text-[8px] font-display uppercase truncate">{st.label.split(' ')[0]}</span>
-                    </button>
-                  );
-                })}
               </div>
             </div>
           </div>
@@ -719,14 +904,241 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
 
         </div>
       ) : (
-        /* 5. TALENTS VIEW FULL WIDTH */
-        <div className="w-full flex-1 p-2 sm:p-3">
-          <TalentsView />
+        /* ------------------------------------------------------------- */
+        /* TAB 2: TALENT TREE (MOBILE-OPTIMIZED VIEW)                     */
+        /* ------------------------------------------------------------- */
+        <div className="p-3 space-y-3 max-w-md mx-auto w-full">
+          
+          {/* Header Card: Points & Reset */}
+          <div className="bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-[#c5a880]/30 rounded-2xl p-3.5 shadow-xl relative overflow-hidden flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest block leading-tight">
+                Skill Points
+              </span>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-xl min-[380px]:text-2xl font-display font-black text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]">
+                  {availableTalentPoints}
+                </span>
+                <span className="text-[9px] font-mono text-gray-400">
+                  / {totalTalentPoints} Total
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsResetConfirmOpen(true)}
+              disabled={spentTalentPoints === 0 || isResetting}
+              className="bg-gradient-to-r from-red-950/80 to-rose-950/90 hover:from-red-900 hover:to-rose-900 border border-rose-500/50 text-rose-200 hover:text-white px-3 py-2 rounded-xl text-[10.5px] font-display font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-rose-400" />
+              <span>Reset (15 💎)</span>
+            </button>
+          </div>
+
+          {/* Stance Selector Pills */}
+          <div className="bg-black/60 border border-white/10 rounded-2xl p-1.5 grid grid-cols-3 gap-1">
+            {(['void_strike', 'blood_aura', 'warlord_cry'] as const).map(stKey => {
+              const st = STANCE_CONFIG[stKey];
+              const isSelectedTab = activeTalentStance === stKey;
+              const isEquipped = (profile.activeStance || 'void_strike') === stKey;
+
+              return (
+                <button
+                  key={stKey}
+                  onClick={() => setActiveTalentStance(stKey)}
+                  className={`py-2 px-1 rounded-xl transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer relative ${
+                    isSelectedTab
+                      ? `bg-gradient-to-b ${st.bgActive} border-2 ${st.borderActive} shadow-lg text-white`
+                      : 'border border-transparent text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  <div className="shrink-0">{st.icon("w-4 h-4")}</div>
+                  <span className="text-[8.5px] min-[380px]:text-[9px] font-display font-bold uppercase truncate max-w-full">
+                    {st.name.split(' ')[0]}
+                  </span>
+                  {isEquipped && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)] absolute top-1 right-1" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active Stance Status Banner & Equip Button */}
+          {(() => {
+            const currentCfg = STANCE_CONFIG[activeTalentStance];
+            const isEquipped = (profile.activeStance || 'void_strike') === activeTalentStance;
+
+            return (
+              <div className="bg-gradient-to-b from-[#13101c] to-[#0a0812] border border-white/15 rounded-2xl p-3 flex items-center justify-between gap-2 shadow-md">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className={`text-[11px] font-display font-black uppercase tracking-wider ${currentCfg.color}`}>
+                      {currentCfg.name}
+                    </span>
+                    {isEquipped && (
+                      <span className="text-[8px] font-mono font-bold bg-emerald-950/80 text-emerald-400 border border-emerald-500/50 px-1.5 py-0.2 rounded-full">
+                        ACTIVE
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[9px] font-sans text-gray-400 mt-0.5 leading-snug">
+                    Base: <span className="text-gray-200">{currentCfg.desc}</span>
+                  </p>
+                </div>
+
+                {isEquipped ? (
+                  <span className="bg-emerald-950/70 border border-emerald-500/40 text-emerald-400 text-[9px] font-mono font-black px-2.5 py-1 rounded-xl shrink-0 flex items-center gap-1">
+                    <Check className="w-3 h-3" /> ACTIVE
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => handleEquipStance(activeTalentStance)}
+                    className="bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-black font-display font-black text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-xl shadow-md shrink-0 active:scale-95 cursor-pointer"
+                  >
+                    Equip Stance
+                  </button>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Mobile Tiered Progression Tree */}
+          {(() => {
+            const activeNodes = TALENT_TREES.filter(t => t.stance === activeTalentStance);
+            const tier1Nodes = activeNodes.filter(n => n.tier === 1);
+            const tier2Nodes = activeNodes.filter(n => n.tier === 2);
+            const tier3Nodes = activeNodes.filter(n => n.tier === 3);
+            const tier4Nodes = activeNodes.filter(n => n.tier === 4);
+            const tier5Nodes = activeNodes.filter(n => n.tier === 5);
+
+            return (
+              <div className="space-y-2 pt-1">
+                {/* TIER 1 (Base Attunement) */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold">
+                      Tier 1 · Base Attunement
+                    </span>
+                  </div>
+                  {tier1Nodes.map(node => renderTalentNodeCard(node, true))}
+                </div>
+
+                {/* Connector Arrow */}
+                <div className="flex justify-center text-gray-600 py-0.5">
+                  <ChevronDown className="w-4 h-4 animate-bounce" />
+                </div>
+
+                {/* TIER 2 (Branching Passives) */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold">
+                      Tier 2 · Enhancement Paths
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {tier2Nodes.map(node => renderTalentNodeCard(node, false))}
+                  </div>
+                </div>
+
+                {/* Connector Arrow */}
+                <div className="flex justify-center text-gray-600 py-0.5">
+                  <ChevronDown className="w-4 h-4 animate-bounce" />
+                </div>
+
+                {/* TIER 3 (Major Keystone) */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-[8.5px] font-mono text-amber-400/90 uppercase tracking-wider font-bold flex items-center gap-1">
+                      <Award className="w-3 h-3 text-amber-400" /> Tier 3 · Major Keystone
+                    </span>
+                    <span className="text-[7.5px] font-mono text-gray-500">Requires Max T2</span>
+                  </div>
+                  {tier3Nodes.map(node => renderTalentNodeCard(node, true))}
+                </div>
+
+                {/* Connector Arrow */}
+                <div className="flex justify-center text-gray-600 py-0.5">
+                  <ChevronDown className="w-4 h-4 animate-bounce" />
+                </div>
+
+                {/* TIER 4 (Advanced Specializations) */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold">
+                      Tier 4 · Advanced Passives
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {tier4Nodes.map(node => renderTalentNodeCard(node, false))}
+                  </div>
+                </div>
+
+                {/* Connector Arrow */}
+                <div className="flex justify-center text-gray-600 py-0.5">
+                  <ChevronDown className="w-4 h-4 animate-bounce" />
+                </div>
+
+                {/* TIER 5 (Ultimate Capstone) */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-[8.5px] font-mono text-rose-400/90 uppercase tracking-wider font-bold flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-rose-400" /> Tier 5 · Ultimate Capstone
+                    </span>
+                    <span className="text-[7.5px] font-mono text-gray-500">Requires All Maxed</span>
+                  </div>
+                  {tier5Nodes.map(node => renderTalentNodeCard(node, true))}
+                </div>
+              </div>
+            );
+          })()}
+
         </div>
       )}
 
       {/* 6. RELIC SELECTION MODAL POPUP */}
       {renderInventoryModal()}
+
+      {/* 7. TALENT RESET CONFIRMATION MODAL */}
+      {isResetConfirmOpen && (
+        <div 
+          onClick={() => setIsResetConfirmOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-150 cursor-pointer"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#15121e] border-2 border-rose-500/50 rounded-2xl p-5 max-w-xs w-full shadow-[0_0_40px_rgba(244,63,94,0.3)] text-center relative overflow-hidden cursor-default"
+          >
+            <div className="w-12 h-12 rounded-full bg-rose-950/60 border border-rose-500/40 flex items-center justify-center mx-auto mb-2 text-rose-400">
+              <RotateCcw className="w-6 h-6" />
+            </div>
+
+            <h3 className="font-display font-black text-white text-base tracking-widest uppercase mb-1">
+              Reset Talents?
+            </h3>
+
+            <p className="text-gray-300 font-sans text-xs mb-4 leading-relaxed">
+              Refund all spent talent points for <span className="text-rose-400 font-bold">15 Dark Shards</span>?
+            </p>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIsResetConfirmOpen(false)}
+                className="flex-1 py-2 rounded-xl bg-black/60 border border-white/15 text-gray-300 text-xs font-mono font-bold hover:bg-white/5 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmReset}
+                disabled={isResetting}
+                className="flex-1 py-2 rounded-xl bg-gradient-to-r from-red-800 to-rose-700 hover:brightness-110 text-white text-xs font-display font-black uppercase tracking-wider shadow-lg active:scale-95 cursor-pointer disabled:opacity-50"
+              >
+                {isResetting ? 'Resetting...' : 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
