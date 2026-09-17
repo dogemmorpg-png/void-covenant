@@ -701,8 +701,8 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                 <span className="font-mono text-xs sm:text-sm font-black text-white">
                   #{myOwnLeagueRank || 1}
                 </span>
-                {mySubTier === 'ultra' && <span className="text-xs">💎</span>}
-                {mySubTier === 'premium' && <span className="text-xs">⚜️</span>}
+                {mySubTier === 'ultra' && <img src="/icons/badge_diamond_v1.png" alt="Ultra" className="w-3.5 h-3.5 object-contain drop-shadow shrink-0" />}
+                {mySubTier === 'premium' && <img src="/icons/badge_fleur_v1.png" alt="Premium" className="w-3.5 h-3.5 object-contain drop-shadow shrink-0" />}
               </div>
             </div>
 
@@ -1236,8 +1236,16 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                               }`}>
                                 {player.username}
                               </span>
-                              {subTier === 'ultra' && <span className="text-[9px]">💎</span>}
-                              {subTier === 'premium' && <span className="text-[9px]">⚜️</span>}
+                              {subTier === 'ultra' && (
+                                <span className="px-1.5 py-0.5 rounded bg-purple-950/90 border border-purple-400/80 shadow-[0_0_8px_rgba(168,85,247,0.5)] shrink-0 flex items-center justify-center" title="Ultra Overlord Pass">
+                                  <img src="/icons/badge_diamond_v1.png" alt="Ultra" className="w-3 h-3 object-contain drop-shadow" />
+                                </span>
+                              )}
+                              {subTier === 'premium' && (
+                                <span className="px-1.5 py-0.5 rounded bg-amber-950/90 border border-amber-400/80 shadow-[0_0_8px_rgba(245,158,11,0.4)] shrink-0 flex items-center justify-center" title="Premium Sovereign Pass">
+                                  <img src="/icons/badge_fleur_v1.png" alt="Premium" className="w-3 h-3 object-contain drop-shadow" />
+                                </span>
+                              )}
                               {isSelf && (
                                 <span className="text-[7.5px] font-mono bg-cyan-950 text-cyan-300 font-bold px-1 rounded border border-cyan-500/40 shrink-0">
                                   YOU
@@ -1300,8 +1308,16 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                     <span className="truncate font-sans font-bold text-xs max-w-[110px] text-white">
                       {profile.username || 'You'}
                     </span>
-                    {mySubTier === 'ultra' && <span className="text-[9px]">💎</span>}
-                    {mySubTier === 'premium' && <span className="text-[9px]">⚜️</span>}
+                    {mySubTier === 'ultra' && (
+                      <span className="px-1.5 py-0.5 rounded bg-purple-950/90 border border-purple-400/80 shadow-[0_0_8px_rgba(168,85,247,0.5)] shrink-0 flex items-center justify-center" title="Ultra Overlord Pass">
+                        <img src="/icons/badge_diamond_v1.png" alt="Ultra" className="w-3 h-3 object-contain drop-shadow" />
+                      </span>
+                    )}
+                    {mySubTier === 'premium' && (
+                      <span className="px-1.5 py-0.5 rounded bg-amber-950/90 border border-amber-400/80 shadow-[0_0_8px_rgba(245,158,11,0.4)] shrink-0 flex items-center justify-center" title="Premium Sovereign Pass">
+                        <img src="/icons/badge_fleur_v1.png" alt="Premium" className="w-3 h-3 object-contain drop-shadow" />
+                      </span>
+                    )}
                     <span className="text-[7.5px] font-mono font-black text-cyan-300 bg-cyan-950/80 border border-cyan-500/60 px-1.5 py-0.2 rounded shrink-0">
                       YOU
                     </span>
@@ -1686,13 +1702,13 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                     {activeOpponent.name || activeOpponent.username}
                   </h4>
                   {activeOpponent.subscriptionTier === 'ultra' && (
-                    <span className="text-[10px] font-mono font-black px-1.5 py-0.2 rounded bg-purple-950/90 border border-purple-400 text-purple-300 shadow-[0_0_8px_rgba(168,85,247,0.4)]">
-                      💎 ULTRA
+                    <span className="text-[10px] font-mono font-black px-1.5 py-0.5 rounded bg-purple-950/90 border border-purple-400 text-purple-300 shadow-[0_0_8px_rgba(168,85,247,0.4)] flex items-center gap-1">
+                      <img src="/icons/badge_diamond_v1.png" alt="Ultra" className="w-3 h-3 object-contain" /> ULTRA
                     </span>
                   )}
                   {activeOpponent.subscriptionTier === 'premium' && (
-                    <span className="text-[10px] font-mono font-black px-1.5 py-0.2 rounded bg-amber-950/90 border border-amber-400 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.3)]">
-                      ⚜️ VIP
+                    <span className="text-[10px] font-mono font-black px-1.5 py-0.5 rounded bg-amber-950/90 border border-amber-400 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.3)] flex items-center gap-1">
+                      <img src="/icons/badge_fleur_v1.png" alt="VIP" className="w-3 h-3 object-contain" /> VIP
                     </span>
                   )}
                 </div>

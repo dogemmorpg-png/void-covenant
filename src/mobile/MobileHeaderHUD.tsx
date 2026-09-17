@@ -191,21 +191,27 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
             className="flex items-center gap-2 cursor-pointer group active:scale-95 transition-transform"
             title="View Imperial Pass Privileges"
           >
-            <div className={`relative w-7 h-7 rounded-full ${ringColor} overflow-hidden bg-gray-900 shrink-0`}>
-              {profile.avatarUrl ? (
-                <img src={profile.avatarUrl} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-gray-700 via-gray-800 to-black" />
-              )}
+            <div className="relative w-7 h-7 shrink-0">
+              <div className={`w-full h-full rounded-full ${ringColor} overflow-hidden bg-gray-900`}>
+                {profile.avatarUrl ? (
+                  <img src={profile.avatarUrl} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-gray-700 via-gray-800 to-black" />
+                )}
+              </div>
               {tier === 'ultra' && (
-                <span className="absolute -top-1 -right-0.5 text-[8px] filter drop-shadow-[0_0_4px_rgba(168,85,247,0.9)] animate-pulse">
-                  💎
-                </span>
+                <img 
+                  src="/icons/badge_diamond_v1.png" 
+                  alt="Ultra" 
+                  className="absolute -top-1.5 -right-1 w-3.5 h-3.5 object-contain filter drop-shadow-[0_0_6px_rgba(168,85,247,0.9)] animate-pulse select-none z-10 pointer-events-none" 
+                />
               )}
               {tier === 'premium' && (
-                <span className="absolute -top-1 -right-0.5 text-[8px] filter drop-shadow-[0_0_4px_rgba(245,158,11,0.9)]">
-                  ⚜️
-                </span>
+                <img 
+                  src="/icons/badge_fleur_v1.png" 
+                  alt="Premium" 
+                  className="absolute -top-1.5 -right-1 w-3.5 h-3.5 object-contain filter drop-shadow-[0_0_6px_rgba(245,158,11,0.9)] select-none z-10 pointer-events-none" 
+                />
               )}
             </div>
 
@@ -692,11 +698,11 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
                             <div>
                               {isUltra ? (
                                 <span className="text-[10px] font-mono font-bold text-fuchsia-200 bg-fuchsia-950/90 border border-fuchsia-400 px-2.5 py-1 rounded-xl flex items-center gap-1 shadow-[0_0_12px_rgba(217,70,239,0.4)]">
-                                  <Crown className="w-3 h-3 text-fuchsia-300" /> ULTRA
+                                  <img src="/icons/badge_diamond_v1.png" alt="Ultra" className="w-3 h-3 object-contain" /> ULTRA
                                 </span>
                               ) : isPremium ? (
                                 <span className="text-[10px] font-mono font-bold text-amber-200 bg-amber-950/90 border border-amber-400 px-2.5 py-1 rounded-xl flex items-center gap-1 shadow-[0_0_12px_rgba(245,158,11,0.4)]">
-                                  ⚜️ PREMIUM
+                                  <img src="/icons/badge_fleur_v1.png" alt="Premium" className="w-3 h-3 object-contain" /> PREMIUM
                                 </span>
                               ) : (
                                 <span className="text-[10px] font-mono font-bold text-gray-300 bg-white/10 border border-white/20 px-2.5 py-1 rounded-xl">

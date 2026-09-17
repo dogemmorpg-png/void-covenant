@@ -736,13 +736,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                     {activeOpponent.name || activeOpponent.username}
                   </h4>
                   {activeOpponent.subscriptionTier === 'ultra' && (
-                    <span className="text-[10px] font-mono font-black px-1.5 py-0.2 rounded bg-purple-950/90 border border-purple-400 text-purple-300 shadow-[0_0_8px_rgba(168,85,247,0.4)]">
-                      💎 ULTRA
+                    <span className="text-[10px] font-mono font-black px-1.5 py-0.5 rounded bg-purple-950/90 border border-purple-400 text-purple-300 shadow-[0_0_8px_rgba(168,85,247,0.4)] flex items-center gap-1">
+                      <img src="/icons/badge_diamond_v1.png" alt="Ultra" className="w-3 h-3 object-contain" /> ULTRA
                     </span>
                   )}
                   {activeOpponent.subscriptionTier === 'premium' && (
-                    <span className="text-[10px] font-mono font-black px-1.5 py-0.2 rounded bg-amber-950/90 border border-amber-400 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.3)]">
-                      ⚜️ VIP
+                    <span className="text-[10px] font-mono font-black px-1.5 py-0.5 rounded bg-amber-950/90 border border-amber-400 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.3)] flex items-center gap-1">
+                      <img src="/icons/badge_fleur_v1.png" alt="VIP" className="w-3 h-3 object-contain" /> VIP
                     </span>
                   )}
                 </div>
@@ -921,10 +921,10 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                   MY RANK
                 </span>
                 {mySubTier === 'ultra' && (
-                  <span className="text-[11px] leading-none" title="Ultra Overlord Pass">💎</span>
+                  <img src="/icons/badge_diamond_v1.png" alt="Ultra" className="w-3.5 h-3.5 object-contain drop-shadow" title="Ultra Overlord Pass" />
                 )}
                 {mySubTier === 'premium' && (
-                  <span className="text-[11px] leading-none" title="Premium Sovereign Pass">⚜️</span>
+                  <img src="/icons/badge_fleur_v1.png" alt="Premium" className="w-3.5 h-3.5 object-contain drop-shadow" title="Premium Sovereign Pass" />
                 )}
               </div>
               <div className={`font-mono text-xl sm:text-2xl font-black mt-0.5 ${
@@ -1802,13 +1802,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
 
                             {/* VIP / Ultra Badges */}
                             {subTier === 'ultra' && (
-                              <span className="text-[9px] px-1 py-0.2 rounded bg-purple-950/90 border border-purple-400/80 text-purple-300 font-mono font-black shadow-[0_0_8px_rgba(168,85,247,0.5)] shrink-0 flex items-center gap-0.5" title="Ultra Overlord Pass">
-                                💎
+                              <span className="px-1.5 py-0.5 rounded bg-purple-950/90 border border-purple-400/80 text-purple-300 font-mono font-black shadow-[0_0_8px_rgba(168,85,247,0.5)] shrink-0 flex items-center justify-center" title="Ultra Overlord Pass">
+                                <img src="/icons/badge_diamond_v1.png" alt="Ultra" className="w-3.5 h-3.5 object-contain drop-shadow" />
                               </span>
                             )}
                             {subTier === 'premium' && (
-                              <span className="text-[9px] px-1 py-0.2 rounded bg-amber-950/90 border border-amber-400/80 text-amber-300 font-mono font-black shadow-[0_0_8px_rgba(245,158,11,0.4)] shrink-0 flex items-center gap-0.5" title="Premium Sovereign Pass">
-                                ⚜️
+                              <span className="px-1.5 py-0.5 rounded bg-amber-950/90 border border-amber-400/80 text-amber-300 font-mono font-black shadow-[0_0_8px_rgba(245,158,11,0.4)] shrink-0 flex items-center justify-center" title="Premium Sovereign Pass">
+                                <img src="/icons/badge_fleur_v1.png" alt="Premium" className="w-3.5 h-3.5 object-contain drop-shadow" />
                               </span>
                             )}
 
@@ -1890,13 +1890,13 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
                           {profile.username || 'You'}
                         </span>
                         {mySubTier === 'ultra' && (
-                          <span className="text-[9px] px-1 py-0.2 rounded bg-purple-950/90 border border-purple-400/80 text-purple-300 font-mono font-black shadow-[0_0_8px_rgba(168,85,247,0.5)] shrink-0" title="Ultra Overlord Pass">
-                            💎
+                          <span className="px-1.5 py-0.5 rounded bg-purple-950/90 border border-purple-400/80 text-purple-300 font-mono font-black shadow-[0_0_8px_rgba(168,85,247,0.5)] shrink-0 flex items-center justify-center" title="Ultra Overlord Pass">
+                            <img src="/icons/badge_diamond_v1.png" alt="Ultra" className="w-3.5 h-3.5 object-contain drop-shadow" />
                           </span>
                         )}
                         {mySubTier === 'premium' && (
-                          <span className="text-[9px] px-1 py-0.2 rounded bg-amber-950/90 border border-amber-400/80 text-amber-300 font-mono font-black shadow-[0_0_8px_rgba(245,158,11,0.4)] shrink-0" title="Premium Sovereign Pass">
-                            ⚜️
+                          <span className="px-1.5 py-0.5 rounded bg-amber-950/90 border border-amber-400/80 text-amber-300 font-mono font-black shadow-[0_0_8px_rgba(245,158,11,0.4)] shrink-0 flex items-center justify-center" title="Premium Sovereign Pass">
+                            <img src="/icons/badge_fleur_v1.png" alt="Premium" className="w-3.5 h-3.5 object-contain drop-shadow" />
                           </span>
                         )}
                         <span className="text-[8px] font-mono font-black text-cyan-300 bg-cyan-950/80 border border-cyan-500/60 px-1.5 py-0.2 rounded shrink-0">

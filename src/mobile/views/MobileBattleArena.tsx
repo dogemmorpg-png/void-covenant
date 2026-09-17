@@ -2652,9 +2652,13 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                   </span>
                   <div className="flex items-center gap-1 flex-wrap">
                     {subGoldBonusPercent > 0 && (
-                      <span className="inline-flex items-center gap-0.5 font-black text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded">
-                        <span>{subTier === 'ultra' ? '👑' : '⚜️'}</span>
-                        <span>+{subGoldBonusPercent}% {subTier === 'ultra' ? 'Ultra' : 'VIP'}</span>
+                      <span className="inline-flex items-center gap-1 font-black text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded">
+                        <img 
+                          src={subTier === 'ultra' ? '/icons/badge_diamond_v1.png' : '/icons/badge_fleur_v1.png'} 
+                          alt="" 
+                          className="w-3.5 h-3.5 object-contain inline" 
+                        />
+                        <span>+{subGoldBonusPercent}% {subTier === 'ultra' ? 'Ultra' : 'Premium'}</span>
                       </span>
                     )}
                     {subGoldBonusPercent > 0 && equipGoldBonus > 0 && (
@@ -2742,9 +2746,13 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                   </span>
                   <div className="flex items-center gap-1 flex-wrap">
                     {subGoldBonusPercent > 0 && (
-                      <span className="inline-flex items-center gap-0.5 font-black text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded">
-                        <span>{subTier === 'ultra' ? '👑' : '⚜️'}</span>
-                        <span>+{subGoldBonusPercent}% {subTier === 'ultra' ? 'Ultra' : 'VIP'}</span>
+                      <span className="inline-flex items-center gap-1 font-black text-amber-300 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded">
+                        <img 
+                          src={subTier === 'ultra' ? '/icons/badge_diamond_v1.png' : '/icons/badge_fleur_v1.png'} 
+                          alt="" 
+                          className="w-3.5 h-3.5 object-contain inline" 
+                        />
+                        <span>+{subGoldBonusPercent}% {subTier === 'ultra' ? 'Ultra' : 'Premium'}</span>
                       </span>
                     )}
                     {subGoldBonusPercent > 0 && equipGoldBonus > 0 && (

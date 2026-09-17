@@ -247,14 +247,18 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                       />
                     )}
                     {tier === 'ultra' && (
-                      <span className="absolute -top-2 -right-1 text-xs select-none filter drop-shadow-[0_0_4px_rgba(168,85,247,0.9)] animate-pulse">
-                        💎
-                      </span>
+                      <img 
+                        src="/icons/badge_diamond_v1.png" 
+                        alt="Ultra" 
+                        className="absolute -top-2 -right-1.5 w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(168,85,247,0.9)] animate-pulse select-none z-10 pointer-events-none" 
+                      />
                     )}
                     {tier === 'premium' && (
-                      <span className="absolute -top-1.5 -right-1 text-[10px] select-none filter drop-shadow-[0_0_4px_rgba(245,158,11,0.9)]">
-                        ⚜️
-                      </span>
+                      <img 
+                        src="/icons/badge_fleur_v1.png" 
+                        alt="Premium" 
+                        className="absolute -top-1.5 -right-1 w-3.5 h-3.5 object-contain filter drop-shadow-[0_0_6px_rgba(245,158,11,0.9)] select-none z-10 pointer-events-none" 
+                      />
                     )}
                   </div>
                   <span className={`font-display text-sm tracking-wide transition-colors ${
@@ -638,11 +642,11 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                             <div>
                               {isUltra ? (
                                 <span className="text-xs font-mono font-bold text-fuchsia-200 bg-fuchsia-950/90 border border-fuchsia-400 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-[0_0_15px_rgba(217,70,239,0.4)]">
-                                  <Crown className="w-3.5 h-3.5 text-fuchsia-300" /> ULTRA OVERLORD
+                                  <img src="/icons/badge_diamond_v1.png" alt="Ultra" className="w-3.5 h-3.5 object-contain" /> ULTRA OVERLORD
                                 </span>
                               ) : isPremium ? (
                                 <span className="text-xs font-mono font-bold text-amber-200 bg-amber-950/90 border border-amber-400 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.4)]">
-                                  ⚜️ PREMIUM PASS
+                                  <img src="/icons/badge_fleur_v1.png" alt="Premium" className="w-3.5 h-3.5 object-contain" /> PREMIUM PASS
                                 </span>
                               ) : (
                                 <span className="text-xs font-mono font-bold text-gray-300 bg-white/10 border border-white/20 px-3 py-1.5 rounded-xl">
