@@ -737,10 +737,10 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
           <img 
             src="/icons/tab_pvp_duels_v2.png" 
             alt="" 
-            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain shrink-0 transition-all duration-300 ${
+            className={`w-5 h-5 min-[390px]:w-[22px] min-[390px]:h-[22px] sm:w-6 sm:h-6 object-contain shrink-0 transition-all duration-300 ${
               activeTab === 'duels' 
-                ? 'scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.9)]' 
-                : 'opacity-85 group-hover:opacity-100'
+                ? 'scale-105 drop-shadow-[0_0_8px_rgba(244,63,94,0.9)]' 
+                : 'opacity-90 group-hover:opacity-100'
             }`} 
           />
           <span className={activeTab === 'duels' ? 'drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]' : ''}>DUELS</span>
@@ -749,7 +749,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
         {/* LEADERBOARD (flex-[1.3] ensures comfortable breathing room with zero overflow) */}
         <button
           onClick={() => setActiveTab('ladder')}
-          className={`group flex-[1.3] py-1.5 sm:py-2 px-1.5 rounded-xl text-[8px] min-[360px]:text-[9px] min-[390px]:text-[10px] sm:text-xs font-display font-black tracking-tight min-[390px]:tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
+          className={`group flex-[1.3] py-1.5 sm:py-2 px-1 rounded-xl text-[8px] min-[360px]:text-[9px] min-[390px]:text-[10px] sm:text-xs font-display font-black tracking-tight min-[390px]:tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
             activeTab === 'ladder'
               ? 'bg-gradient-to-b from-purple-950/90 via-indigo-950/60 to-[#0e0414] border border-purple-500/70 text-purple-100 shadow-[0_0_16px_rgba(168,85,247,0.35),inset_0_1px_1px_rgba(255,255,255,0.2)]'
               : 'bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 hover:border-white/15 text-gray-300 hover:text-white'
@@ -758,10 +758,10 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
           <img 
             src="/icons/tab_pvp_leaderboard_v2.png" 
             alt="" 
-            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain shrink-0 transition-all duration-300 ${
+            className={`w-5 h-5 min-[390px]:w-[22px] min-[390px]:h-[22px] sm:w-6 sm:h-6 object-contain shrink-0 transition-all duration-300 ${
               activeTab === 'ladder' 
-                ? 'scale-110 drop-shadow-[0_0_8px_rgba(168,85,247,0.9)]' 
-                : 'opacity-85 group-hover:opacity-100'
+                ? 'scale-105 drop-shadow-[0_0_8px_rgba(168,85,247,0.9)]' 
+                : 'opacity-90 group-hover:opacity-100'
             }`} 
           />
           <span className={`whitespace-nowrap ${activeTab === 'ladder' ? 'drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]' : ''}`}>
@@ -781,10 +781,10 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
           <img 
             src="/icons/tab_pvp_rewards_v2.png" 
             alt="" 
-            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain shrink-0 transition-all duration-300 ${
+            className={`w-5 h-5 min-[390px]:w-[22px] min-[390px]:h-[22px] sm:w-6 sm:h-6 object-contain shrink-0 transition-all duration-300 ${
               activeTab === 'rewards' 
-                ? 'scale-110 drop-shadow-[0_0_8px_rgba(245,158,11,0.9)]' 
-                : 'opacity-85 group-hover:opacity-100'
+                ? 'scale-105 drop-shadow-[0_0_8px_rgba(245,158,11,0.9)]' 
+                : 'opacity-90 group-hover:opacity-100'
             }`} 
           />
           <span className={activeTab === 'rewards' ? 'drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]' : ''}>REWARDS</span>
@@ -805,10 +805,10 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
           <img 
             src="/icons/tab_pvp_history_v2.png" 
             alt="" 
-            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain shrink-0 transition-all duration-300 ${
+            className={`w-5 h-5 min-[390px]:w-[22px] min-[390px]:h-[22px] sm:w-6 sm:h-6 object-contain shrink-0 transition-all duration-300 ${
               activeTab === 'history' 
-                ? 'scale-110 drop-shadow-[0_0_8px_rgba(6,182,212,0.9)]' 
-                : 'opacity-85 group-hover:opacity-100'
+                ? 'scale-105 drop-shadow-[0_0_8px_rgba(6,182,212,0.9)]' 
+                : 'opacity-90 group-hover:opacity-100'
             }`} 
           />
           <span className={activeTab === 'history' ? 'drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]' : ''}>HISTORY</span>
