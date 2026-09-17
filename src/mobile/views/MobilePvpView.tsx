@@ -511,14 +511,19 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
         return;
       }
 
-      // CRITICAL FIX: send current 10-card deck to sync with server DB
+      // Resolve active deck cards with full stats/tiers to send to matchmaking
+      const clientDeckCards = (profile.deck || [])
+        .map(id => (profile.collection || []).find(c => c && c.id === id))
+        .filter(Boolean);
+
+      // CRITICAL FIX: send current 10-card deck and cards to sync with server DB
       const res = await fetch('/api/matchmaking', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ spendShards, spendEnergy, deck: profile.deck })
+        body: JSON.stringify({ spendShards, spendEnergy, deck: profile.deck, deckCards: clientDeckCards })
       });
 
       if (res.ok) {

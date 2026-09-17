@@ -90,7 +90,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const playerLeague = profileData.pvpLeague || 'Bronze';
 
     // 2. Spend resource (Energy or Shards) or Cancel
-    const { spendShards, spendEnergy, cancel, deck: clientDeck } = req.body || {};
+    const { spendShards, spendEnergy, cancel, deck: clientDeck, deckCards: clientDeckCards } = req.body || {};
     if (clientDeck && Array.isArray(clientDeck) && clientDeck.length >= 10) {
       profileData.deck = clientDeck;
     }
@@ -238,9 +238,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const legendaryTemplates = CARD_TEMPLATES.filter(c => c.tier === 'legendary' || c.tier === 'divine');
 
       // Analyze player's current deck composition
-      const playerDeckCards = (profileData.deck || [])
+      let playerDeckCards = (profileData.deck || [])
         .map(id => (profileData.collection || []).find(c => c && c.id === id))
         .filter(Boolean);
+
+      // Fallback to client-provided deck cards if DB collection didn't resolve local cards
+      if ((!playerDeckCards || playerDeckCards.length === 0) && clientDeckCards && Array.isArray(clientDeckCards) && clientDeckCards.length > 0) {
+        playerDeckCards = clientDeckCards;
+      }
 
       let playerBronze = 0, playerSilver = 0, playerGold = 0, playerLegendary = 0;
       let totalPlayerLevel = 0;

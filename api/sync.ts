@@ -94,6 +94,13 @@ function migrateProfileCards(profile: any): any {
     return { ...card, manaCost: getCardManaCost(card) };
   });
 
+  // Auto-migrate legacy profiles with fewer than 10 cards in collection to full 10-card starter deck
+  if (!profile.collection || profile.collection.length < 10) {
+    const starter = generateStarterDeck();
+    profile.collection = starter.collection;
+    profile.deck = starter.deck;
+  }
+
   return profile;
 }
 
