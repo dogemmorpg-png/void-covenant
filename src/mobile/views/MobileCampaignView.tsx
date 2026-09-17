@@ -127,12 +127,48 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
     }
   };
 
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      setTouchStart({
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      });
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStart || e.changedTouches.length === 0) return;
+    const deltaX = e.changedTouches[0].clientX - touchStart.x;
+    const deltaY = e.changedTouches[0].clientY - touchStart.y;
+    setTouchStart(null);
+
+    // Only switch floor on intentional horizontal swipe (>45px and 1.4x larger than vertical movement)
+    if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4) {
+      if (deltaX < 0) {
+        // Swiped left -> Next floor
+        if (viewingFloor < maxFloor) {
+          setViewingFloor(prev => prev + 1);
+        }
+      } else {
+        // Swiped right -> Prev floor
+        if (viewingFloor > 1) {
+          setViewingFloor(prev => prev - 1);
+        }
+      }
+    }
+  };
+
   return (
-    <div className="h-full w-full overflow-y-auto select-none px-2 sm:px-4 pt-1 pb-[72px] custom-scrollbar">
+    <div className="h-full w-full overflow-y-auto select-none px-2 sm:px-4 pt-1 pb-24 sm:pb-28 custom-scrollbar">
       <div className="max-w-md mx-auto w-full flex flex-col justify-center gap-2">
         
         {/* Unified Majestic Slate Panel */}
-        <div className={`rounded-3xl p-3.5 sm:p-4.5 w-full relative overflow-hidden flex flex-col gap-3 border transition-all duration-300 my-auto ${
+        <div 
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          className={`rounded-3xl p-3.5 sm:p-4.5 w-full relative overflow-hidden flex flex-col gap-3 border transition-all duration-300 my-2 sm:my-auto ${
           isBoss 
             ? 'border-red-950/70 shadow-[0_0_40px_rgba(220,38,38,0.2)] bg-gradient-to-b from-[#1c080d]/95 via-[#0d0406]/95 to-[#050203]' 
             : 'border-[#ebd09b]/25 shadow-[0_0_35px_rgba(0,0,0,0.85)] bg-gradient-to-b from-[#15100c]/95 via-[#0a0705]/95 to-[#050403]'

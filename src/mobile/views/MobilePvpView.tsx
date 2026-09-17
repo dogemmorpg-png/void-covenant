@@ -607,11 +607,50 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
   const sovCap = mySubTier === 'ultra' ? 24 : mySubTier === 'premium' ? 10 : 0;
   const showDailySov = isMySubActive || wonToday > 0;
 
+  // Touch swipe gestures for horizontal tab switching
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      setTouchStart({
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      });
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStart || e.changedTouches.length === 0) return;
+    const deltaX = e.changedTouches[0].clientX - touchStart.x;
+    const deltaY = e.changedTouches[0].clientY - touchStart.y;
+    setTouchStart(null);
+
+    // Only switch tabs on intentional horizontal swipe (>45px and 1.4x larger than vertical movement)
+    if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4) {
+      const tabOrder: Array<'duels' | 'ladder' | 'rewards' | 'history'> = ['duels', 'ladder', 'rewards', 'history'];
+      const currentIndex = tabOrder.indexOf(activeTab);
+      if (deltaX < 0 && currentIndex < tabOrder.length - 1) {
+        // Swiped left -> next tab
+        const next = tabOrder[currentIndex + 1];
+        setActiveTab(next);
+        if (next === 'history') markDefenseHistoryAsViewed();
+      } else if (deltaX > 0 && currentIndex > 0) {
+        // Swiped right -> prev tab
+        const prev = tabOrder[currentIndex - 1];
+        setActiveTab(prev);
+      }
+    }
+  };
+
   return (
-    <div className="h-full w-full flex flex-col px-2 sm:px-4 pt-1 sm:pt-2 pb-20 select-none overflow-hidden">
+    <div 
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="h-full w-full overflow-y-auto select-none px-2 sm:px-4 pt-1 sm:pt-2 pb-24 sm:pb-28 custom-scrollbar"
+    >
       
       {/* 1. TOP MAIN HEADER BANNER (Authentic PC styling matching Screenshot 4) */}
-      <div className="bg-[#151a21] border border-[#c5a880]/20 rounded-2xl p-3 sm:p-4 shadow-xl shrink-0 mb-2.5 relative overflow-hidden">
+      <div className="bg-[#151a21] border border-[#c5a880]/20 rounded-2xl p-3 sm:p-4 shadow-xl mb-2.5 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-red-950/20 via-transparent to-[#151a21] pointer-events-none" />
 
         <div className="flex flex-col gap-2 relative z-10">
@@ -724,7 +763,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
       </div>
 
       {/* 2. NAVIGATION TABS (DUELS / LEADERBOARD / REWARDS / HISTORY) */}
-      <div className="flex items-center bg-gradient-to-b from-[#13141c]/95 via-[#0c0d12]/95 to-[#08080a] p-1 sm:p-1.5 rounded-2xl border border-white/10 gap-1 sm:gap-1.5 mb-2.5 shrink-0 shadow-[0_4px_20px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.06)]">
+      <div className="sticky top-0 z-20 flex items-center bg-[#0d0e14]/95 backdrop-blur-md p-1 sm:p-1.5 rounded-2xl border border-white/15 gap-1 sm:gap-1.5 mb-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.08)]">
         {/* DUELS */}
         <button
           onClick={() => setActiveTab('duels')}
@@ -818,8 +857,8 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
         </button>
       </div>
 
-      {/* 3. TAB CONTENT (Fills remaining view, scrollable) */}
-      <div className="flex-1 min-h-0 relative overflow-y-auto no-scrollbar">
+      {/* 3. TAB CONTENT */}
+      <div className="relative">
 
         {/* TAB 1: DUELS (Exact match with PC Screenshot 4) */}
         {activeTab === 'duels' && (
@@ -1117,7 +1156,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                 <span className="text-[10px] font-mono text-gray-500 uppercase">Loading Leaderboard...</span>
               </div>
             ) : (
-              <div className="space-y-1.5 max-h-[380px] overflow-y-auto pr-0.5">
+              <div className="space-y-1.5 pr-0.5">
                 {(() => {
                   const leagueConfig = LEAGUE_PROMOTION_CONFIG[viewingLeague] || { promoteTop: 20, demoteRankAbove: 100, capacity: 10 };
                   const leagueCap = leagueConfig.capacity || 10;
