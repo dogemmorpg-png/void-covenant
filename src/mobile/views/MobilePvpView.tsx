@@ -1859,101 +1859,78 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
               </p>
             </div>
 
-            {/* Table Grid with Horizontal Scroll support */}
-            <div className="border border-white/15 rounded-2xl overflow-hidden bg-black/60 shadow-2xl relative z-10 flex-1 min-h-0 flex flex-col">
-              <div className="overflow-x-auto flex-1 min-h-0">
-                <div className="min-w-[480px]">
-                  {/* Table Header */}
-                  <div className="grid grid-cols-12 bg-gradient-to-r from-amber-950/40 via-black/80 to-amber-950/40 border-b border-white/15 py-2.5 px-3 sm:px-4 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-gray-400 sticky top-0 z-20">
-                    <div className="col-span-4 flex items-center gap-1.5">
-                      <Shield className="w-3.5 h-3.5 text-amber-400" />
-                      <span>LEAGUE TIER</span>
+            {/* Header Legend for 3 Zones (Zero horizontal overflow, 100% responsive) */}
+            <div className="grid grid-cols-3 text-center text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider py-1.5 px-2 bg-black/60 border border-white/10 rounded-xl shrink-0">
+              <span className="text-emerald-400 flex items-center justify-center gap-1">
+                <span>▲</span> PROMOTION
+              </span>
+              <span className="text-gray-300 flex items-center justify-center gap-1">
+                <span>🛡️</span> SAFE HAVEN
+              </span>
+              <span className="text-rose-400 flex items-center justify-center gap-1">
+                <span>▼</span> DEMOTION
+              </span>
+            </div>
+
+            {/* League Cards List (Fits perfectly on all mobile screens without horizontal scroll) */}
+            <div className="overflow-y-auto max-h-[320px] sm:max-h-[360px] pr-1 space-y-1.5 flex-1 min-h-0">
+              {LEAGUE_TABLE_DATA.map((row) => {
+                const isMyLeague = row.name === (profile.pvpLeague || 'Bronze');
+                return (
+                  <div 
+                    key={row.name}
+                    className={`p-2 sm:p-2.5 rounded-xl border transition-all ${
+                      isMyLeague 
+                        ? 'bg-amber-950/40 border-amber-500/60 shadow-[0_0_15px_rgba(245,158,11,0.2)]' 
+                        : 'bg-black/50 border-white/10 hover:border-white/20'
+                    }`}
+                  >
+                    {/* Line 1: League Icon, Name, YOU Tag, Capacity */}
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <img src={row.icon} alt="" className="w-5 h-5 sm:w-6 sm:h-6 object-contain shrink-0" />
+                        <span className={`font-display font-black text-xs sm:text-sm uppercase tracking-wide truncate ${row.color}`}>
+                          {row.name}
+                        </span>
+                        {isMyLeague && (
+                          <span className="text-[7.5px] font-mono font-black px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/50 shadow-sm shrink-0">
+                            YOU
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[8.5px] sm:text-[9px] font-mono font-bold text-gray-400 bg-white/5 border border-white/10 px-2 py-0.5 rounded-md shrink-0">
+                        {row.capacity}
+                      </span>
                     </div>
-                    <div className="col-span-3 text-center text-emerald-400 flex items-center justify-center gap-1">
-                      <span>▲</span>
-                      <span>PROMOTION</span>
-                    </div>
-                    <div className="col-span-3 text-center text-gray-300 flex items-center justify-center gap-1">
-                      <span>🛡️</span>
-                      <span>SAFE HAVEN</span>
-                    </div>
-                    <div className="col-span-2 text-center text-rose-400 flex items-center justify-center gap-1">
-                      <span>▼</span>
-                      <span>DEMOTION</span>
+
+                    {/* Line 2: 3 Action Zones (Promotion, Safe Haven, Demotion) */}
+                    <div className="grid grid-cols-3 gap-1.5 text-center text-[9.5px] sm:text-[10.5px] font-mono font-bold">
+                      {/* Promotion Zone */}
+                      <div className="bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 py-1 px-1 rounded-lg truncate shadow-sm flex items-center justify-center">
+                        {row.promo ? (
+                          <span className="truncate">{row.promo}</span>
+                        ) : (
+                          <span className="text-amber-400 font-bold italic truncate">Crown Apex 👑</span>
+                        )}
+                      </div>
+
+                      {/* Safe Haven */}
+                      <div className="bg-black/70 border border-white/10 text-gray-300 py-1 px-1 rounded-lg truncate flex items-center justify-center">
+                        <span className="truncate">{row.safe}</span>
+                      </div>
+
+                      {/* Demotion Zone */}
+                      <div className={`py-1 px-1 rounded-lg truncate flex items-center justify-center ${
+                        row.demo 
+                          ? 'bg-rose-950/70 border border-rose-500/40 text-rose-300 shadow-sm' 
+                          : 'bg-black/30 border border-white/5 text-gray-500 italic font-normal'
+                      }`}>
+                        <span className="truncate">{row.demo || 'No Demote'}</span>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Table Rows */}
-                  <div className="divide-y divide-white/5 max-h-[300px] sm:max-h-[340px] overflow-y-auto">
-                    {LEAGUE_TABLE_DATA.map((row) => {
-                      const isMyLeague = row.name === (profile.pvpLeague || 'Bronze');
-                      return (
-                        <div 
-                          key={row.name}
-                          className={`grid grid-cols-12 items-center py-2 px-3 sm:px-4 transition-colors ${
-                            isMyLeague 
-                              ? 'bg-amber-950/30 font-medium' 
-                              : 'hover:bg-white/[0.03]'
-                          }`}
-                        >
-                          {/* League Name & Capacity */}
-                          <div className="col-span-4 flex items-center gap-2 min-w-0 pr-1">
-                            <img src={row.icon} alt="" className="w-5 h-5 sm:w-6 sm:h-6 object-contain shrink-0" />
-                            <div className="min-w-0 truncate">
-                              <div className="flex items-center gap-1.5">
-                                <span className={`font-display font-black text-[11px] sm:text-xs uppercase tracking-wide truncate ${row.color}`}>
-                                  {row.name}
-                                </span>
-                                {isMyLeague && (
-                                  <span className="text-[7.5px] font-mono font-bold px-1 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40 shrink-0">
-                                    YOU
-                                  </span>
-                                )}
-                              </div>
-                              <span className="text-[8.5px] font-mono text-gray-400 block">
-                                {row.capacity}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Promotion Zone */}
-                          <div className="col-span-3 text-center">
-                            {row.promo ? (
-                              <span className="inline-block text-[9.5px] sm:text-[10.5px] font-mono font-black text-emerald-300 bg-emerald-950/70 border border-emerald-500/40 px-2 py-0.5 rounded-md shadow-sm">
-                                {row.promo}
-                              </span>
-                            ) : (
-                              <span className="text-[9.5px] sm:text-[10.5px] font-mono text-amber-400/90 font-bold italic">
-                                Crown Apex 👑
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Safe Haven */}
-                          <div className="col-span-3 text-center">
-                            <span className="inline-block text-[9.5px] sm:text-[10.5px] font-mono font-medium text-gray-300 bg-black/60 border border-white/10 px-2 py-0.5 rounded-md">
-                              {row.safe}
-                            </span>
-                          </div>
-
-                          {/* Demotion Zone */}
-                          <div className="col-span-2 text-center">
-                            {row.demo ? (
-                              <span className="inline-block text-[9.5px] sm:text-[10.5px] font-mono font-black text-rose-300 bg-rose-950/70 border border-rose-500/40 px-2 py-0.5 rounded-md shadow-sm">
-                                {row.demo}
-                              </span>
-                            ) : (
-                              <span className="text-[9.5px] sm:text-[10.5px] font-mono text-gray-500 italic">
-                                No Demote
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
+                );
+              })}
             </div>
 
             {/* Note banner */}
