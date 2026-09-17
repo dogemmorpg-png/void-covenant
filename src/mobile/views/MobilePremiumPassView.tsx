@@ -218,8 +218,13 @@ export const MobilePremiumPassView: React.FC = () => {
             {isSubActive ? (
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/60 shadow-[0_0_12px_rgba(16,185,129,0.3)]">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <img 
+                  src={activeTier === 'ultra' ? '/icons/icon_ultra_diamond.png' : '/icons/icon_premium_crest.png'} 
+                  alt="Tier" 
+                  className="w-3.5 h-3.5 object-contain inline shrink-0" 
+                />
                 <span className="text-[9.5px] font-mono font-black text-emerald-300 uppercase">
-                  {activeTier === 'ultra' ? '💎 ULTRA' : '⚜️ PREMIUM'} • {remainingDays}D LEFT
+                  {activeTier === 'ultra' ? 'ULTRA' : 'PREMIUM'} • {remainingDays}D LEFT
                 </span>
               </div>
             ) : (
@@ -271,7 +276,7 @@ export const MobilePremiumPassView: React.FC = () => {
               : 'bg-transparent text-gray-400 hover:text-gray-200 hover:bg-white/[0.04]'
           }`}
         >
-          <span className="text-base">⚜️</span>
+          <img src="/icons/icon_premium_crest.png" alt="Premium" className="w-5 h-5 object-contain shrink-0 drop-shadow" />
           <span>PREMIUM PASS</span>
         </button>
 
@@ -284,7 +289,7 @@ export const MobilePremiumPassView: React.FC = () => {
               : 'bg-transparent text-gray-400 hover:text-gray-200 hover:bg-white/[0.04]'
           }`}
         >
-          <span className="text-base">💎</span>
+          <img src="/icons/icon_ultra_diamond.png" alt="Ultra" className="w-5 h-5 object-contain shrink-0 drop-shadow" />
           <span>ULTRA OVERLORD</span>
           <span className="absolute -top-2 -right-1 bg-gradient-to-r from-purple-500 to-rose-500 text-[8px] font-mono font-black text-white px-1.5 py-0.5 rounded-full shadow">
             APEX
@@ -312,7 +317,7 @@ export const MobilePremiumPassView: React.FC = () => {
             {/* Tier Badge Header Overlay */}
             <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-md border border-amber-500/40 text-amber-300 font-display font-black text-[11px] tracking-wider uppercase">
-                <span>⚜️</span>
+                <img src="/icons/icon_premium_crest.png" alt="Crest" className="w-3.5 h-3.5 object-contain shrink-0 drop-shadow" />
                 <span>PREMIUM TIER</span>
               </div>
               {activeTier === 'premium' && (
@@ -485,7 +490,7 @@ export const MobilePremiumPassView: React.FC = () => {
             {/* Tier Badge Header Overlay */}
             <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-md border border-purple-400/50 text-purple-300 font-display font-black text-[11px] tracking-wider uppercase shadow-[0_0_12px_rgba(168,85,247,0.5)]">
-                <span>💎</span>
+                <img src="/icons/icon_ultra_diamond.png" alt="Diamond" className="w-3.5 h-3.5 object-contain shrink-0 drop-shadow" />
                 <span>APEX OVERLORD TIER</span>
               </div>
               {activeTier === 'ultra' ? (
@@ -625,7 +630,7 @@ export const MobilePremiumPassView: React.FC = () => {
                 className="w-full py-3 px-4 rounded-xl font-display font-black tracking-widest text-xs uppercase cursor-pointer transition-all duration-200 select-none active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-b from-[#3a154d] via-[#230b2f] to-[#100316] border-t-2 border-t-purple-400/90 border-x border-purple-500/50 border-b-2 border-b-black shadow-[0_4px_16px_rgba(0,0,0,0.8),0_0_20px_rgba(168,85,247,0.25)] flex items-center justify-between gap-2"
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-base drop-shadow shrink-0">💎</span>
+                  <img src="/icons/icon_ultra_diamond.png" alt="Diamond" className="w-4 h-4 object-contain shrink-0 drop-shadow" />
                   <span className="text-purple-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                     {activeTier === 'ultra' ? `EXTEND ULTRA (${durationDays}D)` : `ASCEND TO ULTRA (${durationDays}D)`}
                   </span>
