@@ -594,10 +594,11 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
 
   const activeOpponent = profile.activePvpOpponent;
 
-  // Daily Sovereign won progress
+  // Daily Sovereign won progress (matching PC PvpArenaView.tsx)
   const todayUtc = new Date().toISOString().slice(0, 10);
   const wonToday = profile.lastSovereignsWonDate === todayUtc ? (profile.dailySovereignsWonToday || 0) : 0;
-  const sovCap = mySubTier === 'ultra' ? 24 : 10;
+  const sovCap = mySubTier === 'ultra' ? 24 : mySubTier === 'premium' ? 10 : 0;
+  const showDailySov = isMySubActive || wonToday > 0;
 
   return (
     <div className="h-full w-full flex flex-col px-2 sm:px-4 pt-1 sm:pt-2 pb-20 select-none overflow-hidden">
@@ -659,8 +660,8 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
               </div>
             </div>
 
-            {/* Tier 2: 3 Core Resources (3 equal balanced columns, fits perfectly in 360px) */}
-            <div className="grid grid-cols-3 divide-x divide-white/10 text-center items-center">
+            {/* Tier 2: Core Resources (2 columns if free, 3 if subscriber/has daily sov won) */}
+            <div className={`grid ${showDailySov ? 'grid-cols-3' : 'grid-cols-2'} divide-x divide-white/10 text-center items-center`}>
               {/* CROWNS */}
               <div className="px-1">
                 <span className="text-[8px] sm:text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold block">
@@ -672,16 +673,18 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                 </div>
               </div>
 
-              {/* DAILY SOV */}
-              <div className="px-1">
-                <span className="text-[8px] sm:text-[8.5px] font-mono text-amber-400 uppercase tracking-wider font-bold block">
-                  DAILY SOV
-                </span>
-                <div className="font-mono text-xs sm:text-sm font-black text-amber-300 flex items-center justify-center gap-1 mt-0.5">
-                  <img src="/icons/icon_sovereign.webp" alt="" className="w-3.5 h-3.5 object-contain" />
-                  <span>{wonToday}/{sovCap}</span>
+              {/* DAILY SOV (Subscribers or won today > 0) */}
+              {showDailySov && (
+                <div className="px-1">
+                  <span className="text-[8px] sm:text-[8.5px] font-mono text-amber-400 uppercase tracking-wider font-bold block">
+                    DAILY SOV
+                  </span>
+                  <div className="font-mono text-xs sm:text-sm font-black text-amber-300 flex items-center justify-center gap-1 mt-0.5">
+                    <img src="/icons/icon_sovereign.webp" alt="" className="w-3.5 h-3.5 object-contain" />
+                    <span>{wonToday}/{sovCap}</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* ARENA TICKETS */}
               <div className="px-1 flex flex-col items-center">
