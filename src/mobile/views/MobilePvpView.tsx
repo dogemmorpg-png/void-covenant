@@ -727,45 +727,44 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
         {/* DUELS */}
         <button
           onClick={() => setActiveTab('duels')}
-          className={`group flex-1 py-1.5 sm:py-2 px-1 rounded-xl text-[9px] min-[360px]:text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
+          className={`group flex-[0.9] py-1.5 sm:py-2 px-1 rounded-xl text-[9px] min-[360px]:text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
             activeTab === 'duels'
               ? 'bg-gradient-to-b from-rose-950/90 via-red-950/60 to-[#120406] border border-rose-500/70 text-rose-100 shadow-[0_0_16px_rgba(244,63,94,0.35),inset_0_1px_1px_rgba(255,255,255,0.2)]'
-              : 'bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-white/15 text-gray-400 hover:text-white'
+              : 'bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 hover:border-white/15 text-gray-300 hover:text-white'
           }`}
         >
           <img 
             src="/icons/tab_pvp_duels.png" 
             alt="" 
-            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain transition-all duration-300 ${
+            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain shrink-0 transition-all duration-300 ${
               activeTab === 'duels' 
                 ? 'scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.9)]' 
-                : 'opacity-60 grayscale-[30%] group-hover:opacity-100 group-hover:grayscale-0'
+                : 'opacity-85 group-hover:opacity-100'
             }`} 
           />
           <span className={activeTab === 'duels' ? 'drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]' : ''}>DUELS</span>
         </button>
 
-        {/* LEADERBOARD */}
+        {/* LEADERBOARD (flex-[1.3] ensures comfortable breathing room with zero overflow) */}
         <button
           onClick={() => setActiveTab('ladder')}
-          className={`group flex-1 py-1.5 sm:py-2 px-1 rounded-xl text-[8.5px] min-[360px]:text-[9.5px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
+          className={`group flex-[1.3] py-1.5 sm:py-2 px-1.5 rounded-xl text-[8px] min-[360px]:text-[9px] min-[390px]:text-[10px] sm:text-xs font-display font-black tracking-tight min-[390px]:tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
             activeTab === 'ladder'
               ? 'bg-gradient-to-b from-purple-950/90 via-indigo-950/60 to-[#0e0414] border border-purple-500/70 text-purple-100 shadow-[0_0_16px_rgba(168,85,247,0.35),inset_0_1px_1px_rgba(255,255,255,0.2)]'
-              : 'bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-white/15 text-gray-400 hover:text-white'
+              : 'bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 hover:border-white/15 text-gray-300 hover:text-white'
           }`}
         >
           <img 
             src="/icons/tab_pvp_leaderboard.png" 
             alt="" 
-            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain transition-all duration-300 ${
+            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain shrink-0 transition-all duration-300 ${
               activeTab === 'ladder' 
                 ? 'scale-110 drop-shadow-[0_0_8px_rgba(168,85,247,0.9)]' 
-                : 'opacity-60 grayscale-[30%] group-hover:opacity-100 group-hover:grayscale-0'
+                : 'opacity-85 group-hover:opacity-100'
             }`} 
           />
           <span className={`whitespace-nowrap ${activeTab === 'ladder' ? 'drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]' : ''}`}>
-            <span className="hidden min-[350px]:inline">LEADERBOARD</span>
-            <span className="min-[350px]:hidden">RANKS</span>
+            LEADERBOARD
           </span>
         </button>
 
@@ -775,16 +774,16 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
           className={`group flex-1 py-1.5 sm:py-2 px-1 rounded-xl text-[9px] min-[360px]:text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
             activeTab === 'rewards'
               ? 'bg-gradient-to-b from-amber-950/90 via-yellow-950/60 to-[#140b02] border border-amber-500/70 text-amber-100 shadow-[0_0_16px_rgba(245,158,11,0.35),inset_0_1px_1px_rgba(255,255,255,0.2)]'
-              : 'bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-white/15 text-gray-400 hover:text-white'
+              : 'bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 hover:border-white/15 text-gray-300 hover:text-white'
           }`}
         >
           <img 
             src="/icons/tab_pvp_rewards.png" 
             alt="" 
-            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain transition-all duration-300 ${
+            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain shrink-0 transition-all duration-300 ${
               activeTab === 'rewards' 
                 ? 'scale-110 drop-shadow-[0_0_8px_rgba(245,158,11,0.9)]' 
-                : 'opacity-60 grayscale-[30%] group-hover:opacity-100 group-hover:grayscale-0'
+                : 'opacity-85 group-hover:opacity-100'
             }`} 
           />
           <span className={activeTab === 'rewards' ? 'drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]' : ''}>REWARDS</span>
@@ -799,16 +798,16 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
           className={`relative group flex-1 py-1.5 sm:py-2 px-1 rounded-xl text-[9px] min-[360px]:text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
             activeTab === 'history'
               ? 'bg-gradient-to-b from-cyan-950/90 via-sky-950/60 to-[#031114] border border-cyan-500/70 text-cyan-100 shadow-[0_0_16px_rgba(6,182,212,0.35),inset_0_1px_1px_rgba(255,255,255,0.2)]'
-              : 'bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-white/15 text-gray-400 hover:text-white'
+              : 'bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 hover:border-white/15 text-gray-300 hover:text-white'
           }`}
         >
           <img 
             src="/icons/tab_pvp_history.png" 
             alt="" 
-            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain transition-all duration-300 ${
+            className={`w-4 h-4 sm:w-5 sm:h-5 object-contain shrink-0 transition-all duration-300 ${
               activeTab === 'history' 
                 ? 'scale-110 drop-shadow-[0_0_8px_rgba(6,182,212,0.9)]' 
-                : 'opacity-60 grayscale-[30%] group-hover:opacity-100 group-hover:grayscale-0'
+                : 'opacity-85 group-hover:opacity-100'
             }`} 
           />
           <span className={activeTab === 'history' ? 'drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]' : ''}>HISTORY</span>
@@ -863,7 +862,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                       }`}
                       title="Peace Shield Status"
                     >
-                      <div className={`relative w-7 h-7 rounded-lg flex items-center justify-center border shrink-0 ${
+                      <div className={`relative w-8 h-8 rounded-xl flex items-center justify-center border shrink-0 overflow-hidden ${
                         shieldTimeLeft
                           ? 'bg-emerald-950/90 border-emerald-500/70 shadow-[0_0_10px_rgba(16,185,129,0.4)]'
                           : 'bg-black/70 border-white/15'
@@ -871,7 +870,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                         <img 
                           src="/icons/shield_indicator.png" 
                           alt="" 
-                          className={`w-4 h-4 object-contain ${shieldTimeLeft ? 'animate-pulse' : 'opacity-70'}`} 
+                          className={`w-full h-full object-contain p-0.5 ${shieldTimeLeft ? 'animate-pulse' : ''}`} 
                         />
                         {shieldTimeLeft && (
                           <span className="absolute -top-0.5 -right-0.5 flex h-1.5 w-1.5">
