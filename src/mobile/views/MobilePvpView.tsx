@@ -22,6 +22,7 @@ import {
   ShoppingBag, 
   ArrowRight,
   User,
+  Sparkles,
   X 
 } from 'lucide-react';
 import { renderStanceIcon } from '../../components/SkillAndStanceIcons';
@@ -1590,58 +1591,91 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
         </div>
       )}
 
-      {/* Modal 2: Challenger Found Modal */}
+      {/* Modal 2: Challenger Found Modal (Authentic PC styling matching Screenshot 1) */}
       {isModalOpen && activeOpponent && (
-        <div className="fixed inset-0 z-[110] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-gradient-to-b from-[#1a141b] via-[#100b11] to-[#080509] border-2 border-amber-500/40 rounded-3xl p-5 max-w-sm w-full text-center space-y-4 shadow-[0_0_40px_rgba(0,0,0,0.9)] relative overflow-hidden">
+        <div className="fixed inset-0 z-[110] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fade-in">
+          <div className="bg-gradient-to-b from-[#1a141b] via-[#100b11] to-[#080509] border-2 border-amber-500/40 rounded-3xl p-5 sm:p-6 max-w-sm w-full text-center space-y-4 sm:space-y-5 shadow-[0_0_40px_rgba(0,0,0,0.9)] relative overflow-hidden">
+            
+            {/* Ambient Background Flare */}
+            <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-rose-500/15 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-amber-500/10 blur-3xl pointer-events-none" />
+
+            {/* Close Button */}
             <button
               onClick={() => handleCancelMatch()}
-              className="absolute top-3 right-3 text-gray-400 hover:text-white w-7 h-7 flex items-center justify-center bg-black/70 rounded-full border border-white/10 cursor-pointer"
+              className="absolute top-3.5 right-3.5 text-gray-400 hover:text-white font-sans text-base font-black transition-all cursor-pointer w-8 h-8 flex items-center justify-center bg-black/70 hover:bg-black border border-white/10 hover:border-white/30 rounded-full z-30 shadow-lg hover:scale-105 active:scale-95"
+              title="Close and cancel match"
             >
               ✕
             </button>
 
-            <div className="flex items-center justify-center gap-1.5 border-b border-white/10 pb-2">
+            {/* Header Title with Swords Emblem */}
+            <div className="flex items-center justify-center gap-2 border-b border-white/10 pb-3 px-8 relative z-10">
               <Swords className="w-4 h-4 text-rose-400" />
-              <h3 className="font-display font-black text-xs text-white tracking-widest uppercase">
+              <h3 className="font-display font-black text-sm text-white tracking-widest uppercase">
                 CHALLENGER FOUND
               </h3>
             </div>
 
-            <div className="flex flex-col items-center space-y-2.5">
+            {/* Opponent Identity & Portrait */}
+            <div className="flex flex-col items-center space-y-3 sm:space-y-3.5 relative z-10">
               <div className="relative">
-                <div className="w-20 h-20 rounded-2xl border-2 border-amber-400/60 p-0.5 bg-black/60 shadow-[0_0_20px_rgba(245,158,11,0.25)] overflow-hidden">
+                <div className="w-22 h-22 sm:w-24 sm:h-24 rounded-2xl border-2 border-amber-400/60 p-0.5 bg-black/60 shadow-[0_0_20px_rgba(245,158,11,0.25)] overflow-hidden">
                   <img 
                     src={getSafeAvatarUrl(activeOpponent.avatarUrl)} 
-                    alt="" 
+                    alt="Avatar" 
                     className="w-full h-full rounded-xl object-cover" 
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/avatars/knight.webp'; }}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/avatars/knight.webp';
+                    }}
                   />
                 </div>
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-amber-500 text-black px-2 py-0.2 rounded-full font-mono text-[8px] font-black uppercase">
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-600 to-yellow-600 border border-amber-300 text-black px-2.5 py-0.5 rounded-full font-mono text-[9px] font-black uppercase tracking-wider shadow-md">
                   LVL {activeOpponent.level || 1}
                 </div>
               </div>
 
-              <div>
-                <h4 className="font-display font-black text-base text-white">
-                  {activeOpponent.name || activeOpponent.username}
-                </h4>
-                <div className="flex items-center justify-center gap-1.5 mt-1">
-                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-display font-bold uppercase border ${getLeagueDetails(activeOpponent.league || 'Bronze').color}`}>
+              <div className="space-y-1 pt-1">
+                <div className="flex items-center justify-center gap-2 flex-wrap">
+                  <h4 className={`font-display font-black text-lg sm:text-xl tracking-wide leading-tight ${
+                    activeOpponent.subscriptionTier === 'ultra'
+                      ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-rose-300 to-amber-200 drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]'
+                      : activeOpponent.subscriptionTier === 'premium'
+                      ? 'text-amber-300 drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]'
+                      : 'text-white'
+                  }`}>
+                    {activeOpponent.name || activeOpponent.username}
+                  </h4>
+                  {activeOpponent.subscriptionTier === 'ultra' && (
+                    <span className="text-[10px] font-mono font-black px-1.5 py-0.2 rounded bg-purple-950/90 border border-purple-400 text-purple-300 shadow-[0_0_8px_rgba(168,85,247,0.4)]">
+                      💎 ULTRA
+                    </span>
+                  )}
+                  {activeOpponent.subscriptionTier === 'premium' && (
+                    <span className="text-[10px] font-mono font-black px-1.5 py-0.2 rounded bg-amber-950/90 border border-amber-400 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.3)]">
+                      ⚜️ VIP
+                    </span>
+                  )}
+                </div>
+                
+                <div className="flex items-center justify-center gap-2 pt-0.5">
+                  <span className={`px-2.5 py-0.5 border rounded-full text-[10px] font-display font-bold uppercase tracking-wider inline-flex items-center gap-1.5 ${getLeagueDetails(activeOpponent.league || 'Bronze').color}`}>
+                    <img src={getLeagueDetails(activeOpponent.league || 'Bronze').icon} alt="Crest" className="w-3.5 h-3.5 object-contain" />
                     {getLeagueDetails(activeOpponent.league || 'Bronze').name}
                   </span>
-                  <span className="font-mono text-xs text-amber-300 font-bold bg-black/60 px-2 py-0.5 rounded-full border border-amber-500/30">
-                    {activeOpponent.lp !== undefined ? activeOpponent.lp : (activeOpponent.rating || 0)} 👑
-                  </span>
+
+                  <div className="bg-black/60 border border-amber-500/30 px-2.5 py-0.5 rounded-full flex items-center gap-1 text-xs font-mono font-bold text-amber-300 shadow-inner">
+                    <img src="/icons/crown.png" alt="Crown" className="w-4 h-4 object-contain brightness-110 contrast-125" />
+                    <span>{activeOpponent.lp !== undefined ? activeOpponent.lp : (activeOpponent.rating || 0)}</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Combat Stance */}
-              <div className="w-full bg-black/50 border border-white/10 rounded-xl py-1.5 px-2 flex items-center justify-center gap-2">
-                <span className="text-[9px] font-mono text-gray-400 uppercase font-bold">STANCE:</span>
-                <span className="font-display font-bold text-xs text-white flex items-center gap-1">
-                  {renderStanceIcon(activeOpponent.stance || 'void_strike', 'w-3.5 h-3.5')}
+              {/* Combat Stance / Speciality */}
+              <div className="w-full bg-gradient-to-r from-[#14121d] via-[#101018] to-[#14121d] border border-white/10 rounded-xl py-2 px-3 flex items-center justify-center gap-2.5 shadow-inner">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400 font-bold">STANCE:</span>
+                <span className="font-display font-black text-xs uppercase tracking-wider text-white flex items-center gap-2">
+                  {renderStanceIcon(activeOpponent.stance || 'void_strike', 'w-4 h-4')}
                   <span>
                     {activeOpponent.stance === 'blood_aura' ? 'Blood Aura' : 
                      activeOpponent.stance === 'warlord_cry' ? "Warlord's Cry" : 'Void Strike'}
@@ -1650,219 +1684,446 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/10">
+            {/* Action Buttons (Re-roll & Fight) */}
+            <div className="grid grid-cols-2 gap-2.5 pt-1 border-t border-white/10 relative z-10">
               <button
                 disabled={isMatching || (profile.darkShards || 0) < 5}
                 onClick={() => handleFindOpponent(true, false)}
-                className={`py-2.5 rounded-xl border font-display font-black text-[11px] uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
+                className={`py-3 px-2 rounded-2xl border-2 font-display font-black text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-lg active:scale-95 ${
                   (profile.darkShards || 0) < 5
-                    ? 'border-zinc-800 bg-zinc-900/40 text-zinc-600'
-                    : 'bg-red-950/80 border-rose-600/60 text-rose-100 hover:text-white'
+                    ? 'border-zinc-850 bg-zinc-900/40 text-zinc-600 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-red-950/90 via-[#260c12] to-red-950/90 border-rose-600/60 hover:border-rose-400 text-rose-100 hover:text-white'
                 }`}
               >
-                <RefreshCw className="w-3.5 h-3.5" />
+                <RefreshCw className={`w-3.5 h-3.5 shrink-0 ${isMatching ? 'animate-spin' : ''}`} />
                 <span>RE-ROLL</span>
-                <span className="text-amber-400 font-mono text-xs">(5💎)</span>
+                <span className="flex items-center gap-1 bg-black/70 border border-rose-500/50 rounded-full px-2 py-0.5 font-mono text-xs font-black text-[#ebd09b] shadow-inner ml-0.5">
+                  5
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.6)]" />
+                </span>
               </button>
-
+              
               <button
                 onClick={() => handleFight(activeOpponent)}
-                className="py-2.5 rounded-xl border-2 bg-gradient-to-r from-emerald-800 to-teal-800 border-emerald-400 text-white font-display font-black text-[11px] uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                className="py-3 px-3 rounded-2xl font-display font-black tracking-widest text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer border-2 bg-gradient-to-r from-emerald-950 via-emerald-800 to-teal-950 border-emerald-500/70 hover:border-emerald-400 text-white active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_20px_rgba(16,185,129,0.5)]"
               >
-                <Swords className="w-3.5 h-3.5" />
+                <Swords className="w-4 h-4 shrink-0 text-emerald-300 animate-pulse" />
                 <span>FIGHT</span>
               </button>
             </div>
+
           </div>
         </div>
       )}
 
-      {/* Modal 3: Ticket Vault Modal */}
+      {/* Modal 3: Ticket Vault Modal (Authentic PC styling matching Screenshot 3) */}
       {isBuyTicketsModalOpen && (
-        <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-md flex items-center justify-center p-3 animate-fade-in">
-          <div className="bg-[#120e14] border-2 border-amber-500/50 rounded-2xl max-w-sm w-full p-4 space-y-3 text-center shadow-2xl relative">
-            <button 
+        <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fade-in">
+          <div className="bg-gradient-to-b from-[#181119] via-[#0f0b10] to-[#070508] border-2 border-amber-500/40 rounded-3xl p-4 sm:p-6 max-w-sm sm:max-w-md w-full space-y-3 sm:space-y-4 shadow-[0_0_50px_rgba(0,0,0,0.95)] relative overflow-hidden text-center">
+            
+            {/* Ambient Background Flares */}
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-rose-500/15 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-amber-500/10 blur-3xl pointer-events-none" />
+
+            {/* Close Button */}
+            <button
               onClick={() => setIsBuyTicketsModalOpen(false)}
-              className="absolute top-2.5 right-2.5 text-gray-400 hover:text-white w-7 h-7 flex items-center justify-center bg-black/70 rounded-full border border-white/10"
+              className="absolute top-3.5 right-3.5 text-gray-400 hover:text-white font-sans text-base font-black transition-all cursor-pointer w-8 h-8 flex items-center justify-center bg-black/70 hover:bg-black border border-white/10 hover:border-white/30 rounded-full z-30 shadow-lg hover:scale-105 active:scale-95"
+              title="Close"
             >
               ✕
             </button>
 
-            <div className="w-12 h-12 rounded-xl bg-rose-950/80 border border-rose-500 flex items-center justify-center mx-auto shadow-lg">
-              <img src="/icons/ticket.png" alt="" className="w-8 h-8 object-contain" />
-            </div>
-
-            <div>
-              <h3 className="font-display font-bold text-sm text-white uppercase tracking-wider">
+            {/* Header with Glowing Ticket Emblem */}
+            <div className="text-center space-y-1.5 relative z-10 px-4">
+              <div className="w-13 h-13 mx-auto rounded-2xl bg-gradient-to-b from-rose-950/80 via-black to-black border-2 border-rose-500/60 flex items-center justify-center shadow-[0_0_25px_rgba(244,63,94,0.35)]">
+                <img src="/icons/ticket.png" alt="Ticket" className="w-8 h-8 object-contain drop-shadow-[0_0_10px_rgba(244,63,94,0.75)]" />
+              </div>
+              <h3 className="font-display font-black text-lg sm:text-xl text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-300 to-yellow-500 tracking-widest uppercase text-shadow-gold">
                 ARENA TICKET VAULT
               </h3>
-              <p className="font-sans text-[10px] text-gray-400 mt-0.5">
-                Replenish Arena Tickets with Dark Shards to continue dueling.
+              <p className="text-[10px] sm:text-[11px] text-gray-300 font-sans max-w-xs mx-auto leading-relaxed">
+                Exchange Dark Shards for Arena Tickets to battle rival summoners and climb the Leagues.
               </p>
             </div>
 
-            <div className="grid grid-cols-3 gap-1 bg-black/60 border border-white/10 rounded-xl p-2 font-mono text-[9px] text-gray-300">
-              <div>
-                <span className="block text-gray-500">FREE</span>
-                <span className="font-black text-rose-400">{profile.pvpEnergy !== undefined ? profile.pvpEnergy : 5}/5</span>
-              </div>
-              <div>
-                <span className="block text-gray-500">RESERVE</span>
-                <span className="font-black text-amber-300">+{profile.pvpBonusTickets || 0}</span>
-              </div>
-              <div>
-                <span className="block text-gray-500">SHARDS</span>
-                <span className="font-black text-amber-400">{profile.darkShards || 0}</span>
-              </div>
-            </div>
-
-            {/* 3 Bundles */}
-            <div className="grid grid-cols-3 gap-1.5">
-              {[
-                { count: 1, cost: 12, label: 'Single', img: '/icons/arena_ticket_single.webp' },
-                { count: 5, cost: 50, label: 'Gladiator', popular: true, img: '/icons/arena_ticket_stack.webp' },
-                { count: 10, cost: 90, label: 'Warlord', img: '/icons/arena_ticket_deck_v2.webp' }
-              ].map((pack) => (
-                <div
-                  key={pack.count}
-                  className={`bg-black/50 border rounded-xl p-2 flex flex-col justify-between text-center relative ${
-                    pack.popular ? 'border-amber-500/70 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'border-white/10'
-                  }`}
-                >
-                  {pack.popular && (
-                    <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[6.5px] font-mono font-black bg-amber-500 text-black px-1 rounded-full whitespace-nowrap">
-                      POPULAR
-                    </span>
-                  )}
-                  <div className="w-10 h-10 mx-auto mb-1">
-                    <img src={pack.img} alt="" className="w-full h-full object-contain" />
-                  </div>
-                  <span className="font-display font-black text-xs text-white">+{pack.count}</span>
-                  <button
-                    onClick={async () => {
-                      if ((profile.darkShards || 0) < pack.cost) {
-                        setIsBuyTicketsModalOpen(false);
-                        setIsShardsShopOpen?.(true);
-                        toast('Insufficient Dark Shards! Opening Shop...', 'warning');
-                        return;
-                      }
-                      setIsBuyingTickets(true);
-                      const ok = await buyPvpTickets(pack.count);
-                      setIsBuyingTickets(false);
-                      if (ok) {
-                        toast(`Arena Tickets (+${pack.count}) replenished!`, 'success');
-                        setIsBuyTicketsModalOpen(false);
-                      }
-                    }}
-                    disabled={isBuyingTickets}
-                    className="mt-1.5 py-1 bg-amber-500 hover:bg-amber-400 text-black font-display font-black text-[9px] uppercase tracking-wider rounded-lg active:scale-95 cursor-pointer"
-                  >
-                    {pack.cost} 💎
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal 4: Peace Shield Chamber Modal */}
-      {isShieldModalOpen && (
-        <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-md flex items-center justify-center p-3 animate-fade-in">
-          <div className="bg-gradient-to-b from-[#141822] to-[#07080d] border-2 border-emerald-500/40 rounded-3xl p-4 max-w-sm w-full space-y-3 shadow-2xl relative">
-            <button 
-              onClick={() => setIsShieldModalOpen(false)}
-              className="absolute top-2.5 right-2.5 text-gray-400 hover:text-white w-7 h-7 flex items-center justify-center bg-black/70 rounded-full border border-white/10"
-            >
-              ✕
-            </button>
-
-            <div className="flex items-center gap-2 border-b border-white/10 pb-2">
-              <img src="/icons/shield_indicator_v2.png" alt="" className="w-6 h-6 object-contain" />
-              <div>
-                <h3 className="font-display font-bold text-xs text-white uppercase tracking-wider">
-                  PEACE SHIELD CHAMBER
-                </h3>
-                <span className="text-[9px] font-mono text-emerald-400 font-bold block">
-                  {shieldTimeLeft ? `Immunity Active: ${shieldTimeLeft}` : 'No Active Ward'}
+            {/* Status Bar: Daily Tickets + Reserve Tickets + Shards Balance */}
+            <div className="grid grid-cols-3 gap-1 bg-black/60 border border-white/10 rounded-2xl p-2.5 relative z-10 shadow-inner text-center">
+              <div className="flex flex-col items-center justify-center border-r border-white/10 pr-1">
+                <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Daily Free</span>
+                <span className="font-mono text-sm sm:text-base font-black text-rose-300 flex items-center gap-1 mt-0.5">
+                  <img src="/icons/ticket.png" alt="Ticket" className="w-3.5 h-3.5 object-contain" />
+                  {profile.pvpEnergy !== undefined ? profile.pvpEnergy : 5}/5
                 </span>
+                <span className="text-[7px] text-gray-500 font-mono mt-0.5">Refills 00:00 UTC</span>
+              </div>
+
+              <div className="flex flex-col items-center justify-center border-r border-white/10 px-1">
+                <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Reserve</span>
+                <span className="font-mono text-sm sm:text-base font-black text-amber-300 flex items-center gap-1 mt-0.5">
+                  <img src="/icons/ticket.png" alt="Ticket" className="w-3.5 h-3.5 object-contain brightness-125" />
+                  +{profile.pvpBonusTickets || 0}
+                </span>
+                <span className="text-[7px] text-gray-500 font-mono mt-0.5">Never Expires</span>
+              </div>
+
+              <div className="flex flex-col items-center justify-center pl-1">
+                <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider block font-bold">Your Shards</span>
+                <span className="font-mono text-sm sm:text-base font-black text-amber-400 flex items-center gap-1 mt-0.5">
+                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
+                  {profile.darkShards || 0}
+                </span>
+                <span className="text-[7px] text-gray-500 font-mono mt-0.5">Currency</span>
               </div>
             </div>
 
-            {/* Inventory Shields */}
-            <div className="grid grid-cols-3 gap-1.5">
+            {/* 3 Ticket Bundles */}
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2 relative z-10">
               {[
-                { type: '3h' as const, name: '3-Hour', icon: '/icons/shield_3h.png' },
-                { type: '6h' as const, name: '6-Hour', icon: '/icons/shield_6h.png' },
-                { type: '12h' as const, name: '12-Hour', icon: '/icons/shield_12h.png' }
-              ].map((item) => {
-                const count = profile.shieldsInventory?.[item.type] || 0;
-                const canActivate = count > 0 && !shieldTimeLeft && !isActivatingShield;
-
+                { 
+                  count: 1, 
+                  cost: 12, 
+                  label: 'Single Pass', 
+                  sub: '1 Duel Entry',
+                  image: '/icons/arena_ticket_single.webp',
+                  theme: 'border-white/10 hover:border-white/20 bg-gradient-to-b from-zinc-950 via-black to-black' 
+                },
+                { 
+                  count: 5, 
+                  cost: 50, 
+                  label: 'Gladiator Pack', 
+                  sub: '5 Duel Entries', 
+                  image: '/icons/arena_ticket_stack.webp',
+                  popular: true, 
+                  badge: 'MOST POPULAR',
+                  theme: 'border-amber-500/60 hover:border-amber-400 bg-gradient-to-b from-amber-950/30 via-black to-black shadow-[0_0_20px_rgba(245,158,11,0.15)]' 
+                },
+                { 
+                  count: 10, 
+                  cost: 90, 
+                  label: 'Warlord Bundle', 
+                  sub: '10 Duel Entries', 
+                  image: '/icons/arena_ticket_deck_v2.webp',
+                  badge: 'SAVE 30 SHARDS',
+                  theme: 'border-purple-500/50 hover:border-purple-400 bg-gradient-to-b from-purple-950/30 via-black to-black shadow-[0_0_20px_rgba(168,85,247,0.15)]' 
+                }
+              ].map((pack) => {
+                const canAfford = (profile.darkShards || 0) >= pack.cost;
                 return (
-                  <div 
-                    key={item.type}
-                    className="bg-black/50 border border-white/10 rounded-xl p-2 flex flex-col items-center justify-between text-center"
+                  <div
+                    key={pack.count}
+                    className={`relative p-2 rounded-2xl border flex flex-col items-center justify-between text-center gap-1.5 transition-all duration-300 ${pack.theme}`}
                   >
-                    <img src={item.icon} alt="" className="w-10 h-10 object-contain mb-1" />
-                    <span className="font-display font-bold text-[10px] text-white block">{item.name}</span>
-                    <span className="font-mono text-[9px] text-amber-300 block mb-1.5">{count} in Vault</span>
+                    {pack.badge && (
+                      <span className={`absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-0.2 rounded-full font-display font-black text-[6.5px] uppercase tracking-wider shadow-md whitespace-nowrap z-20 ${
+                        pack.popular 
+                          ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-black border border-amber-300' 
+                          : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white border border-purple-400'
+                      }`}>
+                        {pack.badge}
+                      </span>
+                    )}
+                    
+                    <div className="space-y-0.5 pt-1 flex flex-col items-center">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-black/70 border border-white/10 p-1 flex items-center justify-center shadow-inner overflow-hidden">
+                        <img src={pack.image} alt={pack.label} className="w-full h-full object-contain rounded-lg drop-shadow-[0_0_8px_rgba(244,63,94,0.75)]" />
+                      </div>
+                      <div className="font-display font-black text-base text-white">
+                        +{pack.count}
+                      </div>
+                      <div className="font-display font-bold text-[9px] sm:text-[10px] text-gray-300 uppercase tracking-wide leading-tight">
+                        {pack.label}
+                      </div>
+                      <div className="text-[7.5px] sm:text-[8.5px] text-gray-400 font-sans">
+                        {pack.sub}
+                      </div>
+                    </div>
+
+                    {/* Cost pill with dark shard icon */}
+                    <div className="bg-black/70 border border-white/10 w-full py-1 rounded-xl flex items-center justify-center gap-1 font-mono text-xs font-black text-amber-300 shadow-inner">
+                      <span>{pack.cost}</span>
+                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.7)]" />
+                    </div>
+
                     <button
                       onClick={async () => {
-                        if (shieldTimeLeft) {
-                          toast('A Peace Shield is already active!', 'warning');
+                        if (!canAfford) {
+                          setIsBuyTicketsModalOpen(false);
+                          setIsShardsShopOpen?.(true);
+                          toast('Insufficient Dark Shards! Opening Shop...', 'warning');
                           return;
                         }
-                        setIsActivatingShield(true);
-                        try {
-                          const res = await activateShield(item.type);
-                          if (res.success) {
-                            toast(res.message, 'success');
-                          } else {
-                            toast(res.message, 'error');
-                          }
-                        } catch {
-                          toast('Activation failed', 'error');
-                        } finally {
-                          setIsActivatingShield(false);
+                        setIsBuyingTickets(true);
+                        const ok = await buyPvpTickets(pack.count);
+                        setIsBuyingTickets(false);
+                        if (ok) {
+                          toast(`Successfully purchased ${pack.count} Arena Tickets!`, 'success');
+                          setIsBuyTicketsModalOpen(false);
+                        } else {
+                          toast('Transaction failed.', 'error');
                         }
                       }}
-                      disabled={!canActivate}
-                      className={`w-full py-1 rounded-lg font-display font-black text-[8.5px] uppercase tracking-wider transition-all ${
-                        canActivate 
-                          ? 'bg-emerald-500 hover:bg-emerald-400 text-black active:scale-95 cursor-pointer' 
-                          : 'bg-white/5 text-gray-600 border border-white/5 cursor-not-allowed'
+                      disabled={isBuyingTickets}
+                      className={`w-full py-1.5 rounded-xl font-display font-black tracking-wider text-[9px] uppercase cursor-pointer transition-all duration-300 shadow-md ${
+                        !canAfford
+                          ? 'bg-zinc-900 border border-zinc-800 text-zinc-500 cursor-not-allowed opacity-75'
+                          : pack.popular
+                          ? 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black border border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.3)] active:scale-95'
+                          : 'bg-gradient-to-r from-zinc-800 to-zinc-900 hover:from-zinc-700 hover:to-zinc-800 border border-zinc-600 hover:border-amber-400/60 text-white active:scale-95'
                       }`}
                     >
-                      {isActivatingShield ? '...' : canActivate ? 'ACTIVATE' : 'NONE'}
+                      {isBuyingTickets ? '...' : canAfford ? 'BUY' : 'NEED SHARDS'}
                     </button>
                   </div>
                 );
               })}
             </div>
 
-            {/* Buy in Shop Banner */}
-            <div 
-              onClick={() => {
-                setIsShieldModalOpen(false);
-                onNavigateToShop?.('shields');
-              }}
-              className="bg-purple-950/40 border border-purple-500/40 rounded-xl p-2.5 flex items-center justify-between cursor-pointer hover:border-purple-400 transition-all active:scale-98"
+            <button
+              onClick={() => setIsBuyTicketsModalOpen(false)}
+              className="w-full py-2.5 rounded-2xl border border-white/10 hover:border-white/20 bg-black/40 hover:bg-black/60 text-gray-300 hover:text-white font-display font-bold tracking-widest text-[10px] sm:text-xs transition-colors cursor-pointer uppercase relative z-10"
             >
-              <div className="flex items-center gap-2">
-                <ShoppingBag className="w-4 h-4 text-purple-400" />
-                <div className="text-left">
-                  <span className="font-display font-black text-[10px] text-white uppercase block">
-                    NEED MORE SHIELDS?
-                  </span>
-                  <span className="text-[8px] font-sans text-gray-400 block">
-                    Purchase Aegis Wards with Dark Shards in Shop
+              BACK TO ARENA
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal 4: Peace Shield Chamber Modal (Authentic PC styling matching Screenshot 2) */}
+      {isShieldModalOpen && (
+        <div className="fixed inset-0 z-[110] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fade-in">
+          <div className="bg-gradient-to-b from-[#141822] via-[#0d1017] to-[#07080d] border-2 border-emerald-500/40 rounded-3xl p-4 sm:p-5 max-w-sm sm:max-w-md w-full space-y-3 sm:space-y-3.5 shadow-[0_0_50px_rgba(0,0,0,0.95)] relative overflow-hidden">
+            
+            {/* Ambient glows */}
+            <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 blur-3xl pointer-events-none" />
+
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-2.5 relative z-10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-950/80 border border-emerald-500/50 flex items-center justify-center p-1.5 shadow-[0_0_15px_rgba(16,185,129,0.35)]">
+                  <img src="/icons/shield_indicator.png" alt="Aegis" className="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <h3 className="font-display font-black text-sm sm:text-base text-white tracking-wider uppercase text-shadow-gold">
+                    PEACE SHIELD CHAMBER
+                  </h3>
+                  <p className="text-[9px] sm:text-[10px] font-mono text-emerald-400/90 tracking-wider">
+                    ARENA IMMUNITY & DEFENSE WARDS
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsShieldModalOpen(false)}
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/60 hover:bg-black/90 border border-white/15 hover:border-white/40 text-gray-400 hover:text-white flex items-center justify-center font-bold transition-all cursor-pointer text-xs sm:text-sm"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Current Protection Status Card */}
+            <div className={`p-3 rounded-2xl border flex items-center justify-between gap-2.5 relative z-10 transition-all ${
+              shieldTimeLeft
+                ? 'bg-gradient-to-r from-emerald-950/60 via-[#0c241b]/70 to-black/80 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.2)]'
+                : 'bg-gradient-to-r from-[#181216]/80 via-[#120d11]/80 to-black/80 border-rose-500/30'
+            }`}>
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center border shrink-0 ${
+                  shieldTimeLeft 
+                    ? 'bg-emerald-900/60 border-emerald-400/60 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.4)]' 
+                    : 'bg-black/60 border-rose-500/40 text-rose-400'
+                }`}>
+                  {shieldTimeLeft ? (
+                    <ShieldCheck className="w-5 h-5 animate-pulse text-emerald-400" />
+                  ) : (
+                    <Shield className="w-5 h-5 text-rose-400/80" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-mono uppercase tracking-wider text-gray-400 block">
+                      Shield Status:
+                    </span>
+                    <span className={`text-[8px] font-mono font-black px-1.5 py-0.2 rounded uppercase border ${
+                      shieldTimeLeft 
+                        ? 'bg-emerald-950 border-emerald-500/60 text-emerald-300' 
+                        : 'bg-rose-950 border-rose-500/50 text-rose-300'
+                    }`}>
+                      {shieldTimeLeft ? 'PROTECTED' : 'VULNERABLE'}
+                    </span>
+                  </div>
+                  <span className="font-display font-black text-xs sm:text-sm text-white block mt-0.5 truncate">
+                    {shieldTimeLeft ? 'Immune to Arena Attacks' : 'Exposed to Enemy Duels'}
                   </span>
                 </div>
               </div>
-              <ArrowRight className="w-3.5 h-3.5 text-purple-400" />
+
+              {shieldTimeLeft ? (
+                <div className="font-mono bg-black/50 border border-emerald-500/30 px-2 py-1 rounded-xl flex flex-col justify-between items-end shrink-0">
+                  <span className="text-[7.5px] text-emerald-400/80 uppercase font-bold tracking-wider">Remaining</span>
+                  <span className="text-xs sm:text-sm font-black text-emerald-300 flex items-center gap-1 mt-0.5">
+                    <Clock className="w-3 h-3 text-emerald-400" />
+                    {shieldTimeLeft}
+                  </span>
+                </div>
+              ) : (
+                <div className="text-[9px] font-mono text-rose-400/80 italic shrink-0">
+                  No active ward
+                </div>
+              )}
             </div>
+
+            {/* Inventory Section */}
+            <div className="space-y-1.5 relative z-10">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] sm:text-[11px] font-mono font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                  Shields in Vault
+                </span>
+                <span className="text-[9px] font-mono text-gray-400">
+                  Select a shield to activate
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+                {[
+                  {
+                    type: '3h' as const,
+                    name: '3-Hour Aegis',
+                    duration: '+3 Hours',
+                    icon: '/icons/shield_3h.png',
+                    glow: 'hover:border-emerald-500/60'
+                  },
+                  {
+                    type: '6h' as const,
+                    name: '6-Hour Aegis',
+                    duration: '+6 Hours',
+                    icon: '/icons/shield_6h.png',
+                    glow: 'hover:border-cyan-500/60'
+                  },
+                  {
+                    type: '12h' as const,
+                    name: '12-Hour Aegis',
+                    duration: '+12 Hours',
+                    icon: '/icons/shield_12h.png',
+                    glow: 'hover:border-purple-500/60'
+                  }
+                ].map((item) => {
+                  const count = profile.shieldsInventory?.[item.type] || 0;
+                  const isAvailable = count > 0;
+                  const isBlockedByActiveShield = !!shieldTimeLeft;
+                  const canActivate = isAvailable && !isBlockedByActiveShield && !isActivatingShield;
+
+                  return (
+                    <div 
+                      key={item.type} 
+                      className={`bg-gradient-to-b from-[#11151f] to-[#0a0c12] border rounded-2xl p-2 text-center flex flex-col justify-between transition-all duration-300 ${
+                        isAvailable 
+                          ? `border-white/15 ${item.glow} shadow-lg shadow-black/60 ${canActivate ? 'hover:scale-[1.02]' : ''}` 
+                          : 'border-white/5 opacity-60'
+                      }`}
+                    >
+                      {/* Shield Icon */}
+                      <div className="flex flex-col items-center">
+                        <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-xl p-1 flex items-center justify-center mb-0.5">
+                          <img 
+                            src={item.icon} 
+                            alt={item.name} 
+                            className={`w-full h-full object-contain filter ${
+                              isAvailable ? 'drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]' : 'grayscale opacity-50'
+                            }`} 
+                          />
+                        </div>
+                        <span className="text-[9.5px] sm:text-[10.5px] font-display font-bold text-white block leading-tight">
+                          {item.name}
+                        </span>
+                        <span className="text-[8.5px] sm:text-[9.5px] font-mono text-emerald-400 font-bold block mt-0.5">
+                          {item.duration}
+                        </span>
+                      </div>
+
+                      {/* Quantity & Activate Button */}
+                      <div className="mt-1.5 pt-1.5 border-t border-white/10">
+                        <span className={`font-mono text-[9.5px] sm:text-[10.5px] font-black block mb-1.5 ${
+                          isAvailable ? 'text-amber-300' : 'text-gray-500'
+                        }`}>
+                          {count} in Vault
+                        </span>
+
+                        <button
+                          onClick={async () => {
+                            if (shieldTimeLeft) {
+                              toast('A Peace Shield is already active!', 'warning');
+                              return;
+                            }
+                            setIsActivatingShield(true);
+                            try {
+                              const res = await activateShield(item.type);
+                              if (res.success) {
+                                toast(res.message, 'success');
+                              } else {
+                                toast(res.message, 'error');
+                              }
+                            } catch (e: any) {
+                              toast(e.message || 'Activation failed', 'error');
+                            } finally {
+                              setIsActivatingShield(false);
+                            }
+                          }}
+                          disabled={!canActivate}
+                          className={`w-full py-1.5 px-1 rounded-xl font-display font-black text-[9px] tracking-wider uppercase transition-all select-none cursor-pointer ${
+                            canActivate
+                              ? 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-black shadow-md shadow-emerald-950/50 active:scale-95'
+                              : isBlockedByActiveShield && isAvailable
+                                ? 'bg-emerald-950/20 text-emerald-500/50 border border-emerald-500/20 cursor-not-allowed'
+                                : 'bg-white/5 text-gray-600 border border-white/5 cursor-not-allowed'
+                          }`}
+                        >
+                          {isActivatingShield ? '...' : isBlockedByActiveShield ? 'ACTIVE' : isAvailable ? 'ACTIVATE' : 'NONE'}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Buy in Shop Banner */}
+            <div className="bg-gradient-to-r from-[#1c1228] via-[#160d20] to-[#0e0714] border border-purple-500/40 hover:border-purple-400/70 rounded-2xl p-2.5 flex items-center justify-between gap-2 shadow-xl transition-all relative z-10 group">
+              <div className="flex items-center gap-2 text-left min-w-0">
+                <div className="w-8 h-8 rounded-xl bg-purple-950/80 border border-purple-500/40 flex items-center justify-center text-purple-300 shrink-0">
+                  <ShoppingBag className="w-4 h-4 text-purple-400" />
+                </div>
+                <div className="min-w-0">
+                  <span className="font-display font-black text-[10px] sm:text-xs text-white block uppercase tracking-wider truncate">
+                    NEED MORE DEFENSE SHIELDS?
+                  </span>
+                  <span className="text-[8px] sm:text-[9px] text-gray-300 font-sans block truncate">
+                    Acquire 3h, 6h, and 12h Aegis Wards in Shop.
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  setIsShieldModalOpen(false);
+                  onNavigateToShop?.('shields');
+                }}
+                className="py-1.5 px-2.5 sm:px-3 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white font-display font-black text-[9px] sm:text-[10px] tracking-wider uppercase shadow-lg shadow-purple-950/60 flex items-center justify-center gap-1 shrink-0 transition-all hover:scale-105 active:scale-95 cursor-pointer whitespace-nowrap"
+              >
+                <span>BUY IN SHOP</span>
+                <ArrowRight className="w-3 h-3 stroke-[2.5]" />
+              </button>
+            </div>
+
+            {/* Daily Subscription Pass Tributes Note */}
+            <div className="bg-amber-950/20 border border-amber-500/25 rounded-2xl p-2 sm:p-2.5 flex items-start gap-2 text-xs text-amber-200 font-sans relative z-10">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+              <div className="text-[9px] sm:text-[10px] leading-relaxed">
+                <strong className="text-white">Daily Pass Shield Tributes:</strong> Premium Lords collect <strong className="text-amber-300">1x 3h Shield</strong> daily. Ultra Overlords collect <strong className="text-amber-300">1x 6h Shield</strong> daily in Pass Tributes.
+              </div>
+            </div>
+
           </div>
         </div>
       )}
