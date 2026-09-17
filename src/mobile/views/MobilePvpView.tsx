@@ -5,11 +5,9 @@ import { CampaignStage } from '../../types';
 import { 
   Swords, 
   Award, 
-  Zap, 
   Trophy, 
   Shield, 
   ShieldCheck, 
-  Search, 
   RefreshCw, 
   AlertTriangle, 
   History, 
@@ -17,11 +15,7 @@ import {
   Timer, 
   ChevronLeft, 
   ChevronRight, 
-  User, 
   Info, 
-  Gift, 
-  Sparkles, 
-  CheckCircle2, 
   Lock, 
   Plus, 
   Clock, 
@@ -32,7 +26,7 @@ import {
 import { renderStanceIcon } from '../../components/SkillAndStanceIcons';
 import { assetPreloader } from '../../utils/assetPreloader';
 import { calculateEquipmentSetBonuses } from '../../data/equipment';
-import { ALL_LEAGUE_REWARDS, LEAGUE_PROMOTION_CONFIG } from '../../data/leagueRewards';
+import { ALL_LEAGUE_REWARDS } from '../../data/leagueRewards';
 
 interface MobilePvpViewProps {
   onStartBattle: (stage: CampaignStage, type: 'campaign' | 'pvp', opponentPayload?: any) => Promise<boolean> | void;
@@ -118,7 +112,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState<'duels' | 'ladder' | 'rewards' | 'history'>('duels');
-  const [selectedRewardLeague, setSelectedRewardLeague] = useState<string>(profile.pvpLeague || 'Bronze');
+  const [selectedRewardLeague, setSelectedRewardLeague] = useState<string>(profile.pvpLeague || 'Void Overlord');
   const [viewingLeague, setViewingLeague] = useState<string>(profile.pvpLeague || 'Bronze');
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
@@ -141,7 +135,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
   const isMySubActive = Boolean(profile.subscriptionExpiresAt && Number(profile.subscriptionExpiresAt) > Date.now());
   const mySubTier = isMySubActive ? (profile.subscriptionTier || 'free') : 'free';
 
-  // League calculation helper
+  // League calculation helper matching PC PvpArenaView.tsx
   const getLeagueDetails = (leagueName: string) => {
     const name = leagueName || 'Bronze';
     if (name.startsWith('Bronze')) {
@@ -393,7 +387,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
   // Prepare and start battle with an opponent
   const handleFight = async (opponent: any) => {
     if (profile.deck.length < 10) {
-      toast("Your deck is incomplete! Select 10 cards in CARDS tab.", 'warning');
+      toast("Your deck is incomplete! Go to the 'CARDS' tab and select exactly 10 cards for battle.", 'warning');
       return;
     }
 
@@ -451,7 +445,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
     const pvpStage: CampaignStage = {
       id: -1,
       name: `Arena: ${opponent.name || opponent.username}`,
-      description: `Ranked PvP battle against ${opponent.name || opponent.username} [${opponentLP} 👑]`,
+      description: `Ranked PvP battle for Covenant glory. Opponent: ${opponent.name || opponent.username} [${opponentLP} 👑]`,
       energyCost: 1,
       goldReward: 50,
       dustReward: 25,
@@ -487,13 +481,13 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
   // Quick matchmaking search
   const handleFindOpponent = async (spendShards: boolean = false, spendEnergy: boolean = false) => {
     if (profile.deck.length < 10) {
-      toast("Your deck is incomplete! Select 10 cards in CARDS tab.", 'warning');
+      toast("Your deck is incomplete! Go to the 'CARDS' tab and select exactly 10 cards for battle.", 'warning');
       return;
     }
 
     if (spendEnergy) {
       if (myTickets < 1) {
-        toast('Not enough Arena Tickets! Purchase more in the Vault.', 'warning');
+        toast('Not enough Arena Tickets! Purchase more in the Ticket Vault or wait for daily reset.', 'warning');
         setIsBuyTicketsModalOpen(true);
         return;
       }
@@ -517,19 +511,28 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
         return;
       }
 
+      // CRITICAL FIX: send current 10-card deck to sync with server DB
       const res = await fetch('/api/matchmaking', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ spendShards, spendEnergy })
+        body: JSON.stringify({ spendShards, spendEnergy, deck: profile.deck })
       });
 
       if (res.ok) {
         const data = await res.json();
         if (data.profile) {
-          updateProfile(data.profile);
+          // CRITICAL BUG FIX: Only update PvP-related state and currencies.
+          // NEVER overwrite local deck or collection with stale database records!
+          updateProfile({
+            activePvpOpponent: data.profile.activePvpOpponent,
+            pvpEnergy: data.profile.pvpEnergy,
+            pvpBonusTickets: data.profile.pvpBonusTickets,
+            pvpTickets: data.profile.pvpTickets,
+            darkShards: data.profile.darkShards
+          });
           if (data.profile.activePvpOpponent?.deck) {
             assetPreloader.preloadBattleCreatures(data.profile.activePvpOpponent.deck);
           }
@@ -570,11 +573,16 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
       if (res.ok) {
         const data = await res.json();
         if (data.profile) {
-          updateProfile(data.profile);
+          updateProfile({
+            activePvpOpponent: undefined,
+            pvpEnergy: data.profile.pvpEnergy,
+            pvpBonusTickets: data.profile.pvpBonusTickets,
+            pvpTickets: data.profile.pvpTickets
+          });
         }
         setIsModalOpen(false);
         if (!silent) {
-          toast('Matchmaking canceled. PvP Ticket refunded.', 'info');
+          toast('Matchmaking canceled. PvP Energy forfeited.', 'info');
         }
       }
     } catch {
@@ -592,116 +600,125 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
   const sovCap = mySubTier === 'ultra' ? 24 : 10;
 
   return (
-    <div className="h-full w-full flex flex-col p-2 sm:p-3 select-none overflow-hidden pb-24">
-      {/* 1. TOP HEADER HUD */}
-      <div className="bg-[#131720]/95 border border-[#c5a880]/25 rounded-2xl p-2 sm:p-2.5 shadow-xl shrink-0 mb-2 space-y-1.5">
-        {/* Row 1: Title, Peace Shield Status, Rules Button */}
-        <div className="flex items-center justify-between gap-1.5">
-          <div className="flex items-center gap-1.5">
-            <Crown className="w-4 h-4 text-amber-400" />
-            <h2 className="font-display font-black text-xs sm:text-sm text-white tracking-widest uppercase text-shadow-gold">
-              VOID ARENA
-            </h2>
-          </div>
+    <div className="h-full w-full flex flex-col p-2 sm:p-4 select-none overflow-hidden pb-24">
+      
+      {/* 1. TOP MAIN HEADER BANNER (Authentic PC styling matching Screenshot 4) */}
+      <div className="bg-[#151a21] border border-[#c5a880]/20 rounded-2xl p-3 sm:p-4 shadow-xl shrink-0 mb-3 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-red-950/20 via-transparent to-[#151a21] pointer-events-none" />
 
-          <div className="flex items-center gap-1.5">
-            {/* Peace Shield Pill */}
-            <div
-              onClick={() => setIsShieldModalOpen(true)}
-              className={`flex items-center gap-1 px-2 py-0.5 rounded-lg border text-[9px] font-mono font-bold cursor-pointer transition-all active:scale-95 ${
-                shieldTimeLeft
-                  ? 'bg-emerald-950/80 border-emerald-500/60 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.3)]'
-                  : 'bg-black/50 border-white/10 text-gray-400 hover:text-white hover:border-purple-500/50'
-              }`}
-              title="Peace Shield Immunity Status"
-            >
-              {shieldTimeLeft ? (
-                <>
-                  <ShieldCheck className="w-3 h-3 text-emerald-400 animate-pulse" />
-                  <span>{shieldTimeLeft}</span>
-                </>
-              ) : (
-                <>
-                  <Shield className="w-3 h-3 text-purple-400" />
-                  <span className="text-purple-300">SHIELD OFF</span>
-                </>
-              )}
+        <div className="flex flex-col gap-2.5 relative z-10">
+          {/* Row 1: Title & Subtitle */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Crown className="w-5 h-5 text-amber-400 animate-bounce" />
+              <h2 className="font-display font-black text-sm sm:text-lg text-white tracking-widest uppercase text-shadow-gold">
+                VOID ARENA
+              </h2>
             </div>
-
-            {/* Rules Button */}
             <button
               onClick={() => setIsLeagueRulesModalOpen(true)}
-              className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-950/50 hover:bg-amber-900/50 border border-amber-500/40 text-amber-300 font-display font-black text-[9px] tracking-wider uppercase transition-all active:scale-95 cursor-pointer"
+              className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-950/60 hover:bg-amber-900/60 border border-amber-500/40 text-amber-300 font-display font-black text-[10px] tracking-wider uppercase transition-all active:scale-95 cursor-pointer shadow-sm"
             >
-              <Info className="w-3 h-3 text-amber-400" />
+              <Info className="w-3.5 h-3.5 text-amber-400" />
               <span>RULES</span>
             </button>
           </div>
-        </div>
 
-        {/* Row 2: 4 Jewel Stat Pills */}
-        <div className="grid grid-cols-4 gap-1 sm:gap-1.5">
-          {/* Crowns */}
-          <div className="bg-black/60 border border-amber-500/30 rounded-xl p-1 text-center flex flex-col items-center justify-center">
-            <span className="text-[7.5px] font-mono text-gray-400 uppercase font-bold leading-none">CROWNS</span>
-            <div className="font-mono text-xs font-black text-amber-400 flex items-center justify-center gap-0.5 mt-0.5">
-              <img src="/icons/crown.png" alt="" className="w-3.5 h-3.5 object-contain" />
-              <span>{profile.pvpLP || 0}</span>
-            </div>
-          </div>
+          <p className="text-[10px] sm:text-xs text-gray-300 font-sans leading-tight hidden sm:block">
+            Duel other summoners across the realm, climb the PvP leagues, and claim glorious victory rewards.
+          </p>
 
-          {/* Tickets */}
-          <div 
-            onClick={() => setIsBuyTicketsModalOpen(true)}
-            className="bg-black/60 border border-rose-500/35 hover:border-rose-400 rounded-xl p-1 text-center flex flex-col items-center justify-center cursor-pointer transition-all active:scale-95"
-            title="Replenish Arena Tickets"
-          >
-            <span className="text-[7.5px] font-mono text-gray-400 uppercase font-bold leading-none">TICKETS</span>
-            <div className="font-mono text-xs font-black text-rose-400 flex items-center justify-center gap-0.5 mt-0.5">
-              <img src="/icons/ticket.png" alt="" className="w-3.5 h-3.5 object-contain" />
-              <span>{myTickets}/{pvpEnergyMax}</span>
-              <div className="w-3 h-3 rounded bg-rose-600 text-white flex items-center justify-center text-[9px] font-bold ml-0.5">
-                +
+          {/* Row 2: Horizontal Stats Bar (Exact PC layout matching Screenshot 4) */}
+          <div className="flex items-center justify-between bg-[#11141a]/95 backdrop-blur-md border border-white/10 rounded-2xl p-2 px-3 shadow-inner overflow-x-auto no-scrollbar gap-2 sm:gap-4">
+            
+            {/* CROWNS */}
+            <div className="text-center shrink-0 min-w-[55px]">
+              <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold block">CROWNS</span>
+              <div className="font-mono text-xs sm:text-sm font-black text-amber-400 flex items-center justify-center gap-1 mt-0.5">
+                <img src="/icons/crown.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                <span>{profile.pvpLP || 0}</span>
               </div>
             </div>
-          </div>
 
-          {/* Daily SOV */}
-          <div className="bg-black/60 border border-amber-500/25 rounded-xl p-1 text-center flex flex-col items-center justify-center">
-            <span className="text-[7.5px] font-mono text-amber-400/90 uppercase font-bold leading-none">DAILY SOV</span>
-            <div className="font-mono text-xs font-black text-amber-300 flex items-center justify-center gap-0.5 mt-0.5">
-              <img src="/icons/icon_sovereign.webp" alt="" className="w-3.5 h-3.5 object-contain" />
-              <span>{wonToday}/{sovCap}</span>
-            </div>
-          </div>
+            <div className="w-px h-6 bg-white/10 shrink-0" />
 
-          {/* My League & Rank */}
-          <div className={`bg-black/60 border rounded-xl p-1 text-center flex flex-col items-center justify-center ${
-            mySubTier === 'ultra' ? 'border-purple-500/60 shadow-[0_0_8px_rgba(168,85,247,0.3)]' :
-            mySubTier === 'premium' ? 'border-amber-500/50 shadow-[0_0_8px_rgba(245,158,11,0.3)]' :
-            'border-white/10'
-          }`}>
-            <span className="text-[7.5px] font-mono text-gray-400 uppercase font-bold leading-none flex items-center gap-0.5">
-              <span>RANK</span>
-              {mySubTier === 'ultra' && <span>💎</span>}
-              {mySubTier === 'premium' && <span>⚜️</span>}
-            </span>
-            <div className="font-mono text-xs font-black text-white flex items-center justify-center gap-1 mt-0.5 truncate">
-              <img src={league.icon} alt="" className="w-3.5 h-3.5 object-contain shrink-0" />
-              <span className={league.accent}>#{myOwnLeagueRank || 1}</span>
+            {/* DAILY SOV */}
+            <div className="text-center shrink-0 min-w-[65px]">
+              <span className="text-[8.5px] font-mono text-amber-400 uppercase tracking-wider font-bold block">DAILY SOV</span>
+              <div className="font-mono text-xs sm:text-sm font-black text-amber-300 flex items-center justify-center gap-1 mt-0.5">
+                <img src="/icons/icon_sovereign.webp" alt="" className="w-3.5 h-3.5 object-contain" />
+                <span>{wonToday}/{sovCap}</span>
+              </div>
             </div>
+
+            <div className="w-px h-6 bg-white/10 shrink-0" />
+
+            {/* ARENA TICKETS */}
+            <div className="text-center shrink-0 min-w-[115px] flex flex-col items-center">
+              <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold block">ARENA TICKETS</span>
+              <div className="flex items-center justify-center gap-1.5 mt-0.5">
+                <div className="font-mono text-xs sm:text-sm font-black text-rose-400 flex items-center gap-1">
+                  <img src="/icons/ticket.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                  <span>{myTickets}/{pvpEnergyMax}</span>
+                  {(profile.pvpBonusTickets || 0) > 0 && (
+                    <span className="text-[8.5px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-500/50 px-1 py-0.2 rounded">
+                      +{profile.pvpBonusTickets}
+                    </span>
+                  )}
+                </div>
+                <button
+                  onClick={() => setIsBuyTicketsModalOpen(true)}
+                  className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-rose-950/80 border border-rose-500/50 text-rose-200 text-[9px] font-mono font-bold hover:text-white transition-all active:scale-95 cursor-pointer"
+                >
+                  <Plus className="w-2.5 h-2.5" />
+                  <span>BUY</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="w-px h-6 bg-white/10 shrink-0" />
+
+            {/* MY LEAGUE */}
+            <div className="text-center shrink-0 min-w-[85px] flex flex-col items-center">
+              <span className="text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold block">MY LEAGUE</span>
+              <div className="flex items-center gap-1 mt-0.5">
+                <img src={league.icon} alt="" className="w-4 h-4 object-contain" />
+                <span className={`font-display font-black text-[10px] sm:text-xs uppercase tracking-wider ${league.accent}`}>
+                  {league.name}
+                </span>
+              </div>
+            </div>
+
+            <div className="w-px h-6 bg-white/10 shrink-0" />
+
+            {/* MY RANK */}
+            <div className={`text-center px-2 py-0.5 rounded-xl shrink-0 min-w-[65px] ${
+              mySubTier === 'ultra' ? 'bg-purple-950/40 border border-purple-500/50 shadow-[0_0_10px_rgba(168,85,247,0.3)]' :
+              mySubTier === 'premium' ? 'bg-amber-950/35 border border-amber-500/45 shadow-[0_0_10px_rgba(245,158,11,0.25)]' :
+              ''
+            }`}>
+              <span className="text-[8.5px] font-mono text-gray-400 uppercase font-bold flex items-center justify-center gap-0.5">
+                <span>MY RANK</span>
+                {mySubTier === 'ultra' && <span>💎</span>}
+                {mySubTier === 'premium' && <span>⚜️</span>}
+              </span>
+              <div className="font-mono text-xs sm:text-sm font-black text-white mt-0.5">
+                #{myOwnLeagueRank || 1}
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
 
-      {/* 2. NAVIGATION TABS (DUELS / LADDER / REWARDS / HISTORY) */}
-      <div className="flex items-center gap-1 mb-2 shrink-0">
+      {/* 2. NAVIGATION TABS (DUELS / LEADERBOARD / LEAGUE REWARDS / HISTORY) */}
+      <div className="flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 gap-1.5 mb-3 shrink-0 shadow-inner">
         <button
           onClick={() => setActiveTab('duels')}
-          className={`flex-1 py-2 rounded-xl font-display text-[10px] font-black tracking-wider uppercase transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
+          className={`flex-1 py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
             activeTab === 'duels'
-              ? 'bg-rose-950/90 border border-rose-500 text-rose-200 shadow-[0_0_12px_rgba(244,63,94,0.35)]'
-              : 'bg-black/50 border border-white/5 text-gray-400 hover:text-white'
+              ? 'bg-gradient-to-r from-red-950/90 via-rose-900/70 to-red-950/90 border border-rose-500/60 text-white shadow-[0_0_20px_rgba(244,63,94,0.35)]'
+              : 'text-gray-400 hover:text-white border border-transparent'
           }`}
         >
           <Swords className="w-3.5 h-3.5 text-rose-400" />
@@ -710,25 +727,25 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
 
         <button
           onClick={() => setActiveTab('ladder')}
-          className={`flex-1 py-2 rounded-xl font-display text-[10px] font-black tracking-wider uppercase transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
+          className={`flex-1 py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
             activeTab === 'ladder'
-              ? 'bg-cyan-950/90 border border-cyan-500 text-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.35)]'
-              : 'bg-black/50 border border-white/5 text-gray-400 hover:text-white'
+              ? 'bg-gradient-to-r from-purple-950/90 via-indigo-900/70 to-purple-950/90 border border-purple-500/60 text-white shadow-[0_0_20px_rgba(168,85,247,0.35)]'
+              : 'text-gray-400 hover:text-white border border-transparent'
           }`}
         >
-          <Trophy className="w-3.5 h-3.5 text-cyan-400" />
+          <Award className="w-3.5 h-3.5 text-purple-400" />
           <span>LADDER</span>
         </button>
 
         <button
           onClick={() => setActiveTab('rewards')}
-          className={`flex-1 py-2 rounded-xl font-display text-[10px] font-black tracking-wider uppercase transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
+          className={`flex-1 py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
             activeTab === 'rewards'
-              ? 'bg-amber-950/90 border border-amber-500 text-amber-200 shadow-[0_0_12px_rgba(245,158,11,0.35)]'
-              : 'bg-black/50 border border-white/5 text-gray-400 hover:text-white'
+              ? 'bg-gradient-to-r from-amber-950/90 via-yellow-900/70 to-amber-950/90 border border-amber-500/60 text-white shadow-[0_0_20px_rgba(245,158,11,0.35)]'
+              : 'text-gray-400 hover:text-white border border-transparent'
           }`}
         >
-          <Award className="w-3.5 h-3.5 text-amber-400" />
+          <Trophy className="w-3.5 h-3.5 text-amber-400" />
           <span>REWARDS</span>
         </button>
 
@@ -737,190 +754,280 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
             setActiveTab('history');
             markDefenseHistoryAsViewed();
           }}
-          className={`relative flex-1 py-2 rounded-xl font-display text-[10px] font-black tracking-wider uppercase transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
+          className={`relative flex-1 py-2 rounded-xl text-[10px] sm:text-xs font-display font-black tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
             activeTab === 'history'
-              ? 'bg-purple-950/90 border border-purple-500 text-purple-200 shadow-[0_0_12px_rgba(168,85,247,0.35)]'
-              : 'bg-black/50 border border-white/5 text-gray-400 hover:text-white'
+              ? 'bg-gradient-to-r from-cyan-950/90 via-blue-900/70 to-cyan-950/90 border border-cyan-500/60 text-white shadow-[0_0_20px_rgba(6,182,212,0.35)]'
+              : 'text-gray-400 hover:text-white border border-transparent'
           }`}
         >
-          <History className="w-3.5 h-3.5 text-purple-400" />
-          <span>LOG</span>
+          <History className="w-3.5 h-3.5 text-cyan-400" />
+          <span>HISTORY</span>
           {hasNewDefenseAttacks && (
-            <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping absolute top-1 right-1.5" />
+            <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping absolute top-1 right-2" />
           )}
         </button>
       </div>
 
-      {/* 3. TAB CONTENT */}
+      {/* 3. TAB CONTENT (Fills remaining view, scrollable) */}
       <div className="flex-1 min-h-0 relative overflow-y-auto no-scrollbar">
 
-        {/* TAB 1: DUELS */}
+        {/* TAB 1: DUELS (Exact match with PC Screenshot 4) */}
         {activeTab === 'duels' && (
-          <div className="space-y-2.5">
-            {/* Deck warning */}
+          <div className="space-y-3">
+            {/* Deck Incomplete Warning */}
             {profile.deck.length < 10 && (
-              <div className="bg-amber-950/30 border border-amber-500/40 rounded-xl p-2.5 flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-                <p className="text-[10px] text-amber-200 leading-tight">
-                  Deck incomplete ({profile.deck.length}/10). Select 10 cards in CARDS tab.
-                </p>
+              <div className="bg-amber-950/20 border border-amber-500/35 rounded-xl p-3 flex items-start gap-2.5">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <h5 className="font-display font-bold text-xs text-amber-300 uppercase">DECK INCOMPLETE</h5>
+                  <p className="text-[10px] text-gray-400 mt-0.5 leading-relaxed">
+                    You have selected {profile.deck.length}/10 cards for battle. Please add exactly 10 creatures to your battle deck in the <strong>CARDS</strong> tab before entering the arena.
+                  </p>
+                </div>
               </div>
             )}
 
-            {/* Duel Console Card */}
-            <div className="bg-gradient-to-b from-[#181116] via-[#100b11] to-[#080509] border border-[#c5a880]/30 rounded-2xl p-3 shadow-xl relative overflow-hidden space-y-2.5">
-              <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-xl bg-black/60 border border-rose-500/40 flex items-center justify-center p-1 shrink-0">
+            {/* READY FOR RANKED DUEL Console Card (PC Image 4 Parity) */}
+            <div className="bg-gradient-to-b from-[#181216] via-[#120c11] to-[#0a0709] border border-[#c5a880]/25 rounded-2xl p-4 sm:p-5 shadow-2xl relative overflow-hidden space-y-4">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-rose-500/10 blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-500/5 blur-3xl pointer-events-none" />
+
+              {/* Header: Sigil + Title + Peace Shield Banner */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10 border-b border-white/10 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-black/60 border border-rose-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.25)] shrink-0 p-1.5">
                     <img src="/icons/arena_duel_emblem.png" alt="" className="w-full h-full object-contain" />
                   </div>
                   <div>
-                    <h3 className="font-display font-black text-xs text-white uppercase tracking-wider text-shadow-gold">
-                      RANKED DUEL ARENA
+                    <h3 className="font-display font-black text-sm sm:text-base text-white tracking-widest uppercase text-shadow-gold leading-tight">
+                      READY FOR RANKED DUEL
                     </h3>
-                    <span className="text-[9px] font-mono text-gray-400 block">Season 1 Ladder</span>
+                    <p className="text-[10px] text-gray-400 font-mono mt-0.5">
+                      Season 1 Matchmaking • Duel other lords & climb
+                    </p>
                   </div>
                 </div>
 
-                {/* Peace Shield status */}
-                <div 
+                {/* Minimalist Peace Shield Indicator (Matching PC Image 4) */}
+                <div
                   onClick={() => setIsShieldModalOpen(true)}
-                  className="flex items-center gap-1 bg-black/60 border border-white/10 px-2 py-1 rounded-lg cursor-pointer hover:border-purple-400/50"
+                  className={`group flex items-center gap-2.5 px-3 py-1.5 rounded-2xl border transition-all duration-300 cursor-pointer select-none self-start sm:self-auto shrink-0 ${
+                    shieldTimeLeft
+                      ? 'bg-gradient-to-r from-emerald-950/90 via-[#0a231b]/90 to-black/90 border-emerald-500/60 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-[1.02]'
+                      : 'bg-gradient-to-r from-[#17131e]/90 via-[#100d16]/90 to-black/90 border-white/15 hover:border-purple-400/60 hover:scale-[1.02]'
+                  }`}
+                  title="Peace Shield Status"
                 >
-                  <img src="/icons/shield_indicator.png" alt="" className="w-3.5 h-3.5 object-contain" />
-                  <span className="text-[9px] font-mono font-bold text-gray-300">
-                    {shieldTimeLeft ? shieldTimeLeft : 'NO SHIELD'}
-                  </span>
+                  <div className={`relative w-8 h-8 rounded-xl flex items-center justify-center border shrink-0 ${
+                    shieldTimeLeft
+                      ? 'bg-emerald-950/90 border-emerald-500/70 shadow-[0_0_12px_rgba(16,185,129,0.4)]'
+                      : 'bg-black/70 border-white/15'
+                  }`}>
+                    <img 
+                      src="/icons/shield_indicator.png" 
+                      alt="" 
+                      className={`w-5 h-5 object-contain ${shieldTimeLeft ? 'animate-pulse' : 'opacity-70'}`} 
+                    />
+                    {shieldTimeLeft && (
+                      <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-80"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="text-left">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[9px] font-mono tracking-wider font-bold uppercase text-gray-400">
+                        PEACE SHIELD
+                      </span>
+                      <span className={`text-[7.5px] font-mono font-black px-1.5 py-0.2 rounded uppercase border ${
+                        shieldTimeLeft
+                          ? 'bg-emerald-950 border-emerald-500/60 text-emerald-300'
+                          : 'bg-rose-950/80 border-rose-500/40 text-rose-300'
+                      }`}>
+                        {shieldTimeLeft ? 'ACTIVE' : 'OFF'}
+                      </span>
+                    </div>
+
+                    <div className="font-mono font-black text-[11px] sm:text-xs mt-0.5 flex items-center gap-1">
+                      {shieldTimeLeft ? (
+                        <span className="text-emerald-300 tracking-wider flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-emerald-400" />
+                          <span>{shieldTimeLeft}</span>
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 group-hover:text-purple-300 transition-colors flex items-center gap-1">
+                          <span>UNPROTECTED</span>
+                          <span className="text-purple-400 font-mono uppercase underline ml-0.5">
+                            ACTIVATE →
+                          </span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Victory vs Defeat Rewards Preview */}
-              <div className="grid grid-cols-2 gap-2">
-                {/* Win Spoils */}
-                <div className="bg-emerald-950/20 border border-emerald-500/30 rounded-xl p-2 space-y-1">
-                  <span className="text-[8px] font-mono text-emerald-400 font-bold uppercase block tracking-wider">
-                    VICTORY SPOILS (WIN)
-                  </span>
-                  <div className="grid grid-cols-2 gap-1 text-[9px] font-mono text-white">
-                    <span className="flex items-center gap-0.5 text-amber-400">
-                      +50 <img src="/icons/icon_gold.webp" alt="" className="w-2.5 h-2.5" />
+              {/* Victory & Defeat Rewards Grid (Matching PC Image 4) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 relative z-10">
+                {/* Victory Rewards Card */}
+                <div className="bg-gradient-to-b from-[#181a10]/90 via-[#0e1208]/90 to-[#060804]/90 border border-emerald-500/30 rounded-2xl p-3 space-y-2 shadow-lg shadow-emerald-950/20">
+                  <div className="flex items-center justify-between border-b border-emerald-500/20 pb-1.5">
+                    <span className="text-[10px] font-display text-emerald-400 uppercase font-black tracking-wider flex items-center gap-1">
+                      <Trophy className="w-3.5 h-3.5 text-emerald-400" /> VICTORY REWARDS
                     </span>
-                    <span className="flex items-center gap-0.5 text-cyan-400">
-                      +25 <img src="/icons/icon_dust.webp" alt="" className="w-3 h-3" />
+                    <span className="text-[8px] font-mono text-emerald-400 font-bold tracking-widest bg-emerald-950/60 px-1.5 py-0.2 rounded border border-emerald-500/30">
+                      WIN
                     </span>
-                    <span className="flex items-center gap-0.5 text-emerald-400">
-                      +100 EXP
-                    </span>
-                    <span className="flex items-center gap-0.5 text-amber-300 font-bold">
-                      +20 👑
-                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {/* Gold */}
+                    <div className="bg-black/50 border border-amber-500/20 p-1.5 rounded-xl text-center flex flex-col items-center justify-center">
+                      <span className="text-amber-400 font-display font-bold text-xs block flex items-center gap-1 text-shadow-gold">
+                        +50
+                        <img src="/icons/icon_gold.webp" alt="" className="w-3.5 h-3.5 object-contain" />
+                      </span>
+                      <span className="text-[7.5px] text-amber-500/80 font-mono tracking-wider uppercase font-bold mt-0.5">Gold</span>
+                    </div>
+
+                    {/* Dust */}
+                    <div className="bg-black/50 border border-cyan-500/20 p-1.5 rounded-xl text-center flex flex-col items-center justify-center">
+                      <span className="text-cyan-400 font-display font-bold text-xs block flex items-center gap-1 text-shadow-cyan">
+                        +25
+                        <img src="/icons/icon_dust.webp" alt="" className="w-4 h-4 object-contain" />
+                      </span>
+                      <span className="text-[7.5px] text-cyan-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">Dust</span>
+                    </div>
+
+                    {/* EXP */}
+                    <div className="bg-black/50 border border-emerald-500/20 p-1.5 rounded-xl text-center flex flex-col items-center justify-center">
+                      <span className="text-emerald-400 font-display font-bold text-xs block flex items-center gap-1 text-shadow-emerald">
+                        +100
+                        <img src="/icons/icon_exp.webp" alt="" className="w-3.5 h-3.5 object-contain" />
+                      </span>
+                      <span className="text-[7.5px] text-emerald-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">EXP</span>
+                    </div>
+
+                    {/* Crowns */}
+                    <div className="bg-black/50 border border-amber-500/20 p-1.5 rounded-xl text-center flex flex-col items-center justify-center">
+                      <span className="text-amber-400 font-display font-bold text-xs block flex items-center gap-1">
+                        +20
+                        <img src="/icons/crown.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                      </span>
+                      <span className="text-[7.5px] text-amber-500/80 font-mono tracking-wider uppercase font-bold mt-0.5">Crowns</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Loss Penalty */}
-                <div className="bg-rose-950/20 border border-rose-500/30 rounded-xl p-2 space-y-1">
-                  <span className="text-[8px] font-mono text-rose-400 font-bold uppercase block tracking-wider">
-                    DEFEAT PENALTY (LOSS)
-                  </span>
-                  <div className="grid grid-cols-2 gap-1 text-[9px] font-mono text-white">
-                    <span className="flex items-center gap-0.5 text-rose-400 font-bold">
-                      -15 👑
+                {/* Defeat Penalty Card */}
+                <div className="bg-gradient-to-b from-[#1a0c0e]/90 via-[#120608]/90 to-[#080304]/90 border border-rose-500/25 rounded-2xl p-3 space-y-2 shadow-lg shadow-rose-950/20">
+                  <div className="flex items-center justify-between border-b border-rose-500/20 pb-1.5">
+                    <span className="text-[10px] font-display text-rose-400 uppercase font-black tracking-wider flex items-center gap-1">
+                      <Shield className="w-3.5 h-3.5 text-rose-400" /> DEFEAT PENALTY
                     </span>
-                    <span className="flex items-center gap-0.5 text-gray-400">
-                      +20 <img src="/icons/icon_gold.webp" alt="" className="w-2.5 h-2.5 opacity-70" />
+                    <span className="text-[8px] font-mono text-rose-400 font-bold tracking-widest bg-rose-950/60 px-1.5 py-0.2 rounded border border-rose-500/30">
+                      LOSS
                     </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {/* Crown Loss */}
+                    <div className="bg-black/50 border border-rose-500/20 p-1.5 rounded-xl text-center flex flex-col items-center justify-center">
+                      <span className="text-rose-400 font-display font-bold text-xs block flex items-center gap-1">
+                        -15
+                        <img src="/icons/crown.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                      </span>
+                      <span className="text-[7.5px] text-rose-400/90 font-mono tracking-wider uppercase font-bold mt-0.5">Crowns Lost</span>
+                    </div>
+
+                    {/* Consolation Gold */}
+                    <div className="bg-black/50 border border-white/5 p-1.5 rounded-xl text-center flex flex-col items-center justify-center">
+                      <span className="text-gray-300 font-display font-bold text-xs block flex items-center gap-1">
+                        +20
+                        <img src="/icons/icon_gold.webp" alt="" className="w-3.5 h-3.5 object-contain opacity-75" />
+                      </span>
+                      <span className="text-[7.5px] text-gray-400 font-mono tracking-wider uppercase font-bold mt-0.5">Consolation</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Primary Action Button: FIND OPPONENT */}
-              <button
-                onClick={() => handleFindOpponent(false, true)}
-                disabled={isMatching}
-                className="w-full py-3 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:brightness-110 active:scale-98 rounded-xl font-display font-black text-xs text-white uppercase tracking-widest shadow-[0_0_20px_rgba(225,29,72,0.4)] flex items-center justify-center gap-2 cursor-pointer transition-all border border-rose-400/50"
-              >
-                <Swords className="w-4 h-4 animate-pulse" />
-                <span>FIND OPPONENT</span>
-                <span className="flex items-center gap-1 bg-black/60 border border-rose-400/60 rounded-full px-2 py-0.5 font-mono text-xs text-rose-300 font-bold">
-                  1 <img src="/icons/ticket.png" alt="" className="w-3.5 h-3.5 object-contain" />
-                </span>
-              </button>
-            </div>
-
-            {/* Featured Realm Rivals from League */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between px-1">
-                <span className="font-display font-bold text-[10px] text-gray-400 uppercase tracking-wider flex items-center gap-1">
-                  <Trophy className="w-3 h-3 text-amber-400" />
-                  REALM RIVALS ({myLeague})
-                </span>
+              {/* Primary Action Button: FIND OPPONENT (Matching PC Image 4) */}
+              <div className="pt-1 relative z-10 flex flex-col items-center">
                 <button
-                  onClick={() => fetchLeaderboard(myLeague)}
-                  className="text-[9px] font-mono text-gray-400 hover:text-white flex items-center gap-1 cursor-pointer"
+                  onClick={() => handleFindOpponent(false, true)}
+                  disabled={isMatching}
+                  className="w-full max-w-md font-display font-black tracking-widest py-3.5 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer hover:scale-[1.01] active:scale-[0.98] text-xs sm:text-sm uppercase bg-gradient-to-b from-[#2f1116] via-[#1c080b] to-[#100305] border-2 border-rose-600/50 hover:border-rose-400 text-rose-200 hover:text-white shadow-[0_0_15px_rgba(225,29,72,0.2)] hover:shadow-[0_0_25px_rgba(244,63,94,0.4)]"
                 >
-                  <RefreshCw className={`w-2.5 h-2.5 ${isLoadingLeaderboard ? 'animate-spin' : ''}`} />
-                  <span>REFRESH</span>
+                  <Swords className="w-4 h-4 animate-pulse text-rose-400 shrink-0" />
+                  <span className="tracking-wider">FIND OPPONENT</span>
+                  <span className="flex items-center gap-1 bg-black/60 border border-rose-500/40 rounded-full px-2.5 py-0.5 font-mono text-xs font-bold text-rose-400 shadow-inner">
+                    1
+                    <img src="/icons/ticket.png" alt="" className="w-4 h-4 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(255,40,60,0.55)]" />
+                  </span>
                 </button>
               </div>
 
-              <div className="grid grid-cols-3 gap-1.5">
-                {leaderboard.length === 0 ? (
-                  <div className="col-span-3 text-center py-4 bg-black/30 rounded-xl border border-white/5 text-[9px] font-mono text-gray-500">
-                    No active challengers in queue. Tap FIND OPPONENT above!
-                  </div>
-                ) : (
-                  leaderboard.slice(0, 3).map((opp, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-gradient-to-b from-[#181216] to-[#0a0709] border border-rose-500/25 rounded-xl p-2 flex flex-col justify-between shadow-md"
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-7 h-7 rounded-full border border-amber-400/60 overflow-hidden bg-black shrink-0">
-                          <img 
-                            src={getSafeAvatarUrl(opp.avatarUrl)} 
-                            alt="" 
-                            className="w-full h-full object-cover" 
-                            onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/avatars/knight.webp'; }}
-                          />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <h4 className="font-display font-bold text-[10px] text-white truncate leading-none">
-                            {opp.name || opp.username || 'Summoner'}
-                          </h4>
-                          <span className="text-[8px] font-mono text-amber-400 block mt-0.5">
-                            {opp.lp || opp.rating || 100} 👑
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="my-1.5 py-0.5 border-y border-white/5 flex items-center justify-between text-[8px] font-mono text-gray-400">
-                        <span>Rank #{idx + 1}</span>
-                        <span className="text-rose-300">{opp.deck?.length || 10} Cards</span>
-                      </div>
-
-                      <button
-                        onClick={() => handleFight(opp)}
-                        disabled={isMatching}
-                        className="w-full py-1 bg-rose-600/80 hover:bg-rose-500 active:scale-95 text-white font-display font-black text-[8.5px] uppercase tracking-wider rounded-lg transition-all cursor-pointer"
-                      >
-                        DUEL NOW
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
             </div>
           </div>
         )}
 
-        {/* TAB 2: LADDER (LEADERBOARD HALL) */}
+        {/* TAB 2: LADDER (LEADERBOARD HALL - Matching Screenshots 3 & 4) */}
         {activeTab === 'ladder' && (
-          <div className="space-y-2">
-            {/* League Navigator Carousel */}
-            <div className="flex items-center justify-between bg-black/60 border border-white/10 rounded-2xl p-2 px-3 shadow-md">
+          <div className="bg-[#12151c] border border-white/10 rounded-2xl p-3 sm:p-4 shadow-2xl space-y-3">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4 text-amber-400" />
+                <h3 className="font-display font-bold text-xs sm:text-sm text-white tracking-widest uppercase">
+                  LEADERBOARD HALL
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsLeagueRulesModalOpen(true)}
+                className="flex items-center gap-1 py-1 px-2.5 rounded-xl bg-amber-950/60 border border-amber-500/50 text-amber-300 font-display font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 cursor-pointer"
+              >
+                <Info className="w-3.5 h-3.5 text-amber-400" />
+                <span>RULES</span>
+              </button>
+            </div>
+
+            {/* Round Countdown Timer Banner (Matching PC Image 4) */}
+            <div className="bg-gradient-to-r from-amber-950/30 via-[#16120e] to-black/40 border border-white/10 rounded-xl p-2.5 flex items-center justify-between shadow-inner">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
+                  <Timer className="w-3 h-3 text-amber-400 animate-pulse" />
+                </div>
+                <div>
+                  <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider block font-bold">ROUND RESET</span>
+                  <span className="text-[9px] text-amber-400/80 font-sans">Daily at 00:00 UTC</span>
+                </div>
+              </div>
+              <div className="font-mono text-xs font-bold text-amber-300 bg-black/60 border border-white/10 px-2 py-0.5 rounded-lg">
+                {formatCountdown(timeRemaining)}
+              </div>
+            </div>
+
+            {/* Promotion / Demotion Quick Legend Bar (Matching PC Image 4) */}
+            <div className="bg-black/50 border border-white/5 rounded-xl p-2 flex items-center justify-between text-[9px] font-mono">
+              <span className="text-emerald-400 font-bold">
+                ▲ {LEAGUE_QUICK_RULES[viewingLeague]?.promo || 'Promote'}
+              </span>
+              <span className="text-gray-300">
+                {LEAGUE_QUICK_RULES[viewingLeague]?.safe || 'Safe'}
+              </span>
+              <span className="text-rose-400 font-bold">
+                ▼ {LEAGUE_QUICK_RULES[viewingLeague]?.demo || 'Demote'}
+              </span>
+            </div>
+
+            {/* League Selector Carousel (Matching PC Image 4) */}
+            <div className="flex items-center justify-between bg-black/60 border border-white/10 rounded-xl p-2 px-3 shadow-md">
               <button
                 onClick={() => cycleLeague('prev')}
-                className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-300 flex items-center justify-center active:scale-95 cursor-pointer"
+                className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 flex items-center justify-center active:scale-95 cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -929,46 +1036,26 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                 <img 
                   src={getLeagueDetails(viewingLeague).icon} 
                   alt="" 
-                  className="w-7 h-7 object-contain"
+                  className="w-7 h-7 object-contain" 
                 />
-                <div className="text-center">
-                  <span className={`font-display font-black text-xs uppercase tracking-wider block ${getLeagueDetails(viewingLeague).accent}`}>
-                    {viewingLeague === 'More Leagues Soon' ? 'EXPANSION' : `${getLeagueDetails(viewingLeague).name} LEAGUE`}
-                  </span>
-                  {(profile.pvpLeague || 'Bronze').toLowerCase() === viewingLeague.toLowerCase() && (
-                    <span className="text-[8px] font-mono text-emerald-400 font-bold">
-                      ⭐ Your League
-                    </span>
-                  )}
-                </div>
+                <span className={`font-display font-black text-xs sm:text-sm uppercase tracking-wider ${getLeagueDetails(viewingLeague).accent}`}>
+                  {viewingLeague === 'More Leagues Soon' ? 'EXPANSION' : `${getLeagueDetails(viewingLeague).name} LEAGUE`}
+                </span>
               </div>
 
               <button
                 onClick={() => cycleLeague('next')}
-                className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-300 flex items-center justify-center active:scale-95 cursor-pointer"
+                className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 flex items-center justify-center active:scale-95 cursor-pointer"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Quick Rules Legend */}
-            <div className="bg-black/40 border border-white/5 rounded-xl p-1.5 flex items-center justify-between text-[9px] font-mono text-gray-400">
-              <span className="text-emerald-400 font-bold">
-                ▲ {LEAGUE_QUICK_RULES[viewingLeague]?.promo || 'Promote'}
-              </span>
-              <span>
-                🛡️ {LEAGUE_QUICK_RULES[viewingLeague]?.safe || 'Safe'}
-              </span>
-              <span className="text-rose-400 font-bold">
-                ▼ {LEAGUE_QUICK_RULES[viewingLeague]?.demo || 'Demote'}
-              </span>
-            </div>
-
-            {/* Leaderboard Table List */}
-            <div className="space-y-1">
+            {/* Summoners List (Matching PC Image 3 & 4) */}
+            <div className="space-y-1.5 max-h-[380px] overflow-y-auto pr-0.5">
               {leaderboard.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 font-mono text-[10px]">
-                  No summoners recorded in this league yet.
+                  No summoners registered in this league yet.
                 </div>
               ) : (
                 leaderboard.map((player, idx) => {
@@ -980,27 +1067,29 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                   return (
                     <div
                       key={idx}
-                      className={`p-2 rounded-xl border flex items-center justify-between transition-all ${
+                      className={`p-2 sm:p-2.5 rounded-xl border flex items-center justify-between transition-all ${
                         isSelf
-                          ? 'bg-cyan-950/40 border-cyan-400/80 shadow-[0_0_10px_rgba(6,182,212,0.25)]'
+                          ? 'bg-purple-950/30 border-purple-500/60 shadow-[0_0_12px_rgba(168,85,247,0.25)]'
                           : rank === 1
-                          ? 'bg-amber-950/25 border-amber-500/40'
+                          ? 'bg-amber-950/20 border-amber-500/40'
                           : 'bg-black/50 border-white/5'
                       }`}
                     >
                       <div className="flex items-center gap-2 min-w-0">
+                        {/* Rank Position */}
                         <span className={`w-5 text-center font-mono font-bold text-xs ${
                           rank === 1 ? 'text-amber-400 font-black' :
-                          rank === 2 ? 'text-gray-300 font-bold' :
+                          rank === 2 ? 'text-slate-300 font-bold' :
                           rank === 3 ? 'text-amber-600 font-bold' :
                           'text-gray-500'
                         }`}>
                           #{rank}
                         </span>
 
+                        {/* Avatar */}
                         <div className={`w-6 h-6 rounded-full overflow-hidden shrink-0 border ${
-                          subTier === 'ultra' ? 'border-purple-400 ring-1 ring-purple-400' :
-                          subTier === 'premium' ? 'border-amber-400 ring-1 ring-amber-400' :
+                          subTier === 'ultra' ? 'border-purple-400 ring-1 ring-purple-400/80' :
+                          subTier === 'premium' ? 'border-amber-400 ring-1 ring-amber-400/80' :
                           'border-white/10'
                         }`}>
                           <img 
@@ -1011,8 +1100,9 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                           />
                         </div>
 
-                        <div className="min-w-0 flex items-center gap-1">
-                          <span className={`font-display font-bold text-xs truncate max-w-[110px] ${
+                        {/* Username */}
+                        <div className="min-w-0 flex items-center gap-1 truncate">
+                          <span className={`font-display font-bold text-xs truncate max-w-[120px] ${
                             isSelf ? 'text-cyan-300 font-black' :
                             subTier === 'ultra' ? 'text-purple-300 font-black' :
                             subTier === 'premium' ? 'text-amber-300 font-black' :
@@ -1030,7 +1120,8 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1 font-mono text-xs font-bold text-amber-400 shrink-0">
+                      {/* Crowns */}
+                      <div className="flex items-center gap-1 font-mono text-xs font-bold text-amber-300 shrink-0">
                         <span>{player.pvpLP !== undefined ? player.pvpLP : (player.pvpRating || 0)}</span>
                         <img src="/icons/crown.png" alt="" className="w-3.5 h-3.5 object-contain" />
                       </div>
@@ -1042,32 +1133,56 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
           </div>
         )}
 
-        {/* TAB 3: REWARDS (LEAGUE TRIBUTES) */}
+        {/* TAB 3: LEAGUE REWARDS (Exact match with PC Screenshots 1 & 2) */}
         {activeTab === 'rewards' && (
-          <div className="space-y-2">
-            {/* Header Standing Banner */}
-            <div className="bg-gradient-to-b from-[#1c140f] to-[#0a0705] border border-amber-500/30 rounded-2xl p-2.5 shadow-md flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <img src={league.icon} alt="" className="w-8 h-8 object-contain" />
-                <div>
-                  <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider block">YOUR LEAGUE TRIBUTE</span>
-                  <span className="font-display font-bold text-xs text-white">
-                    {league.name} League • #{myOwnLeagueRank}
+          <div className="space-y-3">
+            {/* Header Banner (Matching PC Image 2) */}
+            <div className="bg-gradient-to-b from-[#1c140f] via-[#120d09] to-[#0a0705] border border-amber-500/30 rounded-2xl p-3 sm:p-4 space-y-2.5 shadow-2xl relative overflow-hidden">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <div className="flex items-center gap-1.5">
+                  <Trophy className="w-4 h-4 text-amber-400" />
+                  <h3 className="font-display font-black text-xs sm:text-sm text-white tracking-widest uppercase">
+                    DAILY LEAGUE TRIBUTES
+                  </h3>
+                </div>
+                <div className="flex items-center gap-1 bg-black/60 border border-amber-500/30 px-2 py-0.5 rounded-lg">
+                  <Timer className="w-3 h-3 text-amber-400 animate-pulse" />
+                  <span className="font-mono text-[9px] text-amber-300 font-bold">
+                    NEXT DECREE IN {formatCountdown(timeRemaining)}
                   </span>
                 </div>
               </div>
 
-              <div className="text-right font-mono">
-                <span className="text-[8px] text-gray-400 block uppercase">RESET IN</span>
-                <span className="text-[10px] text-amber-300 font-bold">{formatCountdown(timeRemaining)}</span>
+              <p className="text-[10px] text-gray-300 font-sans leading-relaxed">
+                Each day at <strong className="text-amber-400 font-mono">00:00 UTC</strong>, the realm decrees daily rewards based on your final season standing. Rewards are attached to official decrees in your <strong>Mailbox</strong>.
+              </p>
+
+              {/* Player Current Standing Card (Matching PC Image 2) */}
+              <div className="bg-black/50 border border-white/10 rounded-xl p-2.5 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <img src={league.icon} alt="" className="w-8 h-8 object-contain" />
+                  <div>
+                    <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider block">YOUR CURRENT STANDING</span>
+                    <span className="font-display font-black text-xs text-white">
+                      <span className={league.accent}>{league.name} League</span> • Rank #{myOwnLeagueRank} ({profile.pvpLP || 0} Crowns)
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setSelectedRewardLeague(profile.pvpLeague || 'Bronze')}
+                  className="text-[9px] font-mono font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 px-2 py-1 rounded-lg transition-all active:scale-95 cursor-pointer whitespace-nowrap"
+                >
+                  View My League →
+                </button>
               </div>
             </div>
 
-            {/* League Selector Carousel */}
-            <div className="flex items-center justify-between bg-black/60 border border-white/10 rounded-2xl p-2 px-3 shadow-md">
+            {/* League Selector Carousel (Matching PC Image 2) */}
+            <div className="flex items-center justify-between bg-black/60 border border-white/10 rounded-2xl p-2 px-3 shadow-xl">
               <button
                 onClick={() => cycleRewardLeague('prev')}
-                className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-300 flex items-center justify-center active:scale-95 cursor-pointer"
+                className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-white flex items-center justify-center cursor-pointer transition-all active:scale-95"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -1078,143 +1193,237 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                   alt="" 
                   className="w-7 h-7 object-contain" 
                 />
-                <span className={`font-display font-black text-xs uppercase tracking-wider ${getLeagueDetails(selectedRewardLeague).accent}`}>
-                  {selectedRewardLeague === 'More Leagues Soon' ? 'EXPANSION' : `${getLeagueDetails(selectedRewardLeague).name} LEAGUE`}
-                </span>
+                <div className="text-center">
+                  <span className={`font-display font-black text-xs sm:text-sm uppercase tracking-wider block ${getLeagueDetails(selectedRewardLeague).accent}`}>
+                    {selectedRewardLeague === 'More Leagues Soon' ? 'EXPANSION' : `${getLeagueDetails(selectedRewardLeague).name} LEAGUE`}
+                  </span>
+                  {(profile.pvpLeague || 'Bronze').toLowerCase() === selectedRewardLeague.toLowerCase() && (
+                    <span className="text-[8px] font-mono font-bold text-emerald-400 block">
+                      ⭐ Your Active League
+                    </span>
+                  )}
+                </div>
               </div>
 
               <button
                 onClick={() => cycleRewardLeague('next')}
-                className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-300 flex items-center justify-center active:scale-95 cursor-pointer"
+                className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-white flex items-center justify-center cursor-pointer transition-all active:scale-95"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Tier Brackets List */}
+            {/* Detailed Breakdown for Selected League (Exact match with PC Screenshot 1) */}
             {(() => {
               const rewardsList = leagueRewardsConfig && leagueRewardsConfig.length > 0 ? leagueRewardsConfig : ALL_LEAGUE_REWARDS;
               const currentTier = rewardsList.find((t: any) => t.name.toLowerCase() === selectedRewardLeague.toLowerCase()) || rewardsList[0];
 
               return (
-                <div className="space-y-1.5">
-                  {currentTier.brackets.map((bracket, bIdx) => (
-                    <div
-                      key={bIdx}
-                      className={`p-2 rounded-xl border flex items-center justify-between ${
-                        bracket.isPromotion ? 'bg-emerald-950/25 border-emerald-500/40' :
-                        bracket.isDemotion ? 'bg-rose-950/25 border-rose-500/30' :
-                        'bg-black/50 border-white/5'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-display font-bold text-xs text-white">
-                          {bracket.rankLabel}
-                        </span>
-                        {bracket.isPromotion && (
-                          <span className="text-[7.5px] font-mono font-black text-emerald-400 bg-emerald-950 px-1 rounded border border-emerald-500/30">
-                            ▲ PROMOTES
-                          </span>
-                        )}
-                        {bracket.isDemotion && (
-                          <span className="text-[7.5px] font-mono font-black text-rose-400 bg-rose-950 px-1 rounded border border-rose-500/30">
-                            ▼ DEMOTES
-                          </span>
-                        )}
-                      </div>
+                <div className="bg-gradient-to-b from-[#181216] via-[#100b11] to-[#080509] border border-white/15 rounded-2xl p-3 sm:p-4 space-y-3 shadow-2xl">
+                  {/* League Card Header */}
+                  <div className="flex items-center gap-3 border-b border-white/10 pb-2.5">
+                    <img 
+                      src={currentTier.icon} 
+                      alt="" 
+                      className="w-9 h-9 sm:w-11 sm:h-11 object-contain" 
+                    />
+                    <h4 className="font-display font-black text-sm sm:text-base text-white tracking-widest uppercase">
+                      {currentTier.name} LEAGUE
+                    </h4>
+                  </div>
 
-                      <div className="flex items-center gap-1.5 font-mono text-[10px] font-bold">
-                        {bracket.sovereigns !== undefined && bracket.sovereigns > 0 && (
-                          <div className="flex items-center gap-0.5 text-amber-300 bg-amber-950/60 border border-amber-500/30 px-1.5 py-0.5 rounded">
-                            <img src="/icons/icon_sovereign.webp" alt="" className="w-3 h-3 object-contain" />
-                            <span>+{bracket.sovereigns}</span>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-0.5 text-amber-400">
-                          <img src="/icons/icon_gold.webp" alt="" className="w-3 h-3 object-contain" />
-                          <span>+{bracket.gold}</span>
+                  {/* Header Row */}
+                  <div className="flex items-center justify-between text-[9px] font-mono text-gray-400 uppercase tracking-widest px-1 font-bold">
+                    <span>RANK STANDING</span>
+                    <span>DAILY REWARDS</span>
+                  </div>
+
+                  {/* Brackets Rows (Matching PC Image 1) */}
+                  <div className="space-y-2">
+                    {currentTier.brackets.map((bracket, bIdx) => (
+                      <div
+                        key={bIdx}
+                        className={`p-2.5 sm:p-3 rounded-2xl border transition-all flex items-center justify-between gap-2 ${
+                          bracket.isPromotion 
+                            ? 'bg-gradient-to-r from-emerald-950/30 via-black/60 to-black/60 border-emerald-500/40 shadow-sm'
+                            : bracket.isDemotion
+                            ? 'bg-gradient-to-r from-rose-950/30 via-black/60 to-black/60 border-rose-500/40'
+                            : 'bg-black/50 border-white/10 hover:border-white/20'
+                        }`}
+                      >
+                        {/* Left: Rank Label & Status Badge */}
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-display font-black text-xs sm:text-sm text-white tracking-wide">
+                            {bracket.rankLabel}
+                          </span>
+                          {bracket.isPromotion && (
+                            <span className="text-[8px] font-mono font-black uppercase text-emerald-400 bg-emerald-950/80 border border-emerald-500/50 px-1.5 py-0.2 rounded">
+                              ▲ PROMOTES
+                            </span>
+                          )}
+                          {bracket.isDemotion && (
+                            <span className="text-[8px] font-mono font-black uppercase text-rose-400 bg-rose-950/80 border border-rose-500/50 px-1.5 py-0.2 rounded">
+                              ▼ DEMOTES
+                            </span>
+                          )}
                         </div>
-                        <div className="flex items-center gap-0.5 text-cyan-300">
-                          <img src="/icons/icon_dust.webp" alt="" className="w-3 h-3 object-contain" />
-                          <span>+{bracket.dust}</span>
+
+                        {/* Right: Authentic PC glowing reward pill badges (Matching PC Image 1) */}
+                        <div className="flex items-center gap-1 sm:gap-2 flex-wrap justify-end">
+                          {/* Blood Sovereigns */}
+                          {bracket.sovereigns !== undefined && bracket.sovereigns > 0 && (
+                            <div className="bg-gradient-to-b from-amber-950/70 via-black to-black border border-amber-400/70 px-2 sm:px-2.5 py-1 rounded-xl flex items-center gap-1 shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+                              <img 
+                                src="/icons/icon_sovereign.webp" 
+                                alt="" 
+                                className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain brightness-110 shrink-0" 
+                              />
+                              <span className="font-display font-black text-[10px] sm:text-xs text-amber-300">
+                                +{bracket.sovereigns}
+                              </span>
+                              <span className="text-[8px] font-mono text-amber-400/80 font-bold hidden sm:inline">SOV</span>
+                            </div>
+                          )}
+
+                          {/* Gold */}
+                          <div className="bg-gradient-to-b from-yellow-950/50 via-black to-black border border-yellow-500/40 px-2 sm:px-2.5 py-1 rounded-xl flex items-center gap-1 shadow-inner">
+                            <img 
+                              src="/icons/icon_gold.webp" 
+                              alt="" 
+                              className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain brightness-110 shrink-0" 
+                            />
+                            <span className="font-display font-black text-[10px] sm:text-xs text-amber-300">
+                              +{bracket.gold}
+                            </span>
+                            <span className="text-[8px] font-mono text-amber-400/70 font-bold hidden sm:inline">GOLD</span>
+                          </div>
+
+                          {/* Dust */}
+                          <div className="bg-gradient-to-b from-cyan-950/50 via-black to-black border border-cyan-500/40 px-2 sm:px-2.5 py-1 rounded-xl flex items-center gap-1 shadow-inner">
+                            <img 
+                              src="/icons/icon_dust.webp" 
+                              alt="" 
+                              className="w-4 h-4 sm:w-4.5 sm:h-4.5 object-contain brightness-115 shrink-0" 
+                            />
+                            <span className="font-display font-black text-[10px] sm:text-xs text-[#66fcf1]">
+                              +{bracket.dust}
+                            </span>
+                            <span className="text-[8px] font-mono text-cyan-400/70 font-bold hidden sm:inline">DUST</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               );
             })()}
           </div>
         )}
 
-        {/* TAB 4: HISTORY (DEFENSE LOG) */}
+        {/* TAB 4: HISTORY (Exact match with PC Screenshot 3) */}
         {activeTab === 'history' && (
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between pb-1 border-b border-white/10 px-1">
-              <span className="font-display font-bold text-[10px] text-gray-400 uppercase">RECENT COMBAT LOGS</span>
-              <span className="font-mono text-[9px] text-gray-500">
-                {(profile.pvpHistory || []).length} Recorded
+          <div className="bg-gradient-to-b from-[#181216] via-[#120c11] to-[#0a0709] border border-[#c5a880]/25 rounded-2xl p-3 sm:p-4 space-y-3 shadow-2xl relative overflow-hidden">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2 px-1">
+              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-bold flex items-center gap-1.5">
+                <History className="w-3.5 h-3.5 text-cyan-400" /> RECENT COMBAT LOGS
+              </span>
+              <span className="text-[8.5px] font-mono text-gray-500 bg-black/40 border border-white/5 px-2 py-0.5 rounded-full">
+                {profile.pvpHistory?.length || 0} Recorded
               </span>
             </div>
 
-            {(profile.pvpHistory || []).length === 0 ? (
-              <div className="text-center py-8 text-gray-500 font-mono text-[10px]">
+            {!profile.pvpHistory || profile.pvpHistory.length === 0 ? (
+              <div className="text-center py-10 text-gray-500 font-mono text-xs">
                 No combat records yet. Duel challengers to climb the ladder!
               </div>
             ) : (
-              profile.pvpHistory.map((record: any, idx: number) => {
-                const isWin = (record.winner === 'attacker' && !record.isDefense) || (record.winner === 'defender' && record.isDefense);
-                const lpChange = record.isDefense 
-                  ? (record.defenderLPChange !== undefined ? record.defenderLPChange : record.defenderRatingChange)
-                  : (record.attackerLPChange !== undefined ? record.attackerLPChange : record.attackerRatingChange);
-                const dateStr = new Date(record.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+              <div className="space-y-2">
+                {profile.pvpHistory.map((record: any) => {
+                  const isWin = (record.winner === 'attacker' && !record.isDefense) || (record.winner === 'defender' && record.isDefense);
+                  const lpChange = record.isDefense 
+                    ? (record.defenderLPChange !== undefined ? record.defenderLPChange : record.defenderRatingChange)
+                    : (record.attackerLPChange !== undefined ? record.attackerLPChange : record.attackerRatingChange);
+                  const dateStr = new Date(record.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                  
+                  const beforeLP = record.isDefense 
+                    ? (record.defenderLPBefore !== undefined ? record.defenderLPBefore : record.defenderRatingBefore) 
+                    : (record.attackerLPBefore !== undefined ? record.attackerLPBefore : record.attackerRatingBefore);
+                  const afterLP = beforeLP + lpChange;
 
-                return (
-                  <div
-                    key={record.id || idx}
-                    className={`p-2 rounded-xl border flex items-center justify-between ${
-                      isWin ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-rose-950/20 border-rose-500/30'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className={`w-7 h-7 rounded-lg border flex items-center justify-center shrink-0 ${
-                        record.isDefense ? 'bg-blue-950/60 border-blue-500/40 text-cyan-400' : 'bg-rose-950/60 border-rose-500/40 text-rose-400'
-                      }`}>
-                        {record.isDefense ? <Shield className="w-3.5 h-3.5" /> : <Swords className="w-3.5 h-3.5" />}
+                  return (
+                    <div 
+                      key={record.id}
+                      className={`flex items-center justify-between p-2.5 sm:p-3 rounded-xl border transition-all ${
+                        isWin 
+                          ? 'bg-gradient-to-r from-emerald-950/20 via-[#101914]/40 to-black/50 border-emerald-500/25' 
+                          : 'bg-gradient-to-r from-rose-950/20 via-[#191012]/40 to-black/50 border-rose-500/25'
+                      }`}
+                    >
+                      {/* Left: Mode icon + details (Matching PC Image 3) */}
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-8 h-8 rounded-xl border flex items-center justify-center shrink-0 ${
+                          record.isDefense 
+                            ? 'bg-gradient-to-b from-blue-950/60 to-indigo-950/60 border-blue-500/40 text-cyan-400' 
+                            : 'bg-gradient-to-b from-rose-950/60 to-red-950/60 border-rose-500/40 text-rose-400'
+                        }`}>
+                          {record.isDefense ? <Shield className="w-3.5 h-3.5" /> : <Swords className="w-3.5 h-3.5" />}
+                        </div>
+
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className={`text-[8px] font-mono font-black uppercase px-1.5 py-0.2 rounded border ${
+                              record.isDefense 
+                                ? 'bg-blue-950/40 text-cyan-400 border-blue-500/30' 
+                                : 'bg-rose-950/40 text-rose-400 border-rose-500/30'
+                            }`}>
+                              {record.isDefense ? 'DEFENSE' : 'OFFENSE'}
+                            </span>
+                            <span className="font-display font-bold text-xs text-white">
+                              {record.isDefense ? `vs ${record.attackerName}` : `vs ${record.defenderName}`}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
+                            <span className={`text-[8px] font-display font-black tracking-wider uppercase px-1.5 py-0.2 rounded-full border ${
+                              isWin 
+                                ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-400' 
+                                : 'bg-rose-950/60 border-rose-500/40 text-rose-400'
+                            }`}>
+                              {isWin ? 'VICTORY' : 'DEFEAT'}
+                            </span>
+                            <span className="text-[8.5px] text-gray-500 font-sans">{dateStr}</span>
+                          </div>
+                        </div>
                       </div>
 
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <span className={`text-[7.5px] font-mono font-bold px-1 rounded uppercase ${
-                            record.isDefense ? 'bg-blue-950 text-cyan-300' : 'bg-rose-950 text-rose-300'
-                          }`}>
-                            {record.isDefense ? 'DEFENSE' : 'OFFENSE'}
-                          </span>
-                          <span className="font-display font-bold text-xs text-white leading-tight">
-                            vs {record.isDefense ? record.attackerName : record.defenderName}
+                      {/* Right: Crowns delta & Transition range (Matching PC Image 3) */}
+                      <div className="text-right space-y-0.5">
+                        <div className={`font-display font-bold text-sm flex items-center justify-end gap-1 ${
+                          lpChange >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                        }`}>
+                          <span>{lpChange >= 0 ? `+${lpChange}` : lpChange}</span>
+                          <img src="/icons/crown.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                        </div>
+
+                        <div className="bg-black/60 border border-white/10 px-2 py-0.2 rounded-md font-mono text-[8px] text-gray-400 inline-flex items-center gap-1">
+                          <span>{beforeLP}</span>
+                          <span className="text-gray-600">→</span>
+                          <span className={lpChange >= 0 ? 'text-amber-400 font-bold' : 'text-rose-400 font-bold'}>
+                            {afterLP}
                           </span>
                         </div>
-                        <span className="text-[8px] font-mono text-gray-400 block mt-0.5">{dateStr}</span>
                       </div>
                     </div>
-
-                    <div className="text-right font-mono">
-                      <span className={`text-xs font-black block ${lpChange >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                        {lpChange >= 0 ? `+${lpChange}` : lpChange} 👑
-                      </span>
-                      <span className={`text-[8px] font-display font-bold uppercase ${isWin ? 'text-emerald-400' : 'text-rose-400'}`}>
-                        {isWin ? 'VICTORY' : 'DEFEAT'}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })
+                  );
+                })}
+              </div>
             )}
           </div>
         )}
+
       </div>
 
-      {/* 4. MODALS */}
+      {/* 4. MODALS (Ported 1:1 from PC with mobile touch ergonomics) */}
 
       {/* Modal 1: Matchmaking Progress Overlay */}
       {isMatching && (
@@ -1279,7 +1488,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
               </div>
 
               {/* Combat Stance */}
-              <div className="w-full bg-black/50 border border-white/10 rounded-xl py-1 px-2 flex items-center justify-center gap-2">
+              <div className="w-full bg-black/50 border border-white/10 rounded-xl py-1.5 px-2 flex items-center justify-center gap-2">
                 <span className="text-[9px] font-mono text-gray-400 uppercase font-bold">STANCE:</span>
                 <span className="font-display font-bold text-xs text-white flex items-center gap-1">
                   {renderStanceIcon(activeOpponent.stance || 'void_strike', 'w-3.5 h-3.5')}

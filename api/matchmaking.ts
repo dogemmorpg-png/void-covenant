@@ -90,7 +90,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const playerLeague = profileData.pvpLeague || 'Bronze';
 
     // 2. Spend resource (Energy or Shards) or Cancel
-    const { spendShards, spendEnergy, cancel } = req.body || {};
+    const { spendShards, spendEnergy, cancel, deck: clientDeck } = req.body || {};
+    if (clientDeck && Array.isArray(clientDeck) && clientDeck.length >= 10) {
+      profileData.deck = clientDeck;
+    }
     
     if (cancel) {
       if (profileData.activePvpOpponent) {
