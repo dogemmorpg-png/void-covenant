@@ -327,7 +327,7 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
                 {/* Dust Pill */}
                 <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-cyan-500/20 hover:border-cyan-400/50 hover:bg-cyan-500/[0.06] transition-all cursor-default group">
                   <div className="flex items-center gap-1.5">
-                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-5.5 h-5.5 sm:w-6 sm:h-6 object-contain drop-shadow-[0_0_10px_rgba(102,252,241,0.6)] scale-125 group-hover:scale-135 transition-transform" />
+                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-5 h-5 sm:w-5.5 sm:h-5.5 object-contain drop-shadow-[0_0_10px_rgba(102,252,241,0.6)] scale-[1.7] group-hover:scale-[1.85] transition-transform" />
                     <span className="font-mono font-black text-[#66fcf1] text-xs sm:text-sm leading-none">+{selectedStage.dustReward}</span>
                   </div>
                   <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider font-semibold mt-0.5">Dust</span>

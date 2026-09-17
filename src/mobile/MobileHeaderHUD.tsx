@@ -301,7 +301,7 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
               <img 
                 src="/icons/icon_dust.webp" 
                 alt="Dust" 
-                className="w-4 h-4 sm:w-4.5 sm:h-4.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.6)] shrink-0" 
+                className="w-4 h-4 sm:w-4.5 sm:h-4.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.6)] shrink-0 scale-[1.7] origin-center mx-0.5" 
               />
               <span className="font-mono font-black text-cyan-300 text-[11px] sm:text-xs leading-none truncate">
                 {formatVal(profile.dust)}

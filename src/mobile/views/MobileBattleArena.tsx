@@ -2587,7 +2587,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                 <div className="bg-gradient-to-b from-cyan-950/40 via-black to-black border border-cyan-500/30 p-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
                   <span className="text-cyan-300 font-display font-black text-sm flex items-center gap-1 text-shadow-cyan">
                     +{earnedDust}
-                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(102,252,241,0.6)]" />
+                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(102,252,241,0.6)] scale-[1.7] ml-1" />
                   </span>
                   <span className="text-[8.5px] text-cyan-400/70 font-mono uppercase tracking-wider font-bold">Dust</span>
                 </div>

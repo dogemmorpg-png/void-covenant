@@ -984,7 +984,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                     <div className="bg-black/50 border border-cyan-500/20 p-1.5 rounded-xl text-center flex flex-col items-center justify-center">
                       <span className="text-cyan-400 font-display font-bold text-xs sm:text-sm block flex items-center gap-1 text-shadow-cyan">
                         +25
-                        <img src="/icons/icon_dust.webp" alt="" className="w-4 h-4 object-contain" />
+                        <img src="/icons/icon_dust.webp" alt="" className="w-4 h-4 object-contain scale-[1.7] ml-0.5" />
                       </span>
                       <span className="text-[7.5px] text-cyan-400/80 font-mono tracking-wider uppercase font-bold mt-0.5">Dust</span>
                     </div>
@@ -1493,7 +1493,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                             <img 
                               src="/icons/icon_dust.webp" 
                               alt="" 
-                              className="w-4 h-4 sm:w-4.5 sm:h-4.5 object-contain brightness-115 shrink-0" 
+                              className="w-4 h-4 sm:w-4.5 sm:h-4.5 object-contain brightness-115 shrink-0 scale-[1.7] mx-0.5" 
                             />
                             <span className="font-display font-black text-[10px] sm:text-xs text-[#66fcf1]">
                               +{bracket.dust}

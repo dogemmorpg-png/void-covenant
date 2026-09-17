@@ -69,7 +69,7 @@ export const DustShopModal: React.FC<DustShopModalProps> = ({ onClose }) => {
               <img 
                 src="/icons/icon_dust.webp" 
                 alt="Void Dust Sanctum" 
-                className="w-6 h-6 sm:w-7 sm:h-7 scale-125 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.9)]" 
+                className="w-6 h-6 sm:w-7 sm:h-7 scale-[1.7] object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.9)]" 
               />
               <Sparkles className="w-3 h-3 text-cyan-300 absolute -top-0.5 -right-0.5 animate-pulse" />
             </div>
@@ -103,7 +103,7 @@ export const DustShopModal: React.FC<DustShopModalProps> = ({ onClose }) => {
 
             {/* Current Dust */}
             <div className="flex items-center gap-1 bg-cyan-950/40 border border-cyan-500/40 rounded-full py-0.5 px-2 shadow-sm">
-              <img src="/icons/icon_dust.webp" alt="Dust" className="w-3.5 h-3.5 sm:w-4 sm:h-4 scale-125 object-contain" />
+              <img src="/icons/icon_dust.webp" alt="Dust" className="w-3.5 h-3.5 sm:w-4 sm:h-4 scale-[1.7] mx-0.5 object-contain" />
               <span className="font-mono font-bold text-cyan-300 text-[10px] sm:text-xs">{(profile.dust || 0).toLocaleString()}</span>
             </div>
 
@@ -166,7 +166,7 @@ export const DustShopModal: React.FC<DustShopModalProps> = ({ onClose }) => {
                   <img 
                     src="/icons/icon_dust.webp" 
                     alt="Dust" 
-                    className="w-3.5 h-3.5 sm:w-4 sm:h-4 scale-125 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.8)] shrink-0" 
+                    className="w-3.5 h-3.5 sm:w-4 sm:h-4 scale-[1.7] mx-0.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.8)] shrink-0" 
                   />
                   <span className="text-xs sm:text-sm font-black text-cyan-300 font-mono leading-none tracking-tight">
                     +{pkg.dustAmount.toLocaleString()}

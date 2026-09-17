@@ -1106,7 +1106,7 @@ export const MobileCollectionView: React.FC = () => {
                       <img 
                         src="/icons/icon_dust.webp" 
                         alt="Dust" 
-                        className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" 
+                        className="w-4 h-4 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.6)] scale-[1.7] ml-0.5" 
                       />
                     </div>
                   </div>
@@ -1140,7 +1140,7 @@ export const MobileCollectionView: React.FC = () => {
                   <span className="text-[8.5px] text-gray-500 block font-mono">Dust Cost</span>
                   <div className="flex items-center justify-center gap-1 font-mono text-[11.5px] font-bold text-cyan-300 mt-0.5">
                     <span>-</span>
-                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 object-contain opacity-60" />
+                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 object-contain opacity-60 scale-[1.7] ml-0.5" />
                   </div>
                 </div>
               </div>
@@ -1412,7 +1412,7 @@ export const MobileCollectionView: React.FC = () => {
                 <img 
                   src="/icons/icon_dust.webp" 
                   alt="Void Dust" 
-                  className="w-5 h-5 object-contain" 
+                  className="w-5 h-5 object-contain scale-[1.7] ml-1" 
                 />
               </button>
             )}
@@ -1454,7 +1454,7 @@ export const MobileCollectionView: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-1">
                   <span className={`font-bold ${profile.dust >= dustCost ? 'text-cyan-300' : 'text-red-400'}`}>{dustCost}</span>
-                  <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 object-contain" />
+                  <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 object-contain scale-[1.7] ml-0.5" />
                 </div>
                 {shardsCost > 0 && (
                   <div className="flex items-center gap-1">
@@ -1504,7 +1504,7 @@ export const MobileCollectionView: React.FC = () => {
                 <img 
                   src="/icons/icon_dust.webp" 
                   alt="Void Dust" 
-                  className="w-12 h-12 object-contain mx-auto drop-shadow-[0_0_15px_rgba(6,182,212,0.8)]" 
+                  className="w-12 h-12 object-contain mx-auto drop-shadow-[0_0_15px_rgba(6,182,212,0.8)] scale-[1.7]" 
                 />
               </div>
 
@@ -1526,7 +1526,7 @@ export const MobileCollectionView: React.FC = () => {
                     +{dustYield}
                   </span>
                   <span className="text-[10px] font-mono font-bold text-gray-300">VOID DUST</span>
-                  <img src="/icons/icon_dust.webp" alt="Void Dust" className="w-6 h-6 object-contain" />
+                  <img src="/icons/icon_dust.webp" alt="Void Dust" className="w-6 h-6 object-contain scale-[1.7] ml-1" />
                 </div>
               </div>
 

@@ -103,8 +103,8 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
       border: 'border-[#c5a880]/40',
       bg: 'from-[#221a12]/60 via-black/60 to-black/80',
       shadow: 'shadow-[0_0_12px_rgba(197,168,128,0.25)]',
-      badge: deckCount !== undefined ? `${deckCount}` : null,
-      badgeColor: 'bg-[#c5a880]/20 text-[#ebd09b] border border-[#c5a880]/40',
+      badge: null,
+      badgeColor: '',
     },
     {
       id: 'hero' as MobileTab,
