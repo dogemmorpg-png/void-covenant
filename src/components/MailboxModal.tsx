@@ -153,30 +153,42 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
       <div className="relative w-full max-w-4xl bg-gradient-to-b from-[#180a10] via-[#100508] to-[#0a0204] border border-[#ebd09b]/30 rounded-3xl shadow-[0_0_50px_rgba(221,44,64,0.25)] overflow-hidden flex flex-col max-h-full my-auto">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-white/10 bg-black/40">
+        <div className="flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-4 border-b border-white/10 bg-black/40">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             {/* Mobile Back button if reading decree */}
             {mobileView === 'detail' && (
               <button
                 onClick={() => setMobileView('list')}
-                className="md:hidden flex items-center gap-1 text-amber-300 hover:text-amber-200 font-mono text-xs font-bold py-1.5 px-2 rounded-xl bg-white/5 border border-amber-500/30 active:scale-95 transition-all shrink-0 mr-1"
+                className="md:hidden flex items-center gap-1 text-amber-300 hover:text-amber-200 font-mono text-xs font-bold py-1.5 px-2.5 rounded-xl bg-white/5 border border-amber-500/30 active:scale-95 transition-all shrink-0 mr-1"
                 title="Back to decrees list"
               >
                 <ChevronLeft className="w-4 h-4 text-amber-400" />
-                <span>List</span>
+                <span>Back</span>
               </button>
             )}
 
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-red-600/30 to-amber-500/20 border border-amber-500/40 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
+            {/* Mail Icon (hidden on mobile when viewing detail to maximize room for title) */}
+            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-red-600/30 to-amber-500/20 border border-amber-500/40 items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0 ${
+              mobileView === 'detail' ? 'hidden md:flex' : 'flex'
+            }`}>
               <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300" />
             </div>
+
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <h2 className="font-display font-black text-base sm:text-xl text-white tracking-wider text-shadow-gold truncate">
-                  VOID MAILBOX
+                <h2 className="font-display font-black text-sm sm:text-xl text-white tracking-wider text-shadow-gold truncate">
+                  {mobileView === 'detail' ? 'DECREE DETAILS' : 'VOID MAILBOX'}
                 </h2>
-                {unreadCount > 0 && (
-                  <span className="px-1.5 sm:px-2 py-0.5 rounded-full bg-red-600/80 border border-red-400 text-white font-mono text-[9px] sm:text-[10px] font-bold shadow-[0_0_8px_rgba(220,38,38,0.8)] animate-pulse shrink-0">
+                {/* Unread badge: only shown in list view on mobile (or always on desktop) to avoid crowding letter header */}
+                {unreadCount > 0 && mobileView === 'list' && (
+                  <span className={`px-1.5 sm:px-2 py-0.5 rounded-full bg-red-600/80 border border-red-400 text-white font-mono text-[9px] sm:text-[10px] font-bold shadow-[0_0_8px_rgba(220,38,38,0.8)] animate-pulse shrink-0 ${
+                    unclaimedCount > 0 ? 'hidden min-[400px]:inline-block' : 'inline-block'
+                  }`}>
+                    {unreadCount} NEW
+                  </span>
+                )}
+                {unreadCount > 0 && mobileView === 'detail' && (
+                  <span className="hidden md:inline-block px-2 py-0.5 rounded-full bg-red-600/80 border border-red-400 text-white font-mono text-[10px] font-bold shadow-[0_0_8px_rgba(220,38,38,0.8)] animate-pulse shrink-0">
                     {unreadCount} NEW
                   </span>
                 )}
@@ -185,11 +197,14 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* CLAIM ALL: shown on desktop, and on mobile only when in list view */}
             {unclaimedCount > 0 && (
               <button
                 onClick={handleClaimAll}
                 disabled={isClaiming}
-                className="flex items-center gap-1.5 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-400 text-black font-display font-black text-[10px] sm:text-xs rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50 shrink-0"
+                className={`${
+                  mobileView === 'detail' ? 'hidden md:flex' : 'flex'
+                } items-center gap-1.5 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-400 text-black font-display font-black text-[10px] sm:text-xs rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50 shrink-0`}
               >
                 <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black animate-spin shrink-0" />
                 <span>CLAIM ALL ({unclaimedCount})</span>

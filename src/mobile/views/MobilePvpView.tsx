@@ -733,23 +733,18 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
               )}
 
               {/* ARENA TICKETS */}
-              <div className="px-1 flex flex-col items-center">
+              <div className="px-1 flex flex-col items-center min-w-0">
                 <span className="text-[8px] sm:text-[8.5px] font-mono text-gray-400 uppercase tracking-wider font-bold block">
                   TICKETS
                 </span>
-                <div className="flex items-center justify-center gap-1 mt-0.5">
-                  <div className="font-mono text-xs sm:text-sm font-black text-rose-400 flex items-center gap-1">
-                    <img src="/icons/ticket.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                <div className="flex items-center justify-center gap-1.5 mt-0.5">
+                  <div className="font-mono text-xs sm:text-sm font-black text-rose-400 flex items-center gap-1 shrink-0">
+                    <img src="/icons/ticket.png" alt="" className="w-3.5 h-3.5 object-contain shrink-0" />
                     <span>{myTickets}/{pvpEnergyMax}</span>
-                    {(profile.pvpBonusTickets || 0) > 0 && (
-                      <span className="text-[8px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-500/50 px-1 py-0.2 rounded">
-                        +{profile.pvpBonusTickets}
-                      </span>
-                    )}
                   </div>
                   <button
                     onClick={() => setIsBuyTicketsModalOpen(true)}
-                    className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-rose-950/80 border border-rose-500/50 text-rose-200 text-[8.5px] font-mono font-bold hover:text-white transition-all active:scale-95 cursor-pointer shrink-0"
+                    className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-rose-950/80 hover:bg-rose-900/80 border border-rose-500/50 text-rose-200 text-[8.5px] font-mono font-bold hover:text-white transition-all active:scale-95 cursor-pointer shrink-0"
                   >
                     <Plus className="w-2.5 h-2.5" />
                     <span>BUY</span>
