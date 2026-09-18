@@ -704,107 +704,131 @@ export function simulateCombatTurn(
     }
   }
 
-  // 2. Enemy AI plays a card
-  // Enemy plays a card in an available board slot if they can afford it with their current Mana
-  if (state.enemyHand.length > 0) {
-    const nextEnemyCardTemplate = state.enemyHand[0];
+  // 2. Enemy AI plays cards
+  // Enemy plays multiple cards if they have enough Mana and empty board slots.
+  // The enemy evaluates up to 3 cards in their active hand (matching player hand limit of 3 cards).
+  let enemyCardsPlayedThisTurn = 0;
+  const maxEnemyCardsPerTurn = 3;
+
+  while (state.enemyHand.length > 0 && enemyCardsPlayedThisTurn < maxEnemyCardsPerTurn) {
+    // Find empty slots on the enemy board
+    const emptySlots: number[] = [];
+    state.enemyBoard.forEach((slot, index) => {
+      if (slot === null || slot.isDead) emptySlots.push(index);
+    });
+    if (emptySlots.length === 0) break; // No space left on board
+
+    // Look at available cards in the enemy's hand (up to 3 cards)
+    const handWindow = Math.min(3, state.enemyHand.length);
+    const affordableIndices: number[] = [];
+    for (let h = 0; h < handWindow; h++) {
+      const cardCost = state.enemyHand[h].manaCost || 1;
+      if (state.enemyMana >= cardCost) {
+        affordableIndices.push(h);
+      }
+    }
+
+    if (affordableIndices.length === 0) {
+      break; // Cannot afford any card in hand
+    }
+
+    // Pick highest mana cost affordable card for optimal mana utilization
+    affordableIndices.sort((a, b) => {
+      const costA = state.enemyHand[a].manaCost || 1;
+      const costB = state.enemyHand[b].manaCost || 1;
+      return costB - costA;
+    });
+    const chosenHandIndex = affordableIndices[0];
+
+    const nextEnemyCardTemplate = state.enemyHand[chosenHandIndex];
     const enemyCard = toBattleCard(nextEnemyCardTemplate as Card);
     const cost = enemyCard.manaCost || 1;
-    
-    if (state.enemyMana >= cost) {
-      state.enemyMana -= cost;
-      
-      // Find empty slots
-      const emptySlots: number[] = [];
-      state.enemyBoard.forEach((slot, index) => {
-        if (slot === null) emptySlots.push(index);
-      });
-      
-      if (emptySlots.length > 0) {
-        let chosenSlot = emptySlots[0];
-        const playerOccupiedSlots: number[] = [];
-        state.playerBoard.forEach((c, idx) => {
-          if (c !== null && emptySlots.includes(idx)) {
-            playerOccupiedSlots.push(idx);
-          }
-        });
-        
-        if (playerOccupiedSlots.length > 0) {
-          chosenSlot = playerOccupiedSlots[Math.floor(Math.random() * playerOccupiedSlots.length)];
-        } else {
-          chosenSlot = emptySlots[Math.floor(Math.random() * emptySlots.length)];
-        }
-        
-        // Trigger enemy sacrifice if any
-        const enemySacSkill = enemyCard.skills.find(s => s.type === 'sacrifice');
-        const enemyAllies = state.enemyBoard.filter(c => c !== null && !c.isDead).length;
-        let enemySacrificedSlot: number | null = null;
-        let sacrCardName = '';
-        if (enemySacSkill && enemyAllies > 0) {
-          const enemyActiveSlots: number[] = [];
-          state.enemyBoard.forEach((c, idx) => {
-            if (c && !c.isDead) enemyActiveSlots.push(idx);
-          });
-          const randAllySlot = enemyActiveSlots[Math.floor(Math.random() * enemyActiveSlots.length)];
-          const sacrCard = state.enemyBoard[randAllySlot]!;
-          sacrCard.isDead = true;
-          state.enemyBoard[randAllySlot] = null;
-          enemySacrificedSlot = randAllySlot;
-          sacrCardName = sacrCard.name;
-          
-          state.enemyHeroHealth = Math.min(state.enemyHeroMaxHealth, state.enemyHeroHealth + enemySacSkill.value);
-          enemyCard.attack += Math.round(enemySacSkill.value / 2);
-          enemyCard.health += enemySacSkill.value;
-          enemyCard.maxHealth += enemySacSkill.value;
-          
-          logs.push(`💀 [Enemy] ${enemyCard.name} sacrifices ${sacrCard.name}! Enemy hero healed for +${enemySacSkill.value} HP.`);
-        }
 
-        // Apply Enemy Delay Reduction (from Equipment / Demiurge set)
-        const enemyDelayReduc = state.enemyDelayReduction || 0;
-        if (enemyDelayReduc > 0) {
-          enemyCard.delay = Math.max(0, enemyCard.delay - enemyDelayReduc);
-          enemyCard.initialDelay = Math.max(0, enemyCard.initialDelay - enemyDelayReduc);
-        }
+    state.enemyMana -= cost;
 
-        // Apply Enemy Creature Buff (e.g. Demiurge Apotheosis 6-pc)
-        if (state.enemyCreatureBuff && (state.enemyCreatureBuff.atk > 0 || state.enemyCreatureBuff.hp > 0)) {
-          enemyCard.attack += state.enemyCreatureBuff.atk;
-          enemyCard.health += state.enemyCreatureBuff.hp;
-          enemyCard.maxHealth += state.enemyCreatureBuff.hp;
-          logs.push(`⚡ Enemy Demiurge Apotheosis: ${enemyCard.name} is empowered with +${state.enemyCreatureBuff.atk} ATK and +${state.enemyCreatureBuff.hp} HP!`);
-        }
-
-        state.enemyBoard[chosenSlot] = enemyCard;
-        state.enemyHand.shift();
-        state.enemyDeckSize = state.enemyHand.length;
-        
-        logs.push(`😈 Enemy played ${enemyCard.name} in slot ${chosenSlot + 1}.`);
-        animateSequence.push({
-          type: 'enemy_play',
-          slot: chosenSlot,
-          card: {
-            ...enemyCard,
-            skills: enemyCard.skills.map(s => ({ ...s }))
-          }
-        });
-
-        // Push sacrifice animation step if enemy sacrificed an ally
-        if (enemySacrificedSlot !== null && enemySacSkill) {
-          animateSequence.push({
-            type: 'sacrifice',
-            side: 'enemy',
-            slot: chosenSlot,
-            targetSlot: enemySacrificedSlot,
-            healAmount: enemySacSkill.value,
-            buffAttack: Math.round(enemySacSkill.value / 2),
-            buffHealth: enemySacSkill.value,
-            sacrificedCardName: sacrCardName
-          });
-        }
+    // Pick slot: prioritize slot opposite a player card so creatures engage in combat duels
+    let chosenSlot = emptySlots[0];
+    const playerOccupiedSlots: number[] = [];
+    state.playerBoard.forEach((c, idx) => {
+      if (c !== null && !c.isDead && emptySlots.includes(idx)) {
+        playerOccupiedSlots.push(idx);
       }
+    });
+
+    if (playerOccupiedSlots.length > 0) {
+      chosenSlot = playerOccupiedSlots[Math.floor(Math.random() * playerOccupiedSlots.length)];
     } else {
-      logs.push(`😈 Enemy cannot afford to play ${enemyCard.name} (needs ${cost} Mana, has ${state.enemyMana} Mana).`);
+      chosenSlot = emptySlots[Math.floor(Math.random() * emptySlots.length)];
+    }
+
+    // Trigger enemy sacrifice if any
+    const enemySacSkill = enemyCard.skills.find(s => s.type === 'sacrifice');
+    const enemyAllies = state.enemyBoard.filter(c => c !== null && !c.isDead).length;
+    let enemySacrificedSlot: number | null = null;
+    let sacrCardName = '';
+    if (enemySacSkill && enemyAllies > 0) {
+      const enemyActiveSlots: number[] = [];
+      state.enemyBoard.forEach((c, idx) => {
+        if (c && !c.isDead) enemyActiveSlots.push(idx);
+      });
+      const randAllySlot = enemyActiveSlots[Math.floor(Math.random() * enemyActiveSlots.length)];
+      const sacrCard = state.enemyBoard[randAllySlot]!;
+      sacrCard.isDead = true;
+      state.enemyBoard[randAllySlot] = null;
+      enemySacrificedSlot = randAllySlot;
+      sacrCardName = sacrCard.name;
+
+      state.enemyHeroHealth = Math.min(state.enemyHeroMaxHealth, state.enemyHeroHealth + enemySacSkill.value);
+      enemyCard.attack += Math.round(enemySacSkill.value / 2);
+      enemyCard.health += enemySacSkill.value;
+      enemyCard.maxHealth += enemySacSkill.value;
+
+      logs.push(`💀 [Enemy] ${enemyCard.name} sacrifices ${sacrCard.name}! Enemy hero healed for +${enemySacSkill.value} HP.`);
+    }
+
+    // Apply Enemy Delay Reduction (from Equipment / Demiurge set)
+    const enemyDelayReduc = state.enemyDelayReduction || 0;
+    if (enemyDelayReduc > 0) {
+      enemyCard.delay = Math.max(0, enemyCard.delay - enemyDelayReduc);
+      enemyCard.initialDelay = Math.max(0, enemyCard.initialDelay - enemyDelayReduc);
+    }
+
+    // Apply Enemy Creature Buff (e.g. Demiurge Apotheosis 6-pc)
+    if (state.enemyCreatureBuff && (state.enemyCreatureBuff.atk > 0 || state.enemyCreatureBuff.hp > 0)) {
+      enemyCard.attack += state.enemyCreatureBuff.atk;
+      enemyCard.health += state.enemyCreatureBuff.hp;
+      enemyCard.maxHealth += state.enemyCreatureBuff.hp;
+      logs.push(`⚡ Enemy Demiurge Apotheosis: ${enemyCard.name} is empowered with +${state.enemyCreatureBuff.atk} ATK and +${state.enemyCreatureBuff.hp} HP!`);
+    }
+
+    state.enemyBoard[chosenSlot] = enemyCard;
+    state.enemyHand.splice(chosenHandIndex, 1);
+    state.enemyDeckSize = state.enemyHand.length;
+    enemyCardsPlayedThisTurn++;
+
+    logs.push(`😈 Enemy played ${enemyCard.name} in slot ${chosenSlot + 1} (Cost: ${cost} Mana, Remaining: ${state.enemyMana}).`);
+    animateSequence.push({
+      type: 'enemy_play',
+      slot: chosenSlot,
+      remainingMana: state.enemyMana,
+      card: {
+        ...enemyCard,
+        skills: enemyCard.skills.map(s => ({ ...s }))
+      }
+    });
+
+    // Push sacrifice animation step if enemy sacrificed an ally
+    if (enemySacrificedSlot !== null && enemySacSkill) {
+      animateSequence.push({
+        type: 'sacrifice',
+        side: 'enemy',
+        slot: chosenSlot,
+        targetSlot: enemySacrificedSlot,
+        healAmount: enemySacSkill.value,
+        buffAttack: Math.round(enemySacSkill.value / 2),
+        buffHealth: enemySacSkill.value,
+        sacrificedCardName: sacrCardName
+      });
     }
   }
 

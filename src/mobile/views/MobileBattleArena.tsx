@@ -646,8 +646,16 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
             ...step.card,
             skills: step.card.skills ? step.card.skills.map((s: any) => ({ ...s })) : []
           };
-          if (copy.enemyHand.length > 0) copy.enemyHand.shift();
+          const cardIdx = copy.enemyHand.findIndex((c: any) => c.name === step.card.name && c.tier === step.card.tier);
+          if (cardIdx !== -1) {
+            copy.enemyHand.splice(cardIdx, 1);
+          } else if (copy.enemyHand.length > 0) {
+            copy.enemyHand.shift();
+          }
           copy.enemyDeckSize = copy.enemyHand.length;
+          if (step.remainingMana !== undefined) {
+            copy.enemyMana = step.remainingMana;
+          }
           return copy;
         });
         break;
