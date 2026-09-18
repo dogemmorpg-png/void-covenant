@@ -55,6 +55,16 @@
   }
 }
 
+:root {
+  --game-brightness: 1.2;
+  --game-saturate: 1.2;
+}
+
+html {
+  filter: brightness(var(--game-brightness, 1.2)) saturate(var(--game-saturate, 1.2));
+  background-color: #030305;
+}
+
 html, body, #root {
   height: 100%;
   min-height: 100%;
