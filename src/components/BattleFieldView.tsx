@@ -1367,10 +1367,13 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         
         {/* Battle Arena - Medieval Fantasy Table */}
         <div 
-          className="flex-1 flex flex-col justify-center border-[6px] border-[#251a14] bg-[#120d0a] rounded-2xl p-4 shadow-[inset_0_0_60px_rgba(0,0,0,0.95),_0_10px_30px_rgba(0,0,0,0.85)] relative min-h-0 overflow-hidden will-change-transform"
+          className="flex-1 flex flex-col justify-center border-[5px] border-[#4a3424] bg-gradient-to-b from-[#241a15] via-[#1b130e] to-[#241a15] rounded-2xl p-4 shadow-[inset_0_0_24px_rgba(0,0,0,0.45),_0_10px_30px_rgba(0,0,0,0.7)] ring-1 ring-[#ebd09b]/35 relative min-h-0 overflow-hidden will-change-transform"
         >
           {/* Wooden Table Board Divider */}
-          <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#ebd09b]/15 to-transparent -translate-y-1/2 pointer-events-none z-10" />
+          <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#ebd09b]/35 to-transparent -translate-y-1/2 pointer-events-none z-10 shadow-[0_0_8px_rgba(235,208,155,0.25)]" />
+          
+          {/* Table Ambient Light Radial Overlay */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(235,208,155,0.12)_0%,rgba(40,26,18,0.35)_55%,rgba(12,8,6,0.65)_100%)] pointer-events-none z-0" />
 
           {/* Glowing Lord casting lasers / energy beams only when targeting a board creature */}
           {isAnimating && currentStep && currentStep.type === 'hero_skill' && currentStep.targetSlot !== undefined && currentStep.targetSlot >= 0 && (
@@ -1970,10 +1973,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       </motion.div>
                       ) : (
                         // Empty Recessed Slot
-                        <div key={`empty-slot-${idx}`} className="w-full h-full rounded-xl border border-amber-950/20 bg-black/45 flex flex-col items-center justify-center relative shadow-[inset_0_4px_10px_rgba(0,0,0,0.8)] group hover:border-[#ebd09b]/15 transition-all duration-300">
+                        <div key={`empty-slot-${idx}`} className="w-full h-full rounded-xl border border-[#ebd09b]/25 bg-[#17110c]/85 flex flex-col items-center justify-center relative shadow-[inset_0_4px_10px_rgba(0,0,0,0.6)] group hover:border-[#ebd09b]/40 transition-all duration-300">
                           <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none" />
-                          <Swords className="w-5 h-5 text-amber-950/30 group-hover:text-amber-950/50 transition-colors" />
-                          <span className="text-[7px] font-mono font-bold text-amber-950/25 uppercase tracking-widest mt-1">Empty Slot</span>
+                          <Swords className="w-5 h-5 text-[#ebd09b]/45 group-hover:text-[#ebd09b]/65 transition-colors" />
+                          <span className="text-[7px] font-mono font-bold text-[#ebd09b]/40 uppercase tracking-widest mt-1">Empty Slot</span>
                         </div>
                       )}
                     </AnimatePresence>
@@ -2241,15 +2244,15 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         <div 
                           key={`player-empty-${idx}`}
                           onClick={() => canPlace && handlePlayCard(idx)}
-                          className={`w-full h-full rounded-xl border flex flex-col items-center justify-center relative shadow-[inset_0_4px_10px_rgba(0,0,0,0.8)] group transition-all duration-300 ${
+                          className={`w-full h-full rounded-xl border flex flex-col items-center justify-center relative shadow-[inset_0_4px_10px_rgba(0,0,0,0.6)] group transition-all duration-300 ${
                             canPlace
-                              ? 'bg-emerald-950/20 border-emerald-500/50 cursor-pointer border-dashed animate-pulse'
-                              : 'bg-black/30 border-amber-950/10 border-dashed'
+                              ? 'bg-emerald-950/40 border-emerald-500/80 cursor-pointer border-dashed animate-pulse ring-1 ring-emerald-500/50'
+                              : 'bg-[#17110c]/80 border-[#ebd09b]/25 border-dashed hover:border-[#ebd09b]/40'
                           }`}
                         >
                           <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none" />
-                          <Swords className={`w-5 h-5 transition-colors ${canPlace ? 'text-emerald-400' : 'text-amber-950/30 group-hover:text-amber-950/50'}`} />
-                          <span className={`text-[7px] font-mono font-bold uppercase tracking-widest mt-1 ${canPlace ? 'text-emerald-400' : 'text-amber-950/25'}`}>
+                          <Swords className={`w-5 h-5 transition-colors ${canPlace ? 'text-emerald-400' : 'text-[#ebd09b]/45 group-hover:text-[#ebd09b]/65'}`} />
+                          <span className={`text-[7px] font-mono font-bold uppercase tracking-widest mt-1 ${canPlace ? 'text-emerald-400 font-bold' : 'text-[#ebd09b]/40'}`}>
                             {canPlace ? 'Place Here' : 'Empty Slot'}
                           </span>
                         </div>

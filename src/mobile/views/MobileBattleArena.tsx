@@ -1337,12 +1337,12 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
         {/* =========================================================================
             3. ARENA PLAYFIELD (5 VS 5 BOARD + CENTRAL CLASH BAR) - MEDIEVAL TABLE
            ========================================================================= */}
-        <main className="flex-1 flex flex-col justify-between mx-2 my-1 px-2 py-1.5 sm:px-3 sm:py-2 rounded-2xl border-[3px] border-[#251a14] bg-[#120d0a] shadow-[inset_0_0_50px_rgba(0,0,0,0.95),_0_6px_20px_rgba(0,0,0,0.85)] ring-1 ring-[#ebd09b]/15 relative min-h-0 overflow-hidden">
+        <main className="flex-1 flex flex-col justify-between mx-2 my-1 px-2 py-1.5 sm:px-3 sm:py-2 rounded-2xl border-[3px] border-[#4a3424] bg-gradient-to-b from-[#241a15] via-[#1b130e] to-[#241a15] shadow-[inset_0_0_24px_rgba(0,0,0,0.45),_0_6px_20px_rgba(0,0,0,0.7)] ring-1 ring-[#ebd09b]/35 relative min-h-0 overflow-hidden">
           {/* Authentic Medieval Table Divider Line */}
-          <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#ebd09b]/15 to-transparent -translate-y-1/2 pointer-events-none z-0" />
+          <div className="absolute top-1/2 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#ebd09b]/35 to-transparent -translate-y-1/2 pointer-events-none z-0 shadow-[0_0_6px_rgba(235,208,155,0.25)]" />
           
-          {/* Table Vignette Overlay */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(235,208,155,0.03)_0%,rgba(0,0,0,0.6)_100%)] pointer-events-none z-0" />
+          {/* Table Ambient Light Radial Overlay */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(235,208,155,0.12)_0%,rgba(40,26,18,0.35)_55%,rgba(12,8,6,0.65)_100%)] pointer-events-none z-0" />
 
           {/* ROW 1: ENEMY SQUAD (5 SLOTS) */}
           <div className="relative z-10">
@@ -1398,8 +1398,8 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                   } as React.CSSProperties}
                   className={`relative h-[92px] sm:h-[100px] rounded-xl border flex flex-col justify-between p-1 select-none overflow-visible transition-all ${
                     card 
-                      ? `${getTierBorderColor(card.tier)} bg-[#151a21] cursor-pointer` 
-                      : 'border-amber-950/25 bg-black/55 shadow-[inset_0_3px_10px_rgba(0,0,0,0.9)] cursor-default'
+                      ? `${getTierBorderColor(card.tier)} bg-[#1a212d] cursor-pointer` 
+                      : 'border-[#ebd09b]/25 bg-[#17110c]/85 shadow-[inset_0_2px_8px_rgba(0,0,0,0.6),0_1px_3px_rgba(235,208,155,0.06)] cursor-default'
                   } ${borderGlowClass} ${
                     isActing
                       ? 'anim-card-strike-enemy'
@@ -1426,14 +1426,14 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                         <img 
                           src={card.image} 
                           alt={card.name} 
-                          className={`w-full h-full object-cover ${card.delay > 0 ? 'opacity-40 filter saturate-50' : 'opacity-85'}`}
+                          className={`w-full h-full object-cover ${card.delay > 0 ? 'opacity-70 filter saturate-75' : 'opacity-90'}`}
                           onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
 
                         {/* AUTHENTIC PC DELAY OVERLAY: ONLY SHOWN WHEN card.delay > 0 AND NOT ACTING */}
                         {Number(card.delay) > 0 && !isActing && (
-                          <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-15">
+                          <div className="absolute inset-0 bg-black/35 flex items-center justify-center z-15">
                             <div className="flex flex-col items-center justify-center relative">
                               <img 
                                 src="/icons/gothic_hourglass.webp" 
@@ -1569,8 +1569,8 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                   ) : (
                     /* Authentic PC Recessed Empty Slot */
                     <div className="flex flex-col items-center justify-center h-full w-full relative">
-                      <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-amber-950/35 transition-colors" />
-                      <span className="text-[6.5px] sm:text-[7px] font-mono font-bold text-amber-950/35 uppercase tracking-widest mt-1 select-none">
+                      <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-[#ebd09b]/45 transition-colors" />
+                      <span className="text-[6.5px] sm:text-[7px] font-mono font-bold text-[#ebd09b]/40 uppercase tracking-widest mt-1 select-none">
                         EMPTY SLOT
                       </span>
                     </div>
@@ -1585,7 +1585,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
         {/* =========================================================================
             CENTRAL GOTHIC CLASH BAR (Combat status, action log, speed buttons)
            ========================================================================= */}
-        <div className="my-1 py-1 px-2.5 rounded-xl bg-gradient-to-r from-[#1c140e]/95 via-[#0d0906] to-[#1c140e]/95 border border-[#ebd09b]/30 flex items-center justify-between shrink-0 shadow-[0_4px_14px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(235,208,155,0.15)] relative overflow-hidden z-10">
+        <div className="my-1 py-1 px-2.5 rounded-xl bg-gradient-to-r from-[#2c1d14]/95 via-[#1a120c] to-[#2c1d14]/95 border border-[#ebd09b]/50 flex items-center justify-between shrink-0 shadow-[0_4px_14px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(235,208,155,0.25)] relative overflow-hidden z-10">
           <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-amber-400 to-amber-600" />
           
           <div className="flex items-center gap-2 min-w-0 flex-1 pr-2">
@@ -1714,10 +1714,10 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                   } as React.CSSProperties}
                   className={`relative h-[92px] sm:h-[100px] rounded-xl border flex flex-col justify-between p-1 select-none overflow-visible transition-all ${
                     card 
-                      ? `${getTierBorderColor(card.tier)} bg-[#151a21] cursor-pointer` 
+                      ? `${getTierBorderColor(card.tier)} bg-[#1a212d] cursor-pointer` 
                       : canPlayHere
-                        ? 'border-dashed border-emerald-500/70 bg-emerald-950/25 shadow-[inset_0_2px_10px_rgba(16,185,129,0.25),0_0_14px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/40 cursor-pointer animate-pulse'
-                        : 'border-amber-950/25 bg-black/55 shadow-[inset_0_3px_10px_rgba(0,0,0,0.9)] cursor-default'
+                        ? 'border-dashed border-emerald-500/80 bg-emerald-950/40 shadow-[inset_0_2px_10px_rgba(16,185,129,0.3),0_0_16px_rgba(16,185,129,0.4)] ring-1 ring-emerald-500/50 cursor-pointer animate-pulse'
+                        : 'border-[#ebd09b]/25 bg-[#17110c]/85 shadow-[inset_0_2px_8px_rgba(0,0,0,0.6),0_1px_3px_rgba(235,208,155,0.06)] cursor-default'
                   } ${borderGlowClass} ${
                     isActing
                       ? 'anim-card-strike-player'
@@ -1744,14 +1744,14 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                         <img 
                           src={card.image} 
                           alt={card.name} 
-                          className={`w-full h-full object-cover ${card.delay > 0 ? 'opacity-40 filter saturate-50' : 'opacity-85'}`}
+                          className={`w-full h-full object-cover ${card.delay > 0 ? 'opacity-70 filter saturate-75' : 'opacity-90'}`}
                           onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
 
                         {/* AUTHENTIC PC DELAY OVERLAY: ONLY SHOWN WHEN card.delay > 0 AND NOT ACTING */}
                         {Number(card.delay) > 0 && !isActing && (
-                          <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-15">
+                          <div className="absolute inset-0 bg-black/35 flex items-center justify-center z-15">
                             <div className="flex flex-col items-center justify-center relative">
                               <img 
                                 src="/icons/gothic_hourglass.webp" 
@@ -1887,8 +1887,8 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                   ) : (
                     /* Authentic PC Recessed Empty Slot */
                     <div className="flex flex-col items-center justify-center h-full w-full relative">
-                      <Swords className={`w-4 h-4 sm:w-5 sm:h-5 transition-colors ${canPlayHere ? 'text-emerald-400 animate-pulse' : 'text-amber-950/35'}`} />
-                      <span className={`text-[6.5px] sm:text-[7px] font-mono font-bold uppercase tracking-widest mt-1 select-none ${canPlayHere ? 'text-emerald-400 font-black' : 'text-amber-950/35'}`}>
+                      <Swords className={`w-4 h-4 sm:w-5 sm:h-5 transition-colors ${canPlayHere ? 'text-emerald-400 animate-pulse' : 'text-[#ebd09b]/45'}`} />
+                      <span className={`text-[6.5px] sm:text-[7px] font-mono font-bold uppercase tracking-widest mt-1 select-none ${canPlayHere ? 'text-emerald-400 font-black' : 'text-[#ebd09b]/40'}`}>
                         {canPlayHere ? 'PLACE HERE' : 'EMPTY SLOT'}
                       </span>
                     </div>
@@ -2211,21 +2211,21 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                     : !canAfford
                       ? 'border-zinc-800 opacity-55 grayscale'
                       : getTierBorderColor(card.tier)
-                } bg-[#151a21]`}
+                } bg-[#181f2b]`}
               >
                 {/* Background Art */}
                 <div className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none z-0">
                   <img 
                     src={card.image} 
                     alt={card.name} 
-                    className={`w-full h-full object-cover ${card.delay > 0 ? 'opacity-40 filter saturate-50' : 'opacity-85'}`}
+                    className={`w-full h-full object-cover ${card.delay > 0 ? 'opacity-70 filter saturate-75' : 'opacity-90'}`}
                     onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
 
                   {/* AUTHENTIC PC DELAY OVERLAY: ONLY SHOWN WHEN card.delay > 0 */}
                   {card.delay > 0 && (
-                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-15">
+                    <div className="absolute inset-0 bg-black/35 flex items-center justify-center z-15">
                       <div className="flex flex-col items-center justify-center relative">
                         <img 
                           src="/icons/gothic_hourglass.webp" 
