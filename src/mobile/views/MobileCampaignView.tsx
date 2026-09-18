@@ -373,23 +373,27 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
             </div>
           )}
 
-          {/* 4. Action Buttons: BATTLE & SWEEP (No extra clutter under buttons, matching PC 1:1) */}
-          <div className="pt-2.5 border-t border-gray-800/80 flex flex-col gap-2 relative z-10">
+          {/* 4. Action Buttons: BATTLE & SWEEP (Adaptive 2-column layout when Sweep is unlocked) */}
+          <div className={`pt-2.5 border-t border-gray-800/80 relative z-10 ${canSweep ? 'grid grid-cols-2 gap-2' : 'flex'}`}>
             <button
               onClick={handleStart}
-              className={`w-full font-display font-bold tracking-widest py-3.5 sm:py-4 px-5 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer hover:scale-[1.01] active:scale-[0.98] text-sm sm:text-base uppercase ${
+              className={`w-full font-display font-bold tracking-wider rounded-2xl transition-all duration-300 flex items-center justify-center cursor-pointer hover:scale-[1.01] active:scale-[0.98] uppercase ${
+                canSweep 
+                  ? 'py-3 px-2 gap-1.5 text-xs min-[375px]:text-sm' 
+                  : 'py-3.5 sm:py-4 px-5 gap-3 text-sm sm:text-base'
+              } ${
                 isBoss 
-                  ? 'bg-gradient-to-b from-[#4a0d16] via-[#2a060a] to-[#1a0305] border-2 border-red-500/70 hover:border-red-400 text-red-300 hover:text-white shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:shadow-[0_0_30px_rgba(239,68,68,0.45)]'
-                  : 'bg-gradient-to-b from-[#342417] via-[#23170e] to-[#160e08] border-2 border-[#ebd09b]/70 hover:border-[#ebd09b] text-[#ebd09b] hover:text-white shadow-[0_0_20px_rgba(235,208,155,0.25)] hover:shadow-[0_0_30px_rgba(235,208,155,0.4)]'
+                  ? 'bg-gradient-to-b from-[#4a0d16] via-[#2a060a] to-[#1a0305] border-2 border-red-500/70 hover:border-red-400 text-red-300 hover:text-white shadow-[0_0_20px_rgba(220,38,38,0.3)]'
+                  : 'bg-gradient-to-b from-[#342417] via-[#23170e] to-[#160e08] border-2 border-[#ebd09b]/70 hover:border-[#ebd09b] text-[#ebd09b] hover:text-white shadow-[0_0_20px_rgba(235,208,155,0.25)]'
               }`}
             >
-              <Swords className="w-5 h-5 animate-pulse" /> 
-              <span className="mr-0.5">BATTLE</span>
-              <span className={`flex items-center gap-1 bg-black/50 border rounded-full px-2.5 py-0.5 font-mono text-xs sm:text-sm font-bold text-emerald-400 shadow-inner ${
+              <Swords className="w-4 h-4 shrink-0 animate-pulse" /> 
+              <span>BATTLE</span>
+              <span className={`flex items-center gap-1 bg-black/50 border rounded-full px-2 py-0.5 font-mono text-[11px] min-[375px]:text-xs font-bold text-emerald-400 shadow-inner shrink-0 ${
                 isBoss ? 'border-red-500/30' : 'border-[#ebd09b]/35'
               }`}>
                 {selectedStage.energyCost}
-                <img src="/icons/icon_energy.webp" alt="Energy" className="w-4 h-4 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
+                <img src="/icons/icon_energy.webp" alt="Energy" className="w-3.5 h-3.5 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
               </span>
             </button>
 
@@ -397,13 +401,13 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
               <button
                 onClick={handleSweep}
                 disabled={isSweeping || (profile.pveEnergy || 0) < selectedStage.energyCost}
-                className="w-full font-display font-bold tracking-widest py-3.5 sm:py-4 px-5 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer hover:scale-[1.01] active:scale-[0.98] text-sm sm:text-base uppercase bg-gradient-to-b from-[#1b122c] via-[#0e071a] to-[#06020c] border-2 border-purple-600/50 hover:border-purple-400 text-purple-400 hover:text-white shadow-[0_0_15px_rgba(147,51,234,0.2)] hover:shadow-[0_0_25px_rgba(168,85,247,0.35)] disabled:opacity-40"
+                className="w-full font-display font-bold tracking-wider py-3 px-2 rounded-2xl transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer hover:scale-[1.01] active:scale-[0.98] text-xs min-[375px]:text-sm uppercase bg-gradient-to-b from-[#25143a] via-[#160a24] to-[#0c0416] border-2 border-purple-500/70 hover:border-purple-400 text-purple-300 hover:text-white shadow-[0_0_15px_rgba(147,51,234,0.25)] hover:shadow-[0_0_25px_rgba(168,85,247,0.4)] disabled:opacity-40"
               >
-                <FastForward className="w-5 h-5" /> 
-                <span className="mr-0.5">SWEEP</span>
-                <span className="flex items-center gap-1 bg-black/50 border border-purple-500/30 rounded-full px-2.5 py-0.5 font-mono text-xs sm:text-sm font-bold text-emerald-400 shadow-inner">
+                <FastForward className="w-4 h-4 shrink-0" /> 
+                <span>SWEEP</span>
+                <span className="flex items-center gap-1 bg-black/50 border border-purple-500/40 rounded-full px-2 py-0.5 font-mono text-[11px] min-[375px]:text-xs font-bold text-emerald-400 shadow-inner shrink-0">
                   {selectedStage.energyCost}
-                  <img src="/icons/icon_energy.webp" alt="Energy" className="w-4 h-4 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
+                  <img src="/icons/icon_energy.webp" alt="Energy" className="w-3.5 h-3.5 object-contain brightness-110 drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]" />
                 </span>
               </button>
             )}
