@@ -926,29 +926,46 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                             </td>
 
                             <td className="p-4">
-                              <div className="flex items-center gap-2">
-                                <span className="text-gray-300 font-mono text-xs">{r.walletAddress?.slice(0, 6)}...{r.walletAddress?.slice(-6)}</span>
-                                <button
-                                  onClick={() => handleCopy(r.walletAddress)}
-                                  className="p-1 text-gray-500 hover:text-white rounded transition-colors"
-                                  title="Copy Solana Address"
-                                >
-                                  {copiedAddress === r.walletAddress ? (
-                                    <Check className="w-3.5 h-3.5 text-emerald-400" />
-                                  ) : (
-                                    <Copy className="w-3.5 h-3.5" />
-                                  )}
-                                </button>
-                                <a
-                                  href={`https://solscan.io/account/${r.walletAddress}`}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="p-1 text-gray-500 hover:text-cyan-400 rounded transition-colors"
-                                  title="View on Solscan"
-                                >
-                                  <ExternalLink className="w-3.5 h-3.5" />
-                                </a>
-                              </div>
+                              {(() => {
+                                const isTon = Boolean(
+                                  r.walletAddress?.startsWith('EQ') ||
+                                  r.walletAddress?.startsWith('UQ') ||
+                                  r.walletAddress?.startsWith('0:') ||
+                                  r.walletAddress?.startsWith('-1:')
+                                );
+                                return (
+                                  <div className="flex items-center gap-2">
+                                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${
+                                      isTon
+                                        ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                                        : 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                                    }`}>
+                                      {isTon ? 'TON' : 'SOL'}
+                                    </span>
+                                    <span className="text-gray-300 font-mono text-xs">{r.walletAddress?.slice(0, 6)}...{r.walletAddress?.slice(-6)}</span>
+                                    <button
+                                      onClick={() => handleCopy(r.walletAddress)}
+                                      className="p-1 text-gray-500 hover:text-white rounded transition-colors"
+                                      title={`Copy ${isTon ? 'TON' : 'Solana'} Address`}
+                                    >
+                                      {copiedAddress === r.walletAddress ? (
+                                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                      ) : (
+                                        <Copy className="w-3.5 h-3.5" />
+                                      )}
+                                    </button>
+                                    <a
+                                      href={isTon ? `https://tonviewer.com/${r.walletAddress}` : `https://solscan.io/account/${r.walletAddress}`}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="p-1 text-gray-500 hover:text-cyan-400 rounded transition-colors"
+                                      title={isTon ? "View on Tonviewer" : "View on Solscan"}
+                                    >
+                                      <ExternalLink className="w-3.5 h-3.5" />
+                                    </a>
+                                  </div>
+                                );
+                              })()}
                             </td>
 
                             <td className="p-4 text-gray-400">
@@ -2188,9 +2205,18 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                 <span className="text-gray-400">Payout Amount:</span>
                 <span className="text-emerald-400 font-bold">${selectedReq.amountUsdt} USDT ({selectedReq.amountSovereigns} SOV)</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-gray-400">Destination Wallet:</span>
-                <span className="text-amber-300 font-bold break-all">{selectedReq.walletAddress}</span>
+                <span className="text-amber-300 font-bold break-all flex items-center gap-1.5">
+                  <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${
+                    selectedReq.walletAddress?.startsWith('EQ') || selectedReq.walletAddress?.startsWith('UQ') || selectedReq.walletAddress?.startsWith('0:') || selectedReq.walletAddress?.startsWith('-1:')
+                      ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                      : 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                  }`}>
+                    {selectedReq.walletAddress?.startsWith('EQ') || selectedReq.walletAddress?.startsWith('UQ') || selectedReq.walletAddress?.startsWith('0:') || selectedReq.walletAddress?.startsWith('-1:') ? 'TON' : 'SOL'}
+                  </span>
+                  {selectedReq.walletAddress}
+                </span>
               </div>
             </div>
 
@@ -2203,13 +2229,19 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
             {selectedReq.actionType === 'approve' ? (
               <div className="space-y-3">
                 <label className="text-xs font-mono text-gray-300 uppercase font-bold block">
-                  Solana On-Chain Transaction Hash (TXID):
+                  {selectedReq.walletAddress?.startsWith('EQ') || selectedReq.walletAddress?.startsWith('UQ') || selectedReq.walletAddress?.startsWith('0:') || selectedReq.walletAddress?.startsWith('-1:')
+                    ? 'TON Transaction Hash / Confirmation Note (TXID):'
+                    : 'Solana On-Chain Transaction Hash (TXID):'}
                 </label>
                 <input
                   type="text"
                   value={txidInput}
                   onChange={(e) => setTxidInput(e.target.value)}
-                  placeholder="Paste Solscan tx hash or manual confirmation note..."
+                  placeholder={
+                    selectedReq.walletAddress?.startsWith('EQ') || selectedReq.walletAddress?.startsWith('UQ') || selectedReq.walletAddress?.startsWith('0:') || selectedReq.walletAddress?.startsWith('-1:')
+                      ? 'Paste Tonviewer tx hash or manual confirmation note...'
+                      : 'Paste Solscan tx hash or manual confirmation note...'
+                  }
                   className="w-full bg-black/60 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500"
                 />
                 <button
@@ -2229,7 +2261,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                   rows={3}
                   value={rejectReasonInput}
                   onChange={(e) => setRejectReasonInput(e.target.value)}
-                  placeholder="e.g. Invalid Solana wallet address / Suspicious activity..."
+                  placeholder="e.g. Invalid wallet address / Suspicious activity..."
                   className="w-full bg-black/60 border border-white/15 rounded-xl p-3 text-xs font-mono text-white placeholder-gray-500 focus:outline-none focus:border-rose-500"
                 />
                 <button

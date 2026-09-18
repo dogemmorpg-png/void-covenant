@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useGame } from '../../context/GameContext';
+import { useTonConnectUI, useTonAddress } from '@tonconnect/ui-react';
 import { 
   Landmark, 
   ArrowUpRight, 
@@ -15,19 +16,60 @@ import {
   Trophy, 
   Scroll, 
   ClipboardPaste,
-  ExternalLink 
+  ExternalLink,
+  Copy,
+  Check,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 export const MobileBankView: React.FC = () => {
   const { profile, requestWithdrawal } = useGame();
 
+  const isTelegramUser = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    const hasTgWebApp = Boolean((window as any).Telegram?.WebApp?.initData);
+    const isTgAddress = Boolean(profile.solanaAddress?.startsWith('tg_'));
+    const isTgUa = /Telegram/i.test(navigator.userAgent || '');
+    return hasTgWebApp || isTgAddress || isTgUa;
+  }, [profile.solanaAddress]);
+
+  const [tonConnectUI] = useTonConnectUI();
+  const tonAddress = useTonAddress();
+  const [manualTonMode, setManualTonMode] = useState(false);
+  const [copiedTon, setCopiedTon] = useState(false);
+
   const [activeTab, setActiveTab] = useState<'terminal' | 'history'>('terminal');
   const [historyTab, setHistoryTab] = useState<'incoming' | 'withdrawals'>('incoming');
 
   const [withdrawAmount, setWithdrawAmount] = useState<string>('');
-  const [targetAddress, setTargetAddress] = useState<string>(profile.solanaAddress || '');
+  const [targetAddress, setTargetAddress] = useState<string>(() => {
+    if (profile.solanaAddress && !profile.solanaAddress.startsWith('tg_')) {
+      return profile.solanaAddress;
+    }
+    return '';
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Automatically sync connected TON wallet address for Telegram users
+  useEffect(() => {
+    if (isTelegramUser && tonAddress) {
+      setTargetAddress(tonAddress);
+    }
+  }, [isTelegramUser, tonAddress]);
+
+  const handleCopyTon = async (text: string) => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        setCopiedTon(true);
+        setTimeout(() => setCopiedTon(false), 2000);
+      }
+    } catch {
+      // Ignore clipboard write permission error
+    }
+  };
 
   const balance = profile.bloodSovereigns || 0;
   const numAmount = parseInt(withdrawAmount, 10) || 0;
@@ -81,7 +123,20 @@ export const MobileBankView: React.FC = () => {
     }
 
     if (!targetAddress || targetAddress.trim().length < 24) {
-      setFeedback({ type: 'error', message: 'Please provide a valid destination wallet address.' });
+      setFeedback({ 
+        type: 'error', 
+        message: isTelegramUser 
+          ? 'Please connect your Telegram/TON wallet or enter a valid TON address.' 
+          : 'Please provide a valid Solana destination wallet address.' 
+      });
+      return;
+    }
+
+    if (isTelegramUser && targetAddress.startsWith('tg_')) {
+      setFeedback({
+        type: 'error',
+        message: 'Please connect your TON wallet (@wallet or Tonkeeper) for Telegram payouts.'
+      });
       return;
     }
 
@@ -351,8 +406,14 @@ export const MobileBankView: React.FC = () => {
               <ArrowUpRight className="w-4 h-4 text-amber-400" />
               WITHDRAWAL TERMINAL
             </h3>
-            <span className="text-[10px] font-mono text-gray-400">
-              SOLANA NETWORK
+            <span className="text-[10px] font-mono text-gray-400 flex items-center gap-1">
+              {isTelegramUser ? (
+                <>
+                  <span className="text-cyan-400">💎</span> TON NETWORK
+                </>
+              ) : (
+                'SOLANA NETWORK'
+              )}
             </span>
           </div>
 
@@ -403,41 +464,154 @@ export const MobileBankView: React.FC = () => {
               <span className="text-sm font-black text-emerald-400">${usdtEquivalent} USDT</span>
             </div>
 
-            {/* Destination Wallet Address Input */}
-            <div className="space-y-1.5">
-              <div className="flex justify-between items-center text-xs">
-                <label className="text-gray-300 font-mono text-[11px]">Destination Wallet</label>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handlePasteClipboard}
-                    className="inline-flex items-center gap-1 text-[10px] font-mono text-cyan-400 hover:text-cyan-300 underline cursor-pointer"
-                  >
-                    <ClipboardPaste className="w-3 h-3" />
-                    Paste
-                  </button>
-                  {profile.solanaAddress && (
+            {/* Destination Wallet: Telegram / TON vs Solana */}
+            {isTelegramUser ? (
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-xs">
+                  <label className="text-gray-300 font-mono text-[11px] flex items-center gap-1.5">
+                    <span className="text-cyan-400 font-bold">💎</span>
+                    <span>Telegram / TON Wallet</span>
+                  </label>
+                  <span className="text-[10px] text-cyan-400/80 font-mono">
+                    @wallet / Tonkeeper
+                  </span>
+                </div>
+
+                {tonAddress ? (
+                  /* TON Connected State */
+                  <div className="bg-gradient-to-r from-sky-950/40 via-cyan-950/30 to-blue-950/40 border border-cyan-500/40 rounded-xl p-3 space-y-2.5 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-xs">
+                          💎
+                        </div>
+                        <div>
+                          <div className="text-[11px] font-bold text-white leading-tight">Telegram Wallet Connected</div>
+                          <span className="text-[9px] font-mono text-emerald-400 font-semibold flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
+                            Ready for TON Payout
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            await tonConnectUI.disconnect();
+                            setTargetAddress('');
+                          } catch (e) {
+                            console.error('Failed to disconnect TON wallet:', e);
+                          }
+                        }}
+                        className="text-[10px] font-mono text-gray-400 hover:text-red-400 transition-colors px-2 py-1 rounded bg-black/40 border border-white/10 hover:border-red-500/30 cursor-pointer"
+                      >
+                        Disconnect
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between bg-black/70 border border-cyan-500/20 rounded-lg px-3 py-2">
+                      <span className="font-mono text-xs text-cyan-200 tracking-wide truncate max-w-[200px]" title={tonAddress}>
+                        {tonAddress.slice(0, 8)}...{tonAddress.slice(-8)}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyTon(tonAddress)}
+                        className="text-[10px] font-mono text-cyan-300 hover:text-cyan-200 flex items-center gap-1 px-2 py-1 rounded bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/30 transition-all cursor-pointer shrink-0"
+                      >
+                        {copiedTon ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                        <span>{copiedTon ? 'Copied' : 'Copy'}</span>
+                      </button>
+                    </div>
+
+                    <p className="text-[10px] text-gray-400 font-sans leading-relaxed">
+                      Withdrawals will be transferred directly to this TON address.
+                    </p>
+                  </div>
+                ) : (
+                  /* TON Disconnected State */
+                  <div className="space-y-2">
                     <button
                       type="button"
-                      onClick={handleUseConnectedWallet}
-                      className="text-amber-400 hover:text-amber-300 text-[10px] font-mono underline cursor-pointer"
+                      onClick={() => tonConnectUI.openModal()}
+                      className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-sky-600 via-cyan-500 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-display font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.4)] active:scale-98 transition-all cursor-pointer border border-cyan-400/40"
                     >
-                      Use Connected
+                      <span className="text-base">💎</span>
+                      <span>Connect Telegram / TON Wallet</span>
                     </button>
-                  )}
+
+                    <div className="flex items-center justify-between px-1 pt-0.5">
+                      <button
+                        type="button"
+                        onClick={() => setManualTonMode(!manualTonMode)}
+                        className="text-[10.5px] font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1 cursor-pointer transition-colors"
+                      >
+                        {manualTonMode ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                        <span>{manualTonMode ? 'Hide manual address input' : 'Or paste TON address manually'}</span>
+                      </button>
+                    </div>
+
+                    {manualTonMode && (
+                      <div className="bg-black/50 border border-white/10 rounded-xl p-3 space-y-1.5 animate-in fade-in duration-150">
+                        <div className="flex justify-between items-center text-[10px]">
+                          <span className="text-gray-400 font-mono">TON Address (UQ... / EQ...)</span>
+                          <button
+                            type="button"
+                            onClick={handlePasteClipboard}
+                            className="inline-flex items-center gap-1 text-[10px] font-mono text-cyan-400 hover:text-cyan-300 underline cursor-pointer"
+                          >
+                            <ClipboardPaste className="w-3 h-3" />
+                            Paste
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          value={targetAddress}
+                          onChange={(e) => setTargetAddress(e.target.value)}
+                          placeholder="e.g. UQD... or EQD..."
+                          className="w-full bg-black/70 border border-white/15 focus:border-cyan-500 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none transition-colors"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Regular Mobile Browser: Solana Wallet Address Input */
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center text-xs">
+                  <label className="text-gray-300 font-mono text-[11px]">Destination Wallet (Solana)</label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handlePasteClipboard}
+                      className="inline-flex items-center gap-1 text-[10px] font-mono text-cyan-400 hover:text-cyan-300 underline cursor-pointer"
+                    >
+                      <ClipboardPaste className="w-3 h-3" />
+                      Paste
+                    </button>
+                    {profile.solanaAddress && !profile.solanaAddress.startsWith('tg_') && (
+                      <button
+                        type="button"
+                        onClick={handleUseConnectedWallet}
+                        className="text-amber-400 hover:text-amber-300 text-[10px] font-mono underline cursor-pointer"
+                      >
+                        Use Connected
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={targetAddress}
+                    onChange={(e) => setTargetAddress(e.target.value)}
+                    placeholder="Solana destination address (e.g. 7xK...)"
+                    className="w-full bg-black/60 border border-white/15 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-white font-mono text-xs outline-none transition-colors pr-9"
+                  />
+                  <Wallet className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                 </div>
               </div>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={targetAddress}
-                  onChange={(e) => setTargetAddress(e.target.value)}
-                  placeholder="Solana destination address (e.g. 7xK...)"
-                  className="w-full bg-black/60 border border-white/15 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-white font-mono text-xs outline-none transition-colors pr-9"
-                />
-                <Wallet className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-              </div>
-            </div>
+            )}
 
             {/* Feedback messages */}
             {feedback && (
@@ -687,24 +861,43 @@ export const MobileBankView: React.FC = () => {
                           </span>
                         </div>
 
-                        <div className="flex justify-between items-center text-[10px] font-mono text-gray-400">
-                          <span className="truncate max-w-[160px]">{req.walletAddress}</span>
-                          <span>{new Date(req.createdAt).toLocaleDateString()}</span>
-                        </div>
+                        {(() => {
+                          const isTon = Boolean(
+                            req.walletAddress?.startsWith('EQ') ||
+                            req.walletAddress?.startsWith('UQ') ||
+                            req.walletAddress?.startsWith('0:') ||
+                            req.walletAddress?.startsWith('-1:')
+                          );
+                          return (
+                            <>
+                              <div className="flex justify-between items-center text-[10px] font-mono text-gray-400">
+                                <span className="truncate max-w-[170px] flex items-center gap-1">
+                                  <span className={`text-[8px] font-bold px-1 py-0.2 rounded border ${
+                                    isTon ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' : 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+                                  }`}>
+                                    {isTon ? 'TON' : 'SOL'}
+                                  </span>
+                                  {req.walletAddress}
+                                </span>
+                                <span>{new Date(req.createdAt).toLocaleDateString()}</span>
+                              </div>
 
-                        {req.txHash && (
-                          <div className="pt-1 border-t border-white/5">
-                            <a 
-                              href={`https://solscan.io/tx/${req.txHash}`} 
-                              target="_blank" 
-                              rel="noreferrer" 
-                              className="text-[10px] font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
-                            >
-                              <ExternalLink className="w-3 h-3" />
-                              View Transaction on Solscan ↗
-                            </a>
-                          </div>
-                        )}
+                              {req.txHash && (
+                                <div className="pt-1 border-t border-white/5">
+                                  <a 
+                                    href={isTon ? `https://tonviewer.com/transaction/${req.txHash}` : `https://solscan.io/tx/${req.txHash}`} 
+                                    target="_blank" 
+                                    rel="noreferrer" 
+                                    className="text-[10px] font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
+                                  >
+                                    <ExternalLink className="w-3 h-3" />
+                                    {isTon ? 'View Transaction on Tonviewer ↗' : 'View Transaction on Solscan ↗'}
+                                  </a>
+                                </div>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
                     ))}
                   </div>

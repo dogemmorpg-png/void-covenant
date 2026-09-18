@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { TonConnectUIProvider, THEME } from '@tonconnect/ui-react';
 import { GameProvider, useGame } from './context/GameContext';
 import { ToastProvider } from './components/Toast';
 import { HeaderHUD } from './components/HeaderHUD';
@@ -583,13 +584,22 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 }
 
 export default function App() {
+  const tonManifestUrl = typeof window !== 'undefined' && window.location?.origin
+    ? `${window.location.origin}/tonconnect-manifest.json`
+    : 'https://void-covenant.com/tonconnect-manifest.json';
+
   return (
     <ErrorBoundary>
-      <ToastProvider>
-        <GameProvider>
-          <MainAppContent />
-        </GameProvider>
-      </ToastProvider>
+      <TonConnectUIProvider
+        manifestUrl={tonManifestUrl}
+        uiPreferences={{ theme: THEME.DARK }}
+      >
+        <ToastProvider>
+          <GameProvider>
+            <MainAppContent />
+          </GameProvider>
+        </ToastProvider>
+      </TonConnectUIProvider>
     </ErrorBoundary>
   );
 }
