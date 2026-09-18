@@ -29,39 +29,39 @@ const SLOTS_CONFIG: SlotConfig[] = [
 
 const TIER_STYLES: Record<CardTier, { border: string; bg: string; text: string; glow: string; itemGlow: string }> = {
   bronze: {
-    border: 'border-amber-700/60 hover:border-amber-600',
-    bg: 'from-[#221609]/90 via-[#150d05]/90 to-black',
-    text: 'text-amber-500',
-    glow: 'shadow-[0_0_12px_rgba(180,83,9,0.25)]',
+    border: 'border-amber-700/70 hover:border-amber-600',
+    bg: 'from-[#2d1e0d] via-[#1c1207] to-[#140b04]',
+    text: 'text-amber-400',
+    glow: 'shadow-[0_0_12px_rgba(180,83,9,0.3)]',
     itemGlow: 'drop-shadow-[0_4px_8px_rgba(0,0,0,0.85)]'
   },
   silver: {
-    border: 'border-slate-300/60 hover:border-slate-200',
-    bg: 'from-[#1a232c]/90 via-[#0e141a]/90 to-black',
-    text: 'text-slate-300',
-    glow: 'shadow-[0_0_12px_rgba(203,213,225,0.25)]',
+    border: 'border-slate-300/70 hover:border-slate-200',
+    bg: 'from-[#222c38] via-[#161f28] to-[#10161d]',
+    text: 'text-slate-200',
+    glow: 'shadow-[0_0_12px_rgba(203,213,225,0.3)]',
     itemGlow: 'drop-shadow-[0_4px_8px_rgba(0,0,0,0.85)]'
   },
   gold: {
-    border: 'border-amber-400/80 hover:border-amber-300',
-    bg: 'from-[#2e2008]/90 via-[#191103]/90 to-black',
+    border: 'border-amber-400/90 hover:border-amber-300',
+    bg: 'from-[#3a290a] via-[#241904] to-[#171002]',
     text: 'text-amber-300',
-    glow: 'shadow-[0_0_18px_rgba(251,191,36,0.35)]',
-    itemGlow: 'drop-shadow-[0_0_10px_rgba(251,191,36,0.35)]'
+    glow: 'shadow-[0_0_18px_rgba(251,191,36,0.4)]',
+    itemGlow: 'drop-shadow-[0_0_10px_rgba(251,191,36,0.4)]'
   },
   legendary: {
-    border: 'border-purple-500/90 hover:border-purple-400',
-    bg: 'from-[#280c35]/90 via-[#15041d]/90 to-black',
+    border: 'border-purple-500/95 hover:border-purple-400',
+    bg: 'from-[#381347] via-[#220a2c] to-[#15061b]',
     text: 'text-purple-300',
-    glow: 'shadow-[0_0_22px_rgba(168,85,247,0.45)]',
-    itemGlow: 'drop-shadow-[0_0_12px_rgba(168,85,247,0.45)]'
+    glow: 'shadow-[0_0_22px_rgba(168,85,247,0.5)]',
+    itemGlow: 'drop-shadow-[0_0_12px_rgba(168,85,247,0.5)]'
   },
   divine: {
-    border: 'border-rose-500/90 hover:border-rose-400',
-    bg: 'from-[#350811]/90 via-[#1c0409]/90 to-black',
-    text: 'text-rose-400 font-bold',
-    glow: 'shadow-[0_0_24px_rgba(244,63,94,0.6)] ring-1 ring-rose-400/50',
-    itemGlow: 'drop-shadow-[0_0_14px_rgba(244,63,94,0.7)]'
+    border: 'border-rose-500/95 hover:border-rose-400',
+    bg: 'from-[#460c18] via-[#2a060e] to-[#1a0308]',
+    text: 'text-rose-300 font-bold',
+    glow: 'shadow-[0_0_26px_rgba(244,63,94,0.65)] ring-1 ring-rose-400/60',
+    itemGlow: 'drop-shadow-[0_0_14px_rgba(244,63,94,0.75)]'
   }
 };
 
@@ -330,10 +330,10 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
         onClick={() => setSelectedSlot(selectedSlot === slot ? null : slot)}
         className={`w-[78px] h-[78px] min-[390px]:w-[84px] min-[390px]:h-[84px] rounded-2xl p-1.5 flex flex-col items-center justify-between cursor-pointer transition-all duration-200 relative group overflow-hidden ${
           isSelected
-            ? 'border-2 border-purple-400 ring-2 ring-purple-500/50 scale-105 shadow-[0_0_20px_rgba(168,85,247,0.5)] z-20 bg-purple-950/40'
+            ? 'border-2 border-purple-400 ring-2 ring-purple-500/50 scale-105 shadow-[0_0_20px_rgba(168,85,247,0.5)] z-20 bg-purple-950/50'
             : item
             ? `border-2 ${tierStyle?.border} bg-gradient-to-b ${tierStyle?.bg} ${tierStyle?.glow} active:scale-95`
-            : 'border border-white/15 bg-gradient-to-b from-[#140e18]/80 to-black/90 active:scale-95 shadow-inner'
+            : 'border border-[#ebd09b]/25 bg-gradient-to-b from-[#201524]/90 to-[#120a15]/95 active:scale-95 shadow-inner'
         }`}
       >
         {item ? (
@@ -410,10 +410,10 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
       >
         <div 
           onClick={(e) => e.stopPropagation()}
-          className="bg-gradient-to-b from-[#1c1422] via-[#130d17] to-[#0a070c] border-2 border-purple-500/40 rounded-3xl p-4 sm:p-5 shadow-[0_0_50px_rgba(168,85,247,0.35)] w-full max-w-lg max-h-[85vh] flex flex-col space-y-3 overflow-hidden cursor-default animate-in zoom-in-95 duration-150"
+          className="bg-gradient-to-b from-[#261c2e] via-[#1a1220] to-[#110a15] border-2 border-purple-500/50 rounded-3xl p-4 sm:p-5 shadow-[0_0_50px_rgba(168,85,247,0.45)] w-full max-w-lg max-h-[85vh] flex flex-col space-y-3 overflow-hidden cursor-default animate-in zoom-in-95 duration-150"
         >
           {/* Modal Header */}
-          <div className="flex items-center justify-between border-b border-gray-800 pb-3 shrink-0">
+          <div className="flex items-center justify-between border-b border-purple-900/40 pb-3 shrink-0">
             <div className="flex items-center gap-2.5">
               <div className="w-10 h-10 rounded-xl bg-black/70 border border-purple-500/50 flex items-center justify-center shadow-inner">
                 <img src={slotCfg?.iconPath} alt={selectedSlot} className="w-6 h-6 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]" />
@@ -548,7 +548,7 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
   };
 
   return (
-    <div className="h-full w-full flex flex-col bg-[#080a0f] text-gray-200 select-none overflow-y-auto no-scrollbar font-sans pb-24">
+    <div className="h-full w-full flex flex-col bg-[#0c0f16] text-gray-200 select-none overflow-y-auto no-scrollbar font-sans pb-24">
       {/* Dynamic Keyframes for Animated SVG Beziers */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes energyFlow {
@@ -561,14 +561,14 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
       `}} />
 
       {/* 1. TOP SUB-TAB NAVIGATION */}
-      <div className="sticky top-0 z-30 bg-[#080a0f]/95 backdrop-blur-md border-b border-[#c5a880]/20 px-3 py-2 shrink-0">
+      <div className="sticky top-0 z-30 bg-[#0c0f16]/95 backdrop-blur-md border-b border-[#c5a880]/30 px-3 py-2 shrink-0">
         <div className="flex gap-2 max-w-sm mx-auto">
           <button 
             onClick={() => setSubTab('equipment')}
             className={`flex-1 py-2 px-3 rounded-xl font-display font-black tracking-wider text-[11px] min-[380px]:text-xs transition-all duration-200 uppercase flex items-center justify-center gap-1.5 cursor-pointer ${
               subTab === 'equipment' 
-                ? 'bg-gradient-to-b from-[#3b1248] via-[#240a2c] to-[#120417] text-purple-200 border-2 border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.35)]' 
-                : 'bg-black/50 text-gray-400 border border-white/10 hover:text-white'
+                ? 'bg-gradient-to-b from-[#4a185b] via-[#300d3b] to-[#1a0720] text-purple-100 border-2 border-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.4)]' 
+                : 'bg-[#131822] text-gray-300 border border-[#c5a880]/20 hover:text-white'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-purple-400" /> RELICS & GEAR
@@ -578,8 +578,8 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
             onClick={() => setSubTab('talents')}
             className={`flex-1 py-2 px-3 rounded-xl font-display font-black tracking-wider text-[11px] min-[380px]:text-xs transition-all duration-200 uppercase flex items-center justify-center gap-1.5 cursor-pointer ${
               subTab === 'talents' 
-                ? 'bg-gradient-to-b from-[#3a2208] via-[#241403] to-[#100801] text-amber-200 border-2 border-amber-500 shadow-[0_0_15px_rgba(251,191,36,0.35)]' 
-                : 'bg-black/50 text-gray-400 border border-white/10 hover:text-white'
+                ? 'bg-gradient-to-b from-[#4a2c0a] via-[#321c04] to-[#1a0e02] text-amber-100 border-2 border-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.4)]' 
+                : 'bg-[#131822] text-gray-300 border border-[#c5a880]/20 hover:text-white'
             }`}
           >
             <Zap className="w-3.5 h-3.5 text-amber-400" /> TALENT TREE
@@ -594,12 +594,12 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
         <div className="p-3 space-y-3 max-w-md mx-auto w-full">
 
           {/* 2. LORD PROFILE & ATTRIBUTES CARD */}
-          <div className="bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-[#c5a880]/30 rounded-2xl p-3.5 shadow-xl relative overflow-hidden space-y-3">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-900/10 blur-3xl pointer-events-none" />
+          <div className="bg-gradient-to-b from-[#261b2a] via-[#1a121e] to-[#120b16] border border-[#ebd09b]/35 rounded-2xl p-3.5 shadow-2xl relative overflow-hidden space-y-3">
+            <div className="absolute top-0 right-0 w-36 h-36 bg-purple-600/15 blur-3xl pointer-events-none" />
 
             {/* Profile Avatar, Username & Current Stance */}
             <div className="flex items-center gap-3 relative z-10">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-b from-purple-950 to-black border-2 border-[#ebd09b] p-0.5 shadow-[0_0_15px_rgba(235,208,155,0.25)] flex items-center justify-center shrink-0">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-b from-purple-900 to-[#180f20] border-2 border-[#ebd09b] p-0.5 shadow-[0_0_15px_rgba(235,208,155,0.35)] flex items-center justify-center shrink-0">
                 {profile.avatarUrl ? (
                   <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                 ) : (
@@ -612,19 +612,19 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                   <h3 className="font-display font-black text-sm text-white tracking-wider uppercase truncate text-shadow-gold">
                     {profile.username || 'Abyssal Lord'}
                   </h3>
-                  <span className="text-[#ebd09b] font-mono text-[9px] font-black bg-[#ebd09b]/10 border border-[#ebd09b]/30 px-2 py-0.5 rounded-full shadow-inner shrink-0">
+                  <span className="text-[#ebd09b] font-mono text-[9px] font-black bg-[#ebd09b]/15 border border-[#ebd09b]/40 px-2 py-0.5 rounded-full shadow-inner shrink-0">
                     LVL {profile.level}
                   </span>
                 </div>
 
                 {/* Stance Indicator Banner */}
-                <div className="mt-1 bg-black/60 border border-white/10 rounded-lg py-1 px-2 flex items-center gap-1.5">
+                <div className="mt-1 bg-[#16101c]/95 border border-[#ebd09b]/25 rounded-lg py-1 px-2 flex items-center gap-1.5">
                   <div className="shrink-0">{activeStance.icon("w-3.5 h-3.5")}</div>
                   <div className="min-w-0 flex-1">
                     <span className={`text-[9px] font-display font-black uppercase tracking-wider block ${activeStance.color} leading-none`}>
                       {activeStance.name}
                     </span>
-                    <span className="text-[7.5px] text-gray-400 font-sans block truncate leading-tight mt-0.5">
+                    <span className="text-[7.5px] text-gray-300 font-sans block truncate leading-tight mt-0.5">
                       {activeStance.desc}
                     </span>
                   </div>
@@ -634,11 +634,11 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
 
             {/* EXP Progress Bar */}
             <div className="space-y-1 relative z-10 pt-0.5">
-              <div className="flex justify-between text-gray-400 text-[8.5px] font-mono uppercase font-bold">
+              <div className="flex justify-between text-gray-300 text-[8.5px] font-mono uppercase font-bold">
                 <span>EXPERIENCE</span>
-                <span className="text-gray-300">{Math.floor(profile.exp || 0).toLocaleString()} / {reqExp.toLocaleString()}</span>
+                <span className="text-gray-200">{Math.floor(profile.exp || 0).toLocaleString()} / {reqExp.toLocaleString()}</span>
               </div>
-              <div className="w-full h-1.5 bg-black/80 rounded-full overflow-hidden border border-white/10 shadow-inner">
+              <div className="w-full h-1.5 bg-[#110a15] rounded-full overflow-hidden border border-[#c5a880]/25 shadow-inner">
                 <div 
                   className="h-full bg-gradient-to-r from-purple-500 via-indigo-400 to-emerald-400 transition-all duration-500 shadow-[0_0_8px_rgba(168,85,247,0.5)]" 
                   style={{ width: `${expPercent}%` }} 
@@ -647,46 +647,46 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
             </div>
 
             {/* Battle Attributes 2x2 Grid */}
-            <div className="pt-2 border-t border-gray-800/80 space-y-1.5 relative z-10">
+            <div className="pt-2 border-t border-purple-900/40 space-y-1.5 relative z-10">
               <div className="flex items-center justify-between">
                 <span className="text-[9.5px] font-display font-black text-[#ebd09b] tracking-wider uppercase">
                   BATTLE ATTRIBUTES
                 </span>
-                <span className="text-[8.5px] font-mono text-purple-300 font-bold bg-purple-950/60 border border-purple-500/30 px-2 py-0.5 rounded-full">
+                <span className="text-[8.5px] font-mono text-purple-300 font-bold bg-purple-950/70 border border-purple-500/40 px-2 py-0.5 rounded-full">
                   {equippedList.length}/6 Relics
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-1.5 font-mono">
                 {/* Max Health */}
-                <div className="bg-black/60 border border-emerald-500/25 px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
-                  <span className="flex items-center gap-1 text-gray-400 text-[9px] uppercase font-bold">
+                <div className="bg-[#16101b]/95 border border-emerald-500/35 px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
+                  <span className="flex items-center gap-1 text-gray-300 text-[9px] uppercase font-bold">
                     <Heart className="w-3 h-3 text-emerald-400 shrink-0" /> HP
                   </span>
                   <div className="flex items-baseline gap-1">
                     <span className="text-emerald-300 font-display font-black text-xs">{totalHealth}</span>
                     {bonusHealth > 0 && (
-                      <span className="text-[8px] text-emerald-400/80 font-bold">+{bonusHealth}</span>
+                      <span className="text-[8px] text-emerald-400/90 font-bold">+{bonusHealth}</span>
                     )}
                   </div>
                 </div>
 
                 {/* Dodge Chance */}
-                <div className="bg-black/60 border border-cyan-500/25 px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
-                  <span className="flex items-center gap-1 text-gray-400 text-[9px] uppercase font-bold">
+                <div className="bg-[#16101b]/95 border border-cyan-500/35 px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
+                  <span className="flex items-center gap-1 text-gray-300 text-[9px] uppercase font-bold">
                     <Wind className="w-3 h-3 text-cyan-400 shrink-0" /> Dodge
                   </span>
                   <div className="flex items-baseline gap-1">
                     <span className="text-cyan-300 font-display font-black text-xs">{bonusDodge}%</span>
                     {bonusDodge > 0 && (
-                      <span className="text-[8px] text-cyan-400/80 font-bold">+{bonusDodge}%</span>
+                      <span className="text-[8px] text-cyan-400/90 font-bold">+{bonusDodge}%</span>
                     )}
                   </div>
                 </div>
 
                 {/* Gold Bonus */}
-                <div className="bg-black/60 border border-amber-500/25 px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
-                  <span className="flex items-center gap-1 text-gray-400 text-[9px] uppercase font-bold">
+                <div className="bg-[#16101b]/95 border border-amber-500/35 px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
+                  <span className="flex items-center gap-1 text-gray-300 text-[9px] uppercase font-bold">
                     <Coins className="w-3 h-3 text-amber-400 shrink-0" /> Gold
                   </span>
                   <div className="flex items-baseline gap-1">
@@ -695,8 +695,8 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                 </div>
 
                 {/* Delay Reduction */}
-                <div className="bg-black/60 border border-purple-500/25 px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
-                  <span className="flex items-center gap-1 text-gray-400 text-[9px] uppercase font-bold">
+                <div className="bg-[#16101b]/95 border border-purple-500/35 px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
+                  <span className="flex items-center gap-1 text-gray-300 text-[9px] uppercase font-bold">
                     <Hourglass className="w-3 h-3 text-purple-400 shrink-0" /> Delay
                   </span>
                   <div className="flex items-baseline gap-1">
@@ -710,14 +710,14 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
           </div>
 
           {/* 3. PAPERDOLL MANNEQUIN CARD */}
-          <div className="bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-purple-900/40 rounded-2xl p-3.5 shadow-xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.08),transparent_70%)] pointer-events-none" />
+          <div className="bg-gradient-to-b from-[#251a28] via-[#1a111d] to-[#110a14] border border-purple-500/35 rounded-2xl p-3.5 shadow-2xl relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.15),transparent_70%)] pointer-events-none" />
 
-            <div className="flex items-center justify-between border-b border-purple-900/40 pb-2 mb-2 relative z-10">
+            <div className="flex items-center justify-between border-b border-purple-900/50 pb-2 mb-2 relative z-10">
               <h3 className="font-display font-black text-xs text-purple-200 tracking-wider uppercase flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-purple-400" /> EQUIPPED RELICS
               </h3>
-              <span className="text-[8.5px] font-mono text-gray-400">
+              <span className="text-[8.5px] font-mono text-purple-200/70">
                 Tap slot to equip
               </span>
             </div>
@@ -735,8 +735,8 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
 
                 {/* Center Silhouette Mannequin */}
                 <div className="w-20 min-[380px]:w-24 h-64 relative flex items-center justify-center">
-                  <div className="w-full h-full bg-black/40 border border-purple-500/20 rounded-2xl flex items-center justify-center p-1.5 shadow-inner overflow-hidden relative">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.2),transparent_70%)] pointer-events-none" />
+                  <div className="w-full h-full bg-[#150e1b]/80 border border-purple-500/30 rounded-2xl flex items-center justify-center p-1.5 shadow-inner overflow-hidden relative">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.3),transparent_70%)] pointer-events-none" />
                     <img 
                       src="/icons/equipment/lord_silhouette.png" 
                       alt="Lord Silhouette" 
@@ -757,13 +757,13 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
           </div>
 
           {/* 4. SET OF THE DEMIURGE (DIVINE RESONANCE MONOLITH) */}
-          <div className="bg-gradient-to-b from-[#210912] via-[#14050b] to-[#0a0205] border-2 border-rose-500/40 rounded-2xl p-3.5 shadow-xl relative overflow-hidden space-y-3">
-            <div className="absolute top-0 right-0 w-36 h-36 bg-rose-600/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="bg-gradient-to-b from-[#2e0e1a] via-[#1d0811] to-[#120409] border-2 border-rose-500/50 rounded-2xl p-3.5 shadow-2xl relative overflow-hidden space-y-3">
+            <div className="absolute top-0 right-0 w-36 h-36 bg-rose-600/20 rounded-full blur-3xl pointer-events-none" />
 
             {/* Crest + Title + Resonance Counter */}
-            <div className="border-b border-rose-500/20 pb-2.5 relative z-10">
+            <div className="border-b border-rose-500/30 pb-2.5 relative z-10">
               <div className="flex items-center gap-2.5">
-                <div className="w-11 h-11 rounded-xl bg-rose-950/80 border border-rose-500/50 p-1 flex items-center justify-center shadow-[0_0_15px_rgba(244,63,94,0.35)] shrink-0">
+                <div className="w-11 h-11 rounded-xl bg-rose-950/90 border border-rose-500/60 p-1 flex items-center justify-center shadow-[0_0_15px_rgba(244,63,94,0.4)] shrink-0">
                   <img 
                     src="/icons/equipment/demiurge_crest.png" 
                     alt="Demiurge Crest" 
@@ -782,7 +782,7 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                   </div>
 
                   <div className="mt-1 flex items-center justify-between">
-                    <span className="text-[8.5px] font-mono text-gray-400 font-bold uppercase">Resonance</span>
+                    <span className="text-[8.5px] font-mono text-gray-300 font-bold uppercase">Resonance</span>
                     <span className="font-mono font-black text-xs text-rose-300">
                       {demiurgePieces} / 6 Pieces
                     </span>
@@ -798,7 +798,7 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                     className={`h-1.5 rounded-full transition-all duration-300 ${
                       i <= demiurgePieces 
                         ? 'bg-gradient-to-r from-rose-500 to-amber-400 shadow-[0_0_8px_rgba(244,63,94,0.8)]' 
-                        : 'bg-black/60 border border-white/10'
+                        : 'bg-[#18080f] border border-rose-900/30'
                     }`}
                   />
                 ))}
@@ -814,8 +814,8 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                     key={tIdx}
                     className={`rounded-xl p-2.5 border transition-all duration-300 ${
                       isActive
-                        ? 'bg-gradient-to-r from-rose-950/90 via-[#270710]/90 to-rose-950/80 border-rose-400/90 shadow-[0_0_12px_rgba(244,63,94,0.35)] ring-1 ring-rose-400/40'
-                        : 'bg-black/50 border-white/10 opacity-60'
+                        ? 'bg-gradient-to-r from-rose-950/90 via-[#2f0813]/90 to-rose-950/80 border-rose-400/90 shadow-[0_0_14px_rgba(244,63,94,0.4)] ring-1 ring-rose-400/40'
+                        : 'bg-[#18080f]/80 border-rose-900/40 opacity-75'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-1 mb-1">
@@ -870,9 +870,9 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
         <div className="p-3 space-y-3 max-w-md mx-auto w-full">
           
           {/* Header Card: Points & Reset */}
-          <div className="bg-gradient-to-b from-[#18121a] via-[#120d15] to-[#0a070c] border border-[#c5a880]/30 rounded-2xl p-3.5 shadow-xl relative overflow-hidden flex items-center justify-between gap-2">
+          <div className="bg-gradient-to-b from-[#261b2a] via-[#1a121e] to-[#120b16] border border-[#ebd09b]/35 rounded-2xl p-3.5 shadow-2xl relative overflow-hidden flex items-center justify-between gap-2">
             <div className="min-w-0">
-              <span className="block text-[10px] min-[380px]:text-[11px] font-bold tracking-widest uppercase text-gray-400 font-mono mb-0.5">
+              <span className="block text-[10px] min-[380px]:text-[11px] font-bold tracking-widest uppercase text-gray-300 font-mono mb-0.5">
                 UNSPENT POINTS
               </span>
               <span className="block text-2xl min-[380px]:text-3xl font-display font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)] leading-none">
@@ -883,7 +883,7 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
             <button
               onClick={() => setIsResetConfirmOpen(true)}
               disabled={spentTalentPoints === 0 || isResetting}
-              className="bg-gradient-to-r from-red-950/80 to-rose-950/90 hover:from-red-900 hover:to-rose-900 border border-rose-500/50 text-rose-200 hover:text-white px-3 py-1.5 rounded-xl text-[10.5px] font-display font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="bg-gradient-to-r from-red-950 via-rose-900 to-red-950 hover:from-red-900 hover:to-rose-800 border border-rose-500/60 text-rose-200 hover:text-white px-3 py-1.5 rounded-xl text-[10.5px] font-display font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5 text-rose-400" />
               <span>RESET</span>
@@ -895,7 +895,7 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
           </div>
 
           {/* Stance Selector Pills */}
-          <div className="bg-black/60 border border-white/10 rounded-2xl p-1.5 grid grid-cols-3 gap-1">
+          <div className="bg-[#141a24]/90 border border-[#c5a880]/30 rounded-2xl p-1.5 grid grid-cols-3 gap-1 shadow-lg">
             {(['void_strike', 'blood_aura', 'warlord_cry'] as const).map(stKey => {
               const st = STANCE_CONFIG[stKey];
               const isSelectedTab = activeTalentStance === stKey;
@@ -908,7 +908,7 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                   className={`py-2 px-1 rounded-xl transition-all flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
                     isSelectedTab
                       ? `bg-gradient-to-b ${st.bgActive} border-2 ${st.borderActive} shadow-lg text-white`
-                      : 'border border-transparent text-gray-400 hover:text-gray-200'
+                      : 'border border-white/5 bg-black/30 text-gray-300 hover:text-white'
                   }`}
                 >
                   <div className="shrink-0">{st.icon("w-4 h-4")}</div>
@@ -929,7 +929,7 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
             const isEquipped = (profile.activeStance || 'void_strike') === activeTalentStance;
 
             return (
-              <div className="bg-gradient-to-b from-[#13101c] to-[#0a0812] border border-white/15 rounded-2xl p-3 flex items-center justify-between gap-2 shadow-md">
+              <div className="bg-gradient-to-b from-[#1e162a] via-[#150f1f] to-[#0f0a17] border border-[#c5a880]/30 rounded-2xl p-3 flex items-center justify-between gap-2 shadow-xl">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
                     <span className={`text-[11px] font-display font-black uppercase tracking-wider ${currentCfg.color}`}>
@@ -941,13 +941,13 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                       </span>
                     )}
                   </div>
-                  <p className="text-[9px] font-sans text-gray-400 mt-0.5 leading-snug">
-                    Base: <span className="text-gray-200">{currentCfg.desc}</span>
+                  <p className="text-[9px] font-sans text-gray-300 mt-0.5 leading-snug">
+                    Base: <span className="text-gray-100">{currentCfg.desc}</span>
                   </p>
                 </div>
 
                 {isEquipped ? (
-                  <span className="bg-emerald-950/70 border border-emerald-500/40 text-emerald-400 text-[9px] font-mono font-black px-2.5 py-1 rounded-xl shrink-0 flex items-center gap-1">
+                  <span className="bg-emerald-950/80 border border-emerald-500/50 text-emerald-400 text-[9px] font-mono font-black px-2.5 py-1 rounded-xl shrink-0 flex items-center gap-1 shadow-sm">
                     <Check className="w-3 h-3" /> ACTIVE
                   </span>
                 ) : (
@@ -965,9 +965,9 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
           {/* ------------------------------------------------------------- */}
           {/* AUTHENTIC PC-STYLE SVG CONSTELLATION TALENT TREE FOR MOBILE   */}
           {/* ------------------------------------------------------------- */}
-          <div className="relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-950/90 via-black to-black border border-white/15 rounded-3xl p-2 pt-3 shadow-2xl overflow-hidden">
+          <div className="relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#221830] via-[#140e1e] to-[#0c0813] border border-[#c5a880]/35 rounded-3xl p-2 pt-3 shadow-2xl overflow-hidden">
             {/* Dynamic Background Watermark matching PC */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center opacity-[0.03] text-white">
+            <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center opacity-[0.07] text-white">
               <div className="scale-[10] blur-sm transform rotate-12">
                 {STANCE_CONFIG[activeTalentStance].icon("w-16 h-16")}
               </div>
@@ -975,7 +975,7 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
 
             {/* Background Ambient Radial Glow */}
             <div 
-              className="absolute -top-20 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full blur-[80px] pointer-events-none opacity-20"
+              className="absolute -top-20 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full blur-[90px] pointer-events-none opacity-35"
               style={{ backgroundColor: STANCE_CONFIG[activeTalentStance].themeHex }}
             />
 
@@ -1093,28 +1093,28 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                 const strokeDashoffset = circumference - (progressPct / 100) * circumference;
 
                 // Theme styles matching PC
-                let themeBg = 'bg-[#0f0f15]/95';
-                let themeBorder = 'border-gray-800';
-                let themeText = 'text-gray-400';
-                let themeIconBg = 'bg-gray-900';
-                let themeIconColor = 'text-gray-500';
+                let themeBg = 'bg-[#151522]/95';
+                let themeBorder = 'border-gray-700/80';
+                let themeText = 'text-gray-300';
+                let themeIconBg = 'bg-gray-800';
+                let themeIconColor = 'text-gray-400';
                 let glowShadow = 'none';
 
                 if (currentLevel > 0) {
-                  themeBg = isMaxed ? `bg-${currentCfg.themeColorClass}-950/30` : 'bg-[#151520]/95';
-                  themeBorder = isMaxed ? `border-${currentCfg.themeColorClass}-500/80` : `border-${currentCfg.themeColorClass}-700/50`;
-                  themeText = 'text-gray-100';
-                  themeIconBg = `bg-${currentCfg.themeColorClass}-900/40`;
-                  themeIconColor = `text-${currentCfg.themeColorClass}-400`;
+                  themeBg = isMaxed ? `bg-[#241738]/95` : 'bg-[#1e1c2e]/95';
+                  themeBorder = isMaxed ? `border-${currentCfg.themeColorClass}-500/90` : `border-${currentCfg.themeColorClass}-600/70`;
+                  themeText = 'text-white';
+                  themeIconBg = `bg-${currentCfg.themeColorClass}-900/60`;
+                  themeIconColor = `text-${currentCfg.themeColorClass}-300`;
                   if (isMaxed) {
-                    glowShadow = `0 0 16px ${currentCfg.themeHex}40, inset 0 0 8px ${currentCfg.themeHex}30`;
+                    glowShadow = `0 0 18px ${currentCfg.themeHex}55, inset 0 0 10px ${currentCfg.themeHex}35`;
                   }
                 } else if (!isLocked) {
-                  themeBg = 'bg-[#151520]/95 hover:bg-[#1a1a28]';
-                  themeBorder = 'border-gray-600 hover:border-gray-400';
-                  themeText = 'text-gray-300';
-                  themeIconBg = 'bg-gray-800';
-                  themeIconColor = 'text-gray-400';
+                  themeBg = 'bg-[#1e1e30]/95 hover:bg-[#282840]';
+                  themeBorder = 'border-gray-500/90 hover:border-gray-300';
+                  themeText = 'text-gray-200';
+                  themeIconBg = 'bg-gray-800/90';
+                  themeIconColor = 'text-gray-300';
                 }
 
                 return (
@@ -1137,7 +1137,7 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                   >
                     {/* Glowing effect inside node on hover if available */}
                     {!isLocked && !isMaxed && (
-                      <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-b from-white/[0.08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl pointer-events-none" />
                     )}
 
                     {/* Circular Icon with Animated Progress Ring */}
@@ -1174,20 +1174,20 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
                           {node.name}
                         </h4>
                         <span className={`shrink-0 text-[8px] font-mono font-bold px-1 rounded ml-1 ${
-                          isMaxed ? 'bg-amber-500/25 text-amber-300' : 'bg-black/60 text-gray-400'
+                          isMaxed ? 'bg-amber-500/25 text-amber-300' : 'bg-black/60 text-gray-300'
                         }`}>
                           {currentLevel}/{node.maxLevel}
                         </span>
                       </div>
                       
-                      <p className="text-[8px] text-gray-400 leading-tight line-clamp-2 font-medium">
+                      <p className="text-[8px] text-gray-300 leading-tight line-clamp-2 font-medium">
                         {node.description(Math.max(1, currentLevel))}
                       </p>
                     </div>
 
                     {/* Star Cost Badge (matching PC) */}
                     {!isLocked && !isMaxed && (
-                      <div className="absolute -top-3 -right-3 bg-black border border-amber-500/60 rounded-full w-7 h-7 min-[380px]:w-8 min-[380px]:h-8 flex items-center justify-center shadow-[0_0_10px_rgba(251,191,36,0.4)] z-30 transition-transform group-hover:scale-110 group-hover:border-amber-400 pointer-events-none">
+                      <div className="absolute -top-3 -right-3 bg-[#130f1c] border border-amber-500/80 rounded-full w-7 h-7 min-[380px]:w-8 min-[380px]:h-8 flex items-center justify-center shadow-[0_0_12px_rgba(251,191,36,0.5)] z-30 transition-transform group-hover:scale-110 group-hover:border-amber-400 pointer-events-none">
                         <span className="text-[9.5px] min-[380px]:text-[10.5px] font-black text-amber-400 flex flex-col items-center leading-none mt-0.5">
                           <Star className="w-2.5 h-2.5 min-[380px]:w-3 min-[380px]:h-3 text-amber-500 fill-amber-500 mb-0.5" />
                           {node.cost}
@@ -1214,9 +1214,9 @@ export const MobileHeroView: React.FC<MobileHeroViewProps> = ({ onNavigateToShop
         >
           <div 
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#15121e] border-2 border-rose-500/50 rounded-2xl p-5 max-w-xs w-full shadow-[0_0_40px_rgba(244,63,94,0.3)] text-center relative overflow-hidden cursor-default"
+            className="bg-[#1b1528] border-2 border-rose-500/60 rounded-2xl p-5 max-w-xs w-full shadow-[0_0_40px_rgba(244,63,94,0.4)] text-center relative overflow-hidden cursor-default"
           >
-            <div className="w-12 h-12 rounded-full bg-rose-950/60 border border-rose-500/40 flex items-center justify-center mx-auto mb-2 text-rose-400">
+            <div className="w-12 h-12 rounded-full bg-rose-950/70 border border-rose-500/50 flex items-center justify-center mx-auto mb-2 text-rose-400">
               <RotateCcw className="w-6 h-6" />
             </div>
 

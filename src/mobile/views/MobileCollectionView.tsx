@@ -189,9 +189,9 @@ const MobileCardItem: React.FC<CollectionCardProps> = React.memo(({
         alt={card.name} 
         loading="lazy"
         decoding="async"
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-85" 
+        className="absolute inset-0 w-full h-full object-cover z-0 opacity-95" 
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 z-0 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent z-0 pointer-events-none" />
 
       {/* Top Bar: Quick Add/Remove (Left) & Mana/Level (Right) */}
       <div className="relative z-10 flex items-center justify-between pointer-events-none">
@@ -613,7 +613,7 @@ export const MobileCollectionView: React.FC = () => {
     <div className="h-full w-full overflow-y-auto select-none px-2 sm:px-3 pt-2 pb-24 sm:pb-28 custom-scrollbar">
 
       {/* 1. GOTHIC DUAL SECTION SWITCHER */}
-      <div className="bg-[#0c1015] border border-[#c5a880]/25 rounded-2xl p-1.5 shadow-2xl mb-2.5">
+      <div className="bg-[#10151c] border border-[#c5a880]/35 rounded-2xl p-1.5 shadow-2xl mb-2.5">
         <div className="grid grid-cols-2 gap-1.5">
           {/* Sanctuary Tab */}
           <button
@@ -692,7 +692,7 @@ export const MobileCollectionView: React.FC = () => {
       {!isFusingMode && (
         <div className="space-y-2.5">
           {/* COMBAT DECK TRAY */}
-          <div className="bg-[#151a21] border border-[#c5a880]/25 rounded-2xl p-2.5 sm:p-3 shadow-xl">
+          <div className="bg-[#18212c] border border-[#c5a880]/35 rounded-2xl p-2.5 sm:p-3 shadow-2xl">
             {/* Tray Header & Controls */}
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
               <div className="flex items-center gap-2">
@@ -737,12 +737,12 @@ export const MobileCollectionView: React.FC = () => {
                         <div
                           key={card.id}
                           onClick={() => setInspectCard(card)}
-                          className="relative flex items-center justify-between p-1.5 rounded-xl border border-gray-800/80 hover:border-gray-700 bg-[#11161d]/90 cursor-pointer transition-all overflow-hidden h-[50px] group active:scale-95"
+                          className="relative flex items-center justify-between p-1.5 rounded-xl border border-gray-700/80 hover:border-gray-600 bg-[#1a2330]/95 cursor-pointer transition-all overflow-hidden h-[50px] group active:scale-95"
                         >
                           {/* Cropped card background art */}
-                          <div className="absolute inset-y-0 right-0 w-2/3 overflow-hidden rounded-r-xl opacity-40 pointer-events-none">
+                          <div className="absolute inset-y-0 right-0 w-2/3 overflow-hidden rounded-r-xl opacity-65 pointer-events-none">
                             <img src={getCardImageUrl(card)} alt="" decoding="async" className="w-full h-full object-cover object-right" />
-                            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#11161d]/85 to-[#11161d]" />
+                            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#1a2330]/85 to-[#1a2330]" />
                           </div>
 
                           {/* Left: Mana & Info */}
@@ -788,9 +788,9 @@ export const MobileCollectionView: React.FC = () => {
                       return (
                         <div
                           key={idx}
-                          className="flex items-center justify-center rounded-xl border border-dashed border-white/5 bg-black/20 text-gray-600 h-[50px]"
+                          className="flex items-center justify-center rounded-xl border border-dashed border-[#c5a880]/25 bg-black/30 text-amber-500/40 h-[50px]"
                         >
-                          <span className="text-[8px] font-mono tracking-wider font-bold opacity-40">EMPTY SLOT</span>
+                          <span className="text-[8px] font-mono tracking-wider font-bold opacity-60">EMPTY SLOT</span>
                         </div>
                       );
                     }
@@ -801,7 +801,7 @@ export const MobileCollectionView: React.FC = () => {
           </div>
 
           {/* COLLECTION VAULT CONTAINER */}
-          <div className="bg-[#151a21] border border-[#c5a880]/25 rounded-2xl p-2.5 sm:p-3 shadow-xl">
+          <div className="bg-[#18212c] border border-[#c5a880]/35 rounded-2xl p-2.5 sm:p-3 shadow-2xl">
             {/* Header, Search & Filter Console */}
             <div className="space-y-2 pb-2.5 border-b border-white/10">
               <div className="flex items-center justify-between">
@@ -817,7 +817,7 @@ export const MobileCollectionView: React.FC = () => {
                   className={`flex items-center gap-1.5 py-1 px-2 rounded-lg border text-[9px] font-mono transition-all cursor-pointer ${
                     showFusableOnly
                       ? 'bg-purple-950/60 border-purple-500 text-purple-300 shadow-[0_0_10px_rgba(168,85,247,0.35)]'
-                      : 'bg-[#0b0c10] border-[#c5a880]/30 text-gray-400 hover:text-white'
+                      : 'bg-[#10151d] border-[#c5a880]/30 text-gray-400 hover:text-white'
                   }`}
                 >
                   <div className={`w-3 h-3 rounded border flex items-center justify-center shrink-0 ${
@@ -831,13 +831,13 @@ export const MobileCollectionView: React.FC = () => {
 
               {/* Search Bar */}
               <div className="relative">
-                <Search className="w-3.5 h-3.5 text-gray-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Search creature by name..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#0b0c10] border border-[#c5a880]/20 rounded-xl pl-8 pr-3 py-1.5 text-xs text-[#ebd09b] placeholder-gray-600 font-sans outline-none focus:border-[#c5a880]/50 transition-colors"
+                  className="w-full bg-[#10151d] border border-[#c5a880]/30 rounded-xl pl-8 pr-3 py-1.5 text-xs text-[#ebd09b] placeholder-gray-500 font-sans outline-none focus:border-[#c5a880]/60 transition-colors"
                 />
                 {searchQuery && (
                   <button onClick={() => setSearchQuery('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
@@ -851,7 +851,7 @@ export const MobileCollectionView: React.FC = () => {
                 <select
                   value={tierFilter}
                   onChange={(e) => setTierFilter(e.target.value)}
-                  className="flex-1 bg-[#0b0c10] border border-[#c5a880]/30 rounded-xl py-1.5 px-2.5 text-[10px] sm:text-xs text-[#ebd09b] font-mono outline-none cursor-pointer"
+                  className="flex-1 bg-[#10151d] border border-[#c5a880]/35 rounded-xl py-1.5 px-2.5 text-[10px] sm:text-xs text-[#ebd09b] font-mono outline-none cursor-pointer"
                 >
                   <option value="all">All tiers</option>
                   <option value="divine">Divine</option>
@@ -864,7 +864,7 @@ export const MobileCollectionView: React.FC = () => {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="flex-1 bg-[#0b0c10] border border-[#c5a880]/30 rounded-xl py-1.5 px-2.5 text-[10px] sm:text-xs text-[#ebd09b] font-mono outline-none cursor-pointer"
+                  className="flex-1 bg-[#10151d] border border-[#c5a880]/35 rounded-xl py-1.5 px-2.5 text-[10px] sm:text-xs text-[#ebd09b] font-mono outline-none cursor-pointer"
                 >
                   <option value="level">Sort: Level</option>
                   <option value="attack">Sort: ATK</option>

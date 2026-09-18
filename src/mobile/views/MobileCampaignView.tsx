@@ -170,12 +170,12 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
           onTouchEnd={handleTouchEnd}
           className={`rounded-3xl p-3.5 sm:p-4.5 w-full relative overflow-hidden flex flex-col gap-3 border transition-all duration-300 my-2 sm:my-auto ${
           isBoss 
-            ? 'border-red-950/70 shadow-[0_0_40px_rgba(220,38,38,0.2)] bg-gradient-to-b from-[#1c080d]/95 via-[#0d0406]/95 to-[#050203]' 
-            : 'border-[#ebd09b]/25 shadow-[0_0_35px_rgba(0,0,0,0.85)] bg-gradient-to-b from-[#15100c]/95 via-[#0a0705]/95 to-[#050403]'
+            ? 'border-red-900/80 shadow-[0_0_40px_rgba(220,38,38,0.25)] bg-gradient-to-b from-[#2a0e14]/95 via-[#18070b]/95 to-[#0f0406]' 
+            : 'border-[#ebd09b]/35 shadow-[0_0_35px_rgba(0,0,0,0.85)] bg-gradient-to-b from-[#241a14]/95 via-[#160f0b]/95 to-[#0e0a07]'
         }`}>
           {/* Ambient Background Glow */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(235,208,155,0.03)_0%,transparent_70%)] pointer-events-none" />
-          {isBoss && <div className="absolute inset-0 bg-red-950/10 pointer-events-none animate-pulse" />}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(235,208,155,0.08)_0%,transparent_70%)] pointer-events-none" />
+          {isBoss && <div className="absolute inset-0 bg-red-950/20 pointer-events-none animate-pulse" />}
 
           {/* Decorative Corner Brackets matching PC */}
           <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[#ebd09b]/40 pointer-events-none" />
@@ -222,7 +222,7 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
           </div>
 
           {/* 2. Large Centered Floor Selector matching PC */}
-          <div className="flex items-center justify-between bg-black/40 border border-gray-800/50 rounded-2xl py-2.5 sm:py-3 px-3 sm:px-5 shadow-inner relative z-10">
+          <div className="flex items-center justify-between bg-[#18120d]/85 border border-[#ebd09b]/25 rounded-2xl py-2.5 sm:py-3 px-3 sm:px-5 shadow-inner relative z-10">
             <button 
               onClick={handlePrev}
               disabled={viewingFloor === 1}
@@ -275,10 +275,10 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
           <div className="flex flex-col gap-3 relative z-10">
             {/* Encounter details */}
             <div className="space-y-1">
-              <span className="text-[10px] font-mono text-gray-500 tracking-widest uppercase font-bold block">
+              <span className="text-[10px] font-mono text-gray-400 tracking-widest uppercase font-bold block">
                 ENCOUNTER
               </span>
-              <div className="bg-black/50 border border-gray-800/60 rounded-2xl p-3 sm:p-3.5 flex items-center gap-3.5 shadow-inner">
+              <div className="bg-[#18120d]/85 border border-[#ebd09b]/25 rounded-2xl p-3 sm:p-3.5 flex items-center gap-3.5 shadow-inner">
                 <div className={`w-13 h-13 sm:w-14 sm:h-14 rounded-full flex items-center justify-center border shrink-0 ${
                   isBoss ? 'bg-[#4e0707] border-[#dd2c40]/50 shadow-[0_0_15px_rgba(220,38,38,0.4)]' : 'bg-[#1f2833] border-cyan-900'
                 } overflow-hidden`}>
@@ -311,44 +311,44 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
 
             {/* Victory Rewards matching PC */}
             <div className="space-y-1">
-              <span className="text-[10px] font-mono text-[#ebd09b]/80 tracking-widest uppercase font-bold block">
+              <span className="text-[10px] font-mono text-[#ebd09b]/90 tracking-widest uppercase font-bold block">
                 VICTORY REWARDS
               </span>
-              <div className="bg-black/50 border border-gray-800/60 rounded-2xl p-2.5 sm:p-3 flex items-center justify-around gap-2 shadow-inner">
+              <div className="bg-[#18120d]/85 border border-[#ebd09b]/25 rounded-2xl p-2.5 sm:p-3 flex items-center justify-around gap-2 shadow-inner">
                 {/* Gold Pill */}
-                <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-amber-500/20 hover:border-amber-400/50 hover:bg-amber-500/[0.06] transition-all cursor-default group">
+                <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.05] border border-amber-500/30 hover:border-amber-400/60 hover:bg-amber-500/[0.08] transition-all cursor-default group">
                   <div className="flex items-center gap-1.5">
                     <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 sm:w-5.5 sm:h-5.5 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] group-hover:scale-110 transition-transform" />
                     <span className="font-mono font-black text-amber-300 text-xs sm:text-sm leading-none">+{selectedStage.goldReward}</span>
                   </div>
-                  <span className="text-[9px] text-amber-500/70 font-mono uppercase tracking-wider font-semibold mt-0.5">Gold</span>
+                  <span className="text-[9px] text-amber-400/90 font-mono uppercase tracking-wider font-semibold mt-0.5">Gold</span>
                 </div>
 
                 {/* Dust Pill */}
-                <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-cyan-500/20 hover:border-cyan-400/50 hover:bg-cyan-500/[0.06] transition-all cursor-default group">
+                <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.05] border border-cyan-500/30 hover:border-cyan-400/60 hover:bg-cyan-500/[0.08] transition-all cursor-default group">
                   <div className="flex items-center gap-1.5">
                     <img src="/icons/icon_dust.webp" alt="Dust" className="w-5 h-5 sm:w-5.5 sm:h-5.5 object-contain drop-shadow-[0_0_10px_rgba(102,252,241,0.6)] scale-[1.7] group-hover:scale-[1.85] transition-transform" />
                     <span className="font-mono font-black text-[#66fcf1] text-xs sm:text-sm leading-none">+{selectedStage.dustReward}</span>
                   </div>
-                  <span className="text-[9px] text-cyan-400/70 font-mono uppercase tracking-wider font-semibold mt-0.5">Dust</span>
+                  <span className="text-[9px] text-cyan-300 font-mono uppercase tracking-wider font-semibold mt-0.5">Dust</span>
                 </div>
 
                 {/* Shards or EXP Pill */}
                 {selectedStage.shardsReward > 0 ? (
-                  <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-red-500/20 hover:border-red-400/50 hover:bg-red-500/[0.06] transition-all cursor-default group">
+                  <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.05] border border-red-500/30 hover:border-red-400/60 hover:bg-red-500/[0.08] transition-all cursor-default group">
                     <div className="flex items-center gap-1.5">
                       <img src="/icons/icon_shards.webp" alt="Shards" className="w-5 h-5 sm:w-5.5 sm:h-5.5 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.5)] scale-110 group-hover:scale-120 transition-transform" />
                       <span className="font-mono font-black text-rose-400 text-xs sm:text-sm leading-none">+{selectedStage.shardsReward}</span>
                     </div>
-                    <span className="text-[9px] text-red-400/70 font-mono uppercase tracking-wider font-semibold mt-0.5">Shards</span>
+                    <span className="text-[9px] text-red-300 font-mono uppercase tracking-wider font-semibold mt-0.5">Shards</span>
                   </div>
                 ) : (
-                  <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.03] border border-emerald-500/20 hover:border-emerald-400/50 hover:bg-emerald-500/[0.06] transition-all cursor-default group">
+                  <div className="flex-1 flex flex-col items-center justify-center p-2 rounded-xl bg-white/[0.05] border border-emerald-500/30 hover:border-emerald-400/60 hover:bg-emerald-500/[0.08] transition-all cursor-default group">
                     <div className="flex items-center gap-1.5">
                       <img src="/icons/icon_exp.webp" alt="EXP" className="w-5 h-5 sm:w-5.5 sm:h-5.5 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.7)] group-hover:scale-110 transition-transform" />
                       <span className="font-mono font-black text-emerald-400 text-xs sm:text-sm leading-none">+{selectedStage.id * 16 + 32}</span>
                     </div>
-                    <span className="text-[9px] text-emerald-400/70 font-mono uppercase tracking-wider font-semibold mt-0.5">Hero EXP</span>
+                    <span className="text-[9px] text-emerald-300 font-mono uppercase tracking-wider font-semibold mt-0.5">Hero EXP</span>
                   </div>
                 )}
               </div>
@@ -357,7 +357,7 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
 
           {/* Guaranteed Card Drop (if present) */}
           {selectedStage.cardReward && (
-            <div className="bg-black/50 border border-emerald-500/20 p-2.5 rounded-2xl flex items-center justify-between shadow-inner relative z-10">
+            <div className="bg-[#18120d]/85 border border-emerald-500/30 p-2.5 rounded-2xl flex items-center justify-between shadow-inner relative z-10">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-full bg-emerald-950/40 flex items-center justify-center border border-emerald-500/30 shrink-0">
                   <Award className="w-3.5 h-3.5 text-emerald-400" />
@@ -379,8 +379,8 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
               onClick={handleStart}
               className={`w-full font-display font-bold tracking-widest py-3.5 sm:py-4 px-5 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer hover:scale-[1.01] active:scale-[0.98] text-sm sm:text-base uppercase ${
                 isBoss 
-                  ? 'bg-gradient-to-b from-[#3a0b12] via-[#200508] to-[#140204] border-2 border-red-600/50 hover:border-red-500 text-red-400 hover:text-white shadow-[0_0_15px_rgba(220,38,38,0.2)] hover:shadow-[0_0_25px_rgba(239,68,68,0.35)]'
-                  : 'bg-gradient-to-b from-[#221a12] via-[#150f0a] to-[#0c0805] border-2 border-[#c5a880]/50 hover:border-[#ebd09b] text-[#ebd09b] hover:text-white shadow-[0_0_15px_rgba(197,168,128,0.2)] hover:shadow-[0_0_25px_rgba(235,208,155,0.35)]'
+                  ? 'bg-gradient-to-b from-[#4a0d16] via-[#2a060a] to-[#1a0305] border-2 border-red-500/70 hover:border-red-400 text-red-300 hover:text-white shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:shadow-[0_0_30px_rgba(239,68,68,0.45)]'
+                  : 'bg-gradient-to-b from-[#342417] via-[#23170e] to-[#160e08] border-2 border-[#ebd09b]/70 hover:border-[#ebd09b] text-[#ebd09b] hover:text-white shadow-[0_0_20px_rgba(235,208,155,0.25)] hover:shadow-[0_0_30px_rgba(235,208,155,0.4)]'
               }`}
             >
               <Swords className="w-5 h-5 animate-pulse" /> 
