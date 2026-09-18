@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, CheckCircle, AlertTriangle, Info, AlertCircle, Gift } from 'lucide-react';
+import { X, CheckCircle, AlertTriangle, Info, AlertCircle, Sparkles } from 'lucide-react';
 
 // Types
 export type ToastType = 'success' | 'error' | 'warning' | 'info' | 'reward';
@@ -10,6 +10,8 @@ interface Toast {
   message: string;
   type: ToastType;
   duration: number;
+  count?: number;
+  updatedAt?: number;
 }
 
 type ToastFn = (message: string, type?: ToastType, duration?: number) => void;
@@ -27,41 +29,123 @@ export const useToast = (): ToastFn => {
 };
 
 // Style config per toast type
-const toastStyles: Record<ToastType, { border: string; bg: string; icon: React.ReactNode; glow?: string }> = {
+const toastStyles: Record<ToastType, { 
+  border: string; 
+  iconBg: string; 
+  iconBorder: string; 
+  icon: React.ReactNode; 
+  badgeColor: string; 
+  label: string; 
+  glow: string; 
+}> = {
   success: {
-    border: 'border-emerald-500/60',
-    bg: 'bg-emerald-950/30',
+    border: 'border-emerald-500/70',
+    iconBg: 'bg-emerald-950/80',
+    iconBorder: 'border-emerald-500/50',
     icon: <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />,
+    badgeColor: 'text-emerald-400',
+    label: 'SUCCESS',
+    glow: 'shadow-[0_4px_25px_rgba(16,185,129,0.3)]',
   },
   error: {
-    border: 'border-[#dd2c40]/60',
-    bg: 'bg-[#4e0707]/40',
-    icon: <AlertCircle className="w-4 h-4 text-[#dd2c40] shrink-0" />,
+    border: 'border-rose-500/70',
+    iconBg: 'bg-rose-950/80',
+    iconBorder: 'border-rose-500/50',
+    icon: <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />,
+    badgeColor: 'text-rose-400',
+    label: 'ERROR',
+    glow: 'shadow-[0_4px_25px_rgba(244,63,94,0.3)]',
   },
   warning: {
-    border: 'border-[#c5a880]/60',
-    bg: 'bg-amber-950/30',
-    icon: <AlertTriangle className="w-4 h-4 text-[#ebd09b] shrink-0" />,
+    border: 'border-amber-500/70',
+    iconBg: 'bg-amber-950/80',
+    iconBorder: 'border-amber-500/50',
+    icon: <AlertTriangle className="w-4 h-4 text-amber-300 shrink-0" />,
+    badgeColor: 'text-amber-300',
+    label: 'NOTICE',
+    glow: 'shadow-[0_4px_25px_rgba(245,158,11,0.3)]',
   },
   info: {
-    border: 'border-[#66fcf1]/50',
-    bg: 'bg-cyan-950/30',
-    icon: <Info className="w-4 h-4 text-[#66fcf1] shrink-0" />,
+    border: 'border-cyan-500/70',
+    iconBg: 'bg-cyan-950/80',
+    iconBorder: 'border-cyan-500/50',
+    icon: <Info className="w-4 h-4 text-cyan-300 shrink-0" />,
+    badgeColor: 'text-cyan-300',
+    label: 'INFO',
+    glow: 'shadow-[0_4px_25px_rgba(6,182,212,0.3)]',
   },
   reward: {
-    border: 'border-[#b64dfa]/50',
-    bg: 'bg-purple-950/30',
-    icon: <Gift className="w-4 h-4 text-[#ebd09b] shrink-0" />,
-    glow: 'shadow-[0_0_15px_rgba(182,77,250,0.25),0_0_30px_rgba(197,168,128,0.1)]',
+    border: 'border-purple-500/70',
+    iconBg: 'bg-purple-950/80',
+    iconBorder: 'border-purple-500/50',
+    icon: <Sparkles className="w-4 h-4 text-purple-300 shrink-0" />,
+    badgeColor: 'text-purple-300',
+    label: 'REWARD',
+    glow: 'shadow-[0_4px_25px_rgba(168,85,247,0.35)]',
   },
 };
-
-const MAX_TOASTS = 5;
 
 // Provider
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+
+  // Safe area top inset calculation for mobile / Telegram WebApp
+  const [topInset, setTopInset] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const tg = (window as any).Telegram?.WebApp;
+        if (tg) {
+          const inset = tg.safeAreaInset?.top ?? tg.contentSafeAreaInset?.top;
+          if (typeof inset === 'number' && inset > 0) return Math.max(76, inset + 46);
+          return 76;
+        }
+      } catch {}
+    }
+    return 76; // Mobile default clearance
+  });
+
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 640;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    window.addEventListener('resize', handleResize);
+
+    const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
+    if (tg) {
+      const checkInset = () => {
+        try {
+          const inset = tg.safeAreaInset?.top ?? tg.contentSafeAreaInset?.top;
+          if (typeof inset === 'number' && inset > 0) {
+            setTopInset(Math.max(76, inset + 46));
+          } else {
+            setTopInset(76);
+          }
+        } catch {}
+      };
+      checkInset();
+      try {
+        tg.onEvent?.('viewportChanged', checkInset);
+      } catch {}
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        try {
+          tg.offEvent?.('viewportChanged', checkInset);
+        } catch {}
+      };
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -73,70 +157,157 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   const toast: ToastFn = useCallback(
-    (message: string, type: ToastType = 'info', duration: number = 3000) => {
-      const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-      const newToast: Toast = { id, message, type, duration };
-
+    (message: string, type: ToastType = 'info', duration: number = 2400) => {
+      if (!message) return;
 
       setToasts((prev) => {
+        // 1. Smart deduplication & in-place update
+        // Handles:
+        // - Exact identical message repeated rapidly: "Need 1 skill point!" -> increment count "x2"
+        // - Sequential upgrades of same talent: "Upgraded Void Strike (Lvl 1)!" -> update to "(Lvl 2)!" in-place
+        // - Sequential sweeps: "Sweep Success! ..." -> updates in-place
+        const isUpgrade = message.startsWith('Upgraded ');
+        const isSweep = message.startsWith('Sweep Success!');
+        const extractEntity = (msg: string) => msg.replace(/ \(Lvl \d+\)!?$/, '').replace(/^Upgraded /, '');
+
+        const existingIdx = prev.findIndex((t) => {
+          if (t.type !== type) return false;
+          if (t.message === message) return true;
+          if (isUpgrade && t.message.startsWith('Upgraded ')) {
+            return extractEntity(t.message) === extractEntity(message);
+          }
+          if (isSweep && t.message.startsWith('Sweep Success!')) {
+            return true;
+          }
+          return false;
+        });
+
+        if (existingIdx !== -1) {
+          const existing = prev[existingIdx];
+          const isSameText = existing.message === message;
+          const updatedToast: Toast = {
+            ...existing,
+            message,
+            duration,
+            count: isSameText ? (existing.count || 1) + 1 : (existing.count || 1),
+            updatedAt: Date.now(),
+          };
+
+          // Reset dismiss timer
+          const oldTimer = timersRef.current.get(existing.id);
+          if (oldTimer) clearTimeout(oldTimer);
+
+          const newTimer = setTimeout(() => {
+            removeToast(existing.id);
+          }, duration);
+          timersRef.current.set(existing.id, newTimer);
+
+          const copy = [...prev];
+          copy[existingIdx] = updatedToast;
+          return copy;
+        }
+
+        // 2. Add as new toast with strict MAX_TOASTS limit (2 on mobile, 3 on desktop)
+        const id = `t_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+        const newToast: Toast = {
+          id,
+          message,
+          type,
+          duration,
+          count: 1,
+          updatedAt: Date.now(),
+        };
+
+        const timer = setTimeout(() => {
+          removeToast(id);
+        }, duration);
+        timersRef.current.set(id, timer);
+
+        const maxVisible = isMobile ? 2 : 3;
         const next = [...prev, newToast];
-        // Trim to max visible
-        if (next.length > MAX_TOASTS) {
-          const removed = next.shift();
-          if (removed) {
-            const timer = timersRef.current.get(removed.id);
-            if (timer) {
-              clearTimeout(timer);
-              timersRef.current.delete(removed.id);
+
+        while (next.length > maxVisible) {
+          const dropped = next.shift();
+          if (dropped) {
+            const oldT = timersRef.current.get(dropped.id);
+            if (oldT) {
+              clearTimeout(oldT);
+              timersRef.current.delete(dropped.id);
             }
           }
         }
+
         return next;
       });
-
-      // Auto dismiss
-      const timer = setTimeout(() => {
-        removeToast(id);
-      }, duration);
-      timersRef.current.set(id, timer);
     },
-    [removeToast]
+    [removeToast, isMobile]
   );
 
   return (
     <ToastContext.Provider value={toast}>
       {children}
 
-      {/* Toast Container - top right */}
-      <div className="fixed top-4 right-4 z-[9999] flex flex-col gap-2.5 pointer-events-none max-w-sm w-full">
+      {/* Toast Container - adaptive top & horizontal centering for mobile */}
+      <div 
+        style={{
+          top: isMobile ? `max(${topInset}px, calc(env(safe-area-inset-top, 0px) + 54px))` : undefined
+        }}
+        className="fixed z-[9999] pointer-events-none flex flex-col items-center gap-2 left-3 right-3 sm:left-auto sm:right-4 sm:top-4 sm:max-w-sm sm:items-end w-auto max-w-md mx-auto sm:mx-0"
+      >
         <AnimatePresence mode="popLayout">
           {toasts.map((t) => {
-            const style = toastStyles[t.type];
+            const style = toastStyles[t.type] || toastStyles.info;
             return (
               <motion.div
                 key={t.id}
-                layout
-                initial={{ opacity: 0, x: 80, scale: 0.85 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: 80, scale: 0.85 }}
-                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                initial={{ opacity: 0, y: -12, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
+                onClick={() => removeToast(t.id)}
                 className={`
                   pointer-events-auto
-                  flex items-start gap-2.5 
-                  bg-[#0b0c10]/95 backdrop-blur-md
-                  border ${style.border}
-                  ${style.bg}
-                  ${style.glow || ''}
-                  rounded-xl p-3.5 pr-2.5
-                  shadow-2xl
-                  font-sans text-xs text-gray-200
+                  w-full
+                  flex items-center gap-2.5 
+                  bg-gradient-to-r from-[#141924]/98 via-[#0f141d]/98 to-[#0b0e14]/98
+                  border-2 ${style.border}
+                  ${style.glow}
+                  rounded-2xl p-2.5 sm:p-3
+                  shadow-[0_8px_30px_rgba(0,0,0,0.85)]
+                  cursor-pointer
+                  select-none
+                  transition-transform active:scale-[0.98]
                 `}
               >
-                {style.icon}
-                <span className="flex-1 leading-relaxed pt-0.5">{t.message}</span>
+                {/* Type Icon */}
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${style.iconBg} ${style.iconBorder} border shadow-inner`}>
+                  {style.icon}
+                </div>
+
+                {/* Message Body */}
+                <div className="flex-1 min-w-0 pr-1">
+                  <div className="flex items-center gap-1.5 leading-none mb-1">
+                    <span className={`text-[8.5px] font-mono font-black uppercase tracking-wider ${style.badgeColor}`}>
+                      {style.label}
+                    </span>
+                    {t.count && t.count > 1 && (
+                      <span className="font-mono text-[8px] font-black bg-amber-400/20 text-amber-300 border border-amber-400/50 px-1.5 py-0.2 rounded-full shadow-[0_0_8px_rgba(251,191,36,0.5)]">
+                        ×{t.count}
+                      </span>
+                    )}
+                  </div>
+                  <div key={t.updatedAt} className="animate-toast-pop text-xs sm:text-[12.5px] text-gray-100 font-sans font-medium leading-snug break-words">
+                    {t.message}
+                  </div>
+                </div>
+
+                {/* Close Button */}
                 <button
-                  onClick={() => removeToast(t.id)}
-                  className="shrink-0 p-1 rounded-lg hover:bg-white/5 text-gray-500 hover:text-gray-300 transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeToast(t.id);
+                  }}
+                  className="shrink-0 w-6 h-6 rounded-lg bg-white/5 hover:bg-white/10 active:bg-white/20 text-gray-400 hover:text-white flex items-center justify-center transition-colors"
                   aria-label="Close"
                 >
                   <X className="w-3.5 h-3.5" />
