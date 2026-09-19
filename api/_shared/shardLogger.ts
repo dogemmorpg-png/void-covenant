@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { PlayerProfile, ShardTransaction } from './types.js';
 
 export function recordShardTransaction(

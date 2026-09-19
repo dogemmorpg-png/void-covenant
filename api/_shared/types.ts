@@ -84,6 +84,7 @@ export interface PlayerProfile {
   gold: number;
   dust: number;
   darkShards: number;
+  bloodSovereigns?: number;
   pveEnergy: number;
   pveEnergyMax: number;
   pvpEnergy: number;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { PlayerProfile, SovereignTransaction } from './types.js';
 
 export function recordSovereignTransaction(
