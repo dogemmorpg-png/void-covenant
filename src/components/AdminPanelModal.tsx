@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
 import { ALL_LEAGUE_REWARDS } from '../data/leagueRewards';
 import { 
@@ -562,6 +562,11 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
   if (!isOpen) return null;
 
+  const isTelegramUser = typeof window !== 'undefined' && Boolean(
+    (window as any).Telegram?.WebApp?.initData ||
+    /Telegram/i.test(navigator.userAgent || '')
+  );
+
   const filteredWithdrawals = withdrawals.filter(r => {
     if (withdrawalFilter !== 'all' && r.status !== withdrawalFilter) return false;
     if (withdrawalSearch) {
@@ -574,49 +579,94 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
     return true;
   });
 
+  const filteredAndSortedPlayers = useMemo(() => {
+    return allPlayers
+      .filter(p => {
+        const isBanned = Boolean(p.profile?.isBanned);
+        const isSubActive = p.profile?.subscriptionExpiresAt && Number(p.profile?.subscriptionExpiresAt) > Date.now();
+        const subTier = isSubActive ? (p.profile?.subscriptionTier || 'free') : 'free';
+        if (playerLeagueFilter === 'Banned') {
+          if (!isBanned) return false;
+        } else if (playerLeagueFilter === 'Premium') {
+          if (isBanned || subTier !== 'premium') return false;
+        } else if (playerLeagueFilter === 'Ultra') {
+          if (isBanned || subTier !== 'ultra') return false;
+        } else if (playerLeagueFilter !== 'all') {
+          if (isBanned) return false;
+          const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
+          if (l.toLowerCase() !== getNormalizedLeague(playerLeagueFilter).toLowerCase()) return false;
+        }
+        if (searchQuery.trim()) {
+          const s = searchQuery.trim().toLowerCase();
+          const w = (p.walletAddress || '').toLowerCase();
+          const u = (p.profile?.username || '').toLowerCase();
+          return w.includes(s) || u.includes(s);
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        const pa = a.profile || {};
+        const pb = b.profile || {};
+        if (playerSortBy === 'level') return (pb.level || 1) - (pa.level || 1);
+        if (playerSortBy === 'sovereigns') return (pb.bloodSovereigns || 0) - (pa.bloodSovereigns || 0);
+        if (playerSortBy === 'gold') return (pb.gold || 0) - (pa.gold || 0);
+        if (playerSortBy === 'lp') return (pb.pvpLP || 0) - (pa.pvpLP || 0);
+        const timeA = pa.lastLogin || (a.updatedAt ? new Date(a.updatedAt).getTime() : 0);
+        const timeB = pb.lastLogin || (b.updatedAt ? new Date(b.updatedAt).getTime() : 0);
+        return timeB - timeA;
+      });
+  }, [allPlayers, playerLeagueFilter, searchQuery, playerSortBy]);
+
   return (
     <div 
-      className="fixed inset-0 z-[110] flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200"
+      style={{
+        paddingTop: isTelegramUser ? 'max(0.35rem, var(--safe-top, 0px))' : '0.35rem',
+        paddingBottom: isTelegramUser ? 'max(0.35rem, var(--safe-bottom, 0px))' : '0.35rem',
+        paddingLeft: '0.35rem',
+        paddingRight: '0.35rem'
+      }}
+      className="fixed inset-0 z-[110] flex items-center justify-center sm:p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="relative w-full max-w-6xl bg-gradient-to-b from-[#140810] via-[#0d0408] to-[#080204] border-2 border-red-500/40 rounded-3xl shadow-[0_0_60px_rgba(220,38,38,0.3)] overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="relative w-full max-w-6xl bg-gradient-to-b from-[#140810] via-[#0d0408] to-[#080204] border-2 border-red-500/40 rounded-2xl sm:rounded-3xl shadow-[0_0_60px_rgba(220,38,38,0.3)] overflow-hidden flex flex-col h-[98dvh] sm:h-auto sm:max-h-[92vh]">
         
         {/* Top Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-red-900/40 bg-black/60">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600/30 to-amber-500/20 border border-red-500/50 flex items-center justify-center shadow-[0_0_15px_rgba(220,38,38,0.4)]">
-              <ShieldAlert className="w-6 h-6 text-red-400" />
+        <div className="flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-4 border-b border-red-900/40 bg-black/60 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-red-600/30 to-amber-500/20 border border-red-500/50 flex items-center justify-center shadow-[0_0_15px_rgba(220,38,38,0.4)] shrink-0">
+              <ShieldAlert className="w-4 h-4 sm:w-6 sm:h-6 text-red-400" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="font-display font-black text-xl text-white tracking-widest text-shadow-crimson">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <h2 className="font-display font-black text-xs sm:text-xl text-white tracking-wider sm:tracking-widest text-shadow-crimson truncate">
                   VOID COMMAND • ADMIN PANEL
                 </h2>
-                <span className="px-2 py-0.5 rounded-full bg-red-950/80 border border-red-500/60 text-red-400 font-mono text-[10px] font-bold uppercase tracking-wider">
-                  MASTER ACCESS
+                <span className="px-1.5 py-0.2 rounded-full bg-red-950/80 border border-red-500/60 text-red-400 font-mono text-[8px] sm:text-[10px] font-bold uppercase tracking-wider shrink-0">
+                  MASTER
                 </span>
               </div>
-              <p className="text-[11px] text-gray-400 font-mono">Real-time economy oversight, treasury payouts & player governance</p>
+              <p className="hidden sm:block text-[11px] text-gray-400 font-mono">Real-time economy oversight, treasury payouts & player governance</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <button
               onClick={() => {
                 if (activeTab === 'overview') loadOverview();
                 if (activeTab === 'withdrawals') loadWithdrawals();
+                if (activeTab === 'players') loadAllPlayers(searchQuery);
               }}
               disabled={isLoading}
-              className="p-2 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl transition-all cursor-pointer disabled:opacity-50"
+              className="p-1.5 sm:p-2 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl transition-all cursor-pointer disabled:opacity-50"
               title="Refresh Data"
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-amber-400' : ''}`} />
             </button>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl transition-colors cursor-pointer"
+              className="p-1.5 sm:p-2 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -624,31 +674,33 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 px-6 py-2.5 bg-black/40 border-b border-white/5 overflow-x-auto select-none">
+        <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-6 py-2 sm:py-2.5 bg-black/40 border-b border-white/5 overflow-x-auto select-none no-scrollbar shrink-0">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer shrink-0 whitespace-nowrap ${
               activeTab === 'overview'
                 ? 'bg-gradient-to-r from-red-900/60 to-amber-900/40 text-amber-300 border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            <BarChart3 className="w-4 h-4" />
-            <span>OVERVIEW & ECONOMY</span>
+            <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="sm:hidden">OVERVIEW</span>
+            <span className="hidden sm:inline">OVERVIEW & ECONOMY</span>
           </button>
 
           <button
             onClick={() => setActiveTab('withdrawals')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer relative ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer relative shrink-0 whitespace-nowrap ${
               activeTab === 'withdrawals'
                 ? 'bg-gradient-to-r from-red-900/60 to-amber-900/40 text-amber-300 border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            <Landmark className="w-4 h-4" />
-            <span>USDT WITHDRAWALS</span>
+            <Landmark className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="sm:hidden">PAYOUTS</span>
+            <span className="hidden sm:inline">USDT WITHDRAWALS</span>
             {overview?.pendingWithdrawalsCount > 0 && (
-              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-red-600 text-white font-mono text-[9px] font-black flex items-center justify-center animate-pulse">
+              <span className="min-w-[16px] sm:min-w-[18px] h-[16px] sm:h-[18px] px-1 rounded-full bg-red-600 text-white font-mono text-[8px] sm:text-[9px] font-black flex items-center justify-center animate-pulse">
                 {overview.pendingWithdrawalsCount}
               </span>
             )}
@@ -656,196 +708,199 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
           <button
             onClick={() => setActiveTab('broadcast')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer shrink-0 whitespace-nowrap ${
               activeTab === 'broadcast'
                 ? 'bg-gradient-to-r from-red-900/60 to-amber-900/40 text-amber-300 border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            <Mail className="w-4 h-4" />
-            <span>MAIL BROADCASTER</span>
+            <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="sm:hidden">BROADCAST</span>
+            <span className="hidden sm:inline">MAIL BROADCASTER</span>
           </button>
 
           <button
             onClick={() => setActiveTab('players')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer shrink-0 whitespace-nowrap ${
               activeTab === 'players'
                 ? 'bg-gradient-to-r from-red-900/60 to-amber-900/40 text-amber-300 border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            <Users className="w-4 h-4" />
-            <span>PLAYER INSPECTOR</span>
+            <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="sm:hidden">PLAYERS</span>
+            <span className="hidden sm:inline">PLAYER INSPECTOR</span>
           </button>
 
           <button
             onClick={() => setActiveTab('rewards')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer shrink-0 whitespace-nowrap ${
               activeTab === 'rewards'
                 ? 'bg-gradient-to-r from-red-900/60 to-amber-900/40 text-amber-300 border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            <Trophy className="w-4 h-4" />
-            <span>LEAGUE REWARDS</span>
+            <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="sm:hidden">REWARDS</span>
+            <span className="hidden sm:inline">LEAGUE REWARDS</span>
           </button>
 
           <button
             onClick={() => setActiveTab('maintenance')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl font-display font-bold text-xs tracking-wider transition-all cursor-pointer shrink-0 whitespace-nowrap ${
               activeTab === 'maintenance'
                 ? 'bg-gradient-to-r from-red-900/60 to-amber-900/40 text-amber-300 border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            <Zap className="w-4 h-4" />
+            <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>MAINTENANCE</span>
           </button>
         </div>
 
         {/* Tab Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
           
           {/* TAB 1: OVERVIEW & ECONOMY */}
           {activeTab === 'overview' && (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Stat Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2 sm:gap-4">
                 
                 {/* Card 1: Total Players */}
-                <div className="bg-gradient-to-b from-white/5 to-black/60 border border-white/10 p-4 rounded-2xl relative overflow-hidden">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400 block mb-1">Total Registered</span>
+                <div className="bg-gradient-to-b from-white/5 to-black/60 border border-white/10 p-3 sm:p-4 rounded-xl sm:rounded-2xl relative overflow-hidden">
+                  <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-gray-400 block mb-1">Total Registered</span>
                   <div className="flex items-baseline justify-between">
-                    <span className="text-3xl font-mono font-black text-white">{overview?.totalPlayers || 0}</span>
-                    <Users className="w-6 h-6 text-gray-500" />
+                    <span className="text-xl sm:text-3xl font-mono font-black text-white">{overview?.totalPlayers || 0}</span>
+                    <Users className="w-4 h-4 sm:w-6 sm:h-6 text-gray-500" />
                   </div>
-                  <div className="mt-3 flex items-center gap-3 text-[11px] font-mono text-gray-400 border-t border-white/5 pt-2">
-                    <span className="text-emerald-400 font-bold">{overview?.active24h || 0} active 24h</span>
+                  <div className="mt-2 sm:mt-3 flex items-center gap-1.5 sm:gap-3 text-[10px] sm:text-[11px] font-mono text-gray-400 border-t border-white/5 pt-1.5 sm:pt-2">
+                    <span className="text-emerald-400 font-bold">{overview?.active24h || 0} in 24h</span>
                     <span>•</span>
-                    <span>{overview?.active7d || 0} active 7d</span>
+                    <span>{overview?.active7d || 0} in 7d</span>
                   </div>
                 </div>
 
                 {/* Card 2: Active Subscribers */}
-                <div className="bg-gradient-to-b from-purple-950/30 via-indigo-950/20 to-black/60 border border-purple-500/30 p-4 rounded-2xl relative overflow-hidden">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-purple-400/90 block mb-1">Active Subscribers</span>
+                <div className="bg-gradient-to-b from-purple-950/30 via-indigo-950/20 to-black/60 border border-purple-500/30 p-3 sm:p-4 rounded-xl sm:rounded-2xl relative overflow-hidden">
+                  <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-purple-400/90 block mb-1">Subscribers</span>
                   <div className="flex items-baseline justify-between">
-                    <span className="text-3xl font-mono font-black text-purple-300">{overview?.totalSubscribersCount || 0}</span>
-                    <Sparkles className="w-6 h-6 text-purple-400/60" />
+                    <span className="text-xl sm:text-3xl font-mono font-black text-purple-300">{overview?.totalSubscribersCount || 0}</span>
+                    <Sparkles className="w-4 h-4 sm:w-6 sm:h-6 text-purple-400/60" />
                   </div>
-                  <div className="mt-3 flex items-center gap-3 text-[11px] font-mono text-gray-400 border-t border-purple-500/20 pt-2">
-                    <span className="text-amber-400 font-bold flex items-center gap-1">⚜️ {overview?.totalPremiumCount || 0} Premium</span>
+                  <div className="mt-2 sm:mt-3 flex items-center gap-1.5 sm:gap-3 text-[10px] sm:text-[11px] font-mono text-gray-400 border-t border-purple-500/20 pt-1.5 sm:pt-2">
+                    <span className="text-amber-400 font-bold flex items-center gap-0.5">⚜️ {overview?.totalPremiumCount || 0}</span>
                     <span>•</span>
-                    <span className="text-purple-400 font-bold flex items-center gap-1">💎 {overview?.totalUltraCount || 0} Ultra</span>
+                    <span className="text-purple-400 font-bold flex items-center gap-0.5">💎 {overview?.totalUltraCount || 0}</span>
                   </div>
                 </div>
 
                 {/* Card 3: Sovereigns Circulation & USDT Reserve */}
-                <div className="bg-gradient-to-b from-amber-950/30 to-black/60 border border-amber-500/30 p-4 rounded-2xl relative overflow-hidden">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-amber-400/90 block mb-1">Sovereigns in Circulation</span>
+                <div className="bg-gradient-to-b from-amber-950/30 to-black/60 border border-amber-500/30 p-3 sm:p-4 rounded-xl sm:rounded-2xl relative overflow-hidden">
+                  <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-amber-400/90 block mb-1">SOV Circulation</span>
                   <div className="flex items-baseline justify-between">
-                    <div className="flex items-center gap-2">
-                      <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-6 h-6 object-contain" />
-                      <span className="text-3xl font-mono font-black text-amber-300">{overview?.totalSovereigns || 0}</span>
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 sm:w-6 sm:h-6 object-contain" />
+                      <span className="text-xl sm:text-3xl font-mono font-black text-amber-300">{overview?.totalSovereigns || 0}</span>
                     </div>
-                    <Crown className="w-6 h-6 text-amber-500/50" />
+                    <Crown className="w-4 h-4 sm:w-6 sm:h-6 text-amber-500/50" />
                   </div>
-                  <div className="mt-3 flex items-center justify-between text-[11px] font-mono border-t border-amber-500/20 pt-2">
-                    <span className="text-gray-400">Reserve Needed:</span>
+                  <div className="mt-2 sm:mt-3 flex items-center justify-between text-[10px] sm:text-[11px] font-mono border-t border-amber-500/20 pt-1.5 sm:pt-2">
+                    <span className="text-gray-400">Reserve:</span>
                     <span className="text-emerald-400 font-black">${overview?.usdtObligations || '0.00'} USDT</span>
                   </div>
                 </div>
 
                 {/* Card 4: Pending Withdrawals */}
-                <div className="bg-gradient-to-b from-rose-950/30 to-black/60 border border-rose-500/30 p-4 rounded-2xl relative overflow-hidden">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-rose-400/90 block mb-1">Pending Payouts</span>
+                <div className="bg-gradient-to-b from-rose-950/30 to-black/60 border border-rose-500/30 p-3 sm:p-4 rounded-xl sm:rounded-2xl relative overflow-hidden">
+                  <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-rose-400/90 block mb-1">Pending Payouts</span>
                   <div className="flex items-baseline justify-between">
-                    <span className="text-3xl font-mono font-black text-rose-400">{overview?.pendingWithdrawalsCount || 0}</span>
-                    <Clock className="w-6 h-6 text-rose-500/50" />
+                    <span className="text-xl sm:text-3xl font-mono font-black text-rose-400">{overview?.pendingWithdrawalsCount || 0}</span>
+                    <Clock className="w-4 h-4 sm:w-6 sm:h-6 text-rose-500/50" />
                   </div>
-                  <div className="mt-3 flex items-center justify-between text-[11px] font-mono border-t border-rose-500/20 pt-2">
-                    <span className="text-gray-400">Total Pending:</span>
-                    <span className="text-rose-300 font-black">${overview?.pendingWithdrawalsUsdt || '0.00'} USDT</span>
+                  <div className="mt-2 sm:mt-3 flex items-center justify-between text-[10px] sm:text-[11px] font-mono border-t border-rose-500/20 pt-1.5 sm:pt-2">
+                    <span className="text-gray-400">Pending:</span>
+                    <span className="text-rose-300 font-black">${overview?.pendingWithdrawalsUsdt || '0.00'}</span>
                   </div>
                 </div>
 
                 {/* Card 5: Total Completed Payouts */}
-                <div className="bg-gradient-to-b from-emerald-950/30 to-black/60 border border-emerald-500/30 p-4 rounded-2xl relative overflow-hidden">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400/90 block mb-1">Completed Payouts</span>
+                <div className="col-span-2 sm:col-span-1 bg-gradient-to-b from-emerald-950/30 to-black/60 border border-emerald-500/30 p-3 sm:p-4 rounded-xl sm:rounded-2xl relative overflow-hidden">
+                  <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-emerald-400/90 block mb-1">Completed Payouts</span>
                   <div className="flex items-baseline justify-between">
-                    <span className="text-3xl font-mono font-black text-emerald-400">{overview?.completedWithdrawalsCount || 0}</span>
-                    <CheckCircle2 className="w-6 h-6 text-emerald-500/50" />
+                    <span className="text-xl sm:text-3xl font-mono font-black text-emerald-400">{overview?.completedWithdrawalsCount || 0}</span>
+                    <CheckCircle2 className="w-4 h-4 sm:w-6 sm:h-6 text-emerald-500/50" />
                   </div>
-                  <div className="mt-3 flex items-center justify-between text-[11px] font-mono border-t border-emerald-500/20 pt-2">
+                  <div className="mt-2 sm:mt-3 flex items-center justify-between text-[10px] sm:text-[11px] font-mono border-t border-emerald-500/20 pt-1.5 sm:pt-2">
                     <span className="text-gray-400">Total Paid:</span>
-                    <span className="text-emerald-300 font-black">${overview?.completedWithdrawalsUsdt || '0.00'} USDT</span>
+                    <span className="text-emerald-300 font-black">${overview?.completedWithdrawalsUsdt || '0.00'}</span>
                   </div>
                 </div>
 
               </div>
 
               {/* Economy Reserves & Currencies Bar */}
-              <div className="bg-black/50 border border-white/10 rounded-3xl p-6 space-y-4">
-                <h3 className="font-display font-bold text-white text-base tracking-wider uppercase flex items-center gap-2">
-                  <Coins className="w-5 h-5 text-amber-400" />
+              <div className="bg-black/50 border border-white/10 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 space-y-3 sm:space-y-4">
+                <h3 className="font-display font-bold text-white text-xs sm:text-base tracking-wider uppercase flex items-center gap-2">
+                  <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
                   TOTAL CURRENCY SUPPLY IN REALMS
                 </h3>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4">
                   {/* Gold */}
-                  <div className="bg-white/5 border border-amber-500/20 p-4 rounded-2xl flex items-center gap-3">
-                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-8 h-8 object-contain" />
-                    <div>
-                      <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest block">Total Gold</span>
-                      <span className="font-mono font-black text-xl text-amber-300">{overview?.totalGold?.toLocaleString() || 0}</span>
+                  <div className="bg-white/5 border border-amber-500/20 p-3 sm:p-4 rounded-xl sm:rounded-2xl flex items-center gap-3">
+                    <img src="/icons/icon_gold.webp" alt="Gold" className="w-7 h-7 sm:w-8 sm:h-8 object-contain shrink-0" />
+                    <div className="min-w-0">
+                      <span className="text-[9px] sm:text-[10px] font-mono text-gray-400 uppercase tracking-widest block">Total Gold</span>
+                      <span className="font-mono font-black text-base sm:text-xl text-amber-300 truncate block">{overview?.totalGold?.toLocaleString() || 0}</span>
                     </div>
                   </div>
 
                   {/* Dust */}
-                  <div className="bg-white/5 border border-cyan-500/20 p-4 rounded-2xl flex items-center gap-3">
-                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-8 h-8 object-contain" />
-                    <div>
-                      <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest block">Total Void Dust</span>
-                      <span className="font-mono font-black text-xl text-[#66fcf1]">{overview?.totalDust?.toLocaleString() || 0}</span>
+                  <div className="bg-white/5 border border-cyan-500/20 p-3 sm:p-4 rounded-xl sm:rounded-2xl flex items-center gap-3">
+                    <img src="/icons/icon_dust.webp" alt="Dust" className="w-7 h-7 sm:w-8 sm:h-8 object-contain shrink-0" />
+                    <div className="min-w-0">
+                      <span className="text-[9px] sm:text-[10px] font-mono text-gray-400 uppercase tracking-widest block">Total Void Dust</span>
+                      <span className="font-mono font-black text-base sm:text-xl text-[#66fcf1] truncate block">{overview?.totalDust?.toLocaleString() || 0}</span>
                     </div>
                   </div>
 
                   {/* Shards */}
-                  <div className="bg-white/5 border border-red-500/20 p-4 rounded-2xl flex items-center gap-3">
-                    <img src="/icons/icon_shards.webp" alt="Shards" className="w-8 h-8 object-contain" />
-                    <div>
-                      <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest block">Total Dark Shards</span>
-                      <span className="font-mono font-black text-xl text-rose-400">{overview?.totalShards?.toLocaleString() || 0}</span>
+                  <div className="bg-white/5 border border-red-500/20 p-3 sm:p-4 rounded-xl sm:rounded-2xl flex items-center gap-3">
+                    <img src="/icons/icon_shards.webp" alt="Shards" className="w-7 h-7 sm:w-8 sm:h-8 object-contain shrink-0" />
+                    <div className="min-w-0">
+                      <span className="text-[9px] sm:text-[10px] font-mono text-gray-400 uppercase tracking-widest block">Total Dark Shards</span>
+                      <span className="font-mono font-black text-base sm:text-xl text-rose-400 truncate block">{overview?.totalShards?.toLocaleString() || 0}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* PvP League Distribution */}
-              <div className="bg-black/50 border border-white/10 rounded-3xl p-6 space-y-4">
-                <h3 className="font-display font-bold text-white text-base tracking-wider uppercase flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-emerald-400" />
+              <div className="bg-black/50 border border-white/10 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 space-y-3 sm:space-y-4">
+                <h3 className="font-display font-bold text-white text-xs sm:text-base tracking-wider uppercase flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
                   PVP LEAGUE POPULATION DISTRIBUTION
                 </h3>
 
-                <div className="grid grid-cols-2 sm:grid-cols-5 md:grid-cols-6 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 sm:gap-3">
                   {['Bronze', 'Silver', 'Gold', 'Platinum', 'Sapphire', 'Emerald', 'Ruby', 'Diamond', 'Master', 'Grandmaster', 'Void Overlord', 'Divine'].map(league => {
                     const count = overview?.leagueDistribution?.[league] || 0;
                     const total = overview?.totalPlayers || 1;
                     const pct = Math.round((count / total) * 100);
 
                     return (
-                      <div key={league} className="bg-white/5 border border-white/10 p-3 rounded-2xl text-center space-y-1">
-                        <span className="font-display font-bold text-xs text-amber-200/90 tracking-wide uppercase block truncate">
+                      <div key={league} className="bg-white/5 border border-white/10 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl text-center space-y-1">
+                        <span className="font-display font-bold text-[11px] sm:text-xs text-amber-200/90 tracking-wide uppercase block truncate">
                           {league}
                         </span>
-                        <span className="font-mono font-black text-xl text-white block">
+                        <span className="font-mono font-black text-lg sm:text-xl text-white block">
                           {count}
                         </span>
                         <div className="w-full bg-black/60 rounded-full h-1.5 overflow-hidden">
                           <div className="bg-amber-400 h-full rounded-full" style={{ width: `${pct}%` }} />
                         </div>
-                        <span className="text-[10px] font-mono text-gray-400 block">{pct}% of realm</span>
+                        <span className="text-[9px] sm:text-[10px] font-mono text-gray-400 block">{pct}% of realm</span>
                       </div>
                     );
                   })}
@@ -858,13 +913,13 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
           {activeTab === 'withdrawals' && (
             <div className="space-y-4">
               {/* Filter and Search Bar */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 no-scrollbar">
                   {(['all', 'pending', 'completed', 'rejected'] as const).map(f => (
                     <button
                       key={f}
                       onClick={() => setWithdrawalFilter(f)}
-                      className={`px-3.5 py-1.5 rounded-xl font-display font-bold text-xs uppercase tracking-wider transition-all cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-xl font-display font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shrink-0 whitespace-nowrap ${
                         withdrawalFilter === f
                           ? 'bg-amber-500/20 text-amber-300 border border-amber-500/60 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
                           : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white'
@@ -881,15 +936,17 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                     type="text"
                     value={withdrawalSearch}
                     onChange={(e) => setWithdrawalSearch(e.target.value)}
-                    placeholder="Search by wallet, name, ID..."
-                    className="w-full bg-black/60 border border-white/10 rounded-xl pl-9 pr-3 py-1.5 text-xs font-mono text-white placeholder-gray-500 focus:outline-none focus:border-amber-500"
+                    placeholder="Search wallet, user, ID..."
+                    className="w-full bg-black/60 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs font-mono text-white placeholder-gray-500 focus:outline-none focus:border-amber-500"
                   />
                 </div>
               </div>
 
-              {/* Withdrawals Table */}
-              <div className="bg-black/50 border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
-                <div className="overflow-x-auto">
+              {/* Withdrawals: Desktop Table & Mobile Cards */}
+              <div className="bg-black/50 border border-white/10 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl">
+                
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full text-left text-xs font-mono">
                     <thead className="bg-white/5 border-b border-white/10 text-gray-400 uppercase text-[10px] tracking-wider">
                       <tr>
@@ -945,7 +1002,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                                     <span className="text-gray-300 font-mono text-xs">{r.walletAddress?.slice(0, 6)}...{r.walletAddress?.slice(-6)}</span>
                                     <button
                                       onClick={() => handleCopy(r.walletAddress)}
-                                      className="p-1 text-gray-500 hover:text-white rounded transition-colors"
+                                      className="p-1 text-gray-500 hover:text-white rounded transition-colors cursor-pointer"
                                       title={`Copy ${isTon ? 'TON' : 'Solana'} Address`}
                                     >
                                       {copiedAddress === r.walletAddress ? (
@@ -1024,45 +1081,173 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                     </tbody>
                   </table>
                 </div>
+
+                {/* Mobile Cards View */}
+                <div className="md:hidden divide-y divide-white/10">
+                  {filteredWithdrawals.length === 0 ? (
+                    <div className="p-6 text-center text-gray-500 font-mono text-xs">
+                      No withdrawal requests found for the selected filter.
+                    </div>
+                  ) : (
+                    filteredWithdrawals.map(r => {
+                      const isTon = Boolean(
+                        r.walletAddress?.startsWith('EQ') ||
+                        r.walletAddress?.startsWith('UQ') ||
+                        r.walletAddress?.startsWith('0:') ||
+                        r.walletAddress?.startsWith('-1:')
+                      );
+
+                      return (
+                        <div key={r.id} className="p-3.5 space-y-2.5 bg-black/30">
+                          {/* Header row: Player name, ID, Status */}
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <span className="font-bold text-white text-sm block truncate">
+                                {r.username || r.userProfileName || 'Voidwalker'}
+                              </span>
+                              <span className="text-[10px] text-gray-500 font-mono block">
+                                ID: {r.id?.slice(-8)} • {new Date(r.createdAt || Date.now()).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <div>
+                              {r.status === 'pending' && (
+                                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/50 text-amber-300 font-bold text-[10px] uppercase shrink-0">
+                                  ⏳ Pending
+                                </span>
+                              )}
+                              {r.status === 'completed' && (
+                                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 font-bold text-[10px] uppercase shrink-0">
+                                  ✅ Paid
+                                </span>
+                              )}
+                              {r.status === 'rejected' && (
+                                <span className="px-2 py-0.5 rounded-full bg-red-500/20 border border-red-500/50 text-red-400 font-bold text-[10px] uppercase shrink-0">
+                                  ❌ Declined
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Amount and SOV */}
+                          <div className="flex items-baseline justify-between bg-white/[0.03] p-2.5 rounded-xl border border-white/5">
+                            <span className="text-[10px] font-mono text-gray-400 uppercase">Payout</span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-mono font-black text-emerald-400 text-base">
+                                ${r.amountUsdt} USDT
+                              </span>
+                              <span className="text-xs text-amber-300 font-mono font-bold">
+                                ({r.amountSovereigns} SOV)
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Wallet info with Copy & Explorer */}
+                          <div className="flex items-center justify-between gap-2 text-xs font-mono bg-black/40 px-2.5 py-1.5 rounded-xl border border-white/5">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border shrink-0 ${
+                                isTon
+                                  ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                                  : 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                              }`}>
+                                {isTon ? 'TON' : 'SOL'}
+                              </span>
+                              <span className="text-gray-300 truncate">
+                                {r.walletAddress?.slice(0, 8)}...{r.walletAddress?.slice(-6)}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1 shrink-0">
+                              <button
+                                onClick={() => handleCopy(r.walletAddress)}
+                                className="p-1.5 text-gray-400 hover:text-white bg-white/5 rounded-lg active:scale-95 cursor-pointer"
+                                title="Copy Address"
+                              >
+                                {copiedAddress === r.walletAddress ? (
+                                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                ) : (
+                                  <Copy className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+                              <a
+                                href={isTon ? `https://tonviewer.com/${r.walletAddress}` : `https://solscan.io/account/${r.walletAddress}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="p-1.5 text-gray-400 hover:text-cyan-400 bg-white/5 rounded-lg active:scale-95"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
+                            </div>
+                          </div>
+
+                          {/* Pending Actions for Mobile */}
+                          {r.status === 'pending' && (
+                            <div className="grid grid-cols-2 gap-2 pt-1">
+                              <button
+                                onClick={() => {
+                                  setSelectedReq({ ...r, actionType: 'approve' });
+                                  setTxidInput('');
+                                  setActionFeedback(null);
+                                }}
+                                className="py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-display font-black text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95 cursor-pointer text-center shadow-[0_0_12px_rgba(16,185,129,0.3)]"
+                              >
+                                Approve & Pay
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setSelectedReq({ ...r, actionType: 'reject' });
+                                  setRejectReasonInput('');
+                                  setActionFeedback(null);
+                                }}
+                                className="py-2.5 bg-red-600/90 hover:bg-red-500 text-white font-display font-black text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95 cursor-pointer text-center"
+                              >
+                                Decline
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
               </div>
             </div>
           )}
 
           {/* TAB 3: MAIL & REWARDS BROADCASTER */}
           {activeTab === 'broadcast' && (
-            <div className="max-w-3xl mx-auto space-y-6">
+            <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6">
               <div className="text-center space-y-1">
-                <h3 className="font-display font-black text-xl text-white tracking-widest text-shadow-gold flex items-center justify-center gap-2">
-                  <Mail className="w-6 h-6 text-amber-400" />
+                <h3 className="font-display font-black text-base sm:text-xl text-white tracking-wider sm:tracking-widest text-shadow-gold flex items-center justify-center gap-2">
+                  <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
                   HIGH VOID IMPERIAL DECREE
                 </h3>
-                <p className="text-xs text-gray-400 font-mono">Send official announcements and attach in-game rewards directly to player mailboxes</p>
+                <p className="text-[11px] sm:text-xs text-gray-400 font-mono">Send official announcements and attach in-game rewards directly to player mailboxes</p>
               </div>
 
               {broadcastResult && (
-                <div className="p-4 rounded-2xl bg-black/60 border border-white/20 text-center font-mono text-sm font-bold">
+                <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-black/60 border border-white/20 text-center font-mono text-xs sm:text-sm font-bold">
                   {broadcastResult}
                 </div>
               )}
 
-              <form onSubmit={handleSendBroadcast} className="bg-black/50 border border-white/10 rounded-3xl p-6 space-y-5 shadow-2xl">
+              <form onSubmit={handleSendBroadcast} className="bg-black/50 border border-white/10 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 space-y-4 sm:space-y-5 shadow-2xl">
                 
                 {/* Target Audience */}
                 <div className="space-y-2">
                   <label className="text-xs font-mono font-bold text-gray-300 uppercase tracking-wider block">
                     1. Target Audience
                   </label>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 gap-1.5 sm:gap-3">
                     {[
                       { id: 'all', label: 'All Players' },
-                      { id: 'league', label: 'Specific League' },
-                      { id: 'player', label: 'Single Player' }
+                      { id: 'league', label: 'League' },
+                      { id: 'player', label: 'Single' }
                     ].map(t => (
                       <button
                         key={t.id}
                         type="button"
                         onClick={() => setBroadcastTarget(t.id as any)}
-                        className={`p-3 rounded-2xl font-display font-bold text-xs uppercase tracking-wider transition-all cursor-pointer ${
+                        className={`p-2 sm:p-3 rounded-xl sm:rounded-2xl font-display font-bold text-xs uppercase tracking-wider transition-all cursor-pointer ${
                           broadcastTarget === t.id
                             ? 'bg-amber-500/20 text-amber-300 border border-amber-500/60 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
                             : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white'
@@ -1077,7 +1262,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                     <select
                       value={broadcastTargetValue}
                       onChange={(e) => setBroadcastTargetValue(e.target.value)}
-                      className="w-full bg-black/70 border border-white/15 rounded-xl px-4 py-2.5 text-xs font-mono text-white mt-2"
+                      className="w-full bg-black/70 border border-white/15 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs font-mono text-white mt-2"
                     >
                       <option value="">Select Target League...</option>
                       <option value="Bronze">Bronze League</option>
@@ -1101,13 +1286,13 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                       value={broadcastTargetValue}
                       onChange={(e) => setBroadcastTargetValue(e.target.value)}
                       placeholder="Enter target Username or Solana Wallet Address..."
-                      className="w-full bg-black/70 border border-white/15 rounded-xl px-4 py-2.5 text-xs font-mono text-white mt-2 placeholder-gray-500"
+                      className="w-full bg-black/70 border border-white/15 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs font-mono text-white mt-2 placeholder-gray-500"
                     />
                   )}
                 </div>
 
                 {/* Decree Content */}
-                <div className="space-y-3 border-t border-white/10 pt-4">
+                <div className="space-y-2 sm:space-y-3 border-t border-white/10 pt-3 sm:pt-4">
                   <label className="text-xs font-mono font-bold text-gray-300 uppercase tracking-wider block">
                     2. Message Content
                   </label>
@@ -1117,8 +1302,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                     required
                     value={broadcastTitle}
                     onChange={(e) => setBroadcastTitle(e.target.value)}
-                    placeholder="Decree Title (e.g. 'Server Maintenance Gift' or 'Season 1 Grand Payout')"
-                    className="w-full bg-black/70 border border-white/15 rounded-xl px-4 py-2.5 text-sm font-display font-bold text-white placeholder-gray-500"
+                    placeholder="Decree Title (e.g. 'Server Gift')"
+                    className="w-full bg-black/70 border border-white/15 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-display font-bold text-white placeholder-gray-500"
                   />
 
                   <textarea
@@ -1127,22 +1312,22 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                     value={broadcastContent}
                     onChange={(e) => setBroadcastContent(e.target.value)}
                     placeholder="Write the decree message body here..."
-                    className="w-full bg-black/70 border border-white/15 rounded-xl p-4 text-xs font-sans text-gray-200 placeholder-gray-500 leading-relaxed"
+                    className="w-full bg-black/70 border border-white/15 rounded-xl p-3 sm:p-4 text-xs font-sans text-gray-200 placeholder-gray-500 leading-relaxed"
                   />
                 </div>
 
                 {/* Attached Tributes & Rewards */}
-                <div className="space-y-3 border-t border-white/10 pt-4">
+                <div className="space-y-2 sm:space-y-3 border-t border-white/10 pt-3 sm:pt-4">
                   <label className="text-xs font-mono font-bold text-amber-300 uppercase tracking-wider flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-amber-400" />
                     3. Attach Rewards (Optional)
                   </label>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                     {/* Gold */}
-                    <div className="bg-white/5 border border-amber-500/20 p-3 rounded-2xl space-y-1">
+                    <div className="bg-white/5 border border-amber-500/20 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl space-y-1">
                       <div className="flex items-center gap-1.5">
-                        <img src="/icons/icon_gold.webp" alt="Gold" className="w-5 h-5 object-contain" />
+                        <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
                         <span className="text-[10px] font-mono text-amber-400 font-bold uppercase">Gold</span>
                       </div>
                       <input
@@ -1151,14 +1336,14 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                         value={rewardGold || ''}
                         onChange={(e) => setRewardGold(parseInt(e.target.value, 10) || 0)}
                         placeholder="0"
-                        className="w-full bg-black/60 border border-white/10 rounded-lg px-2.5 py-1 text-sm font-mono font-bold text-amber-300"
+                        className="w-full bg-black/60 border border-white/10 rounded-lg px-2 py-1 text-xs sm:text-sm font-mono font-bold text-amber-300"
                       />
                     </div>
 
                     {/* Dust */}
-                    <div className="bg-white/5 border border-cyan-500/20 p-3 rounded-2xl space-y-1">
+                    <div className="bg-white/5 border border-cyan-500/20 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl space-y-1">
                       <div className="flex items-center gap-1.5">
-                        <img src="/icons/icon_dust.webp" alt="Dust" className="w-5 h-5 object-contain" />
+                        <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
                         <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase">Dust</span>
                       </div>
                       <input
@@ -1167,14 +1352,14 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                         value={rewardDust || ''}
                         onChange={(e) => setRewardDust(parseInt(e.target.value, 10) || 0)}
                         placeholder="0"
-                        className="w-full bg-black/60 border border-white/10 rounded-lg px-2.5 py-1 text-sm font-mono font-bold text-[#66fcf1]"
+                        className="w-full bg-black/60 border border-white/10 rounded-lg px-2 py-1 text-xs sm:text-sm font-mono font-bold text-[#66fcf1]"
                       />
                     </div>
 
                     {/* Shards */}
-                    <div className="bg-white/5 border border-red-500/20 p-3 rounded-2xl space-y-1">
+                    <div className="bg-white/5 border border-red-500/20 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl space-y-1">
                       <div className="flex items-center gap-1.5">
-                        <img src="/icons/icon_shards.webp" alt="Shards" className="w-5 h-5 object-contain" />
+                        <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
                         <span className="text-[10px] font-mono text-red-400 font-bold uppercase">Shards</span>
                       </div>
                       <input
@@ -1183,14 +1368,14 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                         value={rewardShards || ''}
                         onChange={(e) => setRewardShards(parseInt(e.target.value, 10) || 0)}
                         placeholder="0"
-                        className="w-full bg-black/60 border border-white/10 rounded-lg px-2.5 py-1 text-sm font-mono font-bold text-rose-400"
+                        className="w-full bg-black/60 border border-white/10 rounded-lg px-2 py-1 text-xs sm:text-sm font-mono font-bold text-rose-400"
                       />
                     </div>
 
                     {/* Sovereigns */}
-                    <div className="bg-white/5 border border-amber-500/40 p-3 rounded-2xl space-y-1">
+                    <div className="bg-white/5 border border-amber-500/40 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl space-y-1">
                       <div className="flex items-center gap-1.5">
-                        <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-5 h-5 object-contain" />
+                        <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
                         <span className="text-[10px] font-mono text-amber-300 font-bold uppercase">Sovereigns</span>
                       </div>
                       <input
@@ -1199,7 +1384,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                         value={rewardSovereigns || ''}
                         onChange={(e) => setRewardSovereigns(parseInt(e.target.value, 10) || 0)}
                         placeholder="0"
-                        className="w-full bg-black/60 border border-white/10 rounded-lg px-2.5 py-1 text-sm font-mono font-bold text-amber-200"
+                        className="w-full bg-black/60 border border-white/10 rounded-lg px-2 py-1 text-xs sm:text-sm font-mono font-bold text-amber-200"
                       />
                     </div>
                   </div>
@@ -1209,10 +1394,10 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                   <button
                     type="submit"
                     disabled={isBroadcasting}
-                    className="w-full py-4 bg-gradient-to-r from-red-600 via-amber-600 to-red-600 hover:from-red-500 hover:to-amber-500 text-white font-display font-black text-sm tracking-widest uppercase rounded-2xl shadow-[0_0_25px_rgba(220,38,38,0.4)] hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full py-3 sm:py-4 bg-gradient-to-r from-red-600 via-amber-600 to-red-600 hover:from-red-500 hover:to-amber-500 text-white font-display font-black text-xs sm:text-sm tracking-wider sm:tracking-widest uppercase rounded-xl sm:rounded-2xl shadow-[0_0_25px_rgba(220,38,38,0.4)] active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    <Send className="w-5 h-5" />
-                    <span>{isBroadcasting ? 'TRANSMITTING DECREE...' : 'DISPATCH IMPERIAL DECREE'}</span>
+                    <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span>{isBroadcasting ? 'TRANSMITTING...' : 'DISPATCH IMPERIAL DECREE'}</span>
                   </button>
                 </div>
 
@@ -1227,7 +1412,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
               {!selectedPlayer ? (
                 <div className="space-y-4">
                   {/* Search, Filter, and Sort Controls */}
-                  <div className="flex flex-col lg:flex-row items-center justify-between gap-3 bg-black/40 p-4 rounded-3xl border border-white/10">
+                  <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2.5 sm:gap-3 bg-black/40 p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-white/10">
                     
                     {/* Search Input */}
                     <form onSubmit={handleSearchPlayer} className="relative w-full lg:w-80">
@@ -1237,7 +1422,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search by username or wallet..."
-                        className="w-full bg-black/60 border border-white/15 rounded-2xl pl-10 pr-10 py-2.5 text-xs font-mono text-white placeholder-gray-500 focus:outline-none focus:border-amber-500/60"
+                        className="w-full bg-black/60 border border-white/15 rounded-xl sm:rounded-2xl pl-10 pr-10 py-2 sm:py-2.5 text-xs font-mono text-white placeholder-gray-500 focus:outline-none focus:border-amber-500/60"
                       />
                       {searchQuery && (
                         <button
@@ -1246,7 +1431,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                             setSearchQuery('');
                             loadAllPlayers('');
                           }}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs cursor-pointer"
                         >
                           ✕
                         </button>
@@ -1254,12 +1439,12 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                     </form>
 
                     {/* League Filter Pills */}
-                    <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 select-none">
+                    <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 select-none no-scrollbar">
                       {['all', 'Premium', 'Ultra', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Sapphire', 'Emerald', 'Ruby', 'Diamond', 'Master', 'Grandmaster', 'Void Overlord', 'Divine', 'Banned'].map(l => (
                         <button
                           key={l}
                           onClick={() => setPlayerLeagueFilter(l)}
-                          className={`px-3 py-1.5 rounded-xl font-display font-bold text-[11px] uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+                          className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl font-display font-bold text-[10px] sm:text-[11px] uppercase tracking-wider transition-all cursor-pointer shrink-0 whitespace-nowrap ${
                             playerLeagueFilter === l
                               ? l === 'Banned'
                                 ? 'bg-red-600/30 text-red-300 border border-red-500/80 shadow-[0_0_12px_rgba(220,38,38,0.35)]'
@@ -1277,12 +1462,12 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                     </div>
 
                     {/* Sorting Selector */}
-                    <div className="flex items-center gap-2 w-full lg:w-auto">
-                      <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest whitespace-nowrap">Sort by:</span>
+                    <div className="flex items-center justify-between sm:justify-start gap-2 w-full lg:w-auto">
+                      <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest whitespace-nowrap">Sort:</span>
                       <select
                         value={playerSortBy}
                         onChange={(e) => setPlayerSortBy(e.target.value as any)}
-                        className="bg-black/70 border border-white/15 rounded-xl px-3 py-2 text-xs font-mono text-amber-300 font-bold focus:outline-none focus:border-amber-500"
+                        className="bg-black/70 border border-white/15 rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs font-mono text-amber-300 font-bold focus:outline-none focus:border-amber-500 cursor-pointer flex-1 sm:flex-initial"
                       >
                         <option value="active">Last Active</option>
                         <option value="level">Highest Level</option>
@@ -1294,33 +1479,11 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
                   </div>
 
-                  {/* Players Directory Table */}
-                  <div className="bg-black/50 border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
-                    <div className="px-6 py-3 border-b border-white/10 bg-white/[0.02] flex items-center justify-between">
-                      <span className="text-[11px] font-mono uppercase tracking-widest text-gray-400 font-bold">
-                        Registered Players Directory ({allPlayers.filter(p => {
-                          const isBanned = Boolean(p.profile?.isBanned);
-                          const isSubActive = p.profile?.subscriptionExpiresAt && Number(p.profile?.subscriptionExpiresAt) > Date.now();
-                          const subTier = isSubActive ? (p.profile?.subscriptionTier || 'free') : 'free';
-                          if (playerLeagueFilter === 'Banned') {
-                            if (!isBanned) return false;
-                          } else if (playerLeagueFilter === 'Premium') {
-                            if (isBanned || subTier !== 'premium') return false;
-                          } else if (playerLeagueFilter === 'Ultra') {
-                            if (isBanned || subTier !== 'ultra') return false;
-                          } else if (playerLeagueFilter !== 'all') {
-                            if (isBanned) return false;
-                            const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
-                            if (l.toLowerCase() !== getNormalizedLeague(playerLeagueFilter).toLowerCase()) return false;
-                          }
-                          if (searchQuery.trim()) {
-                            const s = searchQuery.trim().toLowerCase();
-                            const w = (p.walletAddress || '').toLowerCase();
-                            const u = (p.profile?.username || '').toLowerCase();
-                            return w.includes(s) || u.includes(s);
-                          }
-                          return true;
-                        }).length})
+                  {/* Players Directory Table & Mobile Cards */}
+                  <div className="bg-black/50 border border-white/10 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl">
+                    <div className="px-3 sm:px-6 py-2.5 sm:py-3 border-b border-white/10 bg-white/[0.02] flex items-center justify-between">
+                      <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-gray-400 font-bold">
+                        Registered Players ({filteredAndSortedPlayers.length})
                       </span>
                       <button
                         onClick={() => loadAllPlayers(searchQuery)}
@@ -1328,11 +1491,12 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                         className="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                       >
                         <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
-                        <span>Refresh List</span>
+                        <span>Refresh</span>
                       </button>
                     </div>
 
-                    <div className="overflow-x-auto">
+                    {/* Desktop Table View */}
+                    <div className="hidden md:block overflow-x-auto">
                       <table className="w-full text-left text-xs font-mono">
                         <thead className="bg-white/5 border-b border-white/10 text-gray-400 uppercase text-[10px] tracking-wider">
                           <tr>
@@ -1346,263 +1510,326 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
-                          {allPlayers.filter(p => {
-                            const isBanned = Boolean(p.profile?.isBanned);
-                            const isSubActive = p.profile?.subscriptionExpiresAt && Number(p.profile?.subscriptionExpiresAt) > Date.now();
-                            const subTier = isSubActive ? (p.profile?.subscriptionTier || 'free') : 'free';
-                            if (playerLeagueFilter === 'Banned') {
-                              if (!isBanned) return false;
-                            } else if (playerLeagueFilter === 'Premium') {
-                              if (isBanned || subTier !== 'premium') return false;
-                            } else if (playerLeagueFilter === 'Ultra') {
-                              if (isBanned || subTier !== 'ultra') return false;
-                            } else if (playerLeagueFilter !== 'all') {
-                              if (isBanned) return false;
-                              const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
-                              if (l.toLowerCase() !== getNormalizedLeague(playerLeagueFilter).toLowerCase()) return false;
-                            }
-                            if (searchQuery.trim()) {
-                              const s = searchQuery.trim().toLowerCase();
-                              const w = (p.walletAddress || '').toLowerCase();
-                              const u = (p.profile?.username || '').toLowerCase();
-                              return w.includes(s) || u.includes(s);
-                            }
-                            return true;
-                          }).length === 0 ? (
+                          {filteredAndSortedPlayers.length === 0 ? (
                             <tr>
                               <td colSpan={7} className="p-8 text-center text-gray-500 font-mono">
                                 No players found matching your criteria.
                               </td>
                             </tr>
                           ) : (
-                            allPlayers
-                              .filter(p => {
-                                const isBanned = Boolean(p.profile?.isBanned);
-                                const isSubActive = p.profile?.subscriptionExpiresAt && Number(p.profile?.subscriptionExpiresAt) > Date.now();
-                                const subTier = isSubActive ? (p.profile?.subscriptionTier || 'free') : 'free';
-                                if (playerLeagueFilter === 'Banned') {
-                                  if (!isBanned) return false;
-                                } else if (playerLeagueFilter === 'Premium') {
-                                  if (isBanned || subTier !== 'premium') return false;
-                                } else if (playerLeagueFilter === 'Ultra') {
-                                  if (isBanned || subTier !== 'ultra') return false;
-                                } else if (playerLeagueFilter !== 'all') {
-                                  if (isBanned) return false;
-                                  const l = getNormalizedLeague(p.profile?.pvpLeague || p.profile?.league);
-                                  if (l.toLowerCase() !== getNormalizedLeague(playerLeagueFilter).toLowerCase()) return false;
-                                }
-                                if (searchQuery.trim()) {
-                                  const s = searchQuery.trim().toLowerCase();
-                                  const w = (p.walletAddress || '').toLowerCase();
-                                  const u = (p.profile?.username || '').toLowerCase();
-                                  return w.includes(s) || u.includes(s);
-                                }
-                                return true;
-                              })
-                              .sort((a, b) => {
-                                const pa = a.profile || {};
-                                const pb = b.profile || {};
-                                if (playerSortBy === 'level') return (pb.level || 1) - (pa.level || 1);
-                                if (playerSortBy === 'sovereigns') return (pb.bloodSovereigns || 0) - (pa.bloodSovereigns || 0);
-                                if (playerSortBy === 'gold') return (pb.gold || 0) - (pa.gold || 0);
-                                if (playerSortBy === 'lp') return (pb.pvpLP || 0) - (pa.pvpLP || 0);
-                                const timeA = pa.lastLogin || (a.updatedAt ? new Date(a.updatedAt).getTime() : 0);
-                                const timeB = pb.lastLogin || (b.updatedAt ? new Date(b.updatedAt).getTime() : 0);
-                                return timeB - timeA;
-                              })
-                              .map((p) => {
-                                const prof = p.profile || {};
-                                const isUserAdmin = prof.username?.toLowerCase() === 'adminus' || prof.role === 'admin';
-                                const isPlayerBanned = Boolean(prof.isBanned);
-                                const lastAct = prof.lastLogin || (p.updatedAt ? new Date(p.updatedAt).getTime() : 0);
-                                const leagueStyle = getLeagueBadgeStyle(prof.pvpLeague || prof.league);
+                            filteredAndSortedPlayers.map((p) => {
+                              const prof = p.profile || {};
+                              const isUserAdmin = prof.username?.toLowerCase() === 'adminus' || prof.username?.toLowerCase() === 'kirito' || prof.role === 'admin';
+                              const isPlayerBanned = Boolean(prof.isBanned);
+                              const lastAct = prof.lastLogin || (p.updatedAt ? new Date(p.updatedAt).getTime() : 0);
+                              const leagueStyle = getLeagueBadgeStyle(prof.pvpLeague || prof.league);
 
-                                return (
-                                  <tr key={p.walletAddress} className={`transition-colors ${isPlayerBanned ? 'bg-red-950/15 hover:bg-red-950/25 border-l-2 border-red-600' : 'hover:bg-white/[0.02]'}`}>
-                                    {/* Player */}
-                                    <td className="p-4">
-                                      <div className="flex items-center gap-3">
-                                        <div className="relative">
-                                          {prof.avatarUrl ? (
-                                            <img src={prof.avatarUrl} alt="Avatar" className={`w-10 h-10 rounded-full border object-cover shadow-sm ${isPlayerBanned ? 'border-red-500/80 grayscale' : 'border-white/20'}`} />
-                                          ) : (
-                                            <div className={`w-10 h-10 rounded-full border flex items-center justify-center font-display font-black ${isPlayerBanned ? 'bg-red-950/50 border-red-500 text-red-300' : 'bg-white/5 border-white/10 text-amber-300'}`}>
-                                              {(prof.username || 'V')[0].toUpperCase()}
-                                            </div>
+                              return (
+                                <tr key={p.walletAddress} className={`transition-colors ${isPlayerBanned ? 'bg-red-950/15 hover:bg-red-950/25 border-l-2 border-red-600' : 'hover:bg-white/[0.02]'}`}>
+                                  {/* Player */}
+                                  <td className="p-4">
+                                    <div className="flex items-center gap-3">
+                                      <div className="relative">
+                                        {prof.avatarUrl ? (
+                                          <img src={prof.avatarUrl} alt="Avatar" className={`w-10 h-10 rounded-full border object-cover shadow-sm ${isPlayerBanned ? 'border-red-500/80 grayscale' : 'border-white/20'}`} />
+                                        ) : (
+                                          <div className={`w-10 h-10 rounded-full border flex items-center justify-center font-display font-black ${isPlayerBanned ? 'bg-red-950/50 border-red-500 text-red-300' : 'bg-white/5 border-white/10 text-amber-300'}`}>
+                                            {(prof.username || 'V')[0].toUpperCase()}
+                                          </div>
+                                        )}
+                                        {isUserAdmin && (
+                                          <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-red-600 rounded-full flex items-center justify-center text-[8px] font-black text-white" title="Administrator">
+                                            ★
+                                          </span>
+                                        )}
+                                      </div>
+
+                                      <div>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          <span className={`font-display font-bold text-sm ${isPlayerBanned ? 'text-red-300 line-through' : 'text-white'}`}>
+                                            {prof.username || 'Voidwalker'}
+                                          </span>
+                                          {isPlayerBanned && (
+                                            <span className="px-1.5 py-0.2 rounded bg-red-600 text-white font-mono text-[9px] font-black tracking-wider shadow-[0_0_8px_rgba(220,38,38,0.8)]">
+                                              🚫 BANNED
+                                            </span>
                                           )}
                                           {isUserAdmin && (
-                                            <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-red-600 rounded-full flex items-center justify-center text-[8px] font-black text-white" title="Administrator">
-                                              ★
+                                            <span className="px-1.5 py-0.2 rounded bg-red-950/80 border border-red-500/60 text-red-400 font-mono text-[9px] font-bold">
+                                              ADMIN
                                             </span>
                                           )}
                                         </div>
-
-                                        <div>
-                                          <div className="flex items-center gap-2 flex-wrap">
-                                            <span className={`font-display font-bold text-sm ${isPlayerBanned ? 'text-red-300 line-through' : 'text-white'}`}>
-                                              {prof.username || 'Voidwalker'}
-                                            </span>
-                                            {isPlayerBanned && (
-                                              <span className="px-1.5 py-0.2 rounded bg-red-600 text-white font-mono text-[9px] font-black tracking-wider shadow-[0_0_8px_rgba(220,38,38,0.8)]">
-                                                🚫 BANNED
-                                              </span>
+                                        
+                                        <div className="flex items-center gap-1.5 mt-0.5">
+                                          <span className="text-[10px] text-gray-500 font-mono">
+                                            {p.walletAddress?.slice(0, 6)}...{p.walletAddress?.slice(-6)}
+                                          </span>
+                                          <button
+                                            onClick={() => handleCopy(p.walletAddress)}
+                                            className="p-0.5 text-gray-500 hover:text-white rounded cursor-pointer"
+                                            title="Copy Address"
+                                          >
+                                            {copiedAddress === p.walletAddress ? (
+                                              <Check className="w-3 h-3 text-emerald-400" />
+                                            ) : (
+                                              <Copy className="w-3 h-3" />
                                             )}
-                                            {isUserAdmin && (
-                                              <span className="px-1.5 py-0.2 rounded bg-red-950/80 border border-red-500/60 text-red-400 font-mono text-[9px] font-bold">
-                                                ADMIN
-                                              </span>
-                                            )}
-                                          </div>
-                                          
-                                          <div className="flex items-center gap-1.5 mt-0.5">
-                                            <span className="text-[10px] text-gray-500 font-mono">
-                                              {p.walletAddress?.slice(0, 6)}...{p.walletAddress?.slice(-6)}
-                                            </span>
-                                            <button
-                                              onClick={() => handleCopy(p.walletAddress)}
-                                              className="p-0.5 text-gray-500 hover:text-white rounded"
-                                              title="Copy Address"
-                                            >
-                                              {copiedAddress === p.walletAddress ? (
-                                                <Check className="w-3 h-3 text-emerald-400" />
-                                              ) : (
-                                                <Copy className="w-3 h-3" />
-                                              )}
-                                            </button>
-                                            <a
-                                              href={`https://solscan.io/account/${p.walletAddress}`}
-                                              target="_blank"
-                                              rel="noreferrer"
-                                              className="p-0.5 text-gray-500 hover:text-cyan-400 rounded"
-                                              title="View on Solscan"
-                                            >
-                                              <ExternalLink className="w-3 h-3" />
-                                            </a>
-                                          </div>
+                                          </button>
+                                          <a
+                                            href={`https://solscan.io/account/${p.walletAddress}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="p-0.5 text-gray-500 hover:text-cyan-400 rounded"
+                                            title="View on Solscan"
+                                          >
+                                            <ExternalLink className="w-3 h-3" />
+                                          </a>
                                         </div>
                                       </div>
-                                    </td>
+                                    </div>
+                                  </td>
 
-                                    {/* Subscription */}
-                                    <td className="p-4">
-                                      {(() => {
-                                        const isSubActive = prof.subscriptionExpiresAt && Number(prof.subscriptionExpiresAt) > Date.now();
-                                        const tier = isSubActive ? prof.subscriptionTier : 'free';
-                                        if (!isSubActive || tier === 'free') {
-                                          return <span className="text-[11px] text-gray-500 font-mono">Free</span>;
-                                        }
-                                        const daysLeft = Math.max(0, Math.ceil((Number(prof.subscriptionExpiresAt) - Date.now()) / (1000 * 60 * 60 * 24)));
-                                        if (tier === 'ultra') {
-                                          return (
-                                            <div className="flex flex-col gap-0.5">
-                                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-950/80 border border-purple-400/60 text-purple-300 font-mono text-[10px] font-black shadow-[0_0_8px_rgba(168,85,247,0.3)] w-fit">
-                                                💎 ULTRA
-                                              </span>
-                                              <span className="text-[10px] font-mono text-purple-400/80 font-semibold">
-                                                {daysLeft}d left
-                                              </span>
-                                            </div>
-                                          );
-                                        }
+                                  {/* Subscription */}
+                                  <td className="p-4">
+                                    {(() => {
+                                      const isSubActive = prof.subscriptionExpiresAt && Number(prof.subscriptionExpiresAt) > Date.now();
+                                      const tier = isSubActive ? prof.subscriptionTier : 'free';
+                                      if (!isSubActive || tier === 'free') {
+                                        return <span className="text-[11px] text-gray-500 font-mono">Free</span>;
+                                      }
+                                      const daysLeft = Math.max(0, Math.ceil((Number(prof.subscriptionExpiresAt) - Date.now()) / (1000 * 60 * 60 * 24)));
+                                      if (tier === 'ultra') {
                                         return (
                                           <div className="flex flex-col gap-0.5">
-                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-950/80 border border-amber-400/60 text-amber-300 font-mono text-[10px] font-black shadow-[0_0_8px_rgba(245,158,11,0.3)] w-fit">
-                                              ⚜️ PREMIUM
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-950/80 border border-purple-400/60 text-purple-300 font-mono text-[10px] font-black shadow-[0_0_8px_rgba(168,85,247,0.3)] w-fit">
+                                              💎 ULTRA
                                             </span>
-                                            <span className="text-[10px] font-mono text-amber-400/80 font-semibold">
+                                            <span className="text-[10px] font-mono text-purple-400/80 font-semibold">
                                               {daysLeft}d left
                                             </span>
                                           </div>
                                         );
-                                      })()}
-                                    </td>
-
-                                    {/* Level & Progress */}
-                                    <td className="p-4">
-                                      <div className="flex flex-col gap-0.5">
-                                        <span className="font-mono font-bold text-amber-300 text-xs">
-                                          LVL {prof.level || 1}
-                                        </span>
-                                        <span className="text-[10px] text-gray-500">
-                                          EXP: {prof.exp || 0}
-                                        </span>
-                                      </div>
-                                    </td>
-
-                                    {/* PvP League */}
-                                    <td className="p-4">
-                                      <div className="flex items-center gap-1.5">
-                                        <span className={`px-2.5 py-1 rounded-lg font-display font-bold text-[11px] uppercase tracking-wider ${leagueStyle.className}`}>
-                                          {leagueStyle.badge}
-                                        </span>
-                                        <span className="text-[10px] text-cyan-400 font-mono font-bold">
-                                          {prof.pvpLP || 0} LP
-                                        </span>
-                                      </div>
-                                    </td>
-
-                                    {/* Vault Balances */}
-                                    <td className="p-4">
-                                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs font-mono">
-                                        <div className="flex items-center gap-1">
-                                          <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain" />
-                                          <span className="text-amber-400 font-bold">{(prof.gold || 0).toLocaleString()}</span>
+                                      }
+                                      return (
+                                        <div className="flex flex-col gap-0.5">
+                                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-950/80 border border-amber-400/60 text-amber-300 font-mono text-[10px] font-black shadow-[0_0_8px_rgba(245,158,11,0.3)] w-fit">
+                                            ⚜️ PREMIUM
+                                          </span>
+                                          <span className="text-[10px] font-mono text-amber-400/80 font-semibold">
+                                            {daysLeft}d left
+                                          </span>
                                         </div>
-                                        <div className="flex items-center gap-1">
-                                          <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 object-contain" />
-                                          <span className="text-[#66fcf1] font-bold">{(prof.dust || 0).toLocaleString()}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                          <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
-                                          <span className="text-rose-400 font-bold">{(prof.darkShards || 0).toLocaleString()}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                          <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 object-contain" />
-                                          <span className="text-amber-300 font-black">{(prof.bloodSovereigns || 0).toLocaleString()}</span>
-                                        </div>
-                                      </div>
-                                    </td>
+                                      );
+                                    })()}
+                                  </td>
 
-                                    {/* Last Activity */}
-                                    <td className="p-4">
-                                      <span className="text-[10px] text-gray-400 block font-mono">
-                                        {lastAct > 0 ? new Date(lastAct).toLocaleString() : 'N/A'}
+                                  {/* Level & Progress */}
+                                  <td className="p-4">
+                                    <div className="flex flex-col gap-0.5">
+                                      <span className="font-mono font-bold text-amber-300 text-xs">
+                                        LVL {prof.level || 1}
                                       </span>
-                                    </td>
+                                      <span className="text-[10px] text-gray-500">
+                                        EXP: {prof.exp || 0}
+                                      </span>
+                                    </div>
+                                  </td>
 
-                                    {/* Actions */}
-                                    <td className="p-4 text-right">
-                                      <button
-                                        onClick={() => selectPlayerForEdit(p)}
-                                        className="px-3.5 py-1.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-black font-display font-black text-[11px] uppercase tracking-wider rounded-xl transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-[0_0_10px_rgba(245,158,11,0.25)]"
-                                      >
-                                        INSPECT
-                                      </button>
-                                    </td>
-                                  </tr>
-                                );
-                              })
+                                  {/* PvP League */}
+                                  <td className="p-4">
+                                    <div className="flex items-center gap-1.5">
+                                      <span className={`px-2.5 py-1 rounded-lg font-display font-bold text-[11px] uppercase tracking-wider ${leagueStyle.className}`}>
+                                        {leagueStyle.badge}
+                                      </span>
+                                      <span className="text-[10px] text-cyan-400 font-mono font-bold">
+                                        {prof.pvpLP || 0} LP
+                                      </span>
+                                    </div>
+                                  </td>
+
+                                  {/* Vault Balances */}
+                                  <td className="p-4">
+                                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs font-mono">
+                                      <div className="flex items-center gap-1">
+                                        <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain" />
+                                        <span className="text-amber-400 font-bold">{(prof.gold || 0).toLocaleString()}</span>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        <img src="/icons/icon_dust.webp" alt="Dust" className="w-4 h-4 object-contain" />
+                                        <span className="text-[#66fcf1] font-bold">{(prof.dust || 0).toLocaleString()}</span>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
+                                        <span className="text-rose-400 font-bold">{(prof.darkShards || 0).toLocaleString()}</span>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 object-contain" />
+                                        <span className="text-amber-300 font-black">{(prof.bloodSovereigns || 0).toLocaleString()}</span>
+                                      </div>
+                                    </div>
+                                  </td>
+
+                                  {/* Last Activity */}
+                                  <td className="p-4">
+                                    <span className="text-[10px] text-gray-400 block font-mono">
+                                      {lastAct > 0 ? new Date(lastAct).toLocaleString() : 'N/A'}
+                                    </span>
+                                  </td>
+
+                                  {/* Actions */}
+                                  <td className="p-4 text-right">
+                                    <button
+                                      onClick={() => selectPlayerForEdit(p)}
+                                      className="px-3.5 py-1.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-black font-display font-black text-[11px] uppercase tracking-wider rounded-xl transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-[0_0_10px_rgba(245,158,11,0.25)]"
+                                    >
+                                      INSPECT
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })
                           )}
                         </tbody>
                       </table>
                     </div>
+
+                    {/* Mobile Cards View */}
+                    <div className="md:hidden divide-y divide-white/10">
+                      {filteredAndSortedPlayers.length === 0 ? (
+                        <div className="p-6 text-center text-gray-500 font-mono text-xs">
+                          No players found matching your criteria.
+                        </div>
+                      ) : (
+                        filteredAndSortedPlayers.map((p) => {
+                          const prof = p.profile || {};
+                          const isUserAdmin = prof.username?.toLowerCase() === 'adminus' || prof.username?.toLowerCase() === 'kirito' || prof.role === 'admin';
+                          const isPlayerBanned = Boolean(prof.isBanned);
+                          const lastAct = prof.lastLogin || (p.updatedAt ? new Date(p.updatedAt).getTime() : 0);
+                          const leagueStyle = getLeagueBadgeStyle(prof.pvpLeague || prof.league);
+                          const isSubActive = prof.subscriptionExpiresAt && Number(prof.subscriptionExpiresAt) > Date.now();
+                          const subTier = isSubActive ? prof.subscriptionTier : 'free';
+
+                          return (
+                            <div key={p.walletAddress} className={`p-3.5 space-y-2.5 ${isPlayerBanned ? 'bg-red-950/20 border-l-4 border-red-600' : 'bg-black/30'}`}>
+                              {/* Top Row: Avatar + Name + Badges + Level + League */}
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                  <div className="relative shrink-0">
+                                    {prof.avatarUrl ? (
+                                      <img src={prof.avatarUrl} alt="Avatar" className={`w-9 h-9 rounded-full border object-cover ${isPlayerBanned ? 'border-red-500 grayscale' : 'border-amber-500/50'}`} />
+                                    ) : (
+                                      <div className={`w-9 h-9 rounded-full border flex items-center justify-center font-display font-black text-sm ${isPlayerBanned ? 'bg-red-950/50 border-red-500 text-red-300' : 'bg-white/5 border-white/10 text-amber-300'}`}>
+                                        {(prof.username || 'V')[0].toUpperCase()}
+                                      </div>
+                                    )}
+                                    {isUserAdmin && (
+                                      <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-red-600 rounded-full flex items-center justify-center text-[7px] font-black text-white">
+                                        ★
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  <div className="min-w-0">
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      <span className={`font-display font-bold text-sm truncate ${isPlayerBanned ? 'text-red-300 line-through' : 'text-white'}`}>
+                                        {prof.username || 'Voidwalker'}
+                                      </span>
+                                      {isPlayerBanned && (
+                                        <span className="px-1.5 py-0.2 rounded bg-red-600 text-white font-mono text-[8px] font-black">
+                                          BANNED
+                                        </span>
+                                      )}
+                                      {isUserAdmin && (
+                                        <span className="px-1.5 py-0.2 rounded bg-red-950/80 border border-red-500/60 text-red-400 font-mono text-[8px] font-bold">
+                                          ADMIN
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className="text-[10px] text-gray-400 font-mono block">
+                                      LVL {prof.level || 1} • {prof.pvpLP || 0} LP
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="flex flex-col items-end gap-1 shrink-0">
+                                  <span className={`px-2 py-0.5 rounded text-[9px] font-display font-bold uppercase ${leagueStyle.className}`}>
+                                    {leagueStyle.badge}
+                                  </span>
+                                  {subTier !== 'free' && (
+                                    <span className={`text-[9px] font-mono font-bold ${subTier === 'ultra' ? 'text-purple-300' : 'text-amber-300'}`}>
+                                      {subTier === 'ultra' ? '💎 ULTRA' : '⚜️ PREMIUM'}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Balances 4-Grid */}
+                              <div className="grid grid-cols-4 gap-1.5 bg-white/[0.03] p-2 rounded-xl border border-white/5 text-[10px] font-mono">
+                                <div className="flex items-center gap-1 truncate">
+                                  <img src="/icons/icon_gold.webp" alt="Gold" className="w-3.5 h-3.5 object-contain shrink-0" />
+                                  <span className="text-amber-400 font-bold truncate">{(prof.gold || 0).toLocaleString()}</span>
+                                </div>
+                                <div className="flex items-center gap-1 truncate">
+                                  <img src="/icons/icon_dust.webp" alt="Dust" className="w-3.5 h-3.5 object-contain shrink-0" />
+                                  <span className="text-[#66fcf1] font-bold truncate">{(prof.dust || 0).toLocaleString()}</span>
+                                </div>
+                                <div className="flex items-center gap-1 truncate">
+                                  <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain shrink-0" />
+                                  <span className="text-rose-400 font-bold truncate">{(prof.darkShards || 0).toLocaleString()}</span>
+                                </div>
+                                <div className="flex items-center gap-1 truncate">
+                                  <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3.5 h-3.5 object-contain shrink-0" />
+                                  <span className="text-amber-300 font-black truncate">{(prof.bloodSovereigns || 0).toLocaleString()}</span>
+                                </div>
+                              </div>
+
+                              {/* Wallet & Inspect Button */}
+                              <div className="flex items-center justify-between gap-2 pt-0.5">
+                                <div className="flex items-center gap-1 text-[10px] font-mono text-gray-500">
+                                  <span>{p.walletAddress?.slice(0, 6)}...{p.walletAddress?.slice(-4)}</span>
+                                  <button
+                                    onClick={() => handleCopy(p.walletAddress)}
+                                    className="p-1 text-gray-400 hover:text-white cursor-pointer"
+                                  >
+                                    {copiedAddress === p.walletAddress ? (
+                                      <Check className="w-3 h-3 text-emerald-400" />
+                                    ) : (
+                                      <Copy className="w-3 h-3" />
+                                    )}
+                                  </button>
+                                </div>
+
+                                <button
+                                  onClick={() => selectPlayerForEdit(p)}
+                                  className="px-3.5 py-1.5 bg-gradient-to-r from-amber-600 to-amber-500 text-black font-display font-black text-xs uppercase tracking-wider rounded-xl cursor-pointer active:scale-95 shadow-[0_0_10px_rgba(245,158,11,0.25)]"
+                                >
+                                  INSPECT & EDIT
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+
                   </div>
                 </div>
               ) : (
                 /* Selected Player Detailed Editor */
-                <div className="bg-black/50 border border-white/10 rounded-3xl p-6 space-y-6 max-w-3xl mx-auto shadow-2xl">
-                  <div className="flex items-start justify-between border-b border-white/10 pb-4">
-                    <div className="flex items-center gap-4">
+                <div className="bg-black/50 border border-white/10 rounded-3xl p-3.5 sm:p-6 space-y-4 sm:space-y-6 max-w-3xl mx-auto shadow-2xl">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                       {selectedPlayer.profile?.avatarUrl ? (
-                        <img src={selectedPlayer.profile.avatarUrl} alt="Avatar" className={`w-14 h-14 rounded-full border-2 object-cover ${editIsBanned ? 'border-red-600 grayscale' : 'border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.3)]'}`} />
+                        <img src={selectedPlayer.profile.avatarUrl} alt="Avatar" className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 object-cover shrink-0 ${editIsBanned ? 'border-red-600 grayscale' : 'border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.3)]'}`} />
                       ) : (
-                        <div className={`w-14 h-14 rounded-full border-2 flex items-center justify-center font-display font-black text-xl ${editIsBanned ? 'border-red-600 bg-red-950/40 text-red-400' : 'border-amber-500/50 bg-white/5 text-amber-300'}`}>
+                        <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 flex items-center justify-center font-display font-black text-xl shrink-0 ${editIsBanned ? 'border-red-600 bg-red-950/40 text-red-400' : 'border-amber-500/50 bg-white/5 text-amber-300'}`}>
                           {(selectedPlayer.profile?.username || 'V')[0].toUpperCase()}
                         </div>
                       )}
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className={`font-display font-black text-xl tracking-wide ${editIsBanned ? 'text-red-400' : 'text-white'}`}>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                          <h3 className={`font-display font-black text-lg sm:text-xl tracking-wide truncate ${editIsBanned ? 'text-red-400' : 'text-white'}`}>
                             {selectedPlayer.profile?.username || 'Voidwalker'}
                           </h3>
                           {editSubExpiresAt > Date.now() && editSubTier !== 'free' && (
@@ -1616,12 +1843,12 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           )}
                           {editIsBanned && (
                             <span className="px-2 py-0.5 rounded bg-red-600 text-white font-mono text-[10px] font-black uppercase">
-                              🚫 EXILED / BANNED
+                              🚫 BANNED
                             </span>
                           )}
                         </div>
-                        <p className="font-mono text-xs text-gray-400 break-all mt-0.5">{selectedPlayer.walletAddress}</p>
-                        <div className="flex items-center gap-3 mt-2 text-xs font-mono text-gray-300">
+                        <p className="font-mono text-[10px] sm:text-xs text-gray-400 truncate mt-0.5">{selectedPlayer.walletAddress}</p>
+                        <div className="flex items-center gap-2 sm:gap-3 mt-1.5 text-[11px] sm:text-xs font-mono text-gray-300 flex-wrap">
                           <span>Level: <strong className="text-amber-400">{selectedPlayer.profile?.level || 1}</strong></span>
                           <span>•</span>
                           <span>League: <strong className="text-emerald-400">{getNormalizedLeague(selectedPlayer.profile?.pvpLeague || selectedPlayer.profile?.league)}</strong></span>
@@ -1633,9 +1860,9 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
                     <button
                       onClick={() => setSelectedPlayer(null)}
-                      className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-display font-bold text-xs rounded-xl cursor-pointer transition-all"
+                      className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white font-display font-bold text-xs rounded-xl cursor-pointer transition-all shrink-0 self-start sm:self-auto w-full sm:w-auto text-center"
                     >
-                      ← Back to Player List
+                      ← Back to Players
                     </button>
                   </div>
 
@@ -1662,7 +1889,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                         type="button"
                         onClick={handleQuickBanToggle}
                         disabled={isModifyingPlayer}
-                        className={`px-4 py-2 rounded-xl font-display font-black text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md ${
+                        className={`w-full sm:w-auto px-4 py-2.5 rounded-xl font-display font-black text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md text-center ${
                           editIsBanned
                             ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_12px_rgba(16,185,129,0.4)]'
                             : 'bg-red-600 hover:bg-red-500 text-white shadow-[0_0_12px_rgba(220,38,38,0.4)]'
@@ -1804,56 +2031,68 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                       MODIFY VAULT & CURRENCY BALANCES
                     </h4>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono text-amber-400 uppercase font-bold">Gold</label>
+                        <label className="text-[10px] font-mono text-amber-400 uppercase font-bold flex items-center gap-1">
+                          <img src="/icons/icon_gold.webp" alt="Gold" className="w-3.5 h-3.5 object-contain" />
+                          <span>Gold</span>
+                        </label>
                         <input
                           type="number"
                           value={editGold}
                           onChange={(e) => setEditGold(parseInt(e.target.value, 10) || 0)}
-                          className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-sm font-mono font-bold text-amber-300"
+                          className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono font-bold text-amber-300 focus:outline-none focus:border-amber-400"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono text-cyan-400 uppercase font-bold">Void Dust</label>
+                        <label className="text-[10px] font-mono text-cyan-400 uppercase font-bold flex items-center gap-1">
+                          <img src="/icons/icon_dust.webp" alt="Dust" className="w-3.5 h-3.5 object-contain" />
+                          <span>Void Dust</span>
+                        </label>
                         <input
                           type="number"
                           value={editDust}
                           onChange={(e) => setEditDust(parseInt(e.target.value, 10) || 0)}
-                          className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-sm font-mono font-bold text-[#66fcf1]"
+                          className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono font-bold text-[#66fcf1] focus:outline-none focus:border-cyan-400"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono text-red-400 uppercase font-bold">Dark Shards</label>
+                        <label className="text-[10px] font-mono text-red-400 uppercase font-bold flex items-center gap-1">
+                          <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
+                          <span>Dark Shards</span>
+                        </label>
                         <input
                           type="number"
                           value={editShards}
                           onChange={(e) => setEditShards(parseInt(e.target.value, 10) || 0)}
-                          className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-sm font-mono font-bold text-rose-400"
+                          className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono font-bold text-rose-400 focus:outline-none focus:border-rose-400"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono text-amber-300 uppercase font-bold">Sovereigns</label>
+                        <label className="text-[10px] font-mono text-amber-300 uppercase font-bold flex items-center gap-1">
+                          <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3.5 h-3.5 object-contain" />
+                          <span>Sovereigns</span>
+                        </label>
                         <input
                           type="number"
                           value={editSovereigns}
                           onChange={(e) => setEditSovereigns(parseInt(e.target.value, 10) || 0)}
-                          className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-sm font-mono font-bold text-amber-200"
+                          className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono font-bold text-amber-200 focus:outline-none focus:border-amber-400"
                         />
                       </div>
                     </div>
 
                     {/* PvP League & LP Adjustments */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-white/10 pt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 border-t border-white/10 pt-4">
                       <div className="space-y-1">
                         <label className="text-[10px] font-mono text-purple-400 uppercase font-bold">PvP League Tier</label>
                         <select
                           value={editLeague}
                           onChange={(e) => setEditLeague(e.target.value)}
-                          className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-sm font-mono font-bold text-purple-300"
+                          className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono font-bold text-purple-300 focus:outline-none focus:border-purple-400"
                         >
                           <option value="Bronze">🥉 Bronze League</option>
                           <option value="Silver">🥈 Silver League</option>
@@ -1876,16 +2115,16 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           type="number"
                           value={editLP}
                           onChange={(e) => setEditLP(parseInt(e.target.value, 10) || 0)}
-                          className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-sm font-mono font-bold text-cyan-300"
+                          className="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono font-bold text-cyan-300 focus:outline-none focus:border-cyan-400"
                         />
                       </div>
                     </div>
 
-                    <div className="pt-2 flex items-center justify-between gap-3 border-t border-white/10 mt-2">
+                    <div className="pt-3 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 border-t border-white/10 mt-2">
                       <button
                         onClick={handleDeletePlayer}
                         disabled={isModifyingPlayer}
-                        className="px-4 py-2.5 bg-red-950/70 hover:bg-red-900 border border-red-500/50 hover:border-red-400 text-red-300 hover:text-white font-display font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md disabled:opacity-50"
+                        className="w-full sm:w-auto px-4 py-2.5 bg-red-950/70 hover:bg-red-900 border border-red-500/50 hover:border-red-400 text-red-300 hover:text-white font-display font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md disabled:opacity-50 text-center"
                       >
                         🗑️ DELETE ACCOUNT
                       </button>
@@ -1893,7 +2132,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                       <button
                         onClick={handleSavePlayerModifications}
                         disabled={isModifyingPlayer}
-                        className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-black font-display font-black text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-[0_0_15px_rgba(16,185,129,0.3)] disabled:opacity-50"
+                        className="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-black font-display font-black text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-[0_0_15px_rgba(16,185,129,0.3)] disabled:opacity-50 text-center"
                       >
                         {isModifyingPlayer ? 'SAVING...' : 'SAVE MODIFICATIONS'}
                       </button>
@@ -1991,27 +2230,27 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                 const badgeStyle = getLeagueBadgeStyle(currentLeague.name);
 
                 return (
-                  <div className="bg-gradient-to-b from-[#160d14] via-[#10090f] to-black border-2 border-white/10 rounded-3xl p-5 sm:p-7 space-y-6 shadow-2xl relative overflow-hidden">
+                  <div className="bg-gradient-to-b from-[#160d14] via-[#10090f] to-black border-2 border-white/10 rounded-3xl p-3.5 sm:p-7 space-y-4 sm:space-y-6 shadow-2xl relative overflow-hidden">
                     
                     {/* Header */}
-                    <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                      <div className="flex items-center gap-3.5">
+                    <div className="flex items-center justify-between border-b border-white/10 pb-3 sm:pb-4">
+                      <div className="flex items-center gap-3 sm:gap-3.5">
                         <img 
                           src={currentLeague.icon || '/icons/league_bronze.png'} 
                           alt={currentLeague.name} 
-                          className="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" 
+                          className="w-10 h-10 sm:w-14 sm:h-14 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" 
                         />
                         <div>
-                          <div className="flex items-center gap-2.5">
-                            <h4 className="font-display font-black text-lg sm:text-xl text-white tracking-widest uppercase">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-display font-black text-base sm:text-xl text-white tracking-widest uppercase">
                               {currentLeague.name} LEAGUE
                             </h4>
-                            <span className={`px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider border ${badgeStyle.className}`}>
+                            <span className={`px-2 py-0.5 rounded-full font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-wider border ${badgeStyle.className}`}>
                               {badgeStyle.badge}
                             </span>
                           </div>
-                          <p className="text-xs text-gray-400 font-mono mt-0.5">
-                            Edit individual bracket tributes below. Values will sync to all players.
+                          <p className="text-[11px] sm:text-xs text-gray-400 font-mono mt-0.5">
+                            Edit bracket tributes below. Values sync to all players.
                           </p>
                         </div>
                       </div>
@@ -2024,19 +2263,19 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
                     {/* Table of Brackets */}
                     <div className="space-y-3">
-                      <div className="grid grid-cols-12 gap-3 text-[10px] font-mono text-gray-400 uppercase tracking-widest px-3 font-bold">
+                      <div className="hidden sm:grid grid-cols-12 gap-3 text-[10px] font-mono text-gray-400 uppercase tracking-widest px-3 font-bold">
                         <div className="col-span-12 sm:col-span-4">Rank Bracket</div>
                         <div className="col-span-4 sm:col-span-2 text-center sm:text-left">👑 Sovereigns</div>
                         <div className="col-span-4 sm:col-span-3 text-center sm:text-left">🪙 Gold</div>
                         <div className="col-span-4 sm:col-span-3 text-center sm:text-left">🌌 Void Dust</div>
                       </div>
 
-                      <div className="space-y-3">
+                      <div className="space-y-2.5 sm:space-y-3">
                         {currentLeague.brackets?.map((bracket: any, bIdx: number) => {
                           return (
                             <div 
                               key={bIdx}
-                              className={`p-3.5 sm:p-4 rounded-2xl border transition-all grid grid-cols-12 gap-3 items-center ${
+                              className={`p-3 sm:p-4 rounded-2xl border transition-all grid grid-cols-3 sm:grid-cols-12 gap-2 sm:gap-3 items-center ${
                                 bracket.isPromotion 
                                   ? 'bg-gradient-to-r from-emerald-950/30 via-black/60 to-black/60 border-emerald-500/30 shadow-sm'
                                   : bracket.isDemotion
@@ -2045,18 +2284,18 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                               }`}
                             >
                               {/* Left: Rank Label & Status */}
-                              <div className="col-span-12 sm:col-span-4 space-y-1">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="font-display font-black text-sm text-white tracking-wide">
+                              <div className="col-span-3 sm:col-span-4 space-y-1">
+                                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                                  <span className="font-display font-black text-xs sm:text-sm text-white tracking-wide">
                                     {bracket.rankLabel}
                                   </span>
                                   {bracket.isPromotion && (
-                                    <span className="text-[9px] font-mono font-black uppercase text-emerald-400 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded font-bold">
+                                    <span className="text-[8px] sm:text-[9px] font-mono font-black uppercase text-emerald-400 bg-emerald-950/60 border border-emerald-500/40 px-1.5 py-0.2 rounded font-bold">
                                       ▲ PROMOTES
                                     </span>
                                   )}
                                   {bracket.isDemotion && (
-                                    <span className="text-[9px] font-mono font-black uppercase text-rose-400 bg-rose-950/60 border border-rose-500/40 px-2 py-0.5 rounded font-bold">
+                                    <span className="text-[8px] sm:text-[9px] font-mono font-black uppercase text-rose-400 bg-rose-950/60 border border-rose-500/40 px-1.5 py-0.2 rounded font-bold">
                                       ▼ DEMOTES
                                     </span>
                                   )}
@@ -2064,58 +2303,58 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                               </div>
 
                               {/* Sovereigns Input */}
-                              <div className="col-span-4 sm:col-span-2">
-                                <label className="text-[9px] font-mono text-gray-500 block sm:hidden mb-1 uppercase">Sovereigns</label>
+                              <div className="col-span-1 sm:col-span-2">
+                                <label className="text-[8px] font-mono text-gray-400 block sm:hidden mb-0.5 uppercase truncate">👑 SOV</label>
                                 <div className="relative">
                                   <img 
                                     src="/icons/icon_sovereign.webp" 
                                     alt="SOV" 
-                                    className="w-4 h-4 object-contain absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" 
+                                    className="w-3.5 h-3.5 object-contain absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" 
                                   />
                                   <input 
                                     type="number"
                                     min={0}
                                     value={bracket.sovereigns ?? 0}
                                     onChange={(e) => handleBracketValueChange(currentLeague.name, bIdx, 'sovereigns', parseInt(e.target.value) || 0)}
-                                    className="w-full bg-black/60 border border-amber-500/40 hover:border-amber-400 focus:border-amber-300 rounded-xl pl-8 pr-2.5 py-2 font-mono font-black text-xs sm:text-sm text-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-400/50 shadow-inner"
+                                    className="w-full bg-black/60 border border-amber-500/40 hover:border-amber-400 focus:border-amber-300 rounded-xl pl-6 sm:pl-8 pr-1.5 sm:pr-2.5 py-1.5 sm:py-2 font-mono font-black text-[11px] sm:text-sm text-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-400/50 shadow-inner"
                                   />
                                 </div>
                               </div>
 
                               {/* Gold Input */}
-                              <div className="col-span-4 sm:col-span-3">
-                                <label className="text-[9px] font-mono text-gray-500 block sm:hidden mb-1 uppercase">Gold</label>
+                              <div className="col-span-1 sm:col-span-3">
+                                <label className="text-[8px] font-mono text-gray-400 block sm:hidden mb-0.5 uppercase truncate">🪙 Gold</label>
                                 <div className="relative">
                                   <img 
                                     src="/icons/icon_gold.webp" 
                                     alt="Gold" 
-                                    className="w-4 h-4 object-contain absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" 
+                                    className="w-3.5 h-3.5 object-contain absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" 
                                   />
                                   <input 
                                     type="number"
                                     min={0}
                                     value={bracket.gold ?? 0}
                                     onChange={(e) => handleBracketValueChange(currentLeague.name, bIdx, 'gold', parseInt(e.target.value) || 0)}
-                                    className="w-full bg-black/60 border border-yellow-500/40 hover:border-yellow-400 focus:border-yellow-300 rounded-xl pl-8 pr-2.5 py-2 font-mono font-black text-xs sm:text-sm text-amber-300 focus:outline-none focus:ring-1 focus:ring-yellow-400/50 shadow-inner"
+                                    className="w-full bg-black/60 border border-yellow-500/40 hover:border-yellow-400 focus:border-yellow-300 rounded-xl pl-6 sm:pl-8 pr-1.5 sm:pr-2.5 py-1.5 sm:py-2 font-mono font-black text-[11px] sm:text-sm text-amber-300 focus:outline-none focus:ring-1 focus:ring-yellow-400/50 shadow-inner"
                                   />
                                 </div>
                               </div>
 
                               {/* Dust Input */}
-                              <div className="col-span-4 sm:col-span-3">
-                                <label className="text-[9px] font-mono text-gray-500 block sm:hidden mb-1 uppercase">Dust</label>
+                              <div className="col-span-1 sm:col-span-3">
+                                <label className="text-[8px] font-mono text-gray-400 block sm:hidden mb-0.5 uppercase truncate">🌌 Dust</label>
                                 <div className="relative">
                                   <img 
                                     src="/icons/icon_dust.webp" 
                                     alt="Dust" 
-                                    className="w-4 h-4 object-contain absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" 
+                                    className="w-3.5 h-3.5 object-contain absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" 
                                   />
                                   <input 
                                     type="number"
                                     min={0}
                                     value={bracket.dust ?? 0}
                                     onChange={(e) => handleBracketValueChange(currentLeague.name, bIdx, 'dust', parseInt(e.target.value) || 0)}
-                                    className="w-full bg-black/60 border border-cyan-500/40 hover:border-cyan-400 focus:border-cyan-300 rounded-xl pl-8 pr-2.5 py-2 font-mono font-black text-xs sm:text-sm text-[#66fcf1] focus:outline-none focus:ring-1 focus:ring-cyan-400/50 shadow-inner"
+                                    className="w-full bg-black/60 border border-cyan-500/40 hover:border-cyan-400 focus:border-cyan-300 rounded-xl pl-6 sm:pl-8 pr-1.5 sm:pr-2.5 py-1.5 sm:py-2 font-mono font-black text-[11px] sm:text-sm text-[#66fcf1] focus:outline-none focus:ring-1 focus:ring-cyan-400/50 shadow-inner"
                                   />
                                 </div>
                               </div>
@@ -2127,15 +2366,15 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                     </div>
 
                     {/* Bottom Save Reminder */}
-                    <div className="flex items-center justify-between pt-2 border-t border-white/10">
-                      <span className="text-xs font-mono text-gray-400">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2 border-t border-white/10">
+                      <span className="text-xs font-mono text-gray-400 text-center sm:text-left">
                         Click "Save All Rewards" to apply all modified values.
                       </span>
 
                       <button
                         onClick={handleSaveLeagueRewards}
                         disabled={isSavingRewards || isLoadingRewards}
-                        className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-black font-display font-black text-xs uppercase tracking-wider transition-all cursor-pointer shadow-[0_0_20px_rgba(245,158,11,0.4)] disabled:opacity-50 flex items-center gap-1.5 active:scale-95"
+                        className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-black font-display font-black text-xs uppercase tracking-wider transition-all cursor-pointer shadow-[0_0_20px_rgba(245,158,11,0.4)] disabled:opacity-50 flex items-center justify-center gap-1.5 active:scale-95"
                       >
                         <CheckCircle2 className="w-4 h-4" />
                         <span>{isSavingRewards ? 'SAVING...' : 'SAVE ALL REWARDS'}</span>
@@ -2152,7 +2391,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
           {/* TAB 6: MAINTENANCE */}
           {activeTab === 'maintenance' && (
             <div className="max-w-2xl mx-auto space-y-6">
-              <div className="bg-black/50 border border-white/10 rounded-3xl p-6 space-y-4">
+              <div className="bg-black/50 border border-white/10 rounded-3xl p-4 sm:p-6 space-y-4">
                 <h3 className="font-display font-bold text-white text-base tracking-wider uppercase flex items-center gap-2">
                   <Zap className="w-5 h-5 text-amber-400" />
                   PVP SEASON ROLLOVER TRIGGER
@@ -2170,7 +2409,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                 <button
                   onClick={handleTriggerRollover}
                   disabled={isTriggeringRollover}
-                  className="px-6 py-3.5 bg-gradient-to-r from-red-700 via-rose-600 to-red-700 hover:from-red-600 hover:to-rose-500 text-white font-display font-black text-xs tracking-widest uppercase rounded-xl transition-all cursor-pointer shadow-[0_0_20px_rgba(220,38,38,0.4)] disabled:opacity-50"
+                  className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-red-700 via-rose-600 to-red-700 hover:from-red-600 hover:to-rose-500 text-white font-display font-black text-xs tracking-widest uppercase rounded-xl transition-all cursor-pointer shadow-[0_0_20px_rgba(220,38,38,0.4)] disabled:opacity-50 text-center"
                 >
                   {isTriggeringRollover ? 'EXECUTING ROLLOVER...' : '⚡ FORCE PVP SEASON ROLLOVER NOW'}
                 </button>

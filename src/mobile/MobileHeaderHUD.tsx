@@ -56,8 +56,10 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
 
   const isAdmin =
     profile?.username?.toLowerCase() === 'adminus' ||
+    profile?.username?.toLowerCase() === 'kirito' ||
     (profile as any)?.role === 'admin' ||
-    profile?.solanaAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr';
+    profile?.solanaAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr' ||
+    profile?.solanaAddress === 'tg_6432857804';
 
   const unreadMailCount = (profile.mailMessages || []).filter(
     (m) => !m.isRead || (m.rewards && !m.isClaimed)

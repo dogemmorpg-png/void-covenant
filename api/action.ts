@@ -307,11 +307,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (action.startsWith('admin_')) {
       const isAdmin = 
         profile?.username?.toLowerCase() === 'adminus' || 
+        profile?.username?.toLowerCase() === 'kirito' ||
         profile?.role === 'admin' || 
         decoded?.role === 'admin' ||
         walletAddress === 'adminus' ||
+        walletAddress === 'kirito' ||
+        walletAddress === 'tg_6432857804' ||
         walletAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr' ||
-        profile?.solanaAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr';
+        profile?.solanaAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr' ||
+        profile?.solanaAddress === 'tg_6432857804';
 
       if (!isAdmin) {
         return res.status(403).json({ error: 'Forbidden: Admin privileges required.' });
