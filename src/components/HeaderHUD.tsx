@@ -29,9 +29,11 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
     profile.solanaAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr';
   const unreadMailCount = (profile.mailMessages || []).filter(m => !m.isRead || (m.rewards && !m.isClaimed)).length;
 
+  const referralCode = profile.referralCode || profile.solanaAddress || '';
+  const referralLink = `${window.location.origin}?ref=${referralCode}`;
+
   const handleCopyLink = () => {
-    const link = `${window.location.origin}?ref=${profile.solanaAddress || ''}`;
-    navigator.clipboard.writeText(link);
+    navigator.clipboard.writeText(referralLink);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
   };
@@ -346,13 +348,20 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
               <div className="bg-black/60 border border-white/15 rounded-2xl p-4 space-y-2.5 shadow-md">
                 <div className="flex items-center justify-between text-xs text-white font-display font-bold tracking-wider uppercase">
                   <span>YOUR IMPERIAL INVITATION LINK</span>
-                  <span className="text-xs font-mono text-amber-300">Share to recruit</span>
+                  <div className="flex items-center gap-2">
+                    {profile.referralCode && (
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                        CODE: <strong className="font-bold text-white">{profile.referralCode}</strong>
+                      </span>
+                    )}
+                    <span className="text-xs font-mono text-amber-300">Share to recruit</span>
+                  </div>
                 </div>
                 
                 <div className="flex flex-col sm:flex-row items-center gap-2.5">
                   <div className="w-full bg-black/90 border border-white/20 rounded-xl px-4 py-3 font-mono text-xs sm:text-sm text-amber-200 select-all flex items-center gap-2 min-w-0">
                     <Copy className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span className="truncate font-semibold">{`${window.location.origin}?ref=${profile.solanaAddress || ''}`}</span>
+                    <span className="truncate font-semibold">{referralLink}</span>
                   </div>
                   
                   <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
@@ -366,7 +375,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                     </button>
 
                     <a
-                      href={`https://t.me/share/url?url=${encodeURIComponent(`${window.location.origin}?ref=${profile.solanaAddress || ''}`)}&text=${encodeURIComponent('Join Void Covenant! Sign up with my link to get +1,000 Gold starter bonus!')}`}
+                      href={`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent('Join Void Covenant! Sign up with my link to get +1,000 Gold starter bonus!')}`}
                       target="_blank"
                       rel="noreferrer"
                       className="grow sm:grow-0 bg-[#229ED9] hover:bg-[#229ED9]/90 text-white font-mono font-bold px-5 py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-[#229ED9]/20 active:scale-95"

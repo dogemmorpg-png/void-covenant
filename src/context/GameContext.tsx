@@ -258,7 +258,8 @@ const createDefaultProfile = (): PlayerProfile => {
   isPremiumBP: false,
   username: '',
   isRegistered: false,
-  mailMessages: []
+  mailMessages: [],
+  referralCode: ''
   };
 };
 
@@ -273,7 +274,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const params = new URLSearchParams(window.location.search);
     const tgStartParam = (window as any).Telegram?.WebApp?.initDataUnsafe?.start_param;
     const ref = params.get('ref') || params.get('start_param') || params.get('tgWebAppStartParam') || params.get('startapp') || tgStartParam;
-    if (ref && (ref.length >= 32 || ref.startsWith('tg_') || /^\d+$/.test(ref))) {
+    if (ref && (ref.length >= 6 || ref.startsWith('tg_') || /^\d+$/.test(ref))) {
       localStorage.setItem('void_covenant_referrer', ref);
     }
   }, []);

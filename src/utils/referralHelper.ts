@@ -5,6 +5,19 @@ export const TELEGRAM_APP_NAME =
   (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_TELEGRAM_APP_NAME) || 'voidcovenant';
 
 /**
+ * Generates an anonymous, clean, collision-resistant 8-character referral code.
+ * Excludes ambiguous characters (0, O, 1, l, I).
+ */
+export function generateReferralCode(): string {
+  const chars = '23456789abcdefghjkmnpqrstuvwxyz';
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
+/**
  * Builds the referral link based on the user's platform.
  * - Telegram Mini App: https://t.me/<bot>/<app>?startapp=<referralCode>
  * - Web (PC and regular mobile browsers): https://<origin>?ref=<referralCode>

@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import { CARD_TEMPLATES, createCardInstance, getCardManaCost, sanitizeDeck } from './_shared/cards.js';
 import { checkAndPerformPvpRollover } from './_shared/pvpRollover.js';
 import { calculateEnergy } from './_shared/energyHelper.js';
+import { generateReferralCode } from './_shared/types.js';
 
 const jwt = (jwtPkg as any).default || jwtPkg;
 
@@ -173,14 +174,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       let isReferred = false;
       let referrerAddress = '';
       if (referrer && typeof referrer === 'string' && referrer !== walletAddress) {
-        let resolvedReferrer = referrer;
-        let { data: refRows } = await supabase
+        let resolvedReferrer = '';
+        let refRows: any = null;
+        const cleanRef = referrer.toLowerCase().trim();
+
+        // 1. Primary lookup: Match by unique anonymous referralCode in JSONB data
+        const { data: codeRows } = await supabase
           .from('profiles')
           .select('wallet_address')
-          .eq('wallet_address', resolvedReferrer)
+          .eq('data->>referralCode', cleanRef)
           .limit(1);
 
-        // Fallback: If not found and referrer is numeric, try matching with tg_ prefix
+        if (codeRows && codeRows.length > 0) {
+          refRows = codeRows;
+          resolvedReferrer = codeRows[0].wallet_address;
+        }
+
+        // 2. Legacy fallback: Direct wallet_address check (for existing links)
+        if (!refRows || refRows.length === 0) {
+          const { data: directRows } = await supabase
+            .from('profiles')
+            .select('wallet_address')
+            .eq('wallet_address', referrer)
+            .limit(1);
+          if (directRows && directRows.length > 0) {
+            refRows = directRows;
+            resolvedReferrer = referrer;
+          }
+        }
+
+        // 3. Legacy fallback: Telegram numeric ID / tg_ prefix
         if ((!refRows || refRows.length === 0) && /^\d+$/.test(referrer)) {
           const { data: altRows } = await supabase
             .from('profiles')
@@ -192,7 +215,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             resolvedReferrer = `tg_${referrer}`;
           }
         } else if ((!refRows || refRows.length === 0) && referrer.startsWith('tg_')) {
-          // If not found and referrer has tg_ prefix, try without it
           const numOnly = referrer.slice(3);
           const { data: altRows } = await supabase
             .from('profiles')
@@ -276,6 +298,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         avatarUrl: decoded.photoUrl || '',
         telegramId: decoded.telegramId || null,
         isRegistered: Boolean(decoded.telegramId),
+        referralCode: generateReferralCode(),
         referredBy: isReferred ? referrerAddress : null
       };
       // Prevent creating duplicates by checking again or using insert
@@ -289,6 +312,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     } else {
       currentProfile = migrateProfileCards(profileRow.data);
+      // Auto-assign referralCode to existing profiles if missing
+      if (!currentProfile.referralCode) {
+        currentProfile.referralCode = generateReferralCode();
+        try {
+          await supabase
+            .from('profiles')
+            .update({ data: currentProfile, updated_at: new Date().toISOString() })
+            .eq('wallet_address', walletAddress);
+        } catch (codeSaveErr) {
+          console.error('Failed to auto-assign referralCode to existing profile:', codeSaveErr);
+        }
+      }
     }
 
     // Ensure all mail messages have unique IDs deterministically

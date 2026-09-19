@@ -130,6 +130,16 @@ export interface PlayerProfile {
   referralSovereignsTotalEarned?: number;
   referralSubBountiesAwarded?: { premium?: boolean; ultra?: boolean };
   referralContributions?: Record<string, number>;
+  referralCode?: string;
+}
+
+export function generateReferralCode(): string {
+  const chars = '23456789abcdefghjkmnpqrstuvwxyz';
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
 }
 
 export interface SovereignTransaction {

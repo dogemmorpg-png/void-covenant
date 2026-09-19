@@ -114,9 +114,11 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
     return hasTgWebApp || isTgUa || isTgAddress;
   }, [profile.solanaAddress]);
 
+  const referralCode = profile.referralCode || profile.solanaAddress || '';
+
   const referralLink = useMemo(() => {
-    return getReferralLink(profile.solanaAddress, isTelegramUser);
-  }, [profile.solanaAddress, isTelegramUser]);
+    return getReferralLink(referralCode, isTelegramUser);
+  }, [referralCode, isTelegramUser]);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(referralLink);
@@ -424,9 +426,16 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
               <div className="bg-black/60 border border-white/15 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-md">
                 <div className="flex items-center justify-between text-[11px] sm:text-xs text-white font-display font-bold tracking-wider uppercase">
                   <span>YOUR IMPERIAL INVITATION LINK</span>
-                  <span className="text-[11px] font-mono text-amber-300">
-                    {isTelegramUser ? 'Telegram Bot Link' : 'Share to recruit'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {profile.referralCode && (
+                      <span className="text-[9.5px] font-mono px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                        CODE: <strong className="font-bold text-white">{profile.referralCode}</strong>
+                      </span>
+                    )}
+                    <span className="text-[11px] font-mono text-amber-300">
+                      {isTelegramUser ? 'Telegram Bot Link' : 'Share to recruit'}
+                    </span>
+                  </div>
                 </div>
                 
                 <div className="flex flex-col sm:flex-row items-center gap-2.5">
