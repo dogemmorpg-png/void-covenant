@@ -128,7 +128,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
   return (
     <nav 
       style={{
-        paddingBottom: 'max(var(--safe-bottom, 16px), calc(env(safe-area-inset-bottom, 0px) + 8px))'
+        paddingBottom: 'max(var(--safe-bottom, 6px), env(safe-area-inset-bottom, 0px), 6px)'
       }}
       className="shrink-0 w-full z-40 bg-[#151a21]/98 backdrop-blur-md border-t border-[#c5a880]/25 select-none shadow-[0_-8px_30px_rgba(0,0,0,0.95)]"
     >

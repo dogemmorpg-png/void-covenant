@@ -28,21 +28,28 @@ export function initTelegramViewport() {
       }
 
       // Safe area clearance:
-      // Telegram native controls (title bar / close button / icons) occupy the top ~50-56px.
-      // We set a minimum clearance of 62px so game headers never collide with Telegram controls.
+      // In Fullsize / standard mode: Telegram's native title bar ("X Void Covenant ˅ :") is OUTSIDE the webview frame.
+      // Therefore, the webview begins right below the bar and safeTop is 0 (or whatever small device inset applies).
+      // In Fullscreen mode: Telegram's floating close pill [✕] overlays inside the webview, requiring ~50-54px clearance.
       let safeTop = 0;
       if (tg) {
-        const inset = tg?.contentSafeAreaInset?.top ?? tg?.safeAreaInset?.top;
-        safeTop = typeof inset === 'number' && inset > 0 ? Math.max(inset + 4, 62) : 62;
+        const isFullscreen = Boolean(tg?.isFullscreen);
+        const inset = tg?.contentSafeAreaInset?.top ?? tg?.safeAreaInset?.top ?? 0;
+        if (isFullscreen) {
+          safeTop = inset > 0 ? Math.max(inset + 4, 52) : 52;
+        } else {
+          // Standard fullsize sheet: native bar is outside webview frame
+          safeTop = inset > 0 ? inset : 0;
+        }
       }
       document.documentElement.style.setProperty('--safe-top', `${safeTop}px`);
 
       // Safe bottom clearance for Android 3-button navigation / iOS home bar
-      let safeBottom = 16;
+      let safeBottom = 6;
       if (tg) {
         const bInset = tg?.safeAreaInset?.bottom ?? tg?.contentSafeAreaInset?.bottom;
         if (typeof bInset === 'number' && bInset > 0) {
-          safeBottom = Math.max(16, bInset + 4);
+          safeBottom = Math.max(6, bInset);
         }
       }
       document.documentElement.style.setProperty('--safe-bottom', `${safeBottom}px`);
