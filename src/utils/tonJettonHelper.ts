@@ -52,7 +52,7 @@ export async function getUsdtJettonWalletAddress(userAddress: string): Promise<s
     const data = await res.json();
     if (data.ok && data.result?.stack?.[0]?.[1]?.bytes) {
       const bytes = data.result.stack[0][1].bytes;
-      const cell = Cell.fromBoc(Buffer.from(bytes, 'base64'))[0];
+      const cell = Cell.fromBase64(bytes);
       const jettonWalletAddr = cell.beginParse().loadAddress();
       return jettonWalletAddr.toString({ bounceable: true });
     }

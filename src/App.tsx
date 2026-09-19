@@ -596,7 +596,9 @@ export default function App() {
         uiPreferences={{ theme: THEME.DARK }}
         actionsConfiguration={{
           twaReturnUrl: 'https://t.me/voidcovenantbot/voidcovenant',
-          returnStrategy: 'back'
+          returnStrategy: 'none',
+          modals: [],
+          notifications: []
         }}
       >
         <ToastProvider>

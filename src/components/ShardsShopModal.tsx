@@ -8,6 +8,7 @@ import {
   TON_TREASURY_WALLET_ADDRESS 
 } from '../data/telegramPricing';
 import { buildJettonTransferPayload, getUsdtJettonWalletAddress } from '../utils/tonJettonHelper';
+import { Address } from '@ton/core';
 import { 
   X, 
   Wallet, 
@@ -333,17 +334,23 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       });
 
       const nanotons = Math.floor(pkg.tonCost * 1e9).toString();
+      const bounceableTreasury = Address.parse(TON_TREASURY_WALLET_ADDRESS).toString({ bounceable: true });
       const transaction = {
         validUntil: Math.floor(Date.now() / 1000) + 360,
+        network: '-239' as any,
         messages: [
           {
-            address: TON_TREASURY_WALLET_ADDRESS,
+            address: bounceableTreasury,
             amount: nanotons
           }
         ]
       };
 
-      await tonConnectUI.sendTransaction(transaction);
+      await tonConnectUI.sendTransaction(transaction, {
+        returnStrategy: 'none',
+        modals: [],
+        notifications: []
+      });
 
       setPaymentState({
         status: 'verifying',
@@ -389,12 +396,20 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
 
     } catch (err: any) {
       console.error('TON purchase error:', err);
-      const isReject = err.message?.includes('Reject') || err.message?.includes('cancel') || err.message?.includes('declined');
+      const rawMsg = err?.info || err?.message || String(err || '');
+      const isReject = rawMsg.includes('Reject') || rawMsg.includes('cancel') || rawMsg.includes('declined') || rawMsg.includes('UserRejectsError');
+      const isSdkErr = rawMsg.includes('[TON_CONNECT_SDK_ERROR]');
+      let displayMsg = rawMsg;
+      if (isReject) {
+        displayMsg = 'Transaction was cancelled in wallet.';
+      } else if (isSdkErr) {
+        displayMsg = 'Wallet closed or rejected the transaction. Please ensure your Tonkeeper is open, has enough TON for gas, and approve when prompted.';
+      }
       setPaymentState({
         status: isReject ? 'idle' : 'error',
-        message: isReject ? 'Transaction was cancelled by user.' : (err.message || 'TON payment failed.')
+        message: displayMsg || 'TON payment failed.'
       });
-      toast(isReject ? 'Transaction cancelled' : (err.message || 'Payment failed'), isReject ? 'info' : 'error');
+      toast(isReject ? 'Transaction cancelled' : (displayMsg || 'Payment failed'), isReject ? 'info' : 'error');
     }
   };
 
@@ -435,10 +450,12 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       });
 
       const jettonUnits = BigInt(Math.round(pkg.usdtCost * 1e6));
-      const payloadBoc = buildJettonTransferPayload(TON_TREASURY_WALLET_ADDRESS, tonAddress, jettonUnits);
+      const bounceableTreasury = Address.parse(TON_TREASURY_WALLET_ADDRESS).toString({ bounceable: true });
+      const payloadBoc = buildJettonTransferPayload(bounceableTreasury, tonAddress, jettonUnits);
 
       const transaction = {
         validUntil: Math.floor(Date.now() / 1000) + 360,
+        network: '-239' as any,
         messages: [
           {
             address: userJettonWallet,
@@ -448,7 +465,11 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         ]
       };
 
-      await tonConnectUI.sendTransaction(transaction);
+      await tonConnectUI.sendTransaction(transaction, {
+        returnStrategy: 'none',
+        modals: [],
+        notifications: []
+      });
 
       setPaymentState({
         status: 'verifying',
@@ -494,12 +515,20 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
 
     } catch (err: any) {
       console.error('USDT purchase error:', err);
-      const isReject = err.message?.includes('Reject') || err.message?.includes('cancel') || err.message?.includes('declined');
+      const rawMsg = err?.info || err?.message || String(err || '');
+      const isReject = rawMsg.includes('Reject') || rawMsg.includes('cancel') || rawMsg.includes('declined') || rawMsg.includes('UserRejectsError');
+      const isSdkErr = rawMsg.includes('[TON_CONNECT_SDK_ERROR]');
+      let displayMsg = rawMsg;
+      if (isReject) {
+        displayMsg = 'Transaction was cancelled in wallet.';
+      } else if (isSdkErr) {
+        displayMsg = 'Wallet closed or rejected the transaction. Please ensure your Tonkeeper is open, has enough TON for gas, and approve when prompted.';
+      }
       setPaymentState({
         status: isReject ? 'idle' : 'error',
-        message: isReject ? 'Transaction was cancelled by user.' : (err.message || 'USDT payment failed.')
+        message: displayMsg || 'USDT payment failed.'
       });
-      toast(isReject ? 'Transaction cancelled' : (err.message || 'Payment failed'), isReject ? 'info' : 'error');
+      toast(isReject ? 'Transaction cancelled' : (displayMsg || 'Payment failed'), isReject ? 'info' : 'error');
     }
   };
 
