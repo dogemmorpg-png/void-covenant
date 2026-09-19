@@ -43,20 +43,6 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
   const [isClaimingSovereigns, setIsClaimingSovereigns] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
-  const [topInset, setTopInset] = useState<number>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const tg = (window as any).Telegram?.WebApp;
-        if (tg) {
-          const inset = tg.safeAreaInset?.top ?? tg.contentSafeAreaInset?.top;
-          if (typeof inset === 'number' && inset > 0) return Math.max(78, inset + 48);
-          return 78; // Exact clearance matching MobileBattleArena
-        }
-      } catch {}
-    }
-    return 78; // Standard mobile clearance
-  });
-
   useEffect(() => {
     const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
     if (tg) {
@@ -65,26 +51,6 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
         tg.setHeaderColor?.('#0c0e14');
         tg.setBackgroundColor?.('#050505');
       } catch (e) {}
-
-      const checkInset = () => {
-        try {
-          const inset = tg.safeAreaInset?.top ?? tg.contentSafeAreaInset?.top;
-          if (typeof inset === 'number' && inset > 0) {
-            setTopInset(Math.max(78, inset + 48));
-          } else {
-            setTopInset(78);
-          }
-        } catch {}
-      };
-      checkInset();
-      try {
-        tg.onEvent?.('viewportChanged', checkInset);
-      } catch {}
-      return () => {
-        try {
-          tg.offEvent?.('viewportChanged', checkInset);
-        } catch {}
-      };
     }
   }, []);
 
@@ -199,7 +165,7 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
     <>
       <header 
         style={{
-          paddingTop: `max(${topInset}px, calc(env(safe-area-inset-top, 0px) + 54px))`,
+          paddingTop: 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 6px))',
           paddingLeft: 'max(0.6rem, env(safe-area-inset-left, 0.6rem))',
           paddingRight: 'max(0.6rem, env(safe-area-inset-right, 0.6rem))'
         }}
@@ -383,8 +349,8 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
       {isReferralModalOpen && (
         <div 
           style={{
-            paddingTop: `max(${topInset}px, calc(env(safe-area-inset-top, 0px) + 54px))`,
-            paddingBottom: 'max(42px, calc(env(safe-area-inset-bottom, 0px) + 28px))',
+            paddingTop: 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 16px))',
+            paddingBottom: 'max(var(--safe-bottom, 16px), calc(env(safe-area-inset-bottom, 0px) + 16px))',
             paddingLeft: 'max(0.75rem, env(safe-area-inset-left, 0.75rem))',
             paddingRight: 'max(0.75rem, env(safe-area-inset-right, 0.75rem))'
           }}

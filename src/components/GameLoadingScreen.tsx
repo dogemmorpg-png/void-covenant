@@ -10,7 +10,7 @@ export const GameLoadingScreen: React.FC<GameLoadingScreenProps> = ({
   statusText = 'Entering the Void...'
 }) => {
   return (
-    <div className="fixed inset-0 z-[99999] w-full h-[100dvh] bg-[#040508] text-white flex flex-col justify-between items-center select-none overflow-hidden p-6 sm:p-10 safe-area-padding">
+    <div className="fixed inset-0 z-[99999] w-full h-[var(--app-height,100dvh)] bg-[#040508] text-white flex flex-col justify-between items-center select-none overflow-hidden p-6 sm:p-10 safe-area-padding">
       
       {/* 1. Cinematic Background Artwork with Slow Breathing Pan */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">

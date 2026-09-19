@@ -1212,7 +1212,13 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
   const selectedHandCard = visualState.playerHand.find(c => c.id === selectedHandCardId);
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#07090e] text-white select-none overflow-hidden font-sans relative pt-[max(78px,calc(env(safe-area-inset-top)+54px))] pb-[max(12px,env(safe-area-inset-bottom))]">
+    <div 
+      style={{
+        paddingTop: 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 4px))',
+        paddingBottom: 'max(var(--safe-bottom, 8px), calc(env(safe-area-inset-bottom, 0px) + 6px))'
+      }}
+      className="flex flex-col h-full w-full bg-[#07090e] text-white select-none overflow-hidden font-sans relative"
+    >
       
       {/* =========================================================================
           1. TOP APP BAR (Stage Name, Surrender, Codex)
@@ -2511,7 +2517,13 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
           7. VICTORY MODAL (1:1 PC Rewards, Stars, Breakdowns)
          ========================================================================= */}
       {visualState.phase === 'player_won' && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-3 sm:p-4 animate-fade-in pt-[max(72px,calc(env(safe-area-inset-top)+48px))] pb-[max(16px,env(safe-area-inset-bottom))]">
+        <div 
+          style={{
+            paddingTop: 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 16px))',
+            paddingBottom: 'max(var(--safe-bottom, 16px), calc(env(safe-area-inset-bottom, 0px) + 16px))'
+          }}
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-3 sm:p-4 animate-fade-in"
+        >
           <div className="bg-gradient-to-b from-[#18140f] via-[#0d0a08] to-[#050403] border-2 border-amber-500/50 rounded-3xl p-4 sm:p-6 max-w-sm w-full max-h-[85vh] overflow-y-auto custom-scrollbar text-center space-y-3 sm:space-y-4 shadow-[0_0_50px_rgba(245,158,11,0.25)] relative">
             
             {/* Ambient Background Flare */}
@@ -2700,7 +2712,13 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
           8. DEFEAT MODAL (1:1 PC Breakdown, Consolation Gold, Consequences)
          ========================================================================= */}
       {visualState.phase === 'player_lost' && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-3 sm:p-4 animate-fade-in pt-[max(72px,calc(env(safe-area-inset-top)+48px))] pb-[max(16px,env(safe-area-inset-bottom))]">
+        <div 
+          style={{
+            paddingTop: 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 16px))',
+            paddingBottom: 'max(var(--safe-bottom, 16px), calc(env(safe-area-inset-bottom, 0px) + 16px))'
+          }}
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-3 sm:p-4 animate-fade-in"
+        >
           <div className="bg-gradient-to-b from-[#1c080a] via-[#0e0304] to-[#050102] border-2 border-rose-600/50 rounded-3xl p-4 sm:p-6 max-w-sm w-full max-h-[85vh] overflow-y-auto custom-scrollbar text-center space-y-3 sm:space-y-4 shadow-[0_0_50px_rgba(225,29,72,0.25)] relative">
             
             {/* Ambient Background Flare */}
@@ -2795,7 +2813,13 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
          ========================================================================= */}
       <AnimatePresence>
         {showLogDrawer && (
-          <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 pt-[max(72px,calc(env(safe-area-inset-top)+48px))] pb-[max(16px,env(safe-area-inset-bottom))]">
+          <div 
+            style={{
+              paddingTop: 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 16px))',
+              paddingBottom: 'max(var(--safe-bottom, 16px), calc(env(safe-area-inset-bottom, 0px) + 16px))'
+            }}
+            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4"
+          >
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}

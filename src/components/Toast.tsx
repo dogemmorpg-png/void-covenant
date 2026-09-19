@@ -91,20 +91,6 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   // Safe area top inset calculation for mobile / Telegram WebApp
-  const [topInset, setTopInset] = useState<number>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const tg = (window as any).Telegram?.WebApp;
-        if (tg) {
-          const inset = tg.safeAreaInset?.top ?? tg.contentSafeAreaInset?.top;
-          if (typeof inset === 'number' && inset > 0) return Math.max(76, inset + 46);
-          return 76;
-        }
-      } catch {}
-    }
-    return 76; // Mobile default clearance
-  });
-
   const [isMobile, setIsMobile] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       return window.innerWidth < 640;
@@ -117,31 +103,6 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setIsMobile(window.innerWidth < 640);
     };
     window.addEventListener('resize', handleResize);
-
-    const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
-    if (tg) {
-      const checkInset = () => {
-        try {
-          const inset = tg.safeAreaInset?.top ?? tg.contentSafeAreaInset?.top;
-          if (typeof inset === 'number' && inset > 0) {
-            setTopInset(Math.max(76, inset + 46));
-          } else {
-            setTopInset(76);
-          }
-        } catch {}
-      };
-      checkInset();
-      try {
-        tg.onEvent?.('viewportChanged', checkInset);
-      } catch {}
-      return () => {
-        window.removeEventListener('resize', handleResize);
-        try {
-          tg.offEvent?.('viewportChanged', checkInset);
-        } catch {}
-      };
-    }
-
     return () => {
       window.removeEventListener('resize', handleResize);
     };
@@ -250,7 +211,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       {/* Toast Container - adaptive top & horizontal centering for mobile */}
       <div 
         style={{
-          top: isMobile ? `max(${topInset}px, calc(env(safe-area-inset-top, 0px) + 54px))` : undefined
+          top: isMobile ? 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 12px))' : undefined
         }}
         className="fixed z-[9999] pointer-events-none flex flex-col items-center gap-2 left-3 right-3 sm:left-auto sm:right-4 sm:top-4 sm:max-w-sm sm:items-end w-auto max-w-md mx-auto sm:mx-0"
       >

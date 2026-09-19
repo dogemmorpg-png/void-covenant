@@ -139,7 +139,7 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
       </AnimatePresence>
 
       {/* Render children game content directly */}
-      <div className={showRotatePrompt ? 'hidden' : 'w-full h-full flex flex-col min-h-screen min-h-[100dvh]'}>
+      <div className={showRotatePrompt ? 'hidden' : 'w-full h-full flex flex-col'}>
         {children}
       </div>
     </>

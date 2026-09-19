@@ -105,7 +105,13 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
   const currentAvatarObj = AVATARS.find(a => a.url === selectedAvatar) || AVATARS[0];
 
   return (
-    <div className="fixed inset-0 w-full h-[100dvh] bg-[#06080d] text-white overflow-x-hidden overflow-y-auto select-none pt-[max(78px,calc(env(safe-area-inset-top)+54px))] pb-[max(16px,env(safe-area-inset-bottom))] px-3.5 flex flex-col items-center">
+    <div 
+      style={{
+        paddingTop: 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 16px))',
+        paddingBottom: 'max(var(--safe-bottom, 16px), calc(env(safe-area-inset-bottom, 0px) + 16px))'
+      }}
+      className="fixed inset-0 w-full h-[var(--app-height,100dvh)] bg-[#06080d] text-white overflow-x-hidden overflow-y-auto select-none px-3.5 flex flex-col items-center"
+    >
       {/* Dark fantasy atmospheric artwork & vignette background */}
       <div 
         className="absolute inset-0 bg-cover bg-center opacity-25 scale-105 pointer-events-none"

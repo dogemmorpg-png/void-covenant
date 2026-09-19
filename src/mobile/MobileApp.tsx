@@ -53,7 +53,7 @@ export const MobileApp: React.FC = () => {
   // If battle active, render dedicated AAA MobileBattleArena (Hearthstone drawer, zero slot blocking, GPU-accelerated 60fps)
   if (activeBattleStage) {
     return (
-      <div className="h-[100dvh] w-full overflow-hidden bg-[#070504]">
+      <div className="h-[var(--app-height,100dvh)] w-full overflow-hidden bg-[#070504]">
         <MobileBattleArena
           stage={activeBattleStage}
           onExitBattle={handleExitBattle}
@@ -64,7 +64,7 @@ export const MobileApp: React.FC = () => {
   }
 
   return (
-    <div className="mobile-shell-locked bg-[#050505] text-white flex flex-col relative w-full h-[100dvh] overflow-hidden">
+    <div className="mobile-shell-locked bg-[#050505] text-white flex flex-col relative w-full h-[var(--app-height,100dvh)] overflow-hidden">
       {/* Top HUD — Telegram-safe insets */}
       {!isPvpMatching && !isPvpModalOpen && (
         <MobileHeaderHUD onNavigateTab={handleTabChange} />

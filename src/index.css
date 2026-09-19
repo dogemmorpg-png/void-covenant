@@ -58,6 +58,9 @@
 :root {
   --game-brightness: 1.2;
   --game-saturate: 1.2;
+  --app-height: 100dvh;
+  --safe-top: 0px;
+  --safe-bottom: 16px;
 }
 
 html {
@@ -67,10 +70,12 @@ html {
 
 html, body, #root {
   height: 100%;
-  min-height: 100%;
-  min-height: 100dvh;
+  max-height: 100%;
+  height: var(--app-height, 100%);
+  max-height: var(--app-height, 100%);
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 /* Custom scrollbars */
@@ -321,9 +326,9 @@ body {
 
 /* ====== MOBILE LANDSCAPE SHELL & BATTLEFIELD OPTIMIZATIONS ====== */
 .mobile-shell-locked {
-  height: 100dvh;
+  height: var(--app-height, 100dvh);
   width: 100%;
-  max-height: 100dvh;
+  max-height: var(--app-height, 100dvh);
   overflow: hidden;
 }
 
@@ -338,15 +343,15 @@ body {
    Ensures the 100% authentic desktop BattleFieldView adapts smoothly 
    to compact landscape heights (340px-450px) without touching PC/desktop styles. */
 .mobile-battle-shell {
-  height: 100dvh;
-  max-height: 100dvh;
+  height: var(--app-height, 100dvh);
+  max-height: var(--app-height, 100dvh);
   width: 100%;
   overflow: hidden;
 }
 
 .mobile-battle-shell > div {
-  height: 100dvh !important;
-  max-height: 100dvh !important;
+  height: var(--app-height, 100dvh) !important;
+  max-height: var(--app-height, 100dvh) !important;
   padding: 0.25rem !important;
 }
 
