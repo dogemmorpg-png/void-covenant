@@ -271,8 +271,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const ref = params.get('ref');
-    if (ref && ref.length >= 32) {
+    const tgStartParam = (window as any).Telegram?.WebApp?.initDataUnsafe?.start_param;
+    const ref = params.get('ref') || params.get('start_param') || params.get('tgWebAppStartParam') || params.get('startapp') || tgStartParam;
+    if (ref && (ref.length >= 32 || ref.startsWith('tg_') || /^\d+$/.test(ref))) {
       localStorage.setItem('void_covenant_referrer', ref);
     }
   }, []);

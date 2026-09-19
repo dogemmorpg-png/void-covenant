@@ -70,8 +70,9 @@ function MainAppContent() {
 
           const data = await res.json();
           localStorage.setItem('void_covenant_token', data.token);
-          if (data.startParam) {
-            localStorage.setItem('void_covenant_referrer', data.startParam);
+          const startParam = data.startParam || tg?.initDataUnsafe?.start_param;
+          if (startParam) {
+            localStorage.setItem('void_covenant_referrer', startParam);
           }
 
           setIsTelegramAuthenticated(true);

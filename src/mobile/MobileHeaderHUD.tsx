@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { 
@@ -17,6 +17,7 @@ import {
 import { useToast } from '../components/Toast';
 import { MailboxModal } from '../components/MailboxModal';
 import { AdminPanelModal } from '../components/AdminPanelModal';
+import { getReferralLink, getTelegramShareUrl } from '../utils/referralHelper';
 
 interface MobileHeaderHUDProps {
   onNavigateTab?: (tab: string) => void;
@@ -106,11 +107,30 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
       ? 'ring-2 ring-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.6)]'
       : 'ring-1 ring-white/25';
 
+  const isTelegramUser = useMemo(() => {
+    const hasTgWebApp = Boolean((window as any).Telegram?.WebApp?.initData);
+    const isTgUa = /Telegram/i.test(navigator.userAgent || '');
+    const isTgAddress = Boolean(profile.solanaAddress && profile.solanaAddress.startsWith('tg_'));
+    return hasTgWebApp || isTgUa || isTgAddress;
+  }, [profile.solanaAddress]);
+
+  const referralLink = useMemo(() => {
+    return getReferralLink(profile.solanaAddress, isTelegramUser);
+  }, [profile.solanaAddress, isTelegramUser]);
+
   const handleCopyLink = () => {
-    const link = `${window.location.origin}?ref=${profile.solanaAddress || ''}`;
-    navigator.clipboard.writeText(link);
+    navigator.clipboard.writeText(referralLink);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
+  };
+
+  const handleShareTelegram = (e: React.MouseEvent) => {
+    const shareUrl = getTelegramShareUrl(referralLink);
+    const tg = (window as any).Telegram?.WebApp;
+    if (tg && typeof tg.openTelegramLink === 'function') {
+      e.preventDefault();
+      tg.openTelegramLink(shareUrl);
+    }
   };
 
   const handleClaimReferralSovereigns = async () => {
@@ -404,13 +424,15 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
               <div className="bg-black/60 border border-white/15 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-md">
                 <div className="flex items-center justify-between text-[11px] sm:text-xs text-white font-display font-bold tracking-wider uppercase">
                   <span>YOUR IMPERIAL INVITATION LINK</span>
-                  <span className="text-[11px] font-mono text-amber-300">Share to recruit</span>
+                  <span className="text-[11px] font-mono text-amber-300">
+                    {isTelegramUser ? 'Telegram Bot Link' : 'Share to recruit'}
+                  </span>
                 </div>
                 
                 <div className="flex flex-col sm:flex-row items-center gap-2.5">
                   <div className="w-full bg-black/90 border border-white/20 rounded-xl px-3.5 py-2.5 sm:py-3 font-mono text-xs sm:text-sm text-amber-200 select-all flex items-center gap-2 min-w-0">
                     <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 shrink-0" />
-                    <span className="truncate font-semibold">{`${window.location.origin}?ref=${profile.solanaAddress || ''}`}</span>
+                    <span className="truncate font-semibold">{referralLink}</span>
                   </div>
                   
                   <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
@@ -422,7 +444,8 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
                     </button>
 
                     <a
-                      href={`https://t.me/share/url?url=${encodeURIComponent(`${window.location.origin}?ref=${profile.solanaAddress || ''}`)}&text=${encodeURIComponent('Join Void Covenant! Sign up with my link to get +1,000 Gold starter bonus!')}`}
+                      href={getTelegramShareUrl(referralLink)}
+                      onClick={handleShareTelegram}
                       target="_blank"
                       rel="noreferrer"
                       className="flex-1 sm:flex-none bg-[#229ED9] hover:bg-[#229ED9]/90 text-white font-mono font-bold px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-[#229ED9]/20 active:scale-95"

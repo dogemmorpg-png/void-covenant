@@ -173,28 +173,55 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       let isReferred = false;
       let referrerAddress = '';
       if (referrer && typeof referrer === 'string' && referrer !== walletAddress) {
-        const { data: refRows } = await supabase
+        let resolvedReferrer = referrer;
+        let { data: refRows } = await supabase
           .from('profiles')
           .select('wallet_address')
-          .eq('wallet_address', referrer)
+          .eq('wallet_address', resolvedReferrer)
           .limit(1);
-        if (refRows && refRows.length > 0) {
+
+        // Fallback: If not found and referrer is numeric, try matching with tg_ prefix
+        if ((!refRows || refRows.length === 0) && /^\d+$/.test(referrer)) {
+          const { data: altRows } = await supabase
+            .from('profiles')
+            .select('wallet_address')
+            .eq('wallet_address', `tg_${referrer}`)
+            .limit(1);
+          if (altRows && altRows.length > 0) {
+            refRows = altRows;
+            resolvedReferrer = `tg_${referrer}`;
+          }
+        } else if ((!refRows || refRows.length === 0) && referrer.startsWith('tg_')) {
+          // If not found and referrer has tg_ prefix, try without it
+          const numOnly = referrer.slice(3);
+          const { data: altRows } = await supabase
+            .from('profiles')
+            .select('wallet_address')
+            .eq('wallet_address', numOnly)
+            .limit(1);
+          if (altRows && altRows.length > 0) {
+            refRows = altRows;
+            resolvedReferrer = numOnly;
+          }
+        }
+
+        if (refRows && refRows.length > 0 && resolvedReferrer !== walletAddress) {
           await supabase
             .from('referrals')
             .insert({
-              referrer_wallet: referrer,
+              referrer_wallet: resolvedReferrer,
               referred_wallet: walletAddress
             });
           
           isReferred = true;
-          referrerAddress = referrer;
+          referrerAddress = resolvedReferrer;
 
           // Increment referrer's referralsCount
           try {
             const { data: refOwnerRows } = await supabase
               .from('profiles')
               .select('data')
-              .eq('wallet_address', referrer)
+              .eq('wallet_address', resolvedReferrer)
               .limit(1);
             if (refOwnerRows && refOwnerRows.length > 0) {
               const refOwnerData = refOwnerRows[0].data || {};
@@ -202,7 +229,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               await supabase
                 .from('profiles')
                 .update({ data: refOwnerData, updated_at: new Date().toISOString() })
-                .eq('wallet_address', referrer);
+                .eq('wallet_address', resolvedReferrer);
             }
           } catch (refIncErr) {
             console.error('Failed to increment referrer count on registration:', refIncErr);
