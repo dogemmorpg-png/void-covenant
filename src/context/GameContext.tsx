@@ -80,6 +80,8 @@ interface GameContextType {
   refreshProfile: (notifyOnDefense?: boolean) => Promise<PlayerProfile | null>;
   hasNewDefenseAttacks: boolean;
   markDefenseHistoryAsViewed: () => void;
+  createStarsInvoice: (packageId: string) => Promise<{ success: boolean; invoiceLink?: string; message?: string }>;
+  verifyTonPayment: (packageId: string, currency: 'ton' | 'usdt', txHash?: string, senderAddress?: string) => Promise<{ success: boolean; message: string; newDarkShards?: number }>;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -1028,6 +1030,67 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err: any) {
       console.error('Verify payment error:', err);
       return { success: false, message: err.message || 'Network error during payment verification.' };
+    }
+  };
+
+  // Create Stars Invoice for Telegram Mini App
+  const createStarsInvoice = async (packageId: string): Promise<{ success: boolean; invoiceLink?: string; message?: string }> => {
+    const token = localStorage.getItem('void_covenant_token');
+    if (!token) return { success: false, message: 'Authentication required. Please launch from Telegram.' };
+
+    try {
+      const res = await fetch('/api/create-stars-invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ packageId })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, message: data.error || `Failed to create invoice (HTTP ${res.status})` };
+      }
+
+      return { success: true, invoiceLink: data.invoiceLink };
+    } catch (e: any) {
+      console.error('createStarsInvoice error:', e);
+      return { success: false, message: e.message || 'Network error creating Stars invoice' };
+    }
+  };
+
+  // Verify TON or USDT on-chain payment
+  const verifyTonPayment = async (packageId: string, currency: 'ton' | 'usdt', txHash?: string, senderAddress?: string): Promise<{ success: boolean; message: string; newDarkShards?: number }> => {
+    const token = localStorage.getItem('void_covenant_token');
+    if (!token) return { success: false, message: 'Authentication required.' };
+
+    try {
+      const res = await fetch('/api/verify-ton-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ packageId, currency, txHash, senderAddress })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, message: data.error || `Verification failed (HTTP ${res.status})` };
+      }
+
+      if (data.newDarkShards !== undefined) {
+        setProfile(prev => ({
+          ...prev,
+          darkShards: data.newDarkShards
+        }));
+      }
+
+      return { success: true, message: data.message || 'Payment verified!', newDarkShards: data.newDarkShards };
+    } catch (e: any) {
+      console.error('verifyTonPayment error:', e);
+      return { success: false, message: e.message || 'Network error verifying TON payment' };
     }
   };
 
@@ -2200,6 +2263,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         startBattleOnServer,
         buyDarkShardsWithSOL,
         verifySolanaPayment,
+        createStarsInvoice,
+        verifyTonPayment,
         connectSolanaWallet,
         disconnectSolanaWallet,
         fuseCards,

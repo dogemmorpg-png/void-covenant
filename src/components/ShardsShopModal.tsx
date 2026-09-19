@@ -1,33 +1,74 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { SOLANA_PACKAGES, SolanaPackage, TREASURY_WALLET_ADDRESS } from '../data/solanaConfig';
-import { X, Wallet, ExternalLink, CheckCircle, RefreshCw, AlertCircle, Sparkles } from 'lucide-react';
+import { 
+  TELEGRAM_PACKAGES, 
+  TelegramPackage, 
+  TON_TREASURY_WALLET_ADDRESS 
+} from '../data/telegramPricing';
+import { buildJettonTransferPayload, getUsdtJettonWalletAddress } from '../utils/tonJettonHelper';
+import { 
+  X, 
+  Wallet, 
+  ExternalLink, 
+  CheckCircle, 
+  RefreshCw, 
+  AlertCircle, 
+  Sparkles,
+  Star,
+  Coins,
+  ShieldCheck
+} from 'lucide-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Transaction, SystemProgram, PublicKey, LAMPORTS_PER_SOL, ComputeBudgetProgram } from '@solana/web3.js';
+import { useTonConnectUI, useTonAddress } from '@tonconnect/ui-react';
 
 interface ShardsShopModalProps {
   onClose: () => void;
 }
 
 export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => {
-  const { profile, verifySolanaPayment, saveProfile } = useGame();
+  const { 
+    profile, 
+    verifySolanaPayment, 
+    createStarsInvoice, 
+    verifyTonPayment, 
+    refreshProfile, 
+    saveProfile 
+  } = useGame();
+  
   const toast = useToast();
-  const { setVisible } = useWalletModal();
+  const { setVisible: setSolanaModalVisible } = useWalletModal();
   const { connection } = useConnection();
   const { publicKey, sendTransaction, connected, disconnect } = useWallet();
+
+  const [tonConnectUI] = useTonConnectUI();
+  const tonAddress = useTonAddress();
+
+  const isTelegramUser = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return Boolean(
+      (window as any).Telegram?.WebApp?.initData ||
+      /Telegram/i.test(navigator.userAgent || '') ||
+      Boolean(profile.solanaAddress && profile.solanaAddress.startsWith('tg_'))
+    );
+  }, [profile.solanaAddress]);
+
+  const [tgMethod, setTgMethod] = useState<'stars' | 'ton' | 'usdt'>('stars');
 
   // Payment processing state modal
   const [paymentState, setPaymentState] = useState<{
     status: 'idle' | 'signing' | 'verifying' | 'pending' | 'success' | 'error';
     message: string;
     txSignature?: string;
-    selectedPkg?: SolanaPackage;
+    txType?: 'solana' | 'ton' | 'stars';
+    selectedPkg?: any;
   }>({ status: 'idle', message: '' });
 
-  // Direct On-Chain Verification Fallback (100% Fail-Safe)
-  const verifyOnChainDirect = async (signature: string, pkg: SolanaPackage): Promise<boolean> => {
+  // Direct On-Chain Verification Fallback for Solana (PC / External Browser)
+  const verifySolanaOnChainDirect = async (signature: string, pkg: SolanaPackage): Promise<boolean> => {
     const HELIUS_RPC_URL = 'https://mainnet.helius-rpc.com/?api-key=a53833dc-25c4-42e3-bdef-26901e8e84e9';
     const expectedLamports = Math.floor(pkg.solCost * LAMPORTS_PER_SOL);
 
@@ -57,7 +98,6 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
 
       if (!tx || tx.meta?.err) return false;
 
-      // Balance Delta Check
       if (tx.meta?.preBalances && tx.meta?.postBalances) {
         const accountKeys = tx.transaction?.message?.accountKeys || [];
         const treasuryIndex = accountKeys.findIndex((k: any) => {
@@ -71,7 +111,6 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         }
       }
 
-      // Parsed Instruction Check
       const instructions = tx.transaction?.message?.instructions || [];
       for (const ix of instructions) {
         if (ix.program === 'system' && ix.parsed?.type === 'transfer') {
@@ -87,11 +126,13 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
     return false;
   };
 
-  // Blazing fast purchase handler with automatic dual verification
-  const handlePurchasePackage = async (pkg: SolanaPackage) => {
+  // ═══════════════════════════════════════════════════
+  // 1. SOLANA PURCHASE HANDLER (PC / External Browsers)
+  // ═══════════════════════════════════════════════════
+  const handlePurchaseSolana = async (pkg: SolanaPackage) => {
     if (!connected || !publicKey || !sendTransaction) {
       toast('Please connect your Solana wallet first!', 'warning');
-      setVisible(true);
+      setSolanaModalVisible(true);
       return;
     }
 
@@ -99,13 +140,13 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       setPaymentState({
         status: 'signing',
         message: 'Please approve the transaction in your Solana wallet (Phantom / Solflare)...',
-        selectedPkg: pkg
+        selectedPkg: pkg,
+        txType: 'solana'
       });
 
       const lamports = Math.floor(pkg.solCost * LAMPORTS_PER_SOL);
       const transaction = new Transaction();
 
-      // Priority fee for < 1s validator inclusion
       transaction.add(
         ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 100000 })
       );
@@ -122,7 +163,6 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = publicKey;
 
-      // Broadcast transaction instantly
       const signature = await sendTransaction(transaction, connection, {
         skipPreflight: false,
         preflightCommitment: 'confirmed'
@@ -132,10 +172,10 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         status: 'verifying',
         message: 'Transaction broadcasted to Solana Mainnet! Verifying with Helius...',
         txSignature: signature,
-        selectedPkg: pkg
+        selectedPkg: pkg,
+        txType: 'solana'
       });
 
-      // 1. Attempt Server Verification first
       let verifySuccess = false;
       for (let attempt = 1; attempt <= 4; attempt++) {
         setPaymentState(prev => ({
@@ -153,20 +193,17 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         }
       }
 
-      // 2. Direct On-Chain Fallback if server returned error or was indexing
       if (!verifySuccess) {
         setPaymentState(prev => ({
           ...prev,
           message: 'Performing direct on-chain verification with Helius RPC...'
         }));
 
-        const directVerified = await verifyOnChainDirect(signature, pkg);
+        const directVerified = await verifySolanaOnChainDirect(signature, pkg);
         if (directVerified) {
           verifySuccess = true;
-          // Credit directly on client
           const updated = { ...profile };
           if (pkg.shardsReward > 0) updated.darkShards = (updated.darkShards || 0) + pkg.shardsReward;
-          if ((pkg as any).isBattlePass) updated.hasPremiumBp = true;
           updated.processedTransactions = [...(updated.processedTransactions || []), signature];
           saveProfile(updated);
         }
@@ -195,62 +232,340 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       const isUserReject = err.message?.includes('User rejected') || err.message?.includes('cancelled');
       setPaymentState(prev => ({
         ...prev,
-        status: 'error',
+        status: isUserReject ? 'idle' : 'error',
         message: isUserReject ? 'Transaction was cancelled by user.' : (err.message || 'Payment failed.')
       }));
       toast(isUserReject ? 'Transaction cancelled' : (err.message || 'Payment failed'), isUserReject ? 'info' : 'error');
     }
   };
 
-  const handleRetryVerification = async () => {
-    if (!paymentState.txSignature || !paymentState.selectedPkg) return;
-    const sig = paymentState.txSignature;
-    const pkg = paymentState.selectedPkg;
+  // ═══════════════════════════════════════════════════
+  // 2. TELEGRAM STARS PURCHASE HANDLER
+  // ═══════════════════════════════════════════════════
+  const handlePurchaseStars = async (pkg: TelegramPackage) => {
+    const tg = (window as any).Telegram?.WebApp;
+    if (!tg) {
+      toast('Telegram WebApp is not available. Please open inside Telegram.', 'error');
+      return;
+    }
 
     try {
-      setPaymentState(prev => ({
-        ...prev,
+      setPaymentState({
         status: 'verifying',
-        message: 'Re-verifying transaction on Solana blockchain...'
-      }));
+        message: 'Generating Telegram Stars invoice...',
+        selectedPkg: pkg,
+        txType: 'stars'
+      });
 
-      // Server check
-      const res = await verifySolanaPayment(sig, pkg.id);
-      if (res.success) {
-        setPaymentState(prev => ({
-          ...prev,
-          status: 'success',
-          message: res.message
-        }));
-        toast('Transaction verified! Shards credited!', 'success');
+      const res = await createStarsInvoice(pkg.id);
+      if (!res.success || !res.invoiceLink) {
+        setPaymentState({
+          status: 'error',
+          message: res.message || 'Failed to create Stars invoice'
+        });
+        toast(res.message || 'Failed to create invoice', 'error');
         return;
       }
 
-      // Direct Client On-Chain Check
-      const directOk = await verifyOnChainDirect(sig, pkg);
-      if (directOk) {
-        const updated = { ...profile };
-        if (pkg.shardsReward > 0) updated.darkShards = (updated.darkShards || 0) + pkg.shardsReward;
-        if (pkg.dustBonus > 0) updated.dust = (updated.dust || 0) + pkg.dustBonus;
-        if ((pkg as any).isBattlePass) updated.hasPremiumBp = true;
-        updated.processedTransactions = [...(updated.processedTransactions || []), sig];
-        saveProfile(updated);
+      setPaymentState({
+        status: 'signing',
+        message: 'Confirm the Stars payment in Telegram...',
+        selectedPkg: pkg,
+        txType: 'stars'
+      });
+
+      tg.openInvoice(res.invoiceLink, async (status: string) => {
+        if (status === 'paid') {
+          setPaymentState({
+            status: 'success',
+            message: `Stars payment confirmed! +${pkg.shardsReward} Dark Shards added!`,
+            selectedPkg: pkg,
+            txType: 'stars'
+          });
+          toast(`+${pkg.shardsReward} Dark Shards added!`, 'success');
+          if (refreshProfile) {
+            await refreshProfile();
+          }
+        } else if (status === 'cancelled') {
+          setPaymentState({
+            status: 'idle',
+            message: ''
+          });
+          toast('Stars payment cancelled', 'info');
+        } else {
+          setPaymentState({
+            status: 'error',
+            message: `Telegram Stars payment status: ${status}`
+          });
+          toast(`Payment ${status}`, 'error');
+        }
+      });
+
+    } catch (e: any) {
+      console.error('Stars purchase error:', e);
+      setPaymentState({
+        status: 'error',
+        message: e.message || 'Error processing Stars payment'
+      });
+      toast(e.message || 'Payment error', 'error');
+    }
+  };
+
+  // ═══════════════════════════════════════════════════
+  // 3. TON (NATIVE) PURCHASE HANDLER
+  // ═══════════════════════════════════════════════════
+  const handlePurchaseTon = async (pkg: TelegramPackage) => {
+    if (!tonAddress) {
+      toast('Please connect your TON wallet first!', 'warning');
+      tonConnectUI.openModal();
+      return;
+    }
+
+    try {
+      setPaymentState({
+        status: 'signing',
+        message: 'Approve the TON transaction in your wallet (Tonkeeper / TG Wallet)...',
+        selectedPkg: pkg,
+        txType: 'ton'
+      });
+
+      const nanotons = Math.floor(pkg.tonCost * 1e9).toString();
+      const transaction = {
+        validUntil: Math.floor(Date.now() / 1000) + 360,
+        messages: [
+          {
+            address: TON_TREASURY_WALLET_ADDRESS,
+            amount: nanotons
+          }
+        ]
+      };
+
+      await tonConnectUI.sendTransaction(transaction);
+
+      setPaymentState({
+        status: 'verifying',
+        message: 'Transaction sent to TON! Verifying on-chain with Toncenter...',
+        selectedPkg: pkg,
+        txType: 'ton'
+      });
+
+      let verified = false;
+      for (let attempt = 1; attempt <= 6; attempt++) {
+        setPaymentState(prev => ({
+          ...prev,
+          message: `Verifying on-chain via Toncenter (Attempt ${attempt}/6)...`
+        }));
+
+        const res = await verifyTonPayment(pkg.id, 'ton', undefined, tonAddress);
+        if (res.success) {
+          verified = true;
+          setPaymentState({
+            status: 'success',
+            message: `TON payment confirmed! +${pkg.shardsReward} Dark Shards added!`,
+            selectedPkg: pkg,
+            txType: 'ton'
+          });
+          toast(`Payment confirmed! +${pkg.shardsReward} Dark Shards added!`, 'success');
+          if (refreshProfile) await refreshProfile();
+          break;
+        }
+
+        if (attempt < 6) {
+          await new Promise(r => setTimeout(r, 2500));
+        }
+      }
+
+      if (!verified) {
+        setPaymentState({
+          status: 'pending',
+          message: 'Transaction submitted to TON. Waiting for on-chain block confirmation. Click RETRY VERIFICATION below.',
+          selectedPkg: pkg,
+          txType: 'ton'
+        });
+      }
+
+    } catch (err: any) {
+      console.error('TON purchase error:', err);
+      const isReject = err.message?.includes('Reject') || err.message?.includes('cancel') || err.message?.includes('declined');
+      setPaymentState({
+        status: isReject ? 'idle' : 'error',
+        message: isReject ? 'Transaction was cancelled by user.' : (err.message || 'TON payment failed.')
+      });
+      toast(isReject ? 'Transaction cancelled' : (err.message || 'Payment failed'), isReject ? 'info' : 'error');
+    }
+  };
+
+  // ═══════════════════════════════════════════════════
+  // 4. USDT (JETTON ON TON) PURCHASE HANDLER
+  // ═══════════════════════════════════════════════════
+  const handlePurchaseUsdt = async (pkg: TelegramPackage) => {
+    if (!tonAddress) {
+      toast('Please connect your TON wallet first!', 'warning');
+      tonConnectUI.openModal();
+      return;
+    }
+
+    try {
+      setPaymentState({
+        status: 'signing',
+        message: 'Resolving your USDT (Jetton) wallet on TON...',
+        selectedPkg: pkg,
+        txType: 'ton'
+      });
+
+      const userJettonWallet = await getUsdtJettonWalletAddress(tonAddress);
+      if (!userJettonWallet) {
+        setPaymentState({
+          status: 'error',
+          message: 'Could not locate your USDT wallet in TON. Please ensure your wallet holds USDT on TON.'
+        });
+        toast('USDT wallet not found on TON account', 'error');
+        return;
+      }
+
+      setPaymentState({
+        status: 'signing',
+        message: 'Approve the USDT transfer in your TON wallet...',
+        selectedPkg: pkg,
+        txType: 'ton'
+      });
+
+      const jettonUnits = BigInt(Math.round(pkg.usdtCost * 1e6));
+      const payloadBoc = buildJettonTransferPayload(TON_TREASURY_WALLET_ADDRESS, tonAddress, jettonUnits);
+
+      const transaction = {
+        validUntil: Math.floor(Date.now() / 1000) + 360,
+        messages: [
+          {
+            address: userJettonWallet,
+            amount: '50000000', // 0.05 TON for network gas fee
+            payload: payloadBoc
+          }
+        ]
+      };
+
+      await tonConnectUI.sendTransaction(transaction);
+
+      setPaymentState({
+        status: 'verifying',
+        message: 'USDT transfer broadcasted! Verifying on-chain with Toncenter / TonAPI...',
+        selectedPkg: pkg,
+        txType: 'ton'
+      });
+
+      let verified = false;
+      for (let attempt = 1; attempt <= 6; attempt++) {
+        setPaymentState(prev => ({
+          ...prev,
+          message: `Verifying USDT transfer on-chain (Attempt ${attempt}/6)...`
+        }));
+
+        const res = await verifyTonPayment(pkg.id, 'usdt', undefined, tonAddress);
+        if (res.success) {
+          verified = true;
+          setPaymentState({
+            status: 'success',
+            message: `USDT payment confirmed! +${pkg.shardsReward} Dark Shards added!`,
+            selectedPkg: pkg,
+            txType: 'ton'
+          });
+          toast(`+${pkg.shardsReward} Dark Shards added!`, 'success');
+          if (refreshProfile) await refreshProfile();
+          break;
+        }
+
+        if (attempt < 6) {
+          await new Promise(r => setTimeout(r, 2500));
+        }
+      }
+
+      if (!verified) {
+        setPaymentState({
+          status: 'pending',
+          message: 'USDT transaction submitted to TON. Waiting for block confirmation. Click RETRY VERIFICATION below.',
+          selectedPkg: pkg,
+          txType: 'ton'
+        });
+      }
+
+    } catch (err: any) {
+      console.error('USDT purchase error:', err);
+      const isReject = err.message?.includes('Reject') || err.message?.includes('cancel') || err.message?.includes('declined');
+      setPaymentState({
+        status: isReject ? 'idle' : 'error',
+        message: isReject ? 'Transaction was cancelled by user.' : (err.message || 'USDT payment failed.')
+      });
+      toast(isReject ? 'Transaction cancelled' : (err.message || 'Payment failed'), isReject ? 'info' : 'error');
+    }
+  };
+
+  const handleRetryVerification = async () => {
+    if (!paymentState.selectedPkg) return;
+    const pkg = paymentState.selectedPkg;
+
+    try {
+      if (isTelegramUser) {
+        if (tgMethod === 'ton' || tgMethod === 'usdt') {
+          setPaymentState(prev => ({
+            ...prev,
+            status: 'verifying',
+            message: 'Re-verifying on TON blockchain via Toncenter...'
+          }));
+          const res = await verifyTonPayment(pkg.id, tgMethod, undefined, tonAddress);
+          if (res.success) {
+            setPaymentState({
+              status: 'success',
+              message: res.message
+            });
+            toast('Payment verified! Shards added!', 'success');
+            if (refreshProfile) await refreshProfile();
+            return;
+          }
+        }
+      } else {
+        const sig = paymentState.txSignature;
+        if (!sig) return;
 
         setPaymentState(prev => ({
           ...prev,
-          status: 'success',
-          message: `Payment confirmed on-chain! +${pkg.shardsReward} Dark Shards added!`
+          status: 'verifying',
+          message: 'Re-verifying transaction on Solana blockchain...'
         }));
-        toast('Transaction verified on-chain! Shards credited!', 'success');
-        return;
+
+        const res = await verifySolanaPayment(sig, pkg.id);
+        if (res.success) {
+          setPaymentState(prev => ({
+            ...prev,
+            status: 'success',
+            message: res.message
+          }));
+          toast('Transaction verified! Shards credited!', 'success');
+          return;
+        }
+
+        const directOk = await verifySolanaOnChainDirect(sig, pkg);
+        if (directOk) {
+          const updated = { ...profile };
+          if (pkg.shardsReward > 0) updated.darkShards = (updated.darkShards || 0) + pkg.shardsReward;
+          updated.processedTransactions = [...(updated.processedTransactions || []), sig];
+          saveProfile(updated);
+
+          setPaymentState(prev => ({
+            ...prev,
+            status: 'success',
+            message: `Payment confirmed on-chain! +${pkg.shardsReward} Dark Shards added!`
+          }));
+          toast('Transaction verified on-chain! Shards credited!', 'success');
+          return;
+        }
       }
 
       setPaymentState(prev => ({
         ...prev,
         status: 'pending',
-        message: 'Verification in progress on Solana network. Click RETRY VERIFICATION in 2 seconds.'
+        message: 'Verification in progress on the blockchain. Click RETRY VERIFICATION in a few seconds.'
       }));
-      toast('Verification pending on-chain...', 'info');
+      toast('Verification pending...', 'info');
 
     } catch (e: any) {
       toast(e.message || 'Error re-verifying transaction', 'error');
@@ -277,7 +592,6 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      
       {/* Modal Container */}
       <div className="bg-gradient-to-b from-[#18111e] via-[#100a15] to-[#08050a] border-2 border-red-500/30 max-w-xl w-full rounded-3xl p-3 sm:p-5 shadow-[0_0_60px_rgba(221,44,64,0.18)] relative overflow-hidden flex flex-col space-y-2.5 sm:space-y-4 animate-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto custom-scrollbar">
         
@@ -300,28 +614,52 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                 DARK SHARDS SHOP
               </h3>
               <p className="text-[9px] sm:text-[10px] text-rose-300/80 font-mono mt-0.5">
-                Acquire shards on Solana Mainnet
+                {isTelegramUser ? 'Acquire shards via Stars, TON or USDT' : 'Acquire shards on Solana Mainnet'}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            {connected && publicKey ? (
-              <div 
-                onClick={() => disconnect()}
-                title="Click to disconnect"
-                className="flex items-center gap-1 bg-black/60 hover:bg-red-950/40 border border-emerald-500/40 hover:border-red-500/40 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono text-emerald-400 hover:text-red-300 transition-all cursor-pointer"
-              >
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>{publicKey.toBase58().slice(0, 4)}...{publicKey.toBase58().slice(-4)}</span>
-              </div>
+            {isTelegramUser ? (
+              /* Telegram Wallet Status (shown when TON / USDT tab active) */
+              (tgMethod === 'ton' || tgMethod === 'usdt') && (
+                tonAddress ? (
+                  <div 
+                    onClick={() => tonConnectUI.openModal()}
+                    title="Connected TON Wallet"
+                    className="flex items-center gap-1 bg-black/60 hover:bg-cyan-950/40 border border-cyan-500/40 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono text-cyan-300 transition-all cursor-pointer"
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                    <span>{tonAddress.slice(0, 4)}...{tonAddress.slice(-4)}</span>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => tonConnectUI.openModal()}
+                    className="flex items-center gap-1 bg-gradient-to-r from-cyan-900/60 to-blue-900/60 hover:from-cyan-700 hover:to-blue-700 border border-cyan-500/40 text-cyan-200 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold tracking-wider transition-all cursor-pointer"
+                  >
+                    <Wallet className="w-2.5 h-2.5" /> CONNECT TON
+                  </button>
+                )
+              )
             ) : (
-              <button
-                onClick={() => setVisible(true)}
-                className="flex items-center gap-1 bg-gradient-to-r from-purple-900/60 to-[#1f2833] hover:from-purple-700 hover:to-indigo-900 border border-purple-500/40 text-purple-300 px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold tracking-wider transition-all cursor-pointer"
-              >
-                <Wallet className="w-2.5 h-2.5" /> CONNECT
-              </button>
+              /* Solana Wallet Status (PC / External Mobile Browsers) */
+              connected && publicKey ? (
+                <div 
+                  onClick={() => disconnect()}
+                  title="Click to disconnect"
+                  className="flex items-center gap-1 bg-black/60 hover:bg-red-950/40 border border-emerald-500/40 hover:border-red-500/40 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono text-emerald-400 hover:text-red-300 transition-all cursor-pointer"
+                >
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>{publicKey.toBase58().slice(0, 4)}...{publicKey.toBase58().slice(-4)}</span>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setSolanaModalVisible(true)}
+                  className="flex items-center gap-1 bg-gradient-to-r from-purple-900/60 to-[#1f2833] hover:from-purple-700 hover:to-indigo-900 border border-purple-500/40 text-purple-300 px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold tracking-wider transition-all cursor-pointer"
+                >
+                  <Wallet className="w-2.5 h-2.5" /> CONNECT
+                </button>
+              )
             )}
 
             <button 
@@ -333,13 +671,62 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
           </div>
         </div>
 
+        {/* Telegram Multi-Payment Method Switcher */}
+        {isTelegramUser && (paymentState.status === 'idle' || paymentState.status === 'success' || paymentState.status === 'error' || paymentState.status === 'pending') && (
+          <div className="space-y-1.5">
+            <div className="grid grid-cols-3 gap-1.5 p-1 bg-black/60 border border-white/10 rounded-2xl">
+              <button
+                onClick={() => setTgMethod('stars')}
+                className={`py-2 px-2 rounded-xl font-display font-black text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                  tgMethod === 'stars'
+                    ? 'bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 text-black shadow-[0_0_15px_rgba(245,158,11,0.4)]'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <span>⭐️</span>
+                <span>STARS</span>
+              </button>
+
+              <button
+                onClick={() => setTgMethod('ton')}
+                className={`py-2 px-2 rounded-xl font-display font-black text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                  tgMethod === 'ton'
+                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-[0_0_15px_rgba(6,182,212,0.4)]'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <span>💎</span>
+                <span>TON</span>
+              </button>
+
+              <button
+                onClick={() => setTgMethod('usdt')}
+                className={`py-2 px-2 rounded-xl font-display font-black text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                  tgMethod === 'usdt'
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-black shadow-[0_0_15px_rgba(16,185,129,0.4)]'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <span>💵</span>
+                <span>USDT (TON)</span>
+              </button>
+            </div>
+
+            <p className="text-[10px] font-mono text-center text-gray-400">
+              {tgMethod === 'stars' && '⚡ 1-click native purchase with Telegram Stars (Apple/Google Pay & Card).'}
+              {tgMethod === 'ton' && '💎 Direct on-chain transfer in TON via Tonkeeper or Telegram Wallet.'}
+              {tgMethod === 'usdt' && '💵 Transfer in USDT (network TON) via Tonkeeper or Telegram Wallet.'}
+            </p>
+          </div>
+        )}
+
         {/* Main Content */}
         {paymentState.status === 'idle' || paymentState.status === 'success' || paymentState.status === 'error' || paymentState.status === 'pending' ? (
           <div className="space-y-2.5 sm:space-y-4">
             
             {/* Packages 2x2 Grid on ALL screens */}
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
-              {SOLANA_PACKAGES.map(pkg => {
+              {(isTelegramUser ? TELEGRAM_PACKAGES : SOLANA_PACKAGES).map(pkg => {
                 const isPopular = pkg.popular;
                 return (
                   <div
@@ -389,14 +776,46 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                     </div>
 
                     {/* Price Button */}
-                    <button
-                      onClick={() => handlePurchasePackage(pkg)}
-                      disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
-                      className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-mono text-[10px] sm:text-xs font-black py-1.5 sm:py-2 px-1 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_10px_rgba(168,85,247,0.3)] hover:scale-102 flex items-center justify-center gap-1 active:scale-95"
-                    >
-                      <span>{pkg.solCost}</span>
-                      <span className="text-[7.5px] sm:text-[9px] text-purple-200 font-bold">SOL</span>
-                    </button>
+                    {isTelegramUser ? (
+                      tgMethod === 'stars' ? (
+                        <button
+                          onClick={() => handlePurchaseStars(pkg as TelegramPackage)}
+                          disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
+                          className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-mono text-[10px] sm:text-xs font-black py-1.5 sm:py-2 px-1 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_12px_rgba(245,158,11,0.35)] hover:scale-102 flex items-center justify-center gap-1 active:scale-95"
+                        >
+                          <span>{(pkg as TelegramPackage).starsCost}</span>
+                          <span className="text-sm leading-none">⭐️</span>
+                        </button>
+                      ) : tgMethod === 'ton' ? (
+                        <button
+                          onClick={() => handlePurchaseTon(pkg as TelegramPackage)}
+                          disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
+                          className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-mono text-[10px] sm:text-xs font-black py-1.5 sm:py-2 px-1 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_12px_rgba(6,182,212,0.35)] hover:scale-102 flex items-center justify-center gap-1 active:scale-95"
+                        >
+                          <span>{(pkg as TelegramPackage).tonCost}</span>
+                          <span className="text-[8px] sm:text-[9px] text-cyan-200 font-bold">TON</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handlePurchaseUsdt(pkg as TelegramPackage)}
+                          disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
+                          className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-black font-mono text-[10px] sm:text-xs font-black py-1.5 sm:py-2 px-1 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_12px_rgba(16,185,129,0.35)] hover:scale-102 flex items-center justify-center gap-1 active:scale-95"
+                        >
+                          <span>{(pkg as TelegramPackage).usdtCost}</span>
+                          <span className="text-[8px] sm:text-[9px] text-emerald-950 font-black">USDT</span>
+                        </button>
+                      )
+                    ) : (
+                      /* Solana Price Button (PC / External Mobile Browsers) */
+                      <button
+                        onClick={() => handlePurchaseSolana(pkg as SolanaPackage)}
+                        disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
+                        className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-mono text-[10px] sm:text-xs font-black py-1.5 sm:py-2 px-1 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_10px_rgba(168,85,247,0.3)] hover:scale-102 flex items-center justify-center gap-1 active:scale-95"
+                      >
+                        <span>{(pkg as SolanaPackage).solCost}</span>
+                        <span className="text-[7.5px] sm:text-[9px] text-purple-200 font-bold">SOL</span>
+                      </button>
+                    )}
                   </div>
                 );
               })}
@@ -409,18 +828,22 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
           <div className="flex flex-col items-center justify-center py-10 space-y-6 text-center animate-in fade-in duration-200">
             <div className="relative">
               {paymentState.status === 'signing' && (
-                <div className="w-16 h-16 rounded-2xl bg-red-950/50 border-2 border-red-500 flex items-center justify-center animate-bounce shadow-[0_0_20px_rgba(221,44,64,0.4)]">
-                  <Wallet className="w-8 h-8 text-red-400" />
+                <div className="w-16 h-16 rounded-2xl bg-amber-950/50 border-2 border-amber-500 flex items-center justify-center animate-bounce shadow-[0_0_20px_rgba(245,158,11,0.4)]">
+                  {paymentState.txType === 'stars' ? (
+                    <Star className="w-8 h-8 text-amber-400" />
+                  ) : (
+                    <Wallet className="w-8 h-8 text-amber-400" />
+                  )}
                 </div>
               )}
               {paymentState.status === 'verifying' && (
-                <div className="w-16 h-16 rounded-full border-4 border-red-900/30 border-t-red-500 animate-spin" />
+                <div className="w-16 h-16 rounded-full border-4 border-amber-900/30 border-t-amber-500 animate-spin" />
               )}
             </div>
             <div className="space-y-2">
               <h4 className="text-white font-display font-bold text-sm tracking-wider uppercase">
-                {paymentState.status === 'signing' && 'Confirm in Wallet'}
-                {paymentState.status === 'verifying' && 'Verifying on Solana...'}
+                {paymentState.status === 'signing' && (paymentState.txType === 'stars' ? 'Confirm Stars in Telegram' : 'Confirm in Wallet')}
+                {paymentState.status === 'verifying' && 'Verifying Transaction...'}
               </h4>
               <p className="text-xs text-gray-400 font-sans max-w-xs mx-auto leading-relaxed">
                 {paymentState.message}
@@ -454,7 +877,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
               <div className="bg-amber-950/40 border border-amber-500/40 rounded-2xl p-3.5 flex items-start gap-3 text-left">
                 <RefreshCw className="w-5 h-5 text-amber-400 shrink-0 mt-0.5 animate-spin" />
                 <div>
-                  <span className="text-xs font-bold text-white block">Indexing on Solana...</span>
+                  <span className="text-xs font-bold text-white block">Awaiting Confirmation...</span>
                   <span className="text-[11px] text-amber-300 font-sans mt-0.5 block leading-normal">{paymentState.message}</span>
                 </div>
               </div>
@@ -462,9 +885,15 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
 
             {paymentState.txSignature && (
               <div className="bg-black/50 border border-white/10 p-3 rounded-xl text-left space-y-1">
-                <span className="text-[9px] text-gray-400 font-mono block uppercase">Solana Tx Signature</span>
+                <span className="text-[9px] text-gray-400 font-mono block uppercase">
+                  {paymentState.txType === 'ton' ? 'TON Transaction' : 'Solana Tx Signature'}
+                </span>
                 <a 
-                  href={`https://solscan.io/tx/${paymentState.txSignature}`}
+                  href={
+                    paymentState.txType === 'ton'
+                      ? `https://tonviewer.com/transaction/${paymentState.txSignature}`
+                      : `https://solscan.io/tx/${paymentState.txSignature}`
+                  }
                   target="_blank" 
                   rel="noreferrer"
                   className="text-[11px] text-[#66fcf1] font-mono hover:underline flex items-center gap-1 truncate"
@@ -476,7 +905,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
             )}
 
             <div className="flex gap-2">
-              {(paymentState.status === 'pending' || paymentState.status === 'error') && paymentState.txSignature && (
+              {(paymentState.status === 'pending' || paymentState.status === 'error') && (
                 <button
                   onClick={handleRetryVerification}
                   className="flex-1 bg-red-950/60 hover:bg-red-900/60 border border-red-500/40 text-red-200 font-display font-black py-2.5 px-4 rounded-xl text-xs tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2"
@@ -497,4 +926,3 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
     </div>
   );
 };
-
