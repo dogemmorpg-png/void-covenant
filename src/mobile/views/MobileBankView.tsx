@@ -23,6 +23,27 @@ import {
   ChevronUp
 } from 'lucide-react';
 
+// Official TON vector icons
+export const TonIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" }) => (
+  <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <circle cx="14" cy="14" r="14" fill="#0098EA" />
+    <path
+      d="M18.7802 8.00098H9.21936C7.46145 8.00098 6.34727 9.89726 7.23164 11.4302L13.1322 21.6576C13.5173 22.3254 14.4823 22.3254 14.8673 21.6576L20.7691 11.4302C21.6523 9.89966 20.5381 8.00098 18.7814 8.00098H18.7802ZM13.1274 18.5906L11.8424 16.1035L8.74168 10.5578C8.53714 10.2029 8.78981 9.74806 9.21816 9.74806H13.1262V18.5918L13.1274 18.5906ZM19.2555 10.5566L16.156 16.1047L14.8709 18.5906V9.74685H18.779C19.2073 9.74685 19.46 10.2017 19.2555 10.5566Z"
+      fill="white"
+    />
+  </svg>
+);
+
+export const TonSymbol: React.FC<{ className?: string }> = ({ className = "w-4 h-4" }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M14.1839 17.7069C13.6405 18.6507 13.3688 19.1226 13.0591 19.348C12.4278 19.8074 11.5723 19.8074 10.941 19.348C10.6312 19.1226 10.3595 18.6507 9.81613 17.7069L5.52066 10.2464C4.76864 8.94024 4.39263 8.28717 4.33762 7.75894C4.2255 6.68236 4.81894 5.65591 5.80788 5.21589C6.29309 5 7.04667 5 8.55383 5H15.4462C16.9534 5 17.7069 5 18.1922 5.21589C19.1811 5.65591 19.7745 6.68236 19.6624 7.75894C19.6074 8.28717 19.2314 8.94024 18.4794 10.2464L14.1839 17.7069ZM11.1 16.3412L6.56139 8.48002C6.31995 8.06185 6.19924 7.85276 6.18146 7.68365C6.14523 7.33896 6.33507 7.01015 6.65169 6.86919C6.80703 6.80002 7.04847 6.80002 7.53133 6.80002H7.53134L11.1 6.80002V16.3412ZM12.9 16.3412L17.4387 8.48002C17.6801 8.06185 17.8008 7.85276 17.8186 7.68365C17.8548 7.33896 17.665 7.01015 17.3484 6.86919C17.193 6.80002 16.9516 6.80002 16.4687 6.80002L12.9 6.80002V16.3412Z"
+    />
+  </svg>
+);
+
 export const MobileBankView: React.FC = () => {
   const { profile, requestWithdrawal } = useGame();
 
@@ -406,15 +427,11 @@ export const MobileBankView: React.FC = () => {
               <ArrowUpRight className="w-4 h-4 text-amber-400" />
               WITHDRAWAL TERMINAL
             </h3>
-            <span className="text-[10px] font-mono text-gray-400 flex items-center gap-1">
-              {isTelegramUser ? (
-                <>
-                  <span className="text-cyan-400">💎</span> TON NETWORK
-                </>
-              ) : (
-                'SOLANA NETWORK'
-              )}
-            </span>
+            {!isTelegramUser && (
+              <span className="text-[10px] font-mono text-gray-400">
+                SOLANA NETWORK
+              </span>
+            )}
           </div>
 
           <form onSubmit={handleSubmitWithdrawal} className="space-y-4">
@@ -467,24 +484,12 @@ export const MobileBankView: React.FC = () => {
             {/* Destination Wallet: Telegram / TON vs Solana */}
             {isTelegramUser ? (
               <div className="space-y-2">
-                <div className="flex justify-between items-center text-xs">
-                  <label className="text-gray-300 font-mono text-[11px] flex items-center gap-1.5">
-                    <span className="text-cyan-400 font-bold">💎</span>
-                    <span>Telegram / TON Wallet</span>
-                  </label>
-                  <span className="text-[10px] text-cyan-400/80 font-mono">
-                    @wallet / Tonkeeper
-                  </span>
-                </div>
-
                 {tonAddress ? (
                   /* TON Connected State */
-                  <div className="bg-gradient-to-r from-sky-950/40 via-cyan-950/30 to-blue-950/40 border border-cyan-500/40 rounded-xl p-3 space-y-2.5 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                  <div className="bg-[#0b1420]/80 border border-[#0098ea]/30 rounded-xl p-3 space-y-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-xs">
-                          💎
-                        </div>
+                      <div className="flex items-center gap-2.5">
+                        <TonIcon className="w-6 h-6 shrink-0 rounded-full shadow-sm" />
                         <div>
                           <div className="text-[11px] font-bold text-white leading-tight">Telegram Wallet Connected</div>
                           <span className="text-[9px] font-mono text-emerald-400 font-semibold flex items-center gap-1">
@@ -509,14 +514,14 @@ export const MobileBankView: React.FC = () => {
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-between bg-black/70 border border-cyan-500/20 rounded-lg px-3 py-2">
-                      <span className="font-mono text-xs text-cyan-200 tracking-wide truncate max-w-[200px]" title={tonAddress}>
+                    <div className="flex items-center justify-between bg-black/70 border border-[#0098ea]/20 rounded-lg px-3 py-2">
+                      <span className="font-mono text-xs text-sky-200 tracking-wide truncate max-w-[200px]" title={tonAddress}>
                         {tonAddress.slice(0, 8)}...{tonAddress.slice(-8)}
                       </span>
                       <button
                         type="button"
                         onClick={() => handleCopyTon(tonAddress)}
-                        className="text-[10px] font-mono text-cyan-300 hover:text-cyan-200 flex items-center gap-1 px-2 py-1 rounded bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/30 transition-all cursor-pointer shrink-0"
+                        className="text-[10px] font-mono text-[#0098ea] hover:text-[#38b6ff] flex items-center gap-1 px-2 py-1 rounded bg-[#0098ea]/15 hover:bg-[#0098ea]/25 border border-[#0098ea]/30 transition-all cursor-pointer shrink-0"
                       >
                         {copiedTon ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                         <span>{copiedTon ? 'Copied' : 'Copy'}</span>
@@ -533,9 +538,9 @@ export const MobileBankView: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => tonConnectUI.openModal()}
-                      className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-sky-600 via-cyan-500 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-display font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.4)] active:scale-98 transition-all cursor-pointer border border-cyan-400/40"
+                      className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#0088cc] to-[#0098ea] hover:from-[#007cb8] hover:to-[#0aa4f7] text-white font-display font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-[0_4px_16px_rgba(0,152,234,0.3)] active:scale-[0.99] transition-all cursor-pointer border border-[#0098ea]/40"
                     >
-                      <span className="text-base">💎</span>
+                      <TonSymbol className="w-4 h-4 text-white shrink-0" />
                       <span>Connect Telegram / TON Wallet</span>
                     </button>
 
@@ -543,7 +548,7 @@ export const MobileBankView: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setManualTonMode(!manualTonMode)}
-                        className="text-[10.5px] font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1 cursor-pointer transition-colors"
+                        className="text-[10.5px] font-mono text-gray-400 hover:text-sky-300 flex items-center gap-1 cursor-pointer transition-colors"
                       >
                         {manualTonMode ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                         <span>{manualTonMode ? 'Hide manual address input' : 'Or paste TON address manually'}</span>
@@ -557,7 +562,7 @@ export const MobileBankView: React.FC = () => {
                           <button
                             type="button"
                             onClick={handlePasteClipboard}
-                            className="inline-flex items-center gap-1 text-[10px] font-mono text-cyan-400 hover:text-cyan-300 underline cursor-pointer"
+                            className="inline-flex items-center gap-1 text-[10px] font-mono text-[#0098ea] hover:text-[#38b6ff] underline cursor-pointer"
                           >
                             <ClipboardPaste className="w-3 h-3" />
                             Paste
@@ -568,7 +573,7 @@ export const MobileBankView: React.FC = () => {
                           value={targetAddress}
                           onChange={(e) => setTargetAddress(e.target.value)}
                           placeholder="e.g. UQD... or EQD..."
-                          className="w-full bg-black/70 border border-white/15 focus:border-cyan-500 rounded-lg px-3 py-2 text-white font-mono text-xs outline-none transition-colors"
+                          className="w-full bg-black/70 border border-white/15 focus:border-[#0098ea] rounded-lg px-3 py-2 text-white font-mono text-xs outline-none transition-colors"
                         />
                       </div>
                     )}
