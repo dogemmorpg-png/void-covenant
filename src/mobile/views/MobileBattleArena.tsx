@@ -1214,8 +1214,8 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
   return (
     <div 
       style={{
-        paddingTop: 'max(var(--safe-top, 62px), calc(env(safe-area-inset-top, 0px) + 54px))',
-        paddingBottom: 'max(var(--safe-bottom, 8px), calc(env(safe-area-inset-bottom, 0px) + 6px))'
+        paddingTop: 'max(var(--safe-top, 0px), env(safe-area-inset-top, 0px))',
+        paddingBottom: 'max(var(--safe-bottom, 0px), env(safe-area-inset-bottom, 0px))'
       }}
       className="flex flex-col h-full w-full bg-[#07090e] text-white select-none overflow-hidden font-sans relative"
     >
@@ -1223,12 +1223,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       {/* =========================================================================
           1. TOP APP BAR (Stage Name, Surrender, Codex)
          ========================================================================= */}
-      <header 
-        style={{
-          paddingTop: 'max(var(--safe-top, 0px), env(safe-area-inset-top, 0px))',
-        }}
-        className="h-auto min-h-[36px] py-1 px-3 flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-[#0b0f17] via-[#121927] to-[#0b0f17] shrink-0 z-30"
-      >
+      <header className="h-9 px-3 flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-[#0b0f17] via-[#121927] to-[#0b0f17] shrink-0 z-30">
         <button
           onClick={() => setShowEscapeModal(true)}
           className="flex items-center gap-1.5 px-2.5 py-1 bg-red-950/70 hover:bg-red-900 border border-red-500/50 rounded-lg text-red-200 text-xs font-mono font-bold transition-all active:scale-95 cursor-pointer shadow-sm"
@@ -2181,12 +2176,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       {/* =========================================================================
           5. FIXED HAND OF 3 CARDS (Authentic PC Visual Style, Skills & Delay)
          ========================================================================= */}
-      <div 
-        style={{
-          paddingBottom: 'max(var(--safe-bottom, 8px), env(safe-area-inset-bottom, 0px), 8px)'
-        }}
-        className="bg-[#090d15] border-t border-white/10 px-2 pt-1.5 shrink-0 z-20"
-      >
+      <div className="bg-[#090d15] border-t border-white/10 px-2 pt-1.5 pb-2.5 shrink-0 z-20">
         <div className="flex items-center justify-between px-1 mb-1 text-[8.5px] font-mono text-zinc-400">
           <div className="flex items-center gap-1.5">
             <span className="font-bold text-[#ebd09b] uppercase tracking-wider">COMMANDER HAND</span>
