@@ -64,6 +64,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
     message: string;
     txSignature?: string;
     txType?: 'solana' | 'ton' | 'stars';
+    selectedCurrency?: 'ton' | 'usdt' | 'stars' | 'solana';
     selectedPkg?: any;
   }>({ status: 'idle', message: '' });
 
@@ -326,7 +327,8 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         status: 'signing',
         message: 'Approve the TON transaction in your wallet (Tonkeeper / TG Wallet)...',
         selectedPkg: pkg,
-        txType: 'ton'
+        txType: 'ton',
+        selectedCurrency: 'ton'
       });
 
       const nanotons = Math.floor(pkg.tonCost * 1e9).toString();
@@ -410,7 +412,8 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         status: 'signing',
         message: 'Resolving your USDT (Jetton) wallet on TON...',
         selectedPkg: pkg,
-        txType: 'ton'
+        txType: 'ton',
+        selectedCurrency: 'usdt'
       });
 
       const userJettonWallet = await getUsdtJettonWalletAddress(tonAddress);
@@ -505,13 +508,14 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
 
     try {
       if (isTelegramUser) {
-        if (tgMethod === 'ton' || tgMethod === 'usdt') {
+        const cur = paymentState.selectedCurrency || tgMethod || 'ton';
+        if (cur === 'ton' || cur === 'usdt') {
           setPaymentState(prev => ({
             ...prev,
             status: 'verifying',
-            message: 'Re-verifying on TON blockchain via Toncenter...'
+            message: `Re-verifying ${cur.toUpperCase()} on TON blockchain via Toncenter...`
           }));
-          const res = await verifyTonPayment(pkg.id, tgMethod, undefined, tonAddress);
+          const res = await verifyTonPayment(pkg.id, cur, undefined, tonAddress);
           if (res.success) {
             setPaymentState({
               status: 'success',

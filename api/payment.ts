@@ -3,6 +3,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
 import { recordShardTransaction } from './_shared/shardLogger.js';
+import { Address, Cell } from '@ton/core';
 
 const jwt = (jwtPkg as any).default || jwtPkg;
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
@@ -15,6 +16,7 @@ const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_KEY}`;
 
 // TON settings
 const TON_TREASURY_WALLET_ADDRESS = process.env.TON_TREASURY_WALLET_ADDRESS || 'UQAd_yCFpQPo4X4j7t_junsrt8AZ3L35eUEEpy9uoPm3fRvS';
+const TON_TREASURY_JETTON_WALLET = 'EQD1yoMibw_hgRh3UvFRLis0ByXocMZ-caAY2Oj4OiUeQBg4';
 const TONCENTER_API_KEY = process.env.TONCENTER_API_KEY || '0ec3643506cf2ac24fc11bf8f9ad06ec4ceeedcb824fa71acb5e4be692a30e20';
 const USDT_JETTON_MASTER = 'EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs';
 
@@ -71,13 +73,16 @@ const TELEGRAM_PACKAGES: Record<string, { shards: number; starsCost: number; ton
 
 function addressesMatch(a?: string, b?: string): boolean {
   if (!a || !b) return false;
-  const cleanA = a.trim().toLowerCase();
-  const cleanB = b.trim().toLowerCase();
-  if (cleanA === cleanB) return true;
-  if (cleanA.length > 40 && cleanB.length > 40) {
-    return cleanA.slice(2) === cleanB.slice(2);
+  const cleanA = a.trim();
+  const cleanB = b.trim();
+  if (cleanA.toLowerCase() === cleanB.toLowerCase()) return true;
+  try {
+    const addrA = Address.parse(cleanA);
+    const addrB = Address.parse(cleanB);
+    return addrA.equals(addrB);
+  } catch {
+    return false;
   }
-  return false;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -204,7 +209,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       // Check TonAPI events
       try {
-        const tonapiRes = await fetch(`https://tonapi.io/v2/accounts/${TON_TREASURY_WALLET_ADDRESS}/events?limit=25`, {
+        const tonapiRes = await fetch(`https://tonapi.io/v2/accounts/${TON_TREASURY_WALLET_ADDRESS}/events?limit=50`, {
           headers: { 'Accept': 'application/json' }
         });
 
@@ -219,7 +224,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
 
             const evTime = (ev.timestamp || 0) * 1000;
-            if (Date.now() - evTime > 30 * 60 * 1000) continue;
+            if (Date.now() - evTime > 24 * 60 * 60 * 1000) continue;
 
             for (const action of ev.actions || []) {
               if (isTon && action.type === 'TonTransfer') {
@@ -264,7 +269,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             headers['X-API-Key'] = TONCENTER_API_KEY;
           }
 
-          const tcRes = await fetch(`https://toncenter.com/api/v2/getTransactions?address=${TON_TREASURY_WALLET_ADDRESS}&limit=25`, {
+          const tcRes = await fetch(`https://toncenter.com/api/v2/getTransactions?address=${TON_TREASURY_WALLET_ADDRESS}&limit=50`, {
             headers
           });
 
@@ -277,7 +282,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               if (txHash && currentHash !== txHash) continue;
 
               const txTime = (tx.utime || 0) * 1000;
-              if (Date.now() - txTime > 30 * 60 * 1000) continue;
+              if (Date.now() - txTime > 24 * 60 * 60 * 1000) continue;
 
               const inMsg = tx.in_msg;
               if (inMsg && addressesMatch(inMsg.destination, TON_TREASURY_WALLET_ADDRESS)) {
@@ -294,6 +299,61 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
         } catch (tcErr) {
           console.warn('Toncenter verification attempt error:', tcErr);
+        }
+      }
+
+      // Check Toncenter RPC fallback for USDT (Jetton internal_transfer on treasury Jetton wallet)
+      if (!isVerified && isUsdt) {
+        try {
+          const headers: Record<string, string> = { 'Accept': 'application/json' };
+          if (TONCENTER_API_KEY) {
+            headers['X-API-Key'] = TONCENTER_API_KEY;
+          }
+
+          const tcRes = await fetch(`https://toncenter.com/api/v2/getTransactions?address=${TON_TREASURY_JETTON_WALLET}&limit=50`, {
+            headers
+          });
+
+          if (tcRes.ok) {
+            const tcData = await tcRes.json();
+            const txs = tcData.result || [];
+
+            for (const tx of txs) {
+              const currentHash = tx.transaction_id?.hash;
+              if (txHash && currentHash !== txHash) continue;
+
+              const txTime = (tx.utime || 0) * 1000;
+              if (Date.now() - txTime > 24 * 60 * 60 * 1000) continue;
+
+              const inMsg = tx.in_msg;
+              if (!inMsg || !inMsg.msg_data?.body) continue;
+
+              try {
+                const cell = Cell.fromBoc(Buffer.from(inMsg.msg_data.body, 'base64'))[0];
+                const cs = cell.beginParse();
+                const op = cs.loadUint(32);
+                // 0x178d4519 = op::internal_transfer
+                if (op === 0x178d4519) {
+                  cs.loadUint(64); // query_id
+                  const jettonUnits = cs.loadCoins();
+                  const fromAddr = cs.loadAddress();
+                  const amountInUsdt = Number(jettonUnits) / 1e6;
+
+                  if (amountInUsdt >= pkg.usdtCost * 0.98) {
+                    if (!senderAddress || addressesMatch(fromAddr.toString({ bounceable: true }), senderAddress)) {
+                      isVerified = true;
+                      matchedTxHash = currentHash || txHash || `usdt_tc_${tx.utime}`;
+                      break;
+                    }
+                  }
+                }
+              } catch (parseErr) {
+                // skip unparseable msg
+              }
+            }
+          }
+        } catch (tcUsdtErr) {
+          console.warn('Toncenter USDT verification attempt error:', tcUsdtErr);
         }
       }
 
