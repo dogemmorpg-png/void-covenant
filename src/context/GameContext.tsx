@@ -1001,13 +1001,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!token) return { success: false, message: 'Authentication required.' };
 
     try {
-      const res = await fetch('/api/verify-solana-payment', {
+      const res = await fetch('/api/payment?action=verify_solana', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ signature, packageId })
+        body: JSON.stringify({ action: 'verify_solana', signature, packageId })
       });
 
       const text = await res.text();
@@ -1039,13 +1039,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!token) return { success: false, message: 'Authentication required. Please launch from Telegram.' };
 
     try {
-      const res = await fetch('/api/create-stars-invoice', {
+      const res = await fetch('/api/payment?action=create_stars_invoice', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ packageId })
+        body: JSON.stringify({ action: 'create_stars_invoice', packageId })
       });
 
       const data = await res.json();
@@ -1066,13 +1066,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!token) return { success: false, message: 'Authentication required.' };
 
     try {
-      const res = await fetch('/api/verify-ton-payment', {
+      const res = await fetch('/api/payment?action=verify_ton', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ packageId, currency, txHash, senderAddress })
+        body: JSON.stringify({ action: 'verify_ton', packageId, currency, txHash, senderAddress })
       });
 
       const data = await res.json();
