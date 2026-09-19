@@ -125,10 +125,15 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
     },
   ];
 
+  const isTelegramUser = typeof window !== 'undefined' && Boolean(
+    (window as any).Telegram?.WebApp?.initData ||
+    /Telegram/i.test(navigator.userAgent || '')
+  );
+
   return (
     <nav 
       style={{
-        paddingBottom: 'max(var(--safe-bottom, 0px), env(safe-area-inset-bottom, 0px), 4px)'
+        paddingBottom: isTelegramUser ? 'max(var(--safe-bottom, 0px), 4px)' : '4px'
       }}
       className="shrink-0 w-full z-40 bg-[#151a21]/98 backdrop-blur-md border-t border-[#c5a880]/25 select-none shadow-[0_-8px_30px_rgba(0,0,0,0.95)]"
     >

@@ -165,9 +165,9 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
     <>
       <header 
         style={{
-          paddingTop: 'max(var(--safe-top, 0px), env(safe-area-inset-top, 0px), 6px)',
-          paddingLeft: 'max(0.6rem, env(safe-area-inset-left, 0.6rem))',
-          paddingRight: 'max(0.6rem, env(safe-area-inset-right, 0.6rem))'
+          paddingTop: isTelegramUser ? 'max(var(--safe-top, 0px), 6px)' : '6px',
+          paddingLeft: '0.6rem',
+          paddingRight: '0.6rem'
         }}
         className="w-full bg-[#0c0e14]/98 backdrop-blur-md border-b border-white/10 sticky top-0 z-40 pb-1.5 flex flex-col gap-1 select-none shadow-lg"
       >
@@ -349,10 +349,10 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
       {isReferralModalOpen && (
         <div 
           style={{
-            paddingTop: 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 16px))',
-            paddingBottom: 'max(var(--safe-bottom, 16px), calc(env(safe-area-inset-bottom, 0px) + 16px))',
-            paddingLeft: 'max(0.75rem, env(safe-area-inset-left, 0.75rem))',
-            paddingRight: 'max(0.75rem, env(safe-area-inset-right, 0.75rem))'
+            paddingTop: isTelegramUser ? 'max(var(--safe-top, 0px), 16px)' : '16px',
+            paddingBottom: isTelegramUser ? 'max(var(--safe-bottom, 0px), 16px)' : '16px',
+            paddingLeft: '0.75rem',
+            paddingRight: '0.75rem'
           }}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
           onClick={(e) => {

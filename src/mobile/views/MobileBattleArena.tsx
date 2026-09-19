@@ -1211,11 +1211,16 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
 
   const selectedHandCard = visualState.playerHand.find(c => c.id === selectedHandCardId);
 
+  const isTelegramUser = typeof window !== 'undefined' && Boolean(
+    (window as any).Telegram?.WebApp?.initData ||
+    /Telegram/i.test(navigator.userAgent || '')
+  );
+
   return (
     <div 
       style={{
-        paddingTop: 'max(var(--safe-top, 0px), env(safe-area-inset-top, 0px))',
-        paddingBottom: 'max(var(--safe-bottom, 0px), env(safe-area-inset-bottom, 0px))'
+        paddingTop: isTelegramUser ? 'var(--safe-top, 0px)' : '0px',
+        paddingBottom: isTelegramUser ? 'var(--safe-bottom, 0px)' : '0px'
       }}
       className="flex flex-col h-full w-full bg-[#07090e] text-white select-none overflow-hidden font-sans relative"
     >
@@ -2519,8 +2524,8 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       {visualState.phase === 'player_won' && (
         <div 
           style={{
-            paddingTop: 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 16px))',
-            paddingBottom: 'max(var(--safe-bottom, 16px), calc(env(safe-area-inset-bottom, 0px) + 16px))'
+            paddingTop: isTelegramUser ? 'max(var(--safe-top, 0px), 16px)' : '16px',
+            paddingBottom: isTelegramUser ? 'max(var(--safe-bottom, 0px), 16px)' : '16px'
           }}
           className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-3 sm:p-4 animate-fade-in"
         >
@@ -2714,8 +2719,8 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       {visualState.phase === 'player_lost' && (
         <div 
           style={{
-            paddingTop: 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 16px))',
-            paddingBottom: 'max(var(--safe-bottom, 16px), calc(env(safe-area-inset-bottom, 0px) + 16px))'
+            paddingTop: isTelegramUser ? 'max(var(--safe-top, 0px), 16px)' : '16px',
+            paddingBottom: isTelegramUser ? 'max(var(--safe-bottom, 0px), 16px)' : '16px'
           }}
           className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-3 sm:p-4 animate-fade-in"
         >
@@ -2815,8 +2820,8 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
         {showLogDrawer && (
           <div 
             style={{
-              paddingTop: 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 16px))',
-              paddingBottom: 'max(var(--safe-bottom, 16px), calc(env(safe-area-inset-bottom, 0px) + 16px))'
+              paddingTop: isTelegramUser ? 'max(var(--safe-top, 0px), 16px)' : '16px',
+              paddingBottom: isTelegramUser ? 'max(var(--safe-bottom, 0px), 16px)' : '16px'
             }}
             className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4"
           >
