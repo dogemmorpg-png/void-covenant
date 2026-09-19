@@ -1325,10 +1325,21 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     : null;
 
   return (
-    <div className="h-screen max-h-screen overflow-hidden bg-[#090705] text-gray-200 p-1 sm:p-2 md:p-3 font-sans flex flex-col justify-between select-none relative touch-battle-surface safe-landscape-padding">
+    <div className="h-screen max-h-screen overflow-hidden bg-[#07090e] text-gray-200 p-1 sm:p-2 md:p-3 font-sans flex flex-col justify-between select-none relative touch-battle-surface safe-landscape-padding">
       
+      {/* Ambient Colosseum Battle Arena Backdrop */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        <img 
+          src="/landing_tactical_arena.jpg" 
+          alt="Arena Atmosphere" 
+          className="w-full h-full object-cover opacity-25 filter blur-[3px] scale-105" 
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05070c]/92 via-[#06080e]/82 to-[#040508]/96" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(4,6,10,0.85)_80%)]" />
+      </div>
+
       {/* Header Bar */}
-      <div className="bg-[#120d0a]/95 border border-[#ebd09b]/15 rounded-lg p-1.5 px-3 flex justify-between items-center max-w-7xl mx-auto w-full mb-1 sm:mb-2 shadow-md h-[36px] sm:h-[40px] shrink-0 z-20">
+      <div className="bg-[#0b0e15]/90 backdrop-blur-md border border-[#c5a880]/30 rounded-xl p-1.5 px-4 flex justify-between items-center max-w-7xl mx-auto w-full mb-1 sm:mb-2 shadow-[0_4px_20px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.06)] h-[38px] sm:h-[42px] shrink-0 z-20 relative">
         <button
           onClick={() => {
             const confirmMsg = battleType === 'pvp'
@@ -1341,7 +1352,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               onExitBattle(false);
             }
           }}
-          className="flex items-center gap-1 text-[10px] font-mono font-bold text-amber-500 hover:text-white transition-all bg-black/60 py-1 px-2 border border-amber-950/40 rounded cursor-pointer"
+          className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-red-300 hover:text-white transition-all bg-gradient-to-b from-red-950/60 to-black/80 hover:from-red-900/80 hover:to-black py-1 px-2.5 border border-red-800/40 rounded-lg cursor-pointer shadow-sm"
         >
           <ArrowLeft className="w-3 h-3" /> ESCAPE
         </button>
@@ -1355,7 +1366,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowHelpModal(true)}
-            className="text-[10px] font-mono text-[#ebd09b] hover:text-white bg-black/60 py-1 px-2 border border-[#ebd09b]/25 rounded cursor-pointer transition-all"
+            className="text-[10px] font-mono font-bold text-[#ebd09b] hover:text-white bg-gradient-to-b from-amber-950/40 to-black/80 py-1 px-3 border border-[#c5a880]/35 hover:border-[#c5a880]/70 rounded-lg cursor-pointer transition-all shadow-sm"
           >
             RULES
           </button>
@@ -1365,15 +1376,42 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       {/* Main Container */}
       <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col justify-between relative min-h-0 pb-16">
         
-        {/* Battle Arena - Medieval Fantasy Table */}
+        {/* Battle Arena - Obsidian Runic Altar Table */}
         <div 
-          className="flex-1 flex flex-col justify-center border-[5px] border-[#4a3424] bg-gradient-to-b from-[#241a15] via-[#1b130e] to-[#241a15] rounded-2xl p-4 shadow-[inset_0_0_24px_rgba(0,0,0,0.45),_0_10px_30px_rgba(0,0,0,0.7)] ring-1 ring-[#ebd09b]/35 relative min-h-0 overflow-hidden will-change-transform"
+          className="flex-1 flex flex-col justify-center border-2 border-[#c5a880]/40 bg-gradient-to-b from-[#0d111a] via-[#090c13] to-[#0d111a] rounded-2xl p-4 shadow-[0_25px_60px_rgba(0,0,0,0.95),inset_0_1px_1px_rgba(255,255,255,0.08),inset_0_0_80px_rgba(0,0,0,0.95)] ring-1 ring-black/90 ring-offset-2 ring-offset-[#171d29]/50 relative min-h-0 overflow-hidden will-change-transform"
         >
-          {/* Wooden Table Board Divider */}
-          <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#ebd09b]/35 to-transparent -translate-y-1/2 pointer-events-none z-10 shadow-[0_0_8px_rgba(235,208,155,0.25)]" />
+          {/* Gothic Gilded Corner Filigree Accents */}
+          <svg className="absolute top-2.5 left-2.5 w-7 h-7 pointer-events-none text-[#c5a880]/40 z-10" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M2 14V4a2 2 0 0 1 2-2h10" />
+            <circle cx="5" cy="5" r="1.5" fill="currentColor" />
+          </svg>
+          <svg className="absolute top-2.5 right-2.5 w-7 h-7 pointer-events-none text-[#c5a880]/40 z-10" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M26 14V4a2 2 0 0 0-2-2H14" />
+            <circle cx="23" cy="5" r="1.5" fill="currentColor" />
+          </svg>
+          <svg className="absolute bottom-2.5 left-2.5 w-7 h-7 pointer-events-none text-[#c5a880]/40 z-10" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M2 14v10a2 2 0 0 0 2 2h10" />
+            <circle cx="5" cy="23" r="1.5" fill="currentColor" />
+          </svg>
+          <svg className="absolute bottom-2.5 right-2.5 w-7 h-7 pointer-events-none text-[#c5a880]/40 z-10" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M26 14v10a2 2 0 0 1-2 2H14" />
+            <circle cx="23" cy="23" r="1.5" fill="currentColor" />
+          </svg>
+
+          {/* Central Battle Clash Line */}
+          <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#c5a880]/45 to-transparent -translate-y-1/2 pointer-events-none z-10 shadow-[0_0_12px_rgba(197,168,128,0.3)]" />
+          <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent -translate-y-1/2 pointer-events-none z-10 blur-[1px]" />
           
-          {/* Table Ambient Light Radial Overlay */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(235,208,155,0.12)_0%,rgba(40,26,18,0.35)_55%,rgba(12,8,6,0.65)_100%)] pointer-events-none z-0" />
+          {/* Center Runic Jewel Emblem */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-15 flex items-center justify-center">
+            <div className="w-8 h-8 rotate-45 border-2 border-[#c5a880]/50 bg-[#090c13] shadow-[0_0_20px_rgba(197,168,128,0.35)] flex items-center justify-center">
+              <div className="w-3.5 h-3.5 bg-gradient-to-br from-amber-400/40 to-cyan-400/40 border border-[#c5a880]/80 rotate-45 shadow-[0_0_8px_rgba(235,208,155,0.6)]" />
+            </div>
+          </div>
+
+          {/* Table Ambient Radial Depth Overlay */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.03)_0%,rgba(13,17,26,0.5)_50%,rgba(5,7,10,0.92)_100%)] pointer-events-none z-0" />
+          <div className="absolute inset-0 bg-noise opacity-[0.03] pointer-events-none z-0" />
 
           {/* Glowing Lord casting lasers / energy beams only when targeting a board creature */}
           {isAnimating && currentStep && currentStep.type === 'hero_skill' && currentStep.targetSlot !== undefined && currentStep.targetSlot >= 0 && (
@@ -1612,14 +1650,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   '--dodge-duration': `${Math.max(0.2, 0.35 / effectiveSpeed)}s`,
                   '--cast-duration': `${Math.max(0.3, 0.6 / effectiveSpeed)}s`,
                 } as React.CSSProperties}
-                className={`absolute top-4 left-4 flex items-center gap-3 z-30 bg-[#100b08]/95 p-2 rounded-2xl border will-change-transform ${heroAnimClass} ${
+                className={`absolute top-4 left-4 flex items-center gap-3 z-30 bg-[#0c0f17]/95 p-2 rounded-2xl border will-change-transform ${heroAnimClass} ${
                   isEnemyDodge
                     ? 'border-cyan-400 shadow-[0_0_35px_rgba(6,182,212,0.95)]'
                     : isEnemyHit 
                       ? 'border-red-500 shadow-[0_0_35px_rgba(239,68,68,0.95)]' 
                       : isEnemyCasting 
                         ? 'border-red-500/80 shadow-[0_0_30px_rgba(239,68,68,0.6)]' 
-                        : 'border-red-950/30 shadow-md'
+                        : 'border-red-950/40 shadow-[0_10px_25px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.06)]'
                 }`}
               >
                 <div className="relative">
@@ -1670,14 +1708,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   '--dodge-duration': `${Math.max(0.2, 0.35 / effectiveSpeed)}s`,
                   '--cast-duration': `${Math.max(0.3, 0.6 / effectiveSpeed)}s`,
                 } as React.CSSProperties}
-                className={`absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-[#100b08]/95 p-2 rounded-2xl border will-change-transform ${heroAnimClass} ${
+                className={`absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-[#0c0f17]/95 p-2 rounded-2xl border will-change-transform ${heroAnimClass} ${
                   isPlayerDodge
                     ? 'border-cyan-400 shadow-[0_0_35px_rgba(6,182,212,0.95)]'
                     : isPlayerHit 
                       ? 'border-red-500 shadow-[0_0_35px_rgba(239,68,68,0.95)]' 
                       : isPlayerCasting 
                         ? 'border-cyan-500/80 shadow-[0_0_30px_rgba(6,182,212,0.6)]' 
-                        : 'border-cyan-950/30 shadow-md'
+                        : 'border-cyan-950/40 shadow-[0_10px_25px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.06)]'
                 }`}
               >
                 <div className="relative">
@@ -1721,14 +1759,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               <button
                 disabled={isSimulating}
                 onClick={handleEndTurnWithoutCard}
-                className={`w-[86px] h-[36px] bg-gradient-to-b from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 disabled:from-gray-800 disabled:to-gray-900 border-2 border-[#ebd09b]/80 disabled:border-gray-800 text-black disabled:text-gray-600 font-display font-black text-[10px] uppercase tracking-wider rounded-md shadow-[0_4px_12px_rgba(0,0,0,0.6),_0_0_8px_rgba(235,208,155,0.15)] hover:shadow-[0_4px_15px_rgba(235,208,155,0.35),_0_0_12px_rgba(235,208,155,0.25)] transition-all active:scale-95 cursor-pointer flex items-center justify-center leading-none`}
+                className={`w-[90px] h-[38px] bg-gradient-to-b from-[#e6aa45] via-[#cf8b24] to-[#a06214] hover:from-[#f5ba54] hover:to-[#b87319] disabled:from-[#181c24] disabled:to-[#0f1217] border-2 border-[#fcedc7]/80 disabled:border-gray-800 text-black disabled:text-gray-600 font-display font-black text-[10.5px] uppercase tracking-wider rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.7),0_0_12px_rgba(245,158,11,0.35),inset_0_1px_2px_rgba(255,255,255,0.4)] disabled:shadow-none hover:shadow-[0_4px_20px_rgba(245,158,11,0.5),0_0_18px_rgba(245,158,11,0.4)] transition-all active:scale-95 cursor-pointer flex items-center justify-center leading-none`}
               >
                 {isSimulating ? 'PLAYING' : 'END TURN'}
               </button>
             ) : (
               <button
                 onClick={() => setSelectedHandCardId(null)}
-                className="w-[86px] h-[36px] bg-gradient-to-b from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 border-2 border-red-500 text-white font-display font-black text-[9px] uppercase tracking-wider rounded-md shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center leading-none"
+                className="w-[90px] h-[38px] bg-gradient-to-b from-red-700 via-red-800 to-red-950 hover:from-red-600 hover:to-red-800 border-2 border-red-400 text-white font-display font-black text-[9.5px] uppercase tracking-wider rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.7),0_0_12px_rgba(239,68,68,0.4)] transition-all active:scale-95 cursor-pointer flex items-center justify-center leading-none"
               >
                 ✕ CANCEL
               </button>
@@ -1742,7 +1780,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                 initial={{ opacity: 0, y: -15, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -15, scale: 0.95 }}
-                className="absolute top-3 left-1/2 -translate-x-1/2 bg-gradient-to-b from-[#1c140e] to-[#0d0906] border-2 border-[#ebd09b]/35 rounded-xl p-2 px-4 flex justify-between items-center gap-4 shadow-[0_8px_30px_rgba(0,0,0,0.9),_0_0_15px_rgba(235,208,155,0.1)] h-[54px] w-[95%] max-w-[560px] shrink-0 z-35"
+                className="absolute top-3 left-1/2 -translate-x-1/2 bg-gradient-to-b from-[#101520]/95 to-[#090c13]/98 border-2 border-[#c5a880]/40 rounded-xl p-2 px-4 flex justify-between items-center gap-4 shadow-[0_12px_35px_rgba(0,0,0,0.9),0_0_20px_rgba(197,168,128,0.15)] h-[54px] w-[95%] max-w-[560px] shrink-0 z-35 backdrop-blur-md"
               >
                 {/* Combat Message Announcer */}
                 <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -1973,10 +2011,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       </motion.div>
                       ) : (
                         // Empty Recessed Slot
-                        <div key={`empty-slot-${idx}`} className="w-full h-full rounded-xl border border-[#ebd09b]/25 bg-[#17110c]/85 flex flex-col items-center justify-center relative shadow-[inset_0_4px_10px_rgba(0,0,0,0.6)] group hover:border-[#ebd09b]/40 transition-all duration-300">
+                        <div key={`empty-slot-${idx}`} className="w-full h-full rounded-xl border border-white/10 bg-gradient-to-b from-[#0e121a]/85 via-[#0a0d14]/90 to-[#07090f]/95 flex flex-col items-center justify-center relative shadow-[inset_0_4px_12px_rgba(0,0,0,0.85),0_1px_1px_rgba(255,255,255,0.04)] group hover:border-[#c5a880]/40 transition-all duration-300">
                           <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none" />
-                          <Swords className="w-5 h-5 text-[#ebd09b]/45 group-hover:text-[#ebd09b]/65 transition-colors" />
-                          <span className="text-[7px] font-mono font-bold text-[#ebd09b]/40 uppercase tracking-widest mt-1">Empty Slot</span>
+                          <Swords className="w-5 h-5 text-gray-500/50 group-hover:text-[#c5a880]/70 transition-colors" />
+                          <span className="text-[7px] font-mono font-bold text-gray-500/60 group-hover:text-gray-400 uppercase tracking-widest mt-1">Empty Slot</span>
                         </div>
                       )}
                     </AnimatePresence>
@@ -2244,15 +2282,15 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         <div 
                           key={`player-empty-${idx}`}
                           onClick={() => canPlace && handlePlayCard(idx)}
-                          className={`w-full h-full rounded-xl border flex flex-col items-center justify-center relative shadow-[inset_0_4px_10px_rgba(0,0,0,0.6)] group transition-all duration-300 ${
+                          className={`w-full h-full rounded-xl border flex flex-col items-center justify-center relative shadow-[inset_0_4px_12px_rgba(0,0,0,0.85),0_1px_1px_rgba(255,255,255,0.04)] group transition-all duration-300 ${
                             canPlace
-                              ? 'bg-emerald-950/40 border-emerald-500/80 cursor-pointer border-dashed animate-pulse ring-1 ring-emerald-500/50'
-                              : 'bg-[#17110c]/80 border-[#ebd09b]/25 border-dashed hover:border-[#ebd09b]/40'
+                              ? 'bg-gradient-to-b from-emerald-950/40 via-emerald-900/20 to-black/80 border-emerald-500/80 cursor-pointer border-dashed animate-pulse ring-2 ring-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.35),inset_0_0_12px_rgba(16,185,129,0.2)]'
+                              : 'bg-gradient-to-b from-[#0e121a]/85 via-[#0a0d14]/90 to-[#07090f]/95 border-white/10 border-dashed hover:border-[#c5a880]/40'
                           }`}
                         >
                           <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none" />
-                          <Swords className={`w-5 h-5 transition-colors ${canPlace ? 'text-emerald-400' : 'text-[#ebd09b]/45 group-hover:text-[#ebd09b]/65'}`} />
-                          <span className={`text-[7px] font-mono font-bold uppercase tracking-widest mt-1 ${canPlace ? 'text-emerald-400 font-bold' : 'text-[#ebd09b]/40'}`}>
+                          <Swords className={`w-5 h-5 transition-colors ${canPlace ? 'text-emerald-400' : 'text-gray-500/50 group-hover:text-[#c5a880]/70'}`} />
+                          <span className={`text-[7px] font-mono font-bold uppercase tracking-widest mt-1 ${canPlace ? 'text-emerald-400 font-bold' : 'text-gray-500/60 group-hover:text-gray-400'}`}>
                             {canPlace ? 'Place Here' : 'Empty Slot'}
                           </span>
                         </div>
@@ -2370,7 +2408,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         {/* Collapsible log button */}
         <button
           onClick={() => setShowLogDrawer(true)}
-          className="absolute top-14 right-4 bg-[#120d0a]/95 border border-[#ebd09b]/25 hover:border-amber-500 text-[#ebd09b] hover:text-white px-3 py-1.5 rounded-lg cursor-pointer shadow-lg transition-all z-35 flex items-center gap-1.5 font-display font-black text-[10px] uppercase tracking-wider group"
+          className="absolute top-14 right-4 bg-[#0b0e15]/95 border border-[#c5a880]/30 hover:border-amber-400 text-[#ebd09b] hover:text-white px-3 py-1.5 rounded-lg cursor-pointer shadow-[0_4px_15px_rgba(0,0,0,0.7)] transition-all z-35 flex items-center gap-1.5 font-display font-black text-[10px] uppercase tracking-wider group"
         >
           <Scroll className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
           <span>DUEL LOG</span>
