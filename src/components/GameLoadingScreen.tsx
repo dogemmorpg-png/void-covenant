@@ -1,55 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React from 'react';
+import { motion } from 'motion/react';
 
 interface GameLoadingScreenProps {
   statusText?: string;
   progress?: number;
 }
 
-const LORE_TIPS = [
-  {
-    category: "TACTICAL DOCTRINE",
-    tip: "Positioning dictates linear clash priority. Vanguard creatures absorb the brunt of the assault."
-  },
-  {
-    category: "SACRED WARDS",
-    tip: "Barrier wards negate 100% of damage from the next incoming attack, preserving critical guardians."
-  },
-  {
-    category: "ABYSSAL RELICS",
-    tip: "Consecrate Relics of the Demiurge to awaken devastating set bonuses and passive mastery."
-  },
-  {
-    category: "COVENANT RITUAL",
-    tip: "Vampiric entities siphon blood essence, restoring your Lord's health on every strike."
-  },
-  {
-    category: "BLOOD SACRIFICE",
-    tip: "Sacrificing wounded allies channels raw essence directly to your Lord, turning defeat into triumph."
-  },
-  {
-    category: "ARENA OF SOVEREIGNS",
-    tip: "Victory in the PvP Arena awards Crowns and Sovereign dividends to strengthen your permanent vault."
-  }
-];
-
 export const GameLoadingScreen: React.FC<GameLoadingScreenProps> = ({
   statusText = 'Entering the Void...'
 }) => {
-  const [tipIndex, setTipIndex] = useState(0);
-
-  // Cycle lore tips smoothly
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTipIndex(prev => (prev + 1) % LORE_TIPS.length);
-    }, 4500);
-    return () => clearInterval(timer);
-  }, []);
-
-  const currentTip = LORE_TIPS[tipIndex];
-
   return (
-    <div className="fixed inset-0 z-[99999] w-full h-[100dvh] bg-[#040508] text-white flex flex-col justify-between items-center select-none overflow-hidden p-4 sm:p-8 safe-area-padding">
+    <div className="fixed inset-0 z-[99999] w-full h-[100dvh] bg-[#040508] text-white flex flex-col justify-between items-center select-none overflow-hidden p-6 sm:p-10 safe-area-padding">
       
       {/* 1. Cinematic Background Artwork with Slow Breathing Pan */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
@@ -97,17 +58,10 @@ export const GameLoadingScreen: React.FC<GameLoadingScreenProps> = ({
         <path d="M34 44c0-4-2-6-6-6" strokeWidth="1.2" />
       </svg>
 
-      {/* 3. Top System Initialization Badge */}
-      <div className="relative z-10 pt-2 flex flex-col items-center">
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 border border-[#c5a880]/30 backdrop-blur-md shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
-          <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-          <span className="text-[9px] font-mono text-[#ebd09b] tracking-widest uppercase font-bold">
-            VOID COVENANT • THE ABYSSAL ODYSSEY
-          </span>
-        </div>
-      </div>
+      {/* Top Spacer for perfect vertical balance */}
+      <div className="w-full h-4 relative z-10" />
 
-      {/* 4. Centerpiece: Demiurge Relic Emblem & Title */}
+      {/* 3. Centerpiece: Demiurge Relic Emblem & Title */}
       <div className="relative z-10 flex flex-col items-center justify-center my-auto py-4">
         
         {/* Sacred Runic Halo and Winged Eye Emblem */}
@@ -157,8 +111,8 @@ export const GameLoadingScreen: React.FC<GameLoadingScreenProps> = ({
 
       </div>
 
-      {/* 5. Bottom Section: Relic Progress Bar & Lore Tip Card */}
-      <div className="relative z-10 w-full max-w-md flex flex-col items-center space-y-3 pb-3 sm:pb-5">
+      {/* 4. Bottom Section: Relic Progress Bar & Technical Status */}
+      <div className="relative z-10 w-full max-w-sm flex flex-col items-center space-y-3 pb-3 sm:pb-6">
         
         {/* Dynamic Gothic Progress Bar */}
         <div className="w-64 sm:w-80 relative">
@@ -181,27 +135,6 @@ export const GameLoadingScreen: React.FC<GameLoadingScreenProps> = ({
           <span className="text-amber-200/90 font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
             {statusText}
           </span>
-        </div>
-
-        {/* Rotating Lore Tip Card */}
-        <div className="w-full bg-[#0a0e16]/85 border border-[#c5a880]/25 rounded-xl p-2.5 sm:p-3 shadow-[0_4px_20px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.05)] backdrop-blur-md min-h-[64px] flex flex-col justify-center">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={tipIndex}
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.35 }}
-              className="text-center space-y-1"
-            >
-              <span className="text-[8px] sm:text-[8.5px] font-mono font-bold text-amber-400/90 tracking-widest uppercase block">
-                ✦ {currentTip.category} ✦
-              </span>
-              <p className="text-[10px] sm:text-[11px] font-sans text-gray-300 leading-snug px-2">
-                "{currentTip.tip}"
-              </p>
-            </motion.div>
-          </AnimatePresence>
         </div>
 
       </div>
