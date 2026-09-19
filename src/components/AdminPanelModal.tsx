@@ -560,26 +560,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
     }
   };
 
-  if (!isOpen) return null;
-
-  const isTelegramUser = typeof window !== 'undefined' && Boolean(
-    (window as any).Telegram?.WebApp?.initData ||
-    /Telegram/i.test(navigator.userAgent || '')
-  );
-
-  const filteredWithdrawals = withdrawals.filter(r => {
-    if (withdrawalFilter !== 'all' && r.status !== withdrawalFilter) return false;
-    if (withdrawalSearch) {
-      const s = withdrawalSearch.toLowerCase();
-      const matchWallet = (r.walletAddress || '').toLowerCase().includes(s);
-      const matchUser = (r.username || r.userProfileName || '').toLowerCase().includes(s);
-      const matchId = (r.id || '').toLowerCase().includes(s);
-      return matchWallet || matchUser || matchId;
-    }
-    return true;
-  });
-
   const filteredAndSortedPlayers = useMemo(() => {
+    if (!isOpen) return [];
     return allPlayers
       .filter(p => {
         const isBanned = Boolean(p.profile?.isBanned);
@@ -615,7 +597,26 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
         const timeB = pb.lastLogin || (b.updatedAt ? new Date(b.updatedAt).getTime() : 0);
         return timeB - timeA;
       });
-  }, [allPlayers, playerLeagueFilter, searchQuery, playerSortBy]);
+  }, [isOpen, allPlayers, playerLeagueFilter, searchQuery, playerSortBy]);
+
+  if (!isOpen) return null;
+
+  const isTelegramUser = typeof window !== 'undefined' && Boolean(
+    (window as any).Telegram?.WebApp?.initData ||
+    /Telegram/i.test(navigator.userAgent || '')
+  );
+
+  const filteredWithdrawals = withdrawals.filter(r => {
+    if (withdrawalFilter !== 'all' && r.status !== withdrawalFilter) return false;
+    if (withdrawalSearch) {
+      const s = withdrawalSearch.toLowerCase();
+      const matchWallet = (r.walletAddress || '').toLowerCase().includes(s);
+      const matchUser = (r.username || r.userProfileName || '').toLowerCase().includes(s);
+      const matchId = (r.id || '').toLowerCase().includes(s);
+      return matchWallet || matchUser || matchId;
+    }
+    return true;
+  });
 
   return (
     <div 
