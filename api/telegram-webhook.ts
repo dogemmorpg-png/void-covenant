@@ -72,7 +72,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         payloadData = {};
       }
 
-      const { packageId, walletAddress } = payloadData;
+      let { packageId, walletAddress, p, w } = payloadData;
+      packageId = packageId || p;
+      walletAddress = walletAddress || w;
       const pkg = PACKAGES[packageId];
 
       if (walletAddress && pkg) {

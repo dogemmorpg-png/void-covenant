@@ -132,12 +132,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       const selectedPkg = TELEGRAM_PACKAGES[packageId];
+      // Telegram Bot API requires payload to be between 1 and 128 bytes
       const payload = JSON.stringify({
-        packageId,
-        walletAddress,
-        shards: selectedPkg.shards,
-        starsCost: selectedPkg.starsCost,
-        createdAt: Date.now()
+        p: packageId,
+        w: walletAddress
       });
 
       const tgRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/createInvoiceLink`, {
