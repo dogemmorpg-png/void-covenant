@@ -336,8 +336,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       const nanotons = Math.floor(pkg.tonCost * 1e9).toString();
       const bounceableTreasury = Address.parse(TON_TREASURY_WALLET_ADDRESS).toString({ bounceable: true });
       const transaction = {
-        validUntil: Math.floor(Date.now() / 1000) + 360,
-        network: '-239' as any,
+        validUntil: Math.floor(Date.now() / 1000) + 600,
         messages: [
           {
             address: bounceableTreasury,
@@ -454,8 +453,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       const payloadBoc = buildJettonTransferPayload(bounceableTreasury, tonAddress, jettonUnits);
 
       const transaction = {
-        validUntil: Math.floor(Date.now() / 1000) + 360,
-        network: '-239' as any,
+        validUntil: Math.floor(Date.now() / 1000) + 600,
         messages: [
           {
             address: userJettonWallet,
