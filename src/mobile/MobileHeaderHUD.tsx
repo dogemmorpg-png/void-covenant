@@ -392,16 +392,9 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
               <div className="bg-black/60 border border-white/15 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-md">
                 <div className="flex items-center justify-between text-[11px] sm:text-xs text-white font-display font-bold tracking-wider uppercase">
                   <span>YOUR IMPERIAL INVITATION LINK</span>
-                  <div className="flex items-center gap-2">
-                    {profile.referralCode && (
-                      <span className="text-[9.5px] font-mono px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300">
-                        CODE: <strong className="font-bold text-white">{profile.referralCode}</strong>
-                      </span>
-                    )}
-                    <span className="text-[11px] font-mono text-amber-300">
-                      {isTelegramUser ? 'Telegram Bot Link' : 'Share to recruit'}
-                    </span>
-                  </div>
+                  <span className="text-[11px] font-mono text-amber-300">
+                    {isTelegramUser ? 'Telegram Bot Link' : 'Share to recruit'}
+                  </span>
                 </div>
                 
                 <div className="flex flex-col sm:flex-row items-center gap-2.5">
@@ -423,10 +416,10 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
                       onClick={handleShareTelegram}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex-1 sm:flex-none bg-[#229ED9] hover:bg-[#229ED9]/90 text-white font-mono font-bold px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-[#229ED9]/20 active:scale-95"
-                      title="Share to Telegram"
+                      className="flex-1 sm:flex-none bg-[#229ED9] hover:bg-[#229ED9]/90 text-white font-display font-bold px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-[#229ED9]/20 active:scale-95 uppercase"
+                      title={isTelegramUser ? "Invite Friends via Telegram" : "Share to Telegram"}
                     >
-                      <Send className="w-3.5 h-3.5" /> Telegram
+                      <Send className="w-3.5 h-3.5" /> {isTelegramUser ? 'INVITE' : 'Telegram'}
                     </a>
                   </div>
                 </div>

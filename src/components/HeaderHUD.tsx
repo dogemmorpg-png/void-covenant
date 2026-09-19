@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { LogOut, Copy, X, Trophy, User, Clock, Plus, UserPlus, Send, Mail, ShieldAlert, Sparkles, Crown, Gift, ArrowRight } from 'lucide-react';
 import { useToast } from './Toast';
 import { MailboxModal } from './MailboxModal';
 import { AdminPanelModal } from './AdminPanelModal';
+import { getReferralLink, getTelegramShareUrl } from '../utils/referralHelper';
 
 interface HeaderHUDProps {
   onNavigateTab?: (tab: string) => void;
@@ -29,13 +30,31 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
     profile.solanaAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr';
   const unreadMailCount = (profile.mailMessages || []).filter(m => !m.isRead || (m.rewards && !m.isClaimed)).length;
 
+  const isTelegramUser = useMemo(() => {
+    const hasTgWebApp = Boolean((window as any).Telegram?.WebApp?.initData);
+    const isTgUa = /Telegram/i.test(navigator.userAgent || '');
+    const isTgAddress = Boolean(profile.solanaAddress && profile.solanaAddress.startsWith('tg_'));
+    return hasTgWebApp || isTgUa || isTgAddress;
+  }, [profile.solanaAddress]);
+
   const referralCode = profile.referralCode || profile.solanaAddress || '';
-  const referralLink = `${window.location.origin}?ref=${referralCode}`;
+  const referralLink = useMemo(() => {
+    return getReferralLink(referralCode, isTelegramUser);
+  }, [referralCode, isTelegramUser]);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(referralLink);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
+  };
+
+  const handleShareTelegram = (e: React.MouseEvent) => {
+    const shareUrl = getTelegramShareUrl(referralLink);
+    const tg = (window as any).Telegram?.WebApp;
+    if (tg && typeof tg.openTelegramLink === 'function') {
+      e.preventDefault();
+      tg.openTelegramLink(shareUrl);
+    }
   };
 
   const handleClaimReferralSovereigns = async () => {
@@ -348,14 +367,9 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
               <div className="bg-black/60 border border-white/15 rounded-2xl p-4 space-y-2.5 shadow-md">
                 <div className="flex items-center justify-between text-xs text-white font-display font-bold tracking-wider uppercase">
                   <span>YOUR IMPERIAL INVITATION LINK</span>
-                  <div className="flex items-center gap-2">
-                    {profile.referralCode && (
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300">
-                        CODE: <strong className="font-bold text-white">{profile.referralCode}</strong>
-                      </span>
-                    )}
-                    <span className="text-xs font-mono text-amber-300">Share to recruit</span>
-                  </div>
+                  <span className="text-xs font-mono text-amber-300">
+                    {isTelegramUser ? 'Telegram Bot Link' : 'Share to recruit'}
+                  </span>
                 </div>
                 
                 <div className="flex flex-col sm:flex-row items-center gap-2.5">
@@ -366,22 +380,21 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                   
                   <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
                     <button
-                      onClick={() => {
-                        handleCopyLink();
-                      }}
+                      onClick={handleCopyLink}
                       className="grow sm:grow-0 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-black font-display font-bold px-5 py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer uppercase shadow-md shadow-amber-500/20 active:scale-95"
                     >
                       {copySuccess ? 'COPIED!' : <><Copy className="w-3.5 h-3.5" /> COPY</>}
                     </button>
 
                     <a
-                      href={`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent('Join Void Covenant! Sign up with my link to get +1,000 Gold starter bonus!')}`}
+                      href={getTelegramShareUrl(referralLink)}
+                      onClick={handleShareTelegram}
                       target="_blank"
                       rel="noreferrer"
-                      className="grow sm:grow-0 bg-[#229ED9] hover:bg-[#229ED9]/90 text-white font-mono font-bold px-5 py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-[#229ED9]/20 active:scale-95"
-                      title="Share to Telegram"
+                      className="grow sm:grow-0 bg-[#229ED9] hover:bg-[#229ED9]/90 text-white font-display font-bold px-5 py-3 rounded-xl text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-[#229ED9]/20 active:scale-95 uppercase"
+                      title={isTelegramUser ? "Invite Friends via Telegram" : "Share to Telegram"}
                     >
-                      <Send className="w-3.5 h-3.5" /> Telegram
+                      <Send className="w-3.5 h-3.5" /> {isTelegramUser ? 'INVITE' : 'Telegram'}
                     </a>
                   </div>
                 </div>
