@@ -587,13 +587,17 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 export default function App() {
   const tonManifestUrl = typeof window !== 'undefined' && window.location?.origin
     ? `${window.location.origin}/tonconnect-manifest.json`
-    : 'https://void-covenant.com/tonconnect-manifest.json';
+    : 'https://void-covenant.fun/tonconnect-manifest.json';
 
   return (
     <ErrorBoundary>
       <TonConnectUIProvider
         manifestUrl={tonManifestUrl}
         uiPreferences={{ theme: THEME.DARK }}
+        actionsConfiguration={{
+          twaReturnUrl: 'https://t.me/voidcovenantbot/voidcovenant',
+          returnStrategy: 'back'
+        }}
       >
         <ToastProvider>
           <GameProvider>

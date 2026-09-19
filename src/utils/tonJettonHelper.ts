@@ -17,7 +17,7 @@ export function buildJettonTransferPayload(
     .storeAddress(Address.parse(toAddress))       // destination
     .storeAddress(Address.parse(responseAddress)) // response_destination (for excess refund)
     .storeBit(0)                                  // custom_payload (null)
-    .storeCoins(1n)                               // forward_ton_amount (1 nanoton)
+    .storeCoins(0n)                               // forward_ton_amount (0 for standard transfer)
     .storeBit(0)                                  // forward_payload (empty)
     .endCell()
     .toBoc()
