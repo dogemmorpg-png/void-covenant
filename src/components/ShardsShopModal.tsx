@@ -18,7 +18,8 @@ import {
   Sparkles,
   Star,
   Coins,
-  ShieldCheck
+  ShieldCheck,
+  LogOut
 } from 'lucide-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -628,13 +629,30 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
               /* Telegram Wallet Status (shown when TON / USDT tab active) */
               (tgMethod === 'ton' || tgMethod === 'usdt') && (
                 tonAddress ? (
-                  <div 
-                    onClick={() => tonConnectUI.openModal()}
-                    title="Connected TON Wallet"
-                    className="flex items-center gap-1 bg-black/60 hover:bg-cyan-950/40 border border-cyan-500/40 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono text-cyan-300 transition-all cursor-pointer"
-                  >
-                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                    <span>{tonAddress.slice(0, 4)}...{tonAddress.slice(-4)}</span>
+                  <div className="flex items-center gap-1">
+                    <div 
+                      onClick={() => tonConnectUI.openModal()}
+                      title="Connected TON Wallet (click for details)"
+                      className="flex items-center gap-1 bg-black/60 hover:bg-cyan-950/40 border border-cyan-500/40 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono text-cyan-300 transition-all cursor-pointer"
+                    >
+                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                      <span>{tonAddress.slice(0, 4)}...{tonAddress.slice(-4)}</span>
+                    </div>
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        try {
+                          await tonConnectUI.disconnect();
+                          toast('TON wallet disconnected', 'info');
+                        } catch (err) {
+                          console.warn('Disconnect error:', err);
+                        }
+                      }}
+                      title="Disconnect TON wallet"
+                      className="w-5 h-5 rounded-full bg-black/60 hover:bg-red-950/60 border border-white/20 hover:border-red-500/50 text-gray-400 hover:text-red-300 flex items-center justify-center transition-all cursor-pointer"
+                    >
+                      <LogOut className="w-2.5 h-2.5" />
+                    </button>
                   </div>
                 ) : (
                   <button
