@@ -140,7 +140,7 @@ export const MailboxModal: React.FC<MailboxModalProps> = ({ isOpen, onClose }) =
   return (
     <div 
       style={{
-        paddingTop: 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 16px))',
+        paddingTop: 'max(var(--safe-top, 62px), calc(env(safe-area-inset-top, 0px) + 54px))',
         paddingBottom: 'max(var(--safe-bottom, 16px), calc(env(safe-area-inset-bottom, 0px) + 16px))',
         paddingLeft: 'max(0.75rem, env(safe-area-inset-left, 0.75rem))',
         paddingRight: 'max(0.75rem, env(safe-area-inset-right, 0.75rem))'

@@ -1,6 +1,6 @@
 /**
  * Utilities for initializing and maintaining precise viewport height and safe-area insets
- * across Telegram Mini Apps (both fullscreen and bottom-sheet modes) as well as mobile browsers.
+ * across Telegram Mini Apps (both fullscreen and standard modes) as well as mobile browsers.
  */
 
 export function initTelegramViewport() {
@@ -28,13 +28,12 @@ export function initTelegramViewport() {
       }
 
       // Safe area clearance:
-      // When Telegram is in true fullscreen (no native top header), floating close buttons require top inset.
-      // In standard/sheet mode, Telegram native header sits ABOVE the webview, so safe top inset is 0px.
-      const isFullscreen = Boolean(tg?.isFullscreen);
+      // Telegram native controls (title bar / close button / icons) occupy the top ~50-56px.
+      // We set a minimum clearance of 62px so game headers never collide with Telegram controls.
       let safeTop = 0;
-      if (isFullscreen) {
+      if (tg) {
         const inset = tg?.contentSafeAreaInset?.top ?? tg?.safeAreaInset?.top;
-        safeTop = typeof inset === 'number' && inset > 0 ? Math.max(inset, 48) : 48;
+        safeTop = typeof inset === 'number' && inset > 0 ? Math.max(inset + 4, 62) : 62;
       }
       document.documentElement.style.setProperty('--safe-top', `${safeTop}px`);
 
@@ -63,9 +62,6 @@ export function initTelegramViewport() {
       tg.expand?.();
       if (typeof tg.disableVerticalSwipes === 'function') {
         tg.disableVerticalSwipes();
-      }
-      if (typeof tg.requestFullscreen === 'function') {
-        tg.requestFullscreen();
       }
     } catch (e) {
       console.warn('Telegram early expand failed:', e);
@@ -96,15 +92,4 @@ export function initTelegramViewport() {
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', updateAppHeight);
   }
-
-  // Attempt requestFullscreen on first user touch gesture if supported by Telegram client
-  const handleFirstUserGesture = () => {
-    if (tg && typeof tg.requestFullscreen === 'function' && !tg.isFullscreen) {
-      try {
-        tg.requestFullscreen();
-      } catch (e) {}
-    }
-  };
-  window.addEventListener('click', handleFirstUserGesture, { once: true, passive: true });
-  window.addEventListener('touchend', handleFirstUserGesture, { once: true, passive: true });
 }

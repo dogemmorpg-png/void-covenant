@@ -1214,7 +1214,7 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
   return (
     <div 
       style={{
-        paddingTop: 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 4px))',
+        paddingTop: 'max(var(--safe-top, 62px), calc(env(safe-area-inset-top, 0px) + 54px))',
         paddingBottom: 'max(var(--safe-bottom, 8px), calc(env(safe-area-inset-bottom, 0px) + 6px))'
       }}
       className="flex flex-col h-full w-full bg-[#07090e] text-white select-none overflow-hidden font-sans relative"

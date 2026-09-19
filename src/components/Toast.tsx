@@ -211,7 +211,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       {/* Toast Container - adaptive top & horizontal centering for mobile */}
       <div 
         style={{
-          top: isMobile ? 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 12px))' : undefined
+          top: isMobile ? 'max(var(--safe-top, 62px), calc(env(safe-area-inset-top, 0px) + 54px))' : undefined
         }}
         className="fixed z-[9999] pointer-events-none flex flex-col items-center gap-2 left-3 right-3 sm:left-auto sm:right-4 sm:top-4 sm:max-w-sm sm:items-end w-auto max-w-md mx-auto sm:mx-0"
       >

@@ -165,7 +165,7 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
     <>
       <header 
         style={{
-          paddingTop: 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 6px))',
+          paddingTop: 'max(var(--safe-top, 62px), calc(env(safe-area-inset-top, 0px) + 54px))',
           paddingLeft: 'max(0.6rem, env(safe-area-inset-left, 0.6rem))',
           paddingRight: 'max(0.6rem, env(safe-area-inset-right, 0.6rem))'
         }}
