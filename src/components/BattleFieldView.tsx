@@ -1378,35 +1378,170 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
         
         {/* Battle Arena - Obsidian Runic Altar Table */}
         <div 
-          className="flex-1 flex flex-col justify-center border-2 border-[#c5a880]/40 bg-gradient-to-b from-[#0d111a] via-[#090c13] to-[#0d111a] rounded-2xl p-4 shadow-[0_25px_60px_rgba(0,0,0,0.95),inset_0_1px_1px_rgba(255,255,255,0.08),inset_0_0_80px_rgba(0,0,0,0.95)] ring-1 ring-black/90 ring-offset-2 ring-offset-[#171d29]/50 relative min-h-0 overflow-hidden will-change-transform"
+          className="flex-1 flex flex-col justify-center border-2 border-[#c5a880]/45 bg-gradient-to-b from-[#0d111a] via-[#090c13] to-[#0d111a] rounded-2xl p-4 shadow-[0_25px_60px_rgba(0,0,0,0.95),inset_0_1px_1px_rgba(255,255,255,0.08),inset_0_0_80px_rgba(0,0,0,0.95)] ring-1 ring-black/90 ring-offset-2 ring-offset-[#171d29]/50 relative min-h-0 overflow-hidden will-change-transform"
         >
-          {/* Gothic Gilded Corner Filigree Accents */}
-          <svg className="absolute top-2.5 left-2.5 w-7 h-7 pointer-events-none text-[#c5a880]/40 z-10" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M2 14V4a2 2 0 0 1 2-2h10" />
-            <circle cx="5" cy="5" r="1.5" fill="currentColor" />
+          {/* Grand Gothic Gilded Corner Filigree Accents (Cast-Bronze Relief) */}
+          <svg className="absolute top-2 left-2 w-11 h-11 pointer-events-none text-[#c5a880]/60 z-10 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+            <path d="M4 24V8a4 4 0 0 1 4-4h16" strokeWidth="2" />
+            <path d="M8 20V8h12" strokeWidth="1" opacity="0.6" />
+            <circle cx="8" cy="8" r="2.5" fill="#e6aa45" />
+            <path d="M4 14c4 0 6-2 6-6" strokeWidth="1.2" />
+            <path d="M14 4c0 4 2 6 6 6" strokeWidth="1.2" />
           </svg>
-          <svg className="absolute top-2.5 right-2.5 w-7 h-7 pointer-events-none text-[#c5a880]/40 z-10" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M26 14V4a2 2 0 0 0-2-2H14" />
-            <circle cx="23" cy="5" r="1.5" fill="currentColor" />
+          <svg className="absolute top-2 right-2 w-11 h-11 pointer-events-none text-[#c5a880]/60 z-10 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+            <path d="M44 24V8a4 4 0 0 0-4-4H24" strokeWidth="2" />
+            <path d="M40 20V8H28" strokeWidth="1" opacity="0.6" />
+            <circle cx="40" cy="8" r="2.5" fill="#e6aa45" />
+            <path d="M44 14c-4 0-6-2-6-6" strokeWidth="1.2" />
+            <path d="M34 4c0 4-2 6-6 6" strokeWidth="1.2" />
           </svg>
-          <svg className="absolute bottom-2.5 left-2.5 w-7 h-7 pointer-events-none text-[#c5a880]/40 z-10" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M2 14v10a2 2 0 0 0 2 2h10" />
-            <circle cx="5" cy="23" r="1.5" fill="currentColor" />
+          <svg className="absolute bottom-2 left-2 w-11 h-11 pointer-events-none text-[#c5a880]/60 z-10 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+            <path d="M4 24v16a4 4 0 0 0 4 4h16" strokeWidth="2" />
+            <path d="M8 28v12h12" strokeWidth="1" opacity="0.6" />
+            <circle cx="8" cy="40" r="2.5" fill="#e6aa45" />
+            <path d="M4 34c4 0 6 2 6 6" strokeWidth="1.2" />
+            <path d="M14 44c0-4 2-6 6-6" strokeWidth="1.2" />
           </svg>
-          <svg className="absolute bottom-2.5 right-2.5 w-7 h-7 pointer-events-none text-[#c5a880]/40 z-10" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M26 14v10a2 2 0 0 1-2 2H14" />
-            <circle cx="23" cy="23" r="1.5" fill="currentColor" />
+          <svg className="absolute bottom-2 right-2 w-11 h-11 pointer-events-none text-[#c5a880]/60 z-10 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+            <path d="M44 24v16a4 4 0 0 1-4 4H24" strokeWidth="2" />
+            <path d="M40 28v12H28" strokeWidth="1" opacity="0.6" />
+            <circle cx="40" cy="40" r="2.5" fill="#e6aa45" />
+            <path d="M44 34c-4 0-6 2-6 6" strokeWidth="1.2" />
+            <path d="M34 44c0-4-2-6-6-6" strokeWidth="1.2" />
           </svg>
 
-          {/* Central Battle Clash Line */}
-          <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#c5a880]/45 to-transparent -translate-y-1/2 pointer-events-none z-10 shadow-[0_0_12px_rgba(197,168,128,0.3)]" />
-          <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent -translate-y-1/2 pointer-events-none z-10 blur-[1px]" />
-          
-          {/* Center Runic Jewel Emblem */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-15 flex items-center justify-center">
-            <div className="w-8 h-8 rotate-45 border-2 border-[#c5a880]/50 bg-[#090c13] shadow-[0_0_20px_rgba(197,168,128,0.35)] flex items-center justify-center">
-              <div className="w-3.5 h-3.5 bg-gradient-to-br from-amber-400/40 to-cyan-400/40 border border-[#c5a880]/80 rotate-45 shadow-[0_0_8px_rgba(235,208,155,0.6)]" />
+          {/* Dual-Faction Territory Ambient Lighting (Enemy Crimson vs Player Cyan/Gold) */}
+          <div className="absolute top-0 left-0 right-0 h-1/2 bg-[radial-gradient(ellipse_at_top,rgba(225,29,72,0.08)_0%,transparent_70%)] pointer-events-none z-0" />
+          <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-[radial-gradient(ellipse_at_bottom,rgba(6,182,212,0.07)_0%,transparent_70%)] pointer-events-none z-0" />
+
+          {/* Sacred Gothic Arcane Summoning Circle (Occult Stone Mandala) */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] pointer-events-none opacity-[0.16] z-0">
+            <svg className="w-full h-full text-[#c5a880] animate-[spin_240s_linear_infinite]" viewBox="0 0 500 500" fill="none" stroke="currentColor">
+              <circle cx="250" cy="250" r="235" strokeWidth="1" strokeDasharray="6 4" opacity="0.4" />
+              <circle cx="250" cy="250" r="225" strokeWidth="1.5" opacity="0.6" />
+              <circle cx="250" cy="250" r="215" strokeWidth="0.8" opacity="0.4" />
+              <polygon points="250,35 300,200 465,250 300,300 250,465 200,300 35,250 200,200" strokeWidth="1" opacity="0.35" fill="none" />
+              <polygon points="250,55 285,215 445,250 285,285 250,445 215,285 55,250 215,215" strokeWidth="0.8" opacity="0.25" fill="none" />
+              <rect x="110" y="110" width="280" height="280" strokeWidth="1" opacity="0.3" transform="rotate(45 250 250)" />
+              <rect x="110" y="110" width="280" height="280" strokeWidth="1" opacity="0.3" />
+              <circle cx="250" cy="250" r="140" strokeWidth="1.5" opacity="0.5" />
+              <circle cx="250" cy="250" r="130" strokeWidth="0.8" strokeDasharray="3 6" opacity="0.5" />
+              <circle cx="250" cy="250" r="80" strokeWidth="1.2" opacity="0.6" />
+              <circle cx="250" cy="250" r="30" strokeWidth="1" opacity="0.4" />
+              {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
+                <line 
+                  key={i} 
+                  x1="250" 
+                  y1="250" 
+                  x2={250 + 215 * Math.cos((angle * Math.PI) / 180)} 
+                  y2={250 + 215 * Math.sin((angle * Math.PI) / 180)} 
+                  strokeWidth="0.8" 
+                  opacity="0.25" 
+                />
+              ))}
+            </svg>
+          </div>
+
+          {/* CENTRAL GOTHIC BATTLE STRIP & TACTICAL CONSOLE (Permanent Speed & Playback Bar) */}
+          <div className="absolute top-1/2 left-4 right-[114px] -translate-y-1/2 h-[42px] rounded-xl bg-gradient-to-r from-[#0c1018]/95 via-[#131a26]/95 to-[#0c1018]/95 border border-[#c5a880]/40 shadow-[0_4px_25px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_0_20px_rgba(0,0,0,0.6)] flex items-center justify-between px-3.5 z-30 backdrop-blur-md">
+            
+            {/* Left: Combat Status & Live Action Step Narrative */}
+            <div className="flex items-center gap-2.5 min-w-0 flex-1 pr-3">
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-amber-500/20 to-amber-950/40 border border-[#c5a880]/50 flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(197,168,128,0.25)]">
+                <Swords className="w-3.5 h-3.5 text-amber-300" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-display font-black text-[11px] text-[#ebd09b] tracking-wider uppercase leading-none">
+                    TURN {visualState.turn || 1}
+                  </span>
+                  <span className={`text-[8px] font-mono px-1.5 py-0.5 rounded border font-bold uppercase tracking-wider leading-none ${
+                    isAnimating 
+                      ? 'bg-red-950/80 text-red-300 border-red-500/50 animate-pulse' 
+                      : 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50'
+                  }`}>
+                    {isAnimating ? 'CLASHING' : 'DEPLOYMENT'}
+                  </span>
+                  {isAnimating && currentStepIndex >= 0 && (
+                    <span className="text-[9px] font-mono text-gray-400 font-bold">
+                      [{currentStepIndex + 1}/{animateSequence.length}]
+                    </span>
+                  )}
+                </div>
+                <p className="text-[10px] font-mono text-amber-100/90 truncate leading-none mt-1">
+                  {activeLogStepText || (selectedHandCardId ? 'Click an empty slot on your board to deploy card' : 'Choose a card from your hand or click End Turn')}
+                </p>
+              </div>
             </div>
+
+            {/* Center: Gothic Runic Sigil */}
+            <div className="hidden lg:flex items-center gap-2 px-3 text-[#c5a880]/40 shrink-0 select-none pointer-events-none">
+              <div className="w-8 h-[1px] bg-gradient-to-r from-transparent to-[#c5a880]/50" />
+              <div className="w-3.5 h-3.5 rotate-45 border border-[#c5a880]/60 bg-amber-500/20 shadow-[0_0_8px_rgba(245,158,11,0.4)]" />
+              <div className="w-8 h-[1px] bg-gradient-to-l from-transparent to-[#c5a880]/50" />
+            </div>
+
+            {/* Right: Permanent Speed Multiplier & Play/Pause/Step Controls */}
+            <div className="flex items-center gap-2 shrink-0">
+              {/* Speed Multiplier Segmented Buttons (1x, 2x, 3x) */}
+              <div className="flex bg-black/70 p-0.5 rounded-lg border border-[#c5a880]/30 h-[28px] items-center shadow-inner">
+                {[1, 2, 3].map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setSpeedMultiplier(s)}
+                    className={`px-2.5 h-[22px] flex items-center justify-center text-[10px] font-mono font-black rounded-md transition-all cursor-pointer ${
+                      speedMultiplier === s
+                        ? 'bg-gradient-to-b from-amber-400 to-yellow-600 text-black shadow-[0_0_8px_rgba(245,158,11,0.5)] font-black scale-105'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                    title={`Animation Speed: ${s}x`}
+                  >
+                    {s}x
+                  </button>
+                ))}
+              </div>
+
+              {/* Play / Pause Toggle Button */}
+              <button
+                onClick={() => setIsPaused(prev => !prev)}
+                className={`h-[28px] px-2.5 rounded-lg border flex items-center gap-1.5 text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm active:scale-95 ${
+                  isPaused
+                    ? 'bg-emerald-950/80 border-emerald-500 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.4)] animate-pulse'
+                    : 'bg-black/70 border-zinc-700 hover:border-amber-400 text-zinc-300 hover:text-white'
+                }`}
+                title={isPaused ? 'Resume Combat Animation' : 'Pause Combat Animation'}
+              >
+                {isPaused ? (
+                  <>
+                    <Play className="w-3 h-3 fill-emerald-400 text-emerald-400" />
+                    <span>RESUME</span>
+                  </>
+                ) : (
+                  <>
+                    <Pause className="w-3 h-3 text-amber-400 fill-amber-400" />
+                    <span>PAUSE</span>
+                  </>
+                )}
+              </button>
+
+              {/* Manual Step Forward (Visible when paused) */}
+              {isPaused && (
+                <button
+                  onClick={() => {
+                    setAttackerAction(null);
+                    setDefenderAction(null);
+                    setActiveSkillVfx(null);
+                    setCurrentStepIndex(prev => Math.min(animateSequence.length, prev + 1));
+                  }}
+                  className="h-[28px] px-2.5 rounded-lg bg-cyan-950/80 border border-cyan-500/80 text-cyan-300 text-[10px] font-mono font-bold flex items-center gap-1 shadow-[0_0_10px_rgba(6,182,212,0.35)] cursor-pointer active:scale-95"
+                  title="Advance one combat step"
+                >
+                  <ChevronRight className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>STEP</span>
+                </button>
+              )}
+            </div>
+
           </div>
 
           {/* Table Ambient Radial Depth Overlay */}
@@ -1650,18 +1785,18 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   '--dodge-duration': `${Math.max(0.2, 0.35 / effectiveSpeed)}s`,
                   '--cast-duration': `${Math.max(0.3, 0.6 / effectiveSpeed)}s`,
                 } as React.CSSProperties}
-                className={`absolute top-4 left-4 flex items-center gap-3 z-30 bg-[#0c0f17]/95 p-2 rounded-2xl border will-change-transform ${heroAnimClass} ${
+                className={`absolute top-4 left-4 flex items-center gap-3 z-30 bg-gradient-to-br from-[#12080a]/98 via-[#0b0e14]/98 to-[#07090e]/98 p-2.5 rounded-2xl border will-change-transform ${heroAnimClass} ${
                   isEnemyDodge
                     ? 'border-cyan-400 shadow-[0_0_35px_rgba(6,182,212,0.95)]'
                     : isEnemyHit 
                       ? 'border-red-500 shadow-[0_0_35px_rgba(239,68,68,0.95)]' 
                       : isEnemyCasting 
                         ? 'border-red-500/80 shadow-[0_0_30px_rgba(239,68,68,0.6)]' 
-                        : 'border-red-950/40 shadow-[0_10px_25px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.06)]'
+                        : 'border-red-950/60 shadow-[0_12px_30px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_0_15px_rgba(239,68,68,0.1)]'
                 }`}
               >
                 <div className="relative">
-                  <div className="w-18 h-18 rounded-full border-4 border-red-700/80 bg-[#1c0808] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
+                  <div className="w-18 h-18 rounded-full border-4 border-red-700/90 bg-[#1c0808] ring-2 ring-red-500/50 overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.9)] flex items-center justify-center">
                     {renderFloatingTextsFor('enemy-hero')}
                     {stage.enemyHeroImage && (stage.enemyHeroImage.startsWith('/') || stage.enemyHeroImage.startsWith('http')) ? (
                       <img 
@@ -1677,7 +1812,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     )}
                   </div>
                   {/* Health Shield */}
-                  <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-gradient-to-br from-red-600 to-red-800 border-2 border-red-300 flex items-center justify-center shadow-lg z-30">
+                  <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-red-800 border-2 border-red-200 flex items-center justify-center shadow-[0_2px_10px_rgba(239,68,68,0.6)] z-30">
                     <span className="text-white text-xs font-black font-mono leading-none select-none">{visualState.enemyHeroHealth}</span>
                   </div>
                 </div>
@@ -1708,18 +1843,18 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   '--dodge-duration': `${Math.max(0.2, 0.35 / effectiveSpeed)}s`,
                   '--cast-duration': `${Math.max(0.3, 0.6 / effectiveSpeed)}s`,
                 } as React.CSSProperties}
-                className={`absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-[#0c0f17]/95 p-2 rounded-2xl border will-change-transform ${heroAnimClass} ${
+                className={`absolute bottom-4 left-4 flex items-center gap-3 z-30 bg-gradient-to-br from-[#0a1218]/98 via-[#0b0e14]/98 to-[#07090e]/98 p-2.5 rounded-2xl border will-change-transform ${heroAnimClass} ${
                   isPlayerDodge
                     ? 'border-cyan-400 shadow-[0_0_35px_rgba(6,182,212,0.95)]'
                     : isPlayerHit 
                       ? 'border-red-500 shadow-[0_0_35px_rgba(239,68,68,0.95)]' 
                       : isPlayerCasting 
                         ? 'border-cyan-500/80 shadow-[0_0_30px_rgba(6,182,212,0.6)]' 
-                        : 'border-cyan-950/40 shadow-[0_10px_25px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.06)]'
+                        : 'border-cyan-950/60 shadow-[0_12px_30px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_0_15px_rgba(6,182,212,0.1)]'
                 }`}
               >
                 <div className="relative">
-                  <div className="w-18 h-18 rounded-full border-4 border-cyan-600/80 bg-[#0d161d] overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center">
+                  <div className="w-18 h-18 rounded-full border-4 border-cyan-600/90 bg-[#0d161d] ring-2 ring-cyan-400/50 overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.9)] flex items-center justify-center">
                     {renderFloatingTextsFor('player-hero')}
                     {profile.avatarUrl ? (
                       <img 
@@ -1735,7 +1870,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                     )}
                   </div>
                   {/* Health Shield */}
-                  <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-gradient-to-br from-red-600 to-red-800 border-2 border-red-300 flex items-center justify-center shadow-lg z-30">
+                  <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-red-800 border-2 border-red-200 flex items-center justify-center shadow-[0_2px_10px_rgba(239,68,68,0.6)] z-30">
                     <span className="text-white text-xs font-black font-mono leading-none select-none">{visualState.playerHeroHealth}</span>
                   </div>
                 </div>
@@ -1753,97 +1888,25 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             );
           })()}
 
-          {/* Hearthstone Style Flip End Turn Button (Right center) */}
+          {/* Hearthstone Style Flip End Turn Button (Right center, aligned with Central Tactical Bar) */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 z-35">
             {!selectedHandCardId ? (
               <button
                 disabled={isSimulating}
                 onClick={handleEndTurnWithoutCard}
-                className={`w-[90px] h-[38px] bg-gradient-to-b from-[#e6aa45] via-[#cf8b24] to-[#a06214] hover:from-[#f5ba54] hover:to-[#b87319] disabled:from-[#181c24] disabled:to-[#0f1217] border-2 border-[#fcedc7]/80 disabled:border-gray-800 text-black disabled:text-gray-600 font-display font-black text-[10.5px] uppercase tracking-wider rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.7),0_0_12px_rgba(245,158,11,0.35),inset_0_1px_2px_rgba(255,255,255,0.4)] disabled:shadow-none hover:shadow-[0_4px_20px_rgba(245,158,11,0.5),0_0_18px_rgba(245,158,11,0.4)] transition-all active:scale-95 cursor-pointer flex items-center justify-center leading-none`}
+                className={`w-[96px] h-[42px] bg-gradient-to-b from-[#e6aa45] via-[#cf8b24] to-[#a06214] hover:from-[#f5ba54] hover:to-[#b87319] disabled:from-[#181c24] disabled:to-[#0f1217] border-2 border-[#fcedc7]/90 disabled:border-gray-800 text-black disabled:text-gray-600 font-display font-black text-[11px] uppercase tracking-wider rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.7),0_0_15px_rgba(245,158,11,0.4),inset_0_1px_2px_rgba(255,255,255,0.45)] disabled:shadow-none hover:shadow-[0_4px_22px_rgba(245,158,11,0.6),0_0_20px_rgba(245,158,11,0.5)] transition-all active:scale-95 cursor-pointer flex items-center justify-center leading-none`}
               >
-                {isSimulating ? 'PLAYING' : 'END TURN'}
+                {isSimulating ? 'CLASHING...' : 'END TURN'}
               </button>
             ) : (
               <button
                 onClick={() => setSelectedHandCardId(null)}
-                className="w-[90px] h-[38px] bg-gradient-to-b from-red-700 via-red-800 to-red-950 hover:from-red-600 hover:to-red-800 border-2 border-red-400 text-white font-display font-black text-[9.5px] uppercase tracking-wider rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.7),0_0_12px_rgba(239,68,68,0.4)] transition-all active:scale-95 cursor-pointer flex items-center justify-center leading-none"
+                className="w-[96px] h-[42px] bg-gradient-to-b from-red-700 via-red-800 to-red-950 hover:from-red-600 hover:to-red-800 border-2 border-red-400 text-white font-display font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.7),0_0_12px_rgba(239,68,68,0.4)] transition-all active:scale-95 cursor-pointer flex items-center justify-center leading-none"
               >
                 ✕ CANCEL
               </button>
             )}
           </div>
-
-          {/* PLAYBACK ACTION BANNER / CONTROLLER */}
-          <AnimatePresence mode="wait">
-            {isAnimating && (
-              <motion.div
-                initial={{ opacity: 0, y: -15, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -15, scale: 0.95 }}
-                className="absolute top-3 left-1/2 -translate-x-1/2 bg-gradient-to-b from-[#101520]/95 to-[#090c13]/98 border-2 border-[#c5a880]/40 rounded-xl p-2 px-4 flex justify-between items-center gap-4 shadow-[0_12px_35px_rgba(0,0,0,0.9),0_0_20px_rgba(197,168,128,0.15)] h-[54px] w-[95%] max-w-[560px] shrink-0 z-35 backdrop-blur-md"
-              >
-                {/* Combat Message Announcer */}
-                <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping shrink-0" />
-                  <div className="min-w-0">
-                    <span className="text-[7.5px] font-mono font-bold text-amber-500/80 uppercase tracking-widest block leading-none">Combat Log Step</span>
-                    <h5 className="font-display font-black text-[11.5px] text-white tracking-wide truncate mt-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
-                      {activeLogStepText || 'Starting combat duelist...'}
-                    </h5>
-                  </div>
-                </div>
-
-                {/* Announcer Controls */}
-                <div className="flex items-center gap-3 shrink-0">
-                  {/* Step indicator */}
-                  <div className="text-right font-mono text-[9.5px] text-gray-400 leading-none">
-                    <div>STEP</div>
-                    <div className="font-bold text-white mt-0.5">{currentStepIndex + 1}/{animateSequence.length}</div>
-                  </div>
-
-                  {/* Speed Buttons */}
-                  <div className="flex bg-black/60 p-0.5 rounded-lg border border-amber-950/40 h-7 items-center">
-                    {[1, 2, 3].map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => setSpeedMultiplier(s)}
-                        className={`w-6 h-6 flex items-center justify-center text-[9.5px] font-mono font-black rounded-md transition-all cursor-pointer ${
-                          speedMultiplier === s
-                            ? 'bg-gradient-to-b from-amber-400 to-yellow-600 text-black font-bold shadow-md'
-                            : 'text-gray-400 hover:text-white hover:bg-white/5'
-                        }`}
-                      >
-                        {s}x
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Play / Pause */}
-                  <button
-                    onClick={() => setIsPaused(!isPaused)}
-                    className="bg-black/60 hover:bg-amber-950/30 border border-amber-900/40 text-white text-[9px] font-mono font-bold h-7 px-2.5 rounded-md cursor-pointer transition-all flex items-center gap-1 shadow-sm active:scale-95"
-                  >
-                    {isPaused ? <Play className="w-2.5 h-2.5 text-emerald-400 fill-emerald-400" /> : <Pause className="w-2.5 h-2.5 text-yellow-400 fill-yellow-400" />}
-                    <span>{isPaused ? 'RESUME' : 'PAUSE'}</span>
-                  </button>
-
-                  {/* Manual Step */}
-                  {isPaused && (
-                    <button
-                      onClick={() => {
-                        setAttackerAction(null);
-                        setDefenderAction(null);
-                        setCurrentStepIndex(prev => Math.min(animateSequence.length, prev + 1));
-                      }}
-                      className="bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-cyan-300 text-[9px] font-mono font-bold h-7 px-2.5 rounded-md cursor-pointer transition-all active:scale-95 shadow-sm"
-                    >
-                      NEXT ➡️
-                    </button>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           {/* BOARD STAGE FIELD (LINEAR DUELS) - centered board */}
           <div className="flex-1 flex flex-col justify-center gap-8 md:gap-10 my-2 min-h-0 relative py-14">
@@ -2011,10 +2074,20 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                       </motion.div>
                       ) : (
                         // Empty Recessed Slot
-                        <div key={`empty-slot-${idx}`} className="w-full h-full rounded-xl border border-white/10 bg-gradient-to-b from-[#0e121a]/85 via-[#0a0d14]/90 to-[#07090f]/95 flex flex-col items-center justify-center relative shadow-[inset_0_4px_12px_rgba(0,0,0,0.85),0_1px_1px_rgba(255,255,255,0.04)] group hover:border-[#c5a880]/40 transition-all duration-300">
-                          <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none" />
-                          <Swords className="w-5 h-5 text-gray-500/50 group-hover:text-[#c5a880]/70 transition-colors" />
-                          <span className="text-[7px] font-mono font-bold text-gray-500/60 group-hover:text-gray-400 uppercase tracking-widest mt-1">Empty Slot</span>
+                        <div key={`empty-slot-${idx}`} className="w-full h-full rounded-xl border border-[#c5a880]/20 bg-gradient-to-b from-[#0e121a]/95 via-[#090c13]/98 to-[#06080e]/98 flex flex-col items-center justify-center relative shadow-[inset_0_5px_16px_rgba(0,0,0,0.92),0_1px_1px_rgba(255,255,255,0.06)] group hover:border-red-500/40 hover:bg-red-950/15 transition-all duration-300 overflow-hidden">
+                          {/* Corner notches */}
+                          <div className="absolute top-1 left-1 w-2 h-2 border-t border-l border-[#c5a880]/30 pointer-events-none" />
+                          <div className="absolute top-1 right-1 w-2 h-2 border-t border-r border-[#c5a880]/30 pointer-events-none" />
+                          <div className="absolute bottom-1 left-1 w-2 h-2 border-b border-l border-[#c5a880]/30 pointer-events-none" />
+                          <div className="absolute bottom-1 right-1 w-2 h-2 border-b border-r border-[#c5a880]/30 pointer-events-none" />
+
+                          {/* Inner runic emblem watermark */}
+                          <div className="w-9 h-9 rounded-full border border-[#c5a880]/20 bg-black/45 flex items-center justify-center group-hover:border-red-500/40 transition-colors shadow-inner">
+                            <Swords className="w-4 h-4 text-[#c5a880]/40 group-hover:text-red-400/80 transition-colors" />
+                          </div>
+                          <span className="text-[7.5px] font-mono font-bold text-gray-500/70 group-hover:text-gray-300 uppercase tracking-widest mt-1.5 leading-none">
+                            ENEMY SLOT
+                          </span>
                         </div>
                       )}
                     </AnimatePresence>
@@ -2282,16 +2355,30 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                         <div 
                           key={`player-empty-${idx}`}
                           onClick={() => canPlace && handlePlayCard(idx)}
-                          className={`w-full h-full rounded-xl border flex flex-col items-center justify-center relative shadow-[inset_0_4px_12px_rgba(0,0,0,0.85),0_1px_1px_rgba(255,255,255,0.04)] group transition-all duration-300 ${
+                          className={`w-full h-full rounded-xl border flex flex-col items-center justify-center relative shadow-[inset_0_5px_16px_rgba(0,0,0,0.92),0_1px_1px_rgba(255,255,255,0.06)] group transition-all duration-300 overflow-hidden ${
                             canPlace
-                              ? 'bg-gradient-to-b from-emerald-950/40 via-emerald-900/20 to-black/80 border-emerald-500/80 cursor-pointer border-dashed animate-pulse ring-2 ring-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.35),inset_0_0_12px_rgba(16,185,129,0.2)]'
-                              : 'bg-gradient-to-b from-[#0e121a]/85 via-[#0a0d14]/90 to-[#07090f]/95 border-white/10 border-dashed hover:border-[#c5a880]/40'
+                              ? 'bg-gradient-to-b from-emerald-950/50 via-emerald-900/25 to-black/90 border-emerald-400 cursor-pointer border-dashed animate-pulse ring-2 ring-emerald-500/50 shadow-[0_0_25px_rgba(16,185,129,0.45),inset_0_0_15px_rgba(16,185,129,0.3)]'
+                              : 'bg-gradient-to-b from-[#0e121a]/95 via-[#090c13]/98 to-[#06080e]/98 border-[#c5a880]/20 hover:border-amber-400/50 hover:bg-amber-950/15'
                           }`}
                         >
-                          <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none" />
-                          <Swords className={`w-5 h-5 transition-colors ${canPlace ? 'text-emerald-400' : 'text-gray-500/50 group-hover:text-[#c5a880]/70'}`} />
-                          <span className={`text-[7px] font-mono font-bold uppercase tracking-widest mt-1 ${canPlace ? 'text-emerald-400 font-bold' : 'text-gray-500/60 group-hover:text-gray-400'}`}>
-                            {canPlace ? 'Place Here' : 'Empty Slot'}
+                          {/* Corner notches */}
+                          <div className={`absolute top-1 left-1 w-2 h-2 border-t border-l pointer-events-none ${canPlace ? 'border-emerald-400' : 'border-[#c5a880]/30'}`} />
+                          <div className={`absolute top-1 right-1 w-2 h-2 border-t border-r pointer-events-none ${canPlace ? 'border-emerald-400' : 'border-[#c5a880]/30'}`} />
+                          <div className={`absolute bottom-1 left-1 w-2 h-2 border-b border-l pointer-events-none ${canPlace ? 'border-emerald-400' : 'border-[#c5a880]/30'}`} />
+                          <div className={`absolute bottom-1 right-1 w-2 h-2 border-b border-r pointer-events-none ${canPlace ? 'border-emerald-400' : 'border-[#c5a880]/30'}`} />
+
+                          {/* Inner runic emblem watermark */}
+                          <div className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all shadow-inner ${
+                            canPlace 
+                              ? 'bg-emerald-900/50 border-emerald-400 scale-110 shadow-[0_0_15px_rgba(16,185,129,0.6)]' 
+                              : 'bg-black/45 border-[#c5a880]/20 group-hover:border-amber-400/40'
+                          }`}>
+                            <Swords className={`w-4 h-4 transition-colors ${canPlace ? 'text-emerald-300' : 'text-[#c5a880]/40 group-hover:text-amber-300'}`} />
+                          </div>
+                          <span className={`text-[7.5px] font-mono font-bold uppercase tracking-widest mt-1.5 leading-none ${
+                            canPlace ? 'text-emerald-300 font-black tracking-wider' : 'text-gray-500/70 group-hover:text-amber-200/90'
+                          }`}>
+                            {canPlace ? 'SUMMON HERE' : 'SUMMON SLOT'}
                           </span>
                         </div>
                       )}
@@ -2800,7 +2887,10 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
 
         {/* PLAYER HAND FAN ZONE - animated interactively using state-driven slide-aside positioning */}
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex justify-center items-end h-[170px] z-40 select-none pointer-events-none w-full max-w-[560px] px-2">
-          <div className="flex justify-center items-end relative w-full h-full pointer-events-auto">
+          {/* Hand Tray Velvet Shelf */}
+          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[520px] h-[40px] bg-gradient-to-t from-black/85 via-black/45 to-transparent rounded-t-2xl pointer-events-none z-0 border-t border-[#c5a880]/20 shadow-[0_-4px_20px_rgba(0,0,0,0.6)]" />
+
+          <div className="flex justify-center items-end relative w-full h-full pointer-events-auto z-10">
             {visualState.playerHand.map((card, idx) => {
               const isSelected = selectedHandCardId === card.id;
               
@@ -2808,21 +2898,21 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
               const totalHand = visualState.playerHand.length;
               const middle = (totalHand - 1) / 2;
               const offset = idx - middle;
-              const rotate = offset * 5; 
+              const rotate = offset * 4.5; 
               
               // Dynamic card step based on screen width
               const stepX = typeof window !== 'undefined' && window.innerWidth < 640 ? 38 : 52;
               let translateX = offset * stepX;
               // Push cards slightly down when not hovered, but raise them so they are readable
-              let translateY = Math.abs(offset) * 5 + (isSelected ? -25 : 35);
+              let translateY = Math.abs(offset) * 4 + (isSelected ? -42 : 6);
               let scale = 1.0;
               let zIndex = 10 + idx;
 
               // If a card is hovered, slide other cards aside (Hearthstone style)
               if (hoveredHandCardIndex !== null) {
                 if (hoveredHandCardIndex === idx) {
-                  translateY = -75;
-                  scale = 1.45;
+                  translateY = -70;
+                  scale = 1.4;
                   zIndex = 100;
                 } else if (idx < hoveredHandCardIndex) {
                   translateX -= 35; // Slide left
