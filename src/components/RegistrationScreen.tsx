@@ -107,8 +107,8 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
   return (
     <div 
       style={{
-        paddingTop: 'max(var(--safe-top, 62px), calc(env(safe-area-inset-top, 0px) + 54px))',
-        paddingBottom: 'max(var(--safe-bottom, 16px), calc(env(safe-area-inset-bottom, 0px) + 16px))'
+        paddingTop: 'max(var(--safe-top, 0px), calc(env(safe-area-inset-top, 0px) + 16px))',
+        paddingBottom: 'max(var(--safe-bottom, 0px), calc(env(safe-area-inset-bottom, 0px) + 16px))'
       }}
       className="fixed inset-0 w-full h-[var(--app-height,100dvh)] bg-[#06080d] text-white overflow-x-hidden overflow-y-auto select-none px-3.5 flex flex-col items-center"
     >

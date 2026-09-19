@@ -9,10 +9,11 @@ export function initTelegramViewport() {
   const updateAppHeight = () => {
     try {
       const tg = (window as any).Telegram?.WebApp;
+      const isTg = Boolean(tg?.initData || /Telegram/i.test(navigator.userAgent || ''));
       let height = window.innerHeight;
 
       // In Telegram Mini App, tg.viewportHeight provides the exact visible height inside the sheet
-      if (tg?.viewportHeight && typeof tg.viewportHeight === 'number') {
+      if (isTg && tg?.viewportHeight && typeof tg.viewportHeight === 'number') {
         height = tg.viewportHeight;
       } else if (window.visualViewport?.height) {
         height = window.visualViewport.height;
@@ -20,38 +21,36 @@ export function initTelegramViewport() {
 
       document.documentElement.style.setProperty('--app-height', `${height}px`);
 
-      if (tg?.viewportHeight) {
+      if (isTg && tg?.viewportHeight) {
         document.documentElement.style.setProperty('--tg-viewport-height', `${tg.viewportHeight}px`);
       }
-      if (tg?.viewportStableHeight) {
+      if (isTg && tg?.viewportStableHeight) {
         document.documentElement.style.setProperty('--tg-viewport-stable-height', `${tg.viewportStableHeight}px`);
       }
 
       // Safe area clearance:
-      // In Fullsize / standard mode: Telegram's native title bar ("X Void Covenant ˅ :") is OUTSIDE the webview frame.
-      // Therefore, the webview begins right below the bar and safeTop is 0 (or whatever small device inset applies).
-      // In Fullscreen mode: Telegram's floating close pill [✕] overlays inside the webview, requiring ~50-54px clearance.
+      // Mobile browsers (Chrome, Safari, OKX wallet, etc.): safeTop and safeBottom are 0px!
+      // In Telegram Fullsize / standard mode: native bar is outside webview frame, safeTop is 0px!
+      // In Telegram Fullscreen mode: floating close pill [✕] overlays inside webview, requiring clearance.
       let safeTop = 0;
-      if (tg) {
+      let safeBottom = 0;
+
+      if (isTg && tg) {
         const isFullscreen = Boolean(tg?.isFullscreen);
         const inset = tg?.contentSafeAreaInset?.top ?? tg?.safeAreaInset?.top ?? 0;
         if (isFullscreen) {
           safeTop = inset > 0 ? Math.max(inset + 4, 52) : 52;
         } else {
-          // Standard fullsize sheet: native bar is outside webview frame
           safeTop = inset > 0 ? inset : 0;
         }
-      }
-      document.documentElement.style.setProperty('--safe-top', `${safeTop}px`);
 
-      // Safe bottom clearance for Android 3-button navigation / iOS home bar
-      let safeBottom = 6;
-      if (tg) {
         const bInset = tg?.safeAreaInset?.bottom ?? tg?.contentSafeAreaInset?.bottom;
         if (typeof bInset === 'number' && bInset > 0) {
-          safeBottom = Math.max(6, bInset);
+          safeBottom = Math.max(0, bInset);
         }
       }
+
+      document.documentElement.style.setProperty('--safe-top', `${safeTop}px`);
       document.documentElement.style.setProperty('--safe-bottom', `${safeBottom}px`);
     } catch (e) {
       console.warn('Error updating Telegram viewport height:', e);

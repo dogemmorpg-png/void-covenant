@@ -162,13 +162,13 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
 
   return (
     <div className="h-full w-full overflow-y-auto select-none px-2 sm:px-4 pt-1 pb-4 custom-scrollbar">
-      <div className="max-w-md mx-auto w-full flex flex-col justify-center gap-2">
+      <div className="max-w-md mx-auto w-full flex flex-col gap-1.5">
         
         {/* Unified Majestic Slate Panel */}
         <div 
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
-          className={`rounded-3xl p-3.5 sm:p-4.5 w-full relative overflow-hidden flex flex-col gap-3 border transition-all duration-300 my-2 sm:my-auto ${
+          className={`rounded-3xl p-3.5 sm:p-4.5 w-full relative overflow-hidden flex flex-col gap-3 border transition-all duration-300 my-1 sm:my-auto ${
           isBoss 
             ? 'border-red-900/80 shadow-[0_0_40px_rgba(220,38,38,0.25)] bg-gradient-to-b from-[#2a0e14]/95 via-[#18070b]/95 to-[#0f0406]' 
             : 'border-[#ebd09b]/35 shadow-[0_0_35px_rgba(0,0,0,0.85)] bg-gradient-to-b from-[#241a14]/95 via-[#160f0b]/95 to-[#0e0a07]'

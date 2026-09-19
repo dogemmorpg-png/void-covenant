@@ -9,7 +9,8 @@
     <script>
       (function() {
         try {
-          var tg = window.Telegram && window.Telegram.WebApp;
+          var isTg = Boolean((window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) || /Telegram/i.test(navigator.userAgent || ''));
+          var tg = isTg ? window.Telegram.WebApp : null;
           if (tg) {
             tg.ready();
             tg.expand();
@@ -17,7 +18,10 @@
             var h = tg.viewportHeight || window.innerHeight;
             document.documentElement.style.setProperty('--app-height', h + 'px');
           } else {
-            document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+            var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+            document.documentElement.style.setProperty('--app-height', h + 'px');
+            document.documentElement.style.setProperty('--safe-top', '0px');
+            document.documentElement.style.setProperty('--safe-bottom', '0px');
           }
         } catch(e) {}
       })();
