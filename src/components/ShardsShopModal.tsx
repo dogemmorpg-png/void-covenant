@@ -105,23 +105,17 @@ export const UsdtSymbolIcon: React.FC<{ className?: string }> = ({ className = "
 
 export const SolanaSymbolIcon: React.FC<{ className?: string }> = ({ className = "w-4 h-4" }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M4.5 17.5L7.2 20.2H20.5L17.8 17.5H4.5Z" fill="url(#solGrad1)" />
-    <path d="M4.5 3.8L7.2 6.5H20.5L17.8 3.8H4.5Z" fill="url(#solGrad2)" />
-    <path d="M19.5 10.7L16.8 8H3.5L6.2 10.7H19.5Z" fill="url(#solGrad3)" />
     <defs>
-      <linearGradient id="solGrad1" x1="4.5" y1="18.8" x2="20.5" y2="18.8" gradientUnits="userSpaceOnUse">
-        <stop stopColor="#00FFA3" />
-        <stop offset="1" stopColor="#DC1FFF" />
-      </linearGradient>
-      <linearGradient id="solGrad2" x1="4.5" y1="5.1" x2="20.5" y2="5.1" gradientUnits="userSpaceOnUse">
-        <stop stopColor="#00FFA3" />
-        <stop offset="1" stopColor="#DC1FFF" />
-      </linearGradient>
-      <linearGradient id="solGrad3" x1="3.5" y1="9.3" x2="19.5" y2="9.3" gradientUnits="userSpaceOnUse">
-        <stop stopColor="#00FFA3" />
-        <stop offset="1" stopColor="#DC1FFF" />
+      <linearGradient id="solOfficialGrad" x1="0" y1="24" x2="24" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#00FFA3" />
+        <stop offset="50%" stopColor="#03E1FF" />
+        <stop offset="100%" stopColor="#DC1FFF" />
       </linearGradient>
     </defs>
+    <path
+      fill="url(#solOfficialGrad)"
+      d="m23.8764 18.0313-3.962 4.1393a.9201.9201 0 0 1-.306.2106.9407.9407 0 0 1-.367.0742H.4599a.4689.4689 0 0 1-.2522-.0733.4513.4513 0 0 1-.1696-.1962.4375.4375 0 0 1-.0314-.2545.4438.4438 0 0 1 .117-.2298l3.9649-4.1393a.92.92 0 0 1 .3052-.2102.9407.9407 0 0 1 .3658-.0746H23.54a.4692.4692 0 0 1 .2523.0734.4531.4531 0 0 1 .1697.196.438.438 0 0 1 .0313.2547.4442.4442 0 0 1-.1169.2297zm-3.962-8.3355a.9202.9202 0 0 0-.306-.2106.941.941 0 0 0-.367-.0742H.4599a.4687.4687 0 0 0-.2522.0734.4513.4513 0 0 0-.1696.1961.4376.4376 0 0 0-.0314.2546.444.444 0 0 0 .117.2297l3.9649 4.1394a.9204.9204 0 0 0 .3052.2102c.1154.049.24.0744.3658.0746H23.54a.469.469 0 0 0 .2523-.0734.453.453 0 0 0 .1697-.1961.4382.4382 0 0 0 .0313-.2546.4444.4444 0 0 0-.1169-.2297zM.46 6.7225h18.7815a.9411.9411 0 0 0 .367-.0742.9202.9202 0 0 0 .306-.2106l3.962-4.1394a.4442.4442 0 0 0 .117-.2297.4378.4378 0 0 0-.0314-.2546.453.453 0 0 0-.1697-.196.469.469 0 0 0-.2523-.0734H4.7596a.941.941 0 0 0-.3658.0745.9203.9203 0 0 0-.3052.2102L.1246 5.9687a.4438.4438 0 0 0-.1169.2295.4375.4375 0 0 0 .0312.2544.4512.4512 0 0 0 .1692.196.4689.4689 0 0 0 .2518.0739z"
+    />
   </svg>
 );
 
@@ -1007,7 +1001,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
               />
             </div>
             <div className="min-w-0">
-              <h3 className="font-display font-black text-white text-xs sm:text-sm md:text-base tracking-widest uppercase text-shadow-gold leading-none truncate">
+              <h3 className="font-display font-black text-white text-[11px] sm:text-sm md:text-base tracking-wider uppercase text-shadow-gold leading-none truncate">
                 DARK SHARDS SHOP
               </h3>
               <p className="text-[9px] sm:text-[10px] text-rose-300/80 font-mono mt-1 leading-none truncate">
@@ -1228,7 +1222,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                         disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
                         className="w-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 hover:border-purple-400/50 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn"
                       >
-                        <SolanaSymbolIcon className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
+                        <SolanaSymbolIcon className="w-4 h-4 shrink-0 drop-shadow-[0_0_5px_rgba(3,225,255,0.6)] group-hover/btn:scale-110 transition-transform" />
                         <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight">{(pkg as SolanaPackage).solCost}</span>
                         <span className="text-[10px] sm:text-[11px] font-display font-bold text-purple-400 uppercase tracking-wider">SOL</span>
                       </button>
