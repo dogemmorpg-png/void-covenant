@@ -91,18 +91,14 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
   const openWalletLink = (link?: string) => {
     if (!link) return;
     const now = Date.now();
-    if (now - lastLinkOpenTimeRef.current < 2000) return;
+    if (now - lastLinkOpenTimeRef.current < 2500) return;
     lastLinkOpenTimeRef.current = now;
 
-    if (link.startsWith('http://') || link.startsWith('https://')) {
-      const tg = (window as any).Telegram?.WebApp;
-      if (tg?.openLink) {
-        tg.openLink(link);
-      } else {
-        window.open(link, '_blank');
-      }
+    const tg = (window as any).Telegram?.WebApp;
+    if (tg?.openLink) {
+      tg.openLink(link);
     } else {
-      window.location.href = link;
+      window.open(link, '_blank');
     }
   };
 
@@ -439,10 +435,8 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         });
       } else {
         // External Wallets (Tonkeeper, MyTonWallet, Tonhub, etc.):
-        // Use direct prefilled custom URI scheme. Never open via web universal links or bridge concurrently!
-        const directTonUrl = isKeeper
-          ? `tonkeeper://transfer/${bounceableTreasury}?amount=${nanotons}&text=${encodeURIComponent(pkg.id)}`
-          : `ton://transfer/${bounceableTreasury}?amount=${nanotons}&text=${encodeURIComponent(pkg.id)}`;
+        // Use HTTPS universal transfer link opened via Telegram.WebApp.openLink
+        const directTonUrl = `https://app.tonkeeper.com/transfer/${bounceableTreasury}?amount=${nanotons}&text=${encodeURIComponent(pkg.id)}`;
 
         setPaymentState({
           status: 'signing',
@@ -453,8 +447,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
           directUrl: directTonUrl
         });
 
-        // Open custom protocol scheme directly without loading any web pages
-        window.location.href = directTonUrl;
+        openWalletLink(directTonUrl);
       }
 
       setPaymentState(prev => ({
@@ -611,10 +604,8 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         });
       } else {
         // External Wallets (Tonkeeper, MyTonWallet, Tonhub, etc.):
-        // Use direct prefilled custom URI scheme with jetton parameter.
-        const directUsdtUrl = isKeeper
-          ? `tonkeeper://transfer/${bounceableTreasury}?amount=${jettonUnits}&jetton=${USDT_JETTON_MASTER}&text=${encodeURIComponent(pkg.id)}`
-          : `ton://transfer/${bounceableTreasury}?amount=${jettonUnits}&jetton=${USDT_JETTON_MASTER}&text=${encodeURIComponent(pkg.id)}`;
+        // Use HTTPS universal transfer link with jetton parameter opened via Telegram.WebApp.openLink
+        const directUsdtUrl = `https://app.tonkeeper.com/transfer/${bounceableTreasury}?amount=${jettonUnits}&jetton=${USDT_JETTON_MASTER}&text=${encodeURIComponent(pkg.id)}`;
 
         setPaymentState({
           status: 'signing',
@@ -625,7 +616,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
           directUrl: directUsdtUrl
         });
 
-        window.location.href = directUsdtUrl;
+        openWalletLink(directUsdtUrl);
       }
 
       setPaymentState(prev => ({
