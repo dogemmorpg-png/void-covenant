@@ -9,7 +9,7 @@ import {
   USDT_JETTON_MASTER
 } from '../data/telegramPricing';
 import { buildJettonTransferPayload, getUsdtJettonWalletAddress } from '../utils/tonJettonHelper';
-import { Address } from '@ton/core';
+import { Address, beginCell } from '@ton/core';
 import { 
   X, 
   Wallet, 
@@ -26,7 +26,7 @@ import {
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Transaction, SystemProgram, PublicKey, LAMPORTS_PER_SOL, ComputeBudgetProgram } from '@solana/web3.js';
-import { useTonConnectUI, useTonAddress } from '@tonconnect/ui-react';
+import { useTonConnectUI, useTonAddress, CHAIN } from '@tonconnect/ui-react';
 
 interface ShardsShopModalProps {
   onClose: () => void;
@@ -53,8 +53,6 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
   // Atomic payment lock & timestamp debounce refs to prevent duplicate transaction intents
   const isProcessingPaymentRef = useRef(false);
   const lastPaymentTimeRef = useRef(0);
-  const lastLinkOpenTimeRef = useRef(0);
-  const [showManualOpen, setShowManualOpen] = useState(false);
 
   const isTelegramUser = useMemo(() => {
     if (typeof window === 'undefined') return false;
@@ -75,32 +73,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
     txType?: 'solana' | 'ton' | 'stars';
     selectedCurrency?: 'ton' | 'usdt' | 'stars' | 'solana';
     selectedPkg?: any;
-    directUrl?: string;
   }>({ status: 'idle', message: '' });
-
-  // Guard manual re-open button with delay so user doesn't accidentally double-click
-  useEffect(() => {
-    if (paymentState.status === 'signing' && paymentState.directUrl) {
-      const timer = setTimeout(() => setShowManualOpen(true), 3500);
-      return () => clearTimeout(timer);
-    } else {
-      setShowManualOpen(false);
-    }
-  }, [paymentState.status, paymentState.directUrl]);
-
-  const openWalletLink = (link?: string) => {
-    if (!link) return;
-    const now = Date.now();
-    if (now - lastLinkOpenTimeRef.current < 2500) return;
-    lastLinkOpenTimeRef.current = now;
-
-    const tg = (window as any).Telegram?.WebApp;
-    if (tg?.openLink) {
-      tg.openLink(link);
-    } else {
-      window.open(link, '_blank');
-    }
-  };
 
   // Direct On-Chain Verification Fallback for Solana (PC / External Browser)
   const verifySolanaOnChainDirect = async (signature: string, pkg: SolanaPackage): Promise<boolean> => {
@@ -388,72 +361,39 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
     try {
       const nanotons = Math.floor(pkg.tonCost * 1e9).toString();
       const bounceableTreasury = Address.parse(TON_TREASURY_WALLET_ADDRESS).toString({ bounceable: true });
+      const walletName = tonConnectUI.walletInfo?.name || 'Wallet';
 
-      const appName = (tonConnectUI.walletInfo?.appName || (tonConnectUI.wallet as any)?.device?.appName || '').toLowerCase();
-      const name = (tonConnectUI.walletInfo?.name || '').toLowerCase();
-      const universalLink = (tonConnectUI.walletInfo?.universalLink || '').toLowerCase();
+      setPaymentState({
+        status: 'signing',
+        message: `Please approve the transaction in ${walletName}...`,
+        selectedPkg: pkg,
+        txType: 'ton',
+        selectedCurrency: 'ton'
+      });
 
-      const isKeeper = Boolean(
-        appName.includes('keeper') ||
-        name.includes('keeper') ||
-        (tonConnectUI.wallet as any)?.name?.toLowerCase().includes('keeper')
-      );
+      const commentCell = beginCell()
+        .storeUint(0, 32)
+        .storeStringTail(pkg.id)
+        .endCell();
 
-      const isTgWallet = Boolean(
-        universalLink.includes('t.me/wallet') ||
-        appName === 'telegram-wallet' ||
-        (name === 'wallet' && !name.includes('myton') && !name.includes('keeper'))
-      );
+      const transaction = {
+        validUntil: Math.floor(Date.now() / 1000) + 600,
+        network: CHAIN.MAINNET,
+        messages: [
+          {
+            address: bounceableTreasury,
+            amount: nanotons,
+            payload: commentCell.toBoc().toString('base64')
+          }
+        ]
+      };
 
-      const walletName = tonConnectUI.walletInfo?.name || (isKeeper ? 'Tonkeeper' : isTgWallet ? 'Telegram Wallet' : 'Wallet');
-
-      if (isTgWallet) {
-        // Native Telegram Wallet: uses TonConnect sendTransaction exclusively (opens native Telegram bottom-sheet)
-        setPaymentState({
-          status: 'signing',
-          message: 'Please approve the transaction in Telegram Wallet...',
-          selectedPkg: pkg,
-          txType: 'ton',
-          selectedCurrency: 'ton'
-        });
-
-        const transaction = {
-          validUntil: Math.floor(Date.now() / 1000) + 600,
-          network: '-239' as any,
-          messages: [
-            {
-              address: bounceableTreasury,
-              amount: nanotons
-            }
-          ]
-        };
-
-        await tonConnectUI.sendTransaction(transaction, {
-          returnStrategy: 'none',
-          modals: [],
-          notifications: []
-        });
-      } else {
-        // External Wallets (Tonkeeper, MyTonWallet, Tonhub, etc.):
-        // Use HTTPS universal transfer link opened via Telegram.WebApp.openLink
-        const directTonUrl = `https://app.tonkeeper.com/transfer/${bounceableTreasury}?amount=${nanotons}&text=${encodeURIComponent(pkg.id)}`;
-
-        setPaymentState({
-          status: 'signing',
-          message: `Opening TON transfer in ${walletName}...`,
-          selectedPkg: pkg,
-          txType: 'ton',
-          selectedCurrency: 'ton',
-          directUrl: directTonUrl
-        });
-
-        openWalletLink(directTonUrl);
-      }
+      await tonConnectUI.sendTransaction(transaction);
 
       setPaymentState(prev => ({
         ...prev,
         status: 'verifying',
-        message: `Transfer requested! Verifying on-chain via Toncenter / TonAPI...`
+        message: 'Transfer submitted! Verifying on-chain via Toncenter / TonAPI...'
       }));
 
       let verified = false;
@@ -536,93 +476,54 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
     try {
       const jettonUnits = Math.round(pkg.usdtCost * 1e6).toString();
       const bounceableTreasury = Address.parse(TON_TREASURY_WALLET_ADDRESS).toString({ bounceable: true });
+      const walletName = tonConnectUI.walletInfo?.name || 'Wallet';
 
-      const appName = (tonConnectUI.walletInfo?.appName || (tonConnectUI.wallet as any)?.device?.appName || '').toLowerCase();
-      const name = (tonConnectUI.walletInfo?.name || '').toLowerCase();
-      const universalLink = (tonConnectUI.walletInfo?.universalLink || '').toLowerCase();
+      setPaymentState({
+        status: 'signing',
+        message: 'Resolving your USDT (Jetton) wallet on TON...',
+        selectedPkg: pkg,
+        txType: 'ton',
+        selectedCurrency: 'usdt'
+      });
 
-      const isKeeper = Boolean(
-        appName.includes('keeper') ||
-        name.includes('keeper') ||
-        (tonConnectUI.wallet as any)?.name?.toLowerCase().includes('keeper')
-      );
-
-      const isTgWallet = Boolean(
-        universalLink.includes('t.me/wallet') ||
-        appName === 'telegram-wallet' ||
-        (name === 'wallet' && !name.includes('myton') && !name.includes('keeper'))
-      );
-
-      const walletName = tonConnectUI.walletInfo?.name || (isKeeper ? 'Tonkeeper' : isTgWallet ? 'Telegram Wallet' : 'Wallet');
-
-      if (isTgWallet) {
-        // Native Telegram Wallet: uses TonConnect sendTransaction with Jetton transfer payload
+      const userJettonWallet = await getUsdtJettonWalletAddress(tonAddress);
+      if (!userJettonWallet) {
         setPaymentState({
-          status: 'signing',
-          message: 'Resolving your USDT (Jetton) wallet on TON...',
-          selectedPkg: pkg,
-          txType: 'ton',
-          selectedCurrency: 'usdt'
+          status: 'error',
+          message: 'Could not locate your USDT wallet in TON. Please ensure your wallet holds USDT on TON.'
         });
-
-        const userJettonWallet = await getUsdtJettonWalletAddress(tonAddress);
-        if (!userJettonWallet) {
-          setPaymentState({
-            status: 'error',
-            message: 'Could not locate your USDT wallet in TON. Please ensure your wallet holds USDT on TON.'
-          });
-          toast('USDT wallet not found on TON account', 'error');
-          return;
-        }
-
-        setPaymentState({
-          status: 'signing',
-          message: 'Please approve the USDT transfer in Telegram Wallet...',
-          selectedPkg: pkg,
-          txType: 'ton',
-          selectedCurrency: 'usdt'
-        });
-
-        const payloadBoc = buildJettonTransferPayload(bounceableTreasury, tonAddress, BigInt(jettonUnits));
-
-        const transaction = {
-          validUntil: Math.floor(Date.now() / 1000) + 600,
-          network: '-239' as any,
-          messages: [
-            {
-              address: userJettonWallet,
-              amount: '50000000', // 0.05 TON for network gas fee
-              payload: payloadBoc
-            }
-          ]
-        };
-
-        await tonConnectUI.sendTransaction(transaction, {
-          returnStrategy: 'none',
-          modals: [],
-          notifications: []
-        });
-      } else {
-        // External Wallets (Tonkeeper, MyTonWallet, Tonhub, etc.):
-        // Use HTTPS universal transfer link with jetton parameter opened via Telegram.WebApp.openLink
-        const directUsdtUrl = `https://app.tonkeeper.com/transfer/${bounceableTreasury}?amount=${jettonUnits}&jetton=${USDT_JETTON_MASTER}&text=${encodeURIComponent(pkg.id)}`;
-
-        setPaymentState({
-          status: 'signing',
-          message: `Opening USDT transfer in ${walletName}...`,
-          selectedPkg: pkg,
-          txType: 'ton',
-          selectedCurrency: 'usdt',
-          directUrl: directUsdtUrl
-        });
-
-        openWalletLink(directUsdtUrl);
+        toast('USDT wallet not found on TON account', 'error');
+        return;
       }
+
+      setPaymentState({
+        status: 'signing',
+        message: `Please approve the USDT transfer in ${walletName}...`,
+        selectedPkg: pkg,
+        txType: 'ton',
+        selectedCurrency: 'usdt'
+      });
+
+      const payloadBoc = buildJettonTransferPayload(bounceableTreasury, tonAddress, BigInt(jettonUnits));
+
+      const transaction = {
+        validUntil: Math.floor(Date.now() / 1000) + 600,
+        network: CHAIN.MAINNET,
+        messages: [
+          {
+            address: userJettonWallet,
+            amount: '50000000', // 0.05 TON for network gas fee
+            payload: payloadBoc
+          }
+        ]
+      };
+
+      await tonConnectUI.sendTransaction(transaction);
 
       setPaymentState(prev => ({
         ...prev,
         status: 'verifying',
-        message: `USDT transfer requested! Verifying on-chain via Toncenter / TonAPI...`
+        message: 'USDT transfer submitted! Verifying on-chain via Toncenter / TonAPI...'
       }));
 
       let verified = false;
@@ -1051,14 +952,16 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
               <p className="text-xs text-gray-400 font-sans max-w-xs mx-auto leading-relaxed">
                 {paymentState.message}
               </p>
-              {showManualOpen && paymentState.directUrl && (
+              {paymentState.status === 'signing' && (
                 <button
                   type="button"
-                  onClick={() => openWalletLink(paymentState.directUrl)}
-                  className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-500/30 text-cyan-200 text-xs font-mono font-medium transition-all cursor-pointer shadow-[0_0_12px_rgba(6,182,212,0.2)] active:scale-95 animate-in fade-in duration-300"
+                  onClick={() => {
+                    isProcessingPaymentRef.current = false;
+                    setPaymentState({ status: 'idle', message: '' });
+                  }}
+                  className="mt-2 text-xs text-gray-400 hover:text-gray-200 transition-colors underline cursor-pointer"
                 >
-                  <ExternalLink className="w-3 h-3" />
-                  <span>Didn't open? Tap to re-open {tonConnectUI.walletInfo?.name || 'Wallet'}</span>
+                  Dismiss
                 </button>
               )}
             </div>
@@ -1095,16 +998,6 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                     <span className="text-[11px] text-amber-300 font-sans mt-0.5 block leading-normal">{paymentState.message}</span>
                   </div>
                 </div>
-                {(paymentState.directUrl || tonConnectUI.walletInfo?.universalLink) && (
-                  <button
-                    type="button"
-                    onClick={() => openWalletLink(paymentState.directUrl || tonConnectUI.walletInfo?.universalLink)}
-                    className="self-start mt-1 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-200 text-[10px] font-mono font-bold transition-all cursor-pointer"
-                  >
-                    <ExternalLink className="w-3 h-3" />
-                    <span>Re-open {tonConnectUI.walletInfo?.name || 'Wallet'}</span>
-                  </button>
-                )}
               </div>
             )}
 
