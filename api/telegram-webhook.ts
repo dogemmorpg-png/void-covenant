@@ -119,15 +119,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             .limit(1);
 
           if (globalClaimed && globalClaimed.length > 0) {
-            console.log(`[STARS] Charge ${chargeId} already claimed globally, skipping webhook credit.`);
+            console.log(`[STARS] Charge ${chargeId} already claimed globally, ensuring purchase log.`);
+            await logPurchaseToDatabase(supabase, {
+              walletAddress: globalClaimed[0]?.wallet_address || matchedWallet,
+              packageId: packageId,
+              currency: 'XTR',
+              amount: payment.total_amount,
+              shards: pkg.shards,
+              signature: chargeId,
+              provider: 'stars',
+              status: 'success'
+            });
+            return res.status(200).json({ ok: true, already_claimed: true });
+          }
+
+          if (processed.includes(chargeId)) {
+            console.log(`[STARS] Charge ${chargeId} already in profile, ensuring purchase log.`);
+            await logPurchaseToDatabase(supabase, {
+              walletAddress: matchedWallet,
+              packageId: packageId,
+              currency: 'XTR',
+              amount: payment.total_amount,
+              shards: pkg.shards,
+              signature: chargeId,
+              provider: 'stars',
+              status: 'success'
+            });
             return res.status(200).json({ ok: true, already_claimed: true });
           }
 
           if (!processed.includes(chargeId)) {
-            const currentShards = profileData.darkShards || 0;
-            const updatedShards = currentShards + pkg.shards;
-
-            profileData.darkShards = updatedShards;
             profileData.processedTransactions = [...processed, chargeId];
 
             profileData = recordShardTransaction(

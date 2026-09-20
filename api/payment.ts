@@ -228,16 +228,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
             for (const tx of txs) {
               const chargeId = tx.id;
-              if (!chargeId || processed.includes(chargeId)) continue;
-
-              // Check global anti-replay across all database profiles
-              const { data: globalCheck } = await supabase
-                .from('profiles')
-                .select('wallet_address')
-                .contains('data->processedTransactions', [chargeId])
-                .limit(1);
-
-              if (globalCheck && globalCheck.length > 0) continue;
+              if (!chargeId) continue;
 
               // Only incoming transactions from users
               if (tx.source?.type === 'user') {
@@ -258,10 +249,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 if (isUserMatch && (!packageId || txPackageId === packageId)) {
                   const targetPkg = TELEGRAM_PACKAGES[txPackageId] || (packageId ? TELEGRAM_PACKAGES[packageId] : null);
                   if (targetPkg) {
-                    const currentShards = profileData.darkShards || 0;
-                    const updatedShards = currentShards + targetPkg.shards;
+                    if (processed.includes(chargeId)) {
+                      // Already credited to this profile, ensure purchases table entry exists
+                      await logPurchaseToDatabase(supabase, {
+                        walletAddress: matchedWallet,
+                        packageId: txPackageId || targetPkg.id || 'shards_micro',
+                        currency: 'XTR',
+                        amount: tx.amount || targetPkg.starsCost,
+                        shards: targetPkg.shards,
+                        signature: chargeId,
+                        provider: 'stars',
+                        status: 'success'
+                      });
+                      continue;
+                    }
 
-                    profileData.darkShards = updatedShards;
+                    // Check global anti-replay across all database profiles
+                    const { data: globalCheck } = await supabase
+                      .from('profiles')
+                      .select('wallet_address')
+                      .contains('data->processedTransactions', [chargeId])
+                      .limit(1);
+
+                    if (globalCheck && globalCheck.length > 0) {
+                      await logPurchaseToDatabase(supabase, {
+                        walletAddress: globalCheck[0]?.wallet_address || matchedWallet,
+                        packageId: txPackageId || targetPkg.id || 'shards_micro',
+                        currency: 'XTR',
+                        amount: tx.amount || targetPkg.starsCost,
+                        shards: targetPkg.shards,
+                        signature: chargeId,
+                        provider: 'stars',
+                        status: 'success'
+                      });
+                      continue;
+                    }
+
                     profileData.processedTransactions = [...processed, chargeId];
 
                     profileData = recordShardTransaction(
@@ -337,10 +360,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: `Invalid package ID: ${packageId}` });
       }
 
-      if (!senderAddress || typeof senderAddress !== 'string' || senderAddress.trim().length < 10) {
-        return res.status(400).json({ error: 'Valid sender TON wallet address is required for verification.' });
-      }
-
       const pkg = TELEGRAM_PACKAGES[packageId];
       const isTon = currency === 'ton';
       const isUsdt = currency === 'usdt';
@@ -391,7 +410,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 if (addressesMatch(tt.recipient?.address, TON_TREASURY_WALLET_ADDRESS)) {
                   const amountInTon = Number(tt.amount) / 1e9;
                   if (amountInTon >= pkg.tonCost * 0.98) {
-                    if (addressesMatch(tt.sender?.address, senderAddress)) {
+                    const isSenderMatch = !senderAddress || addressesMatch(tt.sender?.address, senderAddress);
+                    const isCommentMatch = tt.comment === pkg.id || (typeof tt.comment === 'string' && tt.comment.includes(pkg.id));
+                    if (isSenderMatch || isCommentMatch) {
                       isVerified = true;
                       matchedTxHash = ev.event_id || txHash || `ton_${ev.timestamp}`;
                       break;
@@ -403,7 +424,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 if (addressesMatch(jt.recipient?.address, TON_TREASURY_WALLET_ADDRESS)) {
                   const amountInUsdt = Number(jt.amount) / 1e6;
                   if (amountInUsdt >= pkg.usdtCost * 0.98) {
-                    if (addressesMatch(jt.sender?.address, senderAddress)) {
+                    const isSenderMatch = !senderAddress || addressesMatch(jt.sender?.address, senderAddress);
+                    const isCommentMatch = jt.comment === pkg.id || (typeof jt.comment === 'string' && jt.comment.includes(pkg.id));
+                    if (isSenderMatch || isCommentMatch) {
                       isVerified = true;
                       matchedTxHash = ev.event_id || txHash || `usdt_${ev.timestamp}`;
                       break;
@@ -570,10 +593,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Transaction already claimed' });
       }
 
-      const currentShards = profileData.darkShards || 0;
-      const updatedShards = currentShards + pkg.shards;
-
-      profileData.darkShards = updatedShards;
       profileData.processedTransactions = [...processed, matchedTxHash];
 
       profileData = recordShardTransaction(
@@ -617,7 +636,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         success: true,
         message: `Payment verified! +${pkg.shards} Dark Shards added!`,
         shardsAdded: pkg.shards,
-        newDarkShards: updatedShards,
+        newDarkShards: profileData.darkShards || 0,
         txHash: matchedTxHash
       });
     }
@@ -769,7 +788,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
 
-      if (pkg.shards > 0) profile.darkShards = (profile.darkShards || 0) + pkg.shards;
       if (pkg.dust > 0) profile.dust = (profile.dust || 0) + pkg.dust;
       if (pkg.isBp) profile.hasPremiumBp = true;
 
