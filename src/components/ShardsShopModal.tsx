@@ -53,6 +53,18 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
   // Atomic payment lock & timestamp debounce refs to prevent duplicate transaction intents
   const isProcessingPaymentRef = useRef(false);
   const lastPaymentTimeRef = useRef(0);
+  const redirectToWalletRef = useRef<(() => Promise<void>) | null>(null);
+
+  const handleOpenWallet = () => {
+    if (redirectToWalletRef.current) {
+      redirectToWalletRef.current().catch(err => console.warn('Wallet redirect error:', err));
+    }
+    const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
+    const info = tonConnectUI.walletInfo;
+    if (tg?.openLink && info && 'universalLink' in info && !info.universalLink.includes('t.me')) {
+      tg.openLink(info.universalLink);
+    }
+  };
 
   const isTelegramUser = useMemo(() => {
     if (typeof window === 'undefined') return false;
@@ -388,7 +400,14 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         ]
       };
 
-      await tonConnectUI.sendTransaction(transaction);
+      await tonConnectUI.sendTransaction(transaction, {
+        returnStrategy: 'none',
+        modals: [],
+        notifications: [],
+        onRequestSent: (redirectToWallet) => {
+          redirectToWalletRef.current = redirectToWallet;
+        }
+      });
 
       setPaymentState(prev => ({
         ...prev,
@@ -438,18 +457,55 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       console.error('TON purchase error:', err);
       const rawMsg = err?.info || err?.message || String(err || '');
       const isReject = rawMsg.includes('Reject') || rawMsg.includes('cancel') || rawMsg.includes('declined') || rawMsg.includes('UserRejectsError');
-      const isSdkErr = rawMsg.includes('[TON_CONNECT_SDK_ERROR]');
-      let displayMsg = rawMsg;
+      
       if (isReject) {
-        displayMsg = 'Transaction was cancelled in wallet.';
-      } else if (isSdkErr) {
-        displayMsg = 'Wallet closed or rejected the transaction. Please ensure your wallet is open, has enough TON for gas, and approve when prompted.';
+        setPaymentState({
+          status: 'idle',
+          message: 'Transaction was cancelled in wallet.'
+        });
+        toast('Transaction cancelled', 'info');
+        return;
       }
-      setPaymentState({
-        status: isReject ? 'idle' : 'error',
-        message: displayMsg || 'TON payment failed.'
-      });
-      toast(isReject ? 'Transaction cancelled' : (displayMsg || 'Payment failed'), isReject ? 'info' : 'error');
+
+      // Check on-chain before declaring failure
+      setPaymentState(prev => ({
+        ...prev,
+        status: 'verifying',
+        message: 'Checking on-chain confirmation on TON blockchain...'
+      }));
+
+      let verified = false;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        const res = await verifyTonPayment(pkg.id, 'ton', undefined, tonAddress);
+        if (res.success) {
+          verified = true;
+          setPaymentState({
+            status: 'success',
+            message: `TON payment confirmed! +${pkg.shardsReward} Dark Shards added!`,
+            selectedPkg: pkg,
+            txType: 'ton',
+            selectedCurrency: 'ton'
+          });
+          toast(`Payment confirmed! +${pkg.shardsReward} Dark Shards added!`, 'success');
+          if (refreshProfile) await refreshProfile();
+          break;
+        }
+        if (attempt < 3) {
+          await new Promise(r => setTimeout(r, 2000));
+        }
+      }
+
+      if (!verified) {
+        setPaymentState(prev => ({
+          ...prev,
+          status: 'pending',
+          message: 'Waiting for on-chain block confirmation. If you confirmed the payment in your wallet, click RETRY VERIFICATION below.',
+          selectedPkg: pkg,
+          txType: 'ton',
+          selectedCurrency: 'ton'
+        }));
+        toast('Awaiting on-chain confirmation. Click Retry Verification if needed.', 'info');
+      }
     } finally {
       isProcessingPaymentRef.current = false;
     }
@@ -518,7 +574,14 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         ]
       };
 
-      await tonConnectUI.sendTransaction(transaction);
+      await tonConnectUI.sendTransaction(transaction, {
+        returnStrategy: 'none',
+        modals: [],
+        notifications: [],
+        onRequestSent: (redirectToWallet) => {
+          redirectToWalletRef.current = redirectToWallet;
+        }
+      });
 
       setPaymentState(prev => ({
         ...prev,
@@ -568,18 +631,55 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       console.error('USDT purchase error:', err);
       const rawMsg = err?.info || err?.message || String(err || '');
       const isReject = rawMsg.includes('Reject') || rawMsg.includes('cancel') || rawMsg.includes('declined') || rawMsg.includes('UserRejectsError');
-      const isSdkErr = rawMsg.includes('[TON_CONNECT_SDK_ERROR]');
-      let displayMsg = rawMsg;
+      
       if (isReject) {
-        displayMsg = 'Transaction was cancelled in wallet.';
-      } else if (isSdkErr) {
-        displayMsg = 'Wallet closed or rejected the transaction. Please ensure your wallet is open, has enough TON for gas, and approve when prompted.';
+        setPaymentState({
+          status: 'idle',
+          message: 'Transaction was cancelled in wallet.'
+        });
+        toast('Transaction cancelled', 'info');
+        return;
       }
-      setPaymentState({
-        status: isReject ? 'idle' : 'error',
-        message: displayMsg || 'USDT payment failed.'
-      });
-      toast(isReject ? 'Transaction cancelled' : (displayMsg || 'Payment failed'), isReject ? 'info' : 'error');
+
+      // Check on-chain before declaring failure
+      setPaymentState(prev => ({
+        ...prev,
+        status: 'verifying',
+        message: 'Checking USDT on-chain confirmation on TON blockchain...'
+      }));
+
+      let verified = false;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        const res = await verifyTonPayment(pkg.id, 'usdt', undefined, tonAddress);
+        if (res.success) {
+          verified = true;
+          setPaymentState({
+            status: 'success',
+            message: `USDT payment confirmed! +${pkg.shardsReward} Dark Shards added!`,
+            selectedPkg: pkg,
+            txType: 'ton',
+            selectedCurrency: 'usdt'
+          });
+          toast(`+${pkg.shardsReward} Dark Shards added!`, 'success');
+          if (refreshProfile) await refreshProfile();
+          break;
+        }
+        if (attempt < 3) {
+          await new Promise(r => setTimeout(r, 2000));
+        }
+      }
+
+      if (!verified) {
+        setPaymentState(prev => ({
+          ...prev,
+          status: 'pending',
+          message: 'Waiting for USDT block confirmation. If you confirmed the payment in your wallet, click RETRY VERIFICATION below.',
+          selectedPkg: pkg,
+          txType: 'ton',
+          selectedCurrency: 'usdt'
+        }));
+        toast('Awaiting on-chain confirmation. Click Retry Verification if needed.', 'info');
+      }
     } finally {
       isProcessingPaymentRef.current = false;
     }
@@ -953,16 +1053,28 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                 {paymentState.message}
               </p>
               {paymentState.status === 'signing' && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    isProcessingPaymentRef.current = false;
-                    setPaymentState({ status: 'idle', message: '' });
-                  }}
-                  className="mt-2 text-xs text-gray-400 hover:text-gray-200 transition-colors underline cursor-pointer"
-                >
-                  Dismiss
-                </button>
+                <div className="flex flex-col items-center gap-2 mt-3 w-full max-w-xs mx-auto">
+                  {paymentState.txType === 'ton' && tonConnectUI.walletInfo && !tonConnectUI.walletInfo.universalLink?.includes('t.me') && (
+                    <button
+                      type="button"
+                      onClick={handleOpenWallet}
+                      className="w-full py-2.5 px-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-display font-black text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-[0_0_15px_rgba(6,182,212,0.4)] active:scale-95 flex items-center justify-center gap-2"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Open {tonConnectUI.walletInfo.name || 'Tonkeeper'}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      isProcessingPaymentRef.current = false;
+                      setPaymentState({ status: 'idle', message: '' });
+                    }}
+                    className="mt-1 text-xs text-gray-400 hover:text-gray-200 transition-colors underline cursor-pointer"
+                  >
+                    Dismiss
+                  </button>
+                </div>
               )}
             </div>
           </div>

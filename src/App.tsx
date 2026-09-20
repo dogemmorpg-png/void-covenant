@@ -595,7 +595,10 @@ export default function App() {
         manifestUrl={tonManifestUrl}
         uiPreferences={{ theme: THEME.DARK }}
         actionsConfiguration={{
-          twaReturnUrl: 'https://t.me/voidcovenantbot/voidcovenant'
+          twaReturnUrl: 'https://t.me/voidcovenantbot/voidcovenant',
+          returnStrategy: 'none',
+          modals: [],
+          notifications: []
         }}
       >
         <ToastProvider>
