@@ -56,8 +56,16 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
   const redirectToWalletRef = useRef<(() => Promise<void>) | null>(null);
 
   const handleOpenWallet = () => {
-    if (redirectToWalletRef.current) {
+    const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
+    const universalLink = tonConnectUI.walletInfo?.universalLink;
+    const deepLink = (tonConnectUI.walletInfo as any)?.deepLink;
+
+    if (tg?.openLink && universalLink && !universalLink.includes('t.me')) {
+      tg.openLink(universalLink);
+    } else if (redirectToWalletRef.current) {
       redirectToWalletRef.current().catch(err => console.warn('Wallet redirect error:', err));
+    } else if (deepLink && typeof window !== 'undefined') {
+      window.location.href = deepLink;
     }
   };
 
@@ -401,6 +409,11 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         notifications: [],
         onRequestSent: (redirectToWallet) => {
           redirectToWalletRef.current = redirectToWallet;
+          const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
+          const uLink = tonConnectUI.walletInfo?.universalLink;
+          if (tg?.openLink && uLink && !uLink.includes('t.me')) {
+            tg.openLink(uLink);
+          }
         }
       });
 
@@ -575,6 +588,11 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         notifications: [],
         onRequestSent: (redirectToWallet) => {
           redirectToWalletRef.current = redirectToWallet;
+          const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
+          const uLink = tonConnectUI.walletInfo?.universalLink;
+          if (tg?.openLink && uLink && !uLink.includes('t.me')) {
+            tg.openLink(uLink);
+          }
         }
       });
 
