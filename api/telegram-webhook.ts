@@ -2,7 +2,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import { recordShardTransaction } from './_shared/shardLogger.js';
-import { logPurchaseToDatabase } from './_shared/purchaseLogger.js';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -87,7 +86,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         const { data: rows } = await supabase
           .from('profiles')
-          .select('data, updated_at')
+          .select('data')
           .eq('wallet_address', walletAddress)
           .limit(1);
 
@@ -97,7 +96,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           const altWallet = walletAddress.startsWith('tg_') ? walletAddress.slice(3) : `tg_${walletAddress}`;
           const { data: altRows } = await supabase
             .from('profiles')
-            .select('data, updated_at')
+            .select('data')
             .eq('wallet_address', altWallet)
             .limit(1);
           if (altRows && altRows.length > 0) {
@@ -109,57 +108,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (profileRow) {
           const profileData = profileRow.data || {};
           const processed = profileData.processedTransactions || [];
-          const oldUpdatedAt = profileRow.updated_at;
-
-          // Global anti-replay check across ALL profiles in the database
-          const { data: globalClaimed } = await supabase
-            .from('profiles')
-            .select('wallet_address')
-            .contains('data', { processedTransactions: [chargeId] })
-            .limit(1);
-
-          if (globalClaimed && globalClaimed.length > 0) {
-            console.log(`[STARS] Charge ${chargeId} already claimed globally, ensuring purchase log.`);
-            await logPurchaseToDatabase(supabase, {
-              walletAddress: globalClaimed[0]?.wallet_address || matchedWallet,
-              packageId: packageId,
-              currency: 'XTR',
-              amount: payment.total_amount,
-              shards: pkg.shards,
-              signature: chargeId,
-              provider: 'stars',
-              status: 'success'
-            });
-            return res.status(200).json({ ok: true, already_claimed: true });
-          }
-
-          if (processed.includes(chargeId)) {
-            console.log(`[STARS] Charge ${chargeId} already in profile, ensuring purchase log.`);
-            await logPurchaseToDatabase(supabase, {
-              walletAddress: matchedWallet,
-              packageId: packageId,
-              currency: 'XTR',
-              amount: payment.total_amount,
-              shards: pkg.shards,
-              signature: chargeId,
-              provider: 'stars',
-              status: 'success'
-            });
-            return res.status(200).json({ ok: true, already_claimed: true });
-          }
 
           if (!processed.includes(chargeId)) {
+            const currentShards = profileData.darkShards || 0;
+            const updatedShards = currentShards + pkg.shards;
+
+            profileData.darkShards = updatedShards;
             profileData.processedTransactions = [...processed, chargeId];
 
-            profileData = recordShardTransaction(
-              profileData,
-              'SHOP_PURCHASE',
-              pkg.shards,
-              `Telegram Stars purchase (webhook): ${pkg.name} (${payment.total_amount} XTR, Charge: ${chargeId})`,
-              { chargeId, amount: payment.total_amount, currency: 'XTR' }
-            );
-
-            const { error: updateErr } = await supabase
+            await supabase
               .from('profiles')
               .update({
                 data: profileData,
@@ -167,24 +124,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               })
               .eq('wallet_address', matchedWallet);
 
-            if (updateErr) {
-              console.error('[STARS] Webhook profile update error:', updateErr);
-              return res.status(200).json({ ok: false, error: updateErr.message });
-            }
+            // Log ledger entry
+            await recordShardTransaction(
+              supabase,
+              matchedWallet,
+              'STARS_PURCHASE',
+              pkg.shards,
+              updatedShards,
+              `Telegram Stars purchase: ${pkg.name} (${payment.total_amount} XTR, Charge: ${chargeId})`
+            );
 
-            // Unified purchase ledger in purchases table
-            await logPurchaseToDatabase(supabase, {
-              walletAddress: matchedWallet,
-              packageId: packageId,
-              currency: 'XTR',
-              amount: payment.total_amount,
-              shards: pkg.shards,
-              signature: chargeId,
-              provider: 'stars',
-              status: 'success'
-            });
-
-            console.log(`[STARS] Successfully credited ${pkg.shards} shards to ${matchedWallet} and logged to purchases`);
+            console.log(`[STARS] Successfully credited ${pkg.shards} shards to ${matchedWallet}`);
           }
         }
       }

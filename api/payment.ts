@@ -3,7 +3,6 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
 import { recordShardTransaction } from './_shared/shardLogger.js';
-import { logPurchaseToDatabase } from './_shared/purchaseLogger.js';
 import { Address, Cell } from '@ton/core';
 
 const jwt = (jwtPkg as any).default || jwtPkg;
@@ -37,9 +36,8 @@ const SOLANA_PACKAGES: Record<string, { solCost: number; shards: number; dust: n
 };
 
 // Packages for Telegram (Stars, TON, USDT)
-const TELEGRAM_PACKAGES: Record<string, { id: string; shards: number; starsCost: number; tonCost: number; usdtCost: number; name: string; description: string }> = {
+const TELEGRAM_PACKAGES: Record<string, { shards: number; starsCost: number; tonCost: number; usdtCost: number; name: string; description: string }> = {
   shards_micro: {
-    id: 'shards_micro',
     name: 'Pouch of Shards',
     shards: 25,
     starsCost: 1,
@@ -48,7 +46,6 @@ const TELEGRAM_PACKAGES: Record<string, { id: string; shards: number; starsCost:
     description: 'Instant credit: 25 pure Dark Shards.'
   },
   shards_pouch: {
-    id: 'shards_pouch',
     name: 'Dark Shard Chest',
     shards: 85,
     starsCost: 5,
@@ -57,7 +54,6 @@ const TELEGRAM_PACKAGES: Record<string, { id: string; shards: number; starsCost:
     description: 'Instant credit: 85 pure Dark Shards.'
   },
   shards_vault: {
-    id: 'shards_vault',
     name: 'Abyssal Treasury',
     shards: 250,
     starsCost: 15,
@@ -66,7 +62,6 @@ const TELEGRAM_PACKAGES: Record<string, { id: string; shards: number; starsCost:
     description: 'Instant credit: 250 pure Dark Shards.'
   },
   shards_overlord: {
-    id: 'shards_overlord',
     name: 'Lord of the Void Vault',
     shards: 700,
     starsCost: 30,
@@ -191,7 +186,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const { data: rows } = await supabase
         .from('profiles')
-        .select('data, updated_at')
+        .select('data')
         .eq('wallet_address', walletAddress)
         .limit(1);
 
@@ -201,7 +196,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const altWallet = walletAddress.startsWith('tg_') ? walletAddress.slice(3) : `tg_${walletAddress}`;
         const { data: altRows } = await supabase
           .from('profiles')
-          .select('data, updated_at')
+          .select('data')
           .eq('wallet_address', altWallet)
           .limit(1);
         if (altRows && altRows.length > 0) {
@@ -216,7 +211,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const profileData = profileRow.data || {};
       const processed = profileData.processedTransactions || [];
-      const oldUpdatedAt = profileRow.updated_at;
 
       let newlyCredited = false;
       let shardsAdded = 0;
@@ -232,7 +226,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
             for (const tx of txs) {
               const chargeId = tx.id;
-              if (!chargeId) continue;
+              if (!chargeId || processed.includes(chargeId)) continue;
 
               // Only incoming transactions from users
               if (tx.source?.type === 'user') {
@@ -253,53 +247,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 if (isUserMatch && (!packageId || txPackageId === packageId)) {
                   const targetPkg = TELEGRAM_PACKAGES[txPackageId] || (packageId ? TELEGRAM_PACKAGES[packageId] : null);
                   if (targetPkg) {
-                    if (processed.includes(chargeId)) {
-                      // Already credited to this profile, ensure purchases table entry exists
-                      await logPurchaseToDatabase(supabase, {
-                        walletAddress: matchedWallet,
-                        packageId: txPackageId || targetPkg.id || 'shards_micro',
-                        currency: 'XTR',
-                        amount: tx.amount || targetPkg.starsCost,
-                        shards: targetPkg.shards,
-                        signature: chargeId,
-                        provider: 'stars',
-                        status: 'success'
-                      });
-                      continue;
-                    }
+                    const currentShards = profileData.darkShards || 0;
+                    const updatedShards = currentShards + targetPkg.shards;
 
-                    // Check global anti-replay across all database profiles
-                    const { data: globalCheck } = await supabase
-                      .from('profiles')
-                      .select('wallet_address')
-                      .contains('data', { processedTransactions: [chargeId] })
-                      .limit(1);
-
-                    if (globalCheck && globalCheck.length > 0) {
-                      await logPurchaseToDatabase(supabase, {
-                        walletAddress: globalCheck[0]?.wallet_address || matchedWallet,
-                        packageId: txPackageId || targetPkg.id || 'shards_micro',
-                        currency: 'XTR',
-                        amount: tx.amount || targetPkg.starsCost,
-                        shards: targetPkg.shards,
-                        signature: chargeId,
-                        provider: 'stars',
-                        status: 'success'
-                      });
-                      continue;
-                    }
-
+                    profileData.darkShards = updatedShards;
                     profileData.processedTransactions = [...processed, chargeId];
 
-                    profileData = recordShardTransaction(
-                      profileData,
-                      'SHOP_PURCHASE',
-                      targetPkg.shards,
-                      `Telegram Stars purchase: ${targetPkg.name} (${tx.amount} XTR, Charge: ${chargeId})`,
-                      { chargeId, amount: tx.amount, currency: 'XTR' }
-                    );
-
-                    const { error: updateErr } = await supabase
+                    await supabase
                       .from('profiles')
                       .update({
                         data: profileData,
@@ -307,22 +261,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                       })
                       .eq('wallet_address', matchedWallet);
 
-                    if (updateErr) {
-                      console.error('[STARS] Profile update error:', updateErr);
-                      continue;
-                    }
-
-                    // Record to unified purchases ledger table
-                    await logPurchaseToDatabase(supabase, {
-                      walletAddress: matchedWallet,
-                      packageId: txPackageId || packageId || 'unknown_stars_pkg',
-                      currency: 'XTR',
-                      amount: tx.amount || targetPkg.starsCost,
-                      shards: targetPkg.shards,
-                      signature: chargeId,
-                      provider: 'stars',
-                      status: 'success'
-                    });
+                    await recordShardTransaction(
+                      supabase,
+                      matchedWallet,
+                      'STARS_PURCHASE',
+                      targetPkg.shards,
+                      updatedShards,
+                      `Telegram Stars purchase: ${targetPkg.name} (${tx.amount} XTR, Charge: ${chargeId})`
+                    );
 
                     newlyCredited = true;
                     shardsAdded = targetPkg.shards;
@@ -373,7 +319,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const { data: existingProfiles } = await supabase
           .from('profiles')
           .select('wallet_address')
-          .contains('data', { processedTransactions: [txHash] })
+          .contains('data->processedTransactions', [txHash])
           .limit(1);
 
         if (existingProfiles && existingProfiles.length > 0) {
@@ -409,9 +355,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 if (addressesMatch(tt.recipient?.address, TON_TREASURY_WALLET_ADDRESS)) {
                   const amountInTon = Number(tt.amount) / 1e9;
                   if (amountInTon >= pkg.tonCost * 0.98) {
-                    const isSenderMatch = Boolean(senderAddress && addressesMatch(tt.sender?.address, senderAddress));
-                    const isCommentMatch = Boolean(packageId && tt.comment && (tt.comment === packageId || (typeof tt.comment === 'string' && tt.comment.includes(packageId))));
-                    if (isSenderMatch || isCommentMatch) {
+                    if (!senderAddress || addressesMatch(tt.sender?.address, senderAddress)) {
                       isVerified = true;
                       matchedTxHash = ev.event_id || txHash || `ton_${ev.timestamp}`;
                       break;
@@ -423,9 +367,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 if (addressesMatch(jt.recipient?.address, TON_TREASURY_WALLET_ADDRESS)) {
                   const amountInUsdt = Number(jt.amount) / 1e6;
                   if (amountInUsdt >= pkg.usdtCost * 0.98) {
-                    const isSenderMatch = Boolean(senderAddress && addressesMatch(jt.sender?.address, senderAddress));
-                    const isCommentMatch = Boolean(packageId && jt.comment && (jt.comment === packageId || (typeof jt.comment === 'string' && jt.comment.includes(packageId))));
-                    if (isSenderMatch || isCommentMatch) {
+                    if (!senderAddress || addressesMatch(jt.sender?.address, senderAddress)) {
                       isVerified = true;
                       matchedTxHash = ev.event_id || txHash || `usdt_${ev.timestamp}`;
                       break;
@@ -562,21 +504,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      // Check global anti-replay across ALL profiles in the database
-      const { data: globalClaimed } = await supabase
-        .from('profiles')
-        .select('wallet_address')
-        .contains('data', { processedTransactions: [matchedTxHash] })
-        .limit(1);
-
-      if (globalClaimed && globalClaimed.length > 0) {
-        return res.status(400).json({ error: 'This transaction has already been claimed and credited to an account.' });
-      }
-
       // Credit Shards
       const { data: rows } = await supabase
         .from('profiles')
-        .select('data, updated_at')
+        .select('data')
         .eq('wallet_address', walletAddress)
         .limit(1);
 
@@ -591,17 +522,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Transaction already claimed' });
       }
 
+      const currentShards = profileData.darkShards || 0;
+      const updatedShards = currentShards + pkg.shards;
+
+      profileData.darkShards = updatedShards;
       profileData.processedTransactions = [...processed, matchedTxHash];
 
-      profileData = recordShardTransaction(
-        profileData,
-        'SHOP_PURCHASE',
-        pkg.shards,
-        `Purchased ${pkg.name} via ${isTon ? 'TON' : 'USDT'} (TX: ${matchedTxHash})`,
-        { txHash: matchedTxHash, currency: isTon ? 'TON' : 'USDT', amount: isTon ? pkg.tonCost : pkg.usdtCost }
-      );
-
-      const { error: updateErr } = await supabase
+      await supabase
         .from('profiles')
         .update({
           data: profileData,
@@ -609,28 +536,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         })
         .eq('wallet_address', walletAddress);
 
-      if (updateErr) {
-        console.error('TON update error:', updateErr);
-        return res.status(500).json({ error: 'Failed to update profile' });
-      }
-
-      // Record to unified purchases ledger table
-      await logPurchaseToDatabase(supabase, {
-        walletAddress: walletAddress,
-        packageId: packageId,
-        currency: isTon ? 'TON' : 'USDT',
-        amount: isTon ? pkg.tonCost : pkg.usdtCost,
-        shards: pkg.shards,
-        signature: matchedTxHash,
-        provider: 'ton',
-        status: 'success'
-      });
+      await recordShardTransaction(
+        supabase,
+        walletAddress,
+        isTon ? 'TON_PURCHASE' : 'USDT_PURCHASE',
+        pkg.shards,
+        updatedShards,
+        `Purchased ${pkg.name} via ${isTon ? 'TON' : 'USDT'} (TX: ${matchedTxHash})`
+      );
 
       return res.status(200).json({
         success: true,
         message: `Payment verified! +${pkg.shards} Dark Shards added!`,
         shardsAdded: pkg.shards,
-        newDarkShards: profileData.darkShards || 0,
+        newDarkShards: updatedShards,
         txHash: matchedTxHash
       });
     }
@@ -782,6 +701,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
 
+      if (pkg.shards > 0) profile.darkShards = (profile.darkShards || 0) + pkg.shards;
       if (pkg.dust > 0) profile.dust = (profile.dust || 0) + pkg.dust;
       if (pkg.isBp) profile.hasPremiumBp = true;
 
@@ -789,35 +709,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!profile.username) profile.username = `Lord_${walletAddress.slice(0, 4)}`;
       profile.processedTransactions = [...processedTxList, signature];
 
-      profile = recordShardTransaction(
-        profile,
-        'SHOP_PURCHASE',
-        pkg.shards,
-        `Purchased ${pkg.name || packageId} via Solana (TX: ${signature})`,
-        { signature, amount: pkg.solCost, currency: 'SOL' }
-      );
-
-      const { error: updateError } = await supabase
+      let updateQuery = supabase
         .from('profiles')
         .update({ data: profile, updated_at: new Date().toISOString() })
         .eq('wallet_address', walletAddress);
 
-      if (updateError) {
-        console.warn('Verify payment update error on attempt', attempts, updateError);
+      if (oldUpdatedAt) {
+        updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
+      }
+
+      const { data: updateResult, error: updateError } = await updateQuery.select('wallet_address');
+
+      if (updateError || !updateResult || updateResult.length === 0) {
+        console.warn('Verify payment OCC conflict on attempt', attempts);
         continue;
       }
 
-      // Record to unified purchases ledger table
-      await logPurchaseToDatabase(supabase, {
-        walletAddress: walletAddress,
-        packageId: packageId,
-        currency: 'SOL',
-        amount: pkg.solCost,
-        shards: pkg.shards,
-        signature: signature,
-        provider: 'solana',
-        status: 'success'
-      });
+      await supabase
+        .from('purchases')
+        .insert({
+          wallet_address: walletAddress,
+          package_id: packageId,
+          sol_amount: pkg.solCost,
+          shards_amount: pkg.shards,
+          signature: signature,
+          status: 'success'
+        });
 
       success = true;
       finalProfile = profile;
