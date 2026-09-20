@@ -532,8 +532,17 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       };
 
       await tonConnectUI.sendTransaction(transaction, {
+        returnStrategy: 'back',
         modals: [],
-        notifications: []
+        notifications: [],
+        onRequestSent: (redirectToWallet) => {
+          redirectToWalletRef.current = redirectToWallet;
+          const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
+          const uLink = tonConnectUI.walletInfo?.universalLink;
+          if (tg?.openLink && uLink && !uLink.includes('t.me')) {
+            tg.openLink(uLink);
+          }
+        }
       });
 
       setPaymentState(prev => ({
@@ -700,8 +709,17 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       };
 
       await tonConnectUI.sendTransaction(transaction, {
+        returnStrategy: 'back',
         modals: [],
-        notifications: []
+        notifications: [],
+        onRequestSent: (redirectToWallet) => {
+          redirectToWalletRef.current = redirectToWallet;
+          const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
+          const uLink = tonConnectUI.walletInfo?.universalLink;
+          if (tg?.openLink && uLink && !uLink.includes('t.me')) {
+            tg.openLink(uLink);
+          }
+        }
       });
 
       setPaymentState(prev => ({

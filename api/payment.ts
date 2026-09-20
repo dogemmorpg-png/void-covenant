@@ -37,8 +37,9 @@ const SOLANA_PACKAGES: Record<string, { solCost: number; shards: number; dust: n
 };
 
 // Packages for Telegram (Stars, TON, USDT)
-const TELEGRAM_PACKAGES: Record<string, { shards: number; starsCost: number; tonCost: number; usdtCost: number; name: string; description: string }> = {
+const TELEGRAM_PACKAGES: Record<string, { id: string; shards: number; starsCost: number; tonCost: number; usdtCost: number; name: string; description: string }> = {
   shards_micro: {
+    id: 'shards_micro',
     name: 'Pouch of Shards',
     shards: 25,
     starsCost: 1,
@@ -47,6 +48,7 @@ const TELEGRAM_PACKAGES: Record<string, { shards: number; starsCost: number; ton
     description: 'Instant credit: 25 pure Dark Shards.'
   },
   shards_pouch: {
+    id: 'shards_pouch',
     name: 'Dark Shard Chest',
     shards: 85,
     starsCost: 5,
@@ -55,6 +57,7 @@ const TELEGRAM_PACKAGES: Record<string, { shards: number; starsCost: number; ton
     description: 'Instant credit: 85 pure Dark Shards.'
   },
   shards_vault: {
+    id: 'shards_vault',
     name: 'Abyssal Treasury',
     shards: 250,
     starsCost: 15,
@@ -63,6 +66,7 @@ const TELEGRAM_PACKAGES: Record<string, { shards: number; starsCost: number; ton
     description: 'Instant credit: 250 pure Dark Shards.'
   },
   shards_overlord: {
+    id: 'shards_overlord',
     name: 'Lord of the Void Vault',
     shards: 700,
     starsCost: 30,
@@ -268,7 +272,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     const { data: globalCheck } = await supabase
                       .from('profiles')
                       .select('wallet_address')
-                      .contains('data->processedTransactions', [chargeId])
+                      .contains('data', { processedTransactions: [chargeId] })
                       .limit(1);
 
                     if (globalCheck && globalCheck.length > 0) {
@@ -295,7 +299,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                       { chargeId, amount: tx.amount, currency: 'XTR' }
                     );
 
-                    let updateQuery = supabase
+                    const { error: updateErr } = await supabase
                       .from('profiles')
                       .update({
                         data: profileData,
@@ -303,13 +307,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                       })
                       .eq('wallet_address', matchedWallet);
 
-                    if (oldUpdatedAt) {
-                      updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
-                    }
-
-                    const { data: updateRes, error: updateErr } = await updateQuery.select('wallet_address');
-                    if (updateErr || !updateRes || updateRes.length === 0) {
-                      console.log('[STARS] OCC write conflict, already updated concurrently.');
+                    if (updateErr) {
+                      console.error('[STARS] Profile update error:', updateErr);
                       continue;
                     }
 
@@ -374,7 +373,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const { data: existingProfiles } = await supabase
           .from('profiles')
           .select('wallet_address')
-          .contains('data->processedTransactions', [txHash])
+          .contains('data', { processedTransactions: [txHash] })
           .limit(1);
 
         if (existingProfiles && existingProfiles.length > 0) {
@@ -410,8 +409,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 if (addressesMatch(tt.recipient?.address, TON_TREASURY_WALLET_ADDRESS)) {
                   const amountInTon = Number(tt.amount) / 1e9;
                   if (amountInTon >= pkg.tonCost * 0.98) {
-                    const isSenderMatch = !senderAddress || addressesMatch(tt.sender?.address, senderAddress);
-                    const isCommentMatch = tt.comment === pkg.id || (typeof tt.comment === 'string' && tt.comment.includes(pkg.id));
+                    const isSenderMatch = Boolean(senderAddress && addressesMatch(tt.sender?.address, senderAddress));
+                    const isCommentMatch = Boolean(packageId && tt.comment && (tt.comment === packageId || (typeof tt.comment === 'string' && tt.comment.includes(packageId))));
                     if (isSenderMatch || isCommentMatch) {
                       isVerified = true;
                       matchedTxHash = ev.event_id || txHash || `ton_${ev.timestamp}`;
@@ -424,8 +423,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 if (addressesMatch(jt.recipient?.address, TON_TREASURY_WALLET_ADDRESS)) {
                   const amountInUsdt = Number(jt.amount) / 1e6;
                   if (amountInUsdt >= pkg.usdtCost * 0.98) {
-                    const isSenderMatch = !senderAddress || addressesMatch(jt.sender?.address, senderAddress);
-                    const isCommentMatch = jt.comment === pkg.id || (typeof jt.comment === 'string' && jt.comment.includes(pkg.id));
+                    const isSenderMatch = Boolean(senderAddress && addressesMatch(jt.sender?.address, senderAddress));
+                    const isCommentMatch = Boolean(packageId && jt.comment && (jt.comment === packageId || (typeof jt.comment === 'string' && jt.comment.includes(packageId))));
                     if (isSenderMatch || isCommentMatch) {
                       isVerified = true;
                       matchedTxHash = ev.event_id || txHash || `usdt_${ev.timestamp}`;
@@ -470,7 +469,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               if (inMsg && addressesMatch(inMsg.destination, TON_TREASURY_WALLET_ADDRESS)) {
                 const amountInTon = Number(inMsg.value) / 1e9;
                 if (amountInTon >= pkg.tonCost * 0.98) {
-                  if (addressesMatch(inMsg.source, senderAddress)) {
+                  if (!senderAddress || addressesMatch(inMsg.source, senderAddress)) {
                     isVerified = true;
                     matchedTxHash = currentHash || txHash || `toncenter_${tx.utime}`;
                     break;
@@ -522,7 +521,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                   const amountInUsdt = Number(jettonUnits) / 1e6;
 
                   if (amountInUsdt >= pkg.usdtCost * 0.98) {
-                    if (addressesMatch(fromAddr.toString({ bounceable: true }), senderAddress)) {
+                    if (!senderAddress || addressesMatch(fromAddr.toString({ bounceable: true }), senderAddress)) {
                       isVerified = true;
                       matchedTxHash = currentHash || txHash || `usdt_tc_${tx.utime}`;
                       break;
@@ -567,7 +566,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { data: globalClaimed } = await supabase
         .from('profiles')
         .select('wallet_address')
-        .contains('data->processedTransactions', [matchedTxHash])
+        .contains('data', { processedTransactions: [matchedTxHash] })
         .limit(1);
 
       if (globalClaimed && globalClaimed.length > 0) {
@@ -587,7 +586,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const profileData = rows[0].data || {};
       const processed = profileData.processedTransactions || [];
-      const oldUpdatedAt = rows[0].updated_at;
 
       if (processed.includes(matchedTxHash)) {
         return res.status(400).json({ error: 'Transaction already claimed' });
@@ -603,7 +601,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         { txHash: matchedTxHash, currency: isTon ? 'TON' : 'USDT', amount: isTon ? pkg.tonCost : pkg.usdtCost }
       );
 
-      let updateQuery = supabase
+      const { error: updateErr } = await supabase
         .from('profiles')
         .update({
           data: profileData,
@@ -611,13 +609,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         })
         .eq('wallet_address', walletAddress);
 
-      if (oldUpdatedAt) {
-        updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
-      }
-
-      const { data: updateRes, error: updateErr } = await updateQuery.select('wallet_address');
-      if (updateErr || !updateRes || updateRes.length === 0) {
-        return res.status(409).json({ error: 'Concurrent update conflict. Please retry verification in a moment.' });
+      if (updateErr) {
+        console.error('TON update error:', updateErr);
+        return res.status(500).json({ error: 'Failed to update profile' });
       }
 
       // Record to unified purchases ledger table
@@ -803,19 +797,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         { signature, amount: pkg.solCost, currency: 'SOL' }
       );
 
-      let updateQuery = supabase
+      const { error: updateError } = await supabase
         .from('profiles')
         .update({ data: profile, updated_at: new Date().toISOString() })
         .eq('wallet_address', walletAddress);
 
-      if (oldUpdatedAt) {
-        updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
-      }
-
-      const { data: updateResult, error: updateError } = await updateQuery.select('wallet_address');
-
-      if (updateError || !updateResult || updateResult.length === 0) {
-        console.warn('Verify payment OCC conflict on attempt', attempts);
+      if (updateError) {
+        console.warn('Verify payment update error on attempt', attempts, updateError);
         continue;
       }
 

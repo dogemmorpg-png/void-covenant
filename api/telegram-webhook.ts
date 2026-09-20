@@ -115,7 +115,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           const { data: globalClaimed } = await supabase
             .from('profiles')
             .select('wallet_address')
-            .contains('data->processedTransactions', [chargeId])
+            .contains('data', { processedTransactions: [chargeId] })
             .limit(1);
 
           if (globalClaimed && globalClaimed.length > 0) {
@@ -159,7 +159,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               { chargeId, amount: payment.total_amount, currency: 'XTR' }
             );
 
-            let updateQuery = supabase
+            const { error: updateErr } = await supabase
               .from('profiles')
               .update({
                 data: profileData,
@@ -167,14 +167,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               })
               .eq('wallet_address', matchedWallet);
 
-            if (oldUpdatedAt) {
-              updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
-            }
-
-            const { data: updateRes, error: updateErr } = await updateQuery.select('wallet_address');
-            if (updateErr || !updateRes || updateRes.length === 0) {
-              console.log(`[STARS] Webhook OCC conflict on charge ${chargeId}, already updated concurrently.`);
-              return res.status(200).json({ ok: true, concurrent_update: true });
+            if (updateErr) {
+              console.error('[STARS] Webhook profile update error:', updateErr);
+              return res.status(200).json({ ok: false, error: updateErr.message });
             }
 
             // Unified purchase ledger in purchases table
