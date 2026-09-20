@@ -978,7 +978,11 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
     }
   };
 
-  const renderBuyButton = (pkg: TelegramPackage | SolanaPackage) => {
+  const renderBuyButton = (pkg: TelegramPackage | SolanaPackage, isMythic = false) => {
+    const mythicBtnClass = isMythic
+      ? "bg-gradient-to-r from-amber-500/[0.12] via-rose-500/[0.12] to-purple-500/[0.12] hover:from-amber-500/[0.22] hover:to-purple-500/[0.22] border-amber-400/50 hover:border-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.2)]"
+      : "bg-white/[0.06] hover:bg-white/[0.12] border-white/15";
+
     if (isTelegramUser) {
       const tgPkg = pkg as TelegramPackage;
       if (tgMethod === 'stars') {
@@ -986,7 +990,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
           <button
             onClick={() => handlePurchaseStars(tgPkg)}
             disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
-            className="w-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 hover:border-amber-400/50 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn"
+            className={`w-full ${mythicBtnClass} hover:border-amber-400/70 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn border`}
           >
             <TelegramStarIcon className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
             <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight">{tgPkg.starsCost}</span>
@@ -999,7 +1003,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
           <button
             onClick={() => handlePurchaseTon(tgPkg)}
             disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
-            className="w-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 hover:border-cyan-400/50 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn"
+            className={`w-full ${mythicBtnClass} hover:border-cyan-400/70 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn border`}
           >
             <TonSymbolIcon className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
             <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight">{tgPkg.tonCost}</span>
@@ -1011,7 +1015,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         <button
           onClick={() => handlePurchaseUsdt(tgPkg)}
           disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
-          className="w-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 hover:border-emerald-400/50 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn"
+          className={`w-full ${mythicBtnClass} hover:border-emerald-400/70 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn border`}
         >
           <UsdtSymbolIcon className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
           <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight">${tgPkg.usdtCost}</span>
@@ -1025,7 +1029,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       <button
         onClick={() => handlePurchaseSolana(solPkg)}
         disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
-        className="w-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 hover:border-purple-400/50 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn"
+        className={`w-full ${mythicBtnClass} hover:border-purple-400/70 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn border`}
       >
         <SolanaSymbolIcon className="w-4 h-4 shrink-0 drop-shadow-[0_0_5px_rgba(3,225,255,0.6)] group-hover/btn:scale-110 transition-transform" />
         <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight">{solPkg.solCost}</span>
@@ -1189,7 +1193,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         {paymentState.status === 'idle' || paymentState.status === 'success' || paymentState.status === 'error' || paymentState.status === 'pending' ? (
           <div className="space-y-2.5 sm:space-y-4">
             
-            {/* Packages Grid: 2x2 on top + 5th item stretched col-span-2 across the bottom */}
+            {/* Packages Grid: 2x2 on top + 5th item centered as a vertical block across the bottom */}
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {(isTelegramUser ? TELEGRAM_PACKAGES : SOLANA_PACKAGES).map(pkg => {
                 const isSovereign = pkg.id === 'shards_sovereign';
@@ -1197,60 +1201,58 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
 
                 if (isSovereign) {
                   return (
-                    <div
-                      key={pkg.id}
-                      className="col-span-2 relative rounded-2xl p-2.5 sm:p-3 flex items-center justify-between gap-2 sm:gap-4 border transition-all duration-200 group hover:scale-[1.01] bg-gradient-to-r from-[#241026]/95 via-[#16091e]/95 to-[#100615]/95 border-amber-500/50 hover:border-amber-400/80 shadow-[0_0_25px_rgba(245,158,11,0.18)] overflow-hidden"
-                    >
-                      {/* Ambient background glow highlights */}
-                      <div className="absolute -left-10 -top-10 w-36 h-36 bg-amber-500/15 rounded-full blur-2xl pointer-events-none" />
-                      <div className="absolute right-0 bottom-0 w-36 h-36 bg-rose-600/15 rounded-full blur-2xl pointer-events-none" />
+                    <div key={pkg.id} className="col-span-2 flex justify-center">
+                      <div
+                        className="w-[calc(50%-4px)] sm:w-[calc(50%-6px)] relative rounded-2xl p-2 sm:p-3 flex flex-col justify-between border-2 border-amber-400/60 hover:border-amber-300 transition-all duration-200 group hover:scale-[1.02] bg-gradient-to-b from-[#341428]/95 via-[#1c0c24]/95 to-[#0b0410] shadow-[0_0_25px_rgba(245,158,11,0.25)] relative overflow-hidden"
+                      >
+                        {/* Top gold accent line */}
+                        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400 to-transparent shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
 
-                      {/* Left: Thumbnail & Details */}
-                      <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
-                        <div className="relative shrink-0 w-13 h-13 sm:w-16 sm:h-16 flex items-center justify-center rounded-xl bg-black/60 border border-amber-500/40 p-1 shadow-inner group-hover:scale-105 transition-transform duration-300">
+                        {/* Ambient background glows */}
+                        <div className="absolute -top-10 -left-10 w-24 h-24 bg-amber-500/20 rounded-full blur-xl pointer-events-none" />
+                        <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-rose-600/20 rounded-full blur-xl pointer-events-none" />
+
+                        {/* Badge */}
+                        {pkg.badge && (
+                          <span className={`absolute top-1.5 right-1.5 text-[7px] sm:text-[8px] px-1.5 py-0.2 rounded-full font-mono font-black tracking-wider border uppercase z-10 ${getBadgeStyle(pkg.badge)}`}>
+                            <Sparkles className="w-2 h-2 inline-block mr-0.5 -mt-0.5 text-amber-300" />
+                            {pkg.badge}
+                          </span>
+                        )}
+
+                        {/* Image Showcase */}
+                        <div className="w-full flex items-center justify-center py-0.5 sm:py-1 relative">
                           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.25),transparent_70%)] pointer-events-none" />
                           {pkg.image && (
                             <img 
                               src={pkg.image} 
                               alt={pkg.name} 
-                              className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(245,158,11,0.5)] rounded-lg" 
+                              className="w-14 h-14 sm:w-20 sm:h-20 object-contain drop-shadow-[0_0_15px_rgba(245,158,11,0.45)] group-hover:scale-105 transition-transform duration-300 rounded-xl" 
                             />
                           )}
                         </div>
 
-                        <div className="min-w-0 flex flex-col justify-center">
-                          <div className="flex items-center gap-1.5 mb-0.5">
-                            {pkg.badge && (
-                              <span className={`text-[7px] sm:text-[8px] px-1.5 py-0.2 rounded-full font-mono font-black tracking-wider border uppercase ${getBadgeStyle(pkg.badge)}`}>
-                                {pkg.badge}
-                              </span>
-                            )}
-                            <span className="text-[8px] sm:text-[9px] font-mono font-bold text-amber-300/80 uppercase tracking-wider hidden sm:inline-block">
-                              APEX MONOLITH
-                            </span>
-                          </div>
-                          <span className="text-white font-display font-black text-[11px] sm:text-xs md:text-sm tracking-wide block truncate">
+                        {/* Title */}
+                        <div className="text-center mt-0.5">
+                          <span className="text-amber-100 font-display font-bold text-[10px] sm:text-xs tracking-wide block truncate drop-shadow-[0_0_6px_rgba(245,158,11,0.3)]">
                             {pkg.name}
                           </span>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <img 
-                              src="/icons/icon_shards.webp" 
-                              alt="Shards" 
-                              className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.8)] shrink-0" 
-                            />
-                            <span className="text-xs sm:text-sm font-black text-white font-mono leading-none tracking-tight">
-                              +{pkg.shardsReward.toLocaleString()}
-                            </span>
-                            <span className="text-[9px] sm:text-[10px] font-mono text-rose-300/70 font-semibold">
-                              SHARDS
-                            </span>
-                          </div>
                         </div>
-                      </div>
 
-                      {/* Right: Buy Button */}
-                      <div className="shrink-0 w-28 sm:w-36">
-                        {renderBuyButton(pkg)}
+                        {/* Reward Amount */}
+                        <div className="flex items-center justify-center gap-1 my-1">
+                          <img 
+                            src="/icons/icon_shards.webp" 
+                            alt="Shards" 
+                            className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.85)] shrink-0" 
+                          />
+                          <span className="text-xs sm:text-sm font-black text-amber-300 font-mono leading-none tracking-tight">
+                            +{pkg.shardsReward.toLocaleString()}
+                          </span>
+                        </div>
+
+                        {/* Price Button */}
+                        {renderBuyButton(pkg, true)}
                       </div>
                     </div>
                   );
