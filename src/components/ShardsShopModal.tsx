@@ -54,35 +54,30 @@ const isUserCancellation = (err: any): boolean => {
 
 // Vector SVG Icons for payment currencies
 export const TelegramStarIcon: React.FC<{ className?: string }> = ({ className = "w-4 h-4" }) => (
-  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+  <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
     <defs>
-      <linearGradient id="tgStarGold" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stopColor="#FFE57F" />
-        <stop offset="45%" stopColor="#FFB300" />
-        <stop offset="100%" stopColor="#E65100" />
+      <linearGradient id="tgStarCircle" x1="16" y1="0" x2="16" y2="32" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#FFC837" />
+        <stop offset="100%" stopColor="#FF8008" />
       </linearGradient>
-      <linearGradient id="tgStarFacetL" x1="12" y1="2" x2="6" y2="18" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stopColor="#FFF9C4" stopOpacity="0.9" />
-        <stop offset="100%" stopColor="#FFB300" stopOpacity="0.2" />
+      <linearGradient id="tgStarFacetL" x1="16" y1="6" x2="10" y2="24" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#FFFFFF" />
+        <stop offset="100%" stopColor="#FFF275" />
       </linearGradient>
-      <linearGradient id="tgStarFacetR" x1="12" y1="2" x2="18" y2="18" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stopColor="#D84315" stopOpacity="0.7" />
-        <stop offset="100%" stopColor="#870000" stopOpacity="0.95" />
+      <linearGradient id="tgStarFacetR" x1="16" y1="6" x2="22" y2="24" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#FFE082" />
+        <stop offset="100%" stopColor="#FFB300" />
       </linearGradient>
     </defs>
+    <circle cx="16" cy="16" r="16" fill="url(#tgStarCircle)" />
     <path
-      d="M12 2.2L14.7 8.3L21.4 8.9C22.1 9.0 22.4 9.9 21.8 10.4L16.7 14.8L18.2 21.3C18.4 22.0 17.6 22.6 17.0 22.2L12 18.9L7.0 22.2C6.4 22.6 5.6 22.0 5.8 21.3L7.3 14.8L2.2 10.4C1.6 9.9 1.9 9.0 2.6 8.9L9.3 8.3L12 2.2Z"
-      fill="url(#tgStarGold)"
-      stroke="#7F2B00"
-      strokeWidth="0.8"
-      strokeLinejoin="round"
+      d="M16 5.5L18.9 12.8L26.6 13.5C27.4 13.6 27.8 14.6 27.2 15.2L21.4 20.2L23.1 27.8C23.3 28.6 22.4 29.3 21.7 28.8L16 25.0L10.3 28.8C9.6 29.3 8.7 28.6 8.9 27.8L10.6 20.2L4.8 15.2C4.2 14.6 4.6 13.6 5.4 13.5L13.1 12.8L16 5.5Z"
+      fill="#FFFFFF"
     />
-    <path d="M12 2.2L14.7 8.3L12 13.5V2.2Z" fill="url(#tgStarFacetL)" />
-    <path d="M21.4 8.9L16.7 14.8L12 13.5L14.7 8.3L21.4 8.9Z" fill="#FFA500" opacity="0.4" />
-    <path d="M12 13.5L16.7 14.8L18.2 21.3L12 18.9V13.5Z" fill="url(#tgStarFacetR)" />
-    <path d="M12 13.5L7.3 14.8L5.8 21.3L12 18.9V13.5Z" fill="#BF360C" opacity="0.4" />
-    <path d="M2.6 8.9L7.3 14.8L12 13.5L9.3 8.3L2.6 8.9Z" fill="url(#tgStarFacetL)" />
-    <circle cx="12" cy="11.5" r="1.8" fill="#FFFFFF" opacity="0.8" />
+    <path d="M16 5.5L18.9 12.8L16 18.5V5.5Z" fill="url(#tgStarFacetL)" />
+    <path d="M5.4 13.5L10.6 20.2L16 18.5L13.1 12.8L5.4 13.5Z" fill="url(#tgStarFacetL)" />
+    <path d="M16 18.5L21.4 20.2L23.1 27.8L16 25.0V18.5Z" fill="url(#tgStarFacetR)" />
+    <circle cx="16" cy="16.5" r="1.8" fill="#FFFFFF" opacity="0.9" />
   </svg>
 );
 
@@ -97,13 +92,12 @@ export const TonSymbolIcon: React.FC<{ className?: string }> = ({ className = "w
 );
 
 export const UsdtSymbolIcon: React.FC<{ className?: string }> = ({ className = "w-4 h-4" }) => (
-  <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <circle cx="14" cy="14" r="14" fill="#26A17B" />
+  <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <circle cx="16" cy="16" r="16" fill="#26A17B" />
     <path
+      fill="#FFFFFF"
       fillRule="evenodd"
-      clipRule="evenodd"
-      d="M15.4 13.8V12.2C18.2 12 20.3 11.2 20.3 10.3C20.3 9.4 18.2 8.6 15.4 8.4V6.5H19.5V5H8.5V6.5H12.6V8.4C9.8 8.6 7.7 9.4 7.7 10.3C7.7 11.2 9.8 12 12.6 12.2V13.8C8.8 14.1 6 15.3 6 16.7C6 18.2 9.3 19.5 14 19.5C18.7 19.5 22 18.2 22 16.7C22 15.3 19.2 14.1 15.4 13.8ZM15.4 9.9V11.2C17.6 11.1 18.8 10.6 18.8 10.3C18.8 10 17.6 9.5 15.4 9.4V9.9ZM12.6 9.9V9.4C10.4 9.5 9.2 10 9.2 10.3C9.2 10.6 10.4 11.1 12.6 11.2V9.9ZM14 18.2C9.9 18.2 7.3 17.1 7.3 16.7C7.3 16.3 9.6 15.3 13.3 15.2V13.8C13.5 13.8 13.8 13.8 14 13.8C14.2 13.8 14.5 13.8 14.7 13.8V15.2C18.4 15.3 20.7 16.3 20.7 16.7C20.7 17.1 18.1 18.2 14 18.2Z"
-      fill="white"
+      d="M17.922 17.383v-.002c-.11.008-.677.042-1.942.042-1.01 0-1.721-.03-1.971-.042v.003c-3.888-.171-6.79-.848-6.79-1.658 0-.809 2.902-1.486 6.79-1.66v2.644c.254.018.982.061 1.988.061 1.207 0 1.812-.05 1.925-.06v-2.643c3.88.173 6.775.85 6.775 1.658 0 .81-2.895 1.485-6.775 1.657m0-3.59v-2.366h5.414V7.819H8.595v3.608h5.414v2.365c-4.4.202-7.709 1.074-7.709 2.118 0 1.044 3.309 1.915 7.709 2.118v7.582h3.913v-7.584c4.393-.202 7.694-1.073 7.694-2.116 0-1.043-3.301-1.914-7.694-2.117"
     />
   </svg>
 );
@@ -1072,41 +1066,52 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                 onClick={() => setTgMethod('stars')}
                 className={`py-2 px-2 rounded-xl font-display font-black text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer select-none ${
                   tgMethod === 'stars'
-                    ? 'bg-gradient-to-b from-[#2d1b06] via-[#1d1103] to-[#0f0801] border-2 border-amber-400 text-amber-300 shadow-[0_0_16px_rgba(245,158,11,0.4)] ring-1 ring-amber-400/50'
+                    ? 'bg-gradient-to-b from-amber-500/25 via-amber-950/60 to-black border-2 border-amber-400 text-amber-200 shadow-[0_0_18px_rgba(245,158,11,0.5),inset_0_1px_1px_rgba(255,255,255,0.3)]'
                     : 'bg-black/40 hover:bg-white/5 border border-white/5 hover:border-white/20 text-gray-400 hover:text-gray-200'
                 }`}
               >
                 <TelegramStarIcon className={`w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0 transition-transform ${tgMethod === 'stars' ? 'scale-110 drop-shadow-[0_0_8px_rgba(245,158,11,0.9)]' : 'opacity-70'}`} />
-                <span className={tgMethod === 'stars' ? 'text-white drop-shadow' : ''}>STARS</span>
+                <span className={tgMethod === 'stars' ? 'text-white drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]' : ''}>STARS</span>
               </button>
 
               <button
                 onClick={() => setTgMethod('ton')}
                 className={`py-2 px-2 rounded-xl font-display font-black text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer select-none ${
                   tgMethod === 'ton'
-                    ? 'bg-gradient-to-b from-[#061d2d] via-[#04131e] to-[#020a10] border-2 border-cyan-400 text-cyan-300 shadow-[0_0_16px_rgba(6,182,212,0.4)] ring-1 ring-cyan-400/50'
+                    ? 'bg-gradient-to-b from-cyan-500/25 via-cyan-950/60 to-black border-2 border-cyan-400 text-cyan-200 shadow-[0_0_18px_rgba(6,182,212,0.5),inset_0_1px_1px_rgba(255,255,255,0.3)]'
                     : 'bg-black/40 hover:bg-white/5 border border-white/5 hover:border-white/20 text-gray-400 hover:text-gray-200'
                 }`}
               >
                 <TonSymbolIcon className={`w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0 transition-transform ${tgMethod === 'ton' ? 'scale-110 drop-shadow-[0_0_8px_rgba(0,152,234,0.9)]' : 'opacity-70'}`} />
-                <span className={tgMethod === 'ton' ? 'text-white drop-shadow' : ''}>TON</span>
+                <span className={tgMethod === 'ton' ? 'text-white drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]' : ''}>TON</span>
               </button>
 
               <button
                 onClick={() => setTgMethod('usdt')}
                 className={`py-2 px-2 rounded-xl font-display font-black text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer select-none ${
                   tgMethod === 'usdt'
-                    ? 'bg-gradient-to-b from-[#06241a] via-[#031710] to-[#020d09] border-2 border-emerald-400 text-emerald-300 shadow-[0_0_16px_rgba(16,185,129,0.4)] ring-1 ring-emerald-400/50'
+                    ? 'bg-gradient-to-b from-emerald-500/25 via-emerald-950/60 to-black border-2 border-emerald-400 text-emerald-200 shadow-[0_0_18px_rgba(16,185,129,0.5),inset_0_1px_1px_rgba(255,255,255,0.3)]'
                     : 'bg-black/40 hover:bg-white/5 border border-white/5 hover:border-white/20 text-gray-400 hover:text-gray-200'
                 }`}
               >
                 <UsdtSymbolIcon className={`w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0 transition-transform ${tgMethod === 'usdt' ? 'scale-110 drop-shadow-[0_0_8px_rgba(38,161,123,0.9)]' : 'opacity-70'}`} />
-                <span className={tgMethod === 'usdt' ? 'text-white drop-shadow' : ''}>USDT</span>
+                <span className={tgMethod === 'usdt' ? 'text-white drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]' : ''}>USDT</span>
               </button>
             </div>
 
-            {/* Dedicated TON Wallet status bar (only for TON & USDT methods) */}
-            {(tgMethod === 'ton' || tgMethod === 'usdt') && (
+            {/* Sub-bar (always rendered with identical height to avoid any layout shifting) */}
+            {tgMethod === 'stars' ? (
+              <div className="flex items-center justify-between px-3 py-1.5 bg-black/40 border border-amber-500/20 rounded-xl">
+                <div className="flex items-center gap-1.5 text-amber-300/80 font-mono text-[10px] sm:text-[11px]">
+                  <TelegramStarIcon className="w-3.5 h-3.5 shrink-0 drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
+                  <span>Способ оплаты:</span>
+                </div>
+                <div className="flex items-center gap-1.5 bg-amber-950/60 border border-amber-500/40 px-2.5 py-0.5 rounded-full text-[10px] font-mono text-amber-300">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                  <span>В 1 клик через Telegram</span>
+                </div>
+              </div>
+            ) : (
               <div className="flex items-center justify-between px-3 py-1.5 bg-black/40 border border-cyan-500/20 rounded-xl">
                 <div className="flex items-center gap-1.5 text-gray-400 font-mono text-[10px] sm:text-[11px]">
                   <Wallet className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
@@ -1213,31 +1218,31 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                         <button
                           onClick={() => handlePurchaseStars(pkg as TelegramPackage)}
                           disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
-                          className="w-full bg-gradient-to-r from-[#2a1705] via-[#3d2308] to-[#1e1003] hover:from-[#3f2407] hover:to-[#2a1705] border border-amber-400/80 hover:border-amber-300 text-white font-mono text-[11px] sm:text-xs font-black py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_14px_rgba(245,158,11,0.25)] hover:shadow-[0_0_20px_rgba(245,158,11,0.45)] hover:scale-[1.02] flex items-center justify-center gap-1.5 active:scale-95 group/btn"
+                          className="w-full bg-gradient-to-b from-[#382208] via-[#231505] to-[#140a02] hover:from-[#482c0b] hover:to-[#1b0d03] border border-amber-400/80 hover:border-amber-300 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_14px_rgba(245,158,11,0.25),inset_0_1px_1px_rgba(255,255,255,0.2)] hover:shadow-[0_0_20px_rgba(245,158,11,0.45)] hover:scale-[1.02] flex items-center justify-center gap-1.5 active:scale-95 group/btn"
                         >
-                          <TelegramStarIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 drop-shadow-[0_0_8px_rgba(245,158,11,0.9)] group-hover/btn:scale-110 transition-transform shrink-0" />
-                          <span className="font-mono font-black text-amber-200 text-xs sm:text-sm tracking-tight">{(pkg as TelegramPackage).starsCost}</span>
-                          <span className="text-[9px] sm:text-[10px] font-display font-bold text-amber-400 uppercase tracking-wider">STARS</span>
+                          <TelegramStarIcon className="w-4 h-4 shrink-0 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)] group-hover/btn:scale-110 transition-transform" />
+                          <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight drop-shadow">{(pkg as TelegramPackage).starsCost}</span>
+                          <span className="text-[10px] sm:text-[11px] font-display font-black text-amber-300 uppercase tracking-wider">STARS</span>
                         </button>
                       ) : tgMethod === 'ton' ? (
                         <button
                           onClick={() => handlePurchaseTon(pkg as TelegramPackage)}
                           disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
-                          className="w-full bg-gradient-to-r from-[#072030] via-[#0c2e44] to-[#051724] hover:from-[#0f3954] hover:to-[#082436] border border-cyan-400/80 hover:border-cyan-300 text-white font-mono text-[11px] sm:text-xs font-black py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_14px_rgba(6,182,212,0.25)] hover:shadow-[0_0_20px_rgba(6,182,212,0.45)] hover:scale-[1.02] flex items-center justify-center gap-1.5 active:scale-95 group/btn"
+                          className="w-full bg-gradient-to-b from-[#0b283b] via-[#061926] to-[#020e17] hover:from-[#10364f] hover:to-[#041521] border border-cyan-400/80 hover:border-cyan-300 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_14px_rgba(6,182,212,0.25),inset_0_1px_1px_rgba(255,255,255,0.2)] hover:shadow-[0_0_20px_rgba(6,182,212,0.45)] hover:scale-[1.02] flex items-center justify-center gap-1.5 active:scale-95 group/btn"
                         >
-                          <TonSymbolIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 drop-shadow-[0_0_8px_rgba(0,152,234,0.9)] group-hover/btn:scale-110 transition-transform shrink-0" />
-                          <span className="font-mono font-black text-cyan-200 text-xs sm:text-sm tracking-tight">{(pkg as TelegramPackage).tonCost}</span>
-                          <span className="text-[9px] sm:text-[10px] font-display font-bold text-cyan-300 uppercase tracking-wider">TON</span>
+                          <TonSymbolIcon className="w-4 h-4 shrink-0 drop-shadow-[0_0_6px_rgba(0,152,234,0.8)] group-hover/btn:scale-110 transition-transform" />
+                          <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight drop-shadow">{(pkg as TelegramPackage).tonCost}</span>
+                          <span className="text-[10px] sm:text-[11px] font-display font-black text-cyan-300 uppercase tracking-wider">TON</span>
                         </button>
                       ) : (
                         <button
                           onClick={() => handlePurchaseUsdt(pkg as TelegramPackage)}
                           disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
-                          className="w-full bg-gradient-to-r from-[#06241a] via-[#093526] to-[#041a13] hover:from-[#0c4431] hover:to-[#06291e] border border-emerald-400/80 hover:border-emerald-300 text-white font-mono text-[11px] sm:text-xs font-black py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_14px_rgba(16,185,129,0.25)] hover:shadow-[0_0_20px_rgba(16,185,129,0.45)] hover:scale-[1.02] flex items-center justify-center gap-1.5 active:scale-95 group/btn"
+                          className="w-full bg-gradient-to-b from-[#092d20] via-[#051c14] to-[#02100b] hover:from-[#0d3d2c] hover:to-[#03170f] border border-emerald-400/80 hover:border-emerald-300 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_14px_rgba(16,185,129,0.25),inset_0_1px_1px_rgba(255,255,255,0.2)] hover:shadow-[0_0_20px_rgba(16,185,129,0.45)] hover:scale-[1.02] flex items-center justify-center gap-1.5 active:scale-95 group/btn"
                         >
-                          <UsdtSymbolIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 drop-shadow-[0_0_8px_rgba(38,161,123,0.9)] group-hover/btn:scale-110 transition-transform shrink-0" />
-                          <span className="font-mono font-black text-emerald-200 text-xs sm:text-sm tracking-tight">${(pkg as TelegramPackage).usdtCost}</span>
-                          <span className="text-[9px] sm:text-[10px] font-display font-bold text-emerald-300 uppercase tracking-wider">USDT</span>
+                          <UsdtSymbolIcon className="w-4 h-4 shrink-0 drop-shadow-[0_0_6px_rgba(38,161,123,0.8)] group-hover/btn:scale-110 transition-transform" />
+                          <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight drop-shadow">${(pkg as TelegramPackage).usdtCost}</span>
+                          <span className="text-[10px] sm:text-[11px] font-display font-black text-emerald-300 uppercase tracking-wider">USDT</span>
                         </button>
                       )
                     ) : (
@@ -1245,11 +1250,11 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                       <button
                         onClick={() => handlePurchaseSolana(pkg as SolanaPackage)}
                         disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
-                        className="w-full bg-gradient-to-r from-[#1d0a2c] via-[#2a0e3e] to-[#160621] hover:from-[#35124e] hover:to-[#1f092e] border border-purple-400/80 hover:border-purple-300 text-white font-mono text-[11px] sm:text-xs font-black py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_14px_rgba(168,85,247,0.25)] hover:shadow-[0_0_20px_rgba(168,85,247,0.45)] hover:scale-[1.02] flex items-center justify-center gap-1.5 active:scale-95 group/btn"
+                        className="w-full bg-gradient-to-b from-[#250d38] via-[#170724] to-[#0d0314] hover:from-[#33124d] hover:to-[#12041b] border border-purple-400/80 hover:border-purple-300 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-[0_0_14px_rgba(168,85,247,0.25),inset_0_1px_1px_rgba(255,255,255,0.2)] hover:shadow-[0_0_20px_rgba(168,85,247,0.45)] hover:scale-[1.02] flex items-center justify-center gap-1.5 active:scale-95 group/btn"
                       >
-                        <SolanaSymbolIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 drop-shadow-[0_0_8px_rgba(220,31,255,0.9)] group-hover/btn:scale-110 transition-transform shrink-0" />
-                        <span className="font-mono font-black text-purple-200 text-xs sm:text-sm tracking-tight">{(pkg as SolanaPackage).solCost}</span>
-                        <span className="text-[9px] sm:text-[10px] font-display font-bold text-purple-300 uppercase tracking-wider">SOL</span>
+                        <SolanaSymbolIcon className="w-4 h-4 shrink-0 drop-shadow-[0_0_6px_rgba(220,31,255,0.8)] group-hover/btn:scale-110 transition-transform" />
+                        <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight drop-shadow">{(pkg as SolanaPackage).solCost}</span>
+                        <span className="text-[10px] sm:text-[11px] font-display font-black text-purple-300 uppercase tracking-wider">SOL</span>
                       </button>
                     )}
                   </div>
