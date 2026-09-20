@@ -86,7 +86,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         const { data: rows } = await supabase
           .from('profiles')
-          .select('data')
+          .select('data, updated_at')
           .eq('wallet_address', walletAddress)
           .limit(1);
 
@@ -96,7 +96,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           const altWallet = walletAddress.startsWith('tg_') ? walletAddress.slice(3) : `tg_${walletAddress}`;
           const { data: altRows } = await supabase
             .from('profiles')
-            .select('data')
+            .select('data, updated_at')
             .eq('wallet_address', altWallet)
             .limit(1);
           if (altRows && altRows.length > 0) {
@@ -108,6 +108,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (profileRow) {
           const profileData = profileRow.data || {};
           const processed = profileData.processedTransactions || [];
+          const oldUpdatedAt = profileRow.updated_at;
+
+          // Global anti-replay check across ALL profiles in the database
+          const { data: globalClaimed } = await supabase
+            .from('profiles')
+            .select('wallet_address')
+            .contains('data->processedTransactions', [chargeId])
+            .limit(1);
+
+          if (globalClaimed && globalClaimed.length > 0) {
+            console.log(`[STARS] Charge ${chargeId} already claimed globally, skipping webhook credit.`);
+            return res.status(200).json({ ok: true, already_claimed: true });
+          }
 
           if (!processed.includes(chargeId)) {
             const currentShards = profileData.darkShards || 0;
@@ -116,13 +129,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             profileData.darkShards = updatedShards;
             profileData.processedTransactions = [...processed, chargeId];
 
-            await supabase
+            let updateQuery = supabase
               .from('profiles')
               .update({
                 data: profileData,
                 updated_at: new Date().toISOString()
               })
               .eq('wallet_address', matchedWallet);
+
+            if (oldUpdatedAt) {
+              updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
+            }
+
+            const { data: updateRes, error: updateErr } = await updateQuery.select('wallet_address');
+            if (updateErr || !updateRes || updateRes.length === 0) {
+              console.log(`[STARS] Webhook OCC conflict on charge ${chargeId}, already updated concurrently.`);
+              return res.status(200).json({ ok: true, concurrent_update: true });
+            }
 
             // Log ledger entry
             await recordShardTransaction(

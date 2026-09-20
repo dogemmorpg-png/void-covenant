@@ -186,7 +186,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const { data: rows } = await supabase
         .from('profiles')
-        .select('data')
+        .select('data, updated_at')
         .eq('wallet_address', walletAddress)
         .limit(1);
 
@@ -196,7 +196,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const altWallet = walletAddress.startsWith('tg_') ? walletAddress.slice(3) : `tg_${walletAddress}`;
         const { data: altRows } = await supabase
           .from('profiles')
-          .select('data')
+          .select('data, updated_at')
           .eq('wallet_address', altWallet)
           .limit(1);
         if (altRows && altRows.length > 0) {
@@ -211,6 +211,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const profileData = profileRow.data || {};
       const processed = profileData.processedTransactions || [];
+      const oldUpdatedAt = profileRow.updated_at;
 
       let newlyCredited = false;
       let shardsAdded = 0;
@@ -227,6 +228,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             for (const tx of txs) {
               const chargeId = tx.id;
               if (!chargeId || processed.includes(chargeId)) continue;
+
+              // Check global anti-replay across all database profiles
+              const { data: globalCheck } = await supabase
+                .from('profiles')
+                .select('wallet_address')
+                .contains('data->processedTransactions', [chargeId])
+                .limit(1);
+
+              if (globalCheck && globalCheck.length > 0) continue;
 
               // Only incoming transactions from users
               if (tx.source?.type === 'user') {
@@ -253,13 +263,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     profileData.darkShards = updatedShards;
                     profileData.processedTransactions = [...processed, chargeId];
 
-                    await supabase
+                    let updateQuery = supabase
                       .from('profiles')
                       .update({
                         data: profileData,
                         updated_at: new Date().toISOString()
                       })
                       .eq('wallet_address', matchedWallet);
+
+                    if (oldUpdatedAt) {
+                      updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
+                    }
+
+                    const { data: updateRes, error: updateErr } = await updateQuery.select('wallet_address');
+                    if (updateErr || !updateRes || updateRes.length === 0) {
+                      console.log('[STARS] OCC write conflict, already updated concurrently.');
+                      continue;
+                    }
 
                     await recordShardTransaction(
                       supabase,
@@ -303,6 +323,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { packageId, currency, txHash, senderAddress } = req.body || {};
       if (!packageId || !TELEGRAM_PACKAGES[packageId]) {
         return res.status(400).json({ error: `Invalid package ID: ${packageId}` });
+      }
+
+      if (!senderAddress || typeof senderAddress !== 'string' || senderAddress.trim().length < 10) {
+        return res.status(400).json({ error: 'Valid sender TON wallet address is required for verification.' });
       }
 
       const pkg = TELEGRAM_PACKAGES[packageId];
@@ -355,7 +379,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 if (addressesMatch(tt.recipient?.address, TON_TREASURY_WALLET_ADDRESS)) {
                   const amountInTon = Number(tt.amount) / 1e9;
                   if (amountInTon >= pkg.tonCost * 0.98) {
-                    if (!senderAddress || addressesMatch(tt.sender?.address, senderAddress)) {
+                    if (addressesMatch(tt.sender?.address, senderAddress)) {
                       isVerified = true;
                       matchedTxHash = ev.event_id || txHash || `ton_${ev.timestamp}`;
                       break;
@@ -367,7 +391,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 if (addressesMatch(jt.recipient?.address, TON_TREASURY_WALLET_ADDRESS)) {
                   const amountInUsdt = Number(jt.amount) / 1e6;
                   if (amountInUsdt >= pkg.usdtCost * 0.98) {
-                    if (!senderAddress || addressesMatch(jt.sender?.address, senderAddress)) {
+                    if (addressesMatch(jt.sender?.address, senderAddress)) {
                       isVerified = true;
                       matchedTxHash = ev.event_id || txHash || `usdt_${ev.timestamp}`;
                       break;
@@ -411,7 +435,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               if (inMsg && addressesMatch(inMsg.destination, TON_TREASURY_WALLET_ADDRESS)) {
                 const amountInTon = Number(inMsg.value) / 1e9;
                 if (amountInTon >= pkg.tonCost * 0.98) {
-                  if (!senderAddress || addressesMatch(inMsg.source, senderAddress)) {
+                  if (addressesMatch(inMsg.source, senderAddress)) {
                     isVerified = true;
                     matchedTxHash = currentHash || txHash || `toncenter_${tx.utime}`;
                     break;
@@ -463,7 +487,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                   const amountInUsdt = Number(jettonUnits) / 1e6;
 
                   if (amountInUsdt >= pkg.usdtCost * 0.98) {
-                    if (!senderAddress || addressesMatch(fromAddr.toString({ bounceable: true }), senderAddress)) {
+                    if (addressesMatch(fromAddr.toString({ bounceable: true }), senderAddress)) {
                       isVerified = true;
                       matchedTxHash = currentHash || txHash || `usdt_tc_${tx.utime}`;
                       break;
@@ -504,10 +528,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
+      // Check global anti-replay across ALL profiles in the database
+      const { data: globalClaimed } = await supabase
+        .from('profiles')
+        .select('wallet_address')
+        .contains('data->processedTransactions', [matchedTxHash])
+        .limit(1);
+
+      if (globalClaimed && globalClaimed.length > 0) {
+        return res.status(400).json({ error: 'This transaction has already been claimed and credited to an account.' });
+      }
+
       // Credit Shards
       const { data: rows } = await supabase
         .from('profiles')
-        .select('data')
+        .select('data, updated_at')
         .eq('wallet_address', walletAddress)
         .limit(1);
 
@@ -517,6 +552,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const profileData = rows[0].data || {};
       const processed = profileData.processedTransactions || [];
+      const oldUpdatedAt = rows[0].updated_at;
 
       if (processed.includes(matchedTxHash)) {
         return res.status(400).json({ error: 'Transaction already claimed' });
@@ -528,13 +564,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       profileData.darkShards = updatedShards;
       profileData.processedTransactions = [...processed, matchedTxHash];
 
-      await supabase
+      let updateQuery = supabase
         .from('profiles')
         .update({
           data: profileData,
           updated_at: new Date().toISOString()
         })
         .eq('wallet_address', walletAddress);
+
+      if (oldUpdatedAt) {
+        updateQuery = updateQuery.eq('updated_at', oldUpdatedAt);
+      }
+
+      const { data: updateRes, error: updateErr } = await updateQuery.select('wallet_address');
+      if (updateErr || !updateRes || updateRes.length === 0) {
+        return res.status(409).json({ error: 'Concurrent update conflict. Please retry verification in a moment.' });
+      }
 
       await recordShardTransaction(
         supabase,
