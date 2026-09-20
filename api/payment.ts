@@ -63,7 +63,7 @@ const TELEGRAM_PACKAGES: Record<string, { shards: number; starsCost: number; ton
     description: 'Instant credit: 250 pure Dark Shards.'
   },
   shards_overlord: {
-    name: 'Lord of the Void Vault',
+    name: 'Void Monolith',
     shards: 700,
     starsCost: 30,
     tonCost: 1.00,
@@ -71,7 +71,7 @@ const TELEGRAM_PACKAGES: Record<string, { shards: number; starsCost: number; ton
     description: 'Instant credit: 700 pure Dark Shards.'
   },
   shards_sovereign: {
-    name: 'Void Sovereign Monolith',
+    name: 'Lord of the Void Vault',
     shards: 1800,
     starsCost: 75,
     tonCost: 2.50,

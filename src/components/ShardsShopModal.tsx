@@ -1215,7 +1215,6 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                         {/* Badge */}
                         {pkg.badge && (
                           <span className={`absolute top-1.5 right-1.5 text-[7px] sm:text-[8px] px-1.5 py-0.2 rounded-full font-mono font-black tracking-wider border uppercase z-10 ${getBadgeStyle(pkg.badge)}`}>
-                            <Sparkles className="w-2 h-2 inline-block mr-0.5 -mt-0.5 text-amber-300" />
                             {pkg.badge}
                           </span>
                         )}

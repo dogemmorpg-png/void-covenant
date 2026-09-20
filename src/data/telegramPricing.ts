@@ -64,26 +64,26 @@ export const TELEGRAM_PACKAGES: TelegramPackage[] = [
   },
   {
     id: 'shards_overlord',
-    name: 'Lord of the Void Vault',
+    name: 'Void Monolith',
     shardsReward: 700,
     dustBonus: 0,
     starsCost: 30,
     tonCost: 1.00,
     usdtCost: 2.50,
     badge: 'SUPREME',
-    description: 'The ultimate royal vault granting 700 Dark Shards.',
-    image: '/shop/void_overlord_vault.png'
+    description: 'The monumental monolith granting 700 Dark Shards.',
+    image: '/shop/void_sovereign_monolith.png'
   },
   {
     id: 'shards_sovereign',
-    name: 'Void Sovereign Monolith',
+    name: 'Lord of the Void Vault',
     shardsReward: 1800,
     dustBonus: 0,
     starsCost: 75,
     tonCost: 2.50,
     usdtCost: 6.50,
     badge: 'MYTHIC',
-    description: 'The monumental monolithic relic granting 1,800 Dark Shards.',
-    image: '/shop/void_sovereign_monolith.png'
+    description: 'The ultimate royal vault granting 1,800 Dark Shards.',
+    image: '/shop/void_overlord_vault.png'
   }
 ];

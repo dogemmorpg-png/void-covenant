@@ -64,22 +64,22 @@ export const SOLANA_PACKAGES: SolanaPackage[] = [
   },
   {
     id: 'shards_overlord',
-    name: 'Lord of the Void Vault',
+    name: 'Void Monolith',
     solCost: 1.00,
     shardsReward: 700,
     dustBonus: 0,
     description: '',
     badge: 'SUPREME',
-    image: '/shop/void_overlord_vault.png'
+    image: '/shop/void_sovereign_monolith.png'
   },
   {
     id: 'shards_sovereign',
-    name: 'Void Sovereign Monolith',
+    name: 'Lord of the Void Vault',
     solCost: 2.50,
     shardsReward: 1800,
     dustBonus: 0,
     description: '',
     badge: 'MYTHIC',
-    image: '/shop/void_sovereign_monolith.png'
+    image: '/shop/void_overlord_vault.png'
   }
 ];
