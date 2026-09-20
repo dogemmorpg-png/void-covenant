@@ -3,6 +3,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwtPkg from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
 import { recordShardTransaction } from './_shared/shardLogger.js';
+import { logPurchaseToDatabase } from './_shared/purchaseLogger.js';
 import { Address, Cell } from '@ton/core';
 
 const jwt = (jwtPkg as any).default || jwtPkg;
@@ -263,6 +264,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     profileData.darkShards = updatedShards;
                     profileData.processedTransactions = [...processed, chargeId];
 
+                    profileData = recordShardTransaction(
+                      profileData,
+                      'SHOP_PURCHASE',
+                      targetPkg.shards,
+                      `Telegram Stars purchase: ${targetPkg.name} (${tx.amount} XTR, Charge: ${chargeId})`,
+                      { chargeId, amount: tx.amount, currency: 'XTR' }
+                    );
+
                     let updateQuery = supabase
                       .from('profiles')
                       .update({
@@ -281,14 +290,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                       continue;
                     }
 
-                    await recordShardTransaction(
-                      supabase,
-                      matchedWallet,
-                      'STARS_PURCHASE',
-                      targetPkg.shards,
-                      updatedShards,
-                      `Telegram Stars purchase: ${targetPkg.name} (${tx.amount} XTR, Charge: ${chargeId})`
-                    );
+                    // Record to unified purchases ledger table
+                    await logPurchaseToDatabase(supabase, {
+                      walletAddress: matchedWallet,
+                      packageId: txPackageId || packageId || 'unknown_stars_pkg',
+                      currency: 'XTR',
+                      amount: tx.amount || targetPkg.starsCost,
+                      shards: targetPkg.shards,
+                      signature: chargeId,
+                      provider: 'stars',
+                      status: 'success'
+                    });
 
                     newlyCredited = true;
                     shardsAdded = targetPkg.shards;
@@ -564,6 +576,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       profileData.darkShards = updatedShards;
       profileData.processedTransactions = [...processed, matchedTxHash];
 
+      profileData = recordShardTransaction(
+        profileData,
+        'SHOP_PURCHASE',
+        pkg.shards,
+        `Purchased ${pkg.name} via ${isTon ? 'TON' : 'USDT'} (TX: ${matchedTxHash})`,
+        { txHash: matchedTxHash, currency: isTon ? 'TON' : 'USDT', amount: isTon ? pkg.tonCost : pkg.usdtCost }
+      );
+
       let updateQuery = supabase
         .from('profiles')
         .update({
@@ -581,14 +601,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(409).json({ error: 'Concurrent update conflict. Please retry verification in a moment.' });
       }
 
-      await recordShardTransaction(
-        supabase,
-        walletAddress,
-        isTon ? 'TON_PURCHASE' : 'USDT_PURCHASE',
-        pkg.shards,
-        updatedShards,
-        `Purchased ${pkg.name} via ${isTon ? 'TON' : 'USDT'} (TX: ${matchedTxHash})`
-      );
+      // Record to unified purchases ledger table
+      await logPurchaseToDatabase(supabase, {
+        walletAddress: walletAddress,
+        packageId: packageId,
+        currency: isTon ? 'TON' : 'USDT',
+        amount: isTon ? pkg.tonCost : pkg.usdtCost,
+        shards: pkg.shards,
+        signature: matchedTxHash,
+        provider: 'ton',
+        status: 'success'
+      });
 
       return res.status(200).json({
         success: true,
@@ -754,6 +777,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!profile.username) profile.username = `Lord_${walletAddress.slice(0, 4)}`;
       profile.processedTransactions = [...processedTxList, signature];
 
+      profile = recordShardTransaction(
+        profile,
+        'SHOP_PURCHASE',
+        pkg.shards,
+        `Purchased ${pkg.name || packageId} via Solana (TX: ${signature})`,
+        { signature, amount: pkg.solCost, currency: 'SOL' }
+      );
+
       let updateQuery = supabase
         .from('profiles')
         .update({ data: profile, updated_at: new Date().toISOString() })
@@ -770,16 +801,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         continue;
       }
 
-      await supabase
-        .from('purchases')
-        .insert({
-          wallet_address: walletAddress,
-          package_id: packageId,
-          sol_amount: pkg.solCost,
-          shards_amount: pkg.shards,
-          signature: signature,
-          status: 'success'
-        });
+      // Record to unified purchases ledger table
+      await logPurchaseToDatabase(supabase, {
+        walletAddress: walletAddress,
+        packageId: packageId,
+        currency: 'SOL',
+        amount: pkg.solCost,
+        shards: pkg.shards,
+        signature: signature,
+        provider: 'solana',
+        status: 'success'
+      });
 
       success = true;
       finalProfile = profile;

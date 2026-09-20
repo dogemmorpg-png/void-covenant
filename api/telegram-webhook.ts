@@ -2,6 +2,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import { recordShardTransaction } from './_shared/shardLogger.js';
+import { logPurchaseToDatabase } from './_shared/purchaseLogger.js';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -129,6 +130,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             profileData.darkShards = updatedShards;
             profileData.processedTransactions = [...processed, chargeId];
 
+            profileData = recordShardTransaction(
+              profileData,
+              'SHOP_PURCHASE',
+              pkg.shards,
+              `Telegram Stars purchase (webhook): ${pkg.name} (${payment.total_amount} XTR, Charge: ${chargeId})`,
+              { chargeId, amount: payment.total_amount, currency: 'XTR' }
+            );
+
             let updateQuery = supabase
               .from('profiles')
               .update({
@@ -147,17 +156,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               return res.status(200).json({ ok: true, concurrent_update: true });
             }
 
-            // Log ledger entry
-            await recordShardTransaction(
-              supabase,
-              matchedWallet,
-              'STARS_PURCHASE',
-              pkg.shards,
-              updatedShards,
-              `Telegram Stars purchase: ${pkg.name} (${payment.total_amount} XTR, Charge: ${chargeId})`
-            );
+            // Unified purchase ledger in purchases table
+            await logPurchaseToDatabase(supabase, {
+              walletAddress: matchedWallet,
+              packageId: packageId,
+              currency: 'XTR',
+              amount: payment.total_amount,
+              shards: pkg.shards,
+              signature: chargeId,
+              provider: 'stars',
+              status: 'success'
+            });
 
-            console.log(`[STARS] Successfully credited ${pkg.shards} shards to ${matchedWallet}`);
+            console.log(`[STARS] Successfully credited ${pkg.shards} shards to ${matchedWallet} and logged to purchases`);
           }
         }
       }
