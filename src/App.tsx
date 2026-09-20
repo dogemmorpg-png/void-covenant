@@ -596,7 +596,7 @@ export default function App() {
         uiPreferences={{ theme: THEME.DARK }}
         actionsConfiguration={{
           twaReturnUrl: 'https://t.me/voidcovenantbot/voidcovenant',
-          returnStrategy: 'none',
+          returnStrategy: 'back',
           modals: [],
           notifications: []
         }}

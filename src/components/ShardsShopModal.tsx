@@ -404,7 +404,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       };
 
       await tonConnectUI.sendTransaction(transaction, {
-        returnStrategy: 'none',
+        returnStrategy: 'back',
         modals: [],
         notifications: [],
         onRequestSent: (redirectToWallet) => {
@@ -583,7 +583,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       };
 
       await tonConnectUI.sendTransaction(transaction, {
-        returnStrategy: 'none',
+        returnStrategy: 'back',
         modals: [],
         notifications: [],
         onRequestSent: (redirectToWallet) => {
