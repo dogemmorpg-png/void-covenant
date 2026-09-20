@@ -73,5 +73,17 @@ export const TELEGRAM_PACKAGES: TelegramPackage[] = [
     badge: 'SUPREME',
     description: 'The ultimate royal vault granting 700 Dark Shards.',
     image: '/shop/void_overlord_vault.png'
+  },
+  {
+    id: 'shards_sovereign',
+    name: 'Void Sovereign Monolith',
+    shardsReward: 1800,
+    dustBonus: 0,
+    starsCost: 75,
+    tonCost: 2.50,
+    usdtCost: 6.50,
+    badge: 'MYTHIC',
+    description: 'The monumental monolithic relic granting 1,800 Dark Shards.',
+    image: '/shop/void_sovereign_monolith.png'
   }
 ];

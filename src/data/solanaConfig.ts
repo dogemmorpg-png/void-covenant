@@ -71,5 +71,15 @@ export const SOLANA_PACKAGES: SolanaPackage[] = [
     description: '',
     badge: 'SUPREME',
     image: '/shop/void_overlord_vault.png'
+  },
+  {
+    id: 'shards_sovereign',
+    name: 'Void Sovereign Monolith',
+    solCost: 2.50,
+    shardsReward: 1800,
+    dustBonus: 0,
+    description: '',
+    badge: 'MYTHIC',
+    image: '/shop/void_sovereign_monolith.png'
   }
 ];

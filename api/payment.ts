@@ -32,6 +32,7 @@ const SOLANA_PACKAGES: Record<string, { solCost: number; shards: number; dust: n
   shards_pouch: { solCost: 0.15, shards: 85, dust: 0 },
   shards_vault: { solCost: 0.40, shards: 250, dust: 0 },
   shards_overlord: { solCost: 1.00, shards: 700, dust: 0 },
+  shards_sovereign: { solCost: 2.50, shards: 1800, dust: 0 },
   premium_bp_sol: { solCost: 0.25, shards: 0, dust: 0, isBp: true }
 };
 
@@ -68,6 +69,14 @@ const TELEGRAM_PACKAGES: Record<string, { shards: number; starsCost: number; ton
     tonCost: 1.00,
     usdtCost: 2.50,
     description: 'Instant credit: 700 pure Dark Shards.'
+  },
+  shards_sovereign: {
+    name: 'Void Sovereign Monolith',
+    shards: 1800,
+    starsCost: 75,
+    tonCost: 2.50,
+    usdtCost: 6.50,
+    description: 'Instant credit: 1,800 pure Dark Shards.'
   }
 };
 

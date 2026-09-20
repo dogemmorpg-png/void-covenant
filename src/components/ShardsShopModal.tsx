@@ -971,9 +971,67 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         return 'bg-gradient-to-r from-amber-950 to-amber-800 text-amber-200 border-amber-400/50 shadow-[0_0_10px_rgba(245,158,11,0.3)]';
       case 'SUPREME':
         return 'bg-gradient-to-r from-rose-950 to-red-800 text-rose-100 border-rose-400/60 shadow-[0_0_12px_rgba(244,63,94,0.4)]';
+      case 'MYTHIC':
+        return 'bg-gradient-to-r from-amber-950 via-rose-950 to-purple-900 text-amber-200 border-amber-400/70 shadow-[0_0_15px_rgba(245,158,11,0.5)]';
       default:
         return 'bg-black/60 text-gray-300 border-white/20';
     }
+  };
+
+  const renderBuyButton = (pkg: TelegramPackage | SolanaPackage) => {
+    if (isTelegramUser) {
+      const tgPkg = pkg as TelegramPackage;
+      if (tgMethod === 'stars') {
+        return (
+          <button
+            onClick={() => handlePurchaseStars(tgPkg)}
+            disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
+            className="w-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 hover:border-amber-400/50 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn"
+          >
+            <TelegramStarIcon className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
+            <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight">{tgPkg.starsCost}</span>
+            <span className="text-[10px] sm:text-[11px] font-display font-bold text-amber-400 uppercase tracking-wider">STARS</span>
+          </button>
+        );
+      }
+      if (tgMethod === 'ton') {
+        return (
+          <button
+            onClick={() => handlePurchaseTon(tgPkg)}
+            disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
+            className="w-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 hover:border-cyan-400/50 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn"
+          >
+            <TonSymbolIcon className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
+            <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight">{tgPkg.tonCost}</span>
+            <span className="text-[10px] sm:text-[11px] font-display font-bold text-cyan-400 uppercase tracking-wider">TON</span>
+          </button>
+        );
+      }
+      return (
+        <button
+          onClick={() => handlePurchaseUsdt(tgPkg)}
+          disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
+          className="w-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 hover:border-emerald-400/50 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn"
+        >
+          <UsdtSymbolIcon className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
+          <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight">${tgPkg.usdtCost}</span>
+          <span className="text-[10px] sm:text-[11px] font-display font-bold text-emerald-400 uppercase tracking-wider">USDT</span>
+        </button>
+      );
+    }
+
+    const solPkg = pkg as SolanaPackage;
+    return (
+      <button
+        onClick={() => handlePurchaseSolana(solPkg)}
+        disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
+        className="w-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 hover:border-purple-400/50 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn"
+      >
+        <SolanaSymbolIcon className="w-4 h-4 shrink-0 drop-shadow-[0_0_5px_rgba(3,225,255,0.6)] group-hover/btn:scale-110 transition-transform" />
+        <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight">{solPkg.solCost}</span>
+        <span className="text-[10px] sm:text-[11px] font-display font-bold text-purple-400 uppercase tracking-wider">SOL</span>
+      </button>
+    );
   };
 
   return (
@@ -1131,10 +1189,73 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         {paymentState.status === 'idle' || paymentState.status === 'success' || paymentState.status === 'error' || paymentState.status === 'pending' ? (
           <div className="space-y-2.5 sm:space-y-4">
             
-            {/* Packages 2x2 Grid on ALL screens */}
+            {/* Packages Grid: 2x2 on top + 5th item stretched col-span-2 across the bottom */}
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {(isTelegramUser ? TELEGRAM_PACKAGES : SOLANA_PACKAGES).map(pkg => {
+                const isSovereign = pkg.id === 'shards_sovereign';
                 const isPopular = pkg.popular;
+
+                if (isSovereign) {
+                  return (
+                    <div
+                      key={pkg.id}
+                      className="col-span-2 relative rounded-2xl p-2.5 sm:p-3 flex items-center justify-between gap-2 sm:gap-4 border transition-all duration-200 group hover:scale-[1.01] bg-gradient-to-r from-[#241026]/95 via-[#16091e]/95 to-[#100615]/95 border-amber-500/50 hover:border-amber-400/80 shadow-[0_0_25px_rgba(245,158,11,0.18)] overflow-hidden"
+                    >
+                      {/* Ambient background glow highlights */}
+                      <div className="absolute -left-10 -top-10 w-36 h-36 bg-amber-500/15 rounded-full blur-2xl pointer-events-none" />
+                      <div className="absolute right-0 bottom-0 w-36 h-36 bg-rose-600/15 rounded-full blur-2xl pointer-events-none" />
+
+                      {/* Left: Thumbnail & Details */}
+                      <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
+                        <div className="relative shrink-0 w-13 h-13 sm:w-16 sm:h-16 flex items-center justify-center rounded-xl bg-black/60 border border-amber-500/40 p-1 shadow-inner group-hover:scale-105 transition-transform duration-300">
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.25),transparent_70%)] pointer-events-none" />
+                          {pkg.image && (
+                            <img 
+                              src={pkg.image} 
+                              alt={pkg.name} 
+                              className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(245,158,11,0.5)] rounded-lg" 
+                            />
+                          )}
+                        </div>
+
+                        <div className="min-w-0 flex flex-col justify-center">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            {pkg.badge && (
+                              <span className={`text-[7px] sm:text-[8px] px-1.5 py-0.2 rounded-full font-mono font-black tracking-wider border uppercase ${getBadgeStyle(pkg.badge)}`}>
+                                {pkg.badge}
+                              </span>
+                            )}
+                            <span className="text-[8px] sm:text-[9px] font-mono font-bold text-amber-300/80 uppercase tracking-wider hidden sm:inline-block">
+                              APEX MONOLITH
+                            </span>
+                          </div>
+                          <span className="text-white font-display font-black text-[11px] sm:text-xs md:text-sm tracking-wide block truncate">
+                            {pkg.name}
+                          </span>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <img 
+                              src="/icons/icon_shards.webp" 
+                              alt="Shards" 
+                              className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.8)] shrink-0" 
+                            />
+                            <span className="text-xs sm:text-sm font-black text-white font-mono leading-none tracking-tight">
+                              +{pkg.shardsReward.toLocaleString()}
+                            </span>
+                            <span className="text-[9px] sm:text-[10px] font-mono text-rose-300/70 font-semibold">
+                              SHARDS
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right: Buy Button */}
+                      <div className="shrink-0 w-28 sm:w-36">
+                        {renderBuyButton(pkg)}
+                      </div>
+                    </div>
+                  );
+                }
+
                 return (
                   <div
                     key={pkg.id}
@@ -1183,50 +1304,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                     </div>
 
                     {/* Price Button */}
-                    {isTelegramUser ? (
-                      tgMethod === 'stars' ? (
-                        <button
-                          onClick={() => handlePurchaseStars(pkg as TelegramPackage)}
-                          disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
-                          className="w-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 hover:border-amber-400/50 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn"
-                        >
-                          <TelegramStarIcon className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
-                          <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight">{(pkg as TelegramPackage).starsCost}</span>
-                          <span className="text-[10px] sm:text-[11px] font-display font-bold text-amber-400 uppercase tracking-wider">STARS</span>
-                        </button>
-                      ) : tgMethod === 'ton' ? (
-                        <button
-                          onClick={() => handlePurchaseTon(pkg as TelegramPackage)}
-                          disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
-                          className="w-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 hover:border-cyan-400/50 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn"
-                        >
-                          <TonSymbolIcon className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
-                          <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight">{(pkg as TelegramPackage).tonCost}</span>
-                          <span className="text-[10px] sm:text-[11px] font-display font-bold text-cyan-400 uppercase tracking-wider">TON</span>
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handlePurchaseUsdt(pkg as TelegramPackage)}
-                          disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
-                          className="w-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 hover:border-emerald-400/50 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn"
-                        >
-                          <UsdtSymbolIcon className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
-                          <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight">${(pkg as TelegramPackage).usdtCost}</span>
-                          <span className="text-[10px] sm:text-[11px] font-display font-bold text-emerald-400 uppercase tracking-wider">USDT</span>
-                        </button>
-                      )
-                    ) : (
-                      /* Solana Price Button (PC / External Mobile Browsers) */
-                      <button
-                        onClick={() => handlePurchaseSolana(pkg as SolanaPackage)}
-                        disabled={paymentState.status === 'signing' || paymentState.status === 'verifying'}
-                        className="w-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 hover:border-purple-400/50 text-white py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 group/btn"
-                      >
-                        <SolanaSymbolIcon className="w-4 h-4 shrink-0 drop-shadow-[0_0_5px_rgba(3,225,255,0.6)] group-hover/btn:scale-110 transition-transform" />
-                        <span className="font-mono font-black text-white text-xs sm:text-sm tracking-tight">{(pkg as SolanaPackage).solCost}</span>
-                        <span className="text-[10px] sm:text-[11px] font-display font-bold text-purple-400 uppercase tracking-wider">SOL</span>
-                      </button>
-                    )}
+                    {renderBuyButton(pkg)}
                   </div>
                 );
               })}

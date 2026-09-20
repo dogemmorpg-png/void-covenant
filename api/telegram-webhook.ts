@@ -15,7 +15,8 @@ const PACKAGES: Record<string, { shards: number; name: string }> = {
   shards_micro: { shards: 25, name: 'Pouch of Shards' },
   shards_pouch: { shards: 85, name: 'Dark Shard Chest' },
   shards_vault: { shards: 250, name: 'Abyssal Treasury' },
-  shards_overlord: { shards: 700, name: 'Lord of the Void Vault' }
+  shards_overlord: { shards: 700, name: 'Lord of the Void Vault' },
+  shards_sovereign: { shards: 1800, name: 'Void Sovereign Monolith' }
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
