@@ -156,7 +156,7 @@ export const MobileBankView: React.FC = () => {
     if (isTelegramUser && targetAddress.startsWith('tg_')) {
       setFeedback({
         type: 'error',
-        message: 'Please connect your TON wallet (@wallet or Tonkeeper) for Telegram payouts.'
+        message: 'Please connect your TON wallet (Telegram Wallet, Tonkeeper, MyTonWallet, etc.) for Telegram payouts.'
       });
       return;
     }

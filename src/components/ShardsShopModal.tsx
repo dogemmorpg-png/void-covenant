@@ -59,11 +59,6 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
     if (redirectToWalletRef.current) {
       redirectToWalletRef.current().catch(err => console.warn('Wallet redirect error:', err));
     }
-    const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
-    const info = tonConnectUI.walletInfo;
-    if (tg?.openLink && info && 'universalLink' in info && !info.universalLink.includes('t.me')) {
-      tg.openLink(info.universalLink);
-    }
   };
 
   const isTelegramUser = useMemo(() => {
@@ -1061,7 +1056,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                       className="w-full py-2.5 px-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-display font-black text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-[0_0_15px_rgba(6,182,212,0.4)] active:scale-95 flex items-center justify-center gap-2"
                     >
                       <ExternalLink className="w-4 h-4" />
-                      Open {tonConnectUI.walletInfo.name || 'Tonkeeper'}
+                      Open {tonConnectUI.walletInfo.name || 'Wallet'}
                     </button>
                   )}
                   <button
