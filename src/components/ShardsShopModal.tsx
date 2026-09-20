@@ -548,14 +548,14 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       setPaymentState(prev => ({
         ...prev,
         status: 'verifying',
-        message: 'Transfer submitted! Verifying on-chain via Toncenter / TonAPI...'
+        message: 'Transfer submitted! Verifying transaction on blockchain...'
       }));
 
       let verified = false;
       for (let attempt = 1; attempt <= 12; attempt++) {
         setPaymentState(prev => ({
           ...prev,
-          message: `Verifying on-chain via Toncenter (Attempt ${attempt}/12)...`
+          message: `Verifying on-chain (Attempt ${attempt}/12)...`
         }));
 
         const res = await verifyTonPayment(pkg.id, 'ton', undefined, tonAddress);
@@ -725,14 +725,14 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
       setPaymentState(prev => ({
         ...prev,
         status: 'verifying',
-        message: 'USDT transfer submitted! Verifying on-chain via Toncenter / TonAPI...'
+        message: 'USDT transfer submitted! Verifying transaction on blockchain...'
       }));
 
       let verified = false;
       for (let attempt = 1; attempt <= 12; attempt++) {
         setPaymentState(prev => ({
           ...prev,
-          message: `Verifying USDT transfer on-chain (Attempt ${attempt}/12)...`
+          message: `Verifying USDT on-chain (Attempt ${attempt}/12)...`
         }));
 
         const res = await verifyTonPayment(pkg.id, 'usdt', undefined, tonAddress);
@@ -833,7 +833,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
           setPaymentState(prev => ({
             ...prev,
             status: 'verifying',
-            message: `Re-verifying ${cur.toUpperCase()} on TON blockchain via Toncenter...`
+            message: `Re-verifying ${cur.toUpperCase()} on TON blockchain...`
           }));
           const res = await verifyTonPayment(pkg.id, cur, undefined, tonAddress);
           if (res.success) {
@@ -924,83 +924,45 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 h-24 bg-red-600/15 blur-3xl pointer-events-none" />
 
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-white/10 pb-2 sm:pb-3 shrink-0">
-          <div className="flex items-center gap-2 sm:gap-2.5">
+        <div className="flex justify-between items-center border-b border-white/10 pb-2.5 sm:pb-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-black/70 border border-red-500/50 flex items-center justify-center shadow-inner shrink-0">
               <img 
                 src="/icons/icon_shards.webp" 
                 alt="Dark Shards" 
-                className="w-6 h-6 sm:w-7 sm:h-7 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" 
+                className="w-5 h-5 sm:w-6 sm:h-6 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" 
               />
             </div>
-            <div>
-              <h3 className="font-display font-black text-white text-xs sm:text-base tracking-widest uppercase text-shadow-gold leading-none">
+            <div className="min-w-0">
+              <h3 className="font-display font-black text-white text-xs sm:text-sm md:text-base tracking-widest uppercase text-shadow-gold leading-none truncate">
                 DARK SHARDS SHOP
               </h3>
-              <p className="text-[9px] sm:text-[10px] text-rose-300/80 font-mono mt-0.5">
-                {isTelegramUser ? 'Acquire shards via Stars, TON or USDT' : 'Acquire shards on Solana Mainnet'}
+              <p className="text-[9px] sm:text-[10px] text-rose-300/80 font-mono mt-1 leading-none truncate">
+                {isTelegramUser ? 'Telegram Stars · TON · USDT' : 'Acquire shards on Solana Mainnet'}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {/* Live Dark Shards Balance Pill */}
-            <div className="flex items-center gap-1.5 bg-black/60 border border-rose-500/40 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full shadow-[0_0_10px_rgba(244,63,94,0.15)]">
+            <div className="flex items-center gap-1.5 bg-black/60 border border-rose-500/40 px-2.5 py-1 rounded-full shadow-[0_0_10px_rgba(244,63,94,0.15)]">
               <img 
                 src="/icons/icon_shards.webp" 
                 alt="Shards" 
                 className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.7)]" 
               />
-              <span className="text-[11px] sm:text-xs font-mono font-black text-rose-300">
+              <span className="text-[11px] sm:text-xs font-mono font-black text-rose-300 leading-none">
                 {(profile.darkShards || 0).toLocaleString()}
               </span>
             </div>
 
-            {isTelegramUser ? (
-              /* Telegram Wallet Status (shown when TON / USDT tab active) */
-              (tgMethod === 'ton' || tgMethod === 'usdt') && (
-                tonAddress ? (
-                  <div className="flex items-center gap-1">
-                    <div 
-                      onClick={() => tonConnectUI.openModal()}
-                      title="Connected TON Wallet (click for details)"
-                      className="flex items-center gap-1 bg-black/60 hover:bg-cyan-950/40 border border-cyan-500/40 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono text-cyan-300 transition-all cursor-pointer"
-                    >
-                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                      <span>{tonAddress.slice(0, 4)}...{tonAddress.slice(-4)}</span>
-                    </div>
-                    <button
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        try {
-                          await tonConnectUI.disconnect();
-                          toast('TON wallet disconnected', 'info');
-                        } catch (err) {
-                          console.warn('Disconnect error:', err);
-                        }
-                      }}
-                      title="Disconnect TON wallet"
-                      className="w-5 h-5 rounded-full bg-black/60 hover:bg-red-950/60 border border-white/20 hover:border-red-500/50 text-gray-400 hover:text-red-300 flex items-center justify-center transition-all cursor-pointer"
-                    >
-                      <LogOut className="w-2.5 h-2.5" />
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => tonConnectUI.openModal()}
-                    className="flex items-center gap-1 bg-gradient-to-r from-cyan-900/60 to-blue-900/60 hover:from-cyan-700 hover:to-blue-700 border border-cyan-500/40 text-cyan-200 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold tracking-wider transition-all cursor-pointer"
-                  >
-                    <Wallet className="w-2.5 h-2.5" /> CONNECT TON
-                  </button>
-                )
-              )
-            ) : (
-              /* Solana Wallet Status (PC / External Mobile Browsers) */
+            {/* Solana Wallet Status (PC / External Mobile Browsers) */}
+            {!isTelegramUser && (
               connected && publicKey ? (
                 <div 
                   onClick={() => disconnect()}
                   title="Click to disconnect"
-                  className="flex items-center gap-1 bg-black/60 hover:bg-red-950/40 border border-emerald-500/40 hover:border-red-500/40 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono text-emerald-400 hover:text-red-300 transition-all cursor-pointer"
+                  className="flex items-center gap-1 bg-black/60 hover:bg-red-950/40 border border-emerald-500/40 hover:border-red-500/40 px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] font-mono text-emerald-400 hover:text-red-300 transition-all cursor-pointer"
                 >
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span>{publicKey.toBase58().slice(0, 4)}...{publicKey.toBase58().slice(-4)}</span>
@@ -1008,7 +970,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
               ) : (
                 <button
                   onClick={() => setSolanaModalVisible(true)}
-                  className="flex items-center gap-1 bg-gradient-to-r from-purple-900/60 to-[#1f2833] hover:from-purple-700 hover:to-indigo-900 border border-purple-500/40 text-purple-300 px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold tracking-wider transition-all cursor-pointer"
+                  className="flex items-center gap-1 bg-gradient-to-r from-purple-900/60 to-[#1f2833] hover:from-purple-700 hover:to-indigo-900 border border-purple-500/40 text-purple-300 px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] font-mono font-bold tracking-wider transition-all cursor-pointer"
                 >
                   <Wallet className="w-2.5 h-2.5" /> CONNECT
                 </button>
@@ -1017,7 +979,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
 
             <button 
               onClick={handleCloseModal}
-              className="w-7 h-7 rounded-xl bg-black/50 hover:bg-red-950/60 border border-white/10 hover:border-red-500/40 text-gray-400 hover:text-red-300 flex items-center justify-center transition-all cursor-pointer ml-0.5"
+              className="w-7 h-7 rounded-xl bg-black/50 hover:bg-red-950/60 border border-white/10 hover:border-red-500/40 text-gray-400 hover:text-red-300 flex items-center justify-center transition-all cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -1026,7 +988,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
 
         {/* Telegram Multi-Payment Method Switcher */}
         {isTelegramUser && (paymentState.status === 'idle' || paymentState.status === 'success' || paymentState.status === 'error' || paymentState.status === 'pending') && (
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <div className="grid grid-cols-3 gap-1.5 p-1 bg-black/60 border border-white/10 rounded-2xl">
               <button
                 onClick={() => setTgMethod('stars')}
@@ -1065,11 +1027,50 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
               </button>
             </div>
 
-            <p className="text-[10px] font-mono text-center text-gray-400">
-              {tgMethod === 'stars' && '⚡ 1-click native purchase with Telegram Stars (Apple/Google Pay & Card).'}
-              {tgMethod === 'ton' && '💎 Direct on-chain transfer in TON via your connected TON wallet.'}
-              {tgMethod === 'usdt' && '💵 Transfer in USDT (TON Network) via your connected TON wallet.'}
-            </p>
+            {/* Dedicated TON Wallet status bar (only for TON & USDT methods) */}
+            {(tgMethod === 'ton' || tgMethod === 'usdt') && (
+              <div className="flex items-center justify-between px-3 py-1.5 bg-black/40 border border-cyan-500/20 rounded-xl">
+                <div className="flex items-center gap-1.5 text-gray-400 font-mono text-[10px] sm:text-[11px]">
+                  <Wallet className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                  <span>TON Wallet:</span>
+                </div>
+
+                {tonAddress ? (
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => tonConnectUI.openModal()}
+                      title="Connected TON Wallet (click for details)"
+                      className="flex items-center gap-1.5 bg-cyan-950/60 hover:bg-cyan-900/60 border border-cyan-500/40 px-2.5 py-0.5 rounded-full text-[10px] font-mono text-cyan-300 transition-all cursor-pointer"
+                    >
+                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                      <span>{tonAddress.slice(0, 4)}...{tonAddress.slice(-4)}</span>
+                    </button>
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        try {
+                          await tonConnectUI.disconnect();
+                          toast('TON wallet disconnected', 'info');
+                        } catch (err) {
+                          console.warn('Disconnect error:', err);
+                        }
+                      }}
+                      title="Disconnect TON wallet"
+                      className="w-5 h-5 rounded-full bg-black/60 hover:bg-red-950/60 border border-white/20 hover:border-red-500/50 text-gray-400 hover:text-red-300 flex items-center justify-center transition-all cursor-pointer"
+                    >
+                      <LogOut className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => tonConnectUI.openModal()}
+                    className="flex items-center gap-1.5 bg-gradient-to-r from-cyan-900/80 to-blue-900/80 hover:from-cyan-700 hover:to-blue-700 border border-cyan-500/50 text-cyan-200 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider transition-all cursor-pointer shadow-[0_0_10px_rgba(6,182,212,0.25)]"
+                  >
+                    <Wallet className="w-3 h-3" /> CONNECT TON WALLET
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -1198,9 +1199,11 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                 {paymentState.status === 'signing' && (paymentState.txType === 'stars' ? 'Confirm Stars in Telegram' : 'Confirm in Wallet')}
                 {paymentState.status === 'verifying' && 'Verifying Transaction...'}
               </h4>
-              <p className="text-xs text-gray-400 font-sans max-w-xs mx-auto leading-relaxed">
-                {paymentState.message}
-              </p>
+              {paymentState.status === 'signing' && paymentState.message && (
+                <p className="text-xs text-gray-400 font-sans max-w-xs mx-auto leading-relaxed">
+                  {paymentState.message}
+                </p>
+              )}
               {paymentState.status === 'signing' && (
                 <div className="flex flex-col items-center gap-2 mt-3 w-full max-w-xs mx-auto">
                   {paymentState.txType === 'ton' && tonConnectUI.walletInfo && !tonConnectUI.walletInfo.universalLink?.includes('t.me') && (
