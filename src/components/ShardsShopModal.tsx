@@ -32,6 +32,26 @@ interface ShardsShopModalProps {
   onClose: () => void;
 }
 
+const isUserCancellation = (err: any): boolean => {
+  if (!err) return false;
+  const name = String(err?.name || '');
+  const msg = String(err?.message || '');
+  const info = String(err?.info || '');
+  const text = `${name} ${msg} ${info} ${String(err)}`.toLowerCase();
+
+  return (
+    text.includes('reject') ||
+    text.includes('cancel') ||
+    text.includes('decline') ||
+    text.includes('abort') ||
+    text.includes('not sent') ||
+    text.includes('denied') ||
+    text.includes('dismiss') ||
+    text.includes('closed') ||
+    text.includes('userrejects')
+  );
+};
+
 export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => {
   const { 
     profile, 
@@ -260,7 +280,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
 
     } catch (err: any) {
       console.error('Solana purchase error:', err);
-      const isUserReject = err.message?.includes('User rejected') || err.message?.includes('cancelled');
+      const isUserReject = isUserCancellation(err);
       setPaymentState(prev => ({
         ...prev,
         status: isUserReject ? 'idle' : 'error',
@@ -463,10 +483,8 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
 
     } catch (err: any) {
       console.error('TON purchase error:', err);
-      const rawMsg = err?.info || err?.message || String(err || '');
-      const isReject = rawMsg.includes('Reject') || rawMsg.includes('cancel') || rawMsg.includes('declined') || rawMsg.includes('UserRejectsError');
       
-      if (isReject) {
+      if (isUserCancellation(err)) {
         setPaymentState({
           status: 'idle',
           message: 'Transaction was cancelled in wallet.'
@@ -642,10 +660,8 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
 
     } catch (err: any) {
       console.error('USDT purchase error:', err);
-      const rawMsg = err?.info || err?.message || String(err || '');
-      const isReject = rawMsg.includes('Reject') || rawMsg.includes('cancel') || rawMsg.includes('declined') || rawMsg.includes('UserRejectsError');
       
-      if (isReject) {
+      if (isUserCancellation(err)) {
         setPaymentState({
           status: 'idle',
           message: 'Transaction was cancelled in wallet.'
