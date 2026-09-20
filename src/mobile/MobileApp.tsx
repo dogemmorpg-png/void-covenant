@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { MobileHeaderHUD } from './MobileHeaderHUD';
 import { MobileNavDrawer, MobileTab } from './MobileNavDrawer';
@@ -40,6 +40,13 @@ export const MobileApp: React.FC = () => {
   const [shopInitialTab, setShopInitialTab] = useState<'cards' | 'equipment' | 'divine' | 'shields' | 'level_boost'>('cards');
   const [isPvpMatching, setIsPvpMatching] = useState(false);
   const [isPvpModalOpen, setIsPvpModalOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.classList.add('mobile-locked');
+    return () => {
+      document.body.classList.remove('mobile-locked');
+    };
+  }, []);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab as MobileTab);

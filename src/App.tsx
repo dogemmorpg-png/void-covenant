@@ -358,7 +358,7 @@ function MainAppContent() {
            {!isPvpMatching && !isPvpModalOpen && <HeaderHUD onNavigateTab={setActiveTab} />}
 
           {/* Tab content */}
-          <div className="py-3 sm:py-4">
+          <div className="pt-3 sm:pt-4 pb-20 sm:pb-24">
             <div className={activeTab === 'campaign' ? 'block' : 'hidden'}>
               <CampaignView onStartBattle={(stage) => {
                 setActiveBattleType('campaign');

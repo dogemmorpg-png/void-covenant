@@ -69,12 +69,18 @@ html {
 }
 
 html, body, #root {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* On mobile / Telegram Mini App, lock the root viewport to avoid unwanted elastic rubber-band bounces */
+body.mobile-locked,
+body.mobile-locked #root {
   height: 100%;
   max-height: 100%;
   height: var(--app-height, 100%);
   max-height: var(--app-height, 100%);
-  margin: 0;
-  padding: 0;
   overflow: hidden;
 }
 

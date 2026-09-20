@@ -19,6 +19,12 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
 
   // Initialize Telegram WebApp fullscreen ONLY for mobile devices
   useEffect(() => {
+    if (isMobile) {
+      document.body.classList.add('mobile-locked');
+    } else {
+      document.body.classList.remove('mobile-locked');
+    }
+
     if (!isMobile) return; // NEVER run on desktop PC — prevents consuming user gesture for wallet extensions
 
     if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp) {
@@ -33,6 +39,10 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
         console.warn('Telegram WebApp setup error:', e);
       }
     }
+
+    return () => {
+      document.body.classList.remove('mobile-locked');
+    };
   }, [isMobile]);
 
   const requestLandscapeAndFullscreen = async () => {
@@ -139,7 +149,7 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
       </AnimatePresence>
 
       {/* Render children game content directly */}
-      <div className={showRotatePrompt ? 'hidden' : 'w-full h-full flex flex-col'}>
+      <div className={showRotatePrompt ? 'hidden' : 'w-full min-h-full flex-1 flex flex-col'}>
         {children}
       </div>
     </>
