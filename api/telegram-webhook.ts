@@ -81,6 +81,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const supabase = getSupabase();
 
         // Anti-replay check via processed_transactions in profile or transactions ledger
+        let profileRow: any = null;
+        let matchedWallet = walletAddress;
+
         const { data: rows } = await supabase
           .from('profiles')
           .select('data')
@@ -88,7 +91,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .limit(1);
 
         if (rows && rows.length > 0) {
-          const profileData = rows[0].data || {};
+          profileRow = rows[0];
+        } else {
+          const altWallet = walletAddress.startsWith('tg_') ? walletAddress.slice(3) : `tg_${walletAddress}`;
+          const { data: altRows } = await supabase
+            .from('profiles')
+            .select('data')
+            .eq('wallet_address', altWallet)
+            .limit(1);
+          if (altRows && altRows.length > 0) {
+            profileRow = altRows[0];
+            matchedWallet = altWallet;
+          }
+        }
+
+        if (profileRow) {
+          const profileData = profileRow.data || {};
           const processed = profileData.processedTransactions || [];
 
           if (!processed.includes(chargeId)) {
@@ -104,19 +122,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 data: profileData,
                 updated_at: new Date().toISOString()
               })
-              .eq('wallet_address', walletAddress);
+              .eq('wallet_address', matchedWallet);
 
             // Log ledger entry
             await recordShardTransaction(
               supabase,
-              walletAddress,
+              matchedWallet,
               'STARS_PURCHASE',
               pkg.shards,
               updatedShards,
               `Telegram Stars purchase: ${pkg.name} (${payment.total_amount} XTR, Charge: ${chargeId})`
             );
 
-            console.log(`[STARS] Successfully credited ${pkg.shards} shards to ${walletAddress}`);
+            console.log(`[STARS] Successfully credited ${pkg.shards} shards to ${matchedWallet}`);
           }
         }
       }

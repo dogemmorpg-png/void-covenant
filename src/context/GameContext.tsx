@@ -81,6 +81,8 @@ interface GameContextType {
   hasNewDefenseAttacks: boolean;
   markDefenseHistoryAsViewed: () => void;
   createStarsInvoice: (packageId: string) => Promise<{ success: boolean; invoiceLink?: string; message?: string }>;
+  verifyStarsPayment: (packageId?: string) => Promise<{ success: boolean; message: string; newDarkShards?: number }>;
+  notifyShardCredit: () => void;
   verifyTonPayment: (packageId: string, currency: 'ton' | 'usdt', txHash?: string, senderAddress?: string) => Promise<{ success: boolean; message: string; newDarkShards?: number }>;
 }
 
@@ -307,6 +309,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Track known defense IDs to avoid duplicate toasts
   const knownDefenseIdsRef = useRef<Set<string>>(new Set());
+  const lastShardCreditTimeRef = useRef<number>(0);
+
+  const notifyShardCredit = useCallback(() => {
+    lastShardCreditTimeRef.current = Date.now();
+  }, []);
 
   // Initialize knownDefenseIds when profile is loaded
   useEffect(() => {
@@ -339,7 +346,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.profile) {
           let serverProfile = calculateEnergy(data.profile);
           serverProfile.solBalance = 12.5;
-          const migrated = migrateProfileTo10Cards(serverProfile);
+          let migrated = migrateProfileTo10Cards(serverProfile);
 
           // Check for new defense attacks
           const newHistory = migrated.pvpHistory || [];
@@ -374,29 +381,39 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           // Check if profile actually changed before re-rendering
           setProfile(prev => {
+            let finalMigrated = migrated;
+            // Prevent rollback if user recently credited shards and server response is slightly delayed
             if (
-              prev.pvpLP !== migrated.pvpLP ||
-              prev.pvpRating !== migrated.pvpRating ||
-              prev.pvpLeague !== migrated.pvpLeague ||
-              (prev.pvpHistory?.length || 0) !== (migrated.pvpHistory?.length || 0) ||
-              prev.gold !== migrated.gold ||
-              prev.dust !== migrated.dust ||
-              prev.darkShards !== migrated.darkShards ||
-              prev.bloodSovereigns !== migrated.bloodSovereigns ||
-              prev.dailySovereignsWonToday !== migrated.dailySovereignsWonToday ||
-              prev.lastSovereignsWonDate !== migrated.lastSovereignsWonDate ||
-              prev.subscriptionTier !== migrated.subscriptionTier ||
-              prev.subscriptionExpiresAt !== migrated.subscriptionExpiresAt ||
-              prev.pvpEnergy !== migrated.pvpEnergy ||
-              prev.pvpBonusTickets !== migrated.pvpBonusTickets ||
-              (prev.mailMessages?.length || 0) !== (migrated.mailMessages?.length || 0) ||
-              (prev.mailMessages || []).filter((m: any) => m.rewards && !m.isClaimed).length !== (migrated.mailMessages || []).filter((m: any) => m.rewards && !m.isClaimed).length ||
-              (prev.mailMessages || []).filter((m: any) => !m.isRead).length !== (migrated.mailMessages || []).filter((m: any) => !m.isRead).length ||
-              (prev.sovereignTransactions?.length || 0) !== (migrated.sovereignTransactions?.length || 0) ||
-              prev.level !== migrated.level ||
-              prev.exp !== migrated.exp
+              lastShardCreditTimeRef.current &&
+              Date.now() - lastShardCreditTimeRef.current < 20000 &&
+              (prev.darkShards || 0) > (migrated.darkShards || 0)
             ) {
-              return migrated;
+              finalMigrated = { ...migrated, darkShards: prev.darkShards };
+            }
+
+            if (
+              prev.pvpLP !== finalMigrated.pvpLP ||
+              prev.pvpRating !== finalMigrated.pvpRating ||
+              prev.pvpLeague !== finalMigrated.pvpLeague ||
+              (prev.pvpHistory?.length || 0) !== (finalMigrated.pvpHistory?.length || 0) ||
+              prev.gold !== finalMigrated.gold ||
+              prev.dust !== finalMigrated.dust ||
+              prev.darkShards !== finalMigrated.darkShards ||
+              prev.bloodSovereigns !== finalMigrated.bloodSovereigns ||
+              prev.dailySovereignsWonToday !== finalMigrated.dailySovereignsWonToday ||
+              prev.lastSovereignsWonDate !== finalMigrated.lastSovereignsWonDate ||
+              prev.subscriptionTier !== finalMigrated.subscriptionTier ||
+              prev.subscriptionExpiresAt !== finalMigrated.subscriptionExpiresAt ||
+              prev.pvpEnergy !== finalMigrated.pvpEnergy ||
+              prev.pvpBonusTickets !== finalMigrated.pvpBonusTickets ||
+              (prev.mailMessages?.length || 0) !== (finalMigrated.mailMessages?.length || 0) ||
+              (prev.mailMessages || []).filter((m: any) => m.rewards && !m.isClaimed).length !== (finalMigrated.mailMessages || []).filter((m: any) => m.rewards && !m.isClaimed).length ||
+              (prev.mailMessages || []).filter((m: any) => !m.isRead).length !== (finalMigrated.mailMessages || []).filter((m: any) => !m.isRead).length ||
+              (prev.sovereignTransactions?.length || 0) !== (finalMigrated.sovereignTransactions?.length || 0) ||
+              prev.level !== finalMigrated.level ||
+              prev.exp !== finalMigrated.exp
+            ) {
+              return finalMigrated;
             }
             return prev;
           });
@@ -1060,6 +1077,42 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Verify / reconcile Telegram Stars payment
+  const verifyStarsPayment = async (packageId?: string): Promise<{ success: boolean; message: string; newDarkShards?: number }> => {
+    const token = localStorage.getItem('void_covenant_token');
+    if (!token) return { success: false, message: 'Authentication required. Please launch from Telegram.' };
+
+    try {
+      const res = await fetch('/api/payment?action=verify_stars', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action: 'verify_stars', packageId })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, message: data.error || `Verification failed (HTTP ${res.status})` };
+      }
+
+      notifyShardCredit();
+
+      if (data.newDarkShards !== undefined) {
+        setProfile(prev => ({
+          ...prev,
+          darkShards: data.newDarkShards
+        }));
+      }
+
+      return { success: true, message: data.message || 'Stars payment verified!', newDarkShards: data.newDarkShards };
+    } catch (e: any) {
+      console.error('verifyStarsPayment error:', e);
+      return { success: false, message: e.message || 'Network error verifying Stars payment' };
+    }
+  };
+
   // Verify TON or USDT on-chain payment
   const verifyTonPayment = async (packageId: string, currency: 'ton' | 'usdt', txHash?: string, senderAddress?: string): Promise<{ success: boolean; message: string; newDarkShards?: number }> => {
     const token = localStorage.getItem('void_covenant_token');
@@ -1079,6 +1132,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!res.ok) {
         return { success: false, message: data.error || `Verification failed (HTTP ${res.status})` };
       }
+
+      notifyShardCredit();
 
       if (data.newDarkShards !== undefined) {
         setProfile(prev => ({
@@ -2264,6 +2319,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         buyDarkShardsWithSOL,
         verifySolanaPayment,
         createStarsInvoice,
+        verifyStarsPayment,
+        notifyShardCredit,
         verifyTonPayment,
         connectSolanaWallet,
         disconnectSolanaWallet,

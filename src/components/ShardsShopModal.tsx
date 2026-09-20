@@ -55,8 +55,11 @@ const isUserCancellation = (err: any): boolean => {
 export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => {
   const { 
     profile, 
+    setProfile,
     verifySolanaPayment, 
     createStarsInvoice, 
+    verifyStarsPayment,
+    notifyShardCredit,
     verifyTonPayment, 
     refreshProfile, 
     saveProfile 
@@ -74,6 +77,45 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
   const isProcessingPaymentRef = useRef(false);
   const lastPaymentTimeRef = useRef(0);
   const redirectToWalletRef = useRef<(() => Promise<void>) | null>(null);
+  const starsWatchdogTimerRef = useRef<any>(null);
+  const activeStarsHandlerRef = useRef<((eventData: any) => void) | null>(null);
+
+  // Fresh profile sync on modal mount
+  useEffect(() => {
+    if (refreshProfile) {
+      refreshProfile(false);
+    }
+  }, [refreshProfile]);
+
+  // Cleanup on unmount: unregister invoice listener and cancel watchdog
+  useEffect(() => {
+    return () => {
+      isProcessingPaymentRef.current = false;
+      const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
+      if (activeStarsHandlerRef.current && tg?.offEvent) {
+        tg.offEvent('invoiceClosed', activeStarsHandlerRef.current);
+        activeStarsHandlerRef.current = null;
+      }
+      if (starsWatchdogTimerRef.current) {
+        clearTimeout(starsWatchdogTimerRef.current);
+        starsWatchdogTimerRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleCloseModal = () => {
+    isProcessingPaymentRef.current = false;
+    const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
+    if (activeStarsHandlerRef.current && tg?.offEvent) {
+      tg.offEvent('invoiceClosed', activeStarsHandlerRef.current);
+      activeStarsHandlerRef.current = null;
+    }
+    if (starsWatchdogTimerRef.current) {
+      clearTimeout(starsWatchdogTimerRef.current);
+      starsWatchdogTimerRef.current = null;
+    }
+    onClose();
+  };
 
   const handleOpenWallet = () => {
     const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
@@ -303,7 +345,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
     isProcessingPaymentRef.current = true;
     lastPaymentTimeRef.current = now;
 
-    const tg = (window as any).Telegram?.WebApp;
+    const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
     if (!tg) {
       isProcessingPaymentRef.current = false;
       toast('Telegram WebApp is not available. Please open inside Telegram.', 'error');
@@ -336,9 +378,34 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
         txType: 'stars'
       });
 
-      tg.openInvoice(res.invoiceLink, async (status: string) => {
+      let hasHandledInvoice = false;
+
+      const finishStarsInvoice = async (status: string) => {
+        if (hasHandledInvoice) return;
+        hasHandledInvoice = true;
+
+        if (starsWatchdogTimerRef.current) {
+          clearTimeout(starsWatchdogTimerRef.current);
+          starsWatchdogTimerRef.current = null;
+        }
+
+        if (activeStarsHandlerRef.current && tg?.offEvent) {
+          tg.offEvent('invoiceClosed', activeStarsHandlerRef.current);
+          activeStarsHandlerRef.current = null;
+        }
+
         isProcessingPaymentRef.current = false;
-        if (status === 'paid') {
+
+        const normalizedStatus = (status || '').toLowerCase().trim();
+
+        if (normalizedStatus === 'paid') {
+          // 1. Instant optimistic local balance update so user sees Dark Shards immediately!
+          notifyShardCredit?.();
+          setProfile(prev => ({
+            ...prev,
+            darkShards: (prev.darkShards || 0) + pkg.shardsReward
+          }));
+
           setPaymentState({
             status: 'success',
             message: `Stars payment confirmed! +${pkg.shardsReward} Dark Shards added!`,
@@ -346,22 +413,63 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
             txType: 'stars'
           });
           toast(`+${pkg.shardsReward} Dark Shards added!`, 'success');
-          if (refreshProfile) {
-            await refreshProfile();
+
+          // 2. Authoritative on-demand verification with server
+          if (verifyStarsPayment) {
+            verifyStarsPayment(pkg.id).catch(err => console.warn('Stars on-demand verify error:', err));
           }
-        } else if (status === 'cancelled') {
+
+          // 3. Staggered background profile refreshes
+          if (refreshProfile) {
+            setTimeout(() => refreshProfile(false), 1500);
+            setTimeout(() => refreshProfile(false), 4000);
+            setTimeout(() => refreshProfile(false), 8000);
+          }
+        } else if (
+          normalizedStatus === 'cancelled' ||
+          normalizedStatus === 'canceled' ||
+          normalizedStatus === 'failed' ||
+          normalizedStatus === 'closed' ||
+          normalizedStatus === 'close'
+        ) {
           setPaymentState({
             status: 'idle',
             message: ''
           });
-          toast('Stars payment cancelled', 'info');
+          if (normalizedStatus === 'cancelled' || normalizedStatus === 'canceled') {
+            toast('Stars payment cancelled', 'info');
+          }
         } else {
           setPaymentState({
-            status: 'error',
-            message: `Telegram Stars payment status: ${status}`
+            status: 'idle',
+            message: ''
           });
-          toast(`Payment ${status}`, 'error');
+          if (normalizedStatus && normalizedStatus !== 'unknown') {
+            toast(`Payment status: ${status}`, 'info');
+          }
         }
+      };
+
+      const handleInvoiceClosed = (eventData: any) => {
+        const status = typeof eventData === 'string' ? eventData : (eventData?.status || 'closed');
+        finishStarsInvoice(status);
+      };
+
+      activeStarsHandlerRef.current = handleInvoiceClosed;
+      if (tg.onEvent) {
+        tg.onEvent('invoiceClosed', handleInvoiceClosed);
+      }
+
+      // Safety watchdog: 40 seconds timeout if native invoice dismissed without event
+      starsWatchdogTimerRef.current = setTimeout(() => {
+        if (!hasHandledInvoice) {
+          finishStarsInvoice('cancelled');
+        }
+      }, 40000);
+
+      // Open native Telegram Stars sheet
+      tg.openInvoice(res.invoiceLink, (status: string) => {
+        finishStarsInvoice(status);
       });
 
     } catch (e: any) {
@@ -805,7 +913,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
     <div 
       className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200"
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget) handleCloseModal();
       }}
     >
       {/* Modal Container */}
@@ -836,6 +944,18 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Live Dark Shards Balance Pill */}
+            <div className="flex items-center gap-1.5 bg-black/60 border border-rose-500/40 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full shadow-[0_0_10px_rgba(244,63,94,0.15)]">
+              <img 
+                src="/icons/icon_shards.webp" 
+                alt="Shards" 
+                className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.7)]" 
+              />
+              <span className="text-[11px] sm:text-xs font-mono font-black text-rose-300">
+                {(profile.darkShards || 0).toLocaleString()}
+              </span>
+            </div>
+
             {isTelegramUser ? (
               /* Telegram Wallet Status (shown when TON / USDT tab active) */
               (tgMethod === 'ton' || tgMethod === 'usdt') && (
@@ -896,7 +1016,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
             )}
 
             <button 
-              onClick={onClose}
+              onClick={handleCloseModal}
               className="w-7 h-7 rounded-xl bg-black/50 hover:bg-red-950/60 border border-white/10 hover:border-red-500/40 text-gray-400 hover:text-red-300 flex items-center justify-center transition-all cursor-pointer ml-0.5"
             >
               <X className="w-3.5 h-3.5" />
@@ -1096,12 +1216,20 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                   <button
                     type="button"
                     onClick={() => {
+                      if (activeStarsHandlerRef.current && (window as any).Telegram?.WebApp?.offEvent) {
+                        (window as any).Telegram.WebApp.offEvent('invoiceClosed', activeStarsHandlerRef.current);
+                        activeStarsHandlerRef.current = null;
+                      }
+                      if (starsWatchdogTimerRef.current) {
+                        clearTimeout(starsWatchdogTimerRef.current);
+                        starsWatchdogTimerRef.current = null;
+                      }
                       isProcessingPaymentRef.current = false;
                       setPaymentState({ status: 'idle', message: '' });
                     }}
-                    className="mt-1 text-xs text-gray-400 hover:text-gray-200 transition-colors underline cursor-pointer"
+                    className="w-full py-2 px-4 bg-white/10 hover:bg-white/20 text-gray-200 hover:text-white font-mono text-xs font-bold rounded-xl transition-all cursor-pointer border border-white/10 active:scale-95 flex items-center justify-center gap-1.5"
                   >
-                    Dismiss
+                    <span>Cancel / Return to Shop</span>
                   </button>
                 </div>
               )}

@@ -174,6 +174,129 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // ─────────────────────────────────────────────────────────────
+    // ROUTE 1.5: VERIFY / RECONCILE TELEGRAM STARS PAYMENT
+    // ─────────────────────────────────────────────────────────────
+    if (action === 'verify_stars' || req.body?.type === 'verify_stars') {
+      const { packageId } = req.body || {};
+      const supabase = getSupabase();
+
+      // Look up profile with fallback for tg_ prefix
+      let profileRow: any = null;
+      let matchedWallet = walletAddress;
+
+      const { data: rows } = await supabase
+        .from('profiles')
+        .select('data')
+        .eq('wallet_address', walletAddress)
+        .limit(1);
+
+      if (rows && rows.length > 0) {
+        profileRow = rows[0];
+      } else {
+        const altWallet = walletAddress.startsWith('tg_') ? walletAddress.slice(3) : `tg_${walletAddress}`;
+        const { data: altRows } = await supabase
+          .from('profiles')
+          .select('data')
+          .eq('wallet_address', altWallet)
+          .limit(1);
+        if (altRows && altRows.length > 0) {
+          profileRow = altRows[0];
+          matchedWallet = altWallet;
+        }
+      }
+
+      if (!profileRow) {
+        return res.status(404).json({ error: 'Player profile not found' });
+      }
+
+      const profileData = profileRow.data || {};
+      const processed = profileData.processedTransactions || [];
+
+      let newlyCredited = false;
+      let shardsAdded = 0;
+      let matchedChargeId = '';
+
+      // Reconcile with Telegram Stars ledger via Bot API
+      if (TELEGRAM_BOT_TOKEN) {
+        try {
+          const starRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getStarTransactions?limit=25`);
+          if (starRes.ok) {
+            const starData = await starRes.json();
+            const txs = starData.result?.transactions || [];
+
+            for (const tx of txs) {
+              const chargeId = tx.id;
+              if (!chargeId || processed.includes(chargeId)) continue;
+
+              // Only incoming transactions from users
+              if (tx.source?.type === 'user') {
+                let payloadData: any = {};
+                try {
+                  payloadData = JSON.parse(tx.source.invoice_payload || '{}');
+                } catch (e) {
+                  payloadData = {};
+                }
+
+                const txPackageId = payloadData.packageId || payloadData.p;
+                const txWallet = payloadData.walletAddress || payloadData.w;
+                const userId = tx.source.user?.id;
+
+                const isUserMatch = (txWallet && (txWallet === walletAddress || txWallet === matchedWallet)) ||
+                                    (userId && (`tg_${userId}` === walletAddress || String(userId) === walletAddress || `tg_${userId}` === matchedWallet));
+
+                if (isUserMatch && (!packageId || txPackageId === packageId)) {
+                  const targetPkg = TELEGRAM_PACKAGES[txPackageId] || (packageId ? TELEGRAM_PACKAGES[packageId] : null);
+                  if (targetPkg) {
+                    const currentShards = profileData.darkShards || 0;
+                    const updatedShards = currentShards + targetPkg.shards;
+
+                    profileData.darkShards = updatedShards;
+                    profileData.processedTransactions = [...processed, chargeId];
+
+                    await supabase
+                      .from('profiles')
+                      .update({
+                        data: profileData,
+                        updated_at: new Date().toISOString()
+                      })
+                      .eq('wallet_address', matchedWallet);
+
+                    await recordShardTransaction(
+                      supabase,
+                      matchedWallet,
+                      'STARS_PURCHASE',
+                      targetPkg.shards,
+                      updatedShards,
+                      `Telegram Stars purchase: ${targetPkg.name} (${tx.amount} XTR, Charge: ${chargeId})`
+                    );
+
+                    newlyCredited = true;
+                    shardsAdded = targetPkg.shards;
+                    matchedChargeId = chargeId;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        } catch (botErr) {
+          console.warn('Error fetching Telegram Star transactions:', botErr);
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+        newlyCredited,
+        shardsAdded,
+        newDarkShards: profileData.darkShards || 0,
+        txId: matchedChargeId,
+        message: newlyCredited 
+          ? `Payment verified! +${shardsAdded} Dark Shards added!` 
+          : 'Stars payment verified and profile updated.'
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────
     // ROUTE 2: VERIFY TON / USDT (TON) PAYMENT
     // ─────────────────────────────────────────────────────────────
     if (action === 'verify_ton' || req.body?.currency === 'ton' || req.body?.currency === 'usdt') {
