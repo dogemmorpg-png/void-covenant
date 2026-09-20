@@ -275,6 +275,35 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                   </div>
                 )}
 
+                {/* First Clear Sovereign Pill for 5th and 10th floors */}
+                {(() => {
+                  const firstClearSov = viewingFloor % 10 === 0 ? 50 : viewingFloor % 5 === 0 ? 25 : 0;
+                  if (firstClearSov === 0) return null;
+                  const isSovClaimed = (profile.campaignSovereignsClaimed || []).includes(viewingFloor);
+
+                  return (
+                    <div className={`flex-1 flex flex-col items-center justify-center p-2 rounded-xl transition-all cursor-default group ${
+                      !isSovClaimed 
+                        ? 'bg-gradient-to-b from-amber-500/15 via-yellow-950/20 to-black border border-amber-400/60 hover:border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.25)] animate-pulse' 
+                        : 'bg-white/[0.02] border border-gray-700/40 opacity-55'
+                    }`}>
+                      <div className="flex items-center gap-1.5">
+                        <img 
+                          src="/icons/icon_sovereign.webp" 
+                          alt="Sovereigns" 
+                          className={`w-6 h-6 object-contain ${!isSovClaimed ? 'drop-shadow-[0_0_8px_rgba(245,158,11,0.8)] group-hover:scale-110' : 'grayscale opacity-60'} transition-transform`} 
+                        />
+                        <span className={`font-mono font-black text-base leading-none ${!isSovClaimed ? 'text-amber-300' : 'text-gray-400 line-through'}`}>
+                          +{firstClearSov}
+                        </span>
+                      </div>
+                      <span className={`text-[9px] font-mono uppercase tracking-wider font-bold mt-1 ${!isSovClaimed ? 'text-amber-400' : 'text-gray-500'}`}>
+                        {!isSovClaimed ? '1st Clear SOV' : 'Claimed'}
+                      </span>
+                    </div>
+                  );
+                })()}
+
               </div>
             </div>
 

@@ -197,6 +197,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           profile.collection.push(stage.cardReward);
           cardRewardStr = stage.cardReward.name;
         }
+
+        // First Clear Sovereign Reward: 50 for floor % 10 === 0, 25 for floor % 5 === 0
+        const firstClearSov = floorNum % 10 === 0 ? 50 : floorNum % 5 === 0 ? 25 : 0;
+        profile.campaignSovereignsClaimed = profile.campaignSovereignsClaimed || [];
+        if (firstClearSov > 0 && !profile.campaignSovereignsClaimed.includes(floorNum)) {
+          profile.campaignSovereignsClaimed.push(floorNum);
+          sovereignsReward = firstClearSov;
+          profile = recordSovereignTransaction(
+            profile,
+            'CAMPAIGN_FIRST_CLEAR',
+            firstClearSov,
+            `Campaign First Clear - Floor ${floorNum}`,
+            { floor: floorNum }
+          );
+        }
       } else {
         goldReward = applyMultiplierWithMinimum(20, goldMultiplier);
         dustReward = 0;

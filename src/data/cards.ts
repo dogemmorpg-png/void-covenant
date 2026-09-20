@@ -1708,6 +1708,7 @@ export const generateCampaignStage = (floor: number): import('../types').Campaig
   const goldReward = 50 + (floorStep * 25);
   const dustReward = 25 + (floorStep * 10);
   const shardsReward = 0;
+  const firstClearSovereigns = floor % 10 === 0 ? 50 : floor % 5 === 0 ? 25 : 0;
   
   // Pick permitted card tiers based on floor
   const permittedTiers = ['bronze'];
@@ -1741,6 +1742,7 @@ export const generateCampaignStage = (floor: number): import('../types').Campaig
     goldReward,
     dustReward,
     shardsReward,
+    firstClearSovereigns,
     enemyHeroName: isBoss ? 'Abyssal Overlord' : 'Abyss Dweller',
     enemyHeroHealth,
     enemyHeroImage: isBoss ? '/mobs/overlord.webp' : '/mobs/dweller.webp',

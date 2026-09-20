@@ -1538,6 +1538,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
               updated.campaignStars[stageId] = stars;
             }
           }
+
+          // First Clear Sovereigns: 50 for floor % 10 === 0, 25 for floor % 5 === 0
+          const firstClearSov = floorNum % 10 === 0 ? 50 : floorNum % 5 === 0 ? 25 : 0;
+          updated.campaignSovereignsClaimed = updated.campaignSovereignsClaimed || [];
+          if (firstClearSov > 0 && !updated.campaignSovereignsClaimed.includes(floorNum)) {
+            updated.campaignSovereignsClaimed.push(floorNum);
+            updated.bloodSovereigns = (updated.bloodSovereigns || 0) + firstClearSov;
+            rewards.sovereigns = firstClearSov;
+          }
         }
 
         updated.gold = (updated.gold || 0) + rewards.gold;

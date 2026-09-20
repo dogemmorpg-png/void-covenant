@@ -1192,6 +1192,8 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
       else if (res.dustReward !== undefined) setEarnedDust(res.dustReward);
       if (res.rewards?.exp !== undefined) setEarnedExp(res.rewards.exp);
       else if (res.expReward !== undefined) setEarnedExp(res.expReward);
+      if (res.rewards?.sovereigns !== undefined) setEarnedSovereigns(res.rewards.sovereigns);
+      else if (res.sovereignsReward !== undefined) setEarnedSovereigns(res.sovereignsReward);
     }
   };
 
@@ -2598,7 +2600,14 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
             {/* Rewards Card */}
             <div className="bg-black/60 p-3 rounded-2xl border border-amber-500/25 space-y-2.5 relative z-10">
               <span className="text-[9.5px] font-display text-amber-400/90 tracking-widest block uppercase font-bold">REWARD OBTAINED</span>
-              <div className={`grid gap-2 ${battleType === 'pvp' ? (earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-3') : (stage.shardsReward > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3')}`}>
+              <div className={`grid gap-2 ${
+                battleType === 'pvp' 
+                  ? (earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-3') 
+                  : (stage.shardsReward > 0 
+                      ? (earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4') 
+                      : (earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3')
+                    )
+              }`}>
                 {/* Gold */}
                 <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
                   <span className="text-amber-300 font-display font-black text-sm flex items-center gap-1 text-shadow-gold">
@@ -2637,14 +2646,16 @@ export const MobileBattleArena: React.FC<MobileBattleArenaProps> = ({
                   </div>
                 )}
 
-                {/* Sovereigns (PvP Only - Subscriber Bounty when > 0) */}
-                {battleType === 'pvp' && earnedSovereigns > 0 && (
+                {/* Sovereigns (PvP Quota or Campaign First Clear) */}
+                {earnedSovereigns > 0 && (
                   <div className="bg-gradient-to-b from-amber-950/50 via-black to-black border border-amber-500/50 p-2 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
                     <span className="text-amber-400 font-display font-black text-sm flex items-center gap-1 text-shadow-gold">
                       +{earnedSovereigns}
                       <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 object-contain" />
                     </span>
-                    <span className="text-[8.5px] text-amber-300 font-mono uppercase tracking-wider font-bold">Sovereigns</span>
+                    <span className="text-[8.5px] text-amber-300 font-mono uppercase tracking-wider font-bold">
+                      {battleType === 'campaign' ? '1st Clear SOV' : 'Sovereigns'}
+                    </span>
                   </div>
                 )}
 

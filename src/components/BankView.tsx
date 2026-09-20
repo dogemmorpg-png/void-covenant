@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
-import { Landmark, ArrowUpRight, Clock, ShieldCheck, CheckCircle2, AlertCircle, Wallet, Coins, RefreshCw, TrendingUp, Swords, Trophy, Mail } from 'lucide-react';
+import { Landmark, ArrowUpRight, Clock, ShieldCheck, CheckCircle2, AlertCircle, Wallet, Coins, RefreshCw, TrendingUp, Swords, Trophy, Mail, Award } from 'lucide-react';
 
 export const BankView: React.FC = () => {
   const { profile, requestWithdrawal } = useGame();
@@ -107,6 +107,7 @@ export const BankView: React.FC = () => {
         if (tx.sovereignsChange > 0) {
           const isLeague = tx.action === 'LEAGUE_ROLLOVER' || tx.description?.toLowerCase().includes('league') || tx.description?.toLowerCase().includes('pvp season');
           const isPvp = tx.action === 'PVP_VICTORY';
+          const isCampaign = tx.action === 'CAMPAIGN_FIRST_CLEAR' || tx.description?.toLowerCase().includes('campaign');
           
           let txTime = typeof tx.timestamp === 'string' ? new Date(tx.timestamp).getTime() : tx.timestamp;
 
@@ -127,11 +128,17 @@ export const BankView: React.FC = () => {
 
           events.push({
             id: tx.id || `stx_${tx.timestamp}`,
-            title: isLeague ? 'League Season Rollover Tribute' : isPvp ? 'PvP Duel Victory Bounty' : 'Imperial Decree Tribute',
+            title: isCampaign 
+              ? 'Abyssal Floor First Clear Reward' 
+              : isLeague 
+                ? 'League Season Rollover Tribute' 
+                : isPvp 
+                  ? 'PvP Duel Victory Bounty' 
+                  : 'Imperial Decree Tribute',
             description: tx.description || 'Blood Sovereigns earned and deposited',
             amount: tx.sovereignsChange,
             timestamp: txTime,
-            type: isLeague ? 'league' : isPvp ? 'pvp' : 'mail'
+            type: isCampaign ? 'campaign' : isLeague ? 'league' : isPvp ? 'pvp' : 'mail'
           });
         }
       });
@@ -481,6 +488,8 @@ export const BankView: React.FC = () => {
                             <Swords className="w-3.5 h-3.5 text-amber-400" />
                           ) : evt.type === 'league' ? (
                             <Trophy className="w-3.5 h-3.5 text-yellow-400" />
+                          ) : evt.type === 'campaign' ? (
+                            <Award className="w-3.5 h-3.5 text-amber-300" />
                           ) : (
                             <Mail className="w-3.5 h-3.5 text-rose-400" />
                           )}
@@ -501,7 +510,7 @@ export const BankView: React.FC = () => {
 
                     <div className="flex justify-between items-center text-[10px] font-mono text-gray-500 pt-1 border-t border-white/5">
                       <span className="uppercase text-[9px] tracking-wider text-amber-500/80 font-bold">
-                        {evt.type === 'pvp' ? 'PvP Duel Win' : evt.type === 'league' ? 'League Season Rollover' : 'Imperial Tribute'}
+                        {evt.type === 'pvp' ? 'PvP Duel Win' : evt.type === 'league' ? 'League Season Rollover' : evt.type === 'campaign' ? 'Abyssal First Clear' : 'Imperial Tribute'}
                       </span>
                       <span>
                         {new Date(evt.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}

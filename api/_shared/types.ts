@@ -132,6 +132,7 @@ export interface PlayerProfile {
   referralSubBountiesAwarded?: { premium?: boolean; ultra?: boolean };
   referralContributions?: Record<string, number>;
   referralCode?: string;
+  campaignSovereignsClaimed?: number[];
 }
 
 export function generateReferralCode(): string {
@@ -146,7 +147,7 @@ export function generateReferralCode(): string {
 export interface SovereignTransaction {
   id: string;
   timestamp: string; // ISO 8601
-  action: 'PVP_VICTORY' | 'LEAGUE_ROLLOVER' | 'MAIL_CLAIM' | 'ADMIN_ADJUSTMENT' | 'WITHDRAWAL' | 'REFERRAL_COMMISSION';
+  action: 'PVP_VICTORY' | 'LEAGUE_ROLLOVER' | 'MAIL_CLAIM' | 'ADMIN_ADJUSTMENT' | 'WITHDRAWAL' | 'REFERRAL_COMMISSION' | 'CAMPAIGN_FIRST_CLEAR';
   sovereignsChange: number; // e.g. +400 or -2000
   sovereignsBefore: number;
   sovereignsAfter: number;
@@ -195,6 +196,7 @@ export interface CampaignStage {
   goldReward: number;
   dustReward: number;
   shardsReward: number;
+  firstClearSovereigns?: number;
   enemyHeroName: string;
   enemyHeroHealth: number;
   enemyHeroImage: string;

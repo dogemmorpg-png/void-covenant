@@ -1228,6 +1228,11 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
       } else if (res.expReward !== undefined) {
         setEarnedExp(res.expReward);
       }
+      if (res.sovereignsReward !== undefined) {
+        setEarnedSovereigns(res.sovereignsReward);
+      } else if (res.rewards?.sovereigns !== undefined) {
+        setEarnedSovereigns(res.rewards.sovereigns);
+      }
     } else {
       console.error('Failed to save battle result:', res.message);
       toast(res.message, 'error');
@@ -3127,7 +3132,14 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
             {/* Rewards Card */}
             <div className="bg-black/60 p-4 rounded-2xl border border-amber-500/25 space-y-3 relative z-10">
               <span className="text-[10px] font-display text-amber-400/90 tracking-widest block uppercase font-bold">REWARD OBTAINED</span>
-              <div className={`grid gap-2.5 ${battleType === 'pvp' ? (earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4') : (stage.shardsReward > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3')}`}>
+              <div className={`grid gap-2.5 ${
+                battleType === 'pvp' 
+                  ? (earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4') 
+                  : (stage.shardsReward > 0 
+                      ? (earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4') 
+                      : (earnedSovereigns > 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3')
+                    )
+              }`}>
                 {/* Gold */}
                 <div className="bg-gradient-to-b from-amber-950/40 via-black to-black border border-amber-500/30 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center">
                   <span className="text-amber-300 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
@@ -3166,14 +3178,16 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
                   </div>
                 )}
 
-                {/* Blood Sovereigns (PvP Only - Subscriber Bounty when > 0) */}
-                {battleType === 'pvp' && earnedSovereigns > 0 && (
+                {/* Blood Sovereigns (PvP Quota or Campaign First Clear) */}
+                {earnedSovereigns > 0 && (
                   <div className="bg-gradient-to-b from-amber-950/50 via-black to-black border border-amber-500/50 p-2.5 rounded-xl text-center shadow-inner flex flex-col items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.2)]">
                     <span className="text-amber-400 font-display font-black text-base flex items-center gap-1 text-shadow-gold">
                       +{earnedSovereigns}
                       <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
                     </span>
-                    <span className="text-[9px] text-amber-300 font-mono uppercase tracking-wider mt-1 font-bold">Sovereigns</span>
+                    <span className="text-[9px] text-amber-300 font-mono uppercase tracking-wider mt-1 font-bold">
+                      {battleType === 'campaign' ? '1st Clear SOV' : 'Sovereigns'}
+                    </span>
                   </div>
                 )}
 
