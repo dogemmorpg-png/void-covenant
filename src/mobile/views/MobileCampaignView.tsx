@@ -554,16 +554,17 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
                         }
                       }}
                       disabled={isPurchasingEnergy}
-                      className={`w-full mt-2 py-1.5 rounded-xl font-mono font-black text-xs transition-all cursor-pointer flex items-center justify-center gap-1 ${
-                        canAfford
-                          ? pkg.popular
-                            ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-black shadow-sm active:scale-95'
-                            : 'bg-white/10 hover:bg-white/20 text-white border border-white/20 active:scale-95'
-                          : 'bg-red-950/30 text-red-400 border border-red-500/30'
+                      className={`w-full mt-2 py-2 rounded-xl font-mono font-black text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 shadow-sm group/btn ${
+                        !canAfford
+                          ? 'bg-black/50 text-red-400/80 border border-red-500/30 hover:border-red-500/50'
+                          : pkg.popular
+                            ? 'bg-gradient-to-b from-[#0e291e] to-[#06140e] hover:from-[#133829] hover:to-[#0a1e15] border border-emerald-400/70 text-white shadow-[0_0_12px_rgba(16,185,129,0.2)]'
+                            : 'bg-gradient-to-b from-[#181116] to-[#0c080b] hover:from-[#241921] hover:to-[#120d11] border border-white/15 hover:border-emerald-500/40 text-white'
                       }`}
                     >
-                      <span>{pkg.cost}</span>
-                      <img src="/icons/icon_shards.webp" alt="" className="w-3.5 h-3.5 object-contain" />
+                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain drop-shadow-[0_0_5px_rgba(239,68,68,0.7)] shrink-0 group-hover/btn:scale-110 transition-transform" />
+                      <span className="font-mono font-black text-white text-xs sm:text-sm drop-shadow">{pkg.cost}</span>
+                      <span className="text-[9px] text-red-400 font-display font-bold uppercase tracking-wider">SHARDS</span>
                     </button>
                   </div>
                 );

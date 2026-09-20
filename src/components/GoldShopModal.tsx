@@ -184,16 +184,18 @@ export const GoldShopModal: React.FC<GoldShopModalProps> = ({ onClose }) => {
                     }
                   }}
                   disabled={isPurchasing}
-                  className="w-full bg-gradient-to-r from-red-900/90 via-red-800 to-rose-900/90 hover:from-red-800 hover:to-rose-800 text-white border border-red-500/50 hover:border-red-400/80 font-mono text-[10px] sm:text-xs font-black py-1.5 sm:py-2 px-1 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1 active:scale-95 shadow-[0_0_10px_rgba(225,29,72,0.25)] hover:scale-102"
+                  className="w-full bg-[#181116] hover:bg-[#241921] text-white border border-red-500/35 hover:border-red-400/70 font-mono text-xs font-black py-2 px-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95 shadow-sm group/btn"
                   title={`Purchase for ${pkg.shardCost} Shards`}
                 >
                   <img 
                     src="/icons/icon_shards.webp" 
                     alt="Shards" 
-                    className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain drop-shadow-[0_0_4px_rgba(244,63,94,0.8)] shrink-0" 
+                    className="w-4 h-4 object-contain drop-shadow-[0_0_5px_rgba(239,68,68,0.7)] shrink-0 group-hover/btn:scale-110 transition-transform" 
                   />
-                  <span>{pkg.shardCost}</span>
-                  <span className="text-[7.5px] sm:text-[9px] text-rose-200 uppercase font-bold tracking-wider opacity-90">
+                  <span className="text-white text-xs sm:text-sm font-black font-mono tracking-tight drop-shadow">
+                    {pkg.shardCost}
+                  </span>
+                  <span className="text-[9px] sm:text-[10px] text-red-400 font-display font-bold uppercase tracking-wider">
                     SHARDS
                   </span>
                 </button>

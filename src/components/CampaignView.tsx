@@ -487,20 +487,21 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                           }
                         }}
                         disabled={isPurchasingEnergy}
-                        className={`w-full py-3 rounded-xl font-mono font-black text-base transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 shadow-md ${
-                          canAfford
-                            ? pkg.popular
-                              ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black shadow-emerald-500/20 hover:scale-105 active:scale-95'
-                              : 'bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:scale-105 active:scale-95'
-                            : 'bg-red-950/30 text-red-400/80 border border-red-500/30 hover:bg-red-950/50'
+                        className={`w-full py-2.5 sm:py-3 rounded-xl font-mono font-black text-sm sm:text-base transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 shadow-sm active:scale-95 group/btn ${
+                          !canAfford
+                            ? 'bg-black/50 text-red-400/80 border border-red-500/30 hover:border-red-500/50'
+                            : pkg.popular
+                              ? 'bg-gradient-to-b from-[#0e291e] to-[#06140e] hover:from-[#133829] hover:to-[#0a1e15] border border-emerald-400/70 text-white shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                              : 'bg-gradient-to-b from-[#181116] to-[#0c080b] hover:from-[#241921] hover:to-[#120d11] border border-white/15 hover:border-emerald-500/40 text-white'
                         }`}
                       >
                         {isPurchasingEnergy ? (
                           <span className="text-xs font-sans">Brewing...</span>
                         ) : (
                           <>
-                            <span className="tracking-wide text-base">{pkg.cost}</span>
-                            <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.9)]" />
+                            <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 sm:w-5 sm:h-5 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.7)] shrink-0 group-hover/btn:scale-110 transition-transform" />
+                            <span className="font-mono font-black text-white text-sm sm:text-base drop-shadow">{pkg.cost}</span>
+                            <span className="text-[10px] sm:text-xs text-red-400 font-display font-bold uppercase tracking-wider">SHARDS</span>
                           </>
                         )}
                       </button>
