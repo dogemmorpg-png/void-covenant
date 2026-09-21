@@ -101,3 +101,11 @@ export const REFERRAL_MILESTONES: ReferralMilestone[] = [
     badgeBg: 'bg-gradient-to-br from-amber-950 via-black to-red-950 border-amber-400/70'
   }
 ];
+
+export const formatSovereignUsd = (sovereigns: number): string => {
+  const usd = sovereigns / 100;
+  if (usd >= 100) {
+    return `$${usd.toLocaleString('en-US')}`;
+  }
+  return `$${usd.toFixed(2)}`;
+};
