@@ -870,22 +870,22 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                         isClaimed
                           ? 'border-emerald-500/25 opacity-75'
                           : canClaim
-                          ? `${milestone.borderTheme} ${milestone.glowTheme} ring-2 ring-amber-400/50 shadow-xl`
+                          ? 'border-amber-500/50'
                           : 'border-white/15 hover:border-amber-500/30'
                       }`}
                     >
-                      {/* Top highlight glow */}
-                      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent pointer-events-none" />
+                      {/* Top highlight line */}
+                      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent pointer-events-none" />
 
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         {/* Left: Badge & Info */}
                         <div className="flex items-center gap-4 min-w-0">
-                          {/* Badge Container */}
-                          <div className={`w-14 h-14 rounded-2xl border-2 flex items-center justify-center shrink-0 shadow-lg ${milestone.badgeBg}`}>
+                          {/* Badge Container - Clean without colored glowing box */}
+                          <div className="w-14 h-14 shrink-0 flex items-center justify-center">
                             <img
                               src={milestone.badgeIcon}
                               alt={milestone.title}
-                              className="w-9 h-9 object-contain drop-shadow-[0_0_10px_rgba(245,158,11,0.65)]"
+                              className="w-12 h-12 object-contain drop-shadow-md"
                               onError={(e) => {
                                 (e.target as HTMLElement).style.display = 'none';
                               }}
@@ -947,10 +947,10 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                             <button
                               onClick={() => handleClaimMilestone(milestone.id)}
                               disabled={isCurrentlyClaiming}
-                              className="h-10 px-5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-200 text-black font-display font-black text-xs tracking-wider uppercase transition-all shadow-[0_0_20px_rgba(245,158,11,0.6)] hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                              className="h-10 px-4.5 rounded-xl bg-gradient-to-b from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-amber-100 hover:text-white font-display font-bold text-xs tracking-wider uppercase transition-all shadow-md hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center justify-center gap-2 border border-amber-400/40 disabled:opacity-50"
                             >
                               {isCurrentlyClaiming ? (
-                                <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                                <div className="w-4 h-4 border-2 border-amber-200 border-t-transparent rounded-full animate-spin" />
                               ) : (
                                 <>
                                   <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 object-contain" />

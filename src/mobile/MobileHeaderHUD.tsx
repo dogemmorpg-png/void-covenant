@@ -872,17 +872,17 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
                         isClaimed
                           ? 'border-white/10 opacity-70'
                           : canClaim
-                          ? `${milestone.borderTheme} ${milestone.glowTheme} ring-1 ring-amber-400/40`
+                          ? 'border-amber-500/50'
                           : 'border-white/10'
                       }`}
                     >
                       <div className="flex items-center justify-between gap-3">
-                        {/* Left: Crest Badge */}
-                        <div className={`w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 shadow-md ${milestone.badgeBg}`}>
+                        {/* Left: Crest Badge - Clean icon without glowing box or drop-shadow backlight */}
+                        <div className="w-11 h-11 shrink-0 flex items-center justify-center">
                           <img
                             src={milestone.badgeIcon}
                             alt={milestone.title}
-                            className="w-8 h-8 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]"
+                            className="w-10 h-10 object-contain drop-shadow-md"
                             onError={(e) => {
                               (e.target as HTMLElement).style.display = 'none';
                             }}
@@ -921,10 +921,10 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
                             <button
                               onClick={() => handleClaimMilestone(milestone.id)}
                               disabled={isCurrentlyClaiming}
-                              className="h-8 px-3.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-200 text-black font-display font-black text-xs tracking-wider uppercase transition-all shadow-[0_0_15px_rgba(245,158,11,0.5)] active:scale-95 cursor-pointer flex items-center gap-1.5"
+                              className="h-8 px-3 rounded-xl bg-gradient-to-b from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-amber-100 hover:text-white font-display font-bold text-xs tracking-wider uppercase transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5 border border-amber-400/40"
                             >
                               {isCurrentlyClaiming ? (
-                                <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                                <div className="w-3.5 h-3.5 border-2 border-amber-200 border-t-transparent rounded-full animate-spin" />
                               ) : (
                                 <>
                                   <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3.5 h-3.5 object-contain" />
