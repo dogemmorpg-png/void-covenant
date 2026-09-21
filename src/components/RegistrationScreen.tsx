@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { CheckCircle, Sparkles, Shield, User, Flame, Dices, PenLine, X } from 'lucide-react';
+import { CheckCircle, Shield, User, Dices, PenLine, X } from 'lucide-react';
 
 interface RegistrationScreenProps {
   onRegister: (username: string, avatarUrl: string) => Promise<{ success: boolean; message: string }>;
@@ -145,8 +145,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
             </div>
           </div>
 
-          <div className="flex items-center gap-1 text-[8.5px] font-mono text-amber-300 bg-amber-950/40 border border-amber-500/40 px-2 py-0.5 rounded-full shrink-0">
-            <Sparkles className="w-2.5 h-2.5 text-amber-400 animate-pulse" />
+          <div className="text-[8.5px] font-mono text-amber-300 bg-amber-950/40 border border-amber-500/40 px-2.5 py-0.5 rounded-full shrink-0">
             <span>REGISTRATION</span>
           </div>
         </header>
@@ -164,7 +163,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
                 </span>
               </div>
               <span className="text-[9px] font-mono text-gray-300">
-                <strong className="text-amber-300 font-bold">{currentAvatarObj.name}</strong> ({currentAvatarObj.role})
+                <strong className="text-amber-300 font-bold">{currentAvatarObj.name}</strong>
               </span>
             </div>
 
@@ -179,7 +178,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
                       setSelectedAvatar(avatar.url);
                       triggerHaptic();
                     }}
-                    className={`group relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-200 aspect-[3/4] flex flex-col justify-end p-1 bg-[#0c101a] shadow-md ${
+                    className={`group relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-200 aspect-[3/4] flex flex-col justify-end p-1.5 bg-[#0c101a] shadow-md ${
                       isSelected
                         ? 'border-[#ebd09b] shadow-[0_0_15px_rgba(235,208,155,0.6)] ring-2 ring-[#ebd09b]/60 scale-[1.02] z-10'
                         : 'border-white/15 opacity-65 hover:opacity-100 hover:scale-[1.01]'
@@ -199,21 +198,13 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
                     )}
 
                     <div className="relative z-10 text-left">
-                      <span className="text-[8px] font-display font-bold text-white block leading-tight truncate drop-shadow">
+                      <span className="text-[8.5px] font-display font-bold text-white block leading-tight truncate drop-shadow">
                         {avatar.name}
-                      </span>
-                      <span className="text-[7px] font-mono text-[#ebd09b] block leading-none truncate">
-                        {avatar.role}
                       </span>
                     </div>
                   </div>
                 );
               })}
-            </div>
-
-            {/* Single line description of selected avatar */}
-            <div className="text-[8px] font-mono text-gray-400 text-center bg-black/40 py-0.5 px-2 rounded-lg border border-white/5 truncate shrink-0">
-              {currentAvatarObj.desc} • Used in Arena & Profile
             </div>
           </div>
 
@@ -341,18 +332,15 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
           <button
             type="submit"
             disabled={isSubmitting || username.length < 4}
-            className="w-full py-3 bg-gradient-to-r from-[#c5a880] via-[#ebd09b] to-[#c5a880] text-black font-display font-black text-xs sm:text-sm tracking-widest uppercase rounded-xl shadow-[0_0_25px_rgba(235,208,155,0.4)] hover:shadow-[0_0_35px_rgba(235,208,155,0.7)] active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shrink-0 mt-0.5"
+            className="w-full py-3.5 bg-gradient-to-r from-[#b3894a] via-[#f3d38c] to-[#b3894a] hover:from-[#c59a58] hover:via-[#fae1a2] hover:to-[#c59a58] text-[#1a0f05] font-display font-black text-xs sm:text-sm tracking-[0.25em] uppercase rounded-xl shadow-[0_4px_20px_rgba(229,194,120,0.25)] hover:shadow-[0_4px_30px_rgba(229,194,120,0.45)] border border-[#ebd09b]/60 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer shrink-0 mt-1"
           >
             {isSubmitting ? (
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                <span>SEALING PACT...</span>
+                <div className="w-4 h-4 border-2 border-[#1a0f05] border-t-transparent rounded-full animate-spin" />
+                <span className="tracking-widest">SEALING PACT...</span>
               </div>
             ) : (
-              <>
-                <Flame className="w-4 h-4 text-black animate-pulse" />
-                <span>SEAL THE PACT ⚔️</span>
-              </>
+              <span className="tracking-[0.25em]">SEAL THE PACT</span>
             )}
           </button>
 
