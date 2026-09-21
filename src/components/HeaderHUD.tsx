@@ -49,12 +49,15 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
   }, [referralCode, isTelegramUser]);
 
   const actualSubscribedCount = useMemo(() => {
+    if (typeof subscribedCount === 'number' && referralsList.length > 0) {
+      return subscribedCount;
+    }
     const fromList = referralsList.filter(r => 
+      (r as any).hasSubscribed ||
       r.subscriptionTier === 'premium' || 
-      r.subscriptionTier === 'ultra' || 
-      (r.sovereignsContributed && r.sovereignsContributed >= 300)
+      r.subscriptionTier === 'ultra'
     ).length;
-    return Math.max(subscribedCount, fromList);
+    return typeof subscribedCount === 'number' ? Math.max(subscribedCount, fromList) : fromList;
   }, [subscribedCount, referralsList]);
 
   const claimedMilestones = useMemo(() => profile.claimedReferralMilestones || [], [profile.claimedReferralMilestones]);

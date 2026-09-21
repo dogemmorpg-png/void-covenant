@@ -176,6 +176,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           contributed = subBounty;
         }
 
+        const hasSubscribed = Boolean(
+          profileData.referralSubBountiesAwarded?.ultra ||
+          profileData.referralSubBountiesAwarded?.premium ||
+          subTier === 'premium' ||
+          subTier === 'ultra'
+        );
+
         return {
           wallet: r.wallet,
           username: profileData.username || 'Anonymous',
@@ -183,14 +190,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           avatarUrl: profileData.avatarUrl || '/avatars/knight.webp',
           joinedAt: r.created_at,
           subscriptionTier: subTier,
+          hasSubscribed,
           sovereignsContributed: Number(contributed.toFixed(2))
         };
       });
 
       const subscribedReferralsCount = referrals.filter(r => 
+        (r as any).hasSubscribed ||
         r.subscriptionTier === 'premium' || 
-        r.subscriptionTier === 'ultra' || 
-        r.sovereignsContributed >= 300
+        r.subscriptionTier === 'ultra'
       ).length;
 
       return res.status(200).json({ 
