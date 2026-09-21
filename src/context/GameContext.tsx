@@ -1512,8 +1512,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             updated.lastSovereignsWonDate = todayUtc;
           }
           const currentWonToday = updated.dailySovereignsWonToday || 0;
-          const cap = subTier === 'ultra' ? 24 : subTier === 'premium' ? 10 : 0;
-          const perWin = subTier === 'ultra' ? 2 : subTier === 'premium' ? 1 : 0;
+          const cap = subTier === 'ultra' ? 36 : subTier === 'premium' ? 20 : 0;
+          const perWin = subTier === 'ultra' ? 3 : subTier === 'premium' ? 2 : 0;
           const sovereignsGain = Math.max(0, Math.min(perWin, cap - currentWonToday));
           if (sovereignsGain > 0) {
             updated.dailySovereignsWonToday = currentWonToday + sovereignsGain;

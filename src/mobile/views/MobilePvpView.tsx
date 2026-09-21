@@ -604,7 +604,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
   // Daily Sovereign won progress (matching PC PvpArenaView.tsx)
   const todayUtc = new Date().toISOString().slice(0, 10);
   const wonToday = profile.lastSovereignsWonDate === todayUtc ? (profile.dailySovereignsWonToday || 0) : 0;
-  const sovCap = mySubTier === 'ultra' ? 24 : mySubTier === 'premium' ? 10 : 0;
+  const sovCap = mySubTier === 'ultra' ? 36 : mySubTier === 'premium' ? 20 : 0;
   const showDailySov = isMySubActive || wonToday > 0;
 
   // Touch swipe gestures for horizontal tab switching

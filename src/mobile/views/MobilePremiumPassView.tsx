@@ -92,8 +92,8 @@ export const MobilePremiumPassView: React.FC = () => {
     },
     {
       icon: '/icons/icon_sovereign.webp',
-      title: '+1 Blood Sovereign / PvP Win',
-      desc: 'Up to 10 SOV daily bounty from arena victories',
+      title: '+2 Blood Sovereigns / PvP Win',
+      desc: 'Up to 20 SOV daily bounty from arena victories',
       color: 'text-emerald-300'
     },
     {
@@ -150,8 +150,8 @@ export const MobilePremiumPassView: React.FC = () => {
     },
     {
       icon: '/icons/icon_sovereign.webp',
-      title: '+2 Blood Sovereigns / PvP Win',
-      desc: 'Up to 24 SOV daily (2.4x higher earnings than Premium)',
+      title: '+3 Blood Sovereigns / PvP Win',
+      desc: 'Up to 36 SOV daily (1.8x higher earnings than Premium)',
       color: 'text-emerald-300'
     },
     {
@@ -253,7 +253,7 @@ export const MobilePremiumPassView: React.FC = () => {
             </div>
             <div className="flex flex-col items-center justify-center p-1.5 rounded-xl bg-black/60 border border-emerald-500/35 text-center shadow-inner">
               <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 object-contain shrink-0" />
-              <span className="text-emerald-300 font-bold mt-1">Up to 24 SOV</span>
+              <span className="text-emerald-300 font-bold mt-1">Up to 36 SOV</span>
               <span className="text-[8px] text-gray-400 leading-tight">Daily Wins</span>
             </div>
             <div className="flex flex-col items-center justify-center p-1.5 rounded-xl bg-black/60 border border-cyan-500/35 text-center shadow-inner">

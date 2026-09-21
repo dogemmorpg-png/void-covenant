@@ -120,7 +120,7 @@ export const PremiumPassView: React.FC = () => {
               </div>
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-black/60 border border-emerald-500/35 text-xs sm:text-[13px] font-mono font-bold text-emerald-300 shadow-inner">
                 <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4.5 h-4.5 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.7)] shrink-0" />
-                <span>Up to 24 SOV/Day on Arena Wins</span>
+                <span>Up to 36 SOV/Day on Arena Wins</span>
               </div>
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-black/60 border border-cyan-500/35 text-xs sm:text-[13px] font-mono font-bold text-cyan-300 shadow-inner">
                 <img src="/icons/shield_3h.png" alt="Peace Shield" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.8)] shrink-0" />
@@ -323,8 +323,8 @@ export const PremiumPassView: React.FC = () => {
                   <img src="/icons/icon_sovereign.webp" alt="Blood Sovereign" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.6)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-emerald-300 text-sm sm:text-[15px] leading-snug">+1 Blood Sovereign / PvP Win</div>
-                  <div className="text-xs text-gray-300 mt-0.5">Up to 10 SOV daily bounty from arena victories</div>
+                  <div className="font-bold text-emerald-300 text-sm sm:text-[15px] leading-snug">+2 Blood Sovereigns / PvP Win</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Up to 20 SOV daily bounty from arena victories</div>
                 </div>
               </div>
 
@@ -536,8 +536,8 @@ export const PremiumPassView: React.FC = () => {
                   <img src="/icons/icon_sovereign.webp" alt="Blood Sovereign" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.7)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-emerald-300 text-sm sm:text-[15px] leading-snug">+2 Blood Sovereigns / PvP Win</div>
-                  <div className="text-xs text-gray-300 mt-0.5">Up to 24 SOV daily (2.4x higher earnings than Premium)</div>
+                  <div className="font-bold text-emerald-300 text-sm sm:text-[15px] leading-snug">+3 Blood Sovereigns / PvP Win</div>
+                  <div className="text-xs text-gray-300 mt-0.5">Up to 36 SOV daily (1.8x higher earnings than Premium)</div>
                 </div>
               </div>
 

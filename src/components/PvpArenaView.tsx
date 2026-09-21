@@ -839,7 +839,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
             {(() => {
               const todayUtc = new Date().toISOString().slice(0, 10);
               const wonToday = profile.lastSovereignsWonDate === todayUtc ? (profile.dailySovereignsWonToday || 0) : 0;
-              const cap = mySubTier === 'ultra' ? 24 : 10;
+              const cap = mySubTier === 'ultra' ? 36 : 20;
               if (!isMySubActive && wonToday === 0) return null;
               return (
                 <>
