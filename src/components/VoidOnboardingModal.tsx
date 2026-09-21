@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, X, ArrowRight } from 'lucide-react';
+import { ChevronLeft, X, ArrowRight, Sparkles } from 'lucide-react';
 
 interface VoidOnboardingModalProps {
   isOpen: boolean;
@@ -52,19 +52,53 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
 
   const slides: OnboardingSlide[] = [
     // ----------------------------------------------------
-    // SLIDE 1: 5 LINEAR SLOTS
+    // SLIDE 1: WELCOME TO THE VOID COVENANT
     // ----------------------------------------------------
     {
       id: 1,
-      tag: 'BATTLEFIELD RULES',
-      title: '5 LINEAR COMBAT SLOTS',
-      headline: 'Cards clash directly with the slot opposite them.',
-      description: 'The battlefield consists of 5 mirror slots. Each card attacks straight ahead into the opposing creature. If the slot opposite your minion is empty, all damage strikes the opposing Hero directly! Reduce enemy HP to 0 to win.',
+      tag: 'PROLOGUE',
+      title: 'WELCOME TO THE VOID',
+      headline: 'Awaken, Initiate. Your dark conquest begins.',
+      description: 'You have sealed the pact and awakened in Void Covenant—a dark fantasy card RPG where tactical prowess meets real-world wealth. Build a formidable legion of minions, conquer towering dungeons, duel summoners across the realm, and forge your sovereign legacy in the Abyss!',
       visual: (
-        <div className="w-full max-w-[310px] flex flex-col items-center justify-center space-y-1.5 py-1">
+        <div className="relative w-full h-full flex flex-col items-center justify-center p-2">
+          <div className="relative w-36 sm:w-40 aspect-[4/5] rounded-2xl border-2 border-amber-400/70 overflow-hidden shadow-[0_0_30px_rgba(245,158,11,0.35)] bg-black">
+            <img 
+              src="/cards/aurelius_the_demiurge.webp" 
+              alt="Void Sovereign" 
+              className="w-full h-full object-cover brightness-110"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/avatars/knight.webp';
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+            <div className="absolute bottom-2 inset-x-2 text-center">
+              <span className="text-[9px] font-mono font-bold text-amber-300 uppercase tracking-widest block">
+                TACTICAL CARD RPG
+              </span>
+              <span className="text-xs font-display font-black text-white tracking-wider uppercase">
+                VOID COVENANT
+              </span>
+            </div>
+          </div>
+        </div>
+      )
+    },
+
+    // ----------------------------------------------------
+    // SLIDE 2: DECK & 5 BATTLE SLOTS
+    // ----------------------------------------------------
+    {
+      id: 2,
+      tag: 'CHAPTER I • COMBAT BASICS',
+      title: 'DECK & 5 BATTLE SLOTS',
+      headline: 'Assemble 10 cards. Minions clash straight ahead.',
+      description: 'Before stepping into combat, build your Combat Deck with exactly 10 cards in the CARDS tab. On the battlefield, you command 5 combat slots. Minions strike directly straight ahead into the opposing card. If an enemy slot is empty, all damage strikes the opposing Hero directly! Reduce enemy HP to 0 to claim victory.',
+      visual: (
+        <div className="w-full max-w-[310px] space-y-1.5 py-1">
           {/* Enemy Row */}
           <div className="w-full">
-            <div className="flex items-center justify-between text-[10px] font-mono font-bold text-rose-400 px-1 mb-1">
+            <div className="flex items-center justify-between text-[10px] font-mono font-bold text-rose-400 px-1 mb-0.5">
               <span>ENEMY FRONTLINE</span>
               <span className="text-zinc-400">HERO HP: 100</span>
             </div>
@@ -89,7 +123,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
                       }}
                     />
                   </div>
-                  <span className="text-[8px] font-mono text-rose-300 font-bold">{slot === 3 ? '12 ATK' : 'EMPTY'}</span>
+                  <span className="text-[7.5px] font-mono text-rose-300 font-bold">{slot === 3 ? '12 ATK' : 'EMPTY'}</span>
                 </div>
               ))}
             </div>
@@ -129,13 +163,13 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
                       }}
                     />
                   </div>
-                  <span className="text-[8px] font-mono text-cyan-300 font-bold">{slot === 3 ? '14 ATK' : 'READY'}</span>
+                  <span className="text-[7.5px] font-mono text-cyan-300 font-bold">{slot === 3 ? '14 ATK' : 'READY'}</span>
                 </div>
               ))}
             </div>
-            <div className="flex items-center justify-between text-[10px] font-mono font-bold text-cyan-400 px-1 mt-1">
+            <div className="flex items-center justify-between text-[10px] font-mono font-bold text-cyan-400 px-1 mt-0.5">
               <span>YOUR BATTLE LINE</span>
-              <span className="text-zinc-400">MANA EXPANDS +1/TURN</span>
+              <span className="text-zinc-400">10 CARDS IN DECK</span>
             </div>
           </div>
         </div>
@@ -143,11 +177,11 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     },
 
     // ----------------------------------------------------
-    // SLIDE 2: DELAY TIMER, ARMOR & BARRIER
+    // SLIDE 3: DELAY TIMER, ARMOR & BARRIER
     // ----------------------------------------------------
     {
-      id: 2,
-      tag: 'CARD ANATOMY & DEFENSE',
+      id: 3,
+      tag: 'CHAPTER II • DEFENSIVE RITES',
       title: 'DELAY TIMER & DEFENSES',
       headline: 'Cards awaken over time. Defenses mitigate damage.',
       description: 'Summoned creatures do not attack right away. Each card has a Delay timer (1–3 turns) that counts down by 1 every round. When Delay reaches 0, the card attacks every turn! Armor absorbs incoming damage before health is lost, and Divine Barrier nullifies 1 full incoming strike.',
@@ -220,81 +254,55 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     },
 
     // ----------------------------------------------------
-    // SLIDE 3: DARK ARTS (CREATURE SKILLS)
-    // ----------------------------------------------------
-    {
-      id: 3,
-      tag: 'CREATURE AFFLICTIONS',
-      title: 'DARK ARTS (SKILLS)',
-      headline: '4 Ancient curses woven into battle minions.',
-      description: 'Hex amplifies all damage the cursed target suffers. Vampirism restores health to your Lord on each attack. Plague inflicts toxic decay at the end of each round. Sacrifice devours an ally when summoned to heal the Hero and permanently boost Attack and Health!',
-      visual: (
-        <div className="w-full max-w-[320px] grid grid-cols-2 gap-2.5 py-1">
-          <div className="p-2.5 rounded-xl bg-purple-950/50 border border-purple-500/40 flex items-center gap-2.5">
-            <img src="/icons/icon_hex.webp" alt="Hex" className="w-8 h-8 object-contain shrink-0 drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
-            <div>
-              <span className="text-xs font-mono font-bold text-purple-300 block">HEX</span>
-              <span className="text-[10px] font-mono text-zinc-200 block">Amps incoming damage</span>
-            </div>
-          </div>
-
-          <div className="p-2.5 rounded-xl bg-red-950/50 border border-red-500/40 flex items-center gap-2.5">
-            <img src="/icons/icon_vampirism.webp" alt="Vampirism" className="w-8 h-8 object-contain shrink-0 drop-shadow-[0_0_8px_rgba(239,68,68,0.7)]" />
-            <div>
-              <span className="text-xs font-mono font-bold text-red-300 block">VAMPIRISM</span>
-              <span className="text-[10px] font-mono text-zinc-200 block">Heals Hero on hit</span>
-            </div>
-          </div>
-
-          <div className="p-2.5 rounded-xl bg-emerald-950/50 border border-emerald-500/40 flex items-center gap-2.5">
-            <img src="/icons/icon_plague.webp" alt="Plague" className="w-8 h-8 object-contain shrink-0 drop-shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
-            <div>
-              <span className="text-xs font-mono font-bold text-emerald-300 block">PLAGUE</span>
-              <span className="text-[10px] font-mono text-zinc-200 block">Toxic damage / turn</span>
-            </div>
-          </div>
-
-          <div className="p-2.5 rounded-xl bg-amber-950/50 border border-amber-500/40 flex items-center gap-2.5">
-            <img src="/icons/icon_sacrifice.webp" alt="Sacrifice" className="w-8 h-8 object-contain shrink-0 drop-shadow-[0_0_8px_rgba(245,158,11,0.7)]" />
-            <div>
-              <span className="text-xs font-mono font-bold text-amber-300 block">SACRIFICE</span>
-              <span className="text-[10px] font-mono text-zinc-200 block">Eats ally for buffs</span>
-            </div>
-          </div>
-        </div>
-      )
-    },
-
-    // ----------------------------------------------------
-    // SLIDE 4: HERO STANCES & TALENTS
+    // SLIDE 4: DARK MAGIC & COMMANDER AURAS
     // ----------------------------------------------------
     {
       id: 4,
-      tag: 'COMMANDER AURAS',
-      title: 'STANCES & TALENTS',
-      headline: 'Active commander auras trigger in combat.',
-      description: 'Your Lord commands an active Stance that has a chance to trigger each round: Void Strike unleashes direct lightning damage with siphon; Blood Aura heals the lowest-HP minion and cleanses Hex; Warlord’s Cry buffs Attack and Armor. Allocate Talent Points in the TALENTS tab to unlock passive upgrades!',
+      tag: 'CHAPTER III • SORCERY & AURAS',
+      title: 'MINION SKILLS & STANCES',
+      headline: 'Weave ancient curses and unleash commander powers.',
+      description: 'Minions wield 4 ancient curses: Hex (amplifies damage on target), Vampirism (heals your Hero), Plague (toxic damage over time), and Sacrifice (devours an ally for colossal buffs). Furthermore, your Lord’s active Stance (Void Strike, Blood Aura, or Warlord’s Cry) has a chance to trigger each round. Upgrade them in the TALENTS tab!',
       visual: (
-        <div className="w-full max-w-[320px] flex items-center justify-between gap-2.5 py-1">
-          {/* Void Strike */}
-          <div className="flex-1 p-2 rounded-xl bg-purple-950/50 border border-purple-500/40 flex flex-col items-center text-center">
-            <img src="/icons/void_strike_fx.webp" alt="Void Strike" className="w-11 h-11 object-contain rounded-lg drop-shadow-[0_0_10px_rgba(168,85,247,0.7)] mb-1" />
-            <span className="text-[11px] font-mono font-bold text-purple-300 block">VOID STRIKE</span>
-            <span className="text-[9.5px] font-mono text-zinc-300">Damage & Leech</span>
+        <div className="w-full max-w-[320px] space-y-2 py-1">
+          {/* Minion Skills Row */}
+          <div className="grid grid-cols-4 gap-1.5">
+            <div className="p-1.5 rounded-xl bg-purple-950/50 border border-purple-500/40 flex flex-col items-center text-center">
+              <img src="/icons/icon_hex.webp" alt="Hex" className="w-6 h-6 object-contain mb-0.5" />
+              <span className="text-[9px] font-mono font-bold text-purple-300">HEX</span>
+            </div>
+            <div className="p-1.5 rounded-xl bg-red-950/50 border border-red-500/40 flex flex-col items-center text-center">
+              <img src="/icons/icon_vampirism.webp" alt="Vampirism" className="w-6 h-6 object-contain mb-0.5" />
+              <span className="text-[9px] font-mono font-bold text-red-300">VAMPIRISM</span>
+            </div>
+            <div className="p-1.5 rounded-xl bg-emerald-950/50 border border-emerald-500/40 flex flex-col items-center text-center">
+              <img src="/icons/icon_plague.webp" alt="Plague" className="w-6 h-6 object-contain mb-0.5" />
+              <span className="text-[9px] font-mono font-bold text-emerald-300">PLAGUE</span>
+            </div>
+            <div className="p-1.5 rounded-xl bg-amber-950/50 border border-amber-500/40 flex flex-col items-center text-center">
+              <img src="/icons/icon_sacrifice.webp" alt="Sacrifice" className="w-6 h-6 object-contain mb-0.5" />
+              <span className="text-[9px] font-mono font-bold text-amber-300">SACRIFICE</span>
+            </div>
           </div>
 
-          {/* Blood Aura */}
-          <div className="flex-1 p-2 rounded-xl bg-rose-950/50 border border-rose-500/40 flex flex-col items-center text-center">
-            <img src="/icons/blood_aura_fx.webp" alt="Blood Aura" className="w-11 h-11 object-contain rounded-lg drop-shadow-[0_0_10px_rgba(244,63,94,0.7)] mb-1" />
-            <span className="text-[11px] font-mono font-bold text-rose-300 block">BLOOD AURA</span>
-            <span className="text-[9.5px] font-mono text-zinc-300">Heal & Cleanse</span>
-          </div>
+          {/* Stances Row */}
+          <div className="grid grid-cols-3 gap-2 pt-0.5">
+            <div className="p-2 rounded-xl bg-purple-950/40 border border-purple-500/30 flex flex-col items-center text-center">
+              <img src="/icons/void_strike_fx.webp" alt="Void Strike" className="w-9 h-9 object-contain rounded-lg mb-1" />
+              <span className="text-[10px] font-mono font-bold text-purple-300">VOID STRIKE</span>
+              <span className="text-[8.5px] font-mono text-zinc-300">Damage & Leech</span>
+            </div>
 
-          {/* Warlord's Cry */}
-          <div className="flex-1 p-2 rounded-xl bg-amber-950/50 border border-amber-500/40 flex flex-col items-center text-center">
-            <img src="/icons/warlord_cry_fx.webp" alt="Warlords Cry" className="w-11 h-11 object-contain rounded-lg drop-shadow-[0_0_10px_rgba(245,158,11,0.7)] mb-1" />
-            <span className="text-[11px] font-mono font-bold text-amber-300 block">WARLORD</span>
-            <span className="text-[9.5px] font-mono text-zinc-300">ATK & Armor</span>
+            <div className="p-2 rounded-xl bg-rose-950/40 border border-rose-500/30 flex flex-col items-center text-center">
+              <img src="/icons/blood_aura_fx.webp" alt="Blood Aura" className="w-9 h-9 object-contain rounded-lg mb-1" />
+              <span className="text-[10px] font-mono font-bold text-rose-300">BLOOD AURA</span>
+              <span className="text-[8.5px] font-mono text-zinc-300">Heal & Cleanse</span>
+            </div>
+
+            <div className="p-2 rounded-xl bg-amber-950/40 border border-amber-500/30 flex flex-col items-center text-center">
+              <img src="/icons/warlord_cry_fx.webp" alt="Warlord Cry" className="w-9 h-9 object-contain rounded-lg mb-1" />
+              <span className="text-[10px] font-mono font-bold text-amber-300">WARLORD</span>
+              <span className="text-[8.5px] font-mono text-zinc-300">ATK & Armor</span>
+            </div>
           </div>
         </div>
       )
@@ -305,10 +313,10 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     // ----------------------------------------------------
     {
       id: 5,
-      tag: 'TOWER EXPEDITIONS',
-      title: 'THE CAMPAIGN & SWEEP',
-      headline: '10 cards in deck. Bosses every 10 floors.',
-      description: 'Your Combat Deck must hold exactly 10 cards to enter battle. Expeditions consume PvE Energy, which recharges over time. Bosses guard floors 10, 20, 30... yielding first-clear Sovereign bounties! Clear any floor with 3 Stars to unlock 1-click Instant Sweeps without fighting.',
+      tag: 'CHAPTER IV • EXPEDITIONS',
+      title: 'THE CAMPAIGN & SWEEPS',
+      headline: 'Descend into the Abyss, slay bosses, harvest loot.',
+      description: 'Venture through the campaign tower using PvE Energy, which recharges over time. Fearsome Bosses await every 10 floors (Floor 10, 20, 30...) carrying first-clear Blood Sovereign bounties and rare card packs. Master any floor with a 3-Star rating to unlock 1-click Instant Sweeps for fast Gold and EXP without re-fighting!',
       visual: (
         <div className="w-full max-w-[320px] flex items-center justify-between gap-2.5 py-1">
           {/* Boss Encounter */}
@@ -344,10 +352,10 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     // ----------------------------------------------------
     {
       id: 6,
-      tag: 'GLADIATORIAL COMBAT',
-      title: 'THE PVP ARENA & LEAGUES',
-      headline: 'Duel summoners, climb 12 Leagues, and earn Sovereigns.',
-      description: 'Spend Arena Tickets to battle real summoners. Pass subscribers earn Blood Sovereigns for every win! Accumulate Crowns to climb from Bronze up through Master and Void Overlord to Divine. Activate Peace Shields (3h, 6h, 12h) to protect your rating while offline.',
+      tag: 'CHAPTER V • THE ARENA',
+      title: 'DUELS, LEAGUES & BOUNTIES',
+      headline: 'Climb 12 competitive leagues and earn Sovereigns per win.',
+      description: 'Enter the Arena using PvP Tickets to duel living summoners. Pass subscribers earn real Blood Sovereigns for every single victory! Accumulate Crowns to ascend through 12 competitive tiers from Bronze to Divine. Before you log off, activate Peace Shields (3h, 6h, 12h) to lock your rating from rival attacks.',
       visual: (
         <div className="w-full max-w-[320px] flex items-center justify-between gap-2.5 py-1">
           {/* League Crowns */}
@@ -375,14 +383,14 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     },
 
     // ----------------------------------------------------
-    // SLIDE 7: 4 REALM CURRENCIES
+    // SLIDE 7: TREASURES & CURRENCIES
     // ----------------------------------------------------
     {
       id: 7,
-      tag: 'TREASURY ASSETS',
-      title: '4 REALM CURRENCIES',
-      headline: 'Gold, Shards, Shadow Dust & Blood Sovereigns.',
-      description: 'Gold: earned in battles, buys card booster packs in the shop. Dark Shards: premium crystals for Gacha summons, energy refills, & passes. Shadow Dust: disenchant duplicate cards to ascend cards up to Divine Tier! Blood Sovereigns: convertible cryptocurrency (100 SOV = $1.00 USDT).',
+      tag: 'CHAPTER VI • ECONOMY',
+      title: 'TREASURES & PROGRESSION',
+      headline: 'Master the four currencies that fuel your supremacy.',
+      description: 'Gold: won in battles to buy card booster packs. Dark Shards: premium gems to summon in the Gacha Shrine, buy energy & passes. Shadow Dust: obtained by disenchanting duplicate cards to ascend your minions up to Divine Tier. Blood Sovereigns: convertible hard currency (100 SOV = $1.00 USDT) earned in battle and alliances.',
       visual: (
         <div className="w-full max-w-[320px] grid grid-cols-2 gap-2 py-1">
           <div className="p-2 rounded-xl bg-amber-950/40 border border-amber-500/40 flex items-center gap-2.5">
@@ -425,10 +433,10 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     // ----------------------------------------------------
     {
       id: 8,
-      tag: 'ALLIANCE & WITHDRAWALS',
-      title: 'ALLIANCE & WITHDRAWALS',
-      headline: 'Earn 15% from allies’ battle wins. Withdraw to wallet.',
-      description: 'Share your invite link to build an Alliance. Receive an instant bounty (+300 to +800 SOV) whenever an ally activates a Pass, plus 15% of all Blood Sovereigns they win in Arena and League! Reach milestone goals for up to 500,000 SOV. Withdraw your earnings anytime in the Bank.',
+      tag: 'CHAPTER VII • DESTINY & CASHOUT',
+      title: 'ALLIANCE & REAL CASHOUTS',
+      headline: 'Recruit allies for lifetime bounties and withdraw your riches.',
+      description: 'Share your personal invite link to build an Alliance. Instantly earn +300 to +800 SOV whenever an invited friend buys a Pass, plus a perpetual 15% share of all Blood Sovereigns they win in Arena battles! Unlock up to 500,000 SOV in milestone rewards. All your Sovereigns accumulate in the Bank for direct on-chain withdrawal to USDT, TON, or Solana (100 SOV = $1.00 USDT).',
       visual: (
         <div className="w-full max-w-[320px] flex items-center justify-between gap-2.5 py-1">
           {/* Pass Bounty */}
@@ -537,7 +545,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
           </AnimatePresence>
         </div>
 
-        {/* Lower Half: Dark Glass Description Panel (Clean typography, no redundant footer badges) */}
+        {/* Lower Half: Dark Glass Description Panel (Clean story narrative) */}
         <div className="p-4 sm:p-5 bg-gradient-to-b from-[#141113] via-[#0d0a0b] to-black border-t border-white/10 flex flex-col justify-between space-y-3 shrink-0">
           <AnimatePresence mode="wait">
             <motion.div
@@ -580,7 +588,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
                   : 'bg-gradient-to-r from-[#b3894a] via-[#f3d38c] to-[#b3894a] hover:from-[#c59a58] hover:via-[#fae1a2] hover:to-[#c59a58] text-[#1a0f05] border-[#ebd09b]/70 shadow-[0_0_20px_rgba(212,175,55,0.3)]'
               }`}
             >
-              <span>{isFinalSlide ? 'ENTER THE VOID' : 'CONTINUE'}</span>
+              <span>{isFinalSlide ? 'SEAL THE PACT & ENTER' : 'CONTINUE'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
