@@ -241,7 +241,12 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
         ),
         (
           <span>
-            <strong className="text-teal-300 font-semibold">Shadow Dust</strong> is obtained by disenchanting duplicate cards to ascend minions up to Divine tier. <strong className="text-red-400 font-semibold">Blood Sovereigns</strong> are real convertible assets (<strong className="text-amber-300 font-semibold">100 SOV = $1.00 USDT</strong>) earned through combat and alliances.
+            <strong className="text-teal-300 font-semibold">Shadow Dust</strong> is obtained by disenchanting duplicate cards to ascend minions up to Divine tier.
+          </span>
+        ),
+        (
+          <span>
+            <strong className="text-red-400 font-semibold">Blood Sovereigns</strong> are real convertible assets (<strong className="text-amber-300 font-semibold">100 SOV = $1.00 USDT</strong>) earned through combat and alliances.
           </span>
         )
       ]
