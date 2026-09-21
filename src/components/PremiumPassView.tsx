@@ -323,7 +323,7 @@ export const PremiumPassView: React.FC = () => {
                   <img src="/icons/icon_sovereign.webp" alt="Blood Sovereign" className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.6)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-emerald-300 text-sm sm:text-[15px] leading-snug">+2 Blood Sovereigns / PvP Win</div>
+                  <div className="font-bold text-emerald-300 text-sm sm:text-[15px] leading-snug">+1 Blood Sovereign / PvP Win</div>
                   <div className="text-xs text-gray-300 mt-0.5">Up to 20 SOV daily bounty from arena victories</div>
                 </div>
               </div>
@@ -536,7 +536,7 @@ export const PremiumPassView: React.FC = () => {
                   <img src="/icons/icon_sovereign.webp" alt="Blood Sovereign" className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.7)]" />
                 </div>
                 <div>
-                  <div className="font-bold text-emerald-300 text-sm sm:text-[15px] leading-snug">+3 Blood Sovereigns / PvP Win</div>
+                  <div className="font-bold text-emerald-300 text-sm sm:text-[15px] leading-snug">+2 Blood Sovereigns / PvP Win</div>
                   <div className="text-xs text-gray-300 mt-0.5">Up to 36 SOV daily (1.8x higher earnings than Premium)</div>
                 </div>
               </div>

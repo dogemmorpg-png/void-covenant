@@ -259,7 +259,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (subTier === 'ultra') {
           const cap = 36;
           if (currentWonToday < cap) {
-            sovereignsReward = Math.min(3, cap - currentWonToday);
+            sovereignsReward = Math.min(2, cap - currentWonToday);
             profile.dailySovereignsWonToday = currentWonToday + sovereignsReward;
             profile = recordSovereignTransaction(
               profile,
@@ -272,7 +272,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         } else if (subTier === 'premium') {
           const cap = 20;
           if (currentWonToday < cap) {
-            sovereignsReward = Math.min(2, cap - currentWonToday);
+            sovereignsReward = Math.min(1, cap - currentWonToday);
             profile.dailySovereignsWonToday = currentWonToday + sovereignsReward;
             profile = recordSovereignTransaction(
               profile,

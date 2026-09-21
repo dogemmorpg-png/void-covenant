@@ -92,7 +92,7 @@ export const MobilePremiumPassView: React.FC = () => {
     },
     {
       icon: '/icons/icon_sovereign.webp',
-      title: '+2 Blood Sovereigns / PvP Win',
+      title: '+1 Blood Sovereign / PvP Win',
       desc: 'Up to 20 SOV daily bounty from arena victories',
       color: 'text-emerald-300'
     },
@@ -150,7 +150,7 @@ export const MobilePremiumPassView: React.FC = () => {
     },
     {
       icon: '/icons/icon_sovereign.webp',
-      title: '+3 Blood Sovereigns / PvP Win',
+      title: '+2 Blood Sovereigns / PvP Win',
       desc: 'Up to 36 SOV daily (1.8x higher earnings than Premium)',
       color: 'text-emerald-300'
     },

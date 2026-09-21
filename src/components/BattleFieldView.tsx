@@ -486,7 +486,7 @@ export const BattleFieldView: React.FC<BattleFieldViewProps> = ({ stage, onExitB
     const todayUtc = new Date().toISOString().slice(0, 10);
     const currentWonToday = profile.lastSovereignsWonDate === todayUtc ? (profile.dailySovereignsWonToday || 0) : 0;
     const cap = subTier === 'ultra' ? 36 : subTier === 'premium' ? 20 : 0;
-    const perWin = subTier === 'ultra' ? 3 : subTier === 'premium' ? 2 : 0;
+    const perWin = subTier === 'ultra' ? 2 : subTier === 'premium' ? 1 : 0;
     return Math.max(0, Math.min(perWin, cap - currentWonToday));
   });
 
