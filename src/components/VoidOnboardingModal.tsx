@@ -16,8 +16,50 @@ interface OnboardingSlide {
   image: string;
 }
 
+// High-priority onboarding assets preloaded into browser & GPU texture cache
+const ONBOARDING_ASSETS = [
+  '/landing_void_realm.webp',
+  '/landing_cards_altar.webp',
+  '/gameplay_cinematic_duel.webp',
+  '/dark_heroes_lore.webp',
+  '/landing_warlord_duel.webp',
+  '/landing_tactical_arena.webp',
+  '/landing_p2e_treasury.webp',
+  '/web3_treasury_vault.webp',
+];
+
+// Preload immediately at script evaluation time
+if (typeof window !== 'undefined') {
+  ONBOARDING_ASSETS.forEach(src => {
+    const img = new Image();
+    img.src = src;
+  });
+}
+
+// Ethereal floating motes/embers for the cosmic void background
+const FLOATING_EMBERS = [
+  { id: 1, left: '12%', top: '85%', size: 3, duration: 13, delay: 0 },
+  { id: 2, left: '28%', top: '80%', size: 4, duration: 17, delay: 2 },
+  { id: 3, left: '48%', top: '90%', size: 2.5, duration: 11, delay: 4 },
+  { id: 4, left: '68%', top: '82%', size: 3.5, duration: 15, delay: 1 },
+  { id: 5, left: '84%', top: '88%', size: 4, duration: 19, delay: 3 },
+  { id: 6, left: '38%', top: '92%', size: 2, duration: 14, delay: 5 },
+  { id: 7, left: '76%', top: '86%', size: 3, duration: 16, delay: 2.5 },
+];
+
 export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen, onClose }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Aggressive browser image preloading & GPU decoding on modal mount
+  useEffect(() => {
+    ONBOARDING_ASSETS.forEach(src => {
+      const img = new Image();
+      img.src = src;
+      if ('decode' in img) {
+        img.decode().catch(() => {});
+      }
+    });
+  }, []);
 
   const triggerHaptic = useCallback(() => {
     try {
@@ -59,7 +101,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       tag: 'PROLOGUE',
       title: 'WELCOME TO VOID COVENANT',
       headline: 'Enter the dark realm of tactical card duels and real rewards.',
-      image: '/landing_void_realm.jpg',
+      image: '/landing_void_realm.webp',
       paragraphs: [
         (
           <span>
@@ -87,7 +129,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       tag: 'CHAPTER I • THE BATTLEFIELD',
       title: 'DECK & 5 BATTLE SLOTS',
       headline: 'Command a 10-card deck across 5 mirrored combat slots.',
-      image: '/landing_cards_altar.jpg',
+      image: '/landing_cards_altar.webp',
       paragraphs: [
         (
           <span>
@@ -115,7 +157,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       tag: 'CHAPTER II • TACTICAL DEFENSES',
       title: 'DELAY TIMER, ARMOR & BARRIER',
       headline: 'Patience awakens minions; armor and wards preserve them.',
-      image: '/gameplay_cinematic_duel.jpg',
+      image: '/gameplay_cinematic_duel.webp',
       paragraphs: [
         (
           <span>
@@ -143,7 +185,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       tag: 'CHAPTER III • DARK SORCERY',
       title: 'MINION CURSES & STANCES',
       headline: 'Cast ancient afflictions and channel your Lord’s aura.',
-      image: '/dark_heroes_lore.jpg',
+      image: '/dark_heroes_lore.webp',
       paragraphs: [
         (
           <span>
@@ -171,7 +213,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       tag: 'CHAPTER IV • EXPEDITIONS',
       title: 'CAMPAIGN, ENERGY & SWEEPS',
       headline: 'Conquer the abyssal tower and harvest instant spoils.',
-      image: '/landing_warlord_duel.jpg',
+      image: '/landing_warlord_duel.webp',
       paragraphs: [
         (
           <span>
@@ -199,7 +241,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       tag: 'CHAPTER V • THE ARENA',
       title: 'DUELS, 12 LEAGUES & SHIELDS',
       headline: 'Duel living rivals, claim daily league cash rewards, and earn Sovereigns.',
-      image: '/landing_tactical_arena.jpg',
+      image: '/landing_tactical_arena.webp',
       paragraphs: [
         (
           <span>
@@ -227,7 +269,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       tag: 'CHAPTER VI • ECONOMY',
       title: 'THE 4 REALM CURRENCIES',
       headline: 'Harness Gold, Shards, Shadow Dust, and Sovereigns.',
-      image: '/landing_p2e_treasury.jpg',
+      image: '/landing_p2e_treasury.webp',
       paragraphs: [
         (
           <span>
@@ -260,7 +302,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       tag: 'CHAPTER VII • DESTINY & REWARDS',
       title: 'ALLIANCE & REAL CASHOUTS',
       headline: 'Recruit sworn allies and withdraw your earnings directly.',
-      image: '/web3_treasury_vault.jpg',
+      image: '/web3_treasury_vault.webp',
       paragraphs: [
         (
           <span>
@@ -300,20 +342,47 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
 
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-2 sm:p-4 select-none overflow-hidden">
-      {/* 1. Rich Atmospheric Background with Cosmic Violet/Amber Nebula & Vignette */}
+      {/* 1. Deep Atmospheric Cosmic Void Backdrop */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.img
-          src="/landing_void_realm.jpg"
+          src="/landing_void_realm.webp"
           alt="Void Atmosphere"
-          initial={{ scale: 1.05 }}
-          animate={{ scale: [1.05, 1.1, 1.05] }}
+          initial={{ scale: 1.02 }}
+          animate={{ scale: [1.02, 1.07, 1.02] }}
           transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-full h-full object-cover filter blur-xl brightness-[0.45] contrast-125 opacity-50"
+          className="w-full h-full object-cover filter blur-[2px] brightness-[0.5] contrast-[1.15] opacity-70"
         />
-        {/* Layered dark fantasy gradients */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/85" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(120,53,140,0.22)_0%,_rgba(5,4,7,0.92)_70%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(212,175,55,0.12)_0%,_transparent_60%)]" />
+        {/* Layered dark fantasy cosmic gradients - twilight abyss, rich purple & starlight */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#050308] via-black/75 to-[#06030a]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(3,2,6,0.9)_80%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(126,34,206,0.22)_0%,transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(59,130,246,0.12)_0%,transparent_60%)]" />
+
+        {/* Floating Glowing Void Embers */}
+        {FLOATING_EMBERS.map(mote => (
+          <motion.div
+            key={mote.id}
+            initial={{ y: 0, opacity: 0 }}
+            animate={{
+              y: [-10, -160, -320],
+              opacity: [0, 0.75, 0],
+              x: [0, mote.id % 2 === 0 ? 12 : -12, 0],
+            }}
+            transition={{
+              duration: mote.duration,
+              repeat: Infinity,
+              delay: mote.delay,
+              ease: 'linear',
+            }}
+            style={{
+              left: mote.left,
+              top: mote.top,
+              width: `${mote.size}px`,
+              height: `${mote.size}px`,
+            }}
+            className="absolute rounded-full bg-gradient-to-t from-amber-300 via-purple-200 to-white shadow-[0_0_8px_rgba(235,185,110,0.8)] pointer-events-none"
+          />
+        ))}
       </div>
 
       {/* 2. Gothic Monolithic Modal Shell */}
@@ -322,16 +391,10 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 12 }}
         transition={{ duration: 0.22, ease: 'easeOut' }}
-        className="relative w-full max-w-md bg-gradient-to-b from-[#161019]/95 via-[#0d090f]/98 to-[#040305] border-2 border-[#d4af37]/50 rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.95),0_0_35px_rgba(212,175,55,0.22),inset_0_1px_2px_rgba(255,255,255,0.15)] backdrop-blur-2xl overflow-hidden flex flex-col h-auto max-h-[96vh]"
+        className="relative w-full max-w-md bg-gradient-to-b from-[#17101c]/95 via-[#0e0913]/98 to-[#050307] border-2 border-[#d4af37]/50 rounded-3xl shadow-[0_0_70px_rgba(0,0,0,0.95),0_0_30px_rgba(130,40,180,0.18),inset_0_1px_2px_rgba(255,255,255,0.15)] backdrop-blur-2xl overflow-hidden flex flex-col h-auto max-h-[96vh]"
       >
         {/* Ornate Top Hairline Glow */}
-        <div className="absolute top-0 inset-x-8 h-px bg-gradient-to-r from-transparent via-[#ffd875] to-transparent shadow-[0_0_8px_#ffd875] pointer-events-none" />
-
-        {/* Modal Outer Frame Corner Runes */}
-        <div className="absolute top-2 left-2.5 text-[#ebd09b]/30 font-serif text-[10px] pointer-events-none select-none">⟦Ω⟧</div>
-        <div className="absolute top-2 right-2.5 text-[#ebd09b]/30 font-serif text-[10px] pointer-events-none select-none">⟦Ω⟧</div>
-        <div className="absolute bottom-2 left-2.5 text-[#ebd09b]/30 font-serif text-[10px] pointer-events-none select-none">⟦Ω⟧</div>
-        <div className="absolute bottom-2 right-2.5 text-[#ebd09b]/30 font-serif text-[10px] pointer-events-none select-none">⟦Ω⟧</div>
+        <div className="absolute top-0 inset-x-10 h-px bg-gradient-to-r from-transparent via-[#ffd875] to-transparent shadow-[0_0_10px_#ffd875] pointer-events-none" />
 
         {/* Top Story Progress Bars (8 Segments) */}
         <div className="px-4 pt-3 pb-1.5 flex items-center gap-1.5 z-20 shrink-0">
@@ -357,7 +420,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
           ))}
         </div>
 
-        {/* Header Bar with Chapter Tag & Stylized Skip Button */}
+        {/* Header Bar with Chapter Tag & Refined Skip Button */}
         <div className="px-4 py-1 flex items-center justify-between z-20 shrink-0">
           <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-[0.2em] text-amber-400 font-bold">
             <span className="w-1.5 h-1.5 rounded-sm bg-amber-400 rotate-45 inline-block shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
@@ -368,38 +431,41 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
 
           <button
             onClick={onClose}
-            className="text-[10px] font-mono uppercase tracking-wider text-amber-300/80 hover:text-amber-100 transition-colors cursor-pointer flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-950/40 border border-amber-500/25 hover:border-amber-400/50 shadow-sm active:scale-95"
+            className="text-[10px] font-mono uppercase tracking-widest text-amber-300/80 hover:text-amber-100 transition-all cursor-pointer flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-b from-[#241728] to-[#120a15] border border-[#d4af37]/40 hover:border-[#ffd875]/80 shadow-[0_2px_8px_rgba(0,0,0,0.6)] active:scale-95"
           >
             <span>Skip</span>
-            <X className="w-3 h-3" />
+            <X className="w-3 h-3 stroke-[2.5]" />
           </button>
         </div>
 
-        {/* Upper Half: Ornate Cinematic Keyart Frame with Corner Accents */}
+        {/* Upper Half: Ornate Keyart Frame with Zero-Lag Pre-Rendered Crossfade */}
         <div className="relative w-full px-3.5 pt-1 pb-1 shrink-0 flex items-center justify-center">
-          <div className="relative w-full aspect-[16/9] max-h-[175px] rounded-2xl overflow-hidden border-2 border-[#d4af37]/45 shadow-[0_0_30px_rgba(0,0,0,0.9),0_0_15px_rgba(212,175,55,0.18)] bg-black">
-            <AnimatePresence mode="wait">
-              <motion.img
-                key={current.image}
-                src={current.image}
-                alt={current.title}
-                initial={{ opacity: 0, scale: 1.04 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="w-full h-full object-cover object-center brightness-105 contrast-[1.05]"
+          <div className="relative w-full aspect-[16/9] max-h-[175px] rounded-2xl overflow-hidden border-2 border-[#d4af37]/50 shadow-[0_0_25px_rgba(0,0,0,0.9),0_0_12px_rgba(212,175,55,0.2)] bg-[#0a070c]">
+            {/* Pre-rendered stacked images: instantaneous zero-latency GPU crossfade */}
+            {slides.map((slide, idx) => (
+              <img
+                key={slide.image}
+                src={slide.image}
+                alt={slide.title}
+                loading="eager"
+                decoding="sync"
+                className={`absolute inset-0 w-full h-full object-cover object-center brightness-105 contrast-[1.05] transition-all duration-300 ease-out pointer-events-none ${
+                  idx === currentSlide
+                    ? 'opacity-100 z-10 scale-100'
+                    : 'opacity-0 z-0 scale-[1.03]'
+                }`}
               />
-            </AnimatePresence>
+            ))}
 
             {/* Cinematic dark vignettes */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/30 pointer-events-none" />
-            <div className="absolute inset-0 ring-1 ring-inset ring-[#ffd875]/25 rounded-2xl pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/30 pointer-events-none z-20" />
+            <div className="absolute inset-0 ring-1 ring-inset ring-[#ffd875]/25 rounded-2xl pointer-events-none z-20" />
 
-            {/* Corner Runes */}
-            <span className="absolute top-1.5 left-1.5 w-2.5 h-2.5 border-t-2 border-l-2 border-amber-400/80 pointer-events-none" />
-            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 border-t-2 border-r-2 border-amber-400/80 pointer-events-none" />
-            <span className="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 border-b-2 border-l-2 border-amber-400/80 pointer-events-none" />
-            <span className="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 border-b-2 border-r-2 border-amber-400/80 pointer-events-none" />
+            {/* Clean Corner Notches */}
+            <span className="absolute top-1.5 left-1.5 w-2.5 h-2.5 border-t-2 border-l-2 border-amber-400/80 pointer-events-none z-20" />
+            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 border-t-2 border-r-2 border-amber-400/80 pointer-events-none z-20" />
+            <span className="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 border-b-2 border-l-2 border-amber-400/80 pointer-events-none z-20" />
+            <span className="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 border-b-2 border-r-2 border-amber-400/80 pointer-events-none z-20" />
           </div>
         </div>
 
@@ -437,24 +503,33 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
             </motion.div>
           </AnimatePresence>
 
-          {/* Action Buttons Row with Burnished Metallic Finish */}
+          {/* Action Buttons Row with Ultra-Luxe Metallic Finish */}
           <div className="pt-1 flex items-center gap-2.5">
             {currentSlide > 0 && (
               <button
                 onClick={handlePrev}
-                className="py-3 px-3.5 rounded-xl bg-gradient-to-b from-[#251c27] via-[#1a131c] to-[#100a12] hover:from-[#2e2332] hover:to-[#18111c] text-amber-300 hover:text-amber-100 text-xs font-mono font-bold flex items-center justify-center cursor-pointer active:scale-95 transition-all border border-[#d4af37]/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(0,0,0,0.6)]"
+                className="py-3 px-3.5 rounded-xl bg-gradient-to-b from-[#2a1c2b] via-[#1b111c] to-[#0e080f] hover:from-[#352336] hover:to-[#170e19] text-amber-300 hover:text-amber-100 text-xs font-mono font-bold flex items-center justify-center cursor-pointer active:scale-95 transition-all border-2 border-[#d4af37]/50 hover:border-[#f5d78e] shadow-[0_4px_15px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.2),inset_0_-1px_2px_rgba(0,0,0,0.8)]"
                 title="Previous Slide"
               >
-                <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
+                <ChevronLeft className="w-4 h-4 stroke-[3] drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
               </button>
             )}
 
             <button
               onClick={handleNext}
-              className="flex-1 py-3.5 px-4 rounded-xl font-display font-black text-xs sm:text-sm tracking-[0.22em] uppercase flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all bg-gradient-to-r from-[#b3894a] via-[#f3d38c] to-[#b3894a] hover:from-[#c59a58] hover:via-[#fae1a2] hover:to-[#c59a58] text-[#1a0f05] border border-[#ebd09b]/80 shadow-[0_4px_25px_rgba(229,194,120,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)]"
+              className={`group relative flex-1 py-3.5 px-5 rounded-xl font-display font-black text-xs sm:text-sm tracking-[0.22em] uppercase flex items-center justify-center gap-2.5 cursor-pointer active:scale-[0.98] transition-all overflow-hidden border-2 shadow-xl ${
+                isFinalSlide
+                  ? 'bg-gradient-to-r from-[#991b1b] via-[#eab308] via-[#f59e0b] to-[#991b1b] hover:from-[#b91c1c] hover:via-[#facc15] hover:to-[#b91c1c] text-[#1a0808] border-[#fde047] shadow-[0_0_30px_rgba(245,158,11,0.5),inset_0_1px_2px_rgba(255,255,255,0.8),inset_0_-2px_4px_rgba(0,0,0,0.5)]'
+                  : 'bg-gradient-to-r from-[#8b6528] via-[#f7dea6] via-[#ffeec2] via-[#e5bf65] to-[#8b6528] hover:from-[#9c7330] hover:via-[#fae8b8] hover:to-[#9c7330] text-[#1c1003] border-[#fff0c8] shadow-[0_6px_25px_rgba(212,175,55,0.4),0_0_0_1px_rgba(0,0,0,0.8),inset_0_1px_2px_rgba(255,255,255,0.9),inset_0_-2px_4px_rgba(110,75,18,0.5)]'
+              }`}
             >
-              <span>{isFinalSlide ? 'SEAL THE PACT & ENTER' : 'CONTINUE'}</span>
-              <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+              {/* Shimmering light reflex sweep across the button */}
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/35 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out pointer-events-none" />
+
+              <span className="relative z-10 drop-shadow-[0_1px_0_rgba(255,255,255,0.5)] font-black">
+                {isFinalSlide ? 'SEAL THE PACT & ENTER' : 'CONTINUE'}
+              </span>
+              <ArrowRight className="relative z-10 w-4 h-4 stroke-[3] text-[#1c1003] drop-shadow-[0_1px_0_rgba(255,255,255,0.5)] group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </div>
