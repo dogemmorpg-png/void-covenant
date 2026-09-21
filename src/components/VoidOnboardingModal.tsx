@@ -503,33 +503,28 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
             </motion.div>
           </AnimatePresence>
 
-          {/* Action Buttons Row with Ultra-Luxe Metallic Finish */}
-          <div className="pt-1 flex items-center gap-2.5">
+          {/* Action Buttons Row */}
+          <div className="pt-2 flex items-center gap-2.5">
             {currentSlide > 0 && (
               <button
                 onClick={handlePrev}
-                className="py-3 px-3.5 rounded-xl bg-gradient-to-b from-[#2a1c2b] via-[#1b111c] to-[#0e080f] hover:from-[#352336] hover:to-[#170e19] text-amber-300 hover:text-amber-100 text-xs font-mono font-bold flex items-center justify-center cursor-pointer active:scale-95 transition-all border-2 border-[#d4af37]/50 hover:border-[#f5d78e] shadow-[0_4px_15px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.2),inset_0_-1px_2px_rgba(0,0,0,0.8)]"
+                className="h-12 w-12 rounded-xl bg-gradient-to-b from-[#22160d] via-[#160d06] to-[#0a0502] hover:from-[#2d1c10] hover:to-[#120a04] text-[#f3d38c] hover:text-white flex items-center justify-center cursor-pointer active:scale-95 transition-all border border-[#d4af37]/50 hover:border-[#ffd875] shadow-[0_2px_10px_rgba(0,0,0,0.6)] shrink-0"
                 title="Previous Slide"
               >
-                <ChevronLeft className="w-4 h-4 stroke-[3] drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
+                <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
               </button>
             )}
 
             <button
               onClick={handleNext}
-              className={`group relative flex-1 py-3.5 px-5 rounded-xl font-display font-black text-xs sm:text-sm tracking-[0.22em] uppercase flex items-center justify-center gap-2.5 cursor-pointer active:scale-[0.98] transition-all overflow-hidden border-2 shadow-xl ${
+              className={`flex-1 h-12 rounded-xl font-sans font-black text-xs sm:text-sm tracking-widest uppercase flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all border shadow-lg ${
                 isFinalSlide
-                  ? 'bg-gradient-to-r from-[#991b1b] via-[#eab308] via-[#f59e0b] to-[#991b1b] hover:from-[#b91c1c] hover:via-[#facc15] hover:to-[#b91c1c] text-[#1a0808] border-[#fde047] shadow-[0_0_30px_rgba(245,158,11,0.5),inset_0_1px_2px_rgba(255,255,255,0.8),inset_0_-2px_4px_rgba(0,0,0,0.5)]'
-                  : 'bg-gradient-to-r from-[#8b6528] via-[#f7dea6] via-[#ffeec2] via-[#e5bf65] to-[#8b6528] hover:from-[#9c7330] hover:via-[#fae8b8] hover:to-[#9c7330] text-[#1c1003] border-[#fff0c8] shadow-[0_6px_25px_rgba(212,175,55,0.4),0_0_0_1px_rgba(0,0,0,0.8),inset_0_1px_2px_rgba(255,255,255,0.9),inset_0_-2px_4px_rgba(110,75,18,0.5)]'
+                  ? 'bg-gradient-to-r from-[#b58228] via-[#f0bf4c] to-[#b58228] hover:from-[#c48e2e] hover:via-[#fad066] hover:to-[#c48e2e] text-[#1a0e02] border-[#ffe899] shadow-[0_0_25px_rgba(245,158,11,0.5)]'
+                  : 'bg-gradient-to-r from-[#9c7126] via-[#deb049] to-[#9c7126] hover:from-[#ab7d2c] hover:via-[#edc25d] hover:to-[#ab7d2c] text-[#1a0f03] border-[#ffe082]/80 shadow-[0_0_20px_rgba(212,175,55,0.35)]'
               }`}
             >
-              {/* Shimmering light reflex sweep across the button */}
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/35 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out pointer-events-none" />
-
-              <span className="relative z-10 drop-shadow-[0_1px_0_rgba(255,255,255,0.5)] font-black">
-                {isFinalSlide ? 'SEAL THE PACT & ENTER' : 'CONTINUE'}
-              </span>
-              <ArrowRight className="relative z-10 w-4 h-4 stroke-[3] text-[#1c1003] drop-shadow-[0_1px_0_rgba(255,255,255,0.5)] group-hover:translate-x-1 transition-transform" />
+              <span>{isFinalSlide ? 'SEAL THE PACT' : 'CONTINUE'}</span>
+              <ArrowRight className="w-4 h-4 stroke-[3] shrink-0" />
             </button>
           </div>
         </div>
