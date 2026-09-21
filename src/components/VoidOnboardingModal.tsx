@@ -302,15 +302,18 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-2 sm:p-4 select-none overflow-hidden">
       {/* 1. Rich Atmospheric Background with Cosmic Violet/Amber Nebula & Vignette */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <img
+        <motion.img
           src="/landing_void_realm.jpg"
           alt="Void Atmosphere"
-          className="w-full h-full object-cover filter blur-2xl scale-125 opacity-40 brightness-[0.4] contrast-125"
+          initial={{ scale: 1.05 }}
+          animate={{ scale: [1.05, 1.1, 1.05] }}
+          transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
+          className="w-full h-full object-cover filter blur-xl brightness-[0.45] contrast-125 opacity-50"
         />
         {/* Layered dark fantasy gradients */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/85 to-black/90" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(120,53,140,0.18)_0%,_rgba(10,8,12,0.92)_70%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(212,175,55,0.1)_0%,_transparent_60%)]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/85" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(120,53,140,0.22)_0%,_rgba(5,4,7,0.92)_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(212,175,55,0.12)_0%,_transparent_60%)]" />
       </div>
 
       {/* 2. Gothic Monolithic Modal Shell */}
@@ -319,10 +322,16 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 12 }}
         transition={{ duration: 0.22, ease: 'easeOut' }}
-        className="relative w-full max-w-md bg-gradient-to-b from-[#18121d]/95 via-[#0e0a12]/98 to-[#060408] border-2 border-[#d4af37]/40 rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.95),0_0_40px_rgba(212,175,55,0.2),inset_0_1px_1px_rgba(255,255,255,0.15)] backdrop-blur-2xl overflow-hidden flex flex-col h-auto max-h-[96vh]"
+        className="relative w-full max-w-md bg-gradient-to-b from-[#161019]/95 via-[#0d090f]/98 to-[#040305] border-2 border-[#d4af37]/50 rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.95),0_0_35px_rgba(212,175,55,0.22),inset_0_1px_2px_rgba(255,255,255,0.15)] backdrop-blur-2xl overflow-hidden flex flex-col h-auto max-h-[96vh]"
       >
         {/* Ornate Top Hairline Glow */}
         <div className="absolute top-0 inset-x-8 h-px bg-gradient-to-r from-transparent via-[#ffd875] to-transparent shadow-[0_0_8px_#ffd875] pointer-events-none" />
+
+        {/* Modal Outer Frame Corner Runes */}
+        <div className="absolute top-2 left-2.5 text-[#ebd09b]/30 font-serif text-[10px] pointer-events-none select-none">⟦Ω⟧</div>
+        <div className="absolute top-2 right-2.5 text-[#ebd09b]/30 font-serif text-[10px] pointer-events-none select-none">⟦Ω⟧</div>
+        <div className="absolute bottom-2 left-2.5 text-[#ebd09b]/30 font-serif text-[10px] pointer-events-none select-none">⟦Ω⟧</div>
+        <div className="absolute bottom-2 right-2.5 text-[#ebd09b]/30 font-serif text-[10px] pointer-events-none select-none">⟦Ω⟧</div>
 
         {/* Top Story Progress Bars (8 Segments) */}
         <div className="px-4 pt-3 pb-1.5 flex items-center gap-1.5 z-20 shrink-0">
@@ -368,7 +377,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
 
         {/* Upper Half: Ornate Cinematic Keyart Frame with Corner Accents */}
         <div className="relative w-full px-3.5 pt-1 pb-1 shrink-0 flex items-center justify-center">
-          <div className="relative w-full aspect-[16/9] max-h-[175px] rounded-2xl overflow-hidden border-2 border-[#d4af37]/40 shadow-[0_0_30px_rgba(0,0,0,0.9),0_0_15px_rgba(212,175,55,0.15)] bg-black">
+          <div className="relative w-full aspect-[16/9] max-h-[175px] rounded-2xl overflow-hidden border-2 border-[#d4af37]/45 shadow-[0_0_30px_rgba(0,0,0,0.9),0_0_15px_rgba(212,175,55,0.18)] bg-black">
             <AnimatePresence mode="wait">
               <motion.img
                 key={current.image}
@@ -384,18 +393,18 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
 
             {/* Cinematic dark vignettes */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/30 pointer-events-none" />
-            <div className="absolute inset-0 ring-1 ring-inset ring-[#ffd875]/20 rounded-2xl pointer-events-none" />
+            <div className="absolute inset-0 ring-1 ring-inset ring-[#ffd875]/25 rounded-2xl pointer-events-none" />
 
             {/* Corner Runes */}
-            <span className="absolute top-1.5 left-1.5 w-2 h-2 border-t-2 border-l-2 border-amber-400/70 pointer-events-none" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 border-t-2 border-r-2 border-amber-400/70 pointer-events-none" />
-            <span className="absolute bottom-1.5 left-1.5 w-2 h-2 border-b-2 border-l-2 border-amber-400/70 pointer-events-none" />
-            <span className="absolute bottom-1.5 right-1.5 w-2 h-2 border-b-2 border-r-2 border-amber-400/70 pointer-events-none" />
+            <span className="absolute top-1.5 left-1.5 w-2.5 h-2.5 border-t-2 border-l-2 border-amber-400/80 pointer-events-none" />
+            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 border-t-2 border-r-2 border-amber-400/80 pointer-events-none" />
+            <span className="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 border-b-2 border-l-2 border-amber-400/80 pointer-events-none" />
+            <span className="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 border-b-2 border-r-2 border-amber-400/80 pointer-events-none" />
           </div>
         </div>
 
-        {/* Lower Half: Dark Glass Story Narrative Panel with Stylized Tablet Blocks */}
-        <div className="p-3.5 sm:p-4 bg-gradient-to-b from-[#18111e]/90 via-[#0e0912]/95 to-[#060408] border-t border-[#d4af37]/25 flex flex-col justify-between space-y-2.5 shrink-0">
+        {/* Lower Half: Dark Glass Story Narrative Panel with Clean Open Paragraphs */}
+        <div className="p-4 sm:p-5 bg-gradient-to-b from-[#141018] via-[#0c080e] to-black border-t border-[#d4af37]/35 shadow-[0_-2px_12px_rgba(0,0,0,0.5)] flex flex-col justify-between space-y-3 shrink-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -403,10 +412,10 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.16 }}
-              className="space-y-2"
+              className="space-y-2.5"
             >
               <div>
-                <h2 className="text-base sm:text-lg font-display font-black text-[#f3d38c] tracking-wider uppercase drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+                <h2 className="text-base sm:text-lg font-display font-black text-[#ebd09b] tracking-wider uppercase text-shadow-sm">
                   {current.title}
                 </h2>
                 <p className="text-[11px] sm:text-xs font-semibold text-zinc-200 leading-snug mt-0.5">
@@ -414,17 +423,12 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
                 </p>
               </div>
 
-              {/* Stylized Gothic Tablet Blocks */}
-              <div className="space-y-1.5 pt-0.5">
+              {/* Formatted Paragraphs: Clean, elegant, unboxed layout with glowing amber pips */}
+              <div className="space-y-2 pt-0.5">
                 {current.paragraphs.map((para, idx) => (
-                  <div
-                    key={idx}
-                    className="relative flex items-start gap-2.5 p-2 sm:p-2.5 rounded-xl bg-gradient-to-r from-amber-950/25 via-[#18121d]/60 to-transparent border-l-2 border-l-amber-400/90 border-y border-r border-amber-500/15 shadow-[0_2px_8px_rgba(0,0,0,0.4)]"
-                  >
-                    <div className="w-4 h-4 rounded bg-amber-950/90 border border-amber-400/60 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_6px_rgba(245,158,11,0.4)]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-300 shadow-[0_0_4px_rgba(251,191,36,0.9)]" />
-                    </div>
-                    <p className="text-[11px] sm:text-[11.5px] leading-relaxed text-zinc-200 font-sans flex-1">
+                  <div key={idx} className="flex items-start gap-2.5 text-left">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0 shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
+                    <p className="text-[11.5px] sm:text-xs leading-relaxed text-zinc-300 font-sans flex-1">
                       {para}
                     </p>
                   </div>
@@ -447,11 +451,9 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
 
             <button
               onClick={handleNext}
-              className="flex-1 py-3 px-4 rounded-xl font-display font-black text-xs sm:text-sm tracking-[0.22em] uppercase flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all bg-gradient-to-r from-[#8b6528] via-[#e5bf65] to-[#8b6528] hover:from-[#9c7230] hover:via-[#f0cf78] hover:to-[#9c7230] text-[#1c1003] border border-[#f5d78e]/80 shadow-[0_4px_25px_rgba(212,175,55,0.35),inset_0_1px_1px_rgba(255,255,255,0.7),inset_0_-1px_2px_rgba(0,0,0,0.5)]"
+              className="flex-1 py-3.5 px-4 rounded-xl font-display font-black text-xs sm:text-sm tracking-[0.22em] uppercase flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all bg-gradient-to-r from-[#b3894a] via-[#f3d38c] to-[#b3894a] hover:from-[#c59a58] hover:via-[#fae1a2] hover:to-[#c59a58] text-[#1a0f05] border border-[#ebd09b]/80 shadow-[0_4px_25px_rgba(229,194,120,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)]"
             >
-              <span className="drop-shadow-[0_1px_0_rgba(255,255,255,0.35)]">
-                {isFinalSlide ? 'SEAL THE PACT & ENTER' : 'CONTINUE'}
-              </span>
+              <span>{isFinalSlide ? 'SEAL THE PACT & ENTER' : 'CONTINUE'}</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </button>
           </div>
