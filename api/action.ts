@@ -13,6 +13,8 @@ import { recordSovereignTransaction } from './_shared/sovereignLogger.js';
 import { REFERRAL_MILESTONES } from './_shared/referralMilestones.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_CHANNEL_USERNAME = process.env.TELEGRAM_CHANNEL_USERNAME || 'voidcovenant';
 
 function getSupabase() {
   const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://yetzjqqnmllwufmzopor.supabase.co';
@@ -941,6 +943,74 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       );
       successMessage = `Bought ${shardsBought} Dark Shards`;
       
+    } else if (action === 'check_tg_subscription') {
+      profile.completedTasks = profile.completedTasks || [];
+      if (profile.completedTasks.includes('tg_channel')) {
+        return res.status(400).json({ error: 'Telegram subscription reward already claimed!' });
+      }
+
+      const telegramId = decoded.telegramId || (walletAddress.startsWith('tg_') ? walletAddress.replace(/^tg_/, '') : null);
+      if (!telegramId) {
+        return res.status(400).json({ error: 'This task is only available for Telegram players.' });
+      }
+
+      const botToken = TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
+      if (!botToken) {
+        return res.status(500).json({ error: 'Telegram Bot Token is not configured on server.' });
+      }
+
+      const rawChannel = TELEGRAM_CHANNEL_USERNAME;
+      const channel = rawChannel.startsWith('@') ? rawChannel : `@${rawChannel}`;
+      
+      try {
+        const tgRes = await fetch(
+          `https://api.telegram.org/bot${botToken}/getChatMember?chat_id=${encodeURIComponent(channel)}&user_id=${encodeURIComponent(telegramId)}`
+        );
+        const tgData: any = await tgRes.json();
+
+        if (!tgRes.ok || !tgData.ok) {
+          console.warn('[Telegram Verify] Bot API returned error:', tgData);
+          const desc = tgData?.description || '';
+          if (desc.includes('chat not found') || desc.includes('bot is not a member')) {
+            return res.status(400).json({
+              error: `Verification error: Bot @voidcovenantbot must be an administrator in channel ${channel} to verify membership.`
+            });
+          }
+          if (desc.includes('user not found') || desc.includes('PARTICIPANT_ID_INVALID')) {
+            return res.status(400).json({
+              error: `You are not subscribed to ${channel} yet. Please join the channel and click check again!`
+            });
+          }
+          return res.status(400).json({ error: desc || 'Failed to verify subscription with Telegram.' });
+        }
+
+        const memberStatus = tgData.result?.status;
+        const isMember = ['creator', 'administrator', 'member', 'restricted'].includes(memberStatus) && tgData.result?.is_member !== false;
+
+        if (!isMember) {
+          return res.status(400).json({
+            error: `You are not subscribed to ${channel} yet. Please join the channel and click check again!`
+          });
+        }
+
+        // Award +25 Dark Shards
+        const shardReward = 25;
+        profile.darkShards = (profile.darkShards || 0) + shardReward;
+        profile.completedTasks.push('tg_channel');
+        
+        profile = recordShardTransaction(
+          profile,
+          'TELEGRAM_CHANNEL_SUBSCRIPTION',
+          shardReward,
+          `Joined official Telegram channel ${channel}`,
+          { taskId: 'tg_channel', channel, telegramId }
+        );
+
+        successMessage = `Subscribed to ${channel}! +${shardReward} Dark Shards added to your vault.`;
+      } catch (err: any) {
+        console.error('[Telegram Verify] Network error:', err);
+        return res.status(500).json({ error: 'Network error checking Telegram subscription. Please try again.' });
+      }
     } else if (action === 'airdrop_task') {
       const { taskId } = payload;
       profile.completedTasks = profile.completedTasks || [];

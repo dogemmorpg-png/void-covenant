@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useGame } from '../../context/GameContext';
 import { useToast } from '../../components/Toast';
 import { generateCampaignStage } from '../../data/cards';
@@ -14,10 +14,12 @@ import {
   X, 
   Award, 
   Crown,
-  ShieldAlert
+  ShieldAlert,
+  Send
 } from 'lucide-react';
 import { assetPreloader } from '../../utils/assetPreloader';
 import { getActiveSubscriptionTier, getTierLimits } from '../../utils/energyHelper';
+import { MobileTelegramChannelModal } from '../components/MobileTelegramChannelModal';
 
 interface MobileCampaignViewProps {
   onStartBattle: (stage: CampaignStage) => void;
@@ -29,6 +31,17 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
   const [isSweeping, setIsSweeping] = useState(false);
   const [isBuyEnergyModalOpen, setIsBuyEnergyModalOpen] = useState(false);
   const [isPurchasingEnergy, setIsPurchasingEnergy] = useState(false);
+  const [isTgModalOpen, setIsTgModalOpen] = useState(false);
+
+  // Telegram Channel Quest state (strictly for Telegram users who haven't completed it)
+  const isTelegramUser = useMemo(() => {
+    const hasTgWebApp = typeof window !== 'undefined' && Boolean((window as any).Telegram?.WebApp?.initData);
+    const isTgUa = typeof navigator !== 'undefined' && /Telegram/i.test(navigator.userAgent || '');
+    const isTgAddress = Boolean(profile.solanaAddress && profile.solanaAddress.startsWith('tg_'));
+    return hasTgWebApp || isTgUa || isTgAddress;
+  }, [profile.solanaAddress]);
+
+  const isTgTaskCompleted = Boolean((profile.completedTasks || []).includes('tg_channel'));
 
   const subTier = getActiveSubscriptionTier(profile);
   const tierLimits = getTierLimits(subTier);
@@ -270,6 +283,33 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
+
+          {/* Floating Telegram Channel Quest Button (Only for Telegram players who haven't completed it) */}
+          {isTelegramUser && !isTgTaskCompleted && (
+            <div className="flex justify-end -mt-1 -mb-1 relative z-20 pr-1">
+              <button
+                onClick={() => setIsTgModalOpen(true)}
+                className="relative flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-gradient-to-r from-cyan-950/90 via-[#0e1829]/95 to-black border border-cyan-400/50 hover:border-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.35)] active:scale-95 transition-all cursor-pointer group"
+                title="Join Official Telegram Channel for +25 Dark Shards"
+              >
+                <div className="w-6 h-6 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center shrink-0 shadow-sm">
+                  <Send className="w-3 h-3 text-cyan-300 transform -rotate-12 translate-x-0.2 group-hover:scale-110 transition-transform" />
+                </div>
+                <div className="flex flex-col text-left leading-none pr-0.5">
+                  <span className="font-display font-black text-[9.5px] text-white tracking-wider uppercase">
+                    JOIN CHANNEL
+                  </span>
+                  <span className="font-mono font-bold text-[8.5px] text-cyan-300 mt-0.5">
+                    +25 Dark Shards
+                  </span>
+                </div>
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400 shadow-[0_0_6px_rgba(6,182,212,0.9)]"></span>
+                </span>
+              </button>
+            </div>
+          )}
 
           {/* 3. Encounter & Victory Rewards matching PC 1:1 */}
           <div className="flex flex-col gap-3 relative z-10">
@@ -618,6 +658,12 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
           </div>
         </div>
       )}
+
+      {/* Telegram Channel Quest Modal */}
+      <MobileTelegramChannelModal
+        isOpen={isTgModalOpen}
+        onClose={() => setIsTgModalOpen(false)}
+      />
 
     </div>
   );

@@ -40,6 +40,7 @@ interface GameContextType {
   addCardToCollection: (cardTemplate: CardTemplate, level?: number) => Card;
   toggleDeckCard: (cardId: string) => { success: boolean; message: string };
   completeAirdropTask: (taskId: string) => Promise<{ success: boolean; message: string }>;
+  checkTelegramSubscription: () => Promise<{ success: boolean; message: string; error?: string }>;
   buySubscription: (tier: 'premium' | 'ultra', durationDays: 30 | 90) => Promise<{ success: boolean; message: string }>;
   claimDailySubscription: () => Promise<{ success: boolean; message: string }>;
   activateShield: (shieldType: '3h' | '6h' | '12h') => Promise<{ success: boolean; message: string }>;
@@ -2218,6 +2219,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return submitAction('airdrop_task', { taskId });
   };
 
+  // Check and claim Telegram channel subscription task
+  const checkTelegramSubscription = async (): Promise<{ success: boolean; message: string; error?: string }> => {
+    return submitAction('check_tg_subscription');
+  };
+
   // Sync profile cards with new images if updated
   useEffect(() => {
     let updated = false;
@@ -2392,6 +2398,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addCardToCollection,
         toggleDeckCard,
         completeAirdropTask,
+        checkTelegramSubscription,
         addExp,
         addCampaignStars,
         addEquipment,
