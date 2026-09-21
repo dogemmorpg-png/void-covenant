@@ -7,6 +7,7 @@ import { calculateEnergy, getTierLimits } from '../utils/energyHelper';
 import { ALL_LEAGUE_REWARDS } from '../data/leagueRewards';
 import { recordShardTransaction } from '../utils/shardLogger';
 import { recordSovereignTransaction } from '../utils/sovereignLogger';
+import { REFERRAL_MILESTONES } from '../data/referralMilestones';
 
 interface GameContextType {
   profile: PlayerProfile;
@@ -45,6 +46,7 @@ interface GameContextType {
   buyShield: (shieldType: '3h' | '6h' | '12h') => Promise<{ success: boolean; message: string }>;
   buyLevelBoost: (targetLevel: 50 | 100) => Promise<{ success: boolean; message: string; [key: string]: any }>;
   claimReferralSovereigns: () => Promise<{ success: boolean; message: string; claimedSovereigns?: number }>;
+  claimReferralMilestone: (milestoneId: string) => Promise<{ success: boolean; message: string; [key: string]: any }>;
   addExp: (amount: number) => void;
   addCampaignStars: (stageId: string, stars: number) => void;
   addEquipment: (equipment: Equipment) => void;
@@ -2131,6 +2133,38 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success, message: msg };
     }
 
+    if (action === 'claim_referral_milestone') {
+      const { milestoneId } = payload || {};
+      const milestone = REFERRAL_MILESTONES.find(m => m.id === milestoneId);
+      if (!milestone) return { success: false, message: 'Invalid milestone ID' };
+      let msg = '';
+      let success = false;
+      setProfile(current => {
+        const claimed = current.claimedReferralMilestones || [];
+        if (claimed.includes(milestoneId)) {
+          msg = 'Already claimed';
+          return current;
+        }
+        let updated = {
+          ...current,
+          claimedReferralMilestones: [...claimed, milestoneId],
+          bloodSovereigns: (current.bloodSovereigns || 0) + milestone.rewardSovereigns
+        };
+        updated = recordSovereignTransaction(
+          updated,
+          'REFERRAL_MILESTONE',
+          milestone.rewardSovereigns,
+          `Alliance Milestone: ${milestone.requiredSubscribers} Premium Allies (${milestone.title})`,
+          { milestoneId, requiredSubscribers: milestone.requiredSubscribers, rewardSovereigns: milestone.rewardSovereigns }
+        );
+        msg = `Claimed ${milestone.rewardSovereigns.toLocaleString()} Blood Sovereigns for reaching ${milestone.requiredSubscribers} Premium Allies!`;
+        success = true;
+        saveProfile(updated);
+        return updated;
+      });
+      return { success, message: msg };
+    }
+
     return { success: true, message: 'Action saved locally.' };
   };
 
@@ -2311,6 +2345,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return await submitAction('claim_referral_sovereigns', {});
   };
 
+  const claimReferralMilestone = async (milestoneId: string) => {
+    return await submitAction('claim_referral_milestone', { milestoneId });
+  };
+
   return (
     <GameContext.Provider
       value={{
@@ -2333,6 +2371,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         buyShield,
         buyLevelBoost,
         claimReferralSovereigns,
+        claimReferralMilestone,
         usePveEnergy,
         usePvpEnergy,
         buyPvpTickets,

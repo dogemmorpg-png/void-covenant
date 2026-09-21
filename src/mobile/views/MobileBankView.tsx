@@ -216,6 +216,7 @@ export const MobileBankView: React.FC = () => {
           const isLeague = tx.action === 'LEAGUE_ROLLOVER' || tx.description?.toLowerCase().includes('league') || tx.description?.toLowerCase().includes('pvp season');
           const isPvp = tx.action === 'PVP_VICTORY';
           const isCampaign = tx.action === 'CAMPAIGN_FIRST_CLEAR' || tx.description?.toLowerCase().includes('campaign');
+          const isMilestone = tx.action === 'REFERRAL_MILESTONE' || tx.description?.toLowerCase().includes('milestone');
           
           let txTime = typeof tx.timestamp === 'string' ? new Date(tx.timestamp).getTime() : tx.timestamp;
 
@@ -235,17 +236,19 @@ export const MobileBankView: React.FC = () => {
 
           events.push({
             id: tx.id || `stx_${tx.timestamp}`,
-            title: isCampaign 
-              ? 'Abyssal First Clear Bounty' 
-              : isLeague 
-                ? 'League Season Rollover Tribute' 
-                : isPvp 
-                  ? 'PvP Duel Victory Bounty' 
-                  : 'Imperial Decree Tribute',
+            title: isMilestone
+              ? 'Alliance Milestone Bounty'
+              : isCampaign 
+                ? 'Abyssal First Clear Bounty' 
+                : isLeague 
+                  ? 'League Season Rollover Tribute' 
+                  : isPvp 
+                    ? 'PvP Duel Victory Bounty' 
+                    : 'Imperial Decree Tribute',
             description: tx.description || 'Blood Sovereigns earned and deposited',
             amount: tx.sovereignsChange,
             timestamp: txTime,
-            type: isCampaign ? 'campaign' : isLeague ? 'league' : isPvp ? 'pvp' : 'mail'
+            type: isMilestone ? 'milestone' : isCampaign ? 'campaign' : isLeague ? 'league' : isPvp ? 'pvp' : 'mail'
           });
         }
       });
@@ -794,6 +797,8 @@ export const MobileBankView: React.FC = () => {
                                 <Trophy className="w-3.5 h-3.5 text-amber-300" />
                               ) : evt.type === 'campaign' ? (
                                 <Award className="w-3.5 h-3.5 text-amber-300" />
+                              ) : evt.type === 'milestone' ? (
+                                <Trophy className="w-3.5 h-3.5 text-amber-300" />
                               ) : (
                                 <Scroll className="w-3.5 h-3.5 text-amber-200" />
                               )}
@@ -814,7 +819,7 @@ export const MobileBankView: React.FC = () => {
 
                         <div className="flex justify-between items-center text-[9.5px] font-mono text-gray-500 pt-1 border-t border-white/5">
                           <span className="uppercase text-[8.5px] tracking-wider text-amber-500/80 font-bold">
-                            {evt.type === 'pvp' ? 'PvP Duel Win' : evt.type === 'league' ? 'League Season Rollover' : evt.type === 'campaign' ? 'Abyssal First Clear' : 'Imperial Decree'}
+                            {evt.type === 'pvp' ? 'PvP Duel Win' : evt.type === 'league' ? 'League Season Rollover' : evt.type === 'campaign' ? 'Abyssal First Clear' : evt.type === 'milestone' ? 'Alliance Milestone' : 'Imperial Decree'}
                           </span>
                           <span>
                             {new Date(evt.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}

@@ -1,27 +1,31 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { LogOut, Copy, X, Trophy, User, Clock, Plus, UserPlus, Send, Mail, ShieldAlert, Sparkles, Crown, Gift, ArrowRight } from 'lucide-react';
+import { LogOut, Copy, X, Trophy, User, Clock, Plus, UserPlus, Send, Mail, ShieldAlert, Sparkles, Crown, Gift, ArrowRight, Lock, CheckCircle2, Award } from 'lucide-react';
 import { useToast } from './Toast';
 import { MailboxModal } from './MailboxModal';
 import { AdminPanelModal } from './AdminPanelModal';
 import { getReferralLink, getTelegramShareUrl } from '../utils/referralHelper';
+import { REFERRAL_MILESTONES } from '../data/referralMilestones';
 
 interface HeaderHUDProps {
   onNavigateTab?: (tab: string) => void;
 }
 
 export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
-  const { profile, logoutPlayer, isShardsShopOpen, setIsShardsShopOpen, isGoldShopOpen, setIsGoldShopOpen, isDustShopOpen, setIsDustShopOpen, claimReferralSovereigns } = useGame();
+  const { profile, logoutPlayer, isShardsShopOpen, setIsShardsShopOpen, isGoldShopOpen, setIsGoldShopOpen, isDustShopOpen, setIsDustShopOpen, claimReferralSovereigns, claimReferralMilestone } = useGame();
   const { disconnect } = useWallet();
   const toast = useToast();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeReferralTab, setActiveReferralTab] = useState<'network' | 'milestones'>('network');
   const [isMailboxOpen, setIsMailboxOpen] = useState(false);
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
   const [referralsList, setReferralsList] = useState<any[]>([]);
+  const [subscribedCount, setSubscribedCount] = useState<number>(0);
   const [isLoadingReferrals, setIsLoadingReferrals] = useState(false);
   const [isClaimingSovereigns, setIsClaimingSovereigns] = useState(false);
+  const [claimingMilestoneId, setClaimingMilestoneId] = useState<string | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
 
   const isAdmin = 
@@ -43,6 +47,29 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
   const referralLink = useMemo(() => {
     return getReferralLink(referralCode, isTelegramUser);
   }, [referralCode, isTelegramUser]);
+
+  const actualSubscribedCount = useMemo(() => {
+    const fromList = referralsList.filter(r => 
+      r.subscriptionTier === 'premium' || 
+      r.subscriptionTier === 'ultra' || 
+      (r.sovereignsContributed && r.sovereignsContributed >= 300)
+    ).length;
+    return Math.max(subscribedCount, fromList);
+  }, [subscribedCount, referralsList]);
+
+  const claimedMilestones = useMemo(() => profile.claimedReferralMilestones || [], [profile.claimedReferralMilestones]);
+
+  const claimableMilestonesCount = useMemo(() => {
+    return REFERRAL_MILESTONES.filter(m => 
+      actualSubscribedCount >= m.requiredSubscribers && !claimedMilestones.includes(m.id)
+    ).length;
+  }, [actualSubscribedCount, claimedMilestones]);
+
+  const totalMilestonesClaimedSovereigns = useMemo(() => {
+    return REFERRAL_MILESTONES
+      .filter(m => claimedMilestones.includes(m.id))
+      .reduce((sum, m) => sum + m.rewardSovereigns, 0);
+  }, [claimedMilestones]);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(referralLink);
@@ -83,6 +110,23 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
     }
   };
 
+  const handleClaimMilestone = async (milestoneId: string) => {
+    if (claimingMilestoneId) return;
+    setClaimingMilestoneId(milestoneId);
+    try {
+      const res = await claimReferralMilestone(milestoneId);
+      if (res.success) {
+        toast(res.message || 'Milestone bounty claimed!', 'success');
+      } else {
+        toast(res.message || 'Failed to claim milestone', 'error');
+      }
+    } catch (e: any) {
+      toast(e.message || 'Error claiming milestone', 'error');
+    } finally {
+      setClaimingMilestoneId(null);
+    }
+  };
+
   useEffect(() => {
     if (!isModalOpen) return;
     
@@ -100,6 +144,9 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
         if (res.ok) {
           const data = await res.json();
           setReferralsList(data.referrals || []);
+          if (typeof data.subscribedReferralsCount === 'number') {
+            setSubscribedCount(data.subscribedReferralsCount);
+          }
         }
       } catch (e) {
         console.error('Failed to fetch referrals:', e);
@@ -137,10 +184,16 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
         >
           <UserPlus className="w-5 h-5 text-amber-400" />
           <span>INVITE FRIENDS</span>
-          <span className="absolute -top-1 -right-0.5 flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400 shadow-[0_0_6px_rgba(250,204,21,0.9)]"></span>
-          </span>
+          {claimableMilestonesCount > 0 ? (
+            <span className="absolute -top-1 -right-0.5 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-red-600 border border-red-300 text-white font-mono text-[9px] font-black animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]">
+              {claimableMilestonesCount}
+            </span>
+          ) : (
+            <span className="absolute -top-1 -right-0.5 flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400 shadow-[0_0_6px_rgba(250,204,21,0.9)]"></span>
+            </span>
+          )}
         </button>
 
         {/* Resources Panel */}
@@ -362,11 +415,45 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
               </button>
             </div>
 
-            {/* Body */}
-            <div className="p-5 sm:p-6 pb-12 sm:pb-16 space-y-4 overflow-y-auto max-h-[calc(92vh-85px)] scrollbar-thin scrollbar-thumb-amber-500/20">
+            {/* Navigation Tabs */}
+            <div className="flex items-center gap-2 p-1.5 bg-black/60 border-b border-white/10 px-5 sm:px-6 shrink-0">
+              <button
+                onClick={() => setActiveReferralTab('network')}
+                className={`flex-1 py-2 sm:py-2.5 px-4 rounded-xl font-display font-bold text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                  activeReferralTab === 'network'
+                    ? 'bg-gradient-to-r from-amber-500/25 via-amber-600/30 to-amber-500/20 text-amber-200 border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
+                    : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent'
+                }`}
+              >
+                <UserPlus className="w-4 h-4 text-amber-400" />
+                <span>Alliance Network</span>
+              </button>
 
-              {/* Personal Invitation Link Card */}
-              <div className="bg-black/60 border border-white/15 rounded-2xl p-4 space-y-2.5 shadow-md">
+              <button
+                onClick={() => setActiveReferralTab('milestones')}
+                className={`flex-1 py-2 sm:py-2.5 px-4 rounded-xl font-display font-bold text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2 relative cursor-pointer ${
+                  activeReferralTab === 'milestones'
+                    ? 'bg-gradient-to-r from-amber-500/25 via-amber-600/30 to-amber-500/20 text-amber-200 border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
+                    : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent'
+                }`}
+              >
+                <Trophy className="w-4 h-4 text-amber-400" />
+                <span>Alliance Milestones</span>
+                {claimableMilestonesCount > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-red-600 border border-red-400 text-white font-mono font-black text-[9px] animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.9)]">
+                    {claimableMilestonesCount} CLAIMABLE
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-5 sm:p-6 pb-12 sm:pb-16 space-y-4 overflow-y-auto max-h-[calc(92vh-120px)] scrollbar-thin scrollbar-thumb-amber-500/20">
+
+              {activeReferralTab === 'network' && (
+                <>
+                  {/* Personal Invitation Link Card */}
+                  <div className="bg-black/60 border border-white/15 rounded-2xl p-4 space-y-2.5 shadow-md">
                 <div className="flex items-center justify-between text-xs text-white font-display font-bold tracking-wider uppercase">
                   <span>YOUR IMPERIAL INVITATION LINK</span>
                   <span className="text-xs font-mono text-amber-300">
@@ -696,12 +783,199 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                 {/* Generous bottom breathing spacer so the last item is never clipped */}
                 <div className="h-6 sm:h-8 shrink-0" />
               </div>
+            </>
+          )}
 
+          {/* MILESTONES TAB */}
+          {activeReferralTab === 'milestones' && (
+            <div className="space-y-4">
+              {/* Hero Milestone Overview Banner */}
+              <div className="relative overflow-hidden rounded-2xl border-2 border-amber-400/50 bg-gradient-to-b from-[#25121b] via-[#160910] to-[#0d0408] p-4 sm:p-5 shadow-[0_0_35px_rgba(245,158,11,0.2)]">
+                <div className="absolute -top-12 -right-12 w-44 h-44 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-10 -left-10 w-44 h-44 bg-red-600/15 rounded-full blur-3xl pointer-events-none" />
+
+                <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/30 to-red-900/40 border border-amber-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
+                      <Trophy className="w-5 h-5 text-amber-300" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-mono font-black text-amber-300 uppercase tracking-widest block">
+                        ALLIANCE ACHIEVEMENTS
+                      </span>
+                      <h3 className="text-base sm:text-lg font-display font-black text-white tracking-wider text-shadow-gold">
+                        PREMIUM RECRUITER MILESTONES
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-start sm:self-auto">
+                    <span className="text-[11px] font-mono font-bold px-3 py-1 rounded-full bg-amber-400/15 border border-amber-400/35 text-amber-200 flex items-center gap-1.5">
+                      <Crown className="w-3.5 h-3.5 text-amber-400" />
+                      <span>{actualSubscribedCount} Premium {actualSubscribedCount === 1 ? 'Ally' : 'Allies'}</span>
+                    </span>
+                  </div>
+                </div>
+
+                <p className="relative z-10 text-xs text-gray-300 font-sans mt-2.5 leading-relaxed">
+                  Recruit fellow commanders who purchase a <strong>Premium</strong> or <strong>Ultra</strong> pass. Reach each alliance tier once to claim imperial Blood Sovereign bounties straight into your Royal Vault!
+                </p>
+
+                {/* Quick Stats Grid */}
+                <div className="relative z-10 grid grid-cols-3 gap-2 sm:gap-3 mt-3.5">
+                  <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 text-center">
+                    <span className="text-[10px] font-mono uppercase text-gray-400 block">Subscribed</span>
+                    <div className="flex items-center justify-center gap-1 mt-0.5">
+                      <Crown className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="text-base sm:text-lg font-mono font-black text-white">{actualSubscribedCount}</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 text-center">
+                    <span className="text-[10px] font-mono uppercase text-gray-400 block">Unlocked</span>
+                    <div className="flex items-center justify-center gap-1 mt-0.5">
+                      <Award className="w-3.5 h-3.5 text-amber-300" />
+                      <span className="text-base sm:text-lg font-mono font-black text-amber-300">
+                        {claimedMilestones.length} / {REFERRAL_MILESTONES.length}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-black/60 border border-white/10 rounded-xl p-2.5 text-center">
+                    <span className="text-[10px] font-mono uppercase text-gray-400 block">Bounties Claimed</span>
+                    <div className="flex items-center justify-center gap-1 mt-0.5">
+                      <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3.5 h-3.5 object-contain" />
+                      <span className="text-base sm:text-lg font-mono font-black text-amber-200">
+                        {totalMilestonesClaimedSovereigns.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Milestones Cards List */}
+              <div className="space-y-2.5">
+                {REFERRAL_MILESTONES.map((milestone) => {
+                  const isClaimed = claimedMilestones.includes(milestone.id);
+                  const isCompleted = actualSubscribedCount >= milestone.requiredSubscribers;
+                  const canClaim = isCompleted && !isClaimed;
+                  const progressPct = Math.min(100, Math.round((actualSubscribedCount / milestone.requiredSubscribers) * 100));
+                  const isCurrentlyClaiming = claimingMilestoneId === milestone.id;
+
+                  return (
+                    <div
+                      key={milestone.id}
+                      className={`relative overflow-hidden rounded-2xl border transition-all duration-300 p-3 sm:p-4 bg-gradient-to-r from-black/85 via-[#12070c]/90 to-black/85 ${
+                        isClaimed
+                          ? 'border-white/10 opacity-75'
+                          : canClaim
+                          ? `${milestone.borderTheme} ${milestone.glowTheme} ring-1 ring-amber-400/40`
+                          : 'border-white/15 hover:border-white/25'
+                      }`}
+                    >
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        {/* Left: Badge & Info */}
+                        <div className="flex items-center gap-3 min-w-0">
+                          {/* Badge Container */}
+                          <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center shrink-0 shadow-lg ${milestone.badgeBg}`}>
+                            <img
+                              src={milestone.badgeIcon}
+                              alt={milestone.title}
+                              className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = 'none';
+                              }}
+                            />
+                          </div>
+
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h4 className="font-display font-black text-sm sm:text-base text-white tracking-wider">
+                                {milestone.title}
+                              </h4>
+                              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-white/10 text-amber-300 border border-white/10">
+                                {milestone.requiredSubscribers} {milestone.requiredSubscribers === 1 ? 'Ally' : 'Allies'}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <span className="text-[11px] font-sans text-gray-400">Reward:</span>
+                              <div className="flex items-center gap-1">
+                                <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3.5 h-3.5 object-contain" />
+                                <span className="font-mono font-black text-amber-300 text-xs sm:text-sm text-shadow-gold">
+                                  +{milestone.rewardSovereigns.toLocaleString()} SOV
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Right: Progress bar & Action Button */}
+                        <div className="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+                          {/* Progress bar container (for uncompleted) */}
+                          {!isClaimed && (
+                            <div className="flex flex-col gap-1 min-w-[140px] sm:w-36">
+                              <div className="flex justify-between text-[10px] font-mono text-gray-400">
+                                <span>Progress</span>
+                                <span className={isCompleted ? 'text-emerald-400 font-bold' : 'text-amber-300'}>
+                                  {Math.min(actualSubscribedCount, milestone.requiredSubscribers)} / {milestone.requiredSubscribers}
+                                </span>
+                              </div>
+                              <div className="w-full h-2 bg-black/80 rounded-full border border-white/15 overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full transition-all duration-500 ${
+                                    isCompleted
+                                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.8)]'
+                                      : 'bg-gradient-to-r from-amber-600 to-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.6)]'
+                                  }`}
+                                  style={{ width: `${progressPct}%` }}
+                                />
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Button */}
+                          {isClaimed ? (
+                            <div className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-display font-bold text-xs tracking-wider flex items-center justify-center gap-1.5 cursor-default">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>CLAIMED</span>
+                            </div>
+                          ) : canClaim ? (
+                            <button
+                              onClick={() => handleClaimMilestone(milestone.id)}
+                              disabled={isCurrentlyClaiming}
+                              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-200 text-black font-display font-black text-xs tracking-wider uppercase transition-all shadow-[0_0_20px_rgba(245,158,11,0.6)] hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+                            >
+                              {isCurrentlyClaiming ? (
+                                <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <Sparkles className="w-3.5 h-3.5 text-black fill-black" />
+                              )}
+                              <span>CLAIM REWARD</span>
+                            </button>
+                          ) : (
+                            <div className="px-4 py-2 rounded-xl bg-black/60 border border-white/10 text-gray-500 font-display font-bold text-xs tracking-wider flex items-center justify-center gap-1.5 cursor-default">
+                              <Lock className="w-3 h-3 text-gray-500" />
+                              <span>NEED {milestone.requiredSubscribers - actualSubscribedCount} MORE</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Bottom breathing spacer */}
+              <div className="h-6 sm:h-8 shrink-0" />
             </div>
+          )}
 
-          </div>
         </div>
-      )}
+
+      </div>
+    </div>
+  )}
 
       {/* Void Mailbox Modal */}
       <MailboxModal isOpen={isMailboxOpen} onClose={() => setIsMailboxOpen(false)} />

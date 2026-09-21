@@ -133,6 +133,7 @@ export interface PlayerProfile {
   referralContributions?: Record<string, number>;
   referralCode?: string;
   campaignSovereignsClaimed?: number[];
+  claimedReferralMilestones?: string[];
 }
 
 export function generateReferralCode(): string {
@@ -147,7 +148,7 @@ export function generateReferralCode(): string {
 export interface SovereignTransaction {
   id: string;
   timestamp: string; // ISO 8601
-  action: 'PVP_VICTORY' | 'LEAGUE_ROLLOVER' | 'MAIL_CLAIM' | 'ADMIN_ADJUSTMENT' | 'WITHDRAWAL' | 'REFERRAL_COMMISSION' | 'CAMPAIGN_FIRST_CLEAR';
+  action: 'PVP_VICTORY' | 'LEAGUE_ROLLOVER' | 'MAIL_CLAIM' | 'ADMIN_ADJUSTMENT' | 'WITHDRAWAL' | 'REFERRAL_COMMISSION' | 'CAMPAIGN_FIRST_CLEAR' | 'REFERRAL_MILESTONE';
   sovereignsChange: number; // e.g. +400 or -2000
   sovereignsBefore: number;
   sovereignsAfter: number;

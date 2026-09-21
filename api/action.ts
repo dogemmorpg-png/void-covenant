@@ -10,6 +10,7 @@ import { calculateEnergy, processExpGain, getActiveSubscriptionTier, getTierLimi
 import { checkAndPerformPvpRollover, DEFAULT_LEAGUE_REWARDS } from './_shared/pvpRollover.js';
 import { recordShardTransaction } from './_shared/shardLogger.js';
 import { recordSovereignTransaction } from './_shared/sovereignLogger.js';
+import { REFERRAL_MILESTONES } from './_shared/referralMilestones.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev-only-change-in-prod';
 
@@ -186,10 +187,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         };
       });
 
+      const subscribedReferralsCount = referrals.filter(r => 
+        r.subscriptionTier === 'premium' || 
+        r.subscriptionTier === 'ultra' || 
+        r.sovereignsContributed >= 300
+      ).length;
+
       return res.status(200).json({ 
         referrals,
         unclaimedSovereigns,
-        totalEarnedSovereigns
+        totalEarnedSovereigns,
+        subscribedReferralsCount
       });
     } catch (e: any) {
       return res.status(500).json({ error: e.message });
@@ -1592,6 +1600,110 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       responseData = {
         claimedSovereigns: wholeUnits,
         referralSovereignsUnclaimed: profile.referralSovereignsUnclaimed,
+        bloodSovereigns: profile.bloodSovereigns
+      };
+    } else if (action === 'claim_referral_milestone') {
+      const { milestoneId } = payload || {};
+      if (!milestoneId) {
+        return res.status(400).json({ error: 'Milestone ID is required.' });
+      }
+
+      const milestone = REFERRAL_MILESTONES.find(m => m.id === milestoneId);
+      if (!milestone) {
+        return res.status(400).json({ error: 'Invalid milestone ID.' });
+      }
+
+      profile.claimedReferralMilestones = profile.claimedReferralMilestones || [];
+      if (profile.claimedReferralMilestones.includes(milestoneId)) {
+        return res.status(400).json({ error: 'This milestone reward has already been claimed.' });
+      }
+
+      // Count subscribed referrals (Premium or Ultra)
+      let subscribedCount = 0;
+      try {
+        const { data: referredProfiles } = await supabase
+          .from('profiles')
+          .select('wallet_address, data')
+          .filter('data->>referredBy', 'eq', walletAddress);
+
+        const countedWallets = new Set<string>();
+
+        if (referredProfiles && Array.isArray(referredProfiles)) {
+          referredProfiles.forEach((p: any) => {
+            const pData = p.data || {};
+            const isSub = Boolean(
+              pData.referralSubBountiesAwarded?.ultra ||
+              pData.referralSubBountiesAwarded?.premium ||
+              pData.subscriptionTier === 'premium' ||
+              pData.subscriptionTier === 'ultra'
+            );
+            if (isSub && !countedWallets.has(p.wallet_address)) {
+              countedWallets.add(p.wallet_address);
+              subscribedCount++;
+            }
+          });
+        }
+
+        // Also check referrals table
+        const { data: refRows } = await supabase
+          .from('referrals')
+          .select('referred_wallet')
+          .eq('referrer_wallet', walletAddress);
+
+        if (refRows && Array.isArray(refRows)) {
+          const uncounted = refRows
+            .map(r => r.referred_wallet)
+            .filter(w => !countedWallets.has(w));
+
+          if (uncounted.length > 0) {
+            const { data: extraProfiles } = await supabase
+              .from('profiles')
+              .select('wallet_address, data')
+              .in('wallet_address', uncounted);
+
+            if (extraProfiles && Array.isArray(extraProfiles)) {
+              extraProfiles.forEach((p: any) => {
+                const pData = p.data || {};
+                const isSub = Boolean(
+                  pData.referralSubBountiesAwarded?.ultra ||
+                  pData.referralSubBountiesAwarded?.premium ||
+                  pData.subscriptionTier === 'premium' ||
+                  pData.subscriptionTier === 'ultra'
+                );
+                if (isSub && !countedWallets.has(p.wallet_address)) {
+                  countedWallets.add(p.wallet_address);
+                  subscribedCount++;
+                }
+              });
+            }
+          }
+        }
+      } catch (countErr) {
+        console.error('Error counting subscribed referrals:', countErr);
+      }
+
+      if (subscribedCount < milestone.requiredSubscribers) {
+        return res.status(400).json({ 
+          error: `Milestone requirement not met. Required: ${milestone.requiredSubscribers} Premium/Ultra allies, you have ${subscribedCount}.` 
+        });
+      }
+
+      // Award the milestone
+      profile.claimedReferralMilestones.push(milestoneId);
+      profile.bloodSovereigns = (profile.bloodSovereigns || 0) + milestone.rewardSovereigns;
+      profile = recordSovereignTransaction(
+        profile,
+        'REFERRAL_MILESTONE',
+        milestone.rewardSovereigns,
+        `Alliance Milestone: ${milestone.requiredSubscribers} Premium Allies (${milestone.title})`,
+        { milestoneId, requiredSubscribers: milestone.requiredSubscribers, rewardSovereigns: milestone.rewardSovereigns }
+      );
+
+      successMessage = `Claimed ${milestone.rewardSovereigns.toLocaleString()} Blood Sovereigns for reaching ${milestone.requiredSubscribers} Premium Allies!`;
+      responseData = {
+        milestoneId,
+        rewardSovereigns: milestone.rewardSovereigns,
+        claimedReferralMilestones: profile.claimedReferralMilestones,
         bloodSovereigns: profile.bloodSovereigns
       };
     } else if (action === 'dismantle_card') {
