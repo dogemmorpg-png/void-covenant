@@ -1,21 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  ChevronRight, 
   ChevronLeft, 
   X, 
   Swords, 
   Shield, 
-  Clock, 
-  Crown, 
+  Flame, 
+  Sparkles, 
+  Trophy, 
   Coins, 
   Users, 
-  Sparkles, 
-  Zap, 
-  CheckCircle2,
-  Lock,
-  Landmark,
-  ArrowRight
+  Landmark, 
+  ArrowRight 
 } from 'lucide-react';
 
 interface VoidOnboardingModalProps {
@@ -51,7 +47,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' || e.key === 'Space') {
-        setCurrentSlide(prev => Math.min(5, prev + 1));
+        setCurrentSlide(prev => Math.min(7, prev + 1));
         triggerHaptic();
       } else if (e.key === 'ArrowLeft') {
         setCurrentSlide(prev => Math.max(0, prev - 1));
@@ -69,24 +65,23 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
 
   const slides: OnboardingSlide[] = [
     // ----------------------------------------------------
-    // SLIDE 1: 5 BATTLE SLOTS & LINEAR DUELS
+    // SLIDE 1: BATTLEFIELD & LINEAR SLOTS
     // ----------------------------------------------------
     {
       id: 1,
       tag: 'BATTLEFIELD ARCHITECTURE',
       title: '5 LINEAR SLOTS',
       headline: 'Creatures strike strictly straight ahead.',
-      description: 'Deploy cards into 5 board slots. Each minion duels the opposing card in the mirror slot. If the opposite slot is empty, all damage hits the enemy Lord directly!',
-      highlightText: 'Empty Slot = Direct Damage to Enemy Hero',
+      description: 'The board has 5 slots on each side. Your minion attacks the enemy card directly opposite in the same slot. If that slot is empty, all attack damage strikes the opposing Hero directly! Reduce enemy HP to 0 to win.',
+      highlightText: 'Empty Slot = Direct Hero Damage',
       visual: (
         <div className="relative w-full h-full flex flex-col items-center justify-center p-3">
-          {/* Subtle Ambient Backlight */}
           <div className="absolute inset-0 bg-radial from-amber-500/10 via-transparent to-transparent pointer-events-none" />
 
           <div className="w-full max-w-[320px] space-y-3 relative z-10">
             {/* Enemy Slots Row */}
             <div className="space-y-1">
-              <div className="flex items-center justify-between text-[9px] font-mono text-rose-400 px-1">
+              <div className="flex items-center justify-between text-[9px] font-mono text-rose-400 px-1 font-bold">
                 <span>ENEMY FRONTLINE</span>
                 <span className="text-zinc-500">HP: 100</span>
               </div>
@@ -96,7 +91,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
                     key={slot}
                     className={`aspect-[3/4] rounded-xl border flex flex-col items-center justify-center relative transition-all ${
                       slot === 3
-                        ? 'border-rose-500/80 bg-rose-950/40 shadow-[0_0_12px_rgba(244,63,94,0.3)]'
+                        ? 'border-rose-500/80 bg-rose-950/40 shadow-[0_0_12px_rgba(244,63,94,0.35)]'
                         : 'border-zinc-800 bg-black/40'
                     }`}
                   >
@@ -109,12 +104,12 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
               </div>
             </div>
 
-            {/* Attack Direction Arrows Indicator */}
+            {/* Attack Direction Indicator */}
             <div className="flex items-center justify-center gap-2 py-0.5">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/60 border border-amber-500/40 text-amber-300 font-mono text-[9px] font-bold shadow-sm">
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/70 border border-amber-500/40 text-amber-300 font-mono text-[9px] font-bold shadow-sm">
                 <span>▲</span>
-                <span>DIRECT DUEL</span>
+                <span>MIRROR DUEL (OPPOSITE SLOT)</span>
                 <span>▼</span>
               </div>
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
@@ -139,9 +134,9 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
                   </div>
                 ))}
               </div>
-              <div className="flex items-center justify-between text-[9px] font-mono text-cyan-400 px-1">
+              <div className="flex items-center justify-between text-[9px] font-mono text-cyan-400 px-1 font-bold">
                 <span>YOUR BATTLE LINE</span>
-                <span className="text-zinc-500">MANA: +1/TURN</span>
+                <span className="text-zinc-500">MANA EXPANDS EACH TURN</span>
               </div>
             </div>
           </div>
@@ -154,18 +149,17 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     // ----------------------------------------------------
     {
       id: 2,
-      tag: 'COMBAT DYNAMICS',
+      tag: 'COMBAT MECHANICS',
       title: 'DELAY & DEFENSE',
-      headline: 'Minions need time to awaken.',
-      description: 'Every creature has an activation Delay (1–3 turns). Each round, all Delay timers decrease by 1. When a card reaches 0, it attacks every turn! Armor absorbs incoming hits, and Barriers fully negate 1 strike.',
-      highlightText: 'Delay ticks down each turn until 0 (Ready to attack)',
+      headline: 'Cards awaken over time. Defenses mitigate damage.',
+      description: 'Cards do not attack immediately. Each card has a Delay timer (1–3 turns) that decreases by 1 every round. When Delay hits 0, the card attacks each turn! Armor absorbs physical damage, while Divine Barrier negates 1 full strike.',
+      highlightText: 'Delay ticks to 0 • Armor absorbs • Barrier negates 1 hit',
       visual: (
         <div className="relative w-full h-full flex flex-col items-center justify-center p-3">
           <div className="absolute inset-0 bg-radial from-purple-500/10 via-transparent to-transparent pointer-events-none" />
 
-          {/* Stylized Center Card with Stat Badges */}
+          {/* Central Card with Stat Callouts */}
           <div className="relative w-44 sm:w-48 aspect-[5/7] rounded-2xl border-2 border-amber-500/70 bg-gradient-to-b from-[#1c1427] via-[#100c18] to-black p-2 flex flex-col justify-between shadow-[0_0_25px_rgba(168,85,247,0.35)]">
-            {/* Top Bar: Mana & Card Name */}
             <div className="flex items-center justify-between">
               <div className="w-6 h-6 rounded-lg bg-cyan-950 border border-cyan-400 flex items-center justify-center shadow-[0_0_8px_rgba(34,211,238,0.5)]">
                 <span className="text-white text-[10px] font-black font-mono">2</span>
@@ -173,38 +167,33 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
               <span className="text-[10px] font-display font-black text-amber-200 tracking-wider uppercase">
                 ABYSSAL REAPER
               </span>
-              <span className="text-[9px] font-mono text-purple-300">GOLD</span>
+              <span className="text-[9px] font-mono text-purple-300 font-bold">GOLD</span>
             </div>
 
-            {/* Central Card Illustration Frame */}
             <div className="relative flex-1 my-1.5 rounded-xl overflow-hidden border border-purple-500/30 bg-black/60 flex items-center justify-center">
               <img 
                 src="/cards/abyss_reaper.webp" 
                 alt="Reaper" 
                 className="w-full h-full object-cover brightness-105"
                 onError={(e) => {
-                  // Fallback to avatar if specific card asset isn't loaded
                   (e.target as HTMLImageElement).src = '/avatars/knight.webp';
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
             </div>
 
-            {/* Bottom 3 Stat Tokens */}
+            {/* Attack, Delay, Health Tokens */}
             <div className="grid grid-cols-3 gap-1 pt-0.5">
-              {/* Attack */}
               <div className="flex items-center justify-center gap-1 py-1 rounded-lg bg-red-950/80 border border-red-500/40">
                 <img src="/icons/gothic_attack.webp" alt="ATK" className="w-3.5 h-3.5 object-contain" />
                 <span className="text-white text-xs font-black font-mono">14</span>
               </div>
 
-              {/* Delay Timer (Hourglass) */}
-              <div className="flex items-center justify-center gap-1 py-1 rounded-lg bg-amber-950/90 border border-amber-400/60 shadow-[0_0_8px_rgba(245,158,11,0.4)]">
+              <div className="flex items-center justify-center gap-1 py-1 rounded-lg bg-amber-950/90 border border-amber-400/70 shadow-[0_0_8px_rgba(245,158,11,0.5)]">
                 <img src="/icons/gothic_hourglass.webp" alt="Delay" className="w-3.5 h-3.5 object-contain" />
                 <span className="text-amber-300 text-xs font-black font-mono">1⏳</span>
               </div>
 
-              {/* Health */}
               <div className="flex items-center justify-center gap-1 py-1 rounded-lg bg-emerald-950/80 border border-emerald-500/40">
                 <img src="/icons/gothic_health.webp" alt="HP" className="w-3.5 h-3.5 object-contain" />
                 <span className="text-white text-xs font-black font-mono">22</span>
@@ -216,37 +205,129 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     },
 
     // ----------------------------------------------------
-    // SLIDE 3: CAMPAIGN & BOSSES
+    // SLIDE 3: DARK ARTS (CREATURE SKILLS)
     // ----------------------------------------------------
     {
       id: 3,
-      tag: 'TOWER EXPEDITIONS',
-      title: 'THE CAMPAIGN',
-      headline: 'Conquer spires & crush towering bosses.',
-      description: 'Your Combat Deck must hold exactly 10 cards. Consume PvE Energy to ascend floors. Bosses await every 10 floors with first-clear bounties! Earn 3 Stars to unlock 1-click Instant Sweeps.',
-      highlightText: 'Exactly 10 cards in Deck • Bosses every 10 floors',
+      tag: 'CREATURE ABILITIES',
+      title: 'DARK ARTS (SKILLS)',
+      headline: '4 Curses govern the battlefield.',
+      description: 'Hex amps all incoming damage on the target. Vampirism heals your Hero for a portion of damage dealt. Plague inflicts toxic damage at the end of every turn. Sacrifice devours an allied minion on entry to grant massive ATK/HP buffs!',
+      highlightText: 'Hex • Vampirism • Plague • Sacrifice',
+      visual: (
+        <div className="relative w-full h-full flex flex-col items-center justify-center p-3">
+          <div className="absolute inset-0 bg-radial from-purple-500/10 via-transparent to-transparent pointer-events-none" />
+
+          <div className="w-full max-w-[310px] grid grid-cols-2 gap-2">
+            <div className="p-2.5 rounded-xl bg-purple-950/40 border border-purple-500/40 flex items-center gap-2.5">
+              <img src="/icons/icon_hex.webp" alt="Hex" className="w-8 h-8 object-contain shrink-0 drop-shadow-[0_0_6px_rgba(168,85,247,0.7)]" />
+              <div>
+                <span className="text-[10px] font-mono font-bold text-purple-300 block">HEX (Сглаз)</span>
+                <span className="text-[8px] font-mono text-zinc-400 leading-tight block">Amps incoming damage</span>
+              </div>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-red-950/40 border border-red-500/40 flex items-center gap-2.5">
+              <img src="/icons/icon_vampirism.webp" alt="Vampirism" className="w-8 h-8 object-contain shrink-0 drop-shadow-[0_0_6px_rgba(239,68,68,0.7)]" />
+              <div>
+                <span className="text-[10px] font-mono font-bold text-red-300 block">VAMPIRISM</span>
+                <span className="text-[8px] font-mono text-zinc-400 leading-tight block">Heals Hero on attack</span>
+              </div>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 flex items-center gap-2.5">
+              <img src="/icons/icon_plague.webp" alt="Plague" className="w-8 h-8 object-contain shrink-0 drop-shadow-[0_0_6px_rgba(16,185,129,0.7)]" />
+              <div>
+                <span className="text-[10px] font-mono font-bold text-emerald-300 block">PLAGUE (Чума)</span>
+                <span className="text-[8px] font-mono text-zinc-400 leading-tight block">Periodic poison each turn</span>
+              </div>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/40 flex items-center gap-2.5">
+              <img src="/icons/icon_sacrifice.webp" alt="Sacrifice" className="w-8 h-8 object-contain shrink-0 drop-shadow-[0_0_6px_rgba(245,158,11,0.7)]" />
+              <div>
+                <span className="text-[10px] font-mono font-bold text-amber-300 block">SACRIFICE</span>
+                <span className="text-[8px] font-mono text-zinc-400 leading-tight block">Devours ally for buffs</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    },
+
+    // ----------------------------------------------------
+    // SLIDE 4: HERO STANCES & TALENT TREES
+    // ----------------------------------------------------
+    {
+      id: 4,
+      tag: 'COMMANDER ARTS',
+      title: 'STANCES & TALENTS',
+      headline: 'Your Lord actively unleashes powers every round.',
+      description: 'Your chosen Stance casts at the start of each round: Void Strike unleashes dark magic with life leech; Blood Aura cleanses Hex and heals wounded minions; Warlord’s Cry boosts attack and accelerates hand delays. Allocate Talents to upgrade them!',
+      highlightText: 'Void Strike • Blood Aura • Warlord’s Cry',
       visual: (
         <div className="relative w-full h-full flex flex-col items-center justify-center p-3">
           <div className="absolute inset-0 bg-radial from-amber-500/10 via-transparent to-transparent pointer-events-none" />
 
-          <div className="w-full max-w-[300px] space-y-2.5">
-            {/* Boss Floor Banner */}
+          <div className="w-full max-w-[310px] space-y-2">
+            <div className="p-2.5 rounded-xl bg-purple-950/30 border border-purple-500/30 flex items-start gap-3">
+              <span className="text-xl">⚡</span>
+              <div>
+                <span className="text-[10px] font-mono font-bold text-purple-300 block">VOID STRIKE</span>
+                <span className="text-[8.5px] font-mono text-zinc-300 block">Dark lightning strike with life leech to Hero.</span>
+              </div>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-rose-950/30 border border-rose-500/30 flex items-start gap-3">
+              <span className="text-xl">🩸</span>
+              <div>
+                <span className="text-[10px] font-mono font-bold text-rose-300 block">BLOOD AURA</span>
+                <span className="text-[8.5px] font-mono text-zinc-300 block">Heals lowest HP ally every round and purges Hex.</span>
+              </div>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-amber-950/30 border border-amber-500/30 flex items-start gap-3">
+              <span className="text-xl">🔥</span>
+              <div>
+                <span className="text-[10px] font-mono font-bold text-amber-300 block">WARLORD’S CRY</span>
+                <span className="text-[8.5px] font-mono text-zinc-300 block">Empowers minion Attack and reduces -1 Delay in hand.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    },
+
+    // ----------------------------------------------------
+    // SLIDE 5: CAMPAIGN, ENERGY & SWEEP
+    // ----------------------------------------------------
+    {
+      id: 5,
+      tag: 'TOWER EXPEDITIONS',
+      title: 'CAMPAIGN & SWEEP',
+      headline: '10 cards in deck. Bosses every 10 floors.',
+      description: 'Your Combat Deck must hold exactly 10 cards to fight. Battles consume PvE Energy, which recharges over time. Formidable Bosses guard floors 10, 20, 30... yielding first-clear bounties! Clear a floor with 3 Stars to unlock 1-click Instant Sweep.',
+      highlightText: 'Exactly 10 cards in Deck • Bosses every 10 floors • Instant Sweep',
+      visual: (
+        <div className="relative w-full h-full flex flex-col items-center justify-center p-3">
+          <div className="absolute inset-0 bg-radial from-amber-500/10 via-transparent to-transparent pointer-events-none" />
+
+          <div className="w-full max-w-[310px] space-y-2.5">
             <div className="p-3 rounded-2xl bg-gradient-to-r from-red-950/80 via-black to-red-950/80 border border-red-500/50 flex items-center justify-between shadow-[0_0_20px_rgba(220,38,38,0.25)]">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-red-900/50 border border-red-400 flex items-center justify-center text-xl shadow-inner">
+                <div className="w-10 h-10 rounded-xl bg-red-900/50 border border-red-400 flex items-center justify-center text-xl">
                   👑
                 </div>
                 <div>
                   <span className="text-[10px] font-mono text-red-400 font-bold block">FLOOR 10 • 20 • 30</span>
-                  <span className="text-xs font-display font-black text-white tracking-wide">ANCIENT BOSS LAIR</span>
+                  <span className="text-xs font-display font-black text-white tracking-wide">BOSS ENCOUNTERS</span>
                 </div>
               </div>
               <span className="text-[9px] font-mono bg-red-500/20 text-red-300 border border-red-500/30 px-2 py-0.5 rounded-full font-bold">
-                +SOV LOOT
+                +SOV BOUNTY
               </span>
             </div>
 
-            {/* Features Row */}
             <div className="grid grid-cols-2 gap-2">
               <div className="p-2.5 rounded-xl bg-zinc-900/80 border border-white/10 flex items-center gap-2">
                 <img src="/icons/icon_energy.webp" alt="Energy" className="w-6 h-6 object-contain shrink-0" />
@@ -267,7 +348,6 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
               </div>
             </div>
 
-            {/* 10 Cards rule reminder */}
             <div className="p-2 rounded-xl bg-black/60 border border-amber-500/30 text-center">
               <span className="text-[9.5px] font-mono text-amber-200">
                 🃏 Set your 10-card deck in the <strong className="text-white">CARDS</strong> tab!
@@ -279,21 +359,20 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     },
 
     // ----------------------------------------------------
-    // SLIDE 4: THE ARENA & VICTORY BOUNTIES
+    // SLIDE 6: ARENA, PER-ROUND BOUNTIES & SHIELDS
     // ----------------------------------------------------
     {
-      id: 4,
+      id: 6,
       tag: 'GLADIATORIAL COMBAT',
-      title: 'THE PVP ARENA',
-      headline: 'Earn Sovereigns for every victorious duel.',
-      description: 'Spend Arena Tickets to battle real summoners. Pass subscribers earn real Blood Sovereigns for every single win! Climb leagues from Bronze to Divine, and activate Peace Shields to stay safe while offline.',
-      highlightText: 'Daily Tickets + Sovereigns Paid Per Win',
+      title: 'ARENA & BOUNTIES',
+      headline: 'Earn Sovereigns for every single won duel.',
+      description: 'Spend PvP Tickets to duel real players. Pass holders earn Blood Sovereigns for every victory! Climb Leagues for season rewards. Activate Peace Shields (3h, 6h, 12h) to lock your rank from attacks while offline.',
+      highlightText: 'Sovereigns Paid Per Win • Peace Shields protect offline',
       visual: (
         <div className="relative w-full h-full flex flex-col items-center justify-center p-3">
           <div className="absolute inset-0 bg-radial from-amber-500/10 via-transparent to-transparent pointer-events-none" />
 
-          <div className="w-full max-w-[300px] space-y-2.5">
-            {/* Arena Header Badge */}
+          <div className="w-full max-w-[310px] space-y-2.5">
             <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-950/80 via-black to-amber-950/80 border border-amber-500/50 flex items-center justify-between shadow-[0_0_20px_rgba(245,158,11,0.25)]">
               <div className="flex items-center gap-2.5">
                 <img src="/icons/crown.png" alt="Crown" className="w-9 h-9 object-contain shrink-0 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
@@ -305,7 +384,6 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
               <img src="/icons/league_divine.png" alt="Divine" className="w-8 h-8 object-contain shrink-0" />
             </div>
 
-            {/* Per-win SOV callout */}
             <div className="p-2.5 rounded-xl bg-gradient-to-r from-red-950/60 to-black border border-red-500/40 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-6 h-6 object-contain" />
@@ -316,11 +394,10 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
               <span className="text-[8.5px] font-mono text-zinc-400">Paid Every Win</span>
             </div>
 
-            {/* Peace Shield Callout */}
             <div className="p-2 rounded-xl bg-sky-950/40 border border-sky-500/40 flex items-center gap-2">
               <Shield className="w-4 h-4 text-sky-400 shrink-0" />
               <span className="text-[9px] font-mono text-sky-200">
-                <strong className="text-white">Peace Shields (3h, 6h, 12h)</strong> lock your crowns from offline attacks.
+                <strong className="text-white">Peace Shields (3h, 6h, 12h)</strong> protect rank while offline.
               </span>
             </div>
           </div>
@@ -329,95 +406,99 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     },
 
     // ----------------------------------------------------
-    // SLIDE 5: BLOOD SOVEREIGNS & BANK WITHDRAWALS
+    // SLIDE 7: TREASURES & CURRENCIES
     // ----------------------------------------------------
     {
-      id: 5,
-      tag: 'REAL CRYPTO ASSET',
-      title: 'SOVEREIGNS & BANK',
-      headline: 'Convertible cryptocurrency pegged 100:1 to USD.',
-      description: 'Blood Sovereigns are the supreme prize of Void Covenant. 100 SOV = $1.00 USDT. All earnings accumulate in your Royal Bank, where you can withdraw on-chain directly to USDT, TON, or Solana.',
-      highlightText: '100 SOV = $1.00 USDT • Direct On-Chain Withdrawal',
-      visual: (
-        <div className="relative w-full h-full flex flex-col items-center justify-center p-3">
-          <div className="absolute inset-0 bg-radial from-emerald-500/10 via-transparent to-transparent pointer-events-none" />
-
-          {/* Central Shining Sovereign Coin */}
-          <div className="relative flex flex-col items-center space-y-3">
-            <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-amber-400 via-amber-600 to-red-950 p-1 shadow-[0_0_35px_rgba(245,158,11,0.5)] animate-pulse">
-                <div className="w-full h-full rounded-full bg-black/80 flex items-center justify-center border-2 border-amber-300">
-                  <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-16 h-16 object-contain drop-shadow-[0_0_12px_rgba(239,68,68,0.7)]" />
-                </div>
-              </div>
-            </div>
-
-            {/* Exchange Rate Card */}
-            <div className="p-2.5 rounded-xl bg-black/80 border border-emerald-500/50 text-center space-y-0.5 shadow-lg">
-              <div className="text-base font-mono font-black text-white flex items-center justify-center gap-1.5">
-                <span className="text-amber-300">100 SOV</span>
-                <span className="text-zinc-400">=</span>
-                <span className="text-emerald-400">$1.00 USDT</span>
-              </div>
-              <span className="text-[8.5px] font-mono text-zinc-400 block">
-                Instant withdrawal inside the BANK tab
-              </span>
-            </div>
-
-            {/* Supported Networks */}
-            <div className="flex items-center gap-2 text-[8.5px] font-mono text-zinc-400">
-              <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10">USDT (TON)</span>
-              <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10">USDT (BEP-20)</span>
-              <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10">SOLANA</span>
-            </div>
-          </div>
-        </div>
-      )
-    },
-
-    // ----------------------------------------------------
-    // SLIDE 6: THE ALLIANCE & REFERRALS
-    // ----------------------------------------------------
-    {
-      id: 6,
-      tag: 'SYNDICATE REVENUE',
-      title: 'THE ALLIANCE',
-      headline: 'Earn 15% of all battle winnings from your allies.',
-      description: 'Share your personal invitation link. Receive 15% lifetime commissions on all Blood Sovereigns your allies win on the Arena and League, plus colossal milestone bounties from 150 to 500,000 SOV!',
-      highlightText: '15% Lifetime Battle Share • 500,000 SOV Milestones',
+      id: 7,
+      tag: 'TREASURY ASSETS',
+      title: '4 REALM CURRENCIES',
+      headline: 'Gold, Shards, Shadow Dust & Sovereigns.',
+      description: 'Gold buys card packs & basic upgrades. Dark Shards summon Gacha chests and refill energy. Shadow Dust disenchanted from duplicate cards ascends cards up to Divine Tier! Blood Sovereigns are real convertible value (100 SOV = $1.00 USDT).',
+      highlightText: '100 Blood Sovereigns = $1.00 USDT',
       visual: (
         <div className="relative w-full h-full flex flex-col items-center justify-center p-3">
           <div className="absolute inset-0 bg-radial from-amber-500/10 via-transparent to-transparent pointer-events-none" />
 
-          <div className="w-full max-w-[300px] space-y-2.5">
-            {/* 15% Share Banner */}
-            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-950/70 via-black to-amber-950/70 border border-amber-500/50 text-center space-y-1 shadow-[0_0_20px_rgba(245,158,11,0.25)]">
-              <span className="text-[10px] font-mono font-bold text-amber-400 uppercase tracking-widest block">
-                PERPETUAL ALLIANCE SHARE
+          <div className="w-full max-w-[310px] space-y-2">
+            <div className="p-2 rounded-xl bg-amber-950/30 border border-amber-500/30 flex items-center gap-3">
+              <img src="/icons/icon_gold.webp" alt="Gold" className="w-7 h-7 object-contain shrink-0" />
+              <div>
+                <span className="text-[10px] font-mono font-bold text-amber-300 block">GOLD (Золото)</span>
+                <span className="text-[8px] font-mono text-zinc-400 leading-tight block">From battles; buys card packs & upgrades.</span>
+              </div>
+            </div>
+
+            <div className="p-2 rounded-xl bg-purple-950/30 border border-purple-500/30 flex items-center gap-3">
+              <img src="/icons/icon_shards.webp" alt="Shards" className="w-7 h-7 object-contain shrink-0" />
+              <div>
+                <span className="text-[10px] font-mono font-bold text-purple-300 block">DARK SHARDS (Осколки)</span>
+                <span className="text-[8px] font-mono text-zinc-400 leading-tight block">Gacha summons, energy refills, & passes.</span>
+              </div>
+            </div>
+
+            <div className="p-2 rounded-xl bg-teal-950/30 border border-teal-500/30 flex items-center gap-3">
+              <img src="/icons/icon_dust.webp" alt="Dust" className="w-7 h-7 object-contain shrink-0" />
+              <div>
+                <span className="text-[10px] font-mono font-bold text-teal-300 block">SHADOW DUST (Пыль)</span>
+                <span className="text-[8px] font-mono text-zinc-400 leading-tight block">Disenchant duplicates to ascend cards to Divine!</span>
+              </div>
+            </div>
+
+            <div className="p-2 rounded-xl bg-red-950/40 border border-red-500/50 flex items-center gap-3 shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+              <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-7 h-7 object-contain shrink-0" />
+              <div>
+                <span className="text-[10px] font-mono font-bold text-red-300 block">BLOOD SOVEREIGNS (100 = $1 USDT)</span>
+                <span className="text-[8px] font-mono text-zinc-300 leading-tight block">Real convertible currency earned in PvP & Alliance.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    },
+
+    // ----------------------------------------------------
+    // SLIDE 8: ALLIANCE, BANK & REAL WITHDRAWALS
+    // ----------------------------------------------------
+    {
+      id: 8,
+      tag: 'ALLIANCE & WITHDRAWALS',
+      title: 'ALLIANCE & BANK',
+      headline: 'Earn 15% from allies’ battle wins. Withdraw to wallet.',
+      description: 'Receive 15% lifetime commissions on all Blood Sovereigns your recruited allies win in the Arena and League (no cuts from purchases), plus up to 500,000 SOV milestone bounties! All earnings store in the Bank for direct withdrawal to USDT, TON, or Solana.',
+      highlightText: '15% Share on battle wins • Direct on-chain withdrawal',
+      visual: (
+        <div className="relative w-full h-full flex flex-col items-center justify-center p-3">
+          <div className="absolute inset-0 bg-radial from-emerald-500/10 via-transparent to-transparent pointer-events-none" />
+
+          <div className="w-full max-w-[310px] space-y-2.5">
+            {/* 15% Battle Share Banner */}
+            <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-950/80 via-black to-emerald-950/80 border border-amber-500/40 text-center space-y-0.5 shadow-lg">
+              <span className="text-[9.5px] font-mono font-bold text-amber-300 uppercase tracking-widest block">
+                15% BATTLE SHARE & BANK
               </span>
-              <div className="text-3xl font-display font-black text-white tracking-wider text-amber-300">
-                15% SHARE
+              <div className="text-xl font-display font-black text-white tracking-wider text-emerald-300">
+                100 SOV = $1.00 USDT
               </div>
               <span className="text-[8.5px] font-mono text-zinc-300 block">
-                Of all Arena & League SOV won by your recruits
+                15% from allies' Arena & League wins • Withdrawable
               </span>
             </div>
 
-            {/* Milestones Card */}
-            <div className="p-2.5 rounded-xl bg-zinc-900/80 border border-white/10 space-y-1">
-              <div className="flex items-center justify-between text-[9px] font-mono">
-                <span className="text-zinc-300">🎁 Pass Activation Bounty</span>
-                <span className="text-amber-300 font-bold">+SOV Instantly</span>
+            {/* Milestones & Payout Networks */}
+            <div className="p-2 rounded-xl bg-zinc-900/80 border border-white/10 space-y-1 text-[9px] font-mono">
+              <div className="flex items-center justify-between">
+                <span className="text-zinc-300">🏆 Alliance Milestones</span>
+                <span className="text-amber-300 font-bold">150 to 500,000 SOV</span>
               </div>
-              <div className="flex items-center justify-between text-[9px] font-mono">
-                <span className="text-zinc-300">🏆 9 Alliance Milestones</span>
-                <span className="text-amber-300 font-bold">Up to 500,000 SOV</span>
+              <div className="flex items-center justify-between">
+                <span className="text-zinc-300">💳 Supported Networks</span>
+                <span className="text-emerald-400 font-bold">USDT / TON / Solana</span>
               </div>
             </div>
 
-            <div className="p-2 rounded-xl bg-black/60 border border-amber-500/30 text-center">
-              <span className="text-[9px] font-mono text-amber-200">
-                Get your invite link in <strong className="text-white">INVITE FRIENDS</strong>!
+            <div className="p-2 rounded-xl bg-black/60 border border-emerald-500/30 text-center">
+              <span className="text-[9px] font-mono text-emerald-200">
+                Withdraw anytime inside the <strong className="text-white">BANK</strong> tab!
               </span>
             </div>
           </div>
@@ -453,7 +534,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
         transition={{ duration: 0.22, ease: 'easeOut' }}
         className="relative w-full max-w-md bg-[#0a0808] border border-[#d4af37]/40 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.9),0_0_30px_rgba(212,175,55,0.2)] overflow-hidden flex flex-col my-auto max-h-[92vh]"
       >
-        {/* Top Story Progress Bars (6 Segments) */}
+        {/* Top Story Progress Bars (8 Segments) */}
         <div className="px-4 pt-4 pb-2 flex items-center gap-1.5 z-20 shrink-0">
           {slides.map((_, idx) => (
             <div
@@ -480,7 +561,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
         {/* Header Bar with Step Tag & Skip Button */}
         <div className="px-5 py-1 flex items-center justify-between z-20 shrink-0">
           <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-amber-400/90 font-bold">
-            {current.tag} • {current.id}/6
+            {current.tag} • {current.id}/8
           </span>
           <button
             onClick={onClose}
