@@ -881,8 +881,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                         {/* Left: Badge & Info */}
                         <div className="flex items-center gap-4 min-w-0">
                           {/* Badge Container */}
-                          <div className={`relative w-14 h-14 rounded-2xl border-2 flex items-center justify-center shrink-0 shadow-lg ${milestone.badgeBg}`}>
-                            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-2xl pointer-events-none" />
+                          <div className={`w-14 h-14 rounded-2xl border-2 flex items-center justify-center shrink-0 shadow-lg ${milestone.badgeBg}`}>
                             <img
                               src={milestone.badgeIcon}
                               alt={milestone.title}
@@ -891,42 +890,25 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                                 (e.target as HTMLElement).style.display = 'none';
                               }}
                             />
-                            <span className="absolute -bottom-2 px-1.5 py-0.2 rounded bg-black/90 border border-white/20 font-mono text-[9px] font-black text-amber-300">
-                              #{index + 1}
-                            </span>
                           </div>
 
                           <div className="min-w-0 space-y-1">
-                            {/* Title & Target Pill */}
-                            <div className="flex items-center gap-2.5 flex-wrap">
-                              <h4 className="font-display font-black text-base text-white tracking-wider text-shadow-gold">
-                                {milestone.title}
-                              </h4>
-                              {isCompleted ? (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-300 font-mono text-[10.5px] font-black tracking-wide">
-                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                                  GOAL COMPLETED
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500/15 to-amber-600/25 border border-amber-400/40 text-amber-200 font-mono text-[10.5px] font-black tracking-wide shadow-[0_0_10px_rgba(245,158,11,0.15)]">
-                                  <Target className="w-3.5 h-3.5 text-amber-400" />
-                                  TARGET: {milestone.requiredSubscribers} {milestone.requiredSubscribers === 1 ? 'PASS ALLY' : 'PASS ALLIES'}
-                                </span>
-                              )}
+                            <h4 className="font-display font-black text-base text-white tracking-wider text-shadow-gold">
+                              {milestone.title}
+                            </h4>
+
+                            <div className="text-xs font-mono text-gray-400">
+                              Target: <strong className="text-amber-300 font-bold">{milestone.requiredSubscribers} {milestone.requiredSubscribers === 1 ? 'Pass Ally' : 'Pass Allies'}</strong>
                             </div>
 
-                            {/* Reward with SOV and USD */}
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-xs font-sans text-gray-400 font-medium">Reward:</span>
-                              <div className="flex items-center gap-1.5">
-                                <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]" />
-                                <span className="font-mono font-black text-amber-300 text-sm sm:text-base text-shadow-gold">
-                                  +{milestone.rewardSovereigns.toLocaleString()} SOV
-                                </span>
-                                <span className="text-amber-200/90 font-mono font-bold text-xs bg-amber-950/70 border border-amber-500/40 px-2 py-0.5 rounded-md shadow-sm">
-                                  ({usdFormatted})
-                                </span>
-                              </div>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 object-contain shrink-0" />
+                              <span className="font-mono font-black text-amber-300 text-sm sm:text-base">
+                                +{milestone.rewardSovereigns.toLocaleString()} SOV
+                              </span>
+                              <span className="text-gray-400 font-mono text-xs">
+                                ({usdFormatted})
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -957,27 +939,29 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
 
                           {/* Button */}
                           {isClaimed ? (
-                            <div className="px-4 py-2.5 rounded-xl bg-emerald-950/30 border border-emerald-500/30 text-emerald-400 font-display font-bold text-xs tracking-wider flex items-center justify-center gap-1.5 cursor-default shadow-inner">
+                            <div className="h-10 px-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 font-display font-bold text-xs tracking-wider flex items-center justify-center gap-1.5 cursor-default shadow-inner">
                               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                              <span>CLAIMED ({usdFormatted})</span>
+                              <span>CLAIMED</span>
                             </div>
                           ) : canClaim ? (
                             <button
                               onClick={() => handleClaimMilestone(milestone.id)}
                               disabled={isCurrentlyClaiming}
-                              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-200 text-black font-display font-black text-xs tracking-wider uppercase transition-all shadow-[0_0_25px_rgba(245,158,11,0.65)] hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                              className="h-10 px-5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-200 text-black font-display font-black text-xs tracking-wider uppercase transition-all shadow-[0_0_20px_rgba(245,158,11,0.6)] hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                               {isCurrentlyClaiming ? (
                                 <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
                               ) : (
-                                <Sparkles className="w-4 h-4 text-black fill-black" />
+                                <>
+                                  <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 object-contain" />
+                                  <span>CLAIM SOV</span>
+                                </>
                               )}
-                              <span>CLAIM REWARD ({usdFormatted})</span>
                             </button>
                           ) : (
-                            <div className="px-4 py-2.5 rounded-xl bg-black/70 border border-white/10 text-gray-400 font-display font-bold text-xs tracking-wider flex items-center justify-center gap-1.5 cursor-default">
+                            <div className="h-10 px-4 rounded-xl bg-black/70 border border-white/10 text-gray-400 font-display font-bold text-xs tracking-wider flex items-center justify-center gap-1.5 cursor-default">
                               <Lock className="w-3.5 h-3.5 text-gray-500" />
-                              <span>NEED {milestone.requiredSubscribers - actualSubscribedCount} MORE</span>
+                              <span>{milestone.requiredSubscribers - actualSubscribedCount} MORE</span>
                             </div>
                           )}
                         </div>

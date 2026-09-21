@@ -819,59 +819,45 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
           {activeReferralTab === 'milestones' && (
             <div className="space-y-3">
               {/* Mobile Overview Banner */}
-              <div className="relative overflow-hidden rounded-2xl border border-amber-400/40 bg-gradient-to-b from-[#25121b] via-[#160910] to-[#0d0408] p-3.5 shadow-[0_0_25px_rgba(245,158,11,0.15)]">
-                <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2.5">
+              <div className="bg-gradient-to-r from-[#1c0c16] via-[#12070e] to-[#1c0c16] border border-amber-500/30 rounded-2xl p-3.5 space-y-2.5 shadow-lg">
+                <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center shrink-0">
-                      <Trophy className="w-4 h-4 text-amber-300" />
-                    </div>
-                    <div>
-                      <span className="text-[9px] font-mono font-bold text-amber-300 uppercase tracking-wider block leading-none">
-                        ALLIANCE MILESTONES
-                      </span>
-                      <h3 className="text-sm font-display font-black text-white tracking-wide mt-0.5">
-                        PREMIUM RECRUITER
-                      </h3>
-                    </div>
+                    <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
+                    <h3 className="font-display font-black text-xs sm:text-sm text-white tracking-wider">
+                      ALLIANCE MILESTONES
+                    </h3>
                   </div>
 
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-400/15 border border-amber-400/35 text-amber-200 flex items-center gap-1">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 flex items-center gap-1">
                     <Crown className="w-3 h-3 text-amber-400" />
-                    <span>{actualSubscribedCount} Subscribed</span>
+                    {actualSubscribedCount} {actualSubscribedCount === 1 ? 'Pass Ally' : 'Pass Allies'}
                   </span>
                 </div>
 
-                <p className="text-[11px] text-gray-300 font-sans mt-2 leading-relaxed">
+                <p className="text-[11px] text-gray-300 font-sans leading-relaxed">
                   Recruit allies who activate <strong>Premium Pass</strong> or <strong>Ultra Pass</strong>. Claim one-time Blood Sovereign bounties for each milestone reached!
                 </p>
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-3 gap-2 mt-2.5">
-                  <div className="bg-black/60 border border-white/10 rounded-xl p-2 text-center">
+                {/* 3 Compact Stats */}
+                <div className="grid grid-cols-3 gap-2 pt-0.5 text-center">
+                  <div className="bg-black/50 rounded-xl py-1.5 px-2 border border-white/5">
                     <span className="text-[8.5px] font-mono uppercase text-gray-400 block">Subscribed</span>
-                    <span className="text-sm font-mono font-black text-white block mt-0.5">{actualSubscribedCount}</span>
+                    <span className="text-xs sm:text-sm font-mono font-black text-white">{actualSubscribedCount}</span>
                   </div>
-                  <div className="bg-black/60 border border-white/10 rounded-xl p-2 text-center">
-                    <span className="text-[8.5px] font-mono uppercase text-gray-400 block">Unlocked</span>
-                    <span className="text-sm font-mono font-black text-amber-300 block mt-0.5">
-                      {claimedMilestones.length}/{REFERRAL_MILESTONES.length}
-                    </span>
-                  </div>
-                  <div className="bg-black/60 border border-white/10 rounded-xl p-2 text-center">
+                  <div className="bg-black/50 rounded-xl py-1.5 px-2 border border-white/5">
                     <span className="text-[8.5px] font-mono uppercase text-gray-400 block">Claimed</span>
-                    <div className="flex items-center justify-center gap-0.5 mt-0.5">
-                      <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3 h-3 object-contain" />
-                      <span className="text-sm font-mono font-black text-amber-200">
-                        {totalMilestonesClaimedSovereigns.toLocaleString()}
-                      </span>
-                    </div>
+                    <span className="text-xs sm:text-sm font-mono font-black text-amber-300">{claimedMilestones.length}/{REFERRAL_MILESTONES.length}</span>
+                  </div>
+                  <div className="bg-black/50 rounded-xl py-1.5 px-2 border border-white/5">
+                    <span className="text-[8.5px] font-mono uppercase text-gray-400 block">Total Earned</span>
+                    <span className="text-xs sm:text-sm font-mono font-black text-amber-200">+{totalMilestonesClaimedSovereigns.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
 
               {/* Milestones Cards List */}
-              <div className="space-y-3">
-                {REFERRAL_MILESTONES.map((milestone, index) => {
+              <div className="space-y-2.5">
+                {REFERRAL_MILESTONES.map((milestone) => {
                   const isClaimed = claimedMilestones.includes(milestone.id);
                   const isCompleted = actualSubscribedCount >= milestone.requiredSubscribers;
                   const canClaim = isCompleted && !isClaimed;
@@ -882,111 +868,95 @@ export const MobileHeaderHUD: React.FC<MobileHeaderHUDProps> = ({ onNavigateTab 
                   return (
                     <div
                       key={milestone.id}
-                      className={`relative overflow-hidden rounded-2xl border transition-all p-3.5 bg-gradient-to-r from-[#180a13]/95 via-[#10060d]/90 to-[#180a13]/95 ${
+                      className={`rounded-2xl border transition-all p-3 bg-gradient-to-r from-black/85 via-[#13070f]/90 to-black/85 ${
                         isClaimed
-                          ? 'border-emerald-500/25 opacity-75'
+                          ? 'border-white/10 opacity-70'
                           : canClaim
-                          ? `${milestone.borderTheme} ${milestone.glowTheme} ring-1.5 ring-amber-400/50 shadow-lg`
-                          : 'border-white/15'
+                          ? `${milestone.borderTheme} ${milestone.glowTheme} ring-1 ring-amber-400/40`
+                          : 'border-white/10'
                       }`}
                     >
-                      {/* Top highlight glow */}
-                      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-amber-400/35 to-transparent pointer-events-none" />
+                      <div className="flex items-center justify-between gap-3">
+                        {/* Left: Crest Badge */}
+                        <div className={`w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 shadow-md ${milestone.badgeBg}`}>
+                          <img
+                            src={milestone.badgeIcon}
+                            alt={milestone.title}
+                            className="w-8 h-8 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
 
-                      <div className="flex items-center justify-between gap-2.5">
-                        <div className="flex items-center gap-3 min-w-0">
-                          {/* Badge */}
-                          <div className={`relative w-11 h-11 rounded-xl border-2 flex items-center justify-center shrink-0 shadow-md ${milestone.badgeBg}`}>
-                            <img
-                              src={milestone.badgeIcon}
-                              alt={milestone.title}
-                              className="w-7 h-7 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]"
-                              onError={(e) => {
-                                (e.target as HTMLElement).style.display = 'none';
-                              }}
-                            />
-                            <span className="absolute -bottom-1.5 px-1 py-0.2 rounded bg-black/90 border border-white/20 font-mono text-[8px] font-black text-amber-300">
-                              #{index + 1}
-                            </span>
+                        {/* Middle: Details */}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-display font-bold text-xs sm:text-sm text-white truncate">
+                            {milestone.title}
+                          </h4>
+
+                          <div className="text-[10px] font-mono text-gray-400 mt-0.5">
+                            Target: <strong className="text-amber-300 font-bold">{milestone.requiredSubscribers} {milestone.requiredSubscribers === 1 ? 'Pass Ally' : 'Pass Allies'}</strong>
                           </div>
 
-                          <div className="min-w-0 space-y-0.5">
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <h4 className="font-display font-bold text-xs sm:text-sm text-white truncate text-shadow-gold">
-                                {milestone.title}
-                              </h4>
-                              {isCompleted ? (
-                                <span className="inline-flex items-center gap-0.5 text-[8.5px] font-mono font-black px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
-                                  <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
-                                  COMPLETED
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1 text-[8.5px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-amber-500/15 text-amber-300 border border-amber-400/30">
-                                  <Target className="w-2.5 h-2.5 text-amber-400" />
-                                  TARGET: {milestone.requiredSubscribers} {milestone.requiredSubscribers === 1 ? 'PASS ALLY' : 'PASS ALLIES'}
-                                </span>
-                              )}
-                            </div>
-
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                              <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3.5 h-3.5 object-contain drop-shadow-[0_0_4px_rgba(245,158,11,0.8)]" />
-                              <span className="font-mono font-black text-amber-300 text-xs">
-                                +{milestone.rewardSovereigns.toLocaleString()} SOV
-                              </span>
-                              <span className="text-amber-200/90 font-mono font-bold text-[10px] bg-amber-950/60 border border-amber-500/30 px-1.5 py-0.2 rounded">
-                                ({usdFormatted})
-                              </span>
-                            </div>
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3.5 h-3.5 object-contain shrink-0" />
+                            <span className="font-mono font-black text-amber-300 text-xs">
+                              +{milestone.rewardSovereigns.toLocaleString()} SOV
+                            </span>
+                            <span className="text-gray-400 font-mono text-[10.5px]">
+                              ({usdFormatted})
+                            </span>
                           </div>
                         </div>
 
-                        {/* Action / Status Button */}
-                        <div className="shrink-0">
+                        {/* Right: Action Button / Status */}
+                        <div className="shrink-0 flex items-center">
                           {isClaimed ? (
-                            <div className="px-2.5 py-1.5 rounded-lg bg-emerald-950/30 border border-emerald-500/30 text-emerald-400 font-display font-bold text-[10px] tracking-wider flex items-center gap-1">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                            <div className="h-8 px-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 font-display font-bold text-[10px] tracking-wider flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                               <span>CLAIMED</span>
                             </div>
                           ) : canClaim ? (
                             <button
                               onClick={() => handleClaimMilestone(milestone.id)}
                               disabled={isCurrentlyClaiming}
-                              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-black font-display font-black text-[10px] tracking-wider uppercase shadow-[0_0_15px_rgba(245,158,11,0.6)] active:scale-95 cursor-pointer flex items-center gap-1"
+                              className="h-8 px-3.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-200 text-black font-display font-black text-xs tracking-wider uppercase transition-all shadow-[0_0_15px_rgba(245,158,11,0.5)] active:scale-95 cursor-pointer flex items-center gap-1.5"
                             >
                               {isCurrentlyClaiming ? (
-                                <div className="w-3 h-3 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                                <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
                               ) : (
-                                <Sparkles className="w-3 h-3 text-black fill-black" />
+                                <>
+                                  <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-3.5 h-3.5 object-contain" />
+                                  <span>CLAIM</span>
+                                </>
                               )}
-                              <span>CLAIM ({usdFormatted})</span>
                             </button>
                           ) : (
-                            <div className="px-2.5 py-1 rounded-lg bg-black/60 border border-white/10 text-gray-500 font-display font-bold text-[9px] flex items-center gap-1">
+                            <div className="h-7 px-2.5 rounded-lg bg-black/60 border border-white/10 text-gray-400 font-mono text-[10px] flex items-center gap-1">
                               <Lock className="w-2.5 h-2.5 text-gray-500" />
-                              <span>{milestone.requiredSubscribers - actualSubscribedCount} MORE</span>
+                              <span>{milestone.requiredSubscribers - actualSubscribedCount} left</span>
                             </div>
                           )}
                         </div>
                       </div>
 
-                      {/* Progress bar on mobile */}
-                      {!isClaimed && (
-                        <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center gap-2">
-                          <div className="flex-1 h-2 bg-black/90 rounded-full border border-white/15 overflow-hidden p-0.2">
-                            <div
-                              className={`h-full rounded-full transition-all duration-500 ${
-                                isCompleted
-                                  ? 'bg-gradient-to-r from-emerald-500 to-emerald-300 shadow-[0_0_6px_rgba(16,185,129,0.8)]'
-                                  : 'bg-gradient-to-r from-amber-500 to-amber-300 shadow-[0_0_6px_rgba(245,158,11,0.6)]'
-                              }`}
-                              style={{ width: `${progressPct}%` }}
-                            />
-                          </div>
-                          <span className="text-[9px] font-mono text-gray-400 shrink-0">
-                            {Math.min(actualSubscribedCount, milestone.requiredSubscribers)}/{milestone.requiredSubscribers} ({progressPct}%)
-                          </span>
+                      {/* Bottom: Sleek Progress Bar */}
+                      <div className="mt-2 pt-2 border-t border-white/5 flex items-center justify-between gap-2.5">
+                        <div className="flex-1 h-1.5 bg-black/80 rounded-full border border-white/10 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              isCompleted
+                                ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]'
+                                : 'bg-gradient-to-r from-amber-500 to-amber-300'
+                            }`}
+                            style={{ width: `${progressPct}%` }}
+                          />
                         </div>
-                      )}
+                        <span className="text-[9.5px] font-mono text-gray-400 shrink-0">
+                          {Math.min(actualSubscribedCount, milestone.requiredSubscribers)}/{milestone.requiredSubscribers} ({progressPct}%)
+                        </span>
+                      </div>
                     </div>
                   );
                 })}
