@@ -15,6 +15,7 @@ import {
   Swords, 
   Trophy, 
   Scroll, 
+  Award,
   ClipboardPaste,
   ExternalLink,
   Copy,
@@ -209,11 +210,12 @@ export const MobileBankView: React.FC = () => {
     const recordedMailIds = new Set<string>();
 
     // 1. Explicit sovereign transactions if present
-    if (profile.soovereignTransactions && Array.isArray(profile.sovereignTransactions)) {
+    if (profile.sovereignTransactions && Array.isArray(profile.sovereignTransactions)) {
       profile.sovereignTransactions.forEach((tx: any) => {
         if (tx.sovereignsChange > 0) {
           const isLeague = tx.action === 'LEAGUE_ROLLOVER' || tx.description?.toLowerCase().includes('league') || tx.description?.toLowerCase().includes('pvp season');
           const isPvp = tx.action === 'PVP_VICTORY';
+          const isCampaign = tx.action === 'CAMPAIGN_FIRST_CLEAR' || tx.description?.toLowerCase().includes('campaign');
           
           let txTime = typeof tx.timestamp === 'string' ? new Date(tx.timestamp).getTime() : tx.timestamp;
 
@@ -233,11 +235,17 @@ export const MobileBankView: React.FC = () => {
 
           events.push({
             id: tx.id || `stx_${tx.timestamp}`,
-            title: isLeague ? 'League Season Rollover Tribute' : isPvp ? 'PvP Duel Victory Bounty' : 'Imperial Decree Tribute',
+            title: isCampaign 
+              ? 'Abyssal First Clear Bounty' 
+              : isLeague 
+                ? 'League Season Rollover Tribute' 
+                : isPvp 
+                  ? 'PvP Duel Victory Bounty' 
+                  : 'Imperial Decree Tribute',
             description: tx.description || 'Blood Sovereigns earned and deposited',
             amount: tx.sovereignsChange,
             timestamp: txTime,
-            type: isLeague ? 'league' : isPvp ? 'pvp' : 'mail'
+            type: isCampaign ? 'campaign' : isLeague ? 'league' : isPvp ? 'pvp' : 'mail'
           });
         }
       });
@@ -291,6 +299,27 @@ export const MobileBankView: React.FC = () => {
       });
     }
 
+    // 4. Campaign First-Clear fallback if not already in sovereignTransactions
+    if (profile.campaignSovereignsClaimed && Array.isArray(profile.campaignSovereignsClaimed)) {
+      profile.campaignSovereignsClaimed.forEach((floorNum: number) => {
+        const floorStr = `Floor ${floorNum}`;
+        const alreadyLogged = events.some(e => e.description?.includes(floorStr) || e.id?.includes(`camp_${floorNum}`));
+        if (!alreadyLogged) {
+          const sovReward = floorNum % 10 === 0 ? 50 : floorNum % 5 === 0 ? 25 : 0;
+          if (sovReward > 0) {
+            events.push({
+              id: `camp_sov_${floorNum}`,
+              title: 'Abyssal First Clear Bounty',
+              description: `Campaign First Clear - Floor ${floorNum}`,
+              amount: sovReward,
+              timestamp: Date.now(),
+              type: 'campaign'
+            });
+          }
+        }
+      });
+    }
+
     // Deduplicate and sort descending
     const seen = new Set<string>();
     const unique = events.filter(e => {
@@ -300,7 +329,7 @@ export const MobileBankView: React.FC = () => {
     });
 
     return unique.sort((a, b) => b.timestamp - a.timestamp);
-  }, [profile.sovereignTransactions, profile.pvpHistory, profile.mailMessages, subTier]);
+  }, [profile.sovereignTransactions, profile.pvpHistory, profile.mailMessages, profile.campaignSovereignsClaimed, subTier]);
 
   // Statistics: Total incoming & Total paid out
   const totalEarned = useMemo(() => {
@@ -763,6 +792,8 @@ export const MobileBankView: React.FC = () => {
                                 <Swords className="w-3.5 h-3.5 text-amber-400" />
                               ) : evt.type === 'league' ? (
                                 <Trophy className="w-3.5 h-3.5 text-amber-300" />
+                              ) : evt.type === 'campaign' ? (
+                                <Award className="w-3.5 h-3.5 text-amber-300" />
                               ) : (
                                 <Scroll className="w-3.5 h-3.5 text-amber-200" />
                               )}
@@ -783,7 +814,7 @@ export const MobileBankView: React.FC = () => {
 
                         <div className="flex justify-between items-center text-[9.5px] font-mono text-gray-500 pt-1 border-t border-white/5">
                           <span className="uppercase text-[8.5px] tracking-wider text-amber-500/80 font-bold">
-                            {evt.type === 'pvp' ? 'PvP Duel Win' : evt.type === 'league' ? 'League Season Rollover' : 'Imperial Decree'}
+                            {evt.type === 'pvp' ? 'PvP Duel Win' : evt.type === 'league' ? 'League Season Rollover' : evt.type === 'campaign' ? 'Abyssal First Clear' : 'Imperial Decree'}
                           </span>
                           <span>
                             {new Date(evt.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}

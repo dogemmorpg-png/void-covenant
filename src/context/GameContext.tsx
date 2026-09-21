@@ -1546,6 +1546,19 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             updated.campaignSovereignsClaimed.push(floorNum);
             updated.bloodSovereigns = (updated.bloodSovereigns || 0) + firstClearSov;
             rewards.sovereigns = firstClearSov;
+
+            const newTx = {
+              id: `svtx_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+              timestamp: new Date().toISOString(),
+              action: 'CAMPAIGN_FIRST_CLEAR' as const,
+              sovereignsChange: firstClearSov,
+              sovereignsBefore: (updated.bloodSovereigns || 0) - firstClearSov,
+              sovereignsAfter: updated.bloodSovereigns,
+              description: `Campaign First Clear - Floor ${floorNum}`,
+              details: { floor: floorNum },
+              status: 'SUCCESS' as const
+            };
+            updated.sovereignTransactions = [newTx, ...(updated.sovereignTransactions || [])].slice(0, 100);
           }
         }
 

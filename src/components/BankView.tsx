@@ -193,6 +193,27 @@ export const BankView: React.FC = () => {
       });
     }
 
+    // 4. Campaign First-Clear fallback if not already in sovereignTransactions
+    if (profile.campaignSovereignsClaimed && Array.isArray(profile.campaignSovereignsClaimed)) {
+      profile.campaignSovereignsClaimed.forEach((floorNum: number) => {
+        const floorStr = `Floor ${floorNum}`;
+        const alreadyLogged = events.some(e => e.description?.includes(floorStr) || e.id?.includes(`camp_${floorNum}`));
+        if (!alreadyLogged) {
+          const sovReward = floorNum % 10 === 0 ? 50 : floorNum % 5 === 0 ? 25 : 0;
+          if (sovReward > 0) {
+            events.push({
+              id: `camp_sov_${floorNum}`,
+              title: 'Abyssal Floor First Clear Reward',
+              description: `Campaign First Clear - Floor ${floorNum}`,
+              amount: sovReward,
+              timestamp: Date.now(),
+              type: 'campaign'
+            });
+          }
+        }
+      });
+    }
+
     // Deduplicate by ID and sort descending by timestamp
     const seen = new Set<string>();
     const unique = events.filter(e => {
@@ -202,7 +223,7 @@ export const BankView: React.FC = () => {
     });
 
     return unique.sort((a, b) => b.timestamp - a.timestamp);
-  }, [profile.sovereignTransactions, profile.pvpHistory, profile.mailMessages, subTier]);
+  }, [profile.sovereignTransactions, profile.pvpHistory, profile.mailMessages, profile.campaignSovereignsClaimed, subTier]);
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-8 animate-fade-in">
