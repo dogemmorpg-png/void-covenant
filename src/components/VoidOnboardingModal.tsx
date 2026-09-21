@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, X, ArrowRight } from 'lucide-react';
+import { ChevronLeft, X, ArrowRight, Sparkles } from 'lucide-react';
 
 interface VoidOnboardingModalProps {
   isOpen: boolean;
@@ -299,17 +299,33 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
   };
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-xl select-none overflow-hidden">
-      {/* Monolithic Cinematic Card Container */}
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-2 sm:p-4 select-none overflow-hidden">
+      {/* 1. Rich Atmospheric Background with Cosmic Violet/Amber Nebula & Vignette */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <img
+          src="/landing_void_realm.jpg"
+          alt="Void Atmosphere"
+          className="w-full h-full object-cover filter blur-2xl scale-125 opacity-40 brightness-[0.4] contrast-125"
+        />
+        {/* Layered dark fantasy gradients */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/85 to-black/90" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(120,53,140,0.18)_0%,_rgba(10,8,12,0.92)_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(212,175,55,0.1)_0%,_transparent_60%)]" />
+      </div>
+
+      {/* 2. Gothic Monolithic Modal Shell */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: 10 }}
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: 10 }}
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
         transition={{ duration: 0.22, ease: 'easeOut' }}
-        className="relative w-full max-w-md bg-[#0d0a0b] border border-[#d4af37]/40 rounded-3xl shadow-[0_0_60px_rgba(0,0,0,0.95),0_0_30px_rgba(212,175,55,0.2)] overflow-hidden flex flex-col h-auto max-h-[95vh]"
+        className="relative w-full max-w-md bg-gradient-to-b from-[#18121d]/95 via-[#0e0a12]/98 to-[#060408] border-2 border-[#d4af37]/40 rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.95),0_0_40px_rgba(212,175,55,0.2),inset_0_1px_1px_rgba(255,255,255,0.15)] backdrop-blur-2xl overflow-hidden flex flex-col h-auto max-h-[96vh]"
       >
+        {/* Ornate Top Hairline Glow */}
+        <div className="absolute top-0 inset-x-8 h-px bg-gradient-to-r from-transparent via-[#ffd875] to-transparent shadow-[0_0_8px_#ffd875] pointer-events-none" />
+
         {/* Top Story Progress Bars (8 Segments) */}
-        <div className="px-4 pt-3 pb-1.5 flex items-center gap-1 z-20 shrink-0">
+        <div className="px-4 pt-3 pb-1.5 flex items-center gap-1.5 z-20 shrink-0">
           {slides.map((_, idx) => (
             <div
               key={idx}
@@ -317,14 +333,14 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
                 setCurrentSlide(idx);
                 triggerHaptic();
               }}
-              className="h-1 flex-1 rounded-full overflow-hidden bg-white/15 cursor-pointer transition-all"
+              className="h-1 flex-1 rounded-full overflow-hidden bg-white/10 cursor-pointer transition-all border border-white/5"
             >
               <div
                 className={`h-full transition-all duration-300 ${
                   idx < currentSlide
-                    ? 'w-full bg-amber-400'
+                    ? 'w-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.6)]'
                     : idx === currentSlide
-                    ? 'w-full bg-gradient-to-r from-amber-400 to-amber-200 shadow-[0_0_8px_rgba(251,191,36,0.9)]'
+                    ? 'w-full bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.9)]'
                     : 'w-0'
                 }`}
               />
@@ -332,23 +348,27 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
           ))}
         </div>
 
-        {/* Header Bar with Chapter Tag & Skip Button */}
+        {/* Header Bar with Chapter Tag & Stylized Skip Button */}
         <div className="px-4 py-1 flex items-center justify-between z-20 shrink-0">
-          <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-amber-400/90 font-bold">
-            {current.tag} • {current.id}/8
-          </span>
+          <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-[0.2em] text-amber-400 font-bold">
+            <span className="w-1.5 h-1.5 rounded-sm bg-amber-400 rotate-45 inline-block shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
+            <span>{current.tag}</span>
+            <span className="text-zinc-600">•</span>
+            <span className="text-amber-200/90">{current.id}/8</span>
+          </div>
+
           <button
             onClick={onClose}
-            className="text-xs font-mono uppercase text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1 px-2.5 py-0.5 rounded-full hover:bg-white/10"
+            className="text-[10px] font-mono uppercase tracking-wider text-amber-300/80 hover:text-amber-100 transition-colors cursor-pointer flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-950/40 border border-amber-500/25 hover:border-amber-400/50 shadow-sm active:scale-95"
           >
             <span>Skip</span>
-            <X className="w-3.5 h-3.5" />
+            <X className="w-3 h-3" />
           </button>
         </div>
 
-        {/* Upper Half: Full Cinematic Keyart Frame (Zero clipping, glorious artwork) */}
+        {/* Upper Half: Ornate Cinematic Keyart Frame with Corner Accents */}
         <div className="relative w-full px-3.5 pt-1 pb-1 shrink-0 flex items-center justify-center">
-          <div className="relative w-full aspect-[16/9] max-h-[175px] rounded-2xl overflow-hidden border border-[#d4af37]/30 shadow-[0_0_20px_rgba(0,0,0,0.8)] bg-black">
+          <div className="relative w-full aspect-[16/9] max-h-[175px] rounded-2xl overflow-hidden border-2 border-[#d4af37]/40 shadow-[0_0_30px_rgba(0,0,0,0.9),0_0_15px_rgba(212,175,55,0.15)] bg-black">
             <AnimatePresence mode="wait">
               <motion.img
                 key={current.image}
@@ -361,14 +381,21 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
                 className="w-full h-full object-cover object-center brightness-105 contrast-[1.05]"
               />
             </AnimatePresence>
+
             {/* Cinematic dark vignettes */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
-            <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-2xl pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/30 pointer-events-none" />
+            <div className="absolute inset-0 ring-1 ring-inset ring-[#ffd875]/20 rounded-2xl pointer-events-none" />
+
+            {/* Corner Runes */}
+            <span className="absolute top-1.5 left-1.5 w-2 h-2 border-t-2 border-l-2 border-amber-400/70 pointer-events-none" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 border-t-2 border-r-2 border-amber-400/70 pointer-events-none" />
+            <span className="absolute bottom-1.5 left-1.5 w-2 h-2 border-b-2 border-l-2 border-amber-400/70 pointer-events-none" />
+            <span className="absolute bottom-1.5 right-1.5 w-2 h-2 border-b-2 border-r-2 border-amber-400/70 pointer-events-none" />
           </div>
         </div>
 
-        {/* Lower Half: Dark Glass Story Narrative Panel with Formatted Paragraphs */}
-        <div className="p-4 sm:p-5 bg-gradient-to-b from-[#141113] via-[#0c090a] to-black border-t border-white/10 flex flex-col justify-between space-y-3 shrink-0">
+        {/* Lower Half: Dark Glass Story Narrative Panel with Stylized Tablet Blocks */}
+        <div className="p-3.5 sm:p-4 bg-gradient-to-b from-[#18111e]/90 via-[#0e0912]/95 to-[#060408] border-t border-[#d4af37]/25 flex flex-col justify-between space-y-2.5 shrink-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -379,7 +406,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
               className="space-y-2"
             >
               <div>
-                <h2 className="text-base sm:text-lg font-display font-black text-[#ebd09b] tracking-wider uppercase text-shadow-sm">
+                <h2 className="text-base sm:text-lg font-display font-black text-[#f3d38c] tracking-wider uppercase drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
                   {current.title}
                 </h2>
                 <p className="text-[11px] sm:text-xs font-semibold text-zinc-200 leading-snug mt-0.5">
@@ -387,12 +414,17 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
                 </p>
               </div>
 
-              {/* Formatted Paragraphs: 100% full text preserved with clean gold pips and keyword highlights */}
-              <div className="space-y-2 pt-0.5">
+              {/* Stylized Gothic Tablet Blocks */}
+              <div className="space-y-1.5 pt-0.5">
                 {current.paragraphs.map((para, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-left">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0 shadow-[0_0_6px_rgba(251,191,36,0.7)]" />
-                    <p className="text-[11.5px] sm:text-xs leading-relaxed text-zinc-300 font-sans flex-1">
+                  <div
+                    key={idx}
+                    className="relative flex items-start gap-2.5 p-2 sm:p-2.5 rounded-xl bg-gradient-to-r from-amber-950/25 via-[#18121d]/60 to-transparent border-l-2 border-l-amber-400/90 border-y border-r border-amber-500/15 shadow-[0_2px_8px_rgba(0,0,0,0.4)]"
+                  >
+                    <div className="w-4 h-4 rounded bg-amber-950/90 border border-amber-400/60 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_6px_rgba(245,158,11,0.4)]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-300 shadow-[0_0_4px_rgba(251,191,36,0.9)]" />
+                    </div>
+                    <p className="text-[11px] sm:text-[11.5px] leading-relaxed text-zinc-200 font-sans flex-1">
                       {para}
                     </p>
                   </div>
@@ -401,28 +433,26 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
             </motion.div>
           </AnimatePresence>
 
-          {/* Action Buttons Row */}
+          {/* Action Buttons Row with Burnished Metallic Finish */}
           <div className="pt-1 flex items-center gap-2.5">
             {currentSlide > 0 && (
               <button
                 onClick={handlePrev}
-                className="py-3 px-3.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-200 text-xs font-mono font-bold flex items-center justify-center cursor-pointer active:scale-95 transition-all border border-white/10"
+                className="py-3 px-3.5 rounded-xl bg-gradient-to-b from-[#251c27] via-[#1a131c] to-[#100a12] hover:from-[#2e2332] hover:to-[#18111c] text-amber-300 hover:text-amber-100 text-xs font-mono font-bold flex items-center justify-center cursor-pointer active:scale-95 transition-all border border-[#d4af37]/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_8px_rgba(0,0,0,0.6)]"
                 title="Previous Slide"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
               </button>
             )}
 
             <button
               onClick={handleNext}
-              className={`flex-1 py-3.5 px-4 rounded-xl font-display font-black text-xs sm:text-sm tracking-[0.2em] uppercase flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all shadow-lg border ${
-                isFinalSlide
-                  ? 'bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-black border-amber-300 shadow-[0_0_25px_rgba(245,158,11,0.5)]'
-                  : 'bg-gradient-to-r from-[#b3894a] via-[#f3d38c] to-[#b3894a] hover:from-[#c59a58] hover:via-[#fae1a2] hover:to-[#c59a58] text-[#1a0f05] border-[#ebd09b]/70 shadow-[0_0_20px_rgba(212,175,55,0.3)]'
-              }`}
+              className="flex-1 py-3 px-4 rounded-xl font-display font-black text-xs sm:text-sm tracking-[0.22em] uppercase flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all bg-gradient-to-r from-[#8b6528] via-[#e5bf65] to-[#8b6528] hover:from-[#9c7230] hover:via-[#f0cf78] hover:to-[#9c7230] text-[#1c1003] border border-[#f5d78e]/80 shadow-[0_4px_25px_rgba(212,175,55,0.35),inset_0_1px_1px_rgba(255,255,255,0.7),inset_0_-1px_2px_rgba(0,0,0,0.5)]"
             >
-              <span>{isFinalSlide ? 'SEAL THE PACT & ENTER' : 'CONTINUE'}</span>
-              <ArrowRight className="w-4 h-4" />
+              <span className="drop-shadow-[0_1px_0_rgba(255,255,255,0.35)]">
+                {isFinalSlide ? 'SEAL THE PACT & ENTER' : 'CONTINUE'}
+              </span>
+              <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </button>
           </div>
         </div>
