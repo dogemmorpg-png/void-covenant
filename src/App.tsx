@@ -20,6 +20,7 @@ import { Swords, FolderGit, Sparkles, Landmark, Award, Trophy, UserCircle2, Stor
 import { AIRDROP_TASKS } from './data/cards';
 import { LandingPage } from './components/LandingPage';
 import { RegistrationScreen } from './components/RegistrationScreen';
+import { VoidGrimoireModal } from './components/VoidGrimoireModal';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import bs58Pkg from 'bs58';
@@ -115,6 +116,28 @@ function MainAppContent() {
   const handleExitBattle = (isVictory: boolean) => {
     setActiveBattleStage(null);
     setActiveTab(activeBattleType === 'pvp' ? 'pvp' : 'campaign');
+  };
+
+  // Newcomer Void Grimoire Tutorial (shows strictly once right after character registration)
+  const [isGrimoireOpen, setIsGrimoireOpen] = useState(() => {
+    return typeof window !== 'undefined' &&
+      sessionStorage.getItem('void_covenant_just_registered') === 'true' &&
+      localStorage.getItem('void_covenant_grimoire_seen') !== 'true';
+  });
+
+  const handleRegister = async (username: string, avatarUrl: string) => {
+    const res = await registerPlayer(username, avatarUrl);
+    if (res.success) {
+      sessionStorage.setItem('void_covenant_just_registered', 'true');
+      setIsGrimoireOpen(true);
+    }
+    return res;
+  };
+
+  const handleCloseGrimoire = () => {
+    localStorage.setItem('void_covenant_grimoire_seen', 'true');
+    sessionStorage.removeItem('void_covenant_just_registered');
+    setIsGrimoireOpen(false);
   };
 
   const hasUnfinishedTasks = AIRDROP_TASKS.some(task => 
@@ -313,7 +336,7 @@ function MainAppContent() {
     return (
       <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait} disableRotatePrompt={true}>
         <RegistrationScreen 
-          onRegister={(username, avatarUrl) => registerPlayer(username, avatarUrl)} 
+          onRegister={handleRegister} 
         />
       </MobileOrientationGuard>
     );
@@ -326,6 +349,7 @@ function MainAppContent() {
     return (
       <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait} disableRotatePrompt={true}>
         <MobileApp />
+        <VoidGrimoireModal isOpen={isGrimoireOpen} onClose={handleCloseGrimoire} />
       </MobileOrientationGuard>
     );
   }
@@ -541,6 +565,7 @@ function MainAppContent() {
       {isDustShopOpen && (
         <DustShopModal onClose={() => setIsDustShopOpen(false)} />
       )}
+      <VoidGrimoireModal isOpen={isGrimoireOpen} onClose={handleCloseGrimoire} />
     </MobileOrientationGuard>
   );
 }
