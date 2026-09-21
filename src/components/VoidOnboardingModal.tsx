@@ -107,7 +107,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       tag: 'CHAPTER IV • EXPEDITIONS',
       title: 'CAMPAIGN, ENERGY & SWEEPS',
       headline: 'Conquer the abyssal tower and harvest instant spoils.',
-      description: 'Venture through the Campaign floors using PvE Energy, which recharges over time. Formidable Bosses await every 10 floors (Floor 10, 20, 30...) offering high-value first-clear bounties and rare card packs. Master any floor with a perfect 3-Star victory to unlock 1-click Instant Sweeps, allowing you to instantly harvest Gold and EXP without re-fighting!',
+      description: 'Venture through the Campaign floors using PvE Energy, which recharges over time. Formidable Bosses await every 10 floors (Floor 10, 20, 30...) offering high-value first-clear Blood Sovereign bounties. Master any floor with a perfect 3-Star victory to unlock 1-click Instant Sweeps, allowing you to instantly harvest Gold and EXP without re-fighting!',
       image: '/landing_warlord_duel.jpg'
     },
 
@@ -118,8 +118,8 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       id: 6,
       tag: 'CHAPTER V • THE ARENA',
       title: 'DUELS, 12 LEAGUES & SHIELDS',
-      headline: 'Duel living rivals, ascend leagues, and claim Sovereigns.',
-      description: 'Spend PvP Tickets to challenge rival summoners on the Arena. Pass subscribers earn real Blood Sovereigns for every single victory! Accumulate Crowns to climb through 12 competitive tiers from Bronze to Divine. Before you go offline, activate Peace Shields (3h, 6h, 12h) to protect your rating and crowns from retaliatory enemy attacks.',
+      headline: 'Duel living rivals, claim daily league cash rewards, and earn Sovereigns.',
+      description: 'Spend PvP Tickets to challenge rival summoners on the Arena. Pass subscribers earn real Blood Sovereigns for every victory! Ascend through 12 competitive tiers from Bronze to Divine to earn daily cash rewards in Blood Sovereigns based on your league leaderboard rank. Before you go offline, activate Peace Shields (3h, 6h, 12h) to protect your rating and crowns from rival attacks.',
       image: '/landing_tactical_arena.jpg'
     },
 
@@ -131,7 +131,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       tag: 'CHAPTER VI • ECONOMY',
       title: 'THE 4 REALM CURRENCIES',
       headline: 'Harness Gold, Shards, Shadow Dust, and Sovereigns.',
-      description: 'Gold is won in battles to purchase card booster packs. Dark Shards are premium gems used to summon in the Gacha Shrine, buy energy, and unlock passes. Shadow Dust is obtained by disenchanting duplicate cards to ascend your minions up to Divine tier. Blood Sovereigns are real convertible assets (100 SOV = $1.00 USDT) earned through combat and alliances.',
+      description: 'Gold is won in battles to purchase card booster packs, basic equipment, and upgrades. Dark Shards are premium gems used to buy exclusive equipment sets, summon in the Gacha Shrine, buy energy, and unlock passes. Shadow Dust is obtained by disenchanting duplicate cards to ascend minions up to Divine tier. Blood Sovereigns are real convertible assets (100 SOV = $1.00 USDT) earned through combat and alliances.',
       image: '/landing_p2e_treasury.jpg'
     },
 
@@ -143,7 +143,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       tag: 'CHAPTER VII • DESTINY & REWARDS',
       title: 'ALLIANCE & REAL CASHOUTS',
       headline: 'Recruit sworn allies and withdraw your earnings directly.',
-      description: 'Share your invite link to build an Alliance. Earn instant Pass Bounties (+300 to +800 SOV) when invited friends activate a Pass, plus a perpetual 15% share of all Blood Sovereigns they win in Arena battles! Unlock up to 500,000 SOV in milestone rewards. All your Sovereigns accumulate in the Bank for direct on-chain withdrawal to USDT, TON, or Solana (100 SOV = $1.00 USDT).',
+      description: 'Share your invite link to build an Alliance. Earn instant Pass Bounties (+300 SOV for Premium, +600 SOV for Ultra) when invited friends activate a Pass, plus a perpetual 15% share of all Blood Sovereigns they win in Arena battles! Unlock up to 500,000 SOV in milestone rewards. All your Sovereigns accumulate in the Bank for direct on-chain withdrawal to USDT, TON, or Solana (100 SOV = $1.00 USDT).',
       image: '/web3_treasury_vault.jpg'
     }
   ];
