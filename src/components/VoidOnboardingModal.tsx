@@ -341,9 +341,12 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
   };
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-2 sm:p-4 select-none overflow-hidden">
-      {/* 1. Deep Atmospheric Cosmic Void Backdrop */}
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-2 sm:p-4 md:p-6 select-none overflow-hidden">
+      {/* 1. Deep Atmospheric Cosmic Void Backdrop with 100% Opaque Ground */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Solid 100% opaque base to completely shield underlying game UI / Campaign menu */}
+        <div className="absolute inset-0 bg-[#050308]" />
+
         <motion.img
           src="/landing_void_realm.webp"
           alt="Void Atmosphere"
@@ -385,19 +388,19 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
         ))}
       </div>
 
-      {/* 2. Gothic Monolithic Modal Shell */}
+      {/* 2. Gothic Monolithic Modal Shell - Responsively expanded for PC */}
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 12 }}
         transition={{ duration: 0.22, ease: 'easeOut' }}
-        className="relative w-full max-w-md bg-gradient-to-b from-[#17101c]/95 via-[#0e0913]/98 to-[#050307] border-2 border-[#d4af37]/50 rounded-3xl shadow-[0_0_70px_rgba(0,0,0,0.95),0_0_30px_rgba(130,40,180,0.18),inset_0_1px_2px_rgba(255,255,255,0.15)] backdrop-blur-2xl overflow-hidden flex flex-col h-auto max-h-[96vh]"
+        className="relative w-full max-w-md md:max-w-xl lg:max-w-2xl bg-gradient-to-b from-[#17101c]/95 via-[#0e0913]/98 to-[#050307] border-2 border-[#d4af37]/50 rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.95),0_0_40px_rgba(130,40,180,0.2),inset_0_1px_2px_rgba(255,255,255,0.15)] backdrop-blur-2xl overflow-hidden flex flex-col h-auto max-h-[96vh] md:max-h-[90vh]"
       >
         {/* Ornate Top Hairline Glow */}
         <div className="absolute top-0 inset-x-10 h-px bg-gradient-to-r from-transparent via-[#ffd875] to-transparent shadow-[0_0_10px_#ffd875] pointer-events-none" />
 
         {/* Top Story Progress Bars (8 Segments) */}
-        <div className="px-4 pt-3 pb-1.5 flex items-center gap-1.5 z-20 shrink-0">
+        <div className="px-4 md:px-6 pt-3 md:pt-4 pb-1.5 flex items-center gap-1.5 z-20 shrink-0">
           {slides.map((_, idx) => (
             <div
               key={idx}
@@ -405,7 +408,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
                 setCurrentSlide(idx);
                 triggerHaptic();
               }}
-              className="h-1 flex-1 rounded-full overflow-hidden bg-white/10 cursor-pointer transition-all border border-white/5"
+              className="h-1 md:h-1.5 flex-1 rounded-full overflow-hidden bg-white/10 cursor-pointer transition-all border border-white/5"
             >
               <div
                 className={`h-full transition-all duration-300 ${
@@ -421,8 +424,8 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
         </div>
 
         {/* Header Bar with Chapter Tag & Refined Skip Button */}
-        <div className="px-4 py-1 flex items-center justify-between z-20 shrink-0">
-          <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-[0.2em] text-amber-400 font-bold">
+        <div className="px-4 md:px-6 py-1 md:py-1.5 flex items-center justify-between z-20 shrink-0">
+          <div className="flex items-center gap-1.5 text-[10px] md:text-xs font-mono uppercase tracking-[0.2em] text-amber-400 font-bold">
             <span className="w-1.5 h-1.5 rounded-sm bg-amber-400 rotate-45 inline-block shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
             <span>{current.tag}</span>
             <span className="text-zinc-600">•</span>
@@ -431,16 +434,16 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
 
           <button
             onClick={onClose}
-            className="text-[10px] font-mono uppercase tracking-widest text-amber-300/80 hover:text-amber-100 transition-all cursor-pointer flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-b from-[#241728] to-[#120a15] border border-[#d4af37]/40 hover:border-[#ffd875]/80 shadow-[0_2px_8px_rgba(0,0,0,0.6)] active:scale-95"
+            className="text-[10px] md:text-xs font-mono uppercase tracking-widest text-amber-300/80 hover:text-amber-100 transition-all cursor-pointer flex items-center gap-1.5 px-3 md:px-4 py-1 rounded-full bg-gradient-to-b from-[#241728] to-[#120a15] border border-[#d4af37]/40 hover:border-[#ffd875]/80 shadow-[0_2px_8px_rgba(0,0,0,0.6)] active:scale-95"
           >
             <span>Skip</span>
-            <X className="w-3 h-3 stroke-[2.5]" />
+            <X className="w-3 h-3 md:w-3.5 md:h-3.5 stroke-[2.5]" />
           </button>
         </div>
 
         {/* Upper Half: Ornate Keyart Frame with Zero-Lag Pre-Rendered Crossfade */}
-        <div className="relative w-full px-3.5 pt-1 pb-1 shrink-0 flex items-center justify-center">
-          <div className="relative w-full aspect-[16/9] max-h-[175px] rounded-2xl overflow-hidden border-2 border-[#d4af37]/50 shadow-[0_0_25px_rgba(0,0,0,0.9),0_0_12px_rgba(212,175,55,0.2)] bg-[#0a070c]">
+        <div className="relative w-full px-3.5 md:px-6 pt-1 pb-1 shrink-0 flex items-center justify-center">
+          <div className="relative w-full aspect-[16/9] max-h-[175px] md:max-h-[250px] lg:max-h-[270px] rounded-2xl overflow-hidden border-2 border-[#d4af37]/50 shadow-[0_0_25px_rgba(0,0,0,0.9),0_0_12px_rgba(212,175,55,0.2)] bg-[#0a070c]">
             {/* Pre-rendered stacked images: instantaneous zero-latency GPU crossfade */}
             {slides.map((slide, idx) => (
               <img
@@ -470,7 +473,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
         </div>
 
         {/* Lower Half: Dark Glass Story Narrative Panel with Clean Open Paragraphs */}
-        <div className="p-4 sm:p-5 bg-gradient-to-b from-[#141018] via-[#0c080e] to-black border-t border-[#d4af37]/35 shadow-[0_-2px_12px_rgba(0,0,0,0.5)] flex flex-col justify-between space-y-3 shrink-0">
+        <div className="p-4 sm:p-5 md:p-6 bg-gradient-to-b from-[#141018] via-[#0c080e] to-black border-t border-[#d4af37]/35 shadow-[0_-2px_12px_rgba(0,0,0,0.5)] flex flex-col justify-between space-y-3 md:space-y-4 shrink-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -478,23 +481,23 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.16 }}
-              className="space-y-2.5"
+              className="space-y-2.5 md:space-y-3"
             >
               <div>
-                <h2 className="text-base sm:text-lg font-display font-black text-[#ebd09b] tracking-wider uppercase text-shadow-sm">
+                <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-display font-black text-[#ebd09b] tracking-wider uppercase text-shadow-sm">
                   {current.title}
                 </h2>
-                <p className="text-[11px] sm:text-xs font-semibold text-zinc-200 leading-snug mt-0.5">
+                <p className="text-[11px] sm:text-xs md:text-sm font-semibold text-zinc-200 leading-snug mt-0.5 md:mt-1">
                   {current.headline}
                 </p>
               </div>
 
               {/* Formatted Paragraphs: Clean, elegant, unboxed layout with glowing amber pips */}
-              <div className="space-y-2 pt-0.5">
+              <div className="space-y-2 md:space-y-2.5 pt-0.5 md:pt-1">
                 {current.paragraphs.map((para, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-left">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0 shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
-                    <p className="text-[11.5px] sm:text-xs leading-relaxed text-zinc-300 font-sans flex-1">
+                  <div key={idx} className="flex items-start gap-2.5 md:gap-3 text-left">
+                    <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-amber-400 mt-1.5 shrink-0 shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
+                    <p className="text-[11.5px] sm:text-xs md:text-sm leading-relaxed text-zinc-300 font-sans flex-1">
                       {para}
                     </p>
                   </div>
@@ -504,27 +507,27 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
           </AnimatePresence>
 
           {/* Action Buttons Row */}
-          <div className="pt-2 flex items-center gap-2.5">
+          <div className="pt-2 md:pt-3 flex items-center gap-2.5 md:gap-3">
             {currentSlide > 0 && (
               <button
                 onClick={handlePrev}
-                className="h-12 w-12 rounded-xl bg-gradient-to-b from-[#22160d] via-[#160d06] to-[#0a0502] hover:from-[#2d1c10] hover:to-[#120a04] text-[#f3d38c] hover:text-white flex items-center justify-center cursor-pointer active:scale-95 transition-all border border-[#d4af37]/50 hover:border-[#ffd875] shadow-[0_2px_10px_rgba(0,0,0,0.6)] shrink-0"
+                className="h-12 md:h-13 w-12 md:w-13 rounded-xl bg-gradient-to-b from-[#22160d] via-[#160d06] to-[#0a0502] hover:from-[#2d1c10] hover:to-[#120a04] text-[#f3d38c] hover:text-white flex items-center justify-center cursor-pointer active:scale-95 transition-all border border-[#d4af37]/50 hover:border-[#ffd875] shadow-[0_2px_10px_rgba(0,0,0,0.6)] shrink-0"
                 title="Previous Slide"
               >
-                <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
+                <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 stroke-[2.5]" />
               </button>
             )}
 
             <button
               onClick={handleNext}
-              className={`flex-1 h-12 rounded-xl font-sans font-black text-xs sm:text-sm tracking-widest uppercase flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all border shadow-lg ${
+              className={`flex-1 h-12 md:h-13 rounded-xl font-sans font-black text-xs sm:text-sm md:text-base tracking-widest uppercase flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all border shadow-lg ${
                 isFinalSlide
                   ? 'bg-gradient-to-r from-[#b58228] via-[#f0bf4c] to-[#b58228] hover:from-[#c48e2e] hover:via-[#fad066] hover:to-[#c48e2e] text-[#1a0e02] border-[#ffe899] shadow-[0_0_25px_rgba(245,158,11,0.5)]'
                   : 'bg-gradient-to-r from-[#9c7126] via-[#deb049] to-[#9c7126] hover:from-[#ab7d2c] hover:via-[#edc25d] hover:to-[#ab7d2c] text-[#1a0f03] border-[#ffe082]/80 shadow-[0_0_20px_rgba(212,175,55,0.35)]'
               }`}
             >
               <span>{isFinalSlide ? 'SEAL THE PACT' : 'CONTINUE'}</span>
-              <ArrowRight className="w-4 h-4 stroke-[3] shrink-0" />
+              <ArrowRight className="w-4 h-4 md:w-5 md:h-5 stroke-[3] shrink-0" />
             </button>
           </div>
         </div>
