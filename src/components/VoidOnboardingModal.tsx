@@ -7,12 +7,18 @@ interface VoidOnboardingModalProps {
   onClose: () => void;
 }
 
+interface OnboardingPoint {
+  icon: string;
+  label: string;
+  desc: string;
+}
+
 interface OnboardingSlide {
   id: number;
   tag: string;
   title: string;
   headline: string;
-  description: string;
+  points: OnboardingPoint[];
   image: string;
 }
 
@@ -58,9 +64,25 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       id: 1,
       tag: 'PROLOGUE',
       title: 'WELCOME TO VOID COVENANT',
-      headline: 'Enter the dark realm of tactical card duels and real rewards.',
-      description: 'You have awakened in Void Covenant—a dark fantasy card RPG where tactical mastery transforms into tangible glory. As a newly sworn commander, you will summon demonic legions, ascend through treacherous dungeon towers, challenge rival summoners in competitive leagues, and amass real wealth in the Abyss. Your journey begins now!',
-      image: '/landing_void_realm.jpg'
+      headline: 'Awaken, Commander. Your dark conquest begins.',
+      image: '/landing_void_realm.jpg',
+      points: [
+        {
+          icon: '⚔️',
+          label: 'Tactical Card RPG',
+          desc: 'Build a formidable legion where strategic mastery yields real wealth and glory.'
+        },
+        {
+          icon: '🏰',
+          label: 'Abyssal Ascent',
+          desc: 'Vanquish dungeon bosses, conquer competitive leagues, and forge your legacy.'
+        },
+        {
+          icon: '💰',
+          label: 'Real Treasury',
+          desc: 'Amass convertible Blood Sovereigns and withdraw your treasury on-chain.'
+        }
+      ]
     },
 
     // ----------------------------------------------------
@@ -70,9 +92,25 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       id: 2,
       tag: 'CHAPTER I • THE BATTLEFIELD',
       title: 'DECK & 5 BATTLE SLOTS',
-      headline: 'Command a 10-card deck across 5 mirrored combat slots.',
-      description: 'Before battle, assemble your Combat Deck with exactly 10 cards in the CARDS tab. When combat begins, cards cost Mana to summon onto 5 mirrored frontline slots. Creatures strike straight ahead into opposing cards. If an opposing slot stands empty, all attack damage strikes the enemy Hero directly! Reduce the rival Hero’s HP to 0 to claim victory.',
-      image: '/landing_cards_altar.jpg'
+      headline: 'Command 10 cards across 5 mirrored combat slots.',
+      image: '/landing_cards_altar.jpg',
+      points: [
+        {
+          icon: '🎴',
+          label: '10-Card Deck',
+          desc: 'Assemble and customize your battle-ready deck in the CARDS tab.'
+        },
+        {
+          icon: '⚡',
+          label: '5 Frontline Slots',
+          desc: 'Spend Mana to summon minions; they strike straight ahead into opposing cards.'
+        },
+        {
+          icon: '💥',
+          label: 'Direct Hero Damage',
+          desc: 'If an opposing slot stands vacant, all damage strikes the rival Hero directly!'
+        }
+      ]
     },
 
     // ----------------------------------------------------
@@ -81,10 +119,26 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     {
       id: 3,
       tag: 'CHAPTER II • TACTICAL DEFENSES',
-      title: 'DELAY TIMER, ARMOR & BARRIER',
-      headline: 'Patience awakens minions; armor and wards preserve them.',
-      description: 'Summoned minions do not strike immediately upon placement. Each card possesses a Delay timer (1 to 3 turns) that counts down by 1 each round. When Delay reaches 0, the minion attacks every turn! Armor absorbs incoming damage before health is lost, while Divine Barrier nullifies one entire incoming strike without taking damage.',
-      image: '/gameplay_cinematic_duel.jpg'
+      title: 'DELAY TIMER & DEFENSES',
+      headline: 'Timing awakens minions; wards shield them from harm.',
+      image: '/gameplay_cinematic_duel.jpg',
+      points: [
+        {
+          icon: '⏳',
+          label: 'Delay Timer (1–3)',
+          desc: 'Minions count down 1 delay per turn; once at 0, they attack every round.'
+        },
+        {
+          icon: '🛡️',
+          label: 'Armor Absorption',
+          desc: 'Absorbs incoming damage before the minion’s health pool is touched.'
+        },
+        {
+          icon: '🔮',
+          label: 'Divine Barrier',
+          desc: 'Completely blocks 1 full incoming strike without taking any damage.'
+        }
+      ]
     },
 
     // ----------------------------------------------------
@@ -94,9 +148,25 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       id: 4,
       tag: 'CHAPTER III • DARK SORCERY',
       title: 'MINION CURSES & STANCES',
-      headline: 'Cast ancient afflictions and channel your Lord’s aura.',
-      description: 'Minions wield 4 dark curses: Hex (amplifies damage taken by the target), Vampirism (heals the minion upon striking), Plague (deals toxic damage over time), and Sacrifice (destroys an ally to heal your Hero and grant colossal stat buffs). In addition, your Lord channels an active Stance (Void Strike, Blood Aura, or Warlord’s Cry) that can trigger each round. Upgrade them in the TALENTS tab!',
-      image: '/dark_heroes_lore.jpg'
+      headline: 'Weave ancient afflictions and channel your Lord’s aura.',
+      image: '/dark_heroes_lore.jpg',
+      points: [
+        {
+          icon: '🩸',
+          label: '4 Minion Curses',
+          desc: 'Hex (amps damage), Vampirism (heals on hit), Plague (DoT poison), Sacrifice (eats ally for buffs).'
+        },
+        {
+          icon: '⚡',
+          label: '3 Lord Stances',
+          desc: 'Void Strike (damage/leech), Blood Aura (heal/cleanse), and Warlord’s Cry (buffs).'
+        },
+        {
+          icon: '📜',
+          label: 'Talents Tab',
+          desc: 'Allocate talent points to unlock powerful passive commander enhancements.'
+        }
+      ]
     },
 
     // ----------------------------------------------------
@@ -105,10 +175,26 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     {
       id: 5,
       tag: 'CHAPTER IV • EXPEDITIONS',
-      title: 'CAMPAIGN, ENERGY & SWEEPS',
+      title: 'CAMPAIGN & SWEEPS',
       headline: 'Conquer the abyssal tower and harvest instant spoils.',
-      description: 'Venture through the Campaign floors using PvE Energy, which recharges over time. Formidable Bosses await every 10 floors (Floor 10, 20, 30...) offering high-value first-clear Blood Sovereign bounties. Master any floor with a perfect 3-Star victory to unlock 1-click Instant Sweeps, allowing you to instantly harvest Gold and EXP without re-fighting!',
-      image: '/landing_warlord_duel.jpg'
+      image: '/landing_warlord_duel.jpg',
+      points: [
+        {
+          icon: '⚡',
+          label: 'PvE Energy',
+          desc: 'Expeditions consume energy, which automatically recharges over time.'
+        },
+        {
+          icon: '👑',
+          label: 'Boss Floors (10, 20...)',
+          desc: 'Slay dungeon bosses to claim massive first-clear Blood Sovereign bounties.'
+        },
+        {
+          icon: '⭐',
+          label: '3-Star Sweep',
+          desc: 'Master floors with 3 stars to collect instant Gold and EXP in 1 click without re-fighting.'
+        }
+      ]
     },
 
     // ----------------------------------------------------
@@ -117,10 +203,26 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     {
       id: 6,
       tag: 'CHAPTER V • THE ARENA',
-      title: 'DUELS, 12 LEAGUES & SHIELDS',
-      headline: 'Duel living rivals, claim daily league cash rewards, and earn Sovereigns.',
-      description: 'Spend PvP Tickets to challenge rival summoners on the Arena. Pass subscribers earn real Blood Sovereigns for every victory! Ascend through 12 competitive tiers from Bronze to Divine to earn daily cash rewards in Blood Sovereigns based on your league leaderboard rank. Before you go offline, activate Peace Shields (3h, 6h, 12h) to protect your rating and crowns from rival attacks.',
-      image: '/landing_tactical_arena.jpg'
+      title: 'DUELS & LEAGUES',
+      headline: 'Duel living rivals, ascend leagues, and claim daily cash.',
+      image: '/landing_tactical_arena.jpg',
+      points: [
+        {
+          icon: '🎟️',
+          label: 'PvP Tickets',
+          desc: 'Spend daily or bonus tickets to challenge rival summoners in ranked duels.'
+        },
+        {
+          icon: '💰',
+          label: 'Daily League Cash',
+          desc: 'Climb 12 tiers (Bronze to Divine) for daily leaderboard payouts in Blood Sovereigns.'
+        },
+        {
+          icon: '🛡️',
+          label: 'Per-Win SOV & Shields',
+          desc: 'Pass holders earn SOV per victory. Activate Peace Shields (3h, 6h, 12h) to lock rating offline.'
+        }
+      ]
     },
 
     // ----------------------------------------------------
@@ -129,10 +231,26 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     {
       id: 7,
       tag: 'CHAPTER VI • ECONOMY',
-      title: 'THE 4 REALM CURRENCIES',
-      headline: 'Harness Gold, Shards, Shadow Dust, and Sovereigns.',
-      description: 'Gold is won in battles to purchase card booster packs, basic equipment, and upgrades. Dark Shards are premium gems used to buy exclusive equipment sets, summon in the Gacha Shrine, buy energy, and unlock passes. Shadow Dust is obtained by disenchanting duplicate cards to ascend minions up to Divine tier. Blood Sovereigns are real convertible assets (100 SOV = $1.00 USDT) earned through combat and alliances.',
-      image: '/landing_p2e_treasury.jpg'
+      title: 'REALM CURRENCIES',
+      headline: 'Four distinct treasures fuel your supremacy.',
+      image: '/landing_p2e_treasury.jpg',
+      points: [
+        {
+          icon: '🟡',
+          label: 'Gold',
+          desc: 'Won in battles; buys card booster packs, basic equipment, and upgrades.'
+        },
+        {
+          icon: '💠',
+          label: 'Dark Shards',
+          desc: 'Premium gems for Gacha summons, energy refills, passes, and exclusive gear sets.'
+        },
+        {
+          icon: '✨',
+          label: 'Dust & Sovereigns',
+          desc: 'Dust fuses cards up to Divine tier. Sovereigns are real cash (100 SOV = $1.00 USDT).'
+        }
+      ]
     },
 
     // ----------------------------------------------------
@@ -141,10 +259,26 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     {
       id: 8,
       tag: 'CHAPTER VII • DESTINY & REWARDS',
-      title: 'ALLIANCE & REAL CASHOUTS',
+      title: 'ALLIANCE & CASHOUTS',
       headline: 'Recruit sworn allies and withdraw your earnings directly.',
-      description: 'Share your invite link to build an Alliance. Earn instant Pass Bounties (+300 SOV for Premium, +600 SOV for Ultra) when invited friends activate a Pass, plus a perpetual 15% share of all Blood Sovereigns they win in Arena battles! Unlock up to 500,000 SOV in milestone rewards. All your Sovereigns accumulate in the Bank for direct on-chain withdrawal to USDT, TON, or Solana (100 SOV = $1.00 USDT).',
-      image: '/web3_treasury_vault.jpg'
+      image: '/web3_treasury_vault.jpg',
+      points: [
+        {
+          icon: '🎁',
+          label: 'Pass Bounties',
+          desc: 'Instantly receive +300 SOV for Premium or +600 SOV for Ultra pass referrals.'
+        },
+        {
+          icon: '⚔️',
+          label: '15% Battle Share',
+          desc: 'Earn a perpetual 15% share of all Sovereigns your allies win in Arena duels.'
+        },
+        {
+          icon: '🏦',
+          label: 'On-Chain Bank',
+          desc: 'Withdraw your accumulated Blood Sovereigns directly to USDT, TON, or Solana.'
+        }
+      ]
     }
   ];
 
@@ -215,7 +349,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
 
         {/* Upper Half: Full Cinematic Keyart Frame (Zero clipping, glorious artwork) */}
         <div className="relative w-full px-3.5 pt-1 pb-1 shrink-0 flex items-center justify-center">
-          <div className="relative w-full aspect-[16/9] max-h-[190px] rounded-2xl overflow-hidden border border-[#d4af37]/30 shadow-[0_0_20px_rgba(0,0,0,0.8)] bg-black">
+          <div className="relative w-full aspect-[16/9] max-h-[175px] rounded-2xl overflow-hidden border border-[#d4af37]/30 shadow-[0_0_20px_rgba(0,0,0,0.8)] bg-black">
             <AnimatePresence mode="wait">
               <motion.img
                 key={current.image}
@@ -234,7 +368,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
           </div>
         </div>
 
-        {/* Lower Half: Dark Glass Story Narrative Panel */}
+        {/* Lower Half: Dark Glass Story Narrative Panel with Bullet Features */}
         <div className="p-4 sm:p-5 bg-gradient-to-b from-[#141113] via-[#0c090a] to-black border-t border-white/10 flex flex-col justify-between space-y-3 shrink-0">
           <AnimatePresence mode="wait">
             <motion.div
@@ -243,17 +377,33 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.16 }}
-              className="space-y-1.5"
+              className="space-y-2"
             >
-              <h2 className="text-lg sm:text-xl font-display font-black text-[#ebd09b] tracking-wider uppercase text-shadow-sm">
-                {current.title}
-              </h2>
-              <p className="text-xs sm:text-sm font-semibold text-zinc-100 leading-snug">
-                {current.headline}
-              </p>
-              <p className="text-[11.5px] sm:text-xs text-zinc-300 font-sans leading-relaxed">
-                {current.description}
-              </p>
+              <div>
+                <h2 className="text-base sm:text-lg font-display font-black text-[#ebd09b] tracking-wider uppercase text-shadow-sm">
+                  {current.title}
+                </h2>
+                <p className="text-[11px] sm:text-xs font-semibold text-zinc-300 leading-snug mt-0.5">
+                  {current.headline}
+                </p>
+              </div>
+
+              {/* Scannable Feature Bullets (No dense text walls) */}
+              <div className="space-y-1.5 pt-0.5">
+                {current.points.map((pt, idx) => (
+                  <div key={idx} className="flex items-start gap-2 text-left bg-white/[0.03] border border-white/5 rounded-lg p-1.5 px-2">
+                    <span className="text-xs shrink-0 mt-0.5 select-none">{pt.icon}</span>
+                    <div className="text-[10.5px] sm:text-[11px] leading-tight flex-1">
+                      <span className="text-amber-300 font-mono font-bold uppercase tracking-wider mr-1.5">
+                        {pt.label}:
+                      </span>
+                      <span className="text-zinc-300 font-sans">
+                        {pt.desc}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </motion.div>
           </AnimatePresence>
 
@@ -271,7 +421,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
 
             <button
               onClick={handleNext}
-              className={`flex-1 py-3.5 px-4 rounded-xl font-display font-black text-xs sm:text-sm tracking-[0.2em] uppercase flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all shadow-lg border ${
+              className={`flex-1 py-3 px-4 rounded-xl font-display font-black text-xs sm:text-sm tracking-[0.2em] uppercase flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all shadow-lg border ${
                 isFinalSlide
                   ? 'bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-black border-amber-300 shadow-[0_0_25px_rgba(245,158,11,0.5)]'
                   : 'bg-gradient-to-r from-[#b3894a] via-[#f3d38c] to-[#b3894a] hover:from-[#c59a58] hover:via-[#fae1a2] hover:to-[#c59a58] text-[#1a0f05] border-[#ebd09b]/70 shadow-[0_0_20px_rgba(212,175,55,0.3)]'
