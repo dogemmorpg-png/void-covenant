@@ -20,7 +20,7 @@ import { Swords, FolderGit, Sparkles, Landmark, Award, Trophy, UserCircle2, Stor
 import { AIRDROP_TASKS } from './data/cards';
 import { LandingPage } from './components/LandingPage';
 import { RegistrationScreen } from './components/RegistrationScreen';
-import { VoidGrimoireModal } from './components/VoidGrimoireModal';
+import { VoidOnboardingModal } from './components/VoidOnboardingModal';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import bs58Pkg from 'bs58';
@@ -349,7 +349,7 @@ function MainAppContent() {
     return (
       <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait} disableRotatePrompt={true}>
         <MobileApp />
-        <VoidGrimoireModal isOpen={isGrimoireOpen} onClose={handleCloseGrimoire} />
+        <VoidOnboardingModal isOpen={isGrimoireOpen} onClose={handleCloseGrimoire} />
       </MobileOrientationGuard>
     );
   }
@@ -565,7 +565,7 @@ function MainAppContent() {
       {isDustShopOpen && (
         <DustShopModal onClose={() => setIsDustShopOpen(false)} />
       )}
-      <VoidGrimoireModal isOpen={isGrimoireOpen} onClose={handleCloseGrimoire} />
+      <VoidOnboardingModal isOpen={isGrimoireOpen} onClose={handleCloseGrimoire} />
     </MobileOrientationGuard>
   );
 }
