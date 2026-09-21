@@ -847,7 +847,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
               </div>
 
               {/* True In-Game Ways to Earn Blood Sovereigns */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2 hover:border-amber-500/40 transition-all">
+                  <div className="flex items-center gap-2">
+                    <img src="/icons/badge_crown_v1.png" alt="Campaign" className="w-6 h-6 object-contain" />
+                    <span className="text-xs font-mono text-amber-300 font-bold uppercase">Abyssal Milestones</span>
+                  </div>
+                  <p className="text-xs text-gray-400 font-sans leading-relaxed">Conquer milestone floors (every 5th & 10th depth) in the Abyss to claim instant first-clear rewards of 25 to 50 Sovereigns.</p>
+                </div>
+
                 <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2 hover:border-amber-500/40 transition-all">
                   <div className="flex items-center gap-2">
                     <img src="/icons/league_divine.png" alt="Leagues" className="w-6 h-6 object-contain" />
