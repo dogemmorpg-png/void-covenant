@@ -13,7 +13,6 @@ interface OnboardingSlide {
   title: string;
   headline: string;
   description: string;
-  highlightText?: string;
   visual: React.ReactNode;
 }
 
@@ -57,75 +56,86 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     // ----------------------------------------------------
     {
       id: 1,
-      tag: 'BATTLEFIELD ARCHITECTURE',
-      title: '5 LINEAR SLOTS',
-      headline: 'Creatures strike strictly straight ahead.',
-      description: 'The battlefield features 5 mirror slots on each side. Your minion attacks the enemy card directly opposite in the same slot. If that slot is vacant, all attack damage strikes the opposing Hero directly! Reduce enemy HP to 0 to claim victory.',
-      highlightText: 'Empty Opposite Slot = Direct Hero Damage',
+      tag: 'BATTLEFIELD RULES',
+      title: '5 LINEAR COMBAT SLOTS',
+      headline: 'Cards clash directly with the slot opposite them.',
+      description: 'The battlefield consists of 5 mirror slots. Each card attacks straight ahead into the opposing creature. If the slot opposite your minion is empty, all damage strikes the opposing Hero directly! Reduce enemy HP to 0 to win.',
       visual: (
-        <div className="w-full max-w-[320px] space-y-2 relative z-10 py-1">
-          {/* Enemy Frontline */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-[11px] font-mono font-bold text-rose-400 px-1">
+        <div className="w-full max-w-[310px] flex flex-col items-center justify-center space-y-1.5 py-1">
+          {/* Enemy Row */}
+          <div className="w-full">
+            <div className="flex items-center justify-between text-[10px] font-mono font-bold text-rose-400 px-1 mb-1">
               <span>ENEMY FRONTLINE</span>
-              <span className="text-zinc-300">HP: 100</span>
+              <span className="text-zinc-400">HERO HP: 100</span>
             </div>
-            <div className="grid grid-cols-5 gap-1.5">
+            <div className="grid grid-cols-5 gap-1.5 w-full">
               {[1, 2, 3, 4, 5].map((slot) => (
                 <div
                   key={slot}
-                  className={`aspect-[3/4] rounded-xl border flex flex-col items-center justify-center relative transition-all ${
+                  className={`aspect-[3/4] rounded-lg border flex flex-col items-center justify-between p-1 transition-all ${
                     slot === 3
-                      ? 'border-rose-500/90 bg-rose-950/50 shadow-[0_0_12px_rgba(244,63,94,0.4)]'
+                      ? 'border-rose-500 bg-rose-950/60 shadow-[0_0_12px_rgba(244,63,94,0.5)]'
                       : 'border-zinc-800 bg-black/60'
                   }`}
                 >
-                  <span className="text-[9px] font-mono text-zinc-400 font-bold">#{slot}</span>
-                  <div className="w-6 h-6 rounded-lg bg-black/70 border border-rose-500/40 flex items-center justify-center mt-0.5 overflow-hidden p-0.5">
+                  <span className="text-[8px] font-mono text-zinc-400 font-bold">#{slot}</span>
+                  <div className="w-6 h-6 rounded-md overflow-hidden bg-black/80 border border-zinc-700 flex items-center justify-center">
                     <img 
-                      src={slot === 3 ? '/icons/icon_boss.webp' : '/icons/icon_mob.webp'} 
-                      alt="Enemy" 
-                      className="w-full h-full object-contain" 
+                      src={slot === 3 ? '/cards/banshee.webp' : '/cards/blood_imp.webp'} 
+                      alt="Enemy Card" 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/avatars/lich.webp';
+                      }}
                     />
                   </div>
+                  <span className="text-[8px] font-mono text-rose-300 font-bold">{slot === 3 ? '12 ATK' : 'EMPTY'}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Clash Direction Indicator */}
-          <div className="flex items-center justify-center gap-2 py-0.5">
+          <div className="flex items-center justify-center gap-2 py-0.5 w-full">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
-            <div className="flex items-center gap-2 px-3 py-0.5 rounded-full bg-amber-950/80 border border-amber-500/50 text-amber-300 font-mono text-[9px] font-bold shadow-sm">
+            <div className="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-950/90 border border-amber-500/50 text-amber-300 font-mono text-[9px] font-bold shadow-sm">
               <img src="/icons/gothic_attack.webp" alt="Attack" className="w-3 h-3 object-contain" />
-              <span>MIRROR DUEL (OPPOSITE SLOT)</span>
+              <span>DIRECT OPPOSITE DUEL</span>
               <img src="/icons/gothic_attack.webp" alt="Attack" className="w-3 h-3 object-contain" />
             </div>
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
           </div>
 
-          {/* Player Frontline */}
-          <div className="space-y-1">
-            <div className="grid grid-cols-5 gap-1.5">
+          {/* Player Row */}
+          <div className="w-full">
+            <div className="grid grid-cols-5 gap-1.5 w-full">
               {[1, 2, 3, 4, 5].map((slot) => (
                 <div
                   key={slot}
-                  className={`aspect-[3/4] rounded-xl border flex flex-col items-center justify-center relative transition-all ${
+                  className={`aspect-[3/4] rounded-lg border flex flex-col items-center justify-between p-1 transition-all ${
                     slot === 3
-                      ? 'border-cyan-400 bg-cyan-950/50 shadow-[0_0_12px_rgba(34,211,238,0.5)] ring-1 ring-cyan-400/60'
-                      : 'border-cyan-900/50 bg-cyan-950/20'
+                      ? 'border-cyan-400 bg-cyan-950/60 shadow-[0_0_12px_rgba(34,211,238,0.5)] ring-1 ring-cyan-400/50'
+                      : 'border-cyan-900/40 bg-cyan-950/20'
                   }`}
                 >
-                  <div className="w-6 h-6 rounded-lg bg-black/70 border border-cyan-400/40 flex items-center justify-center mb-0.5 overflow-hidden p-0.5">
-                    <img src="/avatars/knight.webp" alt="Hero minion" className="w-full h-full object-contain" />
+                  <span className="text-[8px] font-mono text-cyan-300 font-bold">#{slot}</span>
+                  <div className="w-6 h-6 rounded-md overflow-hidden bg-black/80 border border-cyan-500/50 flex items-center justify-center">
+                    <img 
+                      src={slot === 3 ? '/cards/avatar_knight.webp' : '/cards/covenant_initiate.webp'} 
+                      alt="Allied Card" 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/avatars/knight.webp';
+                      }}
+                    />
                   </div>
-                  <span className="text-[9px] font-mono text-cyan-300 font-bold">#{slot}</span>
+                  <span className="text-[8px] font-mono text-cyan-300 font-bold">{slot === 3 ? '14 ATK' : 'READY'}</span>
                 </div>
               ))}
             </div>
-            <div className="flex items-center justify-between text-[11px] font-mono font-bold text-cyan-400 px-1">
+            <div className="flex items-center justify-between text-[10px] font-mono font-bold text-cyan-400 px-1 mt-1">
               <span>YOUR BATTLE LINE</span>
-              <span className="text-zinc-300">MANA EXPANDS EACH TURN</span>
+              <span className="text-zinc-400">MANA EXPANDS +1/TURN</span>
             </div>
           </div>
         </div>
@@ -133,34 +143,33 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     },
 
     // ----------------------------------------------------
-    // SLIDE 2: DELAY & DEFENSE
+    // SLIDE 2: DELAY TIMER, ARMOR & BARRIER
     // ----------------------------------------------------
     {
       id: 2,
-      tag: 'COMBAT MECHANICS',
-      title: 'DELAY & DEFENSE',
+      tag: 'CARD ANATOMY & DEFENSE',
+      title: 'DELAY TIMER & DEFENSES',
       headline: 'Cards awaken over time. Defenses mitigate damage.',
-      description: 'Cards do not attack immediately upon summon. Each card has a Delay timer (1–3 turns) that drops by 1 every round. When Delay reaches 0, the card attacks every turn! Armor absorbs incoming damage, while Divine Barrier completely negates 1 full strike.',
-      highlightText: 'Delay counts down to 0 • Armor absorbs • Barrier negates 1 hit',
+      description: 'Summoned creatures do not attack right away. Each card has a Delay timer (1–3 turns) that counts down by 1 every round. When Delay reaches 0, the card attacks every turn! Armor absorbs incoming damage before health is lost, and Divine Barrier nullifies 1 full incoming strike.',
       visual: (
         <div className="flex items-center justify-center gap-4 py-1">
-          {/* Card Presentation */}
-          <div className="relative w-36 sm:w-40 aspect-[5/7] rounded-2xl border-2 border-amber-500/80 bg-gradient-to-b from-[#1c1427] via-[#100c18] to-black p-2 flex flex-col justify-between shadow-[0_0_25px_rgba(168,85,247,0.4)]">
+          {/* Card Presentation with Crisp Stat Badges */}
+          <div className="relative w-36 sm:w-40 aspect-[5/7] rounded-xl border-2 border-amber-500/80 bg-gradient-to-b from-[#1c1427] via-[#100c18] to-black p-2 flex flex-col justify-between shadow-[0_0_25px_rgba(168,85,247,0.4)]">
             <div className="flex items-center justify-between">
-              <div className="w-6 h-6 rounded-lg bg-cyan-950 border border-cyan-400 flex items-center justify-center shadow-sm">
+              <div className="w-5 h-5 rounded-md bg-cyan-950 border border-cyan-400 flex items-center justify-center shadow-sm">
                 <span className="text-white text-[10px] font-black font-mono">2</span>
               </div>
-              <span className="text-[10px] font-display font-black text-amber-200 tracking-wider uppercase">
-                ABYSSAL REAPER
+              <span className="text-[9.5px] font-display font-black text-amber-200 tracking-wider uppercase truncate max-w-[90px]">
+                ABYSS REAPER
               </span>
-              <span className="text-[9px] font-mono text-purple-300 font-bold">GOLD</span>
+              <span className="text-[8.5px] font-mono text-purple-300 font-bold">GOLD</span>
             </div>
 
-            <div className="relative flex-1 my-1.5 rounded-xl overflow-hidden border border-purple-500/40 bg-black/70 flex items-center justify-center">
+            <div className="relative flex-1 my-1.5 rounded-lg overflow-hidden border border-purple-500/40 bg-black/70 flex items-center justify-center">
               <img 
                 src="/cards/abyss_reaper.webp" 
                 alt="Reaper" 
-                className="w-full h-full object-cover brightness-105"
+                className="w-full h-full object-cover"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/avatars/knight.webp';
                 }}
@@ -168,41 +177,41 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
             </div>
 
             {/* Attack, Delay, Health Tokens */}
-            <div className="grid grid-cols-3 gap-1 pt-0.5">
-              <div className="flex items-center justify-center gap-1 py-1 rounded-lg bg-red-950/90 border border-red-500/50">
-                <img src="/icons/gothic_attack.webp" alt="Attack" className="w-3.5 h-3.5 object-contain" />
-                <span className="text-white text-xs font-black font-mono">14</span>
+            <div className="grid grid-cols-3 gap-1">
+              <div className="flex items-center justify-center gap-1 py-1 rounded bg-red-950 border border-red-500/60" title="Attack Power">
+                <img src="/icons/gothic_attack.webp" alt="ATK" className="w-3.5 h-3.5 object-contain" />
+                <span className="text-white text-[11px] font-black font-mono">14</span>
               </div>
 
-              <div className="flex items-center justify-center gap-1 py-1 rounded-lg bg-amber-950 border border-amber-400/80 shadow-[0_0_8px_rgba(245,158,11,0.6)]">
+              <div className="flex items-center justify-center gap-1 py-1 rounded bg-amber-950 border border-amber-400/80 shadow-[0_0_8px_rgba(245,158,11,0.5)]" title="Turn Delay">
                 <img src="/icons/gothic_hourglass.webp" alt="Delay" className="w-3.5 h-3.5 object-contain" />
-                <span className="text-amber-300 text-xs font-black font-mono">1</span>
+                <span className="text-amber-300 text-[11px] font-black font-mono">1</span>
               </div>
 
-              <div className="flex items-center justify-center gap-1 py-1 rounded-lg bg-emerald-950/90 border border-emerald-500/50">
-                <img src="/icons/gothic_health.webp" alt="Health" className="w-3.5 h-3.5 object-contain" />
-                <span className="text-white text-xs font-black font-mono">22</span>
+              <div className="flex items-center justify-center gap-1 py-1 rounded bg-emerald-950 border border-emerald-500/60" title="Health Points">
+                <img src="/icons/gothic_health.webp" alt="HP" className="w-3.5 h-3.5 object-contain" />
+                <span className="text-white text-[11px] font-black font-mono">22</span>
               </div>
             </div>
           </div>
 
-          {/* Defense Badges Column */}
-          <div className="flex flex-col gap-2">
-            <div className="p-2.5 rounded-xl bg-sky-950/50 border border-sky-500/40 flex items-center gap-2.5 max-w-[150px]">
-              <img src="/icons/gothic_armor.webp" alt="Armor" className="w-7 h-7 object-contain shrink-0" />
+          {/* Defenses Showcase */}
+          <div className="flex flex-col gap-2.5">
+            <div className="p-2.5 rounded-xl bg-sky-950/60 border border-sky-500/50 flex items-center gap-3 w-40">
+              <img src="/icons/gothic_armor.webp" alt="Armor" className="w-8 h-8 object-contain shrink-0 drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
               <div>
                 <span className="text-xs font-mono font-bold text-sky-300 block">ARMOR</span>
-                <span className="text-[10px] font-mono text-zinc-300 block">Absorbs hits</span>
+                <span className="text-[10px] font-mono text-zinc-300 block">Absorbs incoming hits</span>
               </div>
             </div>
 
-            <div className="p-2.5 rounded-xl bg-amber-950/50 border border-amber-500/40 flex items-center gap-2.5 max-w-[150px]">
-              <div className="w-7 h-7 rounded-lg bg-amber-900/60 border border-amber-400/60 flex items-center justify-center shrink-0">
-                <span className="text-amber-300 text-xs font-bold font-mono">100%</span>
+            <div className="p-2.5 rounded-xl bg-amber-950/60 border border-amber-500/50 flex items-center gap-3 w-40">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-b from-amber-600 to-amber-900 border border-amber-300 flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(251,191,36,0.6)]">
+                <img src="/icons/gothic_armor.webp" alt="Barrier" className="w-5 h-5 object-contain brightness-200 contrast-200" />
               </div>
               <div>
-                <span className="text-xs font-mono font-bold text-amber-300 block">BARRIER</span>
-                <span className="text-[10px] font-mono text-zinc-300 block">Negates 1 hit</span>
+                <span className="text-xs font-mono font-bold text-amber-300 block">DIVINE BARRIER</span>
+                <span className="text-[10px] font-mono text-zinc-300 block">Blocks 1 full strike</span>
               </div>
             </div>
           </div>
@@ -215,42 +224,41 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     // ----------------------------------------------------
     {
       id: 3,
-      tag: 'CREATURE ABILITIES',
+      tag: 'CREATURE AFFLICTIONS',
       title: 'DARK ARTS (SKILLS)',
-      headline: '4 Curses govern the battlefield.',
-      description: 'Hex amps all incoming damage on the target. Vampirism heals your Hero for a portion of damage dealt. Plague inflicts toxic damage at the end of every turn. Sacrifice devours an allied minion on entry to grant massive ATK/HP buffs!',
-      highlightText: 'Hex • Vampirism • Plague • Sacrifice',
+      headline: '4 Ancient curses woven into battle minions.',
+      description: 'Hex amplifies all damage the cursed target suffers. Vampirism restores health to your Lord on each attack. Plague inflicts toxic decay at the end of each round. Sacrifice devours an ally when summoned to heal the Hero and permanently boost Attack and Health!',
       visual: (
         <div className="w-full max-w-[320px] grid grid-cols-2 gap-2.5 py-1">
-          <div className="p-2.5 rounded-2xl bg-purple-950/50 border border-purple-500/40 flex items-center gap-2.5">
+          <div className="p-2.5 rounded-xl bg-purple-950/50 border border-purple-500/40 flex items-center gap-2.5">
             <img src="/icons/icon_hex.webp" alt="Hex" className="w-8 h-8 object-contain shrink-0 drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
             <div>
               <span className="text-xs font-mono font-bold text-purple-300 block">HEX</span>
-              <span className="text-[10px] font-mono text-zinc-200 block mt-0.5">Amps damage</span>
+              <span className="text-[10px] font-mono text-zinc-200 block">Amps incoming damage</span>
             </div>
           </div>
 
-          <div className="p-2.5 rounded-2xl bg-red-950/50 border border-red-500/40 flex items-center gap-2.5">
+          <div className="p-2.5 rounded-xl bg-red-950/50 border border-red-500/40 flex items-center gap-2.5">
             <img src="/icons/icon_vampirism.webp" alt="Vampirism" className="w-8 h-8 object-contain shrink-0 drop-shadow-[0_0_8px_rgba(239,68,68,0.7)]" />
             <div>
               <span className="text-xs font-mono font-bold text-red-300 block">VAMPIRISM</span>
-              <span className="text-[10px] font-mono text-zinc-200 block mt-0.5">Heals Hero</span>
+              <span className="text-[10px] font-mono text-zinc-200 block">Heals Hero on hit</span>
             </div>
           </div>
 
-          <div className="p-2.5 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 flex items-center gap-2.5">
+          <div className="p-2.5 rounded-xl bg-emerald-950/50 border border-emerald-500/40 flex items-center gap-2.5">
             <img src="/icons/icon_plague.webp" alt="Plague" className="w-8 h-8 object-contain shrink-0 drop-shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
             <div>
               <span className="text-xs font-mono font-bold text-emerald-300 block">PLAGUE</span>
-              <span className="text-[10px] font-mono text-zinc-200 block mt-0.5">Poison damage</span>
+              <span className="text-[10px] font-mono text-zinc-200 block">Toxic damage / turn</span>
             </div>
           </div>
 
-          <div className="p-2.5 rounded-2xl bg-amber-950/50 border border-amber-500/40 flex items-center gap-2.5">
+          <div className="p-2.5 rounded-xl bg-amber-950/50 border border-amber-500/40 flex items-center gap-2.5">
             <img src="/icons/icon_sacrifice.webp" alt="Sacrifice" className="w-8 h-8 object-contain shrink-0 drop-shadow-[0_0_8px_rgba(245,158,11,0.7)]" />
             <div>
               <span className="text-xs font-mono font-bold text-amber-300 block">SACRIFICE</span>
-              <span className="text-[10px] font-mono text-zinc-200 block mt-0.5">Devours ally</span>
+              <span className="text-[10px] font-mono text-zinc-200 block">Eats ally for buffs</span>
             </div>
           </div>
         </div>
@@ -262,32 +270,31 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
     // ----------------------------------------------------
     {
       id: 4,
-      tag: 'COMMANDER ARTS',
+      tag: 'COMMANDER AURAS',
       title: 'STANCES & TALENTS',
-      headline: 'Your Lord’s stance has a chance to trigger each round.',
-      description: 'In combat, your Lord commands an active Stance with a chance to trigger each turn: Void Strike unleashes direct damage and siphon; Blood Aura heals the lowest-HP minion and purges Hex; Warlord’s Cry grants Attack and Armor. Allocate Talent Points in the TALENTS tab to empower them!',
-      highlightText: 'Void Strike • Blood Aura • Warlord’s Cry',
+      headline: 'Active commander auras trigger in combat.',
+      description: 'Your Lord commands an active Stance that has a chance to trigger each round: Void Strike unleashes direct lightning damage with siphon; Blood Aura heals the lowest-HP minion and cleanses Hex; Warlord’s Cry buffs Attack and Armor. Allocate Talent Points in the TALENTS tab to unlock passive upgrades!',
       visual: (
-        <div className="w-full max-w-[320px] flex items-center justify-between gap-2 py-1">
+        <div className="w-full max-w-[320px] flex items-center justify-between gap-2.5 py-1">
           {/* Void Strike */}
-          <div className="flex-1 p-2 rounded-2xl bg-purple-950/40 border border-purple-500/40 flex flex-col items-center text-center">
-            <img src="/icons/void_strike_fx.webp" alt="Void Strike" className="w-12 h-12 object-contain rounded-xl drop-shadow-[0_0_10px_rgba(168,85,247,0.7)] mb-1" />
+          <div className="flex-1 p-2 rounded-xl bg-purple-950/50 border border-purple-500/40 flex flex-col items-center text-center">
+            <img src="/icons/void_strike_fx.webp" alt="Void Strike" className="w-11 h-11 object-contain rounded-lg drop-shadow-[0_0_10px_rgba(168,85,247,0.7)] mb-1" />
             <span className="text-[11px] font-mono font-bold text-purple-300 block">VOID STRIKE</span>
-            <span className="text-[9.5px] font-mono text-zinc-300 mt-0.5">Damage & Leech</span>
+            <span className="text-[9.5px] font-mono text-zinc-300">Damage & Leech</span>
           </div>
 
           {/* Blood Aura */}
-          <div className="flex-1 p-2 rounded-2xl bg-rose-950/40 border border-rose-500/40 flex flex-col items-center text-center">
-            <img src="/icons/blood_aura_fx.webp" alt="Blood Aura" className="w-12 h-12 object-contain rounded-xl drop-shadow-[0_0_10px_rgba(244,63,94,0.7)] mb-1" />
+          <div className="flex-1 p-2 rounded-xl bg-rose-950/50 border border-rose-500/40 flex flex-col items-center text-center">
+            <img src="/icons/blood_aura_fx.webp" alt="Blood Aura" className="w-11 h-11 object-contain rounded-lg drop-shadow-[0_0_10px_rgba(244,63,94,0.7)] mb-1" />
             <span className="text-[11px] font-mono font-bold text-rose-300 block">BLOOD AURA</span>
-            <span className="text-[9.5px] font-mono text-zinc-300 mt-0.5">Heal & Cleanse</span>
+            <span className="text-[9.5px] font-mono text-zinc-300">Heal & Cleanse</span>
           </div>
 
           {/* Warlord's Cry */}
-          <div className="flex-1 p-2 rounded-2xl bg-amber-950/40 border border-amber-500/40 flex flex-col items-center text-center">
-            <img src="/icons/warlord_cry_fx.webp" alt="Warlord Cry" className="w-12 h-12 object-contain rounded-xl drop-shadow-[0_0_10px_rgba(245,158,11,0.7)] mb-1" />
+          <div className="flex-1 p-2 rounded-xl bg-amber-950/50 border border-amber-500/40 flex flex-col items-center text-center">
+            <img src="/icons/warlord_cry_fx.webp" alt="Warlords Cry" className="w-11 h-11 object-contain rounded-lg drop-shadow-[0_0_10px_rgba(245,158,11,0.7)] mb-1" />
             <span className="text-[11px] font-mono font-bold text-amber-300 block">WARLORD</span>
-            <span className="text-[9.5px] font-mono text-zinc-300 mt-0.5">ATK & Armor</span>
+            <span className="text-[9.5px] font-mono text-zinc-300">ATK & Armor</span>
           </div>
         </div>
       )
@@ -301,29 +308,32 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       tag: 'TOWER EXPEDITIONS',
       title: 'THE CAMPAIGN & SWEEP',
       headline: '10 cards in deck. Bosses every 10 floors.',
-      description: 'Your Combat Deck must hold exactly 10 cards to fight. Battles consume PvE Energy, which recharges over time. Bosses await every 10 floors with first-clear bounties! Clear any floor with 3 Stars to unlock 1-click Instant Sweeps.',
-      highlightText: '10 Cards in Deck • Bosses on Floor 10, 20, 30... • Instant Sweep',
+      description: 'Your Combat Deck must hold exactly 10 cards to enter battle. Expeditions consume PvE Energy, which recharges over time. Bosses guard floors 10, 20, 30... yielding first-clear Sovereign bounties! Clear any floor with 3 Stars to unlock 1-click Instant Sweeps without fighting.',
       visual: (
         <div className="w-full max-w-[320px] flex items-center justify-between gap-2.5 py-1">
           {/* Boss Encounter */}
-          <div className="flex-1 p-2.5 rounded-2xl bg-red-950/50 border border-red-500/50 flex flex-col items-center text-center">
-            <img src="/icons/icon_boss.webp" alt="Boss" className="w-12 h-12 object-contain drop-shadow-[0_0_10px_rgba(239,68,68,0.7)] mb-1" />
-            <span className="text-[11px] font-mono font-bold text-red-400 block">FLOOR 10 • 20 • 30</span>
-            <span className="text-[9.5px] font-mono text-zinc-200 mt-0.5">Boss Bounties</span>
+          <div className="flex-1 p-2.5 rounded-xl bg-red-950/60 border border-red-500/60 flex flex-col items-center text-center">
+            <div className="w-11 h-11 rounded-lg overflow-hidden border border-red-400 bg-black mb-1">
+              <img src="/cards/beelzebub_lord_of_flies.webp" alt="Boss" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = '/avatars/lich.webp'; }} />
+            </div>
+            <span className="text-[10.5px] font-mono font-bold text-red-400 block">FLOORS 10, 20...</span>
+            <span className="text-[9px] font-mono text-zinc-300">Boss Bounties</span>
           </div>
 
           {/* PvE Energy */}
-          <div className="flex-1 p-2.5 rounded-2xl bg-amber-950/40 border border-amber-500/40 flex flex-col items-center text-center">
-            <img src="/icons/icon_energy.webp" alt="Energy" className="w-12 h-12 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] mb-1" />
-            <span className="text-[11px] font-mono font-bold text-amber-300 block">PvE ENERGY</span>
-            <span className="text-[9.5px] font-mono text-zinc-200 mt-0.5">Recharges over time</span>
+          <div className="flex-1 p-2.5 rounded-xl bg-amber-950/50 border border-amber-500/50 flex flex-col items-center text-center">
+            <img src="/icons/icon_energy.webp" alt="Energy" className="w-11 h-11 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.6)] mb-1" />
+            <span className="text-[10.5px] font-mono font-bold text-amber-300 block">PvE ENERGY</span>
+            <span className="text-[9px] font-mono text-zinc-300">Recharges over time</span>
           </div>
 
           {/* 3-Star Sweep */}
-          <div className="flex-1 p-2.5 rounded-2xl bg-yellow-950/40 border border-yellow-500/40 flex flex-col items-center text-center">
-            <img src="/icons/icon_exp.webp" alt="Sweep" className="w-12 h-12 object-contain drop-shadow-[0_0_8px_rgba(234,179,8,0.5)] mb-1" />
-            <span className="text-[11px] font-mono font-bold text-yellow-300 block">3-STAR SWEEP</span>
-            <span className="text-[9.5px] font-mono text-zinc-200 mt-0.5">Instant 1-click loot</span>
+          <div className="flex-1 p-2.5 rounded-xl bg-yellow-950/50 border border-yellow-500/50 flex flex-col items-center text-center">
+            <div className="w-11 h-11 flex items-center justify-center gap-0.5 text-amber-400 text-sm mb-1">
+              <span>⭐</span><span>⭐</span><span>⭐</span>
+            </div>
+            <span className="text-[10.5px] font-mono font-bold text-yellow-300 block">3-STAR SWEEP</span>
+            <span className="text-[9px] font-mono text-zinc-300">1-click instant loot</span>
           </div>
         </div>
       )
@@ -337,29 +347,28 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       tag: 'GLADIATORIAL COMBAT',
       title: 'THE PVP ARENA & LEAGUES',
       headline: 'Duel summoners, climb 12 Leagues, and earn Sovereigns.',
-      description: 'Spend Arena Tickets to battle real summoners. Pass holders earn Blood Sovereigns for every win! Earn Crowns to climb from Bronze up through Master and Void Overlord to Divine. Peace Shields (3h, 6h, 12h) protect your rating from attacks while offline.',
-      highlightText: 'Sovereigns Paid Per Win • 12 Leagues • Peace Shields',
+      description: 'Spend Arena Tickets to battle real summoners. Pass subscribers earn Blood Sovereigns for every win! Accumulate Crowns to climb from Bronze up through Master and Void Overlord to Divine. Activate Peace Shields (3h, 6h, 12h) to protect your rating while offline.',
       visual: (
         <div className="w-full max-w-[320px] flex items-center justify-between gap-2.5 py-1">
           {/* League Crowns */}
-          <div className="flex-1 p-2.5 rounded-2xl bg-amber-950/40 border border-amber-500/50 flex flex-col items-center text-center">
-            <img src="/icons/crown.png" alt="Crowns" className="w-11 h-11 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.6)] mb-1" />
-            <span className="text-[11px] font-mono font-bold text-amber-300 block">12 LEAGUES</span>
-            <span className="text-[9.5px] font-mono text-zinc-200 mt-0.5">Bronze to Divine</span>
+          <div className="flex-1 p-2.5 rounded-xl bg-amber-950/50 border border-amber-500/50 flex flex-col items-center text-center">
+            <img src="/icons/crown.png" alt="Crowns" className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.6)] mb-1" />
+            <span className="text-[10.5px] font-mono font-bold text-amber-300 block">12 LEAGUES</span>
+            <span className="text-[9px] font-mono text-zinc-300">Bronze to Divine</span>
           </div>
 
           {/* Per-Win Bounty */}
-          <div className="flex-1 p-2.5 rounded-2xl bg-red-950/40 border border-red-500/50 flex flex-col items-center text-center">
-            <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-11 h-11 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.7)] mb-1" />
-            <span className="text-[11px] font-mono font-bold text-red-300 block">+1 TO +2 SOV</span>
-            <span className="text-[9.5px] font-mono text-zinc-200 mt-0.5">Paid Every Win</span>
+          <div className="flex-1 p-2.5 rounded-xl bg-red-950/50 border border-red-500/50 flex flex-col items-center text-center">
+            <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.7)] mb-1" />
+            <span className="text-[10.5px] font-mono font-bold text-red-300 block">+1 TO +2 SOV</span>
+            <span className="text-[9px] font-mono text-zinc-300">Paid Every Win</span>
           </div>
 
           {/* Peace Shields */}
-          <div className="flex-1 p-2.5 rounded-2xl bg-sky-950/40 border border-sky-500/40 flex flex-col items-center text-center">
-            <img src="/icons/gothic_armor.webp" alt="Armor" className="w-11 h-11 object-contain drop-shadow-[0_0_8px_rgba(56,189,248,0.5)] mb-1" />
-            <span className="text-[11px] font-mono font-bold text-sky-300 block">PEACE SHIELDS</span>
-            <span className="text-[9.5px] font-mono text-zinc-200 mt-0.5">3h, 6h, 12h Offline</span>
+          <div className="flex-1 p-2.5 rounded-xl bg-sky-950/50 border border-sky-500/50 flex flex-col items-center text-center">
+            <img src="/icons/gothic_armor.webp" alt="Armor" className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(56,189,248,0.5)] mb-1" />
+            <span className="text-[10.5px] font-mono font-bold text-sky-300 block">PEACE SHIELDS</span>
+            <span className="text-[9px] font-mono text-zinc-300">3h, 6h, 12h Offline</span>
           </div>
         </div>
       )
@@ -374,38 +383,37 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       title: '4 REALM CURRENCIES',
       headline: 'Gold, Shards, Shadow Dust & Blood Sovereigns.',
       description: 'Gold: earned in battles, buys card booster packs in the shop. Dark Shards: premium crystals for Gacha summons, energy refills, & passes. Shadow Dust: disenchant duplicate cards to ascend cards up to Divine Tier! Blood Sovereigns: convertible cryptocurrency (100 SOV = $1.00 USDT).',
-      highlightText: 'Gold • Dark Shards • Shadow Dust • Blood Sovereigns',
       visual: (
-        <div className="w-full max-w-[320px] grid grid-cols-2 gap-2.5 py-1">
-          <div className="p-2.5 rounded-2xl bg-amber-950/40 border border-amber-500/40 flex items-center gap-2.5">
+        <div className="w-full max-w-[320px] grid grid-cols-2 gap-2 py-1">
+          <div className="p-2 rounded-xl bg-amber-950/40 border border-amber-500/40 flex items-center gap-2.5">
             <img src="/icons/icon_gold.webp" alt="Gold" className="w-8 h-8 object-contain shrink-0" />
             <div>
               <span className="text-xs font-mono font-bold text-amber-300 block">GOLD</span>
-              <span className="text-[10px] font-mono text-zinc-200 block mt-0.5">Card Booster Packs</span>
+              <span className="text-[10px] font-mono text-zinc-300 leading-tight block">Card Booster Packs</span>
             </div>
           </div>
 
-          <div className="p-2.5 rounded-2xl bg-purple-950/40 border border-purple-500/40 flex items-center gap-2.5">
+          <div className="p-2 rounded-xl bg-purple-950/40 border border-purple-500/40 flex items-center gap-2.5">
             <img src="/icons/icon_shards.webp" alt="Dark Shards" className="w-8 h-8 object-contain shrink-0" />
             <div>
               <span className="text-xs font-mono font-bold text-purple-300 block">DARK SHARDS</span>
-              <span className="text-[10px] font-mono text-zinc-200 block mt-0.5">Gacha & Energy</span>
+              <span className="text-[10px] font-mono text-zinc-300 leading-tight block">Gacha & Energy</span>
             </div>
           </div>
 
-          <div className="p-2.5 rounded-2xl bg-teal-950/40 border border-teal-500/40 flex items-center gap-2.5">
+          <div className="p-2 rounded-xl bg-teal-950/40 border border-teal-500/40 flex items-center gap-2.5">
             <img src="/icons/icon_dust.webp" alt="Shadow Dust" className="w-8 h-8 object-contain shrink-0" />
             <div>
               <span className="text-xs font-mono font-bold text-teal-300 block">SHADOW DUST</span>
-              <span className="text-[10px] font-mono text-zinc-200 block mt-0.5">Tier Ascension</span>
+              <span className="text-[10px] font-mono text-zinc-300 leading-tight block">Tier Ascension</span>
             </div>
           </div>
 
-          <div className="p-2.5 rounded-2xl bg-red-950/50 border border-red-500/60 flex items-center gap-2.5 shadow-[0_0_12px_rgba(239,68,68,0.3)]">
+          <div className="p-2 rounded-xl bg-red-950/50 border border-red-500/60 flex items-center gap-2.5 shadow-[0_0_12px_rgba(239,68,68,0.3)]">
             <img src="/icons/icon_sovereign.webp" alt="Blood Sovereigns" className="w-8 h-8 object-contain shrink-0" />
             <div>
               <span className="text-xs font-mono font-bold text-red-300 block">SOVEREIGNS</span>
-              <span className="text-[10px] font-mono text-zinc-100 block mt-0.5">100 SOV = $1.00</span>
+              <span className="text-[10px] font-mono text-zinc-200 leading-tight block">100 SOV = $1.00</span>
             </div>
           </div>
         </div>
@@ -421,28 +429,27 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
       title: 'ALLIANCE & WITHDRAWALS',
       headline: 'Earn 15% from allies’ battle wins. Withdraw to wallet.',
       description: 'Share your invite link to build an Alliance. Receive an instant bounty (+300 to +800 SOV) whenever an ally activates a Pass, plus 15% of all Blood Sovereigns they win in Arena and League! Reach milestone goals for up to 500,000 SOV. Withdraw your earnings anytime in the Bank.',
-      highlightText: '+300 / +800 SOV Pass Bounty • 15% Battle Share • On-Chain Payouts',
       visual: (
         <div className="w-full max-w-[320px] flex items-center justify-between gap-2.5 py-1">
           {/* Pass Bounty */}
-          <div className="flex-1 p-2.5 rounded-2xl bg-amber-950/40 border border-amber-500/50 flex flex-col items-center text-center">
-            <img src="/icons/icon_pass.webp" alt="Pass Bounty" className="w-11 h-11 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.6)] mb-1" />
-            <span className="text-[11px] font-mono font-bold text-amber-300 block">PASS BOUNTY</span>
-            <span className="text-[9.5px] font-mono text-zinc-200 mt-0.5">+300 / +800 SOV</span>
+          <div className="flex-1 p-2.5 rounded-xl bg-amber-950/50 border border-amber-500/50 flex flex-col items-center text-center">
+            <img src="/icons/icon_pass.webp" alt="Pass Bounty" className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.6)] mb-1" />
+            <span className="text-[10.5px] font-mono font-bold text-amber-300 block">PASS BOUNTY</span>
+            <span className="text-[9px] font-mono text-zinc-300">+300 / +800 SOV</span>
           </div>
 
           {/* 15% Battle Share */}
-          <div className="flex-1 p-2.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/50 flex flex-col items-center text-center">
-            <img src="/icons/referral_seal.png" alt="Alliance Share" className="w-11 h-11 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.6)] mb-1" />
-            <span className="text-[11px] font-mono font-bold text-emerald-300 block">15% SHARE</span>
-            <span className="text-[9.5px] font-mono text-zinc-200 mt-0.5">Arena & League Wins</span>
+          <div className="flex-1 p-2.5 rounded-xl bg-emerald-950/50 border border-emerald-500/50 flex flex-col items-center text-center">
+            <img src="/icons/referral_seal.png" alt="Alliance Share" className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.6)] mb-1" />
+            <span className="text-[10.5px] font-mono font-bold text-emerald-300 block">15% SHARE</span>
+            <span className="text-[9px] font-mono text-zinc-300">Arena & League Wins</span>
           </div>
 
           {/* Real On-Chain Withdrawal */}
-          <div className="flex-1 p-2.5 rounded-2xl bg-cyan-950/40 border border-cyan-500/50 flex flex-col items-center text-center">
-            <img src="/icons/icon_sovereign.webp" alt="Withdrawal" className="w-11 h-11 object-contain drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] mb-1" />
-            <span className="text-[11px] font-mono font-bold text-cyan-300 block">WITHDRAW</span>
-            <span className="text-[9.5px] font-mono text-zinc-200 mt-0.5">USDT/TON/SOL</span>
+          <div className="flex-1 p-2.5 rounded-xl bg-cyan-950/50 border border-cyan-500/50 flex flex-col items-center text-center">
+            <img src="/icons/icon_sovereign.webp" alt="Withdrawal" className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] mb-1" />
+            <span className="text-[10.5px] font-mono font-bold text-cyan-300 block">WITHDRAW</span>
+            <span className="text-[9px] font-mono text-zinc-300">USDT / TON / SOL</span>
           </div>
         </div>
       )
@@ -474,7 +481,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 12 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
-        className="relative w-full max-w-md bg-[#0a0808] border border-[#d4af37]/40 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.9),0_0_30px_rgba(212,175,55,0.2)] overflow-hidden flex flex-col h-auto max-h-[94vh]"
+        className="relative w-full max-w-md bg-[#0a0808] border border-[#d4af37]/40 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.9),0_0_30px_rgba(212,175,55,0.2)] overflow-hidden flex flex-col h-auto max-h-[95vh]"
       >
         {/* Top Story Progress Bars (8 Segments) */}
         <div className="px-4 pt-3 pb-1 flex items-center gap-1 z-20 shrink-0">
@@ -514,8 +521,8 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
           </button>
         </div>
 
-        {/* Upper Half: Visual Graphic Showcase (Height-constrained, zero overflow) */}
-        <div className="relative flex-1 min-h-[170px] max-h-[220px] w-full overflow-hidden shrink-0 flex items-center justify-center px-3">
+        {/* Upper Half: Visual Graphic Showcase (Optimized height, zero clipping) */}
+        <div className="relative flex-1 min-h-[160px] max-h-[200px] w-full overflow-hidden shrink-0 flex items-center justify-center px-3">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -530,7 +537,7 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
           </AnimatePresence>
         </div>
 
-        {/* Lower Half: Dark Glass Description Panel */}
+        {/* Lower Half: Dark Glass Description Panel (Clean typography, no redundant footer badges) */}
         <div className="p-4 sm:p-5 bg-gradient-to-b from-[#141113] via-[#0d0a0b] to-black border-t border-white/10 flex flex-col justify-between space-y-3 shrink-0">
           <AnimatePresence mode="wait">
             <motion.div
@@ -550,15 +557,6 @@ export const VoidOnboardingModal: React.FC<VoidOnboardingModalProps> = ({ isOpen
               <p className="text-[11.5px] sm:text-xs text-zinc-300 font-sans leading-relaxed">
                 {current.description}
               </p>
-
-              {current.highlightText && (
-                <div className="pt-0.5">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-950/50 border border-amber-500/40 text-amber-300 font-mono text-[10px] font-bold">
-                    <img src="/icons/gothic_attack.webp" alt="Highlight" className="w-3 h-3 object-contain" />
-                    <span>{current.highlightText}</span>
-                  </span>
-                </div>
-              )}
             </motion.div>
           </AnimatePresence>
 
