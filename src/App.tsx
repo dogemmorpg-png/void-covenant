@@ -3,6 +3,7 @@ import { TonConnectUIProvider, THEME } from '@tonconnect/ui-react';
 import { GameProvider, useGame } from './context/GameContext';
 import { ToastProvider } from './components/Toast';
 import { HeaderHUD } from './components/HeaderHUD';
+import { useScrollToTopOnChange } from './utils/scrollHelper';
 import { ShardsShopModal } from './components/ShardsShopModal';
 import { GoldShopModal } from './components/GoldShopModal';
 import { DustShopModal } from './components/DustShopModal';
@@ -105,6 +106,9 @@ function MainAppContent() {
   // Tab states
   const [activeTab, setActiveTab] = useState<'campaign' | 'pvp' | 'collection' | 'hero' | 'talents' | 'altar' | 'bank' | 'premium'>('campaign');
   const [shopInitialTab, setShopInitialTab] = useState<'cards' | 'equipment' | 'divine' | 'shields'>('cards');
+
+  // Reset scroll position to top whenever switching tabs or exiting battle on PC
+  useScrollToTopOnChange(activeTab, activeBattleStage, shopInitialTab);
   
   // Active Battle stage state
   const [activeBattleStage, setActiveBattleStage] = useState<CampaignStage | null>(null);

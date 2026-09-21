@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useScrollToTopOnChange } from '../utils/scrollHelper';
 import { useGame } from '../context/GameContext';
 import { Equipment, EquipmentSlot, CardTier } from '../types';
 import { getEquipmentIcon, calculateEquipmentSetBonuses, DEMIURGE_SET } from '../data/equipment';
@@ -76,6 +77,9 @@ export const HeroInventoryView: React.FC<HeroInventoryViewProps> = ({ onNavigate
   
   const [selectedSlot, setSelectedSlot] = useState<EquipmentSlot | null>(null);
   const [subTab, setSubTab] = useState<'equipment' | 'talents'>('equipment');
+
+  // Reset scroll to top when switching between equipment and talents sub-tabs
+  useScrollToTopOnChange(subTab);
 
   // Equipped items resolution
   const eqWeapon = profile.equipment?.find(e => e.id === profile.equipped?.['weapon']) || null;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useScrollToTopOnChange } from '../utils/scrollHelper';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
 import { CampaignStage } from '../types';
@@ -80,6 +81,7 @@ export const PvpArenaView: React.FC<PvpArenaViewProps> = ({
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState<'duels' | 'rewards' | 'history'>('duels');
+  useScrollToTopOnChange(activeTab);
   const [selectedRewardLeague, setSelectedRewardLeague] = useState<string>(profile.pvpLeague || 'Void Overlord');
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true);

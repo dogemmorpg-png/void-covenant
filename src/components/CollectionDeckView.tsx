@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useScrollToTopOnChange } from '../utils/scrollHelper';
 import { getCardTierStyles } from '../utils/tierStyles';
 import { useGame } from '../context/GameContext';
 import { useToast } from './Toast';
@@ -288,6 +289,7 @@ export const CollectionDeckView: React.FC = () => {
   
   // Fusing lab states
   const [isFusingMode, setIsFusingMode] = useState(false);
+  useScrollToTopOnChange(isFusingMode);
   const [fuseCardId1, setFuseCardId1] = useState<string | null>(null);
   const [fuseCardId2, setFuseCardId2] = useState<string | null>(null);
   const [fusionConfirmData, setFusionConfirmData] = useState<{card1: Card, card2: Card} | null>(null);
@@ -387,6 +389,9 @@ export const CollectionDeckView: React.FC = () => {
     if (gridContainerRef.current) {
       gridContainerRef.current.scrollTop = 0;
     }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
   }, [safePage]);
 
   // Currently selected card object

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useScrollToTopOnChange } from '../utils/scrollHelper';
 import { getCardTierStyles } from '../utils/tierStyles';
 import { motion } from 'motion/react';
 import { useGame } from '../context/GameContext';
@@ -66,6 +67,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
   };
 
   const [activeCategory, setActiveCategory] = useState<ShopCategory>(getCategoryFromTab(initialTab));
+  useScrollToTopOnChange(activeCategory);
   const [isBuyingShield, setIsBuyingShield] = useState<string | null>(null);
   const [isBuyingLevelBoost, setIsBuyingLevelBoost] = useState<number | null>(null);
 
