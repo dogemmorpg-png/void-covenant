@@ -20,7 +20,6 @@ import { Swords, FolderGit, Sparkles, Landmark, Award, Trophy, UserCircle2, Stor
 import { AIRDROP_TASKS } from './data/cards';
 import { LandingPage } from './components/LandingPage';
 import { RegistrationScreen } from './components/RegistrationScreen';
-import { DesktopRegistrationScreen } from './components/DesktopRegistrationScreen';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import bs58Pkg from 'bs58';
@@ -311,19 +310,12 @@ function MainAppContent() {
   }
 
   if (!profile.isRegistered) {
-    if (device.isMobile) {
-      return (
-        <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait} disableRotatePrompt={true}>
-          <RegistrationScreen 
-            onRegister={(username, avatarUrl) => registerPlayer(username, avatarUrl)} 
-          />
-        </MobileOrientationGuard>
-      );
-    }
     return (
-      <DesktopRegistrationScreen 
-        onRegister={(username, avatarUrl) => registerPlayer(username, avatarUrl)} 
-      />
+      <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait} disableRotatePrompt={true}>
+        <RegistrationScreen 
+          onRegister={(username, avatarUrl) => registerPlayer(username, avatarUrl)} 
+        />
+      </MobileOrientationGuard>
     );
   }
 
