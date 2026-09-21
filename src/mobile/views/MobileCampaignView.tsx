@@ -282,6 +282,34 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
             >
               <ChevronRight className="w-5 h-5" />
             </button>
+
+            {/* Floating Telegram Channel Quest Button (Exact user location & design, overlay with zero layout shift) */}
+            {isTelegramUser && !isTgTaskCompleted && (
+              <div className="absolute right-2 -bottom-4 sm:-bottom-4.5 z-30 pointer-events-auto">
+                <button
+                  onClick={() => setIsTgModalOpen(true)}
+                  className="relative flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-gradient-to-r from-cyan-950/95 via-[#0e1829]/95 to-black border border-cyan-400/60 hover:border-cyan-300 shadow-[0_0_16px_rgba(6,182,212,0.4)] active:scale-95 transition-all cursor-pointer group select-none"
+                  title="Join Official Telegram Channel for +25 Dark Shards"
+                >
+                  <div className="w-6 h-6 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center shrink-0 shadow-sm">
+                    <Send className="w-3 h-3 text-cyan-300 transform -rotate-12 translate-x-0.2 group-hover:scale-110 transition-transform" />
+                  </div>
+                  <div className="flex flex-col text-left leading-none pr-0.5">
+                    <span className="font-display font-black text-[9.5px] text-white tracking-wider uppercase">
+                      JOIN CHANNEL
+                    </span>
+                    <span className="font-mono font-bold text-[8.5px] text-cyan-300 mt-0.5 flex items-center gap-1">
+                      +25 Dark Shards
+                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-2.5 h-2.5 object-contain inline" />
+                    </span>
+                  </div>
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400 shadow-[0_0_6px_rgba(6,182,212,0.9)]"></span>
+                  </span>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* 3. Encounter & Victory Rewards matching PC 1:1 */}
@@ -291,7 +319,7 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
               <span className="text-[10px] font-mono text-gray-400 tracking-widest uppercase font-bold block">
                 ENCOUNTER
               </span>
-              <div className="bg-[#18120d]/85 border border-[#ebd09b]/25 rounded-2xl p-3 sm:p-3.5 flex items-center gap-3.5 shadow-inner relative">
+              <div className="bg-[#18120d]/85 border border-[#ebd09b]/25 rounded-2xl p-3 sm:p-3.5 flex items-center gap-3.5 shadow-inner">
                 <div className={`w-13 h-13 sm:w-14 sm:h-14 rounded-full flex items-center justify-center border shrink-0 ${
                   isBoss ? 'bg-[#4e0707] border-[#dd2c40]/50 shadow-[0_0_15px_rgba(220,38,38,0.4)]' : 'bg-[#1f2833] border-cyan-900'
                 } overflow-hidden`}>
@@ -308,7 +336,7 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
                     <Skull className="w-6 h-6 text-red-500/90" />
                   )}
                 </div>
-                <div className="pr-14">
+                <div>
                   <h4 className="font-display font-bold text-white text-[15px] sm:text-base leading-tight">
                     {selectedStage.enemyHeroName}
                   </h4>
@@ -319,36 +347,6 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
                     Deck Size: {selectedStage.enemyDeck?.length || 10} Cards
                   </p>
                 </div>
-
-                {/* Floating Telegram Channel Quest Icon (Absolute overlay - zero layout displacement) */}
-                {isTelegramUser && !isTgTaskCompleted && (
-                  <button
-                    onClick={() => setIsTgModalOpen(true)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-[#0c2b48] via-[#091b2c] to-black border-2 border-cyan-400/80 hover:border-cyan-300 shadow-[0_0_18px_rgba(6,182,212,0.45)] active:scale-90 transition-all cursor-pointer group"
-                    title="Join Official Telegram Channel (+25 Dark Shards)"
-                  >
-                    {/* Pulsing beacon indicator */}
-                    <span className="absolute -top-1 -left-1 flex h-3 w-3 pointer-events-none">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,1)]"></span>
-                    </span>
-
-                    {/* Official Telegram Plane SVG */}
-                    <svg 
-                      className="w-5.5 h-5.5 text-cyan-300 transform -rotate-6 translate-x-[-1px] group-hover:scale-110 group-hover:text-white transition-all drop-shadow-[0_0_6px_rgba(6,182,212,0.8)]" 
-                      viewBox="0 0 24 24" 
-                      fill="currentColor"
-                    >
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
-                    </svg>
-
-                    {/* +25 Shards Badge */}
-                    <div className="absolute -bottom-2 -right-1.5 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-gradient-to-r from-red-600 to-rose-600 border border-rose-300/80 shadow-[0_0_8px_rgba(225,29,72,0.8)] pointer-events-none">
-                      <span className="font-mono font-black text-[9px] text-white leading-none tracking-tight">+25</span>
-                      <img src="/icons/icon_shards.webp" alt="Shards" className="w-2.5 h-2.5 object-contain" />
-                    </div>
-                  </button>
-                )}
               </div>
             </div>
 
