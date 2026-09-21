@@ -1587,7 +1587,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       profile.referralSovereignsUnclaimed = Number((unclaimed - wholeUnits).toFixed(2));
-      profile.bloodSovereigns = (profile.bloodSovereigns || 0) + wholeUnits;
       profile = recordSovereignTransaction(
         profile,
         'REFERRAL_COMMISSION',
@@ -1690,7 +1689,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       // Award the milestone
       profile.claimedReferralMilestones.push(milestoneId);
-      profile.bloodSovereigns = (profile.bloodSovereigns || 0) + milestone.rewardSovereigns;
       profile = recordSovereignTransaction(
         profile,
         'REFERRAL_MILESTONE',

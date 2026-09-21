@@ -2147,8 +2147,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         let updated = {
           ...current,
-          claimedReferralMilestones: [...claimed, milestoneId],
-          bloodSovereigns: (current.bloodSovereigns || 0) + milestone.rewardSovereigns
+          claimedReferralMilestones: [...claimed, milestoneId]
         };
         updated = recordSovereignTransaction(
           updated,
