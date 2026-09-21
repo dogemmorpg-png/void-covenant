@@ -993,9 +993,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           });
         }
 
-        // Award +25 Dark Shards
+        // Award +25 Dark Shards (recordShardTransaction handles profile.darkShards update)
         const shardReward = 25;
-        profile.darkShards = (profile.darkShards || 0) + shardReward;
         profile.completedTasks.push('tg_channel');
         
         profile = recordShardTransaction(
