@@ -7,8 +7,14 @@ import {
   Sparkles, 
   Twitter, 
   Send, 
-  ArrowUpRight 
+  ArrowUpRight,
+  Trophy,
+  Crown,
+  Award,
+  ShieldCheck,
+  Users
 } from 'lucide-react';
+import { REFERRAL_MILESTONES } from '../data/referralMilestones';
 
 interface LandingPageProps {
   onConnectWallet: () => void;
@@ -877,7 +883,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
                     <img src="/icons/referral_seal.png" alt="Referrals" className="w-6 h-6 object-contain" />
                     <span className="text-xs font-mono text-amber-300 font-bold uppercase">Alliance Bounties</span>
                   </div>
-                  <p className="text-xs text-gray-400 font-sans leading-relaxed">Invite other commanders to receive instant pass activation bounties and a continuous 15% share of their winnings.</p>
+                  <p className="text-xs text-gray-400 font-sans leading-relaxed">Invite other commanders to earn instant pass bounties, milestone achievements up to 500,000 SOV, and a continuous 15% share of their combat winnings.</p>
                 </div>
               </div>
 
@@ -923,63 +929,230 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
               </span>
             </h2>
             <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
-              War is won together. Invite fellow commanders into the Abyss and earn instant sovereign bounties alongside continuous dividends from their battlefield conquests.
+              War is won together. Invite fellow commanders into the Abyss and earn instant sovereign bounties, tiered milestone achievements up to 500,000 SOV, and continuous dividends from their battlefield conquests.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* 4 Pillars of Alliance Earnings */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             
-            <div className="p-7 rounded-3xl bg-gradient-to-b from-[#1a111a] to-black border border-amber-500/40 hover:border-amber-400/80 transition-all duration-500 space-y-4 shadow-xl">
-              <div className="w-12 h-12 rounded-2xl bg-amber-950/60 border border-amber-500/40 flex items-center justify-center">
-                <img src="/icons/referral_seal.png" alt="Alliance Bounty" className="w-8 h-8 object-contain drop-shadow" />
+            {/* 1. Instant Pass Bounty */}
+            <div className="p-6 rounded-3xl bg-gradient-to-b from-[#1a111a] to-black border border-amber-500/40 hover:border-amber-400/80 transition-all duration-500 space-y-4 shadow-xl flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-2xl bg-amber-950/60 border border-amber-500/40 flex items-center justify-center">
+                  <img src="/icons/referral_seal.png" alt="Alliance Bounty" className="w-8 h-8 object-contain drop-shadow" />
+                </div>
+                <div className="space-y-1">
+                  <span className="text-xs font-mono text-amber-400 font-bold uppercase tracking-wider block">
+                    Up To +600 SOV ($6.00)
+                  </span>
+                  <h4 className="font-display font-black text-lg text-white uppercase">
+                    Instant Pass Bounty
+                  </h4>
+                </div>
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+                  Receive instant one-time Blood Sovereign payouts into your vault whenever an invited ally activates a Premium (+200 SOV) or Ultra (+600 SOV) pass.
+                </p>
               </div>
-              <div className="space-y-1">
-                <span className="text-xs font-mono text-amber-400 font-bold uppercase tracking-wider block">
-                  Up To +600 SOV ($6.00)
-                </span>
-                <h4 className="font-display font-black text-xl text-white uppercase">
-                  Instant Pass Bounty
-                </h4>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
-                Receive instant one-time Blood Sovereign payouts into your vault whenever an invited ally activates a Premium or Ultra pass.
-              </p>
             </div>
 
-            <div className="p-7 rounded-3xl bg-gradient-to-b from-[#121620] to-black border border-fuchsia-500/40 hover:border-fuchsia-400/80 transition-all duration-500 space-y-4 shadow-xl">
-              <div className="w-12 h-12 rounded-2xl bg-fuchsia-950/60 border border-fuchsia-500/40 flex items-center justify-center">
-                <img src="/icons/icon_sovereign.webp" alt="Lifetime Share" className="w-8 h-8 object-contain drop-shadow" />
+            {/* 2. Lifetime Sovereign Share */}
+            <div className="p-6 rounded-3xl bg-gradient-to-b from-[#121620] to-black border border-fuchsia-500/40 hover:border-fuchsia-400/80 transition-all duration-500 space-y-4 shadow-xl flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-2xl bg-fuchsia-950/60 border border-fuchsia-500/40 flex items-center justify-center">
+                  <img src="/icons/icon_sovereign.webp" alt="Lifetime Share" className="w-8 h-8 object-contain drop-shadow" />
+                </div>
+                <div className="space-y-1">
+                  <span className="text-xs font-mono text-fuchsia-400 font-bold uppercase tracking-wider block">
+                    15% Passive Revenue
+                  </span>
+                  <h4 className="font-display font-black text-lg text-white uppercase">
+                    Lifetime Sovereign Share
+                  </h4>
+                </div>
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+                  Earn an ongoing 15% share of all Blood Sovereigns won by your allies across ranked arena battles and daily leaderboard finishes.
+                </p>
               </div>
-              <div className="space-y-1">
-                <span className="text-xs font-mono text-fuchsia-400 font-bold uppercase tracking-wider block">
-                  15% Passive Revenue
-                </span>
-                <h4 className="font-display font-black text-xl text-white uppercase">
-                  Lifetime Sovereign Share
-                </h4>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
-                Earn an ongoing 15% share of all Blood Sovereigns won by your allies across ranked arena battles and daily leaderboard finishes.
-              </p>
             </div>
 
-            <div className="p-7 rounded-3xl bg-gradient-to-b from-[#141510] to-black border border-emerald-500/40 hover:border-emerald-400/80 transition-all duration-500 space-y-4 shadow-xl">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 flex items-center justify-center">
-                <img src="/icons/icon_gold.webp" alt="Starter Bonus" className="w-8 h-8 object-contain drop-shadow" />
+            {/* 3. Alliance Milestones (Достижения подписчиков) */}
+            <div className="p-6 rounded-3xl bg-gradient-to-b from-[#1a140d] to-black border border-yellow-500/50 hover:border-yellow-400/90 transition-all duration-500 space-y-4 shadow-xl flex flex-col justify-between relative overflow-hidden group">
+              <div className="absolute top-0 right-0 px-3 py-1 bg-gradient-to-l from-amber-500/30 to-transparent text-[10px] font-mono text-amber-300 uppercase tracking-widest font-bold">
+                9 Tiers
               </div>
-              <div className="space-y-1">
-                <span className="text-xs font-mono text-emerald-400 font-bold uppercase tracking-wider block">
-                  +1,000 Gold Starter
-                </span>
-                <h4 className="font-display font-black text-xl text-white uppercase">
-                  Welcome Gift For Allies
-                </h4>
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-2xl bg-yellow-950/60 border border-yellow-500/40 flex items-center justify-center">
+                  <img src="/icons/badge_crown_v1.png" alt="Alliance Milestones" className="w-8 h-8 object-contain drop-shadow" />
+                </div>
+                <div className="space-y-1">
+                  <span className="text-xs font-mono text-yellow-400 font-bold uppercase tracking-wider block">
+                    Up To +500,000 SOV ($5,000)
+                  </span>
+                  <h4 className="font-display font-black text-lg text-white uppercase">
+                    Alliance Milestones
+                  </h4>
+                </div>
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+                  Climb 9 progressive achievement tiers by recruiting Pass subscribers. Unlock up to 884,950 SOV in total cumulative cash bounties.
+                </p>
               </div>
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
-                Your recruits begin their journey with a boosted starter treasury bonus, giving them immediate power to forge initial decks.
-              </p>
             </div>
 
+            {/* 4. Welcome Gift For Allies */}
+            <div className="p-6 rounded-3xl bg-gradient-to-b from-[#141510] to-black border border-emerald-500/40 hover:border-emerald-400/80 transition-all duration-500 space-y-4 shadow-xl flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 flex items-center justify-center">
+                  <img src="/icons/icon_gold.webp" alt="Starter Bonus" className="w-8 h-8 object-contain drop-shadow" />
+                </div>
+                <div className="space-y-1">
+                  <span className="text-xs font-mono text-emerald-400 font-bold uppercase tracking-wider block">
+                    +1,000 Gold Starter
+                  </span>
+                  <h4 className="font-display font-black text-lg text-white uppercase">
+                    Welcome Gift For Allies
+                  </h4>
+                </div>
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+                  Your recruits begin their journey with a boosted starter treasury bonus, giving them immediate power to forge initial decks.
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          {/* =========================================================================
+              SUBSCRIBER MILESTONES LADDER (ДОСТИЖЕНИЯ ПОДПИСЧИКОВ)
+             ========================================================================= */}
+          <div className="relative rounded-3xl p-6 sm:p-10 bg-gradient-to-b from-[#180f1e] via-[#0d0713] to-black border border-amber-500/30 shadow-[0_0_50px_rgba(245,158,11,0.08)] space-y-8">
+            {/* Ambient gold glow */}
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-48 bg-amber-500/10 blur-[100px] pointer-events-none rounded-full" />
+
+            {/* Header & Overview Stats */}
+            <div className="relative z-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-6 border-b border-white/10 pb-8">
+              <div className="space-y-3 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30">
+                  <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="font-mono text-xs text-amber-300 font-bold uppercase tracking-widest">
+                    Subscriber Milestone Ladder
+                  </span>
+                </div>
+                <h3 className="font-display font-black text-2xl sm:text-4xl text-white tracking-wide uppercase leading-tight">
+                  Alliance Prestige Milestones
+                </h3>
+                <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-serif italic">
+                  Recruit allies who activate an Imperial Pass (Premium or Ultra) to unlock 9 progressive cash milestone ranks. Every tier instantly deposits Blood Sovereigns directly into your Royal Vault.
+                </p>
+              </div>
+
+              {/* Highlight Stats Badges */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full md:w-auto shrink-0">
+                <div className="bg-black/60 border border-amber-500/25 rounded-2xl p-3 text-center">
+                  <span className="text-[10px] font-mono uppercase text-gray-400 block tracking-wider">Total Pool</span>
+                  <div className="flex items-center justify-center gap-1.5 mt-1">
+                    <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 object-contain" />
+                    <span className="font-mono font-black text-amber-300 text-sm sm:text-base">884,950</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-gray-400 block mt-0.5">≈ $8,849.50</span>
+                </div>
+
+                <div className="bg-black/60 border border-purple-500/25 rounded-2xl p-3 text-center">
+                  <span className="text-[10px] font-mono uppercase text-gray-400 block tracking-wider">Apex Reward</span>
+                  <div className="flex items-center justify-center gap-1.5 mt-1">
+                    <Crown className="w-4 h-4 text-purple-400" />
+                    <span className="font-mono font-black text-purple-300 text-sm sm:text-base">+500,000</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-gray-400 block mt-0.5">≈ $5,000.00</span>
+                </div>
+
+                <div className="col-span-2 sm:col-span-1 bg-black/60 border border-emerald-500/25 rounded-2xl p-3 text-center">
+                  <span className="text-[10px] font-mono uppercase text-gray-400 block tracking-wider">Withdrawal</span>
+                  <div className="flex items-center justify-center gap-1.5 mt-1">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    <span className="font-mono font-black text-emerald-300 text-sm sm:text-base">Instant</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-gray-400 block mt-0.5">Zero Lockup</span>
+                </div>
+              </div>
+            </div>
+
+            {/* The 9 Milestones Grid */}
+            <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {REFERRAL_MILESTONES.map((milestone, idx) => {
+                const usdFormatted = (milestone.rewardSovereigns * 0.01).toLocaleString('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                });
+                const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'];
+                const tierRank = romanNumerals[idx] || `${idx + 1}`;
+
+                return (
+                  <div
+                    key={milestone.id}
+                    className={`relative rounded-2xl p-4 sm:p-5 bg-gradient-to-b from-[#160c18]/90 via-[#0d0711]/95 to-black border transition-all duration-300 hover:scale-[1.02] flex flex-col justify-between group ${milestone.borderTheme} ${milestone.glowTheme}`}
+                  >
+                    {/* Top Tier label & requirement pill */}
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <span className="font-mono text-[11px] uppercase tracking-widest text-gray-400 font-bold">
+                        Tier {tierRank}
+                      </span>
+                      <span className="font-mono text-xs px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-amber-200 font-bold flex items-center gap-1">
+                        <Users className="w-3 h-3 text-amber-400" />
+                        {milestone.requiredSubscribers} {milestone.requiredSubscribers === 1 ? 'Pass Ally' : 'Pass Allies'}
+                      </span>
+                    </div>
+
+                    {/* Middle: Badge & Title */}
+                    <div className="flex items-center gap-3.5 my-2">
+                      <div className="w-12 h-12 shrink-0 flex items-center justify-center">
+                        <img
+                          src={milestone.badgeIcon}
+                          alt={milestone.title}
+                          className="w-11 h-11 object-contain drop-shadow-[0_0_10px_rgba(245,158,11,0.3)] group-hover:scale-110 transition-transform duration-300"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = 'none';
+                          }}
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-display font-black text-base text-white uppercase tracking-wider group-hover:text-amber-200 transition-colors truncate">
+                          {milestone.title}
+                        </h4>
+                        <span className="text-[11px] font-sans text-gray-400 block">
+                          Prestige Milestone
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Bottom: Reward Display */}
+                    <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <img src="/icons/icon_sovereign.webp" alt="SOV" className="w-4 h-4 object-contain" />
+                        <span className="font-mono font-black text-amber-300 text-base sm:text-lg">
+                          +{milestone.rewardSovereigns.toLocaleString()} SOV
+                        </span>
+                      </div>
+                      <span className="font-mono text-xs text-emerald-400 font-bold bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30">
+                        {usdFormatted}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Bottom Trust & Rules Note */}
+            <div className="relative z-10 rounded-2xl bg-white/[0.02] border border-white/10 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3.5 text-xs text-gray-300 font-sans">
+              <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-5 h-5 text-amber-400" />
+              </div>
+              <p className="leading-relaxed">
+                <strong className="text-amber-300 font-semibold">Automatic Non-Custodial Rewards: </strong>
+                All commanders who register through your invitation link and purchase a Premium Pass or Ultra Pass permanently count toward your milestone ladder progression. Bounties stack on top of instant pass bonuses (+200 / +600 SOV) and lifetime 15% revenue shares, withdrawable directly to your Web3 Solana wallet (100 SOV = $1.00 USDT).
+              </p>
+            </div>
           </div>
 
         </div>
