@@ -106,15 +106,15 @@ function MainAppContent() {
   // Tab states
   const [activeTab, setActiveTab] = useState<'campaign' | 'pvp' | 'collection' | 'hero' | 'talents' | 'altar' | 'bank' | 'premium'>('campaign');
   const [shopInitialTab, setShopInitialTab] = useState<'cards' | 'equipment' | 'divine' | 'shields'>('cards');
-
-  // Reset scroll position to top whenever switching tabs or exiting battle on PC
-  useScrollToTopOnChange(activeTab, activeBattleStage, shopInitialTab);
   
   // Active Battle stage state
   const [activeBattleStage, setActiveBattleStage] = useState<CampaignStage | null>(null);
   const [activeBattleType, setActiveBattleType] = useState<'campaign' | 'pvp'>('campaign');
   const [isPvpMatching, setIsPvpMatching] = useState(false);
   const [isPvpModalOpen, setIsPvpModalOpen] = useState(false);
+
+  // Reset scroll position to top whenever switching tabs or exiting battle on PC
+  useScrollToTopOnChange(activeTab, activeBattleStage, shopInitialTab);
 
   // When battle ends
   const handleExitBattle = (isVictory: boolean) => {
