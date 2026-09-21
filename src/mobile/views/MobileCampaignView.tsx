@@ -285,7 +285,7 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
 
             {/* Floating Telegram Channel Quest Button (Exact user location & design, overlay with zero layout shift) */}
             {isTelegramUser && !isTgTaskCompleted && (
-              <div className="absolute right-2 -bottom-4 sm:-bottom-4.5 z-30 pointer-events-auto">
+              <div className="absolute right-2 -bottom-[26px] sm:-bottom-[28px] z-30 pointer-events-auto">
                 <button
                   onClick={() => setIsTgModalOpen(true)}
                   className="relative flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-gradient-to-r from-cyan-950/95 via-[#0e1829]/95 to-black border border-cyan-400/60 hover:border-cyan-300 shadow-[0_0_16px_rgba(6,182,212,0.4)] active:scale-95 transition-all cursor-pointer group select-none"
