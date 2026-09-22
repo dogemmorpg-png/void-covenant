@@ -96,7 +96,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
       const cmdData = await cmdRes.json();
 
-      return res.status(200).json({ setup: true, webhookUrl, hookData, cmdData });
+      // Set bot description (shown in empty chat with the bot)
+      const descResult = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setMyDescription`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          description: '⚔️ Void Covenant — Play-to-Earn Dark Fantasy Card RPG.\n\nBuild your deck of dark creatures, battle rivals in the PvP Arena, climb 12 competitive leagues, and withdraw Blood Sovereigns as real USDT.\n\n🎮 Tap START to begin your conquest!'
+        })
+      });
+      const descData = await descResult.json();
+
+      // Set bot short description (shown in link previews & profile)
+      const shortDescResult = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setMyShortDescription`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          short_description: '⚔️ Play-to-Earn Dark Fantasy Card RPG'
+        })
+      });
+      const shortDescData = await shortDescResult.json();
+
+      return res.status(200).json({ setup: true, webhookUrl, hookData, cmdData, descData, shortDescData });
     }
 
     return res.status(200).json({ ok: true, status: 'Telegram webhook receiver ready' });
