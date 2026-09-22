@@ -1693,10 +1693,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (action === 'buy_gold_pack') {
       const { packageId } = payload || {};
       const GOLD_RATES: Record<string, { gold: number; shards: number; name: string }> = {
-        'gold_5k': { gold: 5000, shards: 20, name: 'Pouch of Gold' },
-        'gold_25k': { gold: 25000, shards: 80, name: 'Sack of Gold' },
-        'gold_50k': { gold: 50000, shards: 150, name: 'Gilded Treasure Chest' },
-        'gold_100k': { gold: 100000, shards: 275, name: 'Overlord Treasury Vault' },
+        'gold_5k': { gold: 5000, shards: 25, name: 'Pouch of Gold' },
+        'gold_25k': { gold: 25000, shards: 120, name: 'Sack of Gold' },
+        'gold_50k': { gold: 50000, shards: 220, name: 'Gilded Treasure Chest' },
+        'gold_100k': { gold: 100000, shards: 400, name: 'Overlord Treasury Vault' },
       };
       const pack = GOLD_RATES[packageId];
       if (!pack) {
@@ -1739,10 +1739,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (action === 'buy_dust_pack') {
       const { packageId } = payload || {};
       const DUST_RATES: Record<string, { dust: number; shards: number; name: string }> = {
-        'dust_2500': { dust: 2500, shards: 15, name: 'Gothic Vial of Dust' },
-        'dust_10000': { dust: 10000, shards: 55, name: 'Astral Reliquary Urn' },
-        'dust_25000': { dust: 25000, shards: 120, name: 'Ancient Void Core' },
-        'dust_50000': { dust: 50000, shards: 220, name: 'Primordial Chalice' },
+        'dust_2500': { dust: 2500, shards: 25, name: 'Gothic Vial of Dust' },
+        'dust_10000': { dust: 10000, shards: 120, name: 'Astral Reliquary Urn' },
+        'dust_25000': { dust: 25000, shards: 220, name: 'Ancient Void Core' },
+        'dust_50000': { dust: 50000, shards: 400, name: 'Primordial Chalice' },
       };
       const pack = DUST_RATES[packageId];
       if (!pack) {
