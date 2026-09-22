@@ -31,6 +31,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ info: infoData });
     }
 
+    if (req.query.logs === 'true') {
+      const supabase = getSupabase();
+      const { data } = await supabase.from('profiles').select('data, updated_at').eq('wallet_address', '__TELEGRAM_WEBHOOK_LOGS__').single();
+      const { data: vdata } = await supabase.from('profiles').select('data, updated_at').eq('wallet_address', '__TELEGRAM_VERIFY_LOGS__').single();
+      return res.status(200).json({ lastUpdate: data, lastVerify: vdata });
+    }
+
     if (req.query.commands === 'true' && TELEGRAM_BOT_TOKEN) {
       const cmdRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getMyCommands`);
       const cmdData = await cmdRes.json();
@@ -83,6 +90,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    const supabase = getSupabase();
+    try {
+      await supabase.from('profiles').upsert({
+        wallet_address: '__TELEGRAM_WEBHOOK_LOGS__',
+        data: {
+          lastUpdate: update,
+          receivedAt: new Date().toISOString()
+        },
+        updated_at: new Date().toISOString()
+      });
+    } catch(e) {}
+
     // 1. Mandatory Pre-Checkout Query Handshake
     if (update.pre_checkout_query) {
       const q = update.pre_checkout_query;
@@ -115,8 +134,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const pkg = PACKAGES[packageId];
 
       if (walletAddress && pkg) {
-        const supabase = getSupabase();
-
         // Anti-replay check via processed_transactions in profile or transactions ledger
         let profileRow: any = null;
         let matchedWallet = walletAddress;
@@ -180,12 +197,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // 3. User Commands & Messages (/start, /appss_verify, etc.)
-    if (update.message?.text && update.message?.chat?.id) {
-      const text = update.message.text.trim();
-      const chatId = update.message.chat.id;
+    const msg = update.message || update.channel_post || update.edited_message;
+    if (msg?.text && msg?.chat?.id) {
+      const text = msg.text.trim();
+      const chatId = msg.chat.id;
 
       // Apps Center / Catalog verification handler
-      if (text.startsWith('/appss_verify') || text.startsWith('appss_verify')) {
+      if (text.includes('appss_verify')) {
         const sendRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -195,6 +213,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           })
         });
         const sendData = await sendRes.json();
+
+        try {
+          await supabase.from('profiles').upsert({
+            wallet_address: '__TELEGRAM_VERIFY_LOGS__',
+            data: {
+              chatId,
+              text,
+              sendData,
+              sentAt: new Date().toISOString()
+            },
+            updated_at: new Date().toISOString()
+          });
+        } catch(e) {}
+
         return res.status(200).json({ ok: true, handled_verify: true, sendData });
       }
 
