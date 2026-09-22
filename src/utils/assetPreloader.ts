@@ -99,14 +99,22 @@ export const preloadPool = async (urls: string[], concurrency = 2): Promise<void
  */
 export const getCardImageUrl = (card: any): string => {
   if (!card) return '/cards/skeleton_warrior.webp';
-  if (card.image && typeof card.image === 'string' && card.image.startsWith('/cards/')) {
+  if (typeof card === 'string') {
+    if (card.startsWith('/cards/') || card.startsWith('http://') || card.startsWith('https://') || card.startsWith('/')) {
+      return card;
+    }
+    const template = CARD_TEMPLATES.find(t => t.baseId === card || (t as any).id === card);
+    if (template?.image) return template.image;
+    return `/cards/${card}.webp`;
+  }
+  if (card.image && typeof card.image === 'string' && (card.image.startsWith('/cards/') || card.image.startsWith('http') || card.image.startsWith('/'))) {
     return card.image;
   }
-  const template = CARD_TEMPLATES.find(t => t.baseId === card.baseId);
+  const template = CARD_TEMPLATES.find(t => t.baseId === card.baseId || (card.id && t.baseId === card.id));
   if (template?.image) {
     return template.image;
   }
-  return `/cards/${card.baseId || 'skeleton_warrior'}.webp`;
+  return `/cards/${card.baseId || card.id || 'skeleton_warrior'}.webp`;
 };
 
 /**

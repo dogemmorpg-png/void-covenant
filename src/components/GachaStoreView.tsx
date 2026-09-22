@@ -1234,7 +1234,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                         <div className="h-64 sm:h-72 rounded-xl bg-gradient-to-b from-rose-950/40 via-black/60 to-black/80 border border-rose-500/40 flex flex-col items-center justify-center relative overflow-hidden group-hover:border-rose-400/70 transition-colors shadow-inner">
                           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(244,63,94,0.3),transparent_70%)]" />
                           <img 
-                            src={getCardImageUrl(card.image)} 
+                            src={card.image || getCardImageUrl(card)} 
                             alt={card.name} 
                             decoding="async" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter drop-shadow-[0_0_25px_rgba(244,63,94,0.5)]" 
