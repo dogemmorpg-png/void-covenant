@@ -460,45 +460,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.8 }}
-            className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 w-full max-w-xl"
+            className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-2xl px-2 select-none"
           >
-            {/* Play in Telegram Button */}
+            {/* Play in Telegram Button - Refined Dark Luxury Telegram Artifact */}
             <a
               href="https://t.me/voidcovenantbot"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 rounded-xl bg-gradient-to-r from-[#0088cc] via-[#1a9de4] to-[#24A1DE] hover:from-[#0099e6] hover:to-[#2cb6fc] text-white font-display font-black text-xs sm:text-sm tracking-[0.2em] uppercase transition-all duration-300 shadow-[0_0_25px_rgba(0,136,204,0.45)] hover:shadow-[0_0_40px_rgba(0,136,204,0.75)] active:scale-95 flex items-center justify-center gap-2.5 border border-cyan-200/50 group select-none cursor-pointer"
+              className="w-full sm:w-auto min-w-[260px] h-[54px] px-8 rounded-2xl bg-gradient-to-b from-[#0f2131]/95 via-[#0a1722]/95 to-[#060c12] border border-cyan-400/40 hover:border-cyan-300 text-cyan-100 hover:text-white font-display font-bold text-xs sm:text-sm tracking-[0.22em] uppercase transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_20px_rgba(6,182,212,0.2)] hover:shadow-[0_0_30px_rgba(6,182,212,0.45)] active:scale-95 flex items-center justify-center gap-3 cursor-pointer group whitespace-nowrap"
             >
-              <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform shrink-0">
-                <Send className="w-3 h-3 text-white transform -rotate-12 translate-x-[-0.5px]" />
+              <div className="w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+                <Send className="w-3.5 h-3.5 text-cyan-300 transform -rotate-12 translate-x-[-0.5px]" />
               </div>
-              <span className="drop-shadow-sm whitespace-nowrap">PLAY IN TELEGRAM</span>
+              <span>PLAY IN TELEGRAM</span>
             </a>
 
-            {/* Connect Wallet & Play Button */}
+            {/* Connect Wallet & Play Button - Refined Dark Luxury Gold Artifact */}
             <button
               onClick={onConnectWallet}
               disabled={isConnecting}
-              className={`
-                w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4
-                bg-gradient-to-r from-[#151a21] to-[#0b0c10]
-                border border-[#c5a880]/50
-                hover:border-[#ebd09b]
-                hover:shadow-[0_0_30px_rgba(197,168,128,0.25)]
-                rounded-xl
-                font-display font-black text-xs sm:text-sm text-[#ebd09b]
-                tracking-[0.2em] uppercase
-                transition-all duration-300
-                cursor-pointer
-                active:scale-95
-                relative overflow-hidden
-                group
-                disabled:opacity-60 disabled:cursor-wait
-                select-none
-              `}
+              className="w-full sm:w-auto min-w-[260px] h-[54px] px-8 rounded-2xl bg-gradient-to-b from-[#211a13]/95 via-[#18130d]/95 to-[#0e0b07] border border-[#c5a880]/50 hover:border-[#ebd09b] text-[#ebd09b] hover:text-[#fff5db] font-display font-bold text-xs sm:text-sm tracking-[0.22em] uppercase transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_20px_rgba(197,168,128,0.15)] hover:shadow-[0_0_30px_rgba(197,168,128,0.35)] active:scale-95 flex items-center justify-center gap-3 cursor-pointer group whitespace-nowrap disabled:opacity-60 disabled:cursor-wait"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#c5a880]/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none" />
-              <span className={`relative z-10 whitespace-nowrap ${isConnecting ? 'animate-pulse' : ''}`}>
+              <div className="w-6 h-6 rounded-full bg-amber-500/20 border border-[#c5a880]/40 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+                <span className="font-display font-black text-xs text-[#ebd09b] leading-none">Ω</span>
+              </div>
+              <span className={isConnecting ? 'animate-pulse' : ''}>
                 {isConnecting ? 'CONNECTING...' : 'CONNECT WALLET & PLAY'}
               </span>
             </button>
@@ -1110,27 +1096,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             </p>
           </div>
 
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-            {/* Play in Telegram Button */}
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-2xl mx-auto select-none">
+            {/* Play in Telegram Button - Refined Dark Luxury Telegram Artifact */}
             <a
               href="https://t.me/voidcovenantbot"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-[#0088cc] via-[#1a9de4] to-[#24A1DE] hover:from-[#0099e6] hover:to-[#2cb6fc] text-white font-display font-black text-sm sm:text-base tracking-[0.2em] uppercase rounded-2xl transition-all duration-300 shadow-[0_0_35px_rgba(0,136,204,0.45)] hover:shadow-[0_0_50px_rgba(0,136,204,0.75)] cursor-pointer hover:scale-105 active:scale-95 border border-cyan-200/50 flex items-center justify-center gap-3 select-none"
+              className="w-full sm:w-auto min-w-[260px] h-[54px] px-8 rounded-2xl bg-gradient-to-b from-[#0f2131]/95 via-[#0a1722]/95 to-[#060c12] border border-cyan-400/40 hover:border-cyan-300 text-cyan-100 hover:text-white font-display font-bold text-xs sm:text-sm tracking-[0.22em] uppercase transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_20px_rgba(6,182,212,0.2)] hover:shadow-[0_0_30px_rgba(6,182,212,0.45)] active:scale-95 flex items-center justify-center gap-3 cursor-pointer group whitespace-nowrap"
             >
-              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shadow-inner">
-                <Send className="w-3.5 h-3.5 text-white transform -rotate-12 translate-x-[-0.5px]" />
+              <div className="w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+                <Send className="w-3.5 h-3.5 text-cyan-300 transform -rotate-12 translate-x-[-0.5px]" />
               </div>
-              <span className="whitespace-nowrap">PLAY IN TELEGRAM</span>
+              <span>PLAY IN TELEGRAM</span>
             </a>
 
-            {/* Enter the Covenant (Browser) Button */}
+            {/* Enter the Covenant Button - Refined Dark Luxury Gold Artifact */}
             <button
               onClick={onConnectWallet}
               disabled={isConnecting}
-              className="px-8 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-black font-display font-black text-sm sm:text-base tracking-[0.2em] uppercase rounded-2xl transition-all duration-300 shadow-[0_0_40px_rgba(245,158,11,0.5)] hover:shadow-[0_0_60px_rgba(245,158,11,0.8)] cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-60 select-none whitespace-nowrap"
+              className="w-full sm:w-auto min-w-[260px] h-[54px] px-8 rounded-2xl bg-gradient-to-b from-[#211a13]/95 via-[#18130d]/95 to-[#0e0b07] border border-[#c5a880]/50 hover:border-[#ebd09b] text-[#ebd09b] hover:text-[#fff5db] font-display font-bold text-xs sm:text-sm tracking-[0.22em] uppercase transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_20px_rgba(197,168,128,0.15)] hover:shadow-[0_0_30px_rgba(197,168,128,0.35)] active:scale-95 flex items-center justify-center gap-3 cursor-pointer group whitespace-nowrap disabled:opacity-60 disabled:cursor-wait"
             >
-              {isConnecting ? 'CONNECTING...' : 'ENTER THE COVENANT'}
+              <div className="w-6 h-6 rounded-full bg-amber-500/20 border border-[#c5a880]/40 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+                <span className="font-display font-black text-xs text-[#ebd09b] leading-none">Ω</span>
+              </div>
+              <span className={isConnecting ? 'animate-pulse' : ''}>
+                {isConnecting ? 'CONNECTING...' : 'ENTER THE COVENANT'}
+              </span>
             </button>
           </div>
 
