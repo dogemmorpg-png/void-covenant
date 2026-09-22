@@ -433,7 +433,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
               {[
                 { 
                   count: 3, 
-                  cost: 10, 
+                  cost: 6, 
                   label: 'Minor Vial', 
                   sub: '+3 Abyss Energy',
                   image: '/icons/energy_vial_small.webp',
@@ -441,7 +441,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                 },
                 { 
                   count: 10, 
-                  cost: 25, 
+                  cost: 18, 
                   label: 'Abyssal Flask', 
                   sub: '+10 Full Refill', 
                   image: '/icons/energy_flask_medium.webp',
@@ -451,11 +451,11 @@ export const CampaignView: React.FC<CampaignViewProps> = ({ onStartBattle }) => 
                 },
                 { 
                   count: 25, 
-                  cost: 50, 
+                  cost: 45, 
                   label: 'Grand Elixir', 
                   sub: '+25 Big Reserve', 
                   image: '/icons/energy_elixir_large.webp',
-                  badge: 'SAVE 25 SHARDS',
+                  badge: 'BEST VALUE',
                   theme: 'border-amber-500/60 hover:border-amber-400 bg-gradient-to-b from-amber-950/30 via-black to-black shadow-[0_0_20px_rgba(245,158,11,0.15)]' 
                 }
               ].map((pkg) => {

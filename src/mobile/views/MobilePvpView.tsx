@@ -1863,7 +1863,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
               {[
                 { 
                   count: 1, 
-                  cost: 12, 
+                  cost: 15, 
                   label: 'Single Pass', 
                   sub: '1 Duel Entry',
                   image: '/icons/arena_ticket_single.webp',
@@ -1871,7 +1871,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                 },
                 { 
                   count: 5, 
-                  cost: 50, 
+                  cost: 60, 
                   label: 'Gladiator Pack', 
                   sub: '5 Duel Entries', 
                   image: '/icons/arena_ticket_stack.webp',
@@ -1881,11 +1881,11 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                 },
                 { 
                   count: 10, 
-                  cost: 90, 
+                  cost: 110, 
                   label: 'Warlord Bundle', 
                   sub: '10 Duel Entries', 
                   image: '/icons/arena_ticket_deck_v2.webp',
-                  badge: 'SAVE 30 SHARDS',
+                  badge: 'SAVE 40 SHARDS',
                   theme: 'border-purple-500/50 hover:border-purple-400 bg-gradient-to-b from-purple-950/30 via-black to-black shadow-[0_0_20px_rgba(168,85,247,0.15)]' 
                 }
               ].map((pack) => {

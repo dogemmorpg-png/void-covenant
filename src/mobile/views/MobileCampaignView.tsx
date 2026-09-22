@@ -547,14 +547,14 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
               {[
                 { 
                   count: 3, 
-                  cost: 10, 
+                  cost: 6, 
                   label: 'Minor Vial', 
                   image: '/icons/energy_vial_small.webp',
                   theme: 'border-white/10 bg-black/70' 
                 },
                 { 
                   count: 10, 
-                  cost: 25, 
+                  cost: 18, 
                   label: 'Flask', 
                   image: '/icons/energy_flask_medium.webp',
                   popular: true, 
@@ -563,7 +563,7 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
                 },
                 { 
                   count: 25, 
-                  cost: 50, 
+                  cost: 45, 
                   label: 'Elixir', 
                   image: '/icons/energy_elixir_large.webp',
                   badge: 'BEST',

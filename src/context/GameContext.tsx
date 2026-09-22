@@ -1650,9 +1650,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (action === 'buy_pvp_tickets') {
       const ticketCount = payload?.ticketCount || 5;
-      let ticketCost = 50;
-      if (ticketCount === 1) ticketCost = 12;
-      else if (ticketCount === 10) ticketCost = 90;
+      let ticketCost = 60;
+      if (ticketCount === 1) ticketCost = 15;
+      else if (ticketCount === 10) ticketCost = 110;
  
       let msg = '';
       let success = false;
@@ -1687,6 +1687,44 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return updated;
       });
  
+      return { success, message: msg, profile: updatedProfile };
+    }
+
+    if (action === 'buy_pve_energy') {
+      const energyCount = payload?.energyCount || 10;
+      let shardCost = 18;
+      if (energyCount === 3) shardCost = 6;
+      else if (energyCount === 25) shardCost = 45;
+
+      let msg = '';
+      let success = false;
+      let updatedProfile: any = null;
+
+      setProfile(current => {
+        const currentShards = current.darkShards || 0;
+        if (currentShards < shardCost) {
+          msg = `Not enough Dark Shards! Need ${shardCost} shards.`;
+          success = false;
+          return current;
+        }
+        success = true;
+        let updated = recordShardTransaction(
+          current,
+          'BUY_PVE_ENERGY',
+          -shardCost,
+          `Restored +${energyCount} PvE Energy for ${shardCost} Shards`,
+          { energyCount, shardCost }
+        );
+        updated = {
+          ...updated,
+          pveEnergy: (updated.pveEnergy || 0) + energyCount
+        };
+        msg = `Restored +${energyCount} PvE Energy for ${shardCost} Shards!`;
+        updatedProfile = updated;
+        saveProfile(updated);
+        return updated;
+      });
+
       return { success, message: msg, profile: updatedProfile };
     }
 

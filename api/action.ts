@@ -1024,9 +1024,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       successMessage = 'Airdrop task completed (+200 Gold)';
     } else if (action === 'buy_pvp_tickets') {
       const ticketCount = payload?.ticketCount || 5;
-      let ticketCost = 50;
-      if (ticketCount === 1) ticketCost = 12;
-      else if (ticketCount === 10) ticketCost = 90;
+      let ticketCost = 60;
+      if (ticketCount === 1) ticketCost = 15;
+      else if (ticketCount === 10) ticketCost = 110;
       else if (ticketCount !== 5) {
         return res.status(400).json({ error: 'Invalid ticket count package' });
       }
@@ -1048,9 +1048,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       successMessage = `Bought ${ticketCount} Arena Tickets for ${ticketCost} Shards (added to Reserve)!`;
     } else if (action === 'buy_pve_energy') {
       const energyCount = payload?.energyCount || 10;
-      let shardCost = 25;
-      if (energyCount === 3) shardCost = 10;
-      else if (energyCount === 25) shardCost = 50;
+      let shardCost = 18;
+      if (energyCount === 3) shardCost = 6;
+      else if (energyCount === 25) shardCost = 45;
       else if (energyCount !== 10) {
         return res.status(400).json({ error: 'Invalid energy package' });
       }
