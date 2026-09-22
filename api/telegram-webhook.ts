@@ -12,11 +12,11 @@ function getSupabase() {
 }
 
 const PACKAGES: Record<string, { shards: number; name: string }> = {
-  shards_micro: { shards: 25, name: 'Pouch of Shards' },
-  shards_pouch: { shards: 85, name: 'Dark Shard Chest' },
-  shards_vault: { shards: 250, name: 'Abyssal Treasury' },
-  shards_overlord: { shards: 700, name: 'Void Monolith' },
-  shards_sovereign: { shards: 1800, name: 'Lord of the Void Vault' }
+  shards_micro: { shards: 50, name: 'Pouch of Shards' },
+  shards_pouch: { shards: 250, name: 'Dark Shard Chest' },
+  shards_vault: { shards: 500, name: 'Abyssal Treasury' },
+  shards_overlord: { shards: 1000, name: 'Void Monolith' },
+  shards_sovereign: { shards: 5000, name: 'Lord of the Void Vault' }
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {

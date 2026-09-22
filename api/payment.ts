@@ -28,11 +28,11 @@ function getSupabase() {
 
 // Packages for Solana
 const SOLANA_PACKAGES: Record<string, { solCost: number; shards: number; dust: number; isBp?: boolean }> = {
-  shards_micro: { solCost: 0.05, shards: 25, dust: 0 },
-  shards_pouch: { solCost: 0.15, shards: 85, dust: 0 },
-  shards_vault: { solCost: 0.40, shards: 250, dust: 0 },
-  shards_overlord: { solCost: 1.00, shards: 700, dust: 0 },
-  shards_sovereign: { solCost: 2.50, shards: 1800, dust: 0 },
+  shards_micro: { solCost: 0.009, shards: 50, dust: 0 },
+  shards_pouch: { solCost: 0.04, shards: 250, dust: 0 },
+  shards_vault: { solCost: 0.08, shards: 500, dust: 0 },
+  shards_overlord: { solCost: 0.15, shards: 1000, dust: 0 },
+  shards_sovereign: { solCost: 0.7, shards: 5000, dust: 0 },
   premium_bp_sol: { solCost: 0.25, shards: 0, dust: 0, isBp: true }
 };
 
@@ -40,43 +40,43 @@ const SOLANA_PACKAGES: Record<string, { solCost: number; shards: number; dust: n
 const TELEGRAM_PACKAGES: Record<string, { shards: number; starsCost: number; tonCost: number; usdtCost: number; name: string; description: string }> = {
   shards_micro: {
     name: 'Pouch of Shards',
-    shards: 25,
-    starsCost: 1,
-    tonCost: 0.05,
-    usdtCost: 0.10,
-    description: 'Instant credit: 25 pure Dark Shards.'
+    shards: 50,
+    starsCost: 75,
+    tonCost: 0.7,
+    usdtCost: 1,
+    description: 'Instant credit: 50 pure Dark Shards.'
   },
   shards_pouch: {
     name: 'Dark Shard Chest',
-    shards: 85,
-    starsCost: 5,
-    tonCost: 0.15,
-    usdtCost: 0.30,
-    description: 'Instant credit: 85 pure Dark Shards.'
+    shards: 250,
+    starsCost: 300,
+    tonCost: 3.1,
+    usdtCost: 4.5,
+    description: 'Instant credit: 250 pure Dark Shards.'
   },
   shards_vault: {
     name: 'Abyssal Treasury',
-    shards: 250,
-    starsCost: 15,
-    tonCost: 0.40,
-    usdtCost: 1.00,
-    description: 'Instant credit: 250 pure Dark Shards.'
+    shards: 500,
+    starsCost: 600,
+    tonCost: 6.2,
+    usdtCost: 9,
+    description: 'Instant credit: 500 pure Dark Shards.'
   },
   shards_overlord: {
     name: 'Void Monolith',
-    shards: 700,
-    starsCost: 30,
-    tonCost: 1.00,
-    usdtCost: 2.50,
-    description: 'Instant credit: 700 pure Dark Shards.'
+    shards: 1000,
+    starsCost: 1150,
+    tonCost: 11.5,
+    usdtCost: 17,
+    description: 'Instant credit: 1,000 pure Dark Shards.'
   },
   shards_sovereign: {
     name: 'Lord of the Void Vault',
-    shards: 1800,
-    starsCost: 75,
-    tonCost: 2.50,
-    usdtCost: 6.50,
-    description: 'Instant credit: 1,800 pure Dark Shards.'
+    shards: 5000,
+    starsCost: 5500,
+    tonCost: 55,
+    usdtCost: 80,
+    description: 'Instant credit: 5,000 pure Dark Shards.'
   }
 };
 

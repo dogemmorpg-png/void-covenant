@@ -1300,7 +1300,7 @@ export const ShardsShopModal: React.FC<ShardsShopModalProps> = ({ onClose }) => 
                         className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain drop-shadow-[0_0_6px_rgba(239,68,68,0.7)] shrink-0" 
                       />
                       <span className="text-xs sm:text-sm font-black text-white font-mono leading-none tracking-tight">
-                        +{pkg.shardsReward}
+                        +{pkg.shardsReward.toLocaleString()}
                       </span>
                     </div>
 

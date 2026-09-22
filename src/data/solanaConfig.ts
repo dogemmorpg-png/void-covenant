@@ -35,8 +35,8 @@ export const SOLANA_PACKAGES: SolanaPackage[] = [
   {
     id: 'shards_micro',
     name: 'Pouch of Shards',
-    solCost: 0.05,
-    shardsReward: 25,
+    solCost: 0.009,
+    shardsReward: 50,
     dustBonus: 0,
     description: '',
     image: '/shop/pouch_of_shards.png'
@@ -44,8 +44,8 @@ export const SOLANA_PACKAGES: SolanaPackage[] = [
   {
     id: 'shards_pouch',
     name: 'Dark Shard Chest',
-    solCost: 0.15,
-    shardsReward: 85,
+    solCost: 0.04,
+    shardsReward: 250,
     dustBonus: 0,
     description: '',
     popular: true,
@@ -55,8 +55,8 @@ export const SOLANA_PACKAGES: SolanaPackage[] = [
   {
     id: 'shards_vault',
     name: 'Abyssal Treasury',
-    solCost: 0.40,
-    shardsReward: 250,
+    solCost: 0.08,
+    shardsReward: 500,
     dustBonus: 0,
     description: '',
     badge: 'BEST VALUE',
@@ -65,8 +65,8 @@ export const SOLANA_PACKAGES: SolanaPackage[] = [
   {
     id: 'shards_overlord',
     name: 'Void Monolith',
-    solCost: 1.00,
-    shardsReward: 700,
+    solCost: 0.15,
+    shardsReward: 1000,
     dustBonus: 0,
     description: '',
     badge: 'SUPREME',
@@ -75,8 +75,8 @@ export const SOLANA_PACKAGES: SolanaPackage[] = [
   {
     id: 'shards_sovereign',
     name: 'Lord of the Void Vault',
-    solCost: 2.50,
-    shardsReward: 1800,
+    solCost: 0.7,
+    shardsReward: 5000,
     dustBonus: 0,
     description: '',
     badge: 'MYTHIC',
