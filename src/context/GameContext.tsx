@@ -1949,9 +1949,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const SHIELD_PRICES: Record<string, number> = {
-        '3h': 8,
-        '6h': 15,
-        '12h': 25
+        '3h': 25,
+        '6h': 40,
+        '12h': 80
       };
       const cost = SHIELD_PRICES[shieldType];
 
@@ -1996,8 +1996,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { targetLevel } = payload || {};
       const numLevel = Number(targetLevel);
       const LEVEL_BOOST_CONFIG: Record<number, { costShards: number; name: string }> = {
-        50: { costShards: 250, name: 'Instant Level 50 Ascension' },
-        100: { costShards: 700, name: 'Instant Level 100 Supreme Godhood' }
+        50: { costShards: 2000, name: 'Instant Level 50 Ascension' },
+        100: { costShards: 3500, name: 'Instant Level 100 Supreme Godhood' }
       };
       const config = LEVEL_BOOST_CONFIG[numLevel];
       if (!config) return { success: false, message: 'Invalid level boost package.' };

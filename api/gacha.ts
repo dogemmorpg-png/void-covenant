@@ -185,11 +185,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let isEquipment = false;
 
     if (packType === 'bronze') goldCost = 1000;
-    else if (packType === 'obsidian') shardCost = 30;
-    else if (packType === 'abyssal') shardCost = 70;
+    else if (packType === 'obsidian') shardCost = 50;
+    else if (packType === 'abyssal') shardCost = 200;
     else if (packType === 'eq_basic') { goldCost = 700; isEquipment = true; }
-    else if (packType === 'eq_rare') { shardCost = 30; isEquipment = true; }
-    else if (packType === 'eq_premium') { shardCost = 70; isEquipment = true; }
+    else if (packType === 'eq_rare') { shardCost = 35; isEquipment = true; }
+    else if (packType === 'eq_premium') { shardCost = 140; isEquipment = true; }
     else return res.status(400).json({ error: 'Invalid pack type' });
 
     if (goldCost > 0 && profile.gold < goldCost) {

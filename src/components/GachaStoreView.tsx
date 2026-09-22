@@ -81,9 +81,9 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
   const [buyingEquipName, setBuyingEquipName] = useState<string | null>(null);
 
   const handleBuyLevelBoost = async (targetLevel: 50 | 100) => {
-    const cost = targetLevel === 50 ? 250 : 700;
+    const cost = targetLevel === 50 ? 2000 : 3500;
     if ((profile.darkShards || 0) < cost) {
-      toast(`Insufficient Dark Shards! Need ${cost} Shards. Opening shop...`, 'warning');
+      toast(`Insufficient Dark Shards! Need ${cost.toLocaleString()} Shards. Opening shop...`, 'warning');
       setIsShardsShopOpen(true);
       return;
     }
@@ -118,9 +118,9 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
   const [revealedEquipment, setRevealedEquipment] = useState<Equipment[]>([]);
   const [isRevealed, setIsRevealed] = useState(false);
 
-  // Buy Divine Card (costs 50 Shards)
+  // Buy Divine Card (costs 2,500 Shards)
   const buyDivineCard = async (baseId: string) => {
-    const cardCost = 50;
+    const cardCost = 2500;
     if ((profile.darkShards || 0) < cardCost) {
       setIsShardsShopOpen(true);
       toast('Insufficient Dark Shards! Opening Shards Shop...', 'warning');
@@ -162,9 +162,9 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
     }
   };
 
-  // Buy Divine Equipment (costs 50 Shards)
+  // Buy Divine Equipment (costs 600 Shards)
   const buyDivineEquipment = async (itemName: string) => {
-    const equipCost = 50;
+    const equipCost = 600;
     if ((profile.darkShards || 0) < equipCost) {
       setIsShardsShopOpen(true);
       toast('Insufficient Dark Shards! Opening Shards Shop...', 'warning');
@@ -209,12 +209,12 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
   const [selectedDemiurgeItemName, setSelectedDemiurgeItemName] = useState<string>(demiurgeItems[0]?.name || 'Blade of the Demiurge');
   const [isBuyingSet, setIsBuyingSet] = useState(false);
 
-  // Buy Full Demiurge Set (discounted 250 Shards instead of 300)
+  // Buy Full Demiurge Set (discounted 3,000 Shards instead of 3,600)
   const buyDivineSet = async () => {
-    const bundleCost = 250;
+    const bundleCost = 3000;
     if ((profile.darkShards || 0) < bundleCost) {
       setIsShardsShopOpen(true);
-      toast(`Insufficient Dark Shards! Bundle costs ${bundleCost} Shards. Opening Shards Shop...`, 'warning');
+      toast(`Insufficient Dark Shards! Bundle costs ${bundleCost.toLocaleString()} Shards. Opening Shards Shop...`, 'warning');
       return;
     }
 
@@ -276,14 +276,26 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
   };
 
   const buyPackBackend = async (packType: string, isEquipment: boolean = false) => {
-    if (packType === 'obsidian' || packType === 'eq_rare') {
-      if ((profile.darkShards || 0) < 30) {
+    if (packType === 'obsidian') {
+      if ((profile.darkShards || 0) < 50) {
         setIsShardsShopOpen(true);
         toast('Insufficient Dark Shards! Opening Abyssal Shop...', 'warning');
         return;
       }
-    } else if (packType === 'abyssal' || packType === 'eq_premium') {
-      if ((profile.darkShards || 0) < 70) {
+    } else if (packType === 'abyssal') {
+      if ((profile.darkShards || 0) < 200) {
+        setIsShardsShopOpen(true);
+        toast('Insufficient Dark Shards! Opening Abyssal Shop...', 'warning');
+        return;
+      }
+    } else if (packType === 'eq_rare') {
+      if ((profile.darkShards || 0) < 35) {
+        setIsShardsShopOpen(true);
+        toast('Insufficient Dark Shards! Opening Abyssal Shop...', 'warning');
+        return;
+      }
+    } else if (packType === 'eq_premium') {
+      if ((profile.darkShards || 0) < 140) {
         setIsShardsShopOpen(true);
         toast('Insufficient Dark Shards! Opening Abyssal Shop...', 'warning');
         return;
@@ -822,7 +834,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       </span>
                       <div className="bg-black/60 border border-cyan-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                         <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                        <span className="font-mono font-bold text-cyan-300 text-xs tracking-normal">30 SHARDS</span>
+                        <span className="font-mono font-bold text-cyan-300 text-xs tracking-normal">50 SHARDS</span>
                       </div>
                     </button>
                   </div>
@@ -840,7 +852,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                         FORBIDDEN SUMMON
                       </span>
                       <span className="bg-rose-950/80 border border-rose-500/50 px-1.5 py-0.2 rounded text-[7.5px] text-rose-300">
-                        TIER III
+                        RANK III
                       </span>
                     </div>
 
@@ -855,58 +867,40 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       />
                       <div className="absolute bottom-1.5 px-2.5 py-0.5 rounded-full bg-black/80 border border-rose-500/50 backdrop-blur-sm shadow-md">
                         <span className="font-display font-black text-[9px] text-rose-300 tracking-widest uppercase">
-                          ABYSSAL PACK
+                          ABYSSAL ENTITIES
                         </span>
                       </div>
                     </div>
 
                     <div>
                       <h4 className="font-display font-black text-sm sm:text-base text-white group-hover:text-rose-300 transition-colors">
-                        Abyssal Lord Pack
+                        Abyssal Booster Pack
                       </h4>
-                      <p className="text-[9.5px] text-gray-400 font-sans mt-0.5 leading-tight">High rate for Gold & Legendary primordial entities</p>
+                      <p className="text-[9.5px] text-gray-400 font-sans mt-0.5 leading-tight">Elite void entities and elder primordial forces</p>
                     </div>
 
-                    {/* Clean Drop Rates Box (100% Total) */}
+                    {/* Clean Drop Rates Box */}
                     <div className="bg-black/65 border border-white/10 rounded-xl p-2.5 text-[11px] font-mono space-y-1.5 shadow-inner">
-                      <div className="flex justify-between items-center text-[10px] text-gray-400 uppercase tracking-wider font-bold border-b border-white/10 pb-1">
-                        <span>Rarity Rates</span>
-                        <span className="text-gray-500">100%</span>
-                      </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-300 flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-                          Silver Cards:
+                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                          Rare Cards:
                         </span>
-                        <span className="text-slate-200 font-bold text-xs bg-slate-900/60 px-1.5 py-0.5 rounded border border-slate-500/40">30%</span>
+                        <span className="text-cyan-300 font-bold text-xs bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-500/40">55%</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-300 flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                          Gold Cards:
+                          Epic Cards:
                         </span>
-                        <span className="text-amber-400 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/40">55%</span>
+                        <span className="text-amber-400 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/40">35%</span>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-300 flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-                          Legendary Cards:
+                      <div className="flex justify-between items-center border-t border-white/10 pt-1.5 text-gray-400 text-[10.5px]">
+                        <span className="flex items-center gap-1 text-rose-300/80">
+                          <Sparkles className="w-3 h-3 text-rose-400" /> Legendary Cards:
                         </span>
-                        <span className="text-purple-300 font-bold text-xs bg-purple-950/60 px-1.5 py-0.5 rounded border border-purple-500/40">15%</span>
+                        <span className="text-rose-300 font-bold bg-rose-950/80 px-1.5 py-0.5 rounded border border-rose-500/40">10%</span>
                       </div>
-                    </div>
-
-                    {/* Separate Level 2 Upgrade Chance Banner */}
-                    <div className="bg-rose-950/30 border border-rose-500/30 rounded-xl px-2.5 py-1.5 flex items-center justify-between text-[10.5px] font-mono shadow-sm">
-                      <div className="flex items-center gap-1.5 text-rose-200">
-                        <span className="text-[8.5px] uppercase font-bold tracking-wider bg-rose-900/60 border border-rose-400/40 px-1.5 py-0.5 rounded text-rose-300">
-                          BONUS ROLL
-                        </span>
-                        <span>Level 2 Chance:</span>
-                      </div>
-                      <span className="text-rose-300 font-bold text-xs bg-rose-950/90 px-2 py-0.5 rounded border border-rose-400/50 shadow">
-                        30%
-                      </span>
                     </div>
                   </div>
 
@@ -920,7 +914,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       </span>
                       <div className="bg-black/60 border border-rose-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                         <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                        <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">70 SHARDS</span>
+                        <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">200 SHARDS</span>
                       </div>
                     </button>
                   </div>
@@ -938,56 +932,51 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-purple-950/80 pb-2">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-lg bg-purple-950/60 border border-purple-500/40 flex items-center justify-center shadow-[0_0_12px_rgba(168,85,247,0.3)]">
-                    <Shield className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
+                    <Shield className="w-4 h-4 text-purple-400" />
                   </div>
                   <div>
-                    <h2 className="font-display font-black text-base sm:text-lg text-white tracking-widest text-shadow-gold uppercase">
-                      Relic Chests
-                    </h2>
-                    <p className="text-[9.5px] sm:text-[10.5px] text-gray-400 font-mono leading-none">Unearth enchanted weapons, armor & sacred Lord relics</p>
+                    <div className="flex items-center gap-2">
+                      <h2 className="font-display font-black text-sm sm:text-base text-white tracking-wider uppercase text-shadow">
+                        Relic Armory Chests
+                      </h2>
+                      <span className="bg-purple-950/90 border border-purple-500/60 text-purple-300 text-[8px] font-mono px-2 py-0.5 rounded font-black tracking-widest uppercase shadow-[0_0_8px_rgba(168,85,247,0.3)]">
+                        3 TIERS
+                      </span>
+                    </div>
+                    <p className="text-[10px] sm:text-xs text-gray-300 font-sans mt-0.5">
+                      Equip your Lord with artifacts of power. Boost HP, dodge chance, and delay reduction.
+                    </p>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="bg-purple-950/80 border border-purple-500/50 text-purple-300 text-[9.5px] font-mono px-2.5 py-0.5 rounded-full font-bold shadow-sm flex items-center gap-1.5">
-                    <Shield className="w-3 h-3 text-purple-400" /> 1 EQUIPMENT PER CHEST
-                  </span>
-                  <span className="text-[9.5px] font-mono text-purple-300 bg-black/60 border border-purple-500/30 px-2 py-0.5 rounded-full hidden sm:inline font-bold">
-                    LORD ARMAMENTS
-                  </span>
                 </div>
               </div>
 
-              {/* 3 Chest Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 lg:gap-4">
+              {/* 3 Chests Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-3.5">
                 
                 {/* Basic Chest */}
-                <div className="bg-gradient-to-b from-[#1c150e] via-[#120e09] to-[#0a0705] border-2 border-amber-600/40 hover:border-amber-400/90 rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between shadow-xl hover:shadow-[0_0_30px_rgba(245,158,11,0.25)] transition-all duration-300 group relative overflow-hidden">
-                  <div className="absolute -top-24 -left-24 w-48 h-48 bg-amber-600/10 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
-                  
+                <div className="bg-gradient-to-b from-[#14120a] via-[#0d0c07] to-[#070604] border-2 border-amber-800/40 hover:border-amber-600/70 rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between shadow-xl hover:shadow-[0_0_25px_rgba(217,119,6,0.2)] transition-all duration-300 group relative overflow-hidden">
                   <div className="space-y-2.5 sm:space-y-3 relative z-10">
-                    {/* Top Tier Tag */}
-                    <div className="flex items-center justify-between text-[8.5px] font-mono font-bold tracking-wider text-amber-400/90 uppercase px-1">
+                    <div className="flex items-center justify-between text-[8.5px] font-mono font-bold tracking-wider text-amber-500/90 uppercase px-1">
                       <span className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                        STANDARD RELICS
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                        INITIATE RELICS
                       </span>
-                      <span className="bg-amber-950/80 border border-amber-500/40 px-1.5 py-0.2 rounded text-[7.5px] text-amber-300">
+                      <span className="bg-black/60 border border-amber-700/40 px-1.5 py-0.2 rounded text-[7.5px] text-amber-400">
                         RANK I
                       </span>
                     </div>
 
-                    {/* Chest Art Box */}
-                    <div className="h-38 sm:h-42 rounded-xl bg-gradient-to-b from-amber-950/40 via-black/60 to-black/80 border border-amber-600/30 flex flex-col items-center justify-center relative overflow-hidden group-hover:border-amber-400/60 transition-colors shadow-inner">
-                      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(245,158,11,0.18),transparent_70%)]" />
+                    <div className="h-38 sm:h-42 rounded-xl bg-gradient-to-b from-amber-950/30 via-black/60 to-black/80 border border-amber-800/30 flex flex-col items-center justify-center relative overflow-hidden group-hover:border-amber-700/50 transition-colors shadow-inner">
+                      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(217,119,6,0.15),transparent_70%)]" />
                       <img 
                         src="/packs/chest_basic.webp" 
                         alt="Basic Relics" 
                         decoding="async" 
-                        className="w-32 h-32 sm:w-36 sm:h-36 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(245,158,11,0.4)]" 
+                        className="w-32 h-32 sm:w-36 sm:h-36 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(217,119,6,0.35)]" 
                       />
-                      <div className="absolute bottom-1.5 px-2.5 py-0.5 rounded-full bg-black/80 border border-amber-500/50 backdrop-blur-sm shadow-md">
+                      <div className="absolute bottom-1.5 px-2.5 py-0.5 rounded-full bg-black/80 border border-amber-700/50 backdrop-blur-sm shadow-md">
                         <span className="font-display font-black text-[9px] text-amber-300 tracking-widest uppercase">
-                          BASIC RELICS
+                          STANDARD GEAR
                         </span>
                       </div>
                     </div>
@@ -996,30 +985,29 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       <h4 className="font-display font-black text-sm sm:text-base text-white group-hover:text-amber-300 transition-colors">
                         Basic Equipment Chest
                       </h4>
-                      <p className="text-[9.5px] text-gray-400 font-sans mt-0.5 leading-tight">Forged for new lords entering the Abyssal Trials</p>
+                      <p className="text-[9.5px] text-gray-400 font-sans mt-0.5 leading-tight">Forged for frontline warriors and acolytes</p>
                     </div>
 
-                    {/* Clean Drop Rates Box */}
                     <div className="bg-black/65 border border-white/10 rounded-xl p-2.5 text-[11px] font-mono space-y-1.5 shadow-inner">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-300 flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-700" />
                           Bronze Equipment:
                         </span>
-                        <span className="text-amber-400 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-600/40">80%</span>
+                        <span className="text-amber-200 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-800/40">70%</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-300 flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
                           Silver Equipment:
                         </span>
-                        <span className="text-slate-200 font-bold text-xs bg-slate-900/60 px-1.5 py-0.5 rounded border border-slate-500/40">20%</span>
+                        <span className="text-cyan-300 font-bold text-xs bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-500/40">25%</span>
                       </div>
                       <div className="flex justify-between items-center border-t border-white/10 pt-1.5 text-gray-400 text-[10.5px]">
-                        <span className="flex items-center gap-1 text-amber-300/80">
-                          <Shield className="w-3 h-3 text-amber-400" /> Tier Range:
+                        <span className="flex items-center gap-1 text-amber-400/80">
+                          <Sparkles className="w-3 h-3 text-amber-400" /> Gold Equipment:
                         </span>
-                        <span className="text-white font-bold bg-white/5 px-1.5 py-0.5 rounded border border-white/10">Bronze – Silver</span>
+                        <span className="text-amber-300 font-bold bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-500/40">5%</span>
                       </div>
                     </div>
                   </div>
@@ -1027,13 +1015,13 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   <div className="mt-2.5 sm:mt-3 relative z-10">
                     <button
                       onClick={buyBasicEquipmentPack}
-                      className="w-full relative overflow-hidden bg-gradient-to-b from-[#3d2410] via-[#241407] to-[#120a03] hover:from-[#4d2d14] hover:via-[#2e1909] hover:to-[#170c04] border-t-2 border-t-amber-400/90 border-x border-amber-600/50 border-b-2 border-b-black font-display font-black tracking-widest py-2 px-3 rounded-xl transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.8),0_0_12px_rgba(245,158,11,0.2)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.9),0_0_18px_rgba(245,158,11,0.35)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.01] active:scale-[0.98] select-none group"
+                      className="w-full relative overflow-hidden bg-gradient-to-b from-[#2e1d0d] via-[#1c1108] to-[#0c0703] hover:from-[#3a2511] hover:via-[#24160a] hover:to-[#100904] border-t-2 border-t-amber-500/90 border-x border-amber-700/50 border-b-2 border-b-black font-display font-black tracking-widest py-2 px-3 rounded-xl transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.8),0_0_12px_rgba(217,119,6,0.2)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.9),0_0_18px_rgba(217,119,6,0.35)] flex items-center justify-between text-xs cursor-pointer hover:scale-[1.01] active:scale-[0.98] select-none group"
                     >
                       <span className="font-display font-black tracking-widest text-amber-200 group-hover:text-amber-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                         FORGE RELIC
                       </span>
                       <div className="bg-black/60 border border-amber-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
-                        <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(245,158,11,0.9)]" />
+                        <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(245,158,11,0.95)]" />
                         <span className="font-mono font-bold text-amber-300 text-xs tracking-normal">700 GOLD</span>
                       </div>
                     </button>
@@ -1041,33 +1029,31 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                 </div>
 
                 {/* Rare Chest */}
-                <div className="bg-gradient-to-b from-[#0a1824] via-[#06111a] to-[#030a10] border-2 border-cyan-500/40 hover:border-cyan-400/90 rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between shadow-xl hover:shadow-[0_0_30px_rgba(6,182,212,0.25)] transition-all duration-300 group relative overflow-hidden">
-                  <div className="absolute -top-24 -left-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-cyan-400/20 transition-all" />
+                <div className="bg-gradient-to-b from-[#0c222c] via-[#07161d] to-[#030b0e] border-2 border-cyan-500/50 hover:border-cyan-400/95 rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between shadow-xl hover:shadow-[0_0_30px_rgba(6,182,212,0.25)] transition-all duration-300 group relative overflow-hidden">
+                  <div className="absolute -top-24 -left-24 w-48 h-48 bg-cyan-500/15 rounded-full blur-2xl pointer-events-none group-hover:bg-cyan-500/25 transition-all" />
                   
                   <div className="space-y-2.5 sm:space-y-3 relative z-10">
-                    {/* Top Tier Tag */}
                     <div className="flex items-center justify-between text-[8.5px] font-mono font-bold tracking-wider text-cyan-400/90 uppercase px-1">
                       <span className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                        ARCANE CACHE
+                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                        VALIANT RELICS
                       </span>
-                      <span className="bg-cyan-950/80 border border-cyan-500/40 px-1.5 py-0.2 rounded text-[7.5px] text-cyan-300">
+                      <span className="bg-cyan-950/80 border border-cyan-500/50 px-1.5 py-0.2 rounded text-[7.5px] text-cyan-300">
                         RANK II
                       </span>
                     </div>
 
-                    {/* Chest Art Box */}
                     <div className="h-38 sm:h-42 rounded-xl bg-gradient-to-b from-cyan-950/40 via-black/60 to-black/80 border border-cyan-600/30 flex flex-col items-center justify-center relative overflow-hidden group-hover:border-cyan-400/60 transition-colors shadow-inner">
-                      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.18),transparent_70%)]" />
+                      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.2),transparent_70%)]" />
                       <img 
                         src="/packs/chest_rare.webp" 
                         alt="Rare Relics" 
                         decoding="async" 
-                        className="w-32 h-32 sm:w-36 sm:h-36 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(6,182,212,0.4)]" 
+                        className="w-32 h-32 sm:w-36 sm:h-36 object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_18px_rgba(6,182,212,0.4)]" 
                       />
                       <div className="absolute bottom-1.5 px-2.5 py-0.5 rounded-full bg-black/80 border border-cyan-500/50 backdrop-blur-sm shadow-md">
                         <span className="font-display font-black text-[9px] text-cyan-300 tracking-widest uppercase">
-                          RARE RELICS
+                          RARE WEAPONS
                         </span>
                       </div>
                     </div>
@@ -1076,24 +1062,23 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       <h4 className="font-display font-black text-sm sm:text-base text-white group-hover:text-cyan-300 transition-colors">
                         Rare Equipment Chest
                       </h4>
-                      <p className="text-[9.5px] text-gray-400 font-sans mt-0.5 leading-tight">Enchanted armaments granting potent stat enhancements</p>
+                      <p className="text-[9.5px] text-gray-400 font-sans mt-0.5 leading-tight">Infused with Void ether to overwhelm champions</p>
                     </div>
 
-                    {/* Clean Drop Rates Box */}
                     <div className="bg-black/65 border border-white/10 rounded-xl p-2.5 text-[11px] font-mono space-y-1.5 shadow-inner">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-300 flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
-                          Bronze Equipment:
-                        </span>
-                        <span className="text-amber-500 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-600/40">40%</span>
-                      </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-300 flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
                           Silver Equipment:
                         </span>
-                        <span className="text-cyan-300 font-bold text-xs bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-500/40">50%</span>
+                        <span className="text-cyan-300 font-bold text-xs bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-500/40">55%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-300 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                          Gold Equipment:
+                        </span>
+                        <span className="text-amber-400 font-bold text-xs bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/40">35%</span>
                       </div>
                       <div className="flex justify-between items-center border-t border-white/10 pt-1.5 text-gray-400 text-[10.5px]">
                         <span className="flex items-center gap-1 text-amber-300/80">
@@ -1114,7 +1099,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       </span>
                       <div className="bg-black/60 border border-cyan-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                         <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                        <span className="font-mono font-bold text-cyan-300 text-xs tracking-normal">30 SHARDS</span>
+                        <span className="font-mono font-bold text-cyan-300 text-xs tracking-normal">35 SHARDS</span>
                       </div>
                     </button>
                   </div>
@@ -1194,7 +1179,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       </span>
                       <div className="bg-black/60 border border-purple-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                         <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                        <span className="font-mono font-bold text-purple-200 text-xs tracking-normal">70 SHARDS</span>
+                        <span className="font-mono font-bold text-purple-200 text-xs tracking-normal">140 SHARDS</span>
                       </div>
                     </button>
                   </div>
@@ -1228,17 +1213,31 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   return (
                     <div 
                       key={card.baseId} 
-                      className="bg-gradient-to-b from-[#1c080d] via-[#14060a] to-black border-2 border-rose-500/40 hover:border-rose-400/90 rounded-2xl p-4 flex flex-col justify-between shadow-2xl hover:shadow-[0_0_35px_rgba(244,63,94,0.35)] transition-all duration-300 group relative overflow-hidden"
+                      className="bg-gradient-to-b from-[#240810] via-[#16050b] to-[#0c0205] border-2 border-rose-500/50 hover:border-rose-400/90 rounded-2xl p-4 flex flex-col justify-between shadow-2xl hover:shadow-[0_0_40px_rgba(244,63,94,0.35)] transition-all duration-300 group relative overflow-hidden"
                     >
-                      <div className="absolute -top-24 -left-24 w-48 h-48 bg-rose-500/15 rounded-full blur-2xl pointer-events-none group-hover:bg-rose-500/25 transition-all" />
+                      {/* Ambient Glow behind card */}
+                      <div className="absolute top-0 right-0 w-48 h-48 bg-rose-500/15 rounded-full blur-3xl pointer-events-none group-hover:bg-rose-500/25 transition-all" />
 
-                      <div className="space-y-3.5 relative z-10">
-                        {/* Card Portrait & Badges */}
-                        <div className="relative h-52 sm:h-56 rounded-xl overflow-hidden border border-rose-400/40 shadow-lg bg-black/60">
+                      <div className="space-y-3 relative z-10">
+                        {/* Top Tier Tag */}
+                        <div className="flex items-center justify-between text-[10px] font-mono font-bold tracking-wider text-rose-400/90 uppercase px-1">
+                          <span className="flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
+                            PRIMORDIAL TIER
+                          </span>
+                          <span className="bg-rose-950/80 border border-rose-500/50 px-2 py-0.5 rounded text-[8.5px] text-rose-300">
+                            {ownedCount > 0 ? `${ownedCount} OWNED` : 'UNACQUIRED'}
+                          </span>
+                        </div>
+
+                        {/* Large Card Art Box */}
+                        <div className="h-64 sm:h-72 rounded-xl bg-gradient-to-b from-rose-950/40 via-black/60 to-black/80 border border-rose-500/40 flex flex-col items-center justify-center relative overflow-hidden group-hover:border-rose-400/70 transition-colors shadow-inner">
+                          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(244,63,94,0.3),transparent_70%)]" />
                           <img 
-                            src={card.image} 
+                            src={getCardImageUrl(card.image)} 
                             alt={card.name} 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                            decoding="async" 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter drop-shadow-[0_0_25px_rgba(244,63,94,0.5)]" 
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/30 pointer-events-none" />
 
@@ -1312,7 +1311,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           </span>
                           <div className="bg-black/60 border border-rose-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                             <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                            <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">50 SHARDS</span>
+                            <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">2,500 SHARDS</span>
                           </div>
                         </button>
                       </div>
@@ -1384,10 +1383,10 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                           <span className="bg-gradient-to-r from-amber-400 to-amber-500 text-black text-[9px] font-black px-1.5 py-0.2 rounded shadow-sm">
                             -17%
                           </span>
-                          <span className="line-through text-gray-400 font-mono text-[11px] font-bold">300</span>
+                          <span className="line-through text-gray-400 font-mono text-[11px] font-bold">3,600</span>
                           <div className="flex items-center gap-1">
                             <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                            <span className="font-mono font-bold text-amber-300 text-xs sm:text-sm">250</span>
+                            <span className="font-mono font-bold text-amber-300 text-xs sm:text-sm">3,000</span>
                           </div>
                         </div>
                       </>
@@ -1441,7 +1440,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                               ) : (
                                 <div className="flex items-center gap-1 text-rose-300 font-mono font-bold text-[8px] sm:text-[9px] bg-black/80 border border-rose-500/40 px-1.5 py-0.5 rounded shadow-inner">
                                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-2.5 h-2.5 object-contain inline filter drop-shadow-[0_0_4px_rgba(244,63,94,0.8)]" />
-                                  <span>50</span>
+                                  <span>600</span>
                                 </div>
                               )}
                             </div>
@@ -1581,7 +1580,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                         </span>
                         <div className="bg-black/60 border border-rose-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                           <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                          <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">50 SHARDS</span>
+                          <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">600 SHARDS</span>
                         </div>
                       </button>
                     </div>
@@ -1704,7 +1703,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                     name: '3-Hour Void Aegis',
                     subtitle: 'Minor Defense Ward',
                     durationLabel: '3 Hours Immunity',
-                    cost: 8,
+                    cost: 25,
                     image: '/icons/shield_3h.png',
                     tag: 'STANDARD',
                     tagColor: 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300',
@@ -1716,7 +1715,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                     name: '6-Hour Astral Aegis',
                     subtitle: 'Greater Defense Ward',
                     durationLabel: '6 Hours Immunity',
-                    cost: 15,
+                    cost: 40,
                     image: '/icons/shield_6h.png',
                     tag: 'MOST POPULAR',
                     tagColor: 'bg-cyan-950/90 border-cyan-500/50 text-cyan-300 shadow-[0_0_8px_rgba(6,182,212,0.3)]',
@@ -1728,9 +1727,9 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                     name: '12-Hour Supreme Aegis',
                     subtitle: 'Celestial Citadel Barrier',
                     durationLabel: '12 Hours Immunity',
-                    cost: 25,
+                    cost: 80,
                     image: '/icons/shield_12h.png',
-                    tag: 'BEST VALUE (-18%)',
+                    tag: 'BEST VALUE (-20%)',
                     tagColor: 'bg-purple-950/90 border-purple-500/60 text-purple-200 shadow-[0_0_10px_rgba(168,85,247,0.4)]',
                     borderGlow: 'border-purple-500/40 hover:border-purple-400/80 shadow-purple-950/50',
                     badge: 'MAX PROTECTION'
@@ -1897,7 +1896,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                 {(() => {
                   const currentLvl = profile.level || 1;
                   const isAlreadyReached = currentLvl >= 50;
-                  const cost = 250;
+                  const cost = 2000;
                   const canAfford = (profile.darkShards || 0) >= cost;
                   const isProcessing = isBuyingLevelBoost === 50;
 
@@ -2009,7 +2008,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                                 </span>
                                 <div className="bg-black/60 border border-amber-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                                  <span className="font-mono font-bold text-amber-300 text-xs sm:text-sm tracking-normal">{cost} SHARDS</span>
+                                  <span className="font-mono font-bold text-amber-300 text-xs sm:text-sm tracking-normal">{cost.toLocaleString()} SHARDS</span>
                                 </div>
                               </>
                             )}
@@ -2024,7 +2023,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                 {(() => {
                   const currentLvl = profile.level || 1;
                   const isMaxLevel = currentLvl >= 100;
-                  const cost = 700;
+                  const cost = 3500;
                   const canAfford = (profile.darkShards || 0) >= cost;
                   const isProcessing = isBuyingLevelBoost === 100;
 
@@ -2136,7 +2135,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                                 </span>
                                 <div className="bg-black/60 border border-rose-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                                  <span className="font-mono font-bold text-rose-300 text-xs sm:text-sm tracking-normal">{cost} SHARDS</span>
+                                  <span className="font-mono font-bold text-rose-300 text-xs sm:text-sm tracking-normal">{cost.toLocaleString()} SHARDS</span>
                                 </div>
                               </>
                             )}

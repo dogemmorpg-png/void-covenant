@@ -1137,7 +1137,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Divine entity template not found.' });
       }
 
-      const cardCost = 50;
+      const cardCost = 2500;
       const currentShards = profile.darkShards || 0;
       if (currentShards < cardCost) {
         return res.status(400).json({ error: 'Not enough Dark Shards' });
@@ -1164,7 +1164,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Divine equipment template not found.' });
       }
 
-      const equipCost = 50;
+      const equipCost = 600;
       const currentShards = profile.darkShards || 0;
       if (currentShards < equipCost) {
         return res.status(400).json({ error: 'Not enough Dark Shards' });
@@ -1190,8 +1190,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Demiurge set templates not found.' });
       }
 
-      // Discount: 250 Dark Shards instead of 300 (50 shards discount)
-      const bundleCost = 250;
+      // Discount: 3000 Dark Shards instead of 3600 (600 shards discount)
+      const bundleCost = 3000;
       const currentShards = profile.darkShards || 0;
       if (currentShards < bundleCost) {
         return res.status(400).json({ error: `Not enough Dark Shards! Bundle costs ${bundleCost} Shards.` });
@@ -1221,8 +1221,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { targetLevel } = payload || {};
       const numLevel = Number(targetLevel);
       const LEVEL_BOOST_CONFIG: Record<number, { costShards: number; name: string }> = {
-        50: { costShards: 250, name: 'Instant Level 50 Ascension' },
-        100: { costShards: 700, name: 'Instant Level 100 Supreme Godhood' }
+        50: { costShards: 2000, name: 'Instant Level 50 Ascension' },
+        100: { costShards: 3500, name: 'Instant Level 100 Supreme Godhood' }
       };
 
       const config = LEVEL_BOOST_CONFIG[numLevel];
@@ -1633,9 +1633,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       const SHIELD_PRICES: Record<string, number> = {
-        '3h': 8,
-        '6h': 15,
-        '12h': 25
+        '3h': 25,
+        '6h': 40,
+        '12h': 80
       };
 
       const cost = SHIELD_PRICES[shieldType];

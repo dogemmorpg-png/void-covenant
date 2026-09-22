@@ -114,14 +114,26 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
 
   // Buy Booster Pack or Chest
   const buyPackBackend = async (packType: string, isEquipment: boolean = false) => {
-    if (packType === 'obsidian' || packType === 'eq_rare') {
-      if ((profile.darkShards || 0) < 30) {
+    if (packType === 'obsidian') {
+      if ((profile.darkShards || 0) < 50) {
         setIsShardsShopOpen(true);
         toast('Insufficient Dark Shards! Opening Abyssal Shop...', 'warning');
         return;
       }
-    } else if (packType === 'abyssal' || packType === 'eq_premium') {
-      if ((profile.darkShards || 0) < 70) {
+    } else if (packType === 'abyssal') {
+      if ((profile.darkShards || 0) < 200) {
+        setIsShardsShopOpen(true);
+        toast('Insufficient Dark Shards! Opening Abyssal Shop...', 'warning');
+        return;
+      }
+    } else if (packType === 'eq_rare') {
+      if ((profile.darkShards || 0) < 35) {
+        setIsShardsShopOpen(true);
+        toast('Insufficient Dark Shards! Opening Abyssal Shop...', 'warning');
+        return;
+      }
+    } else if (packType === 'eq_premium') {
+      if ((profile.darkShards || 0) < 140) {
         setIsShardsShopOpen(true);
         toast('Insufficient Dark Shards! Opening Abyssal Shop...', 'warning');
         return;
@@ -168,9 +180,9 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
     }
   };
 
-  // Buy Divine Card (50 Shards)
+  // Buy Divine Card (2,500 Shards)
   const buyDivineCard = async (baseId: string) => {
-    const cardCost = 50;
+    const cardCost = 2500;
     if ((profile.darkShards || 0) < cardCost) {
       setIsShardsShopOpen(true);
       toast('Insufficient Dark Shards! Opening Shards Shop...', 'warning');
@@ -212,9 +224,9 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
     }
   };
 
-  // Buy Divine Equipment piece (50 Shards)
+  // Buy Divine Equipment piece (600 Shards)
   const buyDivineEquipment = async (itemName: string) => {
-    const equipCost = 50;
+    const equipCost = 600;
     if ((profile.darkShards || 0) < equipCost) {
       setIsShardsShopOpen(true);
       toast('Insufficient Dark Shards! Opening Shards Shop...', 'warning');
@@ -256,12 +268,12 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
     }
   };
 
-  // Buy Full Demiurge Set (250 Shards)
+  // Buy Full Demiurge Set (3,000 Shards)
   const buyDivineSet = async () => {
-    const bundleCost = 250;
+    const bundleCost = 3000;
     if ((profile.darkShards || 0) < bundleCost) {
       setIsShardsShopOpen(true);
-      toast(`Insufficient Dark Shards! Bundle costs ${bundleCost} Shards. Opening Shards Shop...`, 'warning');
+      toast(`Insufficient Dark Shards! Bundle costs ${bundleCost.toLocaleString()} Shards. Opening Shards Shop...`, 'warning');
       return;
     }
 
@@ -302,9 +314,9 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
 
   // Handle Level Boost (50 or 100)
   const handleBuyLevelBoost = async (targetLevel: 50 | 100) => {
-    const cost = targetLevel === 50 ? 250 : 700;
+    const cost = targetLevel === 50 ? 2000 : 3500;
     if ((profile.darkShards || 0) < cost) {
-      toast(`Insufficient Dark Shards! Need ${cost} Shards. Opening shop...`, 'warning');
+      toast(`Insufficient Dark Shards! Need ${cost.toLocaleString()} Shards. Opening shop...`, 'warning');
       setIsShardsShopOpen(true);
       return;
     }
@@ -573,7 +585,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 </span>
                 <div className="bg-black/60 border border-cyan-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                  <span className="font-mono font-bold text-cyan-300 text-xs tracking-normal">30 SHARDS</span>
+                  <span className="font-mono font-bold text-cyan-300 text-xs tracking-normal">50 SHARDS</span>
                 </div>
               </button>
             </div>
@@ -638,7 +650,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 </span>
                 <div className="bg-black/60 border border-rose-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                  <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">70 SHARDS</span>
+                  <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">200 SHARDS</span>
                 </div>
               </button>
             </div>
@@ -648,22 +660,22 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
 
         {/* ===================== 2. CHESTS (FULL AAA SHOWCASE CARDS) ===================== */}
         {activeCategory === 'chests' && (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             
             {/* 1. Basic Chest */}
-            <div className="bg-gradient-to-b from-[#1c130a] via-[#100b05] to-[#080502] border-2 border-amber-600/60 rounded-2xl p-3 shadow-xl relative overflow-hidden space-y-2.5">
+            <div className="bg-gradient-to-b from-[#18130b] via-[#0f0c07] to-black border-2 border-amber-600/50 rounded-2xl p-3 shadow-xl relative overflow-hidden space-y-2.5">
               <div className="flex items-center justify-between">
-                <span className="text-[9px] font-mono font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                <span className="text-[9px] font-mono font-bold text-amber-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                   STANDARD RELICS
                 </span>
-                <span className="bg-amber-950/90 border border-amber-600/50 px-2 py-0.5 rounded text-[8px] font-mono text-amber-300 font-bold">
+                <span className="bg-amber-950/80 border border-amber-500/40 px-2 py-0.5 rounded text-[8px] font-mono text-amber-300 font-bold">
                   RANK I
                 </span>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-24 h-24 min-[380px]:w-26 min-[380px]:h-26 rounded-xl bg-gradient-to-b from-amber-950/40 via-black/60 to-black border border-amber-600/40 flex flex-col items-center justify-center p-1 relative shrink-0 shadow-inner">
+                <div className="w-24 h-24 min-[380px]:w-26 min-[380px]:h-26 rounded-xl bg-gradient-to-b from-amber-950/40 via-black/60 to-black border border-amber-500/40 flex flex-col items-center justify-center p-1 relative shrink-0 shadow-inner">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.25),transparent_70%)]" />
                   <img src="/packs/chest_basic.webp" alt="Basic Chest" className="w-20 h-20 min-[380px]:w-22 min-[380px]:h-22 object-contain relative z-10 drop-shadow-[0_0_12px_rgba(245,158,11,0.6)]" />
                   <span className="absolute bottom-1 px-1.5 py-0.2 rounded-full bg-black/80 border border-amber-500/50 text-[7px] font-display font-black text-amber-300 uppercase tracking-wider z-20">
@@ -677,18 +689,14 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                       Basic Equipment Chest
                     </h3>
                     <p className="text-[10px] text-gray-400 font-sans leading-tight mt-0.5">
-                      1 Lord Relic • Essential starting equipment.
+                      1 Lord Relic • Bronze & Silver tier gear.
                     </p>
                   </div>
 
                   <div className="bg-black/65 border border-white/10 rounded-xl p-2 text-[10px] font-mono space-y-1">
                     <div className="flex justify-between items-center text-gray-300">
-                      <span>Bronze Equipment:</span>
-                      <span className="text-amber-400 font-bold bg-amber-950/60 px-1.5 py-0.2 rounded border border-amber-600/40">80%</span>
-                    </div>
-                    <div className="flex justify-between items-center text-gray-300">
-                      <span>Silver Equipment:</span>
-                      <span className="text-slate-300 font-bold bg-slate-900/60 px-1.5 py-0.2 rounded border border-slate-600/40">20%</span>
+                      <span>Bronze: 80%</span>
+                      <span className="text-cyan-300 font-bold">Silver: 20%</span>
                     </div>
                   </div>
                 </div>
@@ -709,13 +717,13 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
             </div>
 
             {/* 2. Rare Chest */}
-            <div className="bg-gradient-to-b from-[#0a1e2b] via-[#051119] to-[#02070b] border-2 border-cyan-500/60 rounded-2xl p-3 shadow-xl relative overflow-hidden space-y-2.5">
+            <div className="bg-gradient-to-b from-[#0b1b24] via-[#061017] to-black border-2 border-cyan-500/60 rounded-2xl p-3 shadow-xl relative overflow-hidden space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-[9px] font-mono font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                   ARCANE CACHE
                 </span>
-                <span className="bg-cyan-950/90 border border-cyan-500/50 px-2 py-0.5 rounded text-[8px] font-mono text-cyan-300 font-bold">
+                <span className="bg-cyan-950/80 border border-cyan-500/40 px-2 py-0.5 rounded text-[8px] font-mono text-cyan-300 font-bold">
                   RANK II
                 </span>
               </div>
@@ -723,8 +731,8 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
               <div className="flex items-center gap-3">
                 <div className="w-24 h-24 min-[380px]:w-26 min-[380px]:h-26 rounded-xl bg-gradient-to-b from-cyan-950/40 via-black/60 to-black border border-cyan-500/40 flex flex-col items-center justify-center p-1 relative shrink-0 shadow-inner">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.25),transparent_70%)]" />
-                  <img src="/packs/chest_rare.webp" alt="Rare Chest" className="w-20 h-20 min-[380px]:w-22 min-[380px]:h-22 object-contain relative z-10 drop-shadow-[0_0_12px_rgba(6,182,212,0.6)]" />
-                  <span className="absolute bottom-1 px-1.5 py-0.2 rounded-full bg-black/80 border border-cyan-400/50 text-[7px] font-display font-black text-cyan-300 uppercase tracking-wider z-20">
+                  <img src="/packs/chest_rare.webp" alt="Rare Chest" className="w-20 h-20 min-[380px]:w-22 min-[380px]:h-22 object-contain relative z-10 drop-shadow-[0_0_14px_rgba(6,182,212,0.7)]" />
+                  <span className="absolute bottom-1 px-1.5 py-0.2 rounded-full bg-black/80 border border-cyan-500/50 text-[7px] font-display font-black text-cyan-300 uppercase tracking-wider z-20">
                     RARE RELICS
                   </span>
                 </div>
@@ -735,7 +743,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                       Rare Equipment Chest
                     </h3>
                     <p className="text-[10px] text-gray-400 font-sans leading-tight mt-0.5">
-                      1 Lord Relic • Enchanted Silver & Gold gear.
+                      1 Lord Relic • Silver & Gold tier gear.
                     </p>
                   </div>
 
@@ -758,7 +766,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 </span>
                 <div className="bg-black/60 border border-cyan-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                  <span className="font-mono font-bold text-cyan-300 text-xs tracking-normal">30 SHARDS</span>
+                  <span className="font-mono font-bold text-cyan-300 text-xs tracking-normal">35 SHARDS</span>
                 </div>
               </button>
             </div>
@@ -813,7 +821,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 </span>
                 <div className="bg-black/60 border border-purple-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                  <span className="font-mono font-bold text-purple-200 text-xs tracking-normal">70 SHARDS</span>
+                  <span className="font-mono font-bold text-purple-200 text-xs tracking-normal">140 SHARDS</span>
                 </div>
               </button>
             </div>
@@ -978,7 +986,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                   </span>
                   <div className="bg-black/60 border border-rose-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                     <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                    <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">50 SHARDS</span>
+                    <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">2,500 SHARDS</span>
                   </div>
                 </button>
 
@@ -1073,10 +1081,10 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                         <span className="bg-gradient-to-r from-amber-400 to-amber-500 text-black text-[9px] font-black px-1.5 py-0.2 rounded shadow-sm">
                           -17%
                         </span>
-                        <span className="line-through text-gray-400 font-mono text-xs font-bold">300</span>
+                        <span className="line-through text-gray-400 font-mono text-xs font-bold">3,600</span>
                         <div className="flex items-center gap-1">
                           <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                          <span className="font-mono font-bold text-amber-300 text-xs sm:text-sm">250</span>
+                          <span className="font-mono font-bold text-amber-300 text-xs sm:text-sm">3,000</span>
                         </div>
                       </div>
                     </>
@@ -1114,7 +1122,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                           ) : (
                             <div className="flex items-center gap-0.5 text-rose-300 font-mono font-bold text-[8px] bg-black/70 border border-rose-500/40 px-1.5 py-0.2 rounded">
                               <img src="/icons/icon_shards.webp" alt="Shards" className="w-2.5 h-2.5 object-contain inline" />
-                              <span>50</span>
+                              <span>600</span>
                             </div>
                           )}
                         </div>
@@ -1196,7 +1204,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                   </span>
                   <div className="bg-black/60 border border-rose-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                     <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                    <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">50 SHARDS</span>
+                    <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">600 SHARDS</span>
                   </div>
                 </button>
               </div>
@@ -1293,7 +1301,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 name: '3-Hour Void Aegis',
                 durationLabel: '3 Hours Immunity',
                 desc: 'Minor defense ward protecting Arena Crowns.',
-                cost: 8,
+                cost: 25,
                 image: '/icons/shield_3h.png',
                 tag: 'STANDARD',
                 border: 'border-emerald-500/50 hover:border-emerald-400',
@@ -1303,7 +1311,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 name: '6-Hour Astral Aegis',
                 durationLabel: '6 Hours Immunity',
                 desc: 'Greater defense ward for overnight protection.',
-                cost: 15,
+                cost: 40,
                 image: '/icons/shield_6h.png',
                 tag: 'POPULAR',
                 border: 'border-cyan-500/60 hover:border-cyan-400',
@@ -1313,9 +1321,9 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                 name: '12-Hour Supreme Aegis',
                 durationLabel: '12 Hours Immunity',
                 desc: 'Celestial citadel barrier for maximum safety.',
-                cost: 25,
+                cost: 80,
                 image: '/icons/shield_12h.png',
-                tag: 'BEST VALUE (-18%)',
+                tag: 'BEST VALUE (-20%)',
                 border: 'border-purple-500/60 hover:border-purple-400',
               },
             ].map((item) => {
@@ -1433,7 +1441,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
             {(() => {
               const currentLvl = profile.level || 1;
               const isAlreadyReached = currentLvl >= 50;
-              const cost = 250;
+              const cost = 2000;
               const canAfford = (profile.darkShards || 0) >= cost;
               const isProcessing = isBuyingLevelBoost === 50;
 
@@ -1507,7 +1515,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                           </span>
                           <div className="bg-black/60 border border-amber-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                             <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                            <span className="font-mono font-bold text-amber-300 text-xs tracking-normal">{cost} SHARDS</span>
+                            <span className="font-mono font-bold text-amber-300 text-xs tracking-normal">{cost.toLocaleString()} SHARDS</span>
                           </div>
                         </>
                       )}
@@ -1521,7 +1529,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
             {(() => {
               const currentLvl = profile.level || 1;
               const isMaxLevel = currentLvl >= 100;
-              const cost = 700;
+              const cost = 3500;
               const canAfford = (profile.darkShards || 0) >= cost;
               const isProcessing = isBuyingLevelBoost === 100;
 
@@ -1595,7 +1603,7 @@ export const MobileShopView: React.FC<MobileShopViewProps> = ({ initialTab = 'ca
                           </span>
                           <div className="bg-black/60 border border-rose-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                             <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(244,63,94,0.95)]" />
-                            <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">{cost} SHARDS</span>
+                            <span className="font-mono font-bold text-rose-300 text-xs tracking-normal">{cost.toLocaleString()} SHARDS</span>
                           </div>
                         </>
                       )}
