@@ -39,6 +39,6 @@ export function getReferralLink(referralCode?: string, isTelegram?: boolean): st
  * Generates the Telegram web share link.
  */
 export function getTelegramShareUrl(referralLink: string, customText?: string): string {
-  const text = customText || '⚔️ Void Covenant — dark fantasy card RPG с реальным заработком. Собирай колоду, сражайся на Арене, выводи Blood Sovereigns в USDT!\n\n🎁 Переходи по моей ссылке — получишь +1,000 Gold на старте!';
+  const text = customText || '⚔️ Void Covenant — Play-to-Earn Dark Fantasy Card RPG. Build your deck, battle in the Arena, withdraw Blood Sovereigns as USDT!\n\n🎁 Use my link to get +1,000 Gold starter bonus!';
   return `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(text)}`;
 }
