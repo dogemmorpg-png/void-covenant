@@ -65,16 +65,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
       const hookData = await hookRes.json();
 
-      // Register official bot commands including /appss_verify
+      // Register official bot commands including /appss_verify across all scopes and languages
+      const commandList = [
+        { command: 'start', description: 'Start Void Covenant' },
+        { command: 'appss_verify', description: 'Verify Bot Ownership' }
+      ];
+      
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setMyCommands`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ commands: commandList })
+      });
+
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setMyCommands`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ commands: commandList, scope: { type: 'all_private_chats' } })
+      });
+
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setMyCommands`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ commands: commandList, language_code: 'ru' })
+      });
+
       const cmdRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setMyCommands`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          commands: [
-            { command: 'start', description: 'Start Void Covenant' },
-            { command: 'appss_verify', description: 'Verify Bot Ownership' }
-          ]
-        })
+        body: JSON.stringify({ commands: commandList, scope: { type: 'all_private_chats' }, language_code: 'ru' })
       });
       const cmdData = await cmdRes.json();
 
@@ -205,13 +223,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // 3. User Commands & Messages (/start, /appss_verify, etc.)
-    const msg = update.message || update.channel_post || update.edited_message;
-    if (msg?.text && msg?.chat?.id) {
-      const text = msg.text.trim();
+    const msg = update.message || update.channel_post || update.edited_message || update.business_message;
+    const rawText = msg?.text || msg?.caption || '';
+    if (rawText && msg?.chat?.id) {
+      const text = rawText.trim();
+      const lowerText = text.toLowerCase();
       const chatId = msg.chat.id;
 
       // Apps Center / Catalog verification handler
-      if (text.includes('appss_verify')) {
+      if (lowerText.includes('appss_verify') || lowerText.includes('appss_eb30d4')) {
         const sendRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
