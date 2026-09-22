@@ -34,7 +34,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       const infoRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getWebhookInfo`);
       const infoData = await infoRes.json();
-      return res.status(200).json({ info: infoData });
+      const meRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getMe`);
+      const meData = await meRes.json();
+      return res.status(200).json({ me: meData, info: infoData });
     }
 
     if (isLogs) {
