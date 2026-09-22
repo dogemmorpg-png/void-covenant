@@ -479,11 +479,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             <button
               onClick={onConnectWallet}
               disabled={isConnecting}
-              className="w-full sm:w-auto min-w-[260px] h-[54px] px-8 rounded-2xl bg-gradient-to-b from-[#211a13]/95 via-[#18130d]/95 to-[#0e0b07] border border-[#c5a880]/50 hover:border-[#ebd09b] text-[#ebd09b] hover:text-[#fff5db] font-display font-bold text-xs sm:text-sm tracking-[0.22em] uppercase transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_20px_rgba(197,168,128,0.15)] hover:shadow-[0_0_30px_rgba(197,168,128,0.35)] active:scale-95 flex items-center justify-center gap-3 cursor-pointer group whitespace-nowrap disabled:opacity-60 disabled:cursor-wait"
+              className="w-full sm:w-auto min-w-[260px] h-[54px] px-8 rounded-2xl bg-gradient-to-b from-[#211a13]/95 via-[#18130d]/95 to-[#0e0b07] border border-[#c5a880]/50 hover:border-[#ebd09b] text-[#ebd09b] hover:text-[#fff5db] font-display font-bold text-xs sm:text-sm tracking-[0.22em] uppercase transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_20px_rgba(197,168,128,0.15)] hover:shadow-[0_0_30px_rgba(197,168,128,0.35)] active:scale-95 flex items-center justify-center cursor-pointer group whitespace-nowrap disabled:opacity-60 disabled:cursor-wait"
             >
-              <div className="w-6 h-6 rounded-full bg-amber-500/20 border border-[#c5a880]/40 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
-                <span className="font-display font-black text-xs text-[#ebd09b] leading-none">Ω</span>
-              </div>
               <span className={isConnecting ? 'animate-pulse' : ''}>
                 {isConnecting ? 'CONNECTING...' : 'CONNECT WALLET & PLAY'}
               </span>
@@ -1114,11 +1111,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             <button
               onClick={onConnectWallet}
               disabled={isConnecting}
-              className="w-full sm:w-auto min-w-[260px] h-[54px] px-8 rounded-2xl bg-gradient-to-b from-[#211a13]/95 via-[#18130d]/95 to-[#0e0b07] border border-[#c5a880]/50 hover:border-[#ebd09b] text-[#ebd09b] hover:text-[#fff5db] font-display font-bold text-xs sm:text-sm tracking-[0.22em] uppercase transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_20px_rgba(197,168,128,0.15)] hover:shadow-[0_0_30px_rgba(197,168,128,0.35)] active:scale-95 flex items-center justify-center gap-3 cursor-pointer group whitespace-nowrap disabled:opacity-60 disabled:cursor-wait"
+              className="w-full sm:w-auto min-w-[260px] h-[54px] px-8 rounded-2xl bg-gradient-to-b from-[#211a13]/95 via-[#18130d]/95 to-[#0e0b07] border border-[#c5a880]/50 hover:border-[#ebd09b] text-[#ebd09b] hover:text-[#fff5db] font-display font-bold text-xs sm:text-sm tracking-[0.22em] uppercase transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_20px_rgba(197,168,128,0.15)] hover:shadow-[0_0_30px_rgba(197,168,128,0.35)] active:scale-95 flex items-center justify-center cursor-pointer group whitespace-nowrap disabled:opacity-60 disabled:cursor-wait"
             >
-              <div className="w-6 h-6 rounded-full bg-amber-500/20 border border-[#c5a880]/40 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
-                <span className="font-display font-black text-xs text-[#ebd09b] leading-none">Ω</span>
-              </div>
               <span className={isConnecting ? 'animate-pulse' : ''}>
                 {isConnecting ? 'CONNECTING...' : 'ENTER THE COVENANT'}
               </span>
