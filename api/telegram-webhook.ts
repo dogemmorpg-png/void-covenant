@@ -22,7 +22,13 @@ const PACKAGES: Record<string, { shards: number; name: string }> = {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Allow GET to check status or setup webhook
   if (req.method === 'GET') {
-    if (req.query.info === 'true') {
+    const url = new URL(req.url || '', 'http://localhost');
+    const isInfo = req.query?.info === 'true' || url.searchParams.get('info') === 'true';
+    const isLogs = req.query?.logs === 'true' || url.searchParams.get('logs') === 'true';
+    const isCmds = req.query?.commands === 'true' || url.searchParams.get('commands') === 'true';
+    const isSetup = req.query?.setup === 'true' || url.searchParams.get('setup') === 'true';
+
+    if (isInfo) {
       if (!TELEGRAM_BOT_TOKEN) {
         return res.status(200).json({ error: 'TELEGRAM_BOT_TOKEN is missing in env' });
       }
@@ -31,20 +37,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ info: infoData });
     }
 
-    if (req.query.logs === 'true') {
+    if (isLogs) {
       const supabase = getSupabase();
       const { data } = await supabase.from('profiles').select('data, updated_at').eq('wallet_address', '__TELEGRAM_WEBHOOK_LOGS__').single();
       const { data: vdata } = await supabase.from('profiles').select('data, updated_at').eq('wallet_address', '__TELEGRAM_VERIFY_LOGS__').single();
       return res.status(200).json({ lastUpdate: data, lastVerify: vdata });
     }
 
-    if (req.query.commands === 'true' && TELEGRAM_BOT_TOKEN) {
+    if (isCmds && TELEGRAM_BOT_TOKEN) {
       const cmdRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getMyCommands`);
       const cmdData = await cmdRes.json();
       return res.status(200).json({ commands: cmdData });
     }
 
-    if (req.query.setup === 'true' && TELEGRAM_BOT_TOKEN) {
+    if (isSetup && TELEGRAM_BOT_TOKEN) {
       const host = req.headers['x-forwarded-host'] || req.headers.host || 'void-covenant.vercel.app';
       const webhookUrl = `https://${host}/api/telegram-webhook`;
       const hookRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook`, {
