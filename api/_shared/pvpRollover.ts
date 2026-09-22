@@ -395,7 +395,7 @@ export async function checkAndPerformPvpRollover(
       leaguePlayers.sort((a, b) => (b.profile.pvpLP - a.profile.pvpLP) || (b.profile.pvpRating - a.profile.pvpRating));
 
       const count = leaguePlayers.length;
-      const promoConfig = LEAGUE_PROMOTION_CONFIG[leagueName] || { promoteTop: 20, demoteRankAbove: 100 };
+      const promoConfig = LEAGUE_PROMOTION_CONFIG[leagueName] || { promoteTop: 20, demoteRankAbove: 999999, capacity: 80 };
       const promoteTop = promoConfig.promoteTop;
       const demoteRankAbove = promoConfig.demoteRankAbove;
 
