@@ -408,7 +408,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   </span>
                 </div>
                 <div className="text-[10px] text-gray-400 font-mono hidden md:block">
-                  Packs & Summoning
+                  Packs & Creature Cards
                 </div>
               </div>
             </div>
@@ -449,7 +449,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   </span>
                 </div>
                 <div className="text-[10px] text-gray-400 font-mono hidden md:block">
-                  Lord Armaments
+                  Hero Weapons & Armor
                 </div>
               </div>
             </div>
@@ -490,7 +490,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   </span>
                 </div>
                 <div className="text-[10px] text-gray-400 font-mono hidden md:block">
-                  3 Primordial Invocations
+                  Legendary Divine Cards
                 </div>
               </div>
             </div>
@@ -617,7 +617,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                   </span>
                 </div>
                 <div className="text-[10px] text-gray-400 font-mono hidden md:block">
-                  Level 50 & 100 Tributes
+                  Level 50 & 100 Boost
                 </div>
               </div>
             </div>
@@ -643,7 +643,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                     <h2 className="font-display font-black text-base sm:text-lg text-white tracking-widest text-shadow-gold uppercase">
                       Card Boosters
                     </h2>
-                    <p className="text-[9.5px] sm:text-[10.5px] text-gray-400 font-mono leading-none">Summon ancient creatures & warlords from the Nether Realm</p>
+                    <p className="text-[9.5px] sm:text-[10.5px] text-gray-400 font-mono leading-none">Open booster packs to summon new creature and spell cards for your battle deck.</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -944,7 +944,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       </span>
                     </div>
                     <p className="text-[10px] sm:text-xs text-gray-300 font-sans mt-0.5">
-                      Equip your Lord with artifacts of power. Boost HP, dodge chance, and delay reduction.
+                      Open chests to equip your Hero with weapons and armor. Boost HP, Dodge chance, and Initiative.
                     </p>
                   </div>
                 </div>
@@ -1194,13 +1194,24 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
             <div className="space-y-4">
               
               {/* Category Header */}
-              <div className="flex items-center justify-between border-b border-rose-950/60 pb-2.5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-rose-950/60 pb-2">
                 <div className="flex items-center gap-2.5">
-                  <Crown className="w-5 h-5 text-rose-400" />
-                  <h2 className="font-display font-black text-lg md:text-xl text-white tracking-widest text-shadow-gold uppercase">
-                    Divine Pantheon
-                  </h2>
-                  <span className="text-xs text-gray-400 font-mono hidden sm:inline">• 3 Primordial Invocations</span>
+                  <div className="w-7 h-7 rounded-lg bg-rose-950/60 border border-rose-500/40 flex items-center justify-center shadow-[0_0_12px_rgba(244,63,94,0.3)] shrink-0">
+                    <Crown className="w-4 h-4 text-rose-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="font-display font-black text-base sm:text-lg text-white tracking-widest text-shadow-gold uppercase">
+                        Divine Pantheon
+                      </h2>
+                      <span className="bg-rose-950/90 border border-rose-500/60 text-rose-300 text-[8px] font-mono px-2 py-0.5 rounded font-black tracking-widest uppercase shadow-[0_0_8px_rgba(244,63,94,0.3)]">
+                        PRIMORDIAL CARDS
+                      </span>
+                    </div>
+                    <p className="text-[10px] sm:text-xs text-gray-300 font-sans mt-0.5">
+                      Directly acquire the most powerful Divine cards in the realm to dominate duels and raids.
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -1877,7 +1888,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       </span>
                     </h2>
                     <p className="text-[10px] sm:text-[10.5px] text-gray-400 font-mono leading-none mt-0.5">
-                      Transcend mortal limits. Elevate your hero instantly with skill points and base health.
+                      Instantly advance your Hero to Level 50 or 100 to gain immediate Skill Points and maximum Health.
                     </p>
                   </div>
                 </div>
