@@ -22,7 +22,10 @@ const PACKAGES: Record<string, { shards: number; name: string }> = {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Allow GET to check status or setup webhook
   if (req.method === 'GET') {
-    if (req.query.info === 'true' && TELEGRAM_BOT_TOKEN) {
+    if (req.query.info === 'true') {
+      if (!TELEGRAM_BOT_TOKEN) {
+        return res.status(200).json({ error: 'TELEGRAM_BOT_TOKEN is missing in env' });
+      }
       const infoRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getWebhookInfo`);
       const infoData = await infoRes.json();
       return res.status(200).json({ info: infoData });
