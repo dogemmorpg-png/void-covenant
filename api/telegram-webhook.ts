@@ -22,10 +22,23 @@ const PACKAGES: Record<string, { shards: number; name: string }> = {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Allow GET to check status or setup webhook
   if (req.method === 'GET') {
+    if (req.query.info === 'true' && TELEGRAM_BOT_TOKEN) {
+      const infoRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getWebhookInfo`);
+      const infoData = await infoRes.json();
+      return res.status(200).json({ info: infoData });
+    }
+
     if (req.query.setup === 'true' && TELEGRAM_BOT_TOKEN) {
       const host = req.headers['x-forwarded-host'] || req.headers.host || 'void-covenant.vercel.app';
       const webhookUrl = `https://${host}/api/telegram-webhook`;
-      const hookRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook?url=${encodeURIComponent(webhookUrl)}`);
+      const hookRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: webhookUrl,
+          allowed_updates: ['message', 'edited_message', 'callback_query', 'pre_checkout_query']
+        })
+      });
       const hookData = await hookRes.json();
       return res.status(200).json({ setup: true, webhookUrl, hookData });
     }
