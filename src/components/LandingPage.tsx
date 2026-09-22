@@ -1193,6 +1193,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             </a>
           </div>
 
+          {/* PlayToEarn Badge */}
+          <div className="flex items-center justify-center my-1">
+            <a
+              href="https://playtoearn.com/blockchaingame/void-covenant"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block transition-transform duration-300 hover:scale-105"
+            >
+              <img
+                src="https://business.playtoearn.com/badge/6320.png"
+                alt="View Void Covenant on PlayToEarn"
+                width={120}
+                height={120}
+                className="w-[120px] h-[120px] object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.8)]"
+              />
+            </a>
+          </div>
+
           <p className="text-xs text-gray-500 font-display tracking-widest text-center">
             VOID COVENANT © 2024–2026
           </p>
