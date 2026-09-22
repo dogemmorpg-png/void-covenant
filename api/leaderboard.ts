@@ -111,7 +111,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    const leaderboard = sorted.slice(0, 20);
+    const leaderboard = sorted.slice(0, 100);
 
     return res.status(200).json({ success: true, leaderboard, myRank });
 

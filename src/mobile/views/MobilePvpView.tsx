@@ -57,33 +57,33 @@ const LEAGUES = [
 
 const LEAGUE_QUICK_RULES: Record<string, { promo: string; safe: string; demo: string }> = {
   'Divine': { promo: '#1: Retains Godhood', safe: '', demo: '#2: Demote' },
-  'Void Overlord': { promo: 'Top 1: Promote', safe: '2–7: Safe', demo: '8–10: Demote' },
-  'Grandmaster': { promo: 'Top 3: Promote', safe: '4–20: Safe', demo: '21–30: Demote' },
-  'Master': { promo: 'Top 7: Promote', safe: '8–30: Safe', demo: '31–50: Demote' },
-  'Diamond': { promo: 'Top 15: Promote', safe: '16–80: Safe', demo: '81–150: Demote' },
-  'Ruby': { promo: 'Top 20: Promote', safe: '21–100: Safe', demo: '101+: Demote' },
-  'Emerald': { promo: 'Top 25: Promote', safe: '26–100: Safe', demo: '101+: Demote' },
-  'Sapphire': { promo: 'Top 25: Promote', safe: '26–100: Safe', demo: '101+: Demote' },
-  'Platinum': { promo: 'Top 30: Promote', safe: '31–100: Safe', demo: '101+: Demote' },
-  'Gold': { promo: 'Top 40: Promote', safe: '41–120: Safe', demo: '121+: Demote' },
-  'Silver': { promo: 'Top 50: Promote', safe: '51–150: Safe', demo: '151+: Demote' },
-  'Bronze': { promo: 'Top 60: Promote', safe: '61+: Safe', demo: 'No Demote' },
+  'Void Overlord': { promo: 'Top 1: Promote', safe: '2–3: Safe', demo: '4–5: Demote' },
+  'Grandmaster': { promo: 'Top 2: Promote', safe: '3–8: Safe', demo: '9–12: Demote' },
+  'Master': { promo: 'Top 4: Promote', safe: '5–14: Safe', demo: '15–20: Demote' },
+  'Diamond': { promo: 'Top 6: Promote', safe: '7–22: Safe', demo: '23–30: Demote' },
+  'Ruby': { promo: 'Top 8: Promote', safe: '9–25: Safe', demo: '26+: Demote' },
+  'Emerald': { promo: 'Top 10: Promote', safe: '11–28: Safe', demo: '29+: Demote' },
+  'Sapphire': { promo: 'Top 12: Promote', safe: '13–31: Safe', demo: '32+: Demote' },
+  'Platinum': { promo: 'Top 14: Promote', safe: '15–34: Safe', demo: '35+: Demote' },
+  'Gold': { promo: 'Top 16: Promote', safe: '17–37: Safe', demo: '38+: Demote' },
+  'Silver': { promo: 'Top 18: Promote', safe: '19–42: Safe', demo: '43+: Demote' },
+  'Bronze': { promo: 'Top 20: Promote', safe: '21+: Safe', demo: 'No Demote' },
   'More Leagues Soon': { promo: 'Expansion', safe: 'Higher Realms', demo: 'Coming Soon' }
 };
 
 const LEAGUE_TABLE_DATA = [
   { name: 'Divine', icon: '/icons/league_divine.png', capacity: '2 Seats', color: 'text-amber-300', promo: '', safe: 'Rank #1 (Godhood)', demo: 'Rank #2' },
-  { name: 'Void Overlord', icon: '/icons/league_void_overlord.png', capacity: '10 Seats', color: 'text-rose-400', promo: 'Rank #1', safe: 'Ranks #2 – #7', demo: 'Ranks #8 – #10' },
-  { name: 'Grandmaster', icon: '/icons/league_grandmaster_crest.png', capacity: '30 Seats', color: 'text-amber-300', promo: 'Top 3 (#1–#3)', safe: 'Ranks #4 – #20', demo: 'Ranks #21 – #30' },
-  { name: 'Master', icon: '/icons/league_master_crest.png', capacity: '50 Seats', color: 'text-purple-300', promo: 'Top 7 (#1–#7)', safe: 'Ranks #8 – #30', demo: 'Ranks #31 – #50' },
-  { name: 'Diamond', icon: '/icons/league_diamond.png', capacity: '150 Seats', color: 'text-cyan-300', promo: 'Top 15 (#1–#15)', safe: 'Ranks #16 – #80', demo: 'Ranks #81 – #150' },
-  { name: 'Ruby', icon: '/icons/league_ruby_crest.png', capacity: '~250 Seats', color: 'text-red-400', promo: 'Top 20 (#1–#20)', safe: 'Ranks #21 – #100', demo: 'Ranks #101+' },
-  { name: 'Emerald', icon: '/icons/league_emerald_crest.png', capacity: '~350 Seats', color: 'text-emerald-400', promo: 'Top 25 (#1–#25)', safe: 'Ranks #26 – #100', demo: 'Ranks #101+' },
-  { name: 'Sapphire', icon: '/icons/league_sapphire.png?v=2', capacity: '~400 Seats', color: 'text-blue-400', promo: 'Top 25 (#1–#25)', safe: 'Ranks #26 – #100', demo: 'Ranks #101+' },
-  { name: 'Platinum', icon: '/icons/league_platinum.png', capacity: '~500 Seats', color: 'text-indigo-300', promo: 'Top 30 (#1–#30)', safe: 'Ranks #31 – #100', demo: 'Ranks #101+' },
-  { name: 'Gold', icon: '/icons/league_gold.png', capacity: 'Open Tier', color: 'text-yellow-400', promo: 'Top 40 (#1–#40)', safe: 'Ranks #41 – #120', demo: 'Ranks #121+' },
-  { name: 'Silver', icon: '/icons/league_silver.png', capacity: 'Open Tier', color: 'text-gray-300', promo: 'Top 50 (#1–#50)', safe: 'Ranks #51 – #150', demo: 'Ranks #151+' },
-  { name: 'Bronze', icon: '/icons/league_bronze.png', capacity: 'Open Tier', color: 'text-amber-400', promo: 'Top 60 (#1–#60)', safe: 'Ranks #61+', demo: '' }
+  { name: 'Void Overlord', icon: '/icons/league_void_overlord.png', capacity: '5 Seats', color: 'text-rose-400', promo: 'Rank #1', safe: 'Ranks #2 – #3', demo: 'Ranks #4 – #5' },
+  { name: 'Grandmaster', icon: '/icons/league_grandmaster_crest.png', capacity: '12 Seats', color: 'text-amber-300', promo: 'Top 2 (#1–#2)', safe: 'Ranks #3 – #8', demo: 'Ranks #9 – #12' },
+  { name: 'Master', icon: '/icons/league_master_crest.png', capacity: '20 Seats', color: 'text-purple-300', promo: 'Top 4 (#1–#4)', safe: 'Ranks #5 – #14', demo: 'Ranks #15 – #20' },
+  { name: 'Diamond', icon: '/icons/league_diamond.png', capacity: '30 Seats', color: 'text-cyan-300', promo: 'Top 6 (#1–#6)', safe: 'Ranks #7 – #22', demo: 'Ranks #23 – #30' },
+  { name: 'Ruby', icon: '/icons/league_ruby_crest.png', capacity: '35 Seats', color: 'text-red-400', promo: 'Top 8 (#1–#8)', safe: 'Ranks #9 – #25', demo: 'Ranks #26+' },
+  { name: 'Emerald', icon: '/icons/league_emerald_crest.png', capacity: '40 Seats', color: 'text-emerald-400', promo: 'Top 10 (#1–#10)', safe: 'Ranks #11 – #28', demo: 'Ranks #29+' },
+  { name: 'Sapphire', icon: '/icons/league_sapphire.png?v=2', capacity: '45 Seats', color: 'text-blue-400', promo: 'Top 12 (#1–#12)', safe: 'Ranks #13 – #31', demo: 'Ranks #32+' },
+  { name: 'Platinum', icon: '/icons/league_platinum.png', capacity: '50 Seats', color: 'text-indigo-300', promo: 'Top 14 (#1–#14)', safe: 'Ranks #15 – #34', demo: 'Ranks #35+' },
+  { name: 'Gold', icon: '/icons/league_gold.png', capacity: '55 Seats', color: 'text-yellow-400', promo: 'Top 16 (#1–#16)', safe: 'Ranks #17 – #37', demo: 'Ranks #38+' },
+  { name: 'Silver', icon: '/icons/league_silver.png', capacity: '60 Seats', color: 'text-gray-300', promo: 'Top 18 (#1–#18)', safe: 'Ranks #19 – #42', demo: 'Ranks #43+' },
+  { name: 'Bronze', icon: '/icons/league_bronze.png', capacity: '80 Seats', color: 'text-amber-400', promo: 'Top 20 (#1–#20)', safe: 'Ranks #21+', demo: '' }
 ];
 
 const getSafeAvatarUrl = (url?: string) => {
@@ -1163,9 +1163,9 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
             ) : (
               <div className="space-y-1.5 pr-0.5">
                 {(() => {
-                  const leagueConfig = LEAGUE_PROMOTION_CONFIG[viewingLeague] || { promoteTop: 20, demoteRankAbove: 100, capacity: 10 };
-                  const leagueCap = leagueConfig.capacity || 10;
-                  const minSlots = leagueCap < 8 ? leagueCap : 8;
+                  const leagueConfig = LEAGUE_PROMOTION_CONFIG[viewingLeague] || { promoteTop: 20, demoteRankAbove: 999999, capacity: 80 };
+                  const leagueCap = leagueConfig.capacity || 80;
+                  const minSlots = leagueCap <= 20 ? leagueCap : Math.min(leagueCap, 15);
                   const totalSlots = Math.max(minSlots, leaderboard.length);
 
                   return Array.from({ length: totalSlots }).map((_, idx) => {
@@ -1274,9 +1274,20 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                           className="flex items-center justify-between p-2 sm:p-2.5 px-3 rounded-xl border border-white/5 bg-black/20 text-xs opacity-35"
                         >
                           <div className="flex items-center gap-2.5">
-                            <span className="w-5 text-center font-mono text-xs text-gray-600">
-                              #{rank}
-                            </span>
+                            <div className="flex items-center gap-0.5 shrink-0">
+                              <span className={`w-5 text-center font-mono text-xs ${
+                                isDemo ? 'text-rose-500/70 font-bold' :
+                                isPromo ? 'text-emerald-500/70 font-bold' : 'text-gray-600'
+                              }`}>
+                                #{rank}
+                              </span>
+                              {isPromo && (
+                                <span className="text-[8px] text-emerald-500/70 font-black">▲</span>
+                              )}
+                              {isDemo && (
+                                <span className="text-[8px] text-rose-500/70 font-black">▼</span>
+                              )}
+                            </div>
                             <span className="font-mono text-xs text-gray-600">
                               —
                             </span>
