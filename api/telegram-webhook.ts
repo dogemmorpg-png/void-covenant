@@ -143,10 +143,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ ok: true, payment_processed: true });
     }
 
-    // 3. User Commands & Messages (/start, etc.)
+    // 3. User Commands & Messages (/start, /appss_verify, etc.)
     if (update.message?.text && update.message?.chat?.id) {
       const text = update.message.text.trim();
       const chatId = update.message.chat.id;
+
+      // Apps Center / Catalog verification handler
+      if (text.startsWith('/appss_verify')) {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: 'appss_eb30d4'
+          })
+        });
+        return res.status(200).json({ ok: true, handled_verify: true });
+      }
 
       if (text.startsWith('/start') || text === '/play' || text === '/game') {
         const parts = text.split(' ');
