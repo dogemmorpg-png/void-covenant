@@ -143,6 +143,56 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ ok: true, payment_processed: true });
     }
 
+    // 3. User Commands & Messages (/start, etc.)
+    if (update.message?.text && update.message?.chat?.id) {
+      const text = update.message.text.trim();
+      const chatId = update.message.chat.id;
+
+      if (text.startsWith('/start') || text === '/play' || text === '/game') {
+        const parts = text.split(' ');
+        const refCode = parts.length > 1 ? parts[1].trim() : '';
+
+        const gameBaseUrl = process.env.VITE_APP_URL || 'https://void-covenant.fun';
+        const webAppUrl = refCode
+          ? `${gameBaseUrl}${gameBaseUrl.includes('?') ? '&' : '?'}ref=${encodeURIComponent(refCode)}`
+          : gameBaseUrl;
+
+        const welcomeText = `⚔️ <b>Welcome to Void Covenant!</b>\n\nA dark fantasy card game where skill meets real rewards.\n\nCollect rare cards, craft your ultimate deck, and challenge players in tactical duels. Climb the competitive ranks and turn your victories into real crypto rewards you can withdraw anytime.\n\nReady to test your strategy?`;
+
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: welcomeText,
+            parse_mode: 'HTML',
+            reply_markup: {
+              inline_keyboard: [
+                [
+                  {
+                    text: '⚔️ Play Void Covenant',
+                    web_app: { url: webAppUrl }
+                  }
+                ],
+                [
+                  {
+                    text: '📢 Telegram Channel',
+                    url: 'https://t.me/voidcovenant'
+                  },
+                  {
+                    text: '🌐 Website',
+                    url: 'https://void-covenant.fun'
+                  }
+                ]
+              ]
+            }
+          })
+        });
+
+        return res.status(200).json({ ok: true, message_sent: true });
+      }
+    }
+
     return res.status(200).json({ ok: true });
   } catch (error: any) {
     console.error('telegram-webhook error:', error);
