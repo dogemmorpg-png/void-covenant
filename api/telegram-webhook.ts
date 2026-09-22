@@ -31,6 +31,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ info: infoData });
     }
 
+    if (req.query.commands === 'true' && TELEGRAM_BOT_TOKEN) {
+      const cmdRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getMyCommands`);
+      const cmdData = await cmdRes.json();
+      return res.status(200).json({ commands: cmdData });
+    }
+
     if (req.query.setup === 'true' && TELEGRAM_BOT_TOKEN) {
       const host = req.headers['x-forwarded-host'] || req.headers.host || 'void-covenant.vercel.app';
       const webhookUrl = `https://${host}/api/telegram-webhook`;
@@ -43,7 +49,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         })
       });
       const hookData = await hookRes.json();
-      return res.status(200).json({ setup: true, webhookUrl, hookData });
+
+      // Register official bot commands including /appss_verify
+      const cmdRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setMyCommands`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          commands: [
+            { command: 'start', description: 'Start Void Covenant' },
+            { command: 'appss_verify', description: 'Verify Bot Ownership' }
+          ]
+        })
+      });
+      const cmdData = await cmdRes.json();
+
+      return res.status(200).json({ setup: true, webhookUrl, hookData, cmdData });
     }
 
     return res.status(200).json({ ok: true, status: 'Telegram webhook receiver ready' });
@@ -165,8 +185,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const chatId = update.message.chat.id;
 
       // Apps Center / Catalog verification handler
-      if (text.startsWith('/appss_verify')) {
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      if (text.startsWith('/appss_verify') || text.startsWith('appss_verify')) {
+        const sendRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -174,7 +194,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             text: 'appss_eb30d4'
           })
         });
-        return res.status(200).json({ ok: true, handled_verify: true });
+        const sendData = await sendRes.json();
+        return res.status(200).json({ ok: true, handled_verify: true, sendData });
       }
 
       if (text.startsWith('/start') || text === '/play' || text === '/game') {
