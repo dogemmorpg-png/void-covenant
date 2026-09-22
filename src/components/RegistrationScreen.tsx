@@ -117,10 +117,10 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(221,44,64,0.12)_0%,transparent_70%)] pointer-events-none" />
 
       {/* Decorative corner runes */}
-      <div className="absolute top-2 left-3 md:top-4 md:left-5 text-[#ebd09b]/20 font-serif text-[10px] md:text-xs pointer-events-none">⟦Ω⟧</div>
-      <div className="absolute top-2 right-3 md:top-4 md:right-5 text-[#ebd09b]/20 font-serif text-[10px] md:text-xs pointer-events-none">⟦Ω⟧</div>
-      <div className="absolute bottom-2 left-3 md:bottom-4 md:left-5 text-[#ebd09b]/20 font-serif text-[10px] md:text-xs pointer-events-none">⟦Ω⟧</div>
-      <div className="absolute bottom-2 right-3 md:bottom-4 md:right-5 text-[#ebd09b]/20 font-serif text-[10px] md:text-xs pointer-events-none">⟦Ω⟧</div>
+      <div className="absolute top-2 left-3 md:top-4 md:left-5 text-[#ebd09b]/20 font-display text-[10px] md:text-xs pointer-events-none">⟦Ω⟧</div>
+      <div className="absolute top-2 right-3 md:top-4 md:right-5 text-[#ebd09b]/20 font-display text-[10px] md:text-xs pointer-events-none">⟦Ω⟧</div>
+      <div className="absolute bottom-2 left-3 md:bottom-4 md:left-5 text-[#ebd09b]/20 font-display text-[10px] md:text-xs pointer-events-none">⟦Ω⟧</div>
+      <div className="absolute bottom-2 right-3 md:bottom-4 md:right-5 text-[#ebd09b]/20 font-display text-[10px] md:text-xs pointer-events-none">⟦Ω⟧</div>
 
       {/* Main Container: Centered, balanced proportions for both mobile & desktop */}
       <div className="relative z-10 w-full max-w-md md:max-w-2xl my-auto flex flex-col gap-2.5 md:gap-3.5">

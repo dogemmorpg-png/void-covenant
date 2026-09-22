@@ -381,7 +381,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
         ))}
 
         {/* Central content */}
-        <div className="relative z-10 flex flex-col items-center gap-6 px-4 text-center">
+        <div className="relative z-10 flex flex-col items-center gap-5 sm:gap-6 px-4 w-full max-w-4xl text-center">
           {/* Omega symbol */}
           <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
@@ -414,7 +414,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.5 }}
-            className="font-display font-black text-5xl md:text-7xl lg:text-8xl text-white tracking-[0.25em] select-none"
+            className="font-display font-black text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-white tracking-[0.14em] sm:tracking-[0.25em] select-none max-w-full"
             style={{
               textShadow:
                 '0 0 30px rgba(197,168,128,0.3), 0 0 60px rgba(197,168,128,0.15), 0 2px 4px rgba(0,0,0,0.8)',
@@ -442,7 +442,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: 0.8, delay: 1.2 }}
-            className="w-56 h-px bg-gradient-to-r from-transparent via-[#c5a880]/40 to-transparent"
+            className="w-40 sm:w-56 h-px bg-gradient-to-r from-transparent via-[#c5a880]/40 to-transparent"
           />
 
           {/* Tagline highlighting dark fantasy & play-to-earn */}
@@ -450,7 +450,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.4 }}
-            className="text-sm md:text-base text-gray-300 italic font-serif max-w-lg leading-relaxed select-none"
+            className="text-xs sm:text-sm md:text-base text-gray-300/90 font-sans font-normal max-w-md md:max-w-lg leading-relaxed px-4 select-none"
           >
             Command forbidden forces, conquer high-stakes arenas, and claim real on-chain rewards for every tactical victory.
           </motion.p>
@@ -523,7 +523,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
                 Power Is Seized, Not Given
               </span>
             </h2>
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic max-w-2xl mx-auto">
+            <p className="text-gray-300/90 text-sm sm:text-base md:text-lg leading-relaxed font-sans max-w-2xl mx-auto">
               Void Covenant is a dark fantasy card battle RPG where you forge pacts with ancient horrors, master lethal forbidden sorceries, and challenge warlords across the world for glory and real treasure.
             </p>
           </div>
@@ -633,7 +633,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
                 You Lead The Frontline.
               </span>
             </h2>
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
+            <p className="text-gray-300/90 text-sm sm:text-base md:text-lg leading-relaxed font-sans max-w-2xl">
               Your hero enters combat alongside your creatures. Forge mythical armaments, choose your combat stance, and unleash game-changing hero abilities when all seems lost.
             </p>
           </div>
@@ -799,7 +799,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
                 To Claim The Crown of Gods
               </span>
             </h2>
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
+            <p className="text-gray-300/90 text-sm sm:text-base md:text-lg leading-relaxed font-sans max-w-2xl">
               Compete against commanders worldwide in live ranked arena duels. Earn trophies, climb tiers, and fight for the ultimate honor: a place in the supreme Divine Pantheon.
             </p>
           </div>
@@ -880,7 +880,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
                 Real USDT Value
               </span>
             </h2>
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
+            <p className="text-gray-300/90 text-sm sm:text-base md:text-lg leading-relaxed font-sans max-w-2xl mx-auto">
               Void Covenant is built on a transparent hard currency exchange with zero token volatility. Every victory, ladder climb, and challenge directly translates into real, withdrawable value.
             </p>
           </div>
@@ -978,7 +978,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
                 Earn Lifetime Bounties
               </span>
             </h2>
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed font-serif italic">
+            <p className="text-gray-300/90 text-sm sm:text-base md:text-lg leading-relaxed font-sans max-w-2xl mx-auto">
               War is won together. Invite fellow commanders into the Abyss and earn instant sovereign bounties, tiered milestone achievements up to 500,000 SOV, and continuous dividends from their battlefield conquests.
             </p>
           </div>
@@ -1088,7 +1088,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             <h2 className="font-display font-black text-4xl sm:text-6xl text-white tracking-[0.15em] uppercase leading-tight text-shadow-gold">
               Your Throne Awaits
             </h2>
-            <p className="text-base sm:text-lg text-gray-300 font-serif italic max-w-xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base md:text-lg text-gray-300/90 font-sans max-w-xl mx-auto leading-relaxed">
               No downloads. No endless tutorials. Connect your wallet or play in browser within seconds and begin your ascent into the Abyss.
             </p>
           </div>

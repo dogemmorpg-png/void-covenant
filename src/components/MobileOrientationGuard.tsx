@@ -131,7 +131,7 @@ export const MobileOrientationGuard: React.FC<MobileOrientationGuardProps> = ({
                   to Landscape
                 </span>
               </h2>
-              <p className="font-serif italic text-xs text-gray-400 leading-relaxed">
+              <p className="font-sans text-xs text-gray-300/90 leading-relaxed">
                 Enable auto-rotate in your phone settings and turn your device horizontally to enter the Battlefield.
               </p>
             </div>
