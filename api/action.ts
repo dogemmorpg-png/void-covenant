@@ -1426,8 +1426,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       const PRICES: Record<string, Record<number, number>> = {
-        premium: { 30: 150, 90: 400 },
-        ultra: { 30: 350, 90: 900 }
+        premium: { 30: 1500, 90: 3800 },
+        ultra: { 30: 2500, 90: 6400 }
       };
 
       const cost = PRICES[tier]?.[durationDays];

@@ -44,12 +44,12 @@ export const PremiumPassView: React.FC = () => {
   // Prices in Dark Shards
   const PRICES = {
     premium: {
-      30: 150,
-      90: 400 // ~11% discount
+      30: 1500,
+      90: 3800
     },
     ultra: {
-      30: 350,
-      90: 900 // ~14% discount
+      30: 2500,
+      90: 6400
     }
   };
 
@@ -266,7 +266,7 @@ export const PremiumPassView: React.FC = () => {
                 <div className="flex items-center gap-2 mt-1">
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
                   <span className="font-display font-black text-3xl text-amber-300">
-                    {PRICES.premium[durationDays]}
+                    {PRICES.premium[durationDays].toLocaleString()}
                   </span>
                   <span className="font-mono text-xs text-amber-400/80 font-bold">DARK SHARDS</span>
                 </div>
@@ -418,7 +418,7 @@ export const PremiumPassView: React.FC = () => {
                   {activeTier === 'premium' ? `EXTEND PREMIUM (${durationDays}D)` : `ACTIVATE PREMIUM (${durationDays}D)`}
                 </span>
                 <span className="flex items-center gap-1.5 bg-black/60 border border-amber-500/40 rounded-full px-3 py-1 font-mono text-xs font-bold text-amber-300 shadow-inner ml-auto shrink-0">
-                  <span>{PRICES.premium[durationDays]}</span>
+                  <span>{PRICES.premium[durationDays].toLocaleString()}</span>
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow-[0_0_4px_rgba(245,158,11,0.6)]" />
                 </span>
               </button>
@@ -479,7 +479,7 @@ export const PremiumPassView: React.FC = () => {
                 <div className="flex items-center gap-2 mt-1">
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
                   <span className="font-display font-black text-3xl text-purple-300">
-                    {PRICES.ultra[durationDays]}
+                    {PRICES.ultra[durationDays].toLocaleString()}
                   </span>
                   <span className="font-mono text-xs text-purple-400 font-bold">DARK SHARDS</span>
                 </div>
@@ -631,7 +631,7 @@ export const PremiumPassView: React.FC = () => {
                   {activeTier === 'ultra' ? `EXTEND ULTRA (${durationDays}D)` : `ASCEND TO ULTRA (${durationDays}D)`}
                 </span>
                 <span className="flex items-center gap-1.5 bg-black/60 border border-purple-500/40 rounded-full px-3 py-1 font-mono text-xs font-bold text-purple-300 shadow-inner ml-auto shrink-0">
-                  <span>{PRICES.ultra[durationDays]}</span>
+                  <span>{PRICES.ultra[durationDays].toLocaleString()}</span>
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain drop-shadow-[0_0_4px_rgba(168,85,247,0.7)]" />
                 </span>
               </button>

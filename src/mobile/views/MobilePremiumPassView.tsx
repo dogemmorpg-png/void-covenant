@@ -46,12 +46,12 @@ export const MobilePremiumPassView: React.FC = () => {
   // Prices in Dark Shards (Exact PC parity)
   const PRICES = {
     premium: {
-      30: 150,
-      90: 400 // ~11% discount
+      30: 1500,
+      90: 3800
     },
     ultra: {
-      30: 350,
-      90: 900 // ~14% discount
+      30: 2500,
+      90: 6400
     }
   };
 
@@ -366,7 +366,7 @@ export const MobilePremiumPassView: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-1.5 mt-1">
                     <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
-                    <span className="font-display font-black text-lg text-amber-300">{PRICES.premium[30]}</span>
+                    <span className="font-display font-black text-lg text-amber-300">{PRICES.premium[30].toLocaleString()}</span>
                     <span className="text-[9px] font-mono text-amber-400/80">SHARDS</span>
                   </div>
                 </button>
@@ -383,12 +383,12 @@ export const MobilePremiumPassView: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <span className="font-display font-black text-xs text-white">90 DAYS</span>
                     <span className="text-[8px] font-mono font-black text-rose-200 bg-rose-950 px-1 py-0.2 rounded border border-rose-500/40">
-                      -11% OFF
+                      -16% OFF
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 mt-1">
                     <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
-                    <span className="font-display font-black text-lg text-amber-300">{PRICES.premium[90]}</span>
+                    <span className="font-display font-black text-lg text-amber-300">{PRICES.premium[90].toLocaleString()}</span>
                     <span className="text-[9px] font-mono text-amber-400/80">SHARDS</span>
                   </div>
                   <div className="text-[9.5px] font-sans font-semibold text-amber-300 mt-0.5">
@@ -463,7 +463,7 @@ export const MobilePremiumPassView: React.FC = () => {
                 {/* Recessed Currency Socket */}
                 <div className="bg-black/60 border border-amber-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner shrink-0">
                   <span className="font-mono font-bold text-amber-300 text-xs">
-                    {PRICES.premium[durationDays]}
+                    {PRICES.premium[durationDays].toLocaleString()}
                   </span>
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain drop-shadow" />
                 </div>
@@ -544,7 +544,7 @@ export const MobilePremiumPassView: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-1.5 mt-1">
                     <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
-                    <span className="font-display font-black text-lg text-purple-300">{PRICES.ultra[30]}</span>
+                    <span className="font-display font-black text-lg text-purple-300">{PRICES.ultra[30].toLocaleString()}</span>
                     <span className="text-[9px] font-mono text-purple-400">SHARDS</span>
                   </div>
                 </button>
@@ -561,12 +561,12 @@ export const MobilePremiumPassView: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <span className="font-display font-black text-xs text-white">90 DAYS</span>
                     <span className="text-[8px] font-mono font-black text-rose-200 bg-rose-950 px-1 py-0.2 rounded border border-rose-500/40">
-                      -14% OFF
+                      -15% OFF
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 mt-1">
                     <img src="/icons/icon_shards.webp" alt="Shards" className="w-4 h-4 object-contain" />
-                    <span className="font-display font-black text-lg text-purple-300">{PRICES.ultra[90]}</span>
+                    <span className="font-display font-black text-lg text-purple-300">{PRICES.ultra[90].toLocaleString()}</span>
                     <span className="text-[9px] font-mono text-purple-400">SHARDS</span>
                   </div>
                   <div className="text-[9.5px] font-sans font-semibold text-purple-300 mt-0.5">
@@ -641,7 +641,7 @@ export const MobilePremiumPassView: React.FC = () => {
                 {/* Recessed Currency Socket */}
                 <div className="bg-black/60 border border-purple-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner shrink-0">
                   <span className="font-mono font-bold text-purple-300 text-xs">
-                    {PRICES.ultra[durationDays]}
+                    {PRICES.ultra[durationDays].toLocaleString()}
                   </span>
                   <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain drop-shadow" />
                 </div>
