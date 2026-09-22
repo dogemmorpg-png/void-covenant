@@ -1525,9 +1525,9 @@ const LEVEL_UP_COSTS: Record<CardTier, Record<number, { gold: number; dust: numb
 };
 
 const TIER_ASCENSION_COSTS: Record<string, { gold: number; dust: number; shards: number }> = {
-  bronze: { gold: 2000, dust: 1000, shards: 10 },
-  silver: { gold: 5000, dust: 2500, shards: 25 },
-  gold: { gold: 10000, dust: 6000, shards: 40 },
+  bronze: { gold: 2000, dust: 1000, shards: 40 },
+  silver: { gold: 5000, dust: 2500, shards: 100 },
+  gold: { gold: 10000, dust: 6000, shards: 200 },
 };
 
 export function getFusionCosts(card: { level: number; tier: CardTier } | null | undefined): FusionCost {
@@ -1547,7 +1547,7 @@ export function getFusionCosts(card: { level: number; tier: CardTier } | null | 
     };
   }
 
-  const ascensionCost = TIER_ASCENSION_COSTS[card.tier] || { gold: 10000, dust: 6000, shards: 40 };
+  const ascensionCost = TIER_ASCENSION_COSTS[card.tier] || { gold: 10000, dust: 6000, shards: 200 };
   return {
     goldCost: ascensionCost.gold,
     dustCost: ascensionCost.dust,
