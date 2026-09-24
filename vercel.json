@@ -5,6 +5,12 @@
       "schedule": "0 0 * * *"
     }
   ],
+  "rewrites": [
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(cards|avatars|icons|audio|packs|shop|mobs)/(.*)",
