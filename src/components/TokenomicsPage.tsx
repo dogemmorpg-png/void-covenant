@@ -536,7 +536,7 @@ export const TokenomicsPage: React.FC<TokenomicsPageProps> = ({ onBackToGame, on
                     TIER I
                   </span>
                   <span className="px-2.5 py-1 rounded-lg bg-white/[0.05] border border-white/10 text-white font-mono text-xs font-bold">
-                    500,000+ $VOID
+                    1,000,000+ $VOID
                   </span>
                 </div>
 
@@ -592,7 +592,7 @@ export const TokenomicsPage: React.FC<TokenomicsPageProps> = ({ onBackToGame, on
                     TIER II
                   </span>
                   <span className="px-2.5 py-1 rounded-lg bg-[#ebd09b]/15 border border-[#ebd09b]/35 text-[#ebd09b] font-mono text-xs font-bold">
-                    1,000,000+ $VOID
+                    5,000,000+ $VOID
                   </span>
                 </div>
 
@@ -658,7 +658,7 @@ export const TokenomicsPage: React.FC<TokenomicsPageProps> = ({ onBackToGame, on
                     TIER III
                   </span>
                   <span className="px-2.5 py-1 rounded-lg bg-rose-500/15 border border-rose-500/35 text-rose-300 font-mono text-xs font-bold">
-                    3,000,000+ $VOID
+                    10,000,000+ $VOID
                   </span>
                 </div>
 
