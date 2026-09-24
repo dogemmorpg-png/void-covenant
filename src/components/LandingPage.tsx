@@ -13,6 +13,7 @@ import {
 interface LandingPageProps {
   onConnectWallet: () => void;
   isConnecting: boolean;
+  onOpenTokenomics?: () => void;
 }
 
 // Floating particles & rune symbols (100% identical to original Hero Section)
@@ -138,7 +139,7 @@ const WARLORD_ARTIFACTS = [
   { slot: 'Boots', name: 'Boots of the Apocalypse', icon: '/icons/equipment/items/boots_of_the_apocalypse.png', trait: '+25% Gold & Sovereign Multiplier' },
 ];
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isConnecting }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isConnecting, onOpenTokenomics }) => {
   const [selectedChampionIdx, setSelectedChampionIdx] = useState(0);
   const activeChampion = CHAMPIONS_GALLERY[selectedChampionIdx];
 
@@ -263,6 +264,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
 
           <div className="w-[1px] h-4 bg-gradient-to-b from-transparent via-[#c5a880]/30 to-transparent mx-1 hidden sm:block" />
 
+          {/* $VOID Token Button */}
+          {onOpenTokenomics && (
+            <button
+              onClick={onOpenTokenomics}
+              className="px-3 py-1.5 rounded-full bg-[#181a20] hover:bg-[#221c17] border border-[#c5a880]/40 hover:border-[#ebd09b] text-[#ebd09b] hover:text-[#fff2d1] font-display font-bold text-[10px] sm:text-[11px] tracking-[0.16em] uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer active:scale-95"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880]" />
+              <span>$VOID Token</span>
+            </button>
+          )}
+
           {/* CTA Play Now - Refined Dark Gothic Gold Button */}
           <button
             onClick={onConnectWallet}
@@ -288,9 +300,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
           initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="absolute top-5 right-5 sm:top-6 sm:right-8 z-30 flex items-center gap-2 sm:gap-2.5"
+          className="absolute top-5 right-5 sm:top-6 sm:right-8 z-30 flex flex-col items-end gap-2.5"
         >
-          {/* Twitter / X */}
+          {/* Social Links Row */}
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* Twitter / X */}
           <a
             href="https://x.com/voidcovenantrpg"
             target="_blank"
@@ -335,7 +349,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
               Discord
             </span>
           </a>
-        </motion.div>
+        </div>
+
+        {/* $VOID Token Button - Harmonized with Top-Right Gothic Style */}
+        {onOpenTokenomics && (
+          <button
+            onClick={onOpenTokenomics}
+            className="w-full h-[38px] px-4 rounded-xl bg-[#0b0c10]/85 hover:bg-[#181510] border border-[#c5a880]/35 hover:border-[#ebd09b] text-[#ebd09b] hover:text-[#fff5db] shadow-[0_4px_16px_rgba(0,0,0,0.7)] backdrop-blur-md transition-all duration-300 flex items-center justify-center gap-2 font-display font-bold text-xs tracking-[0.2em] uppercase cursor-pointer group active:scale-95 select-none"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880] group-hover:bg-[#ebd09b] transition-colors" />
+            <span>$VOID Token</span>
+          </button>
+        )}
+      </motion.div>
 
         {/* Background gradient */}
         <div
