@@ -79,9 +79,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!profileRow) {
       const starterCards = getStarterDeck();
       profile = {
-        gold: 1000,
-        dust: 250,
-        darkShards: 50,
+        gold: 500,
+        dust: 100,
+        darkShards: 0,
         collection: starterCards,
         deck: starterCards.map(c => c.id),
         pveEnergy: 5,
