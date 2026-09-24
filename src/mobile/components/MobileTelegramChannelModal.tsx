@@ -45,7 +45,7 @@ export const MobileTelegramChannelModal: React.FC<MobileTelegramChannelModalProp
         if (tg?.HapticFeedback) {
           tg.HapticFeedback.notificationOccurred('success');
         }
-        toast(res.message || '🎉 Subscribed! +25 Dark Shards added to your vault.', 'success');
+        toast(res.message || '🎉 Subscribed! +50 Dark Shards added to your vault.', 'success');
         if (onClaimed) onClaimed();
         onClose();
       } else {
@@ -111,7 +111,7 @@ export const MobileTelegramChannelModal: React.FC<MobileTelegramChannelModalProp
               <span className="text-[9px] font-mono text-gray-400 uppercase tracking-wider block">Reward</span>
               <div className="flex items-center gap-1.5">
                 <span className="font-display font-black text-white text-[15px] leading-tight">
-                  +25 Dark Shards
+                  +50 Dark Shards
                 </span>
                 <img src="/icons/icon_shards.webp" alt="" className="w-3.5 h-3.5 object-contain" />
               </div>
@@ -155,7 +155,7 @@ export const MobileTelegramChannelModal: React.FC<MobileTelegramChannelModalProp
             ) : (
               <>
                 <CheckCircle2 className="w-3.5 h-3.5 text-black" />
-                <span>2. Check & Claim +25</span>
+                <span>2. Check & Claim +50</span>
                 <img src="/icons/icon_shards.webp" alt="Shards" className="w-3.5 h-3.5 object-contain" />
               </>
             )}

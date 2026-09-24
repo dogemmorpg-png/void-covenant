@@ -1761,7 +1761,7 @@ export const AIRDROP_TASKS: AirdropTask[] = [
     title: 'Subscribe to Telegram Channel',
     description: 'Join the Dark Covenant on Telegram to follow Airdrop announcements.',
     rewardType: 'shards',
-    rewardAmount: 25,
+    rewardAmount: 50,
     actionUrl: 'https://t.me/voidcovenant'
   },
   {

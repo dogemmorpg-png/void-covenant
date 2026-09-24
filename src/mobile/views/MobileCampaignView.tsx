@@ -289,7 +289,7 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
                 <button
                   onClick={() => setIsTgModalOpen(true)}
                   className="relative flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-gradient-to-r from-cyan-950/95 via-[#0e1829]/95 to-black border border-cyan-400/60 hover:border-cyan-300 shadow-[0_0_16px_rgba(6,182,212,0.4)] active:scale-95 transition-all cursor-pointer group select-none"
-                  title="Join Official Telegram Channel for +25 Dark Shards"
+                  title="Join Official Telegram Channel for +50 Dark Shards"
                 >
                   <div className="w-6 h-6 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center shrink-0 shadow-sm">
                     <Send className="w-3 h-3 text-cyan-300 transform -rotate-12 translate-x-0.2 group-hover:scale-110 transition-transform" />
@@ -299,7 +299,7 @@ export const MobileCampaignView: React.FC<MobileCampaignViewProps> = ({ onStartB
                       JOIN CHANNEL
                     </span>
                     <span className="font-mono font-bold text-[8.5px] text-cyan-300 mt-0.5 flex items-center gap-1">
-                      +25 Dark Shards
+                      +50 Dark Shards
                       <img src="/icons/icon_shards.webp" alt="Shards" className="w-2.5 h-2.5 object-contain inline" />
                     </span>
                   </div>
