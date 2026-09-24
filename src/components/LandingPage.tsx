@@ -538,53 +538,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
               </span>
             </button>
           </motion.div>
-
-          {/* Official $VOID Contract Address Bar & Quick Buy on Pump.fun */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 2.0 }}
-            className="mt-6 w-full max-w-xl px-2 select-none"
-          >
-            <div className="flex flex-col sm:flex-row items-center justify-between p-2 sm:p-2.5 sm:pl-4 rounded-2xl bg-black/75 hover:bg-black/90 border border-[#c5a880]/35 hover:border-[#ebd09b]/60 shadow-[0_4px_24px_rgba(0,0,0,0.85)] backdrop-blur-md transition-all gap-2 group">
-              <div className="flex items-center gap-2 overflow-hidden text-left min-w-0 w-full sm:w-auto">
-                <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-[#ebd09b] font-bold shrink-0">
-                  $VOID CA
-                </span>
-                <span className="text-white/20 select-none">|</span>
-                <span className="text-[11px] sm:text-xs font-mono text-gray-300 truncate select-all">
-                  {VOID_CA}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
-                <button
-                  onClick={handleCopyCA}
-                  className="px-3 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-white text-[11px] font-mono font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-                >
-                  {caCopied ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
-                      <span className="text-emerald-300">Copied</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5 text-gray-400 group-hover:text-white" />
-                      <span>Copy</span>
-                    </>
-                  )}
-                </button>
-                <a
-                  href={`https://pump.fun/coin/${VOID_CA}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 hover:text-white text-[11px] font-display font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-[0_0_12px_rgba(16,185,129,0.15)] active:scale-95"
-                >
-                  <span>Pump.fun</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              </div>
-            </div>
-          </motion.div>
         </div>
 
         {/* Scroll indicator */}
