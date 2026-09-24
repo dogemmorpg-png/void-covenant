@@ -300,10 +300,10 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
         toast('Insufficient Dark Shards! Opening Abyssal Shop...', 'warning');
         return;
       }
-    } else if (packType === 'bronze' && (profile.gold || 0) < 1000) {
+    } else if (packType === 'bronze' && (profile.gold || 0) < 500) {
       toast('Insufficient Gold!', 'warning');
       return;
-    } else if (packType === 'eq_basic' && (profile.gold || 0) < 700) {
+    } else if (packType === 'eq_basic' && (profile.gold || 0) < 350) {
       toast('Insufficient Gold!', 'warning');
       return;
     }
@@ -736,7 +736,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       </span>
                       <div className="bg-black/60 border border-amber-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                         <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(245,158,11,0.9)]" />
-                        <span className="font-mono font-bold text-amber-300 text-xs tracking-normal">1,000 GOLD</span>
+                        <span className="font-mono font-bold text-amber-300 text-xs tracking-normal">500 GOLD</span>
                       </div>
                     </button>
                   </div>
@@ -1022,7 +1022,7 @@ export const GachaStoreView: React.FC<GachaStoreViewProps> = ({ initialTab = 'ca
                       </span>
                       <div className="bg-black/60 border border-amber-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 shadow-inner">
                         <img src="/icons/icon_gold.webp" alt="Gold" className="w-4 h-4 object-contain filter drop-shadow-[0_0_6px_rgba(245,158,11,0.95)]" />
-                        <span className="font-mono font-bold text-amber-300 text-xs tracking-normal">700 GOLD</span>
+                        <span className="font-mono font-bold text-amber-300 text-xs tracking-normal">350 GOLD</span>
                       </div>
                     </button>
                   </div>
