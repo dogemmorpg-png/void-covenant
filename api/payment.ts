@@ -600,7 +600,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (!profileRow) {
         profile = {
-          gold: 500, dust: 100, darkShards: 0,
+          gold: 1000, dust: 450, darkShards: 0,
           collection: [], deck: [],
           pveEnergy: 5, pveEnergyMax: 5,
           pvpEnergy: 5, pvpEnergyMax: 5,

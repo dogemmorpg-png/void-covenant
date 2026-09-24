@@ -579,11 +579,11 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
                   </div>
                   <div>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-lg font-mono font-black text-amber-300 text-shadow-gold">+1,000 GOLD</span>
+                      <span className="text-lg font-mono font-black text-amber-300 text-shadow-gold">+1,500 GOLD & 450 DUST</span>
                       <span className="text-xs font-mono font-bold text-amber-200 uppercase">GIFT</span>
                     </div>
                     <p className="text-xs sm:text-sm text-white font-sans mt-1 leading-relaxed">
-                      Every friend who registers via your link immediately receives <strong>1,000 Gold</strong> starter bonus (non-referred players only get 500 Gold).
+                      Every friend who registers via your link immediately receives <strong>1,500 Gold & 450 Dust</strong> starter bonus (non-referred players get 1,000 Gold & 450 Dust).
                     </p>
                   </div>
                 </div>

@@ -227,8 +227,8 @@ const migrateProfileTo10Cards = (p: PlayerProfile): PlayerProfile => {
 const createDefaultProfile = (): PlayerProfile => {
   const starterDeck = getStarterDeck();
   return {
-  gold: 500,
-  dust: 100,
+  gold: 1000,
+  dust: 450,
   darkShards: 0,
   bloodSovereigns: 0,
   collection: starterDeck,

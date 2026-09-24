@@ -1083,7 +1083,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
                 </div>
                 <div className="space-y-1">
                   <span className="text-xs font-mono text-emerald-400 font-bold uppercase tracking-wider block">
-                    +1,000 Gold Starter
+                    +1,500 Gold & 450 Dust Starter
                   </span>
                   <h4 className="font-display font-black text-lg text-white uppercase">
                     Welcome Gift For Allies

@@ -262,8 +262,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const starterDeck = generateStarterDeck();
 
       currentProfile = {
-        gold: isReferred ? 1000 : 500,
-        dust: 100,
+        gold: isReferred ? 1500 : 1000,
+        dust: 450,
         darkShards: 0,
         collection: starterDeck.collection,
         deck: starterDeck.deck,
