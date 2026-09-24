@@ -71,7 +71,7 @@ function MainAppContent() {
 
   // Telegram Mini App authentication state
   const hasTelegramInitData = typeof window !== 'undefined' && Boolean((window as any).Telegram?.WebApp?.initData);
-  const isTelegram = device.isTelegram || hasTelegramInitData;
+  const isTelegram = device.isTelegram || hasTelegramInitData || (typeof navigator !== 'undefined' && /Telegram/i.test(navigator.userAgent || ''));
   const [isTelegramAuthLoading, setIsTelegramAuthLoading] = useState<boolean>(() => hasTelegramInitData);
   const [isTelegramAuthenticated, setIsTelegramAuthenticated] = useState(false);
   const [telegramAuthError, setTelegramAuthError] = useState<string | null>(null);
@@ -149,9 +149,12 @@ function MainAppContent() {
     setActiveTab(activeBattleType === 'pvp' ? 'pvp' : 'campaign');
   };
 
-  // Newcomer Void Grimoire Tutorial (shows strictly once right after character registration)
+  // Newcomer Void Grimoire Tutorial (shows strictly once right after character registration; disabled for Telegram version)
+  const isTelegramUser = isTelegram || Boolean(profile?.solanaAddress && profile.solanaAddress.startsWith('tg_'));
+
   const [isGrimoireOpen, setIsGrimoireOpen] = useState(() => {
     return typeof window !== 'undefined' &&
+      !isTelegramUser &&
       sessionStorage.getItem('void_covenant_just_registered') === 'true' &&
       localStorage.getItem('void_covenant_grimoire_seen') !== 'true';
   });
@@ -159,8 +162,13 @@ function MainAppContent() {
   const handleRegister = async (username: string, avatarUrl: string) => {
     const res = await registerPlayer(username, avatarUrl);
     if (res.success) {
-      sessionStorage.setItem('void_covenant_just_registered', 'true');
-      setIsGrimoireOpen(true);
+      if (!isTelegramUser) {
+        sessionStorage.setItem('void_covenant_just_registered', 'true');
+        setIsGrimoireOpen(true);
+      } else {
+        localStorage.setItem('void_covenant_grimoire_seen', 'true');
+        sessionStorage.removeItem('void_covenant_just_registered');
+      }
     }
     return res;
   };
@@ -409,7 +417,7 @@ function MainAppContent() {
     return (
       <MobileOrientationGuard isMobile={device.isMobile} isPortrait={device.isPortrait} disableRotatePrompt={true}>
         <MobileApp />
-        <VoidOnboardingModal isOpen={isGrimoireOpen} onClose={handleCloseGrimoire} />
+        <VoidOnboardingModal isOpen={isGrimoireOpen && !isTelegramUser} onClose={handleCloseGrimoire} />
       </MobileOrientationGuard>
     );
   }
@@ -625,7 +633,7 @@ function MainAppContent() {
       {isDustShopOpen && (
         <DustShopModal onClose={() => setIsDustShopOpen(false)} />
       )}
-      <VoidOnboardingModal isOpen={isGrimoireOpen} onClose={handleCloseGrimoire} />
+      <VoidOnboardingModal isOpen={isGrimoireOpen && !isTelegramUser} onClose={handleCloseGrimoire} />
     </MobileOrientationGuard>
   );
 }
