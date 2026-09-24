@@ -15,14 +15,14 @@ interface TokenomicsPageProps {
   onPlayNow?: () => void;
 }
 
-const DUMMY_CA = 'Coming Soon';
+const VOID_CA = '5G9cipV2i9gp7trRudVritynrPmd1Ai8f1qAjpEfpump';
 
 export const TokenomicsPage: React.FC<TokenomicsPageProps> = ({ onBackToGame, onPlayNow }) => {
   const [copied, setCopied] = useState(false);
   const [selectedTier, setSelectedTier] = useState<number>(2);
 
   const handleCopyCA = () => {
-    navigator.clipboard.writeText(DUMMY_CA);
+    navigator.clipboard.writeText(VOID_CA);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
@@ -144,7 +144,7 @@ export const TokenomicsPage: React.FC<TokenomicsPageProps> = ({ onBackToGame, on
               <div className="flex items-center gap-2.5 overflow-hidden text-left">
                 <span className="text-[11px] font-mono uppercase tracking-wider text-[#c5a880] shrink-0 font-bold">CA</span>
                 <span className="text-white/20 select-none">|</span>
-                <span className="text-xs font-mono text-gray-300 truncate select-all">{DUMMY_CA}</span>
+                <span className="text-xs font-mono text-gray-300 truncate select-all">{VOID_CA}</span>
               </div>
               <button
                 onClick={handleCopyCA}
@@ -170,7 +170,7 @@ export const TokenomicsPage: React.FC<TokenomicsPageProps> = ({ onBackToGame, on
             
             {/* 1. Pump.fun */}
             <a
-              href="https://pump.fun"
+              href={`https://pump.fun/coin/${VOID_CA}`}
               target="_blank"
               rel="noopener noreferrer"
               className="h-11 px-5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/35 hover:border-emerald-400 text-emerald-300 font-display font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(16,185,129,0.12)] hover:scale-[1.02] active:scale-95"

@@ -7,8 +7,13 @@ import {
   Sparkles, 
   Twitter, 
   Send, 
-  ArrowUpRight 
+  ArrowUpRight,
+  Copy,
+  Check,
+  ExternalLink
 } from 'lucide-react';
+
+const VOID_CA = '5G9cipV2i9gp7trRudVritynrPmd1Ai8f1qAjpEfpump';
 
 interface LandingPageProps {
   onConnectWallet: () => void;
@@ -142,6 +147,13 @@ const WARLORD_ARTIFACTS = [
 export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isConnecting, onOpenTokenomics }) => {
   const [selectedChampionIdx, setSelectedChampionIdx] = useState(0);
   const activeChampion = CHAMPIONS_GALLERY[selectedChampionIdx];
+  const [caCopied, setCaCopied] = useState(false);
+
+  const handleCopyCA = () => {
+    navigator.clipboard.writeText(VOID_CA);
+    setCaCopied(true);
+    setTimeout(() => setCaCopied(false), 2500);
+  };
 
   // Active section tracking for floating navigation
   const [activeNav, setActiveNav] = useState<string>('hero');
@@ -349,6 +361,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
               Discord
             </span>
           </a>
+
+          {/* Pump.fun */}
+          <a
+            href={`https://pump.fun/coin/${VOID_CA}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Buy $VOID on Pump.fun"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0b0c10]/85 hover:bg-[#082216] border border-[#c5a880]/30 hover:border-emerald-400 text-gray-300 hover:text-emerald-300 shadow-[0_4px_16px_rgba(0,0,0,0.7)] backdrop-blur-md transition-all duration-300 group cursor-pointer active:scale-95 select-none"
+          >
+            <img src="/icons/icon_sovereign.webp" alt="Pump" className="w-3.5 h-3.5 object-contain brightness-110 group-hover:scale-110 transition-transform" />
+            <span className="font-display font-bold text-xs tracking-wider uppercase hidden sm:inline text-emerald-300">
+              Pump.fun
+            </span>
+          </a>
         </div>
 
         {/* $VOID Token Button - Harmonized with Top-Right Gothic Style */}
@@ -511,6 +537,53 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
                 {isConnecting ? 'CONNECTING...' : 'CONNECT WALLET & PLAY'}
               </span>
             </button>
+          </motion.div>
+
+          {/* Official $VOID Contract Address Bar & Quick Buy on Pump.fun */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 2.0 }}
+            className="mt-6 w-full max-w-xl px-2 select-none"
+          >
+            <div className="flex flex-col sm:flex-row items-center justify-between p-2 sm:p-2.5 sm:pl-4 rounded-2xl bg-black/75 hover:bg-black/90 border border-[#c5a880]/35 hover:border-[#ebd09b]/60 shadow-[0_4px_24px_rgba(0,0,0,0.85)] backdrop-blur-md transition-all gap-2 group">
+              <div className="flex items-center gap-2 overflow-hidden text-left min-w-0 w-full sm:w-auto">
+                <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-[#ebd09b] font-bold shrink-0">
+                  $VOID CA
+                </span>
+                <span className="text-white/20 select-none">|</span>
+                <span className="text-[11px] sm:text-xs font-mono text-gray-300 truncate select-all">
+                  {VOID_CA}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
+                <button
+                  onClick={handleCopyCA}
+                  className="px-3 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-white text-[11px] font-mono font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  {caCopied ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      <span className="text-emerald-300">Copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-gray-400 group-hover:text-white" />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
+                <a
+                  href={`https://pump.fun/coin/${VOID_CA}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 hover:text-white text-[11px] font-display font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-[0_0_12px_rgba(16,185,129,0.15)] active:scale-95"
+                >
+                  <span>Pump.fun</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
           </motion.div>
         </div>
 
@@ -1217,6 +1290,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
                 <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
               </svg>
             </a>
+          </div>
+
+          {/* Footer CA pill */}
+          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 max-w-sm w-full justify-between shadow-inner">
+            <div className="flex items-center gap-1.5 overflow-hidden">
+              <span className="text-[10px] font-mono font-bold text-[#ebd09b]">CA</span>
+              <span className="text-white/20">|</span>
+              <span className="text-[11px] font-mono text-gray-400 truncate select-all">{VOID_CA}</span>
+            </div>
+            <button
+              onClick={handleCopyCA}
+              className="px-2.5 py-0.5 rounded-lg bg-white/10 hover:bg-white/15 text-white text-[10px] font-mono transition-all shrink-0 cursor-pointer active:scale-95"
+            >
+              {caCopied ? 'Copied' : 'Copy'}
+            </button>
           </div>
 
           {/* PlayToEarn Badge */}
