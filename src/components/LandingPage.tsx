@@ -13,7 +13,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 
-const VOID_CA = '5G9cipV2i9gp7trRudVritynrPmd1Ai8f1qAjpEfpump';
+const VOID_CA = '5PadLtq68GCUmAjzTFp4xg6b6rzH6TvMb7ePF9ecLJfT';
 
 interface LandingPageProps {
   onConnectWallet: () => void;
