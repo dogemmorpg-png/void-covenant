@@ -85,7 +85,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (battleType === 'campaign') {
         const floorNum = parseInt(stageId);
-        if (isNaN(floorNum)) return res.status(400).json({ error: 'Invalid campaign stage' });
+        if (isNaN(floorNum) || floorNum < 1) return res.status(400).json({ error: 'Invalid campaign stage' });
+
+        const maxUnlockedFloor = profile.pveProgress || 1;
+        if (floorNum > maxUnlockedFloor) {
+          return res.status(400).json({ error: `Floor ${floorNum} is locked. Highest unlocked floor is ${maxUnlockedFloor}.` });
+        }
 
         const stage = generateCampaignStage(floorNum);
         if (!stage) return res.status(400).json({ error: 'Invalid campaign stage' });
@@ -166,7 +171,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (battleType === 'campaign') {
       const floorNum = parseInt(stageId);
-      if (isNaN(floorNum)) return res.status(400).json({ error: 'Invalid stage ID' });
+      if (isNaN(floorNum) || floorNum < 1) return res.status(400).json({ error: 'Invalid stage ID' });
+
+      const maxUnlockedFloor = profile.pveProgress || 1;
+      if (floorNum > maxUnlockedFloor) {
+        return res.status(400).json({ error: `Floor ${floorNum} is locked. Highest unlocked floor is ${maxUnlockedFloor}.` });
+      }
 
       const stage = generateCampaignStage(floorNum);
       if (!stage) return res.status(400).json({ error: 'Stage not found' });
@@ -180,9 +190,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         dustReward = baseDust;
         expReward = applyMultiplierWithMinimum(baseExp, expMultiplier);
 
-        const currentCleared = profile.pveProgress || 1;
-        if (floorNum >= currentCleared) {
-          profile.pveProgress = floorNum + 1;
+        if (floorNum === maxUnlockedFloor) {
+          profile.pveProgress = maxUnlockedFloor + 1;
         }
 
         const stageStars = stars || 3;

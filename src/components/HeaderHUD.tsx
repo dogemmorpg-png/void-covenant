@@ -29,9 +29,6 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onNavigateTab }) => {
   const [copySuccess, setCopySuccess] = useState(false);
 
   const isAdmin = 
-    profile.username?.toLowerCase() === 'adminus' || 
-    profile.username?.toLowerCase() === 'kirito' || 
-    profile.role === 'admin' ||
     profile.solanaAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr' ||
     profile.solanaAddress === 'tg_6432857804';
   const unreadMailCount = (profile.mailMessages || []).filter(m => !m.isRead || (m.rewards && !m.isClaimed)).length;

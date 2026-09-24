@@ -385,12 +385,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (!usernameRegex.test(reqUsername)) {
           return res.status(400).json({ error: 'Username must be 4-12 characters long and contain only English letters, numbers, or underscores.' });
         }
+
+        const TRUSTED_ADMIN_WALLETS = new Set([
+          'tg_6432857804',
+          'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr'
+        ]);
+
+        const RESERVED_USERNAMES = new Set([
+          'admin', 'adminus', 'kirito', 'administrator', 'moderator',
+          'voidwalker', 'system', 'covenant', 'support', 'root', 'bot', 'official'
+        ]);
+
+        if (RESERVED_USERNAMES.has(reqUsername.toLowerCase()) && !TRUSTED_ADMIN_WALLETS.has(walletAddress)) {
+          return res.status(400).json({ error: 'This username is reserved and cannot be registered.' });
+        }
         
         if (currentProfile.username !== reqUsername) {
           const { data: duplicateRows, error: dupError } = await supabase
             .from('profiles')
             .select('wallet_address')
-            .eq('data->>username', reqUsername)
+            .ilike('data->>username', reqUsername)
             .neq('wallet_address', walletAddress)
             .limit(1);
             

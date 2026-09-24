@@ -323,17 +323,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // --- ADMIN ACTION DISPATCHER ---
     if (action.startsWith('admin_')) {
-      const isAdmin = 
-        profile?.username?.toLowerCase() === 'adminus' || 
-        profile?.username?.toLowerCase() === 'kirito' ||
-        profile?.role === 'admin' || 
-        decoded?.role === 'admin' ||
-        walletAddress === 'adminus' ||
-        walletAddress === 'kirito' ||
-        walletAddress === 'tg_6432857804' ||
-        walletAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr' ||
-        profile?.solanaAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr' ||
-        profile?.solanaAddress === 'tg_6432857804';
+      const TRUSTED_ADMIN_WALLETS = new Set([
+        'tg_6432857804',
+        'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr'
+      ]);
+
+      const isAdmin = TRUSTED_ADMIN_WALLETS.has(walletAddress);
 
       if (!isAdmin) {
         return res.status(403).json({ error: 'Forbidden: Admin privileges required.' });
@@ -680,6 +675,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(400).json({ error: 'Missing targetWallet or updates' });
         }
 
+        if (TRUSTED_ADMIN_WALLETS.has(targetWallet) && targetWallet !== walletAddress) {
+          return res.status(403).json({ error: 'Cannot modify another administrator account.' });
+        }
+
         const { data: targetRows, error: findErr } = await supabase
           .from('profiles')
           .select('data')
@@ -692,10 +691,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         const targetData = targetRows[0].data;
 
-        if (updates.gold !== undefined) targetData.gold = Number(updates.gold);
-        if (updates.dust !== undefined) targetData.dust = Number(updates.dust);
-        if (updates.darkShards !== undefined) targetData.darkShards = Number(updates.darkShards);
-        if (updates.bloodSovereigns !== undefined) targetData.bloodSovereigns = Number(updates.bloodSovereigns);
+        if (updates.gold !== undefined) targetData.gold = Math.max(0, Number(updates.gold));
+        if (updates.dust !== undefined) targetData.dust = Math.max(0, Number(updates.dust));
+        if (updates.darkShards !== undefined) targetData.darkShards = Math.max(0, Number(updates.darkShards));
+        if (updates.bloodSovereigns !== undefined) targetData.bloodSovereigns = Math.max(0, Number(updates.bloodSovereigns));
         if (updates.pveEnergy !== undefined) targetData.pveEnergy = Number(updates.pveEnergy);
         if (updates.pvpTickets !== undefined) targetData.pvpTickets = Number(updates.pvpTickets);
         if (updates.pvpLeague !== undefined) targetData.pvpLeague = updates.pvpLeague;
@@ -713,8 +712,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
         }
         if (updates.subscriptionExpiresAt !== undefined) targetData.subscriptionExpiresAt = Number(updates.subscriptionExpiresAt);
-        if (updates.role !== undefined) targetData.role = updates.role;
-        if (updates.isBanned !== undefined) {
+        if (updates.role !== undefined && updates.role !== 'admin') targetData.role = updates.role;
+        if (updates.isBanned !== undefined && !TRUSTED_ADMIN_WALLETS.has(targetWallet)) {
           targetData.isBanned = Boolean(updates.isBanned);
           if (targetData.isBanned) {
             targetData.banReason = updates.banReason ? String(updates.banReason) : 'Violation of Void Covenant terms & rules';
@@ -747,6 +746,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const { targetWallet } = payload || {};
         if (!targetWallet) {
           return res.status(400).json({ error: 'Missing targetWallet' });
+        }
+
+        if (TRUSTED_ADMIN_WALLETS.has(targetWallet)) {
+          return res.status(403).json({ error: 'Cannot delete an administrator account.' });
         }
 
         const { error: delErr } = await supabase
@@ -1258,6 +1261,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { amountSovereigns, targetAddress } = payload || {};
       const numAmount = parseInt(amountSovereigns, 10);
 
+      if (!profile.username || !profile.isRegistered || profile.username.trim() === '') {
+        return res.status(400).json({ error: 'You must set a valid username before requesting a withdrawal.' });
+      }
+
       const isSubActive = profile.subscriptionExpiresAt && profile.subscriptionExpiresAt > Date.now();
       const subTier = isSubActive ? (profile.subscriptionTier || 'free') : 'free';
       const minSov = subTier === 'ultra' ? 2000 : subTier === 'premium' ? 2500 : 3000;
@@ -1278,7 +1285,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const newRequest = {
         id: `req_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
         userId: walletAddress,
-        username: profile.username || 'Voidwalker',
+        username: profile.username.trim(),
         walletAddress: targetAddress.trim(),
         amountSovereigns: numAmount,
         amountUsdt: Number((numAmount * 0.01).toFixed(2)),

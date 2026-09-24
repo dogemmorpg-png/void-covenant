@@ -1520,7 +1520,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           ) : (
                             filteredAndSortedPlayers.map((p) => {
                               const prof = p.profile || {};
-                              const isUserAdmin = prof.username?.toLowerCase() === 'adminus' || prof.username?.toLowerCase() === 'kirito' || prof.role === 'admin';
+                              const isUserAdmin = p.walletAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr' || p.walletAddress === 'tg_6432857804';
                               const isPlayerBanned = Boolean(prof.isBanned);
                               const lastAct = prof.lastLogin || (p.updatedAt ? new Date(p.updatedAt).getTime() : 0);
                               const leagueStyle = getLeagueBadgeStyle(prof.pvpLeague || prof.league);
@@ -1704,7 +1704,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                       ) : (
                         filteredAndSortedPlayers.map((p) => {
                           const prof = p.profile || {};
-                          const isUserAdmin = prof.username?.toLowerCase() === 'adminus' || prof.username?.toLowerCase() === 'kirito' || prof.role === 'admin';
+                          const isUserAdmin = p.walletAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr' || p.walletAddress === 'tg_6432857804';
                           const isPlayerBanned = Boolean(prof.isBanned);
                           const lastAct = prof.lastLogin || (p.updatedAt ? new Date(p.updatedAt).getTime() : 0);
                           const leagueStyle = getLeagueBadgeStyle(prof.pvpLeague || prof.league);
