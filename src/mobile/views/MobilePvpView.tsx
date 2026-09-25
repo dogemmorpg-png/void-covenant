@@ -1165,7 +1165,7 @@ export const MobilePvpView: React.FC<MobilePvpViewProps> = ({
                 {(() => {
                   const leagueConfig = LEAGUE_PROMOTION_CONFIG[viewingLeague] || { promoteTop: 20, demoteRankAbove: 999999, capacity: 80 };
                   const leagueCap = leagueConfig.capacity || 80;
-                  const minSlots = leagueCap <= 20 ? leagueCap : Math.min(leagueCap, 15);
+                  const minSlots = leagueCap <= 25 ? leagueCap : Math.min(leagueCap, 20);
                   const totalSlots = Math.max(minSlots, leaderboard.length);
 
                   return Array.from({ length: totalSlots }).map((_, idx) => {
