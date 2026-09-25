@@ -390,7 +390,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             else if (tier === 'premium') totalPremiumCount++;
           }
 
-          const lastActive = d.lastLogin || (p.updated_at ? new Date(p.updated_at).getTime() : 0);
+          const pvpHistory = Array.isArray(d.pvpHistory) ? d.pvpHistory : [];
+          const latestPvpAttack = pvpHistory
+            .filter((h: any) => !h.isDefense && h.timestamp)
+            .reduce((max: number, h: any) => Math.max(max, Number(h.timestamp || 0)), 0);
+
+          const lastActive = Math.max(
+            d.lastLogin ? Number(d.lastLogin) : 0,
+            d.lastBattleTimestamp ? Number(d.lastBattleTimestamp) : 0,
+            latestPvpAttack
+          );
+
           if (lastActive >= oneDayAgo) active24h++;
           if (lastActive >= sevenDaysAgo) active7d++;
 
@@ -660,11 +670,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
 
         const matches = filtered
-          .map(p => ({
-            walletAddress: p.wallet_address,
-            updatedAt: p.updated_at,
-            profile: p.data
-          }));
+          .map(p => {
+            const d = p.data || {};
+            const pvpHistory = Array.isArray(d.pvpHistory) ? d.pvpHistory : [];
+            const latestPvpAttack = pvpHistory
+              .filter((h: any) => !h.isDefense && h.timestamp)
+              .reduce((max: number, h: any) => Math.max(max, Number(h.timestamp || 0)), 0);
+
+            const lastActive = Math.max(
+              d.lastLogin ? Number(d.lastLogin) : 0,
+              d.lastBattleTimestamp ? Number(d.lastBattleTimestamp) : 0,
+              latestPvpAttack
+            );
+
+            return {
+              walletAddress: p.wallet_address,
+              updatedAt: p.updated_at,
+              lastActive,
+              profile: {
+                ...d,
+                lastLogin: lastActive > 0 ? lastActive : (d.lastLogin || 0)
+              }
+            };
+          });
 
         return res.status(200).json({ success: true, matches, players: matches });
       }

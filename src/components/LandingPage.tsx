@@ -13,8 +13,6 @@ import {
   ExternalLink
 } from 'lucide-react';
 
-const VOID_CA = '5PadLtq68GCUmAjzTFp4xg6b6rzH6TvMb7ePF9ecLJfT';
-
 interface LandingPageProps {
   onConnectWallet: () => void;
   isConnecting: boolean;
@@ -146,13 +144,6 @@ const WARLORD_ARTIFACTS = [
 export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isConnecting }) => {
   const [selectedChampionIdx, setSelectedChampionIdx] = useState(0);
   const activeChampion = CHAMPIONS_GALLERY[selectedChampionIdx];
-  const [caCopied, setCaCopied] = useState(false);
-
-  const handleCopyCA = () => {
-    navigator.clipboard.writeText(VOID_CA);
-    setCaCopied(true);
-    setTimeout(() => setCaCopied(false), 2500);
-  };
 
   // Active section tracking for floating navigation
   const [activeNav, setActiveNav] = useState<string>('hero');
@@ -1211,20 +1202,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             </a>
           </div>
 
-          {/* Footer CA pill */}
-          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 max-w-sm w-full justify-between shadow-inner">
-            <div className="flex items-center gap-1.5 overflow-hidden">
-              <span className="text-[10px] font-mono font-bold text-[#ebd09b]">CA</span>
-              <span className="text-white/20">|</span>
-              <span className="text-[11px] font-mono text-gray-400 truncate select-all">{VOID_CA}</span>
-            </div>
-            <button
-              onClick={handleCopyCA}
-              className="px-2.5 py-0.5 rounded-lg bg-white/10 hover:bg-white/15 text-white text-[10px] font-mono transition-all shrink-0 cursor-pointer active:scale-95"
-            >
-              {caCopied ? 'Copied' : 'Copy'}
-            </button>
-          </div>
+
 
           {/* PlayToEarn Badge */}
           <div className="flex items-center justify-center my-0.5">

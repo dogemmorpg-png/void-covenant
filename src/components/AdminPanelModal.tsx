@@ -593,8 +593,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
         if (playerSortBy === 'sovereigns') return (pb.bloodSovereigns || 0) - (pa.bloodSovereigns || 0);
         if (playerSortBy === 'gold') return (pb.gold || 0) - (pa.gold || 0);
         if (playerSortBy === 'lp') return (pb.pvpLP || 0) - (pa.pvpLP || 0);
-        const timeA = pa.lastLogin || (a.updatedAt ? new Date(a.updatedAt).getTime() : 0);
-        const timeB = pb.lastLogin || (b.updatedAt ? new Date(b.updatedAt).getTime() : 0);
+        const timeA = pa.lastLogin || a.lastActive || 0;
+        const timeB = pb.lastLogin || b.lastActive || 0;
         return timeB - timeA;
       });
   }, [isOpen, allPlayers, playerLeagueFilter, searchQuery, playerSortBy]);
@@ -1522,7 +1522,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                               const prof = p.profile || {};
                               const isUserAdmin = p.walletAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr' || p.walletAddress === 'tg_6432857804';
                               const isPlayerBanned = Boolean(prof.isBanned);
-                              const lastAct = prof.lastLogin || (p.updatedAt ? new Date(p.updatedAt).getTime() : 0);
+                              const lastAct = prof.lastLogin || p.lastActive || 0;
                               const leagueStyle = getLeagueBadgeStyle(prof.pvpLeague || prof.league);
 
                               return (
@@ -1706,7 +1706,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           const prof = p.profile || {};
                           const isUserAdmin = p.walletAddress === 'BxxQjEStvpcbWLbSnwL19rjbGmvND1J5pEBRShWFoYNr' || p.walletAddress === 'tg_6432857804';
                           const isPlayerBanned = Boolean(prof.isBanned);
-                          const lastAct = prof.lastLogin || (p.updatedAt ? new Date(p.updatedAt).getTime() : 0);
+                          const lastAct = prof.lastLogin || p.lastActive || 0;
                           const leagueStyle = getLeagueBadgeStyle(prof.pvpLeague || prof.league);
                           const isSubActive = prof.subscriptionExpiresAt && Number(prof.subscriptionExpiresAt) > Date.now();
                           const subTier = isSubActive ? prof.subscriptionTier : 'free';

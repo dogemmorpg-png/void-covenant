@@ -299,7 +299,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         telegramId: decoded.telegramId || null,
         isRegistered: Boolean(decoded.telegramId),
         referralCode: generateReferralCode(),
-        referredBy: isReferred ? referrerAddress : null
+        referredBy: isReferred ? referrerAddress : null,
+        lastLogin: Date.now()
       };
       // Prevent creating duplicates by checking again or using insert
       const { data: existingCheck } = await supabase.from('profiles').select('wallet_address').eq('wallet_address', walletAddress).limit(1);
@@ -351,6 +352,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     currentProfile = calculateEnergy(currentProfile);
+
+    // Track real online presence / last login (throttled to once every 2 minutes)
+    const now = Date.now();
+    const lastLoginTime = currentProfile.lastLogin ? Number(currentProfile.lastLogin) : 0;
+    let shouldSavePresence = false;
+    if (now - lastLoginTime > 2 * 60 * 1000) {
+      currentProfile.lastLogin = now;
+      shouldSavePresence = true;
+    }
 
     // Ensure Telegram players complete the registration screen (choose avatar & name)
     if (walletAddress.startsWith('tg_') && (!currentProfile.avatarUrl || !currentProfile.avatarUrl.startsWith('/avatars/'))) {
@@ -494,7 +504,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!safeProfileData) safeProfileData = {};
     }
 
-    if (safeProfileData) {
+    if (safeProfileData || shouldSavePresence) {
       const newUpdatedAt = new Date().toISOString();
       let updateQuery = supabase
         .from('profiles')
@@ -515,14 +525,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         if (freshRecord && freshRecord.data) {
           const freshProfile = freshRecord.data;
-          if (safeProfileData.deck && Array.isArray(safeProfileData.deck)) {
-            freshProfile.deck = sanitizeDeck(safeProfileData.deck, freshProfile.collection || []);
-          }
-          if (safeProfileData.equipped && typeof safeProfileData.equipped === 'object') {
-            freshProfile.equipped = safeProfileData.equipped;
-          }
-          if (safeProfileData.activeStance) {
-            freshProfile.activeStance = safeProfileData.activeStance;
+          freshProfile.lastLogin = currentProfile.lastLogin;
+          if (safeProfileData) {
+            if (safeProfileData.deck && Array.isArray(safeProfileData.deck)) {
+              freshProfile.deck = sanitizeDeck(safeProfileData.deck, freshProfile.collection || []);
+            }
+            if (safeProfileData.equipped && typeof safeProfileData.equipped === 'object') {
+              freshProfile.equipped = safeProfileData.equipped;
+            }
+            if (safeProfileData.activeStance) {
+              freshProfile.activeStance = safeProfileData.activeStance;
+            }
           }
           await supabase
             .from('profiles')
