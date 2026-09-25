@@ -20,7 +20,6 @@ import { CampaignStage } from './types';
 import { Swords, FolderGit, Sparkles, Landmark, Award, Trophy, UserCircle2, Store, Crown, Flame } from 'lucide-react';
 import { AIRDROP_TASKS } from './data/cards';
 import { LandingPage } from './components/LandingPage';
-import { TokenomicsPage } from './components/TokenomicsPage';
 import { RegistrationScreen } from './components/RegistrationScreen';
 import { VoidOnboardingModal } from './components/VoidOnboardingModal';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -43,31 +42,7 @@ function MainAppContent() {
   const [isVerified, setIsVerified] = useState(false);
   const [isSigning, setIsSigning] = useState(false);
 
-  // Dedicated $VOID Tokenomics / Pump.fun Portal View
-  const [isTokenomicsOpen, setIsTokenomicsOpen] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    const path = window.location.pathname.toLowerCase();
-    const search = window.location.search.toLowerCase();
-    const hash = window.location.hash.toLowerCase();
-    return path.includes('/token') || search.includes('token') || hash.includes('token') || path.includes('/pump') || search.includes('pump');
-  });
 
-  // Keep URL in sync on popstate/hashchange
-  React.useEffect(() => {
-    const handleUrlChange = () => {
-      const path = window.location.pathname.toLowerCase();
-      const search = window.location.search.toLowerCase();
-      const hash = window.location.hash.toLowerCase();
-      setIsTokenomicsOpen(path.includes('/token') || search.includes('token') || hash.includes('token') || path.includes('/pump') || search.includes('pump'));
-    };
-
-    window.addEventListener('popstate', handleUrlChange);
-    window.addEventListener('hashchange', handleUrlChange);
-    return () => {
-      window.removeEventListener('popstate', handleUrlChange);
-      window.removeEventListener('hashchange', handleUrlChange);
-    };
-  }, []);
 
   // Telegram Mini App authentication state
   const hasTelegramInitData = typeof window !== 'undefined' && Boolean((window as any).Telegram?.WebApp?.initData);
@@ -281,40 +256,11 @@ function MainAppContent() {
     }
   }
 
-  // Dedicated Tokenomics Page view (accessible via /token, #token, or from Landing Page)
-  if (isTokenomicsOpen) {
-    return (
-      <TokenomicsPage
-        onBackToGame={() => {
-          setIsTokenomicsOpen(false);
-          if (window.history.pushState) {
-            window.history.pushState(null, '', '/');
-          }
-        }}
-        onPlayNow={() => {
-          setIsTokenomicsOpen(false);
-          if (window.history.pushState) {
-            window.history.pushState(null, '', '/');
-          }
-          if (!connected) {
-            setVisible(true);
-          }
-        }}
-      />
-    );
-  }
-
   if (!isTelegram && !connected) {
     return (
       <LandingPage
         onConnectWallet={() => setVisible(true)}
         isConnecting={false}
-        onOpenTokenomics={() => {
-          setIsTokenomicsOpen(true);
-          if (window.history.pushState) {
-            window.history.pushState(null, '', '/token');
-          }
-        }}
       />
     );
   }

@@ -18,7 +18,6 @@ const VOID_CA = '5PadLtq68GCUmAjzTFp4xg6b6rzH6TvMb7ePF9ecLJfT';
 interface LandingPageProps {
   onConnectWallet: () => void;
   isConnecting: boolean;
-  onOpenTokenomics?: () => void;
 }
 
 // Floating particles & rune symbols (100% identical to original Hero Section)
@@ -144,7 +143,7 @@ const WARLORD_ARTIFACTS = [
   { slot: 'Boots', name: 'Boots of the Apocalypse', icon: '/icons/equipment/items/boots_of_the_apocalypse.png', trait: '+25% Gold & Sovereign Multiplier' },
 ];
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isConnecting, onOpenTokenomics }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isConnecting }) => {
   const [selectedChampionIdx, setSelectedChampionIdx] = useState(0);
   const activeChampion = CHAMPIONS_GALLERY[selectedChampionIdx];
   const [caCopied, setCaCopied] = useState(false);
@@ -276,16 +275,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
 
           <div className="w-[1px] h-4 bg-gradient-to-b from-transparent via-[#c5a880]/30 to-transparent mx-1 hidden sm:block" />
 
-          {/* $VOID Token Button */}
-          {onOpenTokenomics && (
-            <button
-              onClick={onOpenTokenomics}
-              className="px-3 py-1.5 rounded-full bg-[#181a20] hover:bg-[#221c17] border border-[#c5a880]/40 hover:border-[#ebd09b] text-[#ebd09b] hover:text-[#fff2d1] font-display font-bold text-[10px] sm:text-[11px] tracking-[0.16em] uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer active:scale-95"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880]" />
-              <span>$VOID Token</span>
-            </button>
-          )}
+
 
           {/* CTA Play Now - Refined Dark Gothic Gold Button */}
           <button
@@ -362,31 +352,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, isCon
             </span>
           </a>
 
-          {/* Pump.fun */}
-          <a
-            href={`https://pump.fun/coin/${VOID_CA}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Buy $VOID on Pump.fun"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0b0c10]/85 hover:bg-[#082216] border border-[#c5a880]/30 hover:border-emerald-400 text-gray-300 hover:text-emerald-300 shadow-[0_4px_16px_rgba(0,0,0,0.7)] backdrop-blur-md transition-all duration-300 group cursor-pointer active:scale-95 select-none"
-          >
-            <img src="/icons/icon_sovereign.webp" alt="Pump" className="w-3.5 h-3.5 object-contain brightness-110 group-hover:scale-110 transition-transform" />
-            <span className="font-display font-bold text-xs tracking-wider uppercase hidden sm:inline text-emerald-300">
-              Pump.fun
-            </span>
-          </a>
         </div>
-
-        {/* $VOID Token Button - Harmonized with Top-Right Gothic Style */}
-        {onOpenTokenomics && (
-          <button
-            onClick={onOpenTokenomics}
-            className="w-full h-[38px] px-4 rounded-xl bg-[#0b0c10]/85 hover:bg-[#181510] border border-[#c5a880]/35 hover:border-[#ebd09b] text-[#ebd09b] hover:text-[#fff5db] shadow-[0_4px_16px_rgba(0,0,0,0.7)] backdrop-blur-md transition-all duration-300 flex items-center justify-center gap-2 font-display font-bold text-xs tracking-[0.2em] uppercase cursor-pointer group active:scale-95 select-none"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#c5a880] group-hover:bg-[#ebd09b] transition-colors" />
-            <span>$VOID Token</span>
-          </button>
-        )}
       </motion.div>
 
         {/* Background gradient */}
