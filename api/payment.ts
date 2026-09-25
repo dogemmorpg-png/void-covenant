@@ -489,19 +489,47 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
 
-      // Fallback single-tx lookup
+      // Fallback single-event lookup with strict recipient and amount validation
       if (!isVerified && txHash) {
         try {
-          const checkRes = await fetch(`https://tonapi.io/v2/blockchain/transactions/${txHash}`);
-          if (checkRes.ok) {
-            const txInfo = await checkRes.json();
-            if (txInfo && !txInfo.aborted && txInfo.success) {
-              isVerified = true;
-              matchedTxHash = txHash;
+          const singleEvRes = await fetch(`https://tonapi.io/v2/events/${txHash}`, {
+            headers: { 'Accept': 'application/json' }
+          });
+          if (singleEvRes.ok) {
+            const ev = await singleEvRes.json();
+            const evTime = (ev.timestamp || 0) * 1000;
+            if (Date.now() - evTime <= 24 * 60 * 60 * 1000) {
+              for (const action of ev.actions || []) {
+                if (isTon && action.type === 'TonTransfer') {
+                  const tt = action.TonTransfer;
+                  if (addressesMatch(tt.recipient?.address, TON_TREASURY_WALLET_ADDRESS)) {
+                    const amountInTon = Number(tt.amount) / 1e9;
+                    if (amountInTon >= pkg.tonCost * 0.98) {
+                      if (!senderAddress || addressesMatch(tt.sender?.address, senderAddress)) {
+                        isVerified = true;
+                        matchedTxHash = ev.event_id || txHash;
+                        break;
+                      }
+                    }
+                  }
+                } else if (isUsdt && action.type === 'JettonTransfer') {
+                  const jt = action.JettonTransfer;
+                  if (addressesMatch(jt.recipient?.address, TON_TREASURY_WALLET_ADDRESS)) {
+                    const amountInUsdt = Number(jt.amount) / 1e6;
+                    if (amountInUsdt >= pkg.usdtCost * 0.98) {
+                      if (!senderAddress || addressesMatch(jt.sender?.address, senderAddress)) {
+                        isVerified = true;
+                        matchedTxHash = ev.event_id || txHash;
+                        break;
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
-        } catch (e) {
-          // ignore
+        } catch (singleErr) {
+          console.warn('Single-event lookup error:', singleErr);
         }
       }
 
@@ -524,7 +552,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(404).json({ error: 'Player profile not found' });
       }
 
-      const profileData = rows[0].data || {};
+      let profileData = rows[0].data || {};
       const processed = profileData.processedTransactions || [];
 
       if (processed.includes(matchedTxHash)) {
@@ -534,7 +562,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const currentShards = profileData.darkShards || 0;
       const updatedShards = currentShards + pkg.shards;
 
-      profileData.darkShards = updatedShards;
+      try {
+        profileData = recordShardTransaction(
+          profileData,
+          isTon ? 'TON_PURCHASE' : 'USDT_PURCHASE',
+          pkg.shards,
+          `Purchased ${pkg.name} via ${isTon ? 'TON' : 'USDT'} (TX: ${matchedTxHash})`,
+          { txHash: matchedTxHash, currency: isTon ? 'TON' : 'USDT' }
+        );
+      } catch (err) {
+        console.warn('recordShardTransaction failed, fallback to manual darkShards:', err);
+        profileData.darkShards = updatedShards;
+      }
+
       profileData.processedTransactions = [...processed, matchedTxHash];
 
       await supabase
@@ -544,15 +584,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           updated_at: new Date().toISOString()
         })
         .eq('wallet_address', walletAddress);
-
-      await recordShardTransaction(
-        supabase,
-        walletAddress,
-        isTon ? 'TON_PURCHASE' : 'USDT_PURCHASE',
-        pkg.shards,
-        updatedShards,
-        `Purchased ${pkg.name} via ${isTon ? 'TON' : 'USDT'} (TX: ${matchedTxHash})`
-      );
 
       return res.status(200).json({
         success: true,
